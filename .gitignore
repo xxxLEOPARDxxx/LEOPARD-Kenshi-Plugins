@@ -1,13 +1,6 @@
-# Репозиторий LEOPARD-Kenshi-Plugins: только наши плагины, общие заголовки и
-# скрипты сборки. Всё остальное в D:\DEV\Kenshi (deps, KenshiLib-src, форки -
-# у них своя репа LEOPARD-Kenshi-Forks, build, workshop, tools) - не здесь.
-/*
-!/.gitignore
-!/README.md
-!/ours/
-!/shared/
-!/build.ps1
-!/rebuild_all.ps1
+# LEOPARD-Kenshi-Plugins: корень репо = D:\DEV\Kenshi\ours. Плагины - папками,
+# shared/ - общие заголовки (D:\DEV\Kenshi\shared - ссылка сюда), build.ps1 и
+# rebuild_all.ps1 - сборка (в D:\DEV\Kenshi - обёртки на них).
 
 # копии до правок и прочий мусор
 *.pre-*

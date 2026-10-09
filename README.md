@@ -18,7 +18,7 @@
 | StatColours | цвета навыков и поправок снаряжения |
 | WantedMap | метки разыскиваемых на большой карте |
 
-Форки модов других авторов (Emkej, BetterLooting) - в репозитории
+Каждая папка - один плагин. Форки модов других авторов (Emkej, BetterLooting) - в репозитории
 [LEOPARD-Kenshi-Forks](https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks).
 
 ## Сборка
@@ -33,4 +33,7 @@ Visual C++ 2010 (VC10) + Windows SDK 7.1, KenshiLib 0.2.1, boost 1.60.
 `shared/` - общие заголовки: Localization.h (перевод через .po), WidgetRef.h,
 HoldKey.h, GameTheme.h, ModConfigMenu.h (API вкладки MCM).
 
-Перевод - `ours/<Плагин>/locale/<язык>/LC_MESSAGES/*.po`; в DLL только английский.
+Перевод - `<Плагин>/locale/<язык>/LC_MESSAGES/*.po`; в DLL только английский.
+
+Пути в скриптах абсолютные: репо лежит в `D:\DEV\Kenshi\ours`, `D:\DEV\Kenshi\shared` - ссылка
+на `shared/`, KenshiLib и boost - в `D:\DEV\Kenshi\deps`.
