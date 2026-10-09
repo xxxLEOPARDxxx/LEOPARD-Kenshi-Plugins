@@ -2224,6 +2224,8 @@ namespace
     }
     OptionsWindow* g_captionFor = NULL;
     const char* g_captionShownPtr = NULL;  // название, что сейчас в заголовке
+    int g_captionFontHeight = 0;           // высота шрифта заголовка (крупный + 4)
+    DWORD g_captionRefreshMs = 0;          // когда заголовок перерисовывали заново
 
     MyGUI::Window* FindOptionsWindowFrame(OptionsWindow* w)
     {
@@ -2302,6 +2304,7 @@ namespace
                 // Крупнее самого крупного «рисованного» шрифта игры нет -
                 // растягиваем его на четыре единицы.
                 edit->setFontHeight(edit->getFontHeight() + 4);
+                g_captionFontHeight = edit->getFontHeight();
                 edit->setTextColour(MyGUI::Colour(0.93f, 0.86f, 0.56f));
             }
             label->setVisible(false);
@@ -2346,8 +2349,19 @@ namespace
         // а не собираем строку каждый кадр, пока открыта вкладка.
         const char* const title = Tr(g_current->title.c_str());
         MyGUI::Widget* const back = g_captionBack->get();
-        if (title != g_captionShownPtr)
+        // Раз в секунду - заново шрифт, высота и текст: игра иногда
+        // перестраивает текстуру шрифта, и надпись, собранная раньше,
+        // превращалась в кашу из обрывков букв (10.10.2026, снимок
+        // пользователя). Свои надписи игра после этого ставит заново, нашу -
+        // нет. Одна надпись раз в секунду - копейки.
+        const DWORD now = GetTickCount();
+        if (title != g_captionShownPtr || now - g_captionRefreshMs > 1000)
         {
+            g_captionRefreshMs = now;
+            label->setFontName("Kenshi_PaintedTextFont_Large");
+            if (g_captionFontHeight > 0)
+                label->setFontHeight(g_captionFontHeight);
+            label->setCaption("");
             label->setCaption(EscapeTags(title));
             g_captionShownPtr = title;
 
