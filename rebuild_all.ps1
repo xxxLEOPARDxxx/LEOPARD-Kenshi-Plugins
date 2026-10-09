@@ -121,7 +121,7 @@ BuildPlugin "$F\Au2942-plugins\SquadAutonomy"     "SquadAutonomy"     "SquadAuto
 BuildPlugin "$F\Au2942-plugins\MoreImmersiveBars" "MoreImmersiveBars" "MoreImmersiveBars"
 BuildPlugin "$F\CharacterInspector-src\CharacterInspector\CharacterInspector\src" `
             "CharacterInspector" "Character Inspector"
-BuildPlugin "$F\BetterLooting-src\Source"         "BetterLooting"     "BetterLooting"
+BuildPlugin "$F\LEOPARD-Kenshi-Forks\BetterLooting\Source"         "BetterLooting"     "BetterLooting"
 # Свой плагин, не форк: живёт в ours\, а не в forks\.
 BuildPlugin "$ROOT\ours\StatColours"               "StatColours"       "StatColours"
 # У StatColours есть свои файлы рядом с DLL: настройки цветов и описание.
@@ -236,28 +236,27 @@ if (Test-Path $mcmMod) {
     }
 }
 
-# Форки модов Emkej (forks\emkej, ветка leopard): список файлов - из vcxproj.
+# Форки модов Emkej - в репо forks\LEOPARD-Kenshi-Forks (09.10.2026; старые
+# клоны forks\emkej - архив со ссылками на оригиналы): список файлов - из vcxproj.
 foreach ($e in @("Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader",
                   "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load",
                   "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
-    BuildPlugin "$ROOT\forks\emkej\$e" $e $e -FromVcxproj
+    BuildPlugin "$ROOT\forks\LEOPARD-Kenshi-Forks\$e" $e $e -FromVcxproj
     # Переводы страниц MCM (en/ru/zh) - в папке пакета форка
-    $loc = "$ROOT\forks\emkej\$e\$e\locale"
+    $loc = "$ROOT\forks\LEOPARD-Kenshi-Forks\$e\$e\locale"
     $eDir = ModDir $e
     if (-not $NoDeploy -and (Test-Path $loc) -and $eDir) {
         Copy-Item $loc $eDir -Recurse -Force
     }
     # Значения по умолчанию для «Сбросить» в MCM (авторский mod-config.json)
-    $defaults = "$ROOT\forks\emkej\$e\$e\mod-config.defaults.json"
+    $defaults = "$ROOT\forks\LEOPARD-Kenshi-Forks\$e\$e\mod-config.defaults.json"
     if (-not $NoDeploy -and (Test-Path $defaults) -and $eDir) {
         Copy-Item $defaults $eDir -Force
     }
 }
-# Моды Emkej - под GPLv3: к изменённой DLL - её исходники архивом в корне
-# папки мода (<Mod>-source.zip; только включённые в mods.cfg).
-if (-not $NoDeploy) {
-    & python -X utf8 "$ROOT\tools\pack_emkej_sources.py" | Select-String -Pattern "КБ"
-}
+# Исходники в папку мода больше не кладём (09.10.2026): они на GitHub -
+# LEOPARD-Kenshi-Plugins и LEOPARD-Kenshi-Forks; Nexus держал архивы с
+# исходниками на карантине.
 
 # Метки разыскиваемых на большой карте. Цели листовок плагин подбирает
 # сам по данным игры; ручные пары - tools\wanted_overrides.txt
