@@ -312,11 +312,12 @@ namespace
     }
 
     // Чертёж изучен: исследование завершено или чертёж прочитан (игра тогда
-    // пишет «Research already known»). Тип - из данных вещи, без
-    // виртуального вызова.
+    // пишет «Research already known»). Чертёж узнаём по getClassType() - как
+    // DarkUiTweaks: в data у предмета-чертежа лежит сама запись исследования
+    // (тип RESEARCH), по data->type == BLUEPRINT глаз не находился (09.10.2026).
     bool BlueprintLearned(Item* item)
     {
-        if (item == NULL || item->data == NULL || item->data->type != BLUEPRINT)
+        if (item == NULL || item->getClassType() != BLUEPRINT)
             return false;
         if (ou == NULL || ou->player == NULL || ou->player->technology == NULL)
             return false;
@@ -508,6 +509,19 @@ namespace
         entry.item = item;
         entry.marks.clear();
         Decorate(root, entry);
+        if (g_debug && item->getClassType() == BLUEPRINT)
+        {
+            static unsigned s_blueprints = 0;
+            if (s_blueprints < 50)
+            {
+                ++s_blueprints;
+                char line[256];
+                sprintf_s(line, "ItemMarkers: blueprint '%s' data type %d, learned %d, marks %u",
+                          item->data->name.c_str(), static_cast<int>(item->data->type), BlueprintLearned(item) ? 1 : 0,
+                          static_cast<unsigned>(entry.marks.size()));
+                DebugLog(line);
+            }
+        }
         if (g_debug && Graded(item))
         {
             static unsigned s_logged = 0;
