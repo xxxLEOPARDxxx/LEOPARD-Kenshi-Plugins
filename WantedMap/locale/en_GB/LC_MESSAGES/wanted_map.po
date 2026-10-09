@@ -1,0 +1,120 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WantedMap\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "dead"
+msgstr "dead"
+
+msgid "imprisoned"
+msgstr "imprisoned"
+
+msgid "approx."
+msgstr "approx."
+
+msgid "lives here"
+msgstr "lives here"
+
+msgid "Wanted posters on the map"
+msgstr "Wanted posters on the map"
+
+msgid "Markers"
+msgstr "Markers"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Markers on the big map for the targets of wanted posters held by the selected characters."
+msgstr "Markers on the big map for the targets of wanted posters held by the selected characters."
+
+msgid "Names next to markers"
+msgstr "Names next to markers"
+
+msgid "Mark the home of targets not seen yet"
+msgstr "Mark the home of targets not seen yet"
+
+msgid "A yellow marker on the town or camp where the target's squad lives."
+msgstr "A yellow marker on the town or camp where the target's squad lives."
+
+msgid "Killed targets"
+msgstr "Killed targets"
+
+msgid "Remember seen and killed targets"
+msgstr "Remember seen and killed targets"
+
+msgid "Kept per playthrough in the memory folder next to the plugin."
+msgstr "Kept per playthrough in the memory folder next to the plugin."
+
+msgid "Show killed targets for, game hours"
+msgstr "Show killed targets for, game hours"
+
+msgid "A grey marker where the target died. 0 - do not show killed targets."
+msgstr "A grey marker where the target died. 0 - do not show killed targets."
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Poster check, seconds"
+msgstr "Poster check, seconds"
+
+msgid "How often the selected characters' inventories are checked while the map is open."
+msgstr "How often the selected characters' inventories are checked while the map is open."
+
+msgid "Target search, seconds"
+msgstr "Target search, seconds"
+
+msgid "How often all factions are searched for the targets' squads while the map is open."
+msgstr "How often all factions are searched for the targets' squads while the map is open."
+
+msgid "Words ignored in names"
+msgstr "Words ignored in names"
+
+msgid "Comma-separated, any language. Used when posters are matched to targets."
+msgstr "Comma-separated, any language. Used when posters are matched to targets."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt and the matched table next to the plugin."
+msgstr "Details in RE_Kenshi_log.txt and the matched table next to the plugin."
+
+msgid "Markers on the big map for the targets of the wanted posters the selected character carries."
+msgstr "Markers on the big map for the targets of the wanted posters the selected character carries."
+
+msgid "The target's name, and dead or imprisoned, next to its marker on the map."
+msgstr "The target's name, and dead or imprisoned, next to its marker on the map."
+
+msgid "If the target's squad has not appeared in the world yet: a yellow marker on the town or camp where it lives."
+msgstr "If the target's squad has not appeared in the world yet: a yellow marker on the town or camp where it lives."
+
+msgid "Remembers which targets were already in the world and who was killed, where and when. Kept per playthrough in the memory folder next to the plugin."
+msgstr "Remembers which targets were already in the world and who was killed, where and when. Kept per playthrough in the memory folder next to the plugin."
+
+msgid "How many game hours a grey marker stays where a target was killed. 0 - killed targets are not shown."
+msgstr "How many game hours a grey marker stays where a target was killed. 0 - killed targets are not shown."
+
+msgid "How often the selected characters' inventories and backpacks are checked for posters while the map is open."
+msgstr "How often the selected characters' inventories and backpacks are checked for posters while the map is open."
+
+msgid "How often all factions are searched for the targets' squads while the map is open. In between only the positions of found markers move."
+msgstr "How often all factions are searched for the targets' squads while the map is open. In between only the positions of found markers move."
+
+msgid "Comma-separated words that do not count when a poster's name is compared with a character's name, such as king or leader. Any language."
+msgstr "Comma-separated words that do not count when a poster's name is compared with a character's name, such as king or leader. Any language."
+
+msgid "Details in RE_Kenshi_log.txt: posters, targets and markers, and the matched table WantedMap_runtime_table.txt next to the plugin."
+msgstr "Details in RE_Kenshi_log.txt: posters, targets and markers, and the matched table WantedMap_runtime_table.txt next to the plugin."
+
+msgid "the,of,and,wanted,king,boss,leader"
+msgstr "the,of,and,wanted,king,boss,leader"
+
+msgid "Badge on the poster"
+msgstr "Badge on the poster"
+
+msgid "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."
+msgstr "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."

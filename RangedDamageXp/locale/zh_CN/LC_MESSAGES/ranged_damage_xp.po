@@ -1,0 +1,90 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: RangedDamageXp\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Ranged damage XP"
+msgstr "远程伤害经验"
+
+msgid "Experience"
+msgstr "经验"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "The shooter also gets experience for the damage dealt."
+msgstr "射手也会因造成的伤害获得经验。"
+
+msgid "Experience per damage"
+msgstr "每点伤害的经验"
+
+msgid "Damage after armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+msgstr "护甲后的伤害。数值为 0.02 时，约 70 点伤害的命中相当于瞄准一秒的经验。"
+
+msgid "Limit per hit"
+msgstr "每次命中上限"
+
+msgid "0 - no limit."
+msgstr "0 - 无上限。"
+
+msgid "Minimum damage"
+msgstr "最低伤害"
+
+msgid "Weaker hits are not counted."
+msgstr "低于此值的命中不计算。"
+
+msgid "Share for Perception"
+msgstr "知觉所占比例"
+
+msgid "0 - Perception gets nothing."
+msgstr "0 - 知觉不获得经验。"
+
+msgid "Which hits count"
+msgstr "计算哪些命中"
+
+msgid "Turrets"
+msgstr "炮塔"
+
+msgid "Shots from a turret train the Turrets skill."
+msgstr "炮塔射击会提升炮塔技能。"
+
+msgid "Hits on allies"
+msgstr "命中友军"
+
+msgid "Hits on downed targets"
+msgstr "命中倒地目标"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "A line in RE_Kenshi_log.txt for every counted hit."
+msgstr "每次计入的命中都会在 RE_Kenshi_log.txt 中记录一行。"
+
+msgid "Shooters also get experience for the damage their shots deal."
+msgstr "射手也会因射击造成的伤害获得经验。"
+
+msgid "Experience for each point of damage that got through armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+msgstr "每点穿透护甲的伤害获得的经验。数值为 0.02 时，约 70 点伤害的命中相当于瞄准一秒的经验。"
+
+msgid "Caps the experience from one hit, so a lucky point-blank bolt does not give too much. 0 - no limit."
+msgstr "限制单次命中获得的经验，避免一发近距离的幸运弩箭给出过多经验。0 - 无上限。"
+
+msgid "Hits weaker than this are not counted - scratches on armour."
+msgstr "低于此值的命中不计算 - 视为护甲上的擦伤。"
+
+msgid "Part of the extra experience that goes to Perception. 0 - Perception gets nothing."
+msgstr "额外经验中分给知觉的比例。0 - 知觉不获得经验。"
+
+msgid "Give experience for hitting your own people too. Off by default, otherwise shooting allies would pay."
+msgstr "命中自己人也给予经验。默认关闭，否则射击友军反而有利。"
+
+msgid "Give experience for hitting targets lying unconscious."
+msgstr "命中昏迷倒地的目标也给予经验。"
+
+msgid "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
+msgstr "每次计入的命中都会在 RE_Kenshi_log.txt 中记录一行：谁、命中谁、伤害、经验、前后等级。"

@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ItemMarkers\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "All marks on item icons."
+msgstr "All marks on item icons."
+
+msgid "Armour, weapons, crossbows and limbs get the colour of their grade, as in the item tooltip."
+msgstr "Armour, weapons, crossbows and limbs get the colour of their grade, as in the item tooltip."
+
+msgid "Badges"
+msgstr "Badges"
+
+msgid "Colour items of this grade and better. 0 and 1 are grey and beige - ordinary items; 2 - from blue."
+msgstr "Colour items of this grade and better. 0 and 1 are grey and beige - ordinary items; 2 - from blue."
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "In RE_Kenshi_log.txt: the first 200 marked items (kind, level, grade) and how long marking takes."
+msgstr "In RE_Kenshi_log.txt: the first 200 marked items (kind, level, grade) and how long marking takes."
+
+msgid "Faction uniform"
+msgstr "Faction uniform"
+
+msgid "Fill"
+msgstr "Fill"
+
+msgid "Fill - the whole cell, frame - the edge with a glow inside, gradient - from the bottom, star - in the corner."
+msgstr "Fill - the whole cell, frame - the edge with a glow inside, gradient - from the bottom, star - in the corner."
+
+msgid "Frame"
+msgstr "Frame"
+
+msgid "General"
+msgstr "General"
+
+msgid "Grade colour"
+msgstr "Grade colour"
+
+msgid "Gradient"
+msgstr "Gradient"
+
+
+
+msgid "In pixels."
+msgstr "In pixels."
+
+msgid "From grade"
+msgstr "From grade"
+
+
+msgid "Marks on item icons: the colour of the item grade, stolen goods, faction uniforms."
+msgstr "Marks on item icons: the colour of the item grade, stolen goods, faction uniforms."
+
+
+msgid "Star"
+msgstr "Star"
+
+msgid "Stolen"
+msgstr "Stolen"
+
+msgid "Stolen badge size"
+msgstr "Stolen badge size"
+
+msgid "Stolen badge strength"
+msgstr "Stolen badge strength"
+
+msgid "Strength"
+msgstr "Strength"
+
+msgid "Style"
+msgstr "Style"
+
+msgid "The game's hand pointer on armour that is a faction uniform: wearing it you look like one of them."
+msgstr "The game's hand pointer on armour that is a faction uniform: wearing it you look like one of them."
+
+msgid "The game's steal pointer on stolen items."
+msgstr "The game's steal pointer on stolen items."
+
+msgid "Uniform badge size"
+msgstr "Uniform badge size"
+
+msgid "Uniform badge strength"
+msgstr "Uniform badge strength"
+
+msgid "Star corner"
+msgstr "Star corner"
+
+msgid "Where the star of the Star style goes."
+msgstr "Where the star of the Star style goes."
+
+msgid "Top left"
+msgstr "Top left"
+
+msgid "Top right"
+msgstr "Top right"
+
+msgid "Bottom left"
+msgstr "Bottom left"
+
+msgid "Bottom right"
+msgstr "Bottom right"
+
+
+
+
+
+msgid "Show key"
+msgstr "Show key"
+
+
+msgid "How bright the grade colour is, 1-10 (10% steps)."
+msgstr "How bright the grade colour is, 1-10 (10% steps)."
+
+msgid "How visible the badge is, 1-10 (10% steps)."
+msgstr "How visible the badge is, 1-10 (10% steps)."
+
+msgid "The marks are shown while this key is held. NONE (Backspace when assigning) - always shown."
+msgstr "The marks are shown while this key is held. NONE (Backspace when assigning) - always shown."
+
+msgid "Eye on learned blueprints"
+msgstr "Eye on learned blueprints"
+
+msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
+msgstr "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."

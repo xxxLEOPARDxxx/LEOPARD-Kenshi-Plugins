@@ -1,0 +1,90 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: RangedDamageXp\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Ranged damage XP"
+msgstr "Ranged damage XP"
+
+msgid "Experience"
+msgstr "Experience"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "The shooter also gets experience for the damage dealt."
+msgstr "The shooter also gets experience for the damage dealt."
+
+msgid "Experience per damage"
+msgstr "Experience per damage"
+
+msgid "Damage after armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+msgstr "Damage after armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+
+msgid "Limit per hit"
+msgstr "Limit per hit"
+
+msgid "0 - no limit."
+msgstr "0 - no limit."
+
+msgid "Minimum damage"
+msgstr "Minimum damage"
+
+msgid "Weaker hits are not counted."
+msgstr "Weaker hits are not counted."
+
+msgid "Share for Perception"
+msgstr "Share for Perception"
+
+msgid "0 - Perception gets nothing."
+msgstr "0 - Perception gets nothing."
+
+msgid "Which hits count"
+msgstr "Which hits count"
+
+msgid "Turrets"
+msgstr "Turrets"
+
+msgid "Shots from a turret train the Turrets skill."
+msgstr "Shots from a turret train the Turrets skill."
+
+msgid "Hits on allies"
+msgstr "Hits on allies"
+
+msgid "Hits on downed targets"
+msgstr "Hits on downed targets"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "A line in RE_Kenshi_log.txt for every counted hit."
+msgstr "A line in RE_Kenshi_log.txt for every counted hit."
+
+msgid "Shooters also get experience for the damage their shots deal."
+msgstr "Shooters also get experience for the damage their shots deal."
+
+msgid "Experience for each point of damage that got through armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+msgstr "Experience for each point of damage that got through armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+
+msgid "Caps the experience from one hit, so a lucky point-blank bolt does not give too much. 0 - no limit."
+msgstr "Caps the experience from one hit, so a lucky point-blank bolt does not give too much. 0 - no limit."
+
+msgid "Hits weaker than this are not counted - scratches on armour."
+msgstr "Hits weaker than this are not counted - scratches on armour."
+
+msgid "Part of the extra experience that goes to Perception. 0 - Perception gets nothing."
+msgstr "Part of the extra experience that goes to Perception. 0 - Perception gets nothing."
+
+msgid "Give experience for hitting your own people too. Off by default, otherwise shooting allies would pay."
+msgstr "Give experience for hitting your own people too. Off by default, otherwise shooting allies would pay."
+
+msgid "Give experience for hitting targets lying unconscious."
+msgstr "Give experience for hitting targets lying unconscious."
+
+msgid "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
+msgstr "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."

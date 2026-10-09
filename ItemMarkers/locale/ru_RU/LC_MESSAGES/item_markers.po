@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ItemMarkers\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "All marks on item icons."
+msgstr "Все пометки на иконках вещей."
+
+msgid "Armour, weapons, crossbows and limbs get the colour of their grade, as in the item tooltip."
+msgstr "Броня, оружие, арбалеты и протезы окрашиваются цветом сорта, как в подсказке вещи."
+
+msgid "Badges"
+msgstr "Значки"
+
+msgid "Colour items of this grade and better. 0 and 1 are grey and beige - ordinary items; 2 - from blue."
+msgstr "Красить вещи этого сорта и лучше. 0 и 1 - серый и бежевый, обычные вещи; 2 - начиная с синего."
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "In RE_Kenshi_log.txt: the first 200 marked items (kind, level, grade) and how long marking takes."
+msgstr "В RE_Kenshi_log.txt: первые 200 помеченных вещей (вид, уровень, сорт) и сколько времени уходит на пометки."
+
+msgid "Faction uniform"
+msgstr "Форма фракции"
+
+msgid "Fill"
+msgstr "Заливка"
+
+msgid "Fill - the whole cell, frame - the edge with a glow inside, gradient - from the bottom, star - in the corner."
+msgstr "Заливка - вся ячейка, рамка - край со свечением внутрь, градиент - снизу, звезда - в углу."
+
+msgid "Frame"
+msgstr "Рамка"
+
+msgid "General"
+msgstr "Общее"
+
+msgid "Grade colour"
+msgstr "Цвет сорта"
+
+msgid "Gradient"
+msgstr "Градиент"
+
+
+
+msgid "In pixels."
+msgstr "В пикселях."
+
+msgid "From grade"
+msgstr "С какого сорта"
+
+
+msgid "Marks on item icons: the colour of the item grade, stolen goods, faction uniforms."
+msgstr "Пометки на иконках вещей: цвет сорта, краденое, форма фракции."
+
+
+msgid "Star"
+msgstr "Звезда"
+
+msgid "Stolen"
+msgstr "Краденое"
+
+msgid "Stolen badge size"
+msgstr "Размер значка краденого"
+
+msgid "Stolen badge strength"
+msgstr "Заметность значка краденого"
+
+msgid "Strength"
+msgstr "Яркость"
+
+msgid "Style"
+msgstr "Стиль"
+
+msgid "The game's hand pointer on armour that is a faction uniform: wearing it you look like one of them."
+msgstr "Курсор-рука игры на броне, которая является формой фракции: в ней вас принимают за своего."
+
+msgid "The game's steal pointer on stolen items."
+msgstr "Курсор кражи игры на краденых вещах."
+
+msgid "Uniform badge size"
+msgstr "Размер значка формы"
+
+msgid "Uniform badge strength"
+msgstr "Заметность значка формы"
+
+msgid "Star corner"
+msgstr "Угол звезды"
+
+msgid "Where the star of the Star style goes."
+msgstr "В каком углу ячейки стоит звезда стиля «Звезда»."
+
+msgid "Top left"
+msgstr "Слева сверху"
+
+msgid "Top right"
+msgstr "Справа сверху"
+
+msgid "Bottom left"
+msgstr "Слева снизу"
+
+msgid "Bottom right"
+msgstr "Справа снизу"
+
+
+
+
+
+msgid "Show key"
+msgstr "Клавиша показа"
+
+
+msgid "How bright the grade colour is, 1-10 (10% steps)."
+msgstr "Яркость цвета сорта, 1-10 (шаг 10%)."
+
+msgid "How visible the badge is, 1-10 (10% steps)."
+msgstr "Заметность значка, 1-10 (шаг 10%)."
+
+msgid "The marks are shown while this key is held. NONE (Backspace when assigning) - always shown."
+msgstr "Пометки видны, пока зажата эта клавиша. NONE (Backspace при назначении) - видны всегда."
+
+msgid "Eye on learned blueprints"
+msgstr "Глаз на изученных чертежах"
+
+msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
+msgstr "Глаз в левом нижнем углу значка чертежа, если он уже изучен - покупать незачем."

@@ -1,0 +1,309 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GearCompare\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Cut resistance"
+msgstr "切割抵抗"
+
+msgid "Blunt resistance"
+msgstr "钝器抵抗"
+
+msgid "Harpoon resistance"
+msgstr "鱼叉抵抗"
+
+msgid "Coverage: "
+msgstr "覆盖："
+
+msgid "Attack"
+msgstr "攻击"
+
+msgid "Defence"
+msgstr "防御"
+
+msgid "Perception"
+msgstr "知觉"
+
+msgid "Martial arts"
+msgstr "武术"
+
+msgid "Stealth"
+msgstr "潜行"
+
+msgid "Assassination"
+msgstr "暗杀"
+
+msgid "Athletics"
+msgstr "运动"
+
+msgid "Dexterity"
+msgstr "敏捷"
+
+msgid "Dodge"
+msgstr "躲闪"
+
+msgid "Combat speed"
+msgstr "战斗速度"
+
+msgid "Damage"
+msgstr "伤害"
+
+msgid "Ranged skills"
+msgstr "远程技能"
+
+msgid "Fist injuries"
+msgstr "拳头伤害"
+
+msgid "Cut damage"
+msgstr "切割伤害"
+
+msgid "Blunt damage"
+msgstr "钝器伤害"
+
+msgid "Bleeding"
+msgstr "流血"
+
+msgid "Indoors"
+msgstr "室内"
+
+msgid "Range"
+msgstr "范围"
+
+msgid "Shot speed"
+msgstr "射击速度"
+
+msgid "Aim speed"
+msgstr "瞄准速度"
+
+msgid "Spread"
+msgstr "散布"
+
+msgid "Reload time"
+msgstr "重装时间"
+
+msgid "Shots"
+msgstr "射击次数"
+
+msgid "Combat weight"
+msgstr "战斗重量"
+
+msgid "Weight"
+msgstr "重量"
+
+msgid "Price"
+msgstr "价值"
+
+msgid "Head"
+msgstr "头部"
+
+msgid "Shirt"
+msgstr "衬衫"
+
+msgid "Armour"
+msgstr "护甲"
+
+msgid "Trousers"
+msgstr "裤子"
+
+msgid "Boots"
+msgstr "靴子"
+
+msgid "Belt"
+msgstr "腰带"
+
+msgid "Backpack"
+msgstr "背包"
+
+msgid "Slot"
+msgstr "栏位"
+
+msgid "Weapon"
+msgstr "武器"
+
+msgid "better"
+msgstr "更好"
+
+msgid "worse"
+msgstr "更差"
+
+msgid "mixed"
+msgstr "有好有坏"
+
+msgid "equal"
+msgstr "相当"
+
+msgid "worn"
+msgstr "已穿戴"
+
+msgid "new"
+msgstr "新"
+
+msgid "change"
+msgstr "变化"
+
+msgid "Worn"
+msgstr "已穿戴"
+
+msgid "No difference"
+msgstr "没有区别"
+
+msgid "Protection"
+msgstr "保护"
+
+msgid "Properties"
+msgstr "属性"
+
+msgid "Weight, kg"
+msgstr "重量，千克"
+
+msgid "Total"
+msgstr "总计"
+
+msgid "Verdict"
+msgstr "结论"
+
+msgid "no slot for it"
+msgstr "无处可装备"
+
+msgid "nothing"
+msgstr "无"
+
+msgid "Acid protection"
+msgstr "防酸"
+
+msgid "Gas protection"
+msgstr "防毒气"
+
+msgid "Burning protection"
+msgstr "防火"
+
+msgid "Dust storm protection"
+msgstr "防沙尘暴"
+
+msgid "Rain protection"
+msgstr "防雨"
+
+msgid "always"
+msgstr "始终"
+
+msgid "Gear comparison"
+msgstr "装备对比"
+
+msgid "Panel"
+msgstr "面板"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "A panel with what is worn next to the item description."
+msgstr "在物品说明旁显示已穿戴装备的面板。"
+
+msgid "Show while held"
+msgstr "按住时显示"
+
+msgid "The panel is visible only while this key is held."
+msgstr "仅在按住此键时显示面板。"
+
+msgid "Compare with an empty slot"
+msgstr "与空栏位比较"
+
+msgid "Off - no panel when nothing suitable is worn."
+msgstr "关闭 - 未穿戴合适装备时不显示面板。"
+
+msgid "Total percentage"
+msgstr "总百分比"
+
+msgid "The main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."
+msgstr "主轴数值，每项更好的属性加分，每项更差的属性及额外重量减分。"
+
+msgid "Per property, %"
+msgstr "每项属性，%"
+
+msgid "Per extra kg, %"
+msgstr "每额外千克，%"
+
+msgid "Colours"
+msgstr "颜色"
+
+msgid "Better"
+msgstr "更好"
+
+msgid "auto - as in the game's item tooltip, or #RRGGBB."
+msgstr "auto - 与游戏物品说明相同，或 #RRGGBB。"
+
+msgid "Worse"
+msgstr "更差"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "Compares the item under the cursor with what is worn: a panel next to the item description."
+msgstr "将光标下的物品与已穿戴的装备进行比较：在物品说明旁显示面板。"
+
+msgid "The panel is shown only while this key is held. always - the panel is always shown."
+msgstr "仅在按住此键时显示面板。始终 - 面板一直显示。"
+
+msgid "On - compare with an empty slot too, Worn: nothing. Off - no panel when nothing suitable is worn."
+msgstr "开启 - 也与空栏位比较，已穿戴：无。关闭 - 未穿戴合适装备时不显示面板。"
+
+msgid "A total at the bottom of the panel: the main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."
+msgstr "在面板底部显示总计：主轴数值，每项更好的属性加分，每项更差的属性及额外重量减分。"
+
+msgid "How many percent each property that got better adds to the total, and each one that got worse takes away."
+msgstr "每项变好的属性为总计增加的百分比，以及每项变差的属性扣除的百分比。"
+
+msgid "How many percent each extra kilogram takes away from the total."
+msgstr "每多出一千克从总计中扣除的百分比。"
+
+msgid "Colour of what gets better. auto - like the +2 in the game's item tooltip, or #RRGGBB."
+msgstr "变好的数值的颜色。auto - 与游戏物品说明中的 +2 相同，或 #RRGGBB。"
+
+msgid "Colour of what gets worse. auto - like the -1 in the game's item tooltip, or #RRGGBB."
+msgstr "变差的数值的颜色。auto - 与游戏物品说明中的 -1 相同，或 #RRGGBB。"
+
+msgid "Details in RE_Kenshi_log.txt: the item under the cursor, for whom, what it is compared with and its raw numbers. Written only when the item changes."
+msgstr "在 RE_Kenshi_log.txt 中记录：光标下的物品、为谁比较、与什么比较以及物品的原始数值。仅在物品变化时写入。"
+
+msgid "Armour penetration"
+msgstr "穿甲"
+
+msgid "Cut resistance efficiency"
+msgstr "切割抵抗效果"
+
+msgid "Weapon length"
+msgstr "武器长度"
+
+msgid "Length"
+msgstr "长度"
+
+msgid "Damage vs robots"
+msgstr "对机器人的伤害"
+
+msgid "Damage vs humans"
+msgstr "对人的伤害"
+
+msgid "Damage vs animals"
+msgstr "对动物的伤害"
+
+msgid "Damage vs"
+msgstr "对抗"
+
+msgid "Protection (with coverage)"
+msgstr "防护（含覆盖）"
+
+msgid "Damage (cut + blunt)"
+msgstr "伤害（切割+钝击）"
+
+msgid "Damage (per shot)"
+msgstr "伤害（每发）"
+
+msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+msgstr "仅在按住此键时显示面板。点击后按下一个键；Backspace - 不设键，面板始终显示。"

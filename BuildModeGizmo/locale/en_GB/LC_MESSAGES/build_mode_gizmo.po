@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BuildModeGizmo\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Moving placed buildings"
+msgstr "Moving placed buildings"
+
+msgid "Gizmo"
+msgstr "Gizmo"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Move arrows for placed buildings in the developer build mode (Shift+F12)."
+msgstr "Move arrows for placed buildings in the developer build mode (Shift+F12)."
+
+msgid "Not while placing a new building"
+msgstr "Not while placing a new building"
+
+msgid "A click then places the building instead of grabbing an arrow. Turn off only if the arrows never appear."
+msgstr "A click then places the building instead of grabbing an arrow. Turn off only if the arrows never appear."
+
+msgid "Write the move into the building"
+msgstr "Write the move into the building"
+
+msgid "Only if a building moves on screen but the move is not saved."
+msgstr "Only if a building moves on screen but the move is not saved."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "Move arrows for already placed buildings in the developer build mode."
+msgstr "Move arrows for already placed buildings in the developer build mode."
+
+msgid "Only if a building moves on screen but the move is not saved. Usually the game does it itself."
+msgstr "Only if a building moves on screen but the move is not saved. Usually the game does it itself."
+
+msgid "Details in RE_Kenshi_log.txt: who called the arrows this frame - the game or the plugin, the selection and the transform window."
+msgstr "Details in RE_Kenshi_log.txt: who called the arrows this frame - the game or the plugin, the selection and the transform window."
+
+msgid "Move arrows on your construction site: shift a placed building before it is built, without the developer menu."
+msgstr "Move arrows on your construction site: shift a placed building before it is built, without the developer menu."
+
+msgid "Construction sites"
+msgstr "Construction sites"
+
+msgid "Turns the whole plugin on or off."
+msgstr "Turns the whole plugin on or off."
+
+msgid "Arrows on your construction site"
+msgstr "Arrows on your construction site"
+
+msgid "Select your building that is not built yet: move arrows appear on it. Drag an arrow to shift it, the window button switches to rotation. Close the window to hide them."
+msgstr "Select your building that is not built yet: move arrows appear on it. Drag an arrow to shift it, the window button switches to rotation. Close the window to hide them."
+
+msgid "Developer menu"
+msgstr "Developer menu"
+
+msgid "Arrows in the developer build mode"
+msgstr "Arrows in the developer build mode"
+
+msgid "The first version: arrows in the normal build mode of the developer menu (Shift+F12). Experimental, off by default."
+msgstr "The first version: arrows in the normal build mode of the developer menu (Shift+F12). Experimental, off by default."
+
+msgid "A click then places the building instead of grabbing an arrow. Developer menu only."
+msgstr "A click then places the building instead of grabbing an arrow. Developer menu only."
+
+msgid "Developer menu only: if a building moves on screen but the move is not saved."
+msgstr "Developer menu only: if a building moves on screen but the move is not saved."
+
+msgid "Details in RE_Kenshi_log.txt: when the arrows open and close and where the building moved."
+msgstr "Details in RE_Kenshi_log.txt: when the arrows open and close and where the building moved."
+
+msgid "Settle on the ground after a move"
+msgstr "Settle on the ground after a move"
+
+msgid "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."
+msgstr "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."

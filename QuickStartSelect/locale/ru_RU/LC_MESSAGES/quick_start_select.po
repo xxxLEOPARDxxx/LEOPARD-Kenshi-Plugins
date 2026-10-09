@@ -1,0 +1,259 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru_RU\n"
+
+msgid "Choose your beginning"
+msgstr "Выберите предысторию"
+
+msgid "Advanced options"
+msgstr "Другие настройки"
+
+msgid "Begin"
+msgstr "Начать"
+
+msgid "BEGIN"
+msgstr "НАЧАТЬ"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Difficulty:"
+msgstr "Сложность:"
+
+msgid "Cash:"
+msgstr "Деньги:"
+
+msgid "Play Style:"
+msgstr "Стиль игры:"
+
+msgid "Search:"
+msgstr "Поиск:"
+
+msgid "All races"
+msgstr "Все расы"
+
+msgid "Human (random)"
+msgstr "Человек (случайно)"
+
+msgid "EASY-HARD"
+msgstr "ЛЕГКО-ТЯЖЕЛО"
+
+msgid "HARD-EASY"
+msgstr "ТЯЖЕЛО-ЛЕГКО"
+
+msgid "Begin a new game with this start?"
+msgstr "Начать новую игру с этой предысторией?"
+
+msgid "The \"Choose your beginning\" window as a list: search, sorting, race filter, advanced options beside it."
+msgstr "Окно \"Выберите предысторию\" списком: поиск, сортировка, фильтр по расе, другие настройки рядом."
+
+msgid "Window"
+msgstr "Окно"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Replace the game's start selection window with the list."
+msgstr "Заменить окно выбора предыстории игры списком."
+
+msgid "Layout"
+msgstr "Раскладка"
+
+msgid "Wide"
+msgstr "Широкая"
+
+msgid "Compact"
+msgstr "Компактная"
+
+msgid "Wide: list on the left, description on the right. Compact: a narrow window, description under the list. The first button in the window switches it too."
+msgstr "Широкая: список слева, описание справа. Компактная: узкое окно, описание под списком. Переключает и первая кнопка в окне."
+
+msgid "Sort"
+msgstr "Сортировка"
+
+msgid "By name"
+msgstr "По названию"
+
+msgid "By difficulty"
+msgstr "По сложности"
+
+msgid "Order of the list. The buttons in the window switch it too; pressing the active one reverses the order."
+msgstr "Порядок списка. Переключают и кнопки в окне; нажатие на выбранную разворачивает порядок."
+
+msgid "Reverse order"
+msgstr "Обратный порядок"
+
+msgid "Z-A, or hardest first."
+msgstr "Z-A или сначала самые тяжёлые."
+
+msgid "Confirm before starting"
+msgstr "Спрашивать перед началом"
+
+msgid "Ask before starting the game, so a stray double click does not start it."
+msgstr "Спросить перед началом игры, чтобы случайный двойной щелчок её не запустил."
+
+msgid "Right click resets an option"
+msgstr "Правый клик сбрасывает настройку"
+
+msgid "Right click on a line of the advanced options returns its default value."
+msgstr "Правый клик по строке других настроек возвращает значение по умолчанию."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt: every start with its difficulty and races, the advanced options and their defaults."
+msgstr "Подробности в RE_Kenshi_log.txt: каждая предыстория со сложностью и расами, другие настройки и их значения по умолчанию."
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Compact view"
+msgstr "Компактно"
+
+msgid "Wide view"
+msgstr "Широко"
+
+msgid "on"
+msgstr "вкл."
+
+msgid "off"
+msgstr "выкл."
+
+msgid "Default: %s. Right click resets it."
+msgstr "По умолчанию: %s. Правый клик - сбросить."
+
+msgid "The game's options were not found."
+msgstr "Настройки игры не найдены."
+
+msgid "Animals eat"
+msgstr "Животные едят"
+
+msgid "Difficult healing"
+msgstr "Трудное лечение"
+
+msgid "Continue"
+msgstr "Продолжить"
+
+msgid "Hunger time"
+msgstr "Время голода"
+
+msgid "This sets how long it takes characters to get hungry.  A higher number means it takes longer, therefore they need less food to get by."
+msgstr "Определяет, как быстро персонажи проголодаются. Большие числа увеличивают это время, следовательно они обойдутся меньшим количеством еды."
+
+msgid "Chance of death"
+msgstr "Шанс смерти"
+
+msgid "Determines the overall likelyhood of any character dying (players or NPCs).  Directly affects rates of wound degeneration and blood loss (Higher=more likely to die)"
+msgstr "Определяет общую вероятность любого персонажа (игроков или НИП) погибнуть. Напрямую затрагивает темпы ухудшения ран и кровопотери (Выше=более вероятная смерть)"
+
+msgid "Global damage multiplier"
+msgstr "Множ. урона"
+
+msgid "Overall combat damage for everything.  Doesn't necessarily make the game harder or easier, but affects the speed of battles"
+msgstr "Общий боевой урон для всего. Не обязательно делает игру сложнее или проще, но влияет на длительность сражений"
+
+msgid "Production speed"
+msgstr "Скор. выпуска"
+
+msgid "Affects speed of item production such as mines and crafting (more than 1.0 == easier)"
+msgstr "Влияет на скорость производства предметов, например на рудниках и в ремесле (выше 1.0 == легче)"
+
+msgid "Research speed"
+msgstr "Скор. изучения"
+
+msgid "Affects speed of research (more than 1.0 == easier)"
+msgstr "Влияет на скорость исследования (выше 1.0 == легче)"
+
+msgid "Building speed"
+msgstr "Скор. стройки"
+
+msgid "Affects speed of building (more than 1.0 == easier)"
+msgstr "Влияет на скорость строительства (выше 1.0 == легче)"
+
+msgid "Number of nests multiplier"
+msgstr "Кол-во. гнёзд"
+
+msgid "Affects number of animal nests, bandit camps etc that appear in the wilds.  Higher number makes life more dangerous."
+msgstr "Влияет на количество гнёзд животных, бандитских лагерей и т.п., появляющихся в мире. Высокие числа делают жизнь опаснее."
+
+msgid "Bandits loot the player"
+msgstr "Бандиты грабят игрока"
+
+msgid "Makes life unfair"
+msgstr "Делает жизнь несправедливой"
+
+msgid "Easy prospecting"
+msgstr "Простая разведка"
+
+msgid "Town:"
+msgstr "Город:"
+
+msgid "Characters:"
+msgstr "Персонажи:"
+
+msgid "Relations:"
+msgstr "Отношения:"
+
+msgid "Towns"
+msgstr "Города"
+
+msgid "Relations"
+msgstr "Отношения"
+
+msgid "Random"
+msgstr "Случайный"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Window size"
+msgstr "Размер окна"
+
+msgid "Wide view width, %"
+msgstr "Ширина широкого окна, %"
+
+msgid "Width of the wide window, in percent of the screen width."
+msgstr "Ширина широкого окна в процентах от ширины экрана."
+
+msgid "Compact view width, %"
+msgstr "Ширина компактного окна, %"
+
+msgid "Width of the compact window, in percent of the screen width."
+msgstr "Ширина компактного окна в процентах от ширины экрана."
+
+msgid "Window height, %"
+msgstr "Высота окна, %"
+
+msgid "Height of the window, in percent of the screen height."
+msgstr "Высота окна в процентах от высоты экрана."
+
+msgid "Custom difficulties"
+msgstr "Свои сложности"
+
+msgid "Very easy (green)"
+msgstr "Очень легко (зелёный)"
+
+msgid "Easy (light green)"
+msgstr "Легко (светло-зелёный)"
+
+msgid "Normal (yellow)"
+msgstr "Средне (жёлтый)"
+
+msgid "Above normal (orange)"
+msgstr "Выше среднего (оранжевый)"
+
+msgid "Hard (red-orange)"
+msgstr "Тяжело (красно-оранжевый)"
+
+msgid "Very hard (red)"
+msgstr "Очень тяжело (красный)"
+
+msgid "Difficulties of starts from other mods to show in this colour and sort as this level. Several - separated by commas; part of the word is enough."
+msgstr "Сложности стартов из других модов, которые красить этим цветом и сортировать как эту ступень. Несколько - через запятую; достаточно части слова."
+
+msgid ", animals: %d"
+msgstr ", животные: %d"

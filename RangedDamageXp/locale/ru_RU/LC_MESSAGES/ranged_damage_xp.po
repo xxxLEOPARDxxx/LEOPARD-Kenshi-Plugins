@@ -1,0 +1,90 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: RangedDamageXp\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Ranged damage XP"
+msgstr "Опыт стрелкам за урон"
+
+msgid "Experience"
+msgstr "Опыт"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "The shooter also gets experience for the damage dealt."
+msgstr "Стрелок получает опыт и за нанесённый урон."
+
+msgid "Experience per damage"
+msgstr "Опыт за единицу урона"
+
+msgid "Damage after armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+msgstr "Урон после брони. При 0.02 попадание примерно на 70 урона даёт столько же, сколько секунда прицеливания."
+
+msgid "Limit per hit"
+msgstr "Предел за попадание"
+
+msgid "0 - no limit."
+msgstr "0 - без предела."
+
+msgid "Minimum damage"
+msgstr "Наименьший урон"
+
+msgid "Weaker hits are not counted."
+msgstr "Попадания слабее не считаются."
+
+msgid "Share for Perception"
+msgstr "Доля Восприятия"
+
+msgid "0 - Perception gets nothing."
+msgstr "0 - Восприятию ничего."
+
+msgid "Which hits count"
+msgstr "Какие попадания считать"
+
+msgid "Turrets"
+msgstr "Турели"
+
+msgid "Shots from a turret train the Turrets skill."
+msgstr "Выстрелы из турели качают навык Турели."
+
+msgid "Hits on allies"
+msgstr "Попадания по своим"
+
+msgid "Hits on downed targets"
+msgstr "Попадания по лежачим"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "A line in RE_Kenshi_log.txt for every counted hit."
+msgstr "Строка в RE_Kenshi_log.txt на каждое засчитанное попадание."
+
+msgid "Shooters also get experience for the damage their shots deal."
+msgstr "Стрелки получают опыт и за урон, нанесённый их выстрелами."
+
+msgid "Experience for each point of damage that got through armour. At 0.02 a hit of about 70 damage gives as much as a second of aiming."
+msgstr "Опыт за каждую единицу урона, прошедшего через броню. При 0.02 попадание примерно на 70 урона даёт столько же, сколько секунда прицеливания."
+
+msgid "Caps the experience from one hit, so a lucky point-blank bolt does not give too much. 0 - no limit."
+msgstr "Ограничивает опыт за одно попадание, чтобы удачный болт в упор не давал слишком много. 0 - без предела."
+
+msgid "Hits weaker than this are not counted - scratches on armour."
+msgstr "Попадания слабее не считаются - царапины по броне."
+
+msgid "Part of the extra experience that goes to Perception. 0 - Perception gets nothing."
+msgstr "Доля добавочного опыта, которая идёт Восприятию. 0 - Восприятию ничего."
+
+msgid "Give experience for hitting your own people too. Off by default, otherwise shooting allies would pay."
+msgstr "Давать опыт и за попадания по своим. По умолчанию выключено, иначе было бы выгодно стрелять по своим."
+
+msgid "Give experience for hitting targets lying unconscious."
+msgstr "Давать опыт и за попадания по лежащим без сознания."
+
+msgid "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
+msgstr "Строка в RE_Kenshi_log.txt на каждое засчитанное попадание: кто, по кому, урон, опыт, уровень до и после."

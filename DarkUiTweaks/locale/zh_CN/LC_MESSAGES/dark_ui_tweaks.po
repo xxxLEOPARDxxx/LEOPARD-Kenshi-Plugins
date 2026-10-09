@@ -1,0 +1,137 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: DarkUiTweaks\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Interface tweaks"
+msgstr "界面调整"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Research and crafting queues"
+msgstr "研究和制作队列"
+
+msgid "Row height, px"
+msgstr "行高，像素"
+
+msgid "0 - the game's height."
+msgstr "0 - 使用游戏默认高度。"
+
+msgid "Bar inset, px"
+msgstr "进度条内边距，像素"
+
+msgid "0 - the bar is left to the game."
+msgstr "0 - 进度条交给游戏处理。"
+
+msgid "Squads tab"
+msgstr "小队标签页"
+
+msgid "Rows of portraits"
+msgstr "头像行数"
+
+msgid "Grow with the largest squad"
+msgstr "随最大的小队扩展"
+
+msgid "Next level bar"
+msgstr "下一级进度条"
+
+msgid "Frame padding, px"
+msgstr "边框内边距，像素"
+
+msgid "Lower by, px"
+msgstr "下移，像素"
+
+msgid "Raise the top edge by, px"
+msgstr "上边缘上移，像素"
+
+msgid "Description panels"
+msgstr "说明面板"
+
+msgid "Scroll bar"
+msgstr "滚动条"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "Interface fixes that layouts cannot do: queues, bars, squad cells, scrolling descriptions."
+msgstr "布局文件无法实现的界面修正：队列、进度条、小队格子、说明滚动。"
+
+msgid "Interface fixes that layouts cannot do. Each one can be turned off below."
+msgstr "布局文件无法实现的界面修正。每一项都可以在下方单独关闭。"
+
+msgid "Row height in the research and crafting queues. The game gives about 16 and Russian text does not fit. 0 - the game's height."
+msgstr "研究和制作队列中的行高。游戏默认约为 16，俄文放不下。0 - 使用游戏默认高度。"
+
+msgid "Gap between the progress fill and the row frame. The plugin draws its own fill across the whole frame. 0 - the bar is left to the game."
+msgstr "进度填充与行边框之间的间距。插件会绘制填满整个边框的进度条。0 - 进度条交给游戏处理。"
+
+msgid "How many rows of portraits fit in a squad cell on the Squads tab without cutting. 0 - the game's height."
+msgstr "小队标签页中每个小队格子能完整显示的头像行数。0 - 使用游戏默认高度。"
+
+msgid "When the largest squad needs more rows, all cells grow - the list has one height for all. Off - extra fighters go under the scroll."
+msgstr "当最大的小队需要更多行时，所有格子一起变高 - 列表只有一个高度。关闭 - 多出的队员需滚动查看。"
+
+msgid "How much taller the frame of the Next level bar in the skill description is, at the top and the bottom. 0 - the bar is left to the game."
+msgstr "技能说明中下一级进度条边框在上下各加高多少。0 - 进度条交给游戏处理。"
+
+msgid "Moves the bar with its frame down without moving the text, so the text looks centred. Lines below move by the same amount."
+msgstr "将进度条连同边框下移而不移动文字，使文字看起来居中。下方的行也会同样下移。"
+
+msgid "Raises only the top edge of the bar frame. The bottom edge and the text stay where they are."
+msgstr "仅上移进度条边框的上边缘。下边缘和文字保持不动。"
+
+msgid "A scroll bar in the description panels of research and items, so long text is not cut off."
+msgstr "在研究和物品的说明面板中加入滚动条，避免长文本被截断。"
+
+msgid "Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."
+msgstr "在 RE_Kenshi_log.txt 中列出所有创建的说明面板及其标志 - 滚动条未出现时有用。"
+
+msgid "Hints"
+msgstr "提示"
+
+msgid "Faction relation by the name"
+msgstr "名字旁显示派系关系"
+
+msgid "After the faction name of the selected character - that faction's relation to you, like in the factions window: green above zero, red from -10 down."
+msgstr "在所选角色的派系名称后显示该派系对你的关系，与派系窗口相同：大于零为绿色，-10 及以下为红色。"
+
+
+
+msgid "Item icon in the crafting list"
+msgstr "制作列表中的物品图标"
+
+msgid "On the Crafting tab, the icon of the item appears next to the mouse over a line of the Items list."
+msgstr "在“制作”标签页中，鼠标悬停在“物品”列表的某一行时，鼠标旁会显示该物品的图标。"
+
+msgid "Draw icons of all items"
+msgstr "绘制所有物品的图标"
+
+msgid "The game draws an item icon only when the item first gets into an inventory. This draws them now for every item without one, a few per frame, in a loaded game. The pictures stay in data/icons."
+msgstr "游戏只在物品首次进入背包时才绘制其图标。此按钮会在已加载的游戏中，为所有没有图标的物品逐帧绘制图标。图片保存在 data/icons 中。"
+
+msgid "Load a game first - icons are drawn in the game world."
+msgstr "请先载入游戏 - 图标需在游戏世界中绘制。"
+
+msgid "Drawing item icons: %u / %u"
+msgstr "正在绘制物品图标：%u / %u"
+
+msgid "Item icons done: %u drawn, %u could not be drawn"
+msgstr "图标完成：已绘制 %u，无法绘制 %u"
+
+msgid "Icon key"
+msgstr "图标按键"
+
+msgid "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
+msgstr "按住此键时显示图标。NONE（设定时按 Backspace）- 鼠标悬停即显示。"

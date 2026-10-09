@@ -1,0 +1,48 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ModConfigMenu\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mods"
+msgstr "Моды"
+
+msgid "No mods with settings were found."
+msgstr "Модов с настройками не найдено."
+
+msgid "* Takes effect after the game is restarted."
+msgstr "* Вступит в силу после перезапуска игры."
+
+msgid "Reset to defaults"
+msgstr "Сбросить по умолчанию"
+
+msgid "Press a key... Backspace - none"
+msgstr "Нажмите клавишу... Backspace - нет"
+
+msgid "none"
+msgstr "нет"
+
+msgid "Press a key... Backspace - none, Esc - cancel"
+msgstr "Нажмите клавишу... Backspace - нет, Esc - отмена"
+
+msgid "Press a key... Backspace - none, click - cancel"
+msgstr "Нажмите клавишу... Backspace - нет, щелчок - отмена"
+
+msgid "Palette"
+msgstr "Палитра"
+
+msgid "Hide"
+msgstr "Скрыть"
+
+msgid "Current colour"
+msgstr "Текущий цвет"
+
+msgid "Default"
+msgstr "По умолчанию"
+
+msgid "Switch between the palette and typing the colour code (#RRGGBB)"
+msgstr "Переключить: палитра или ввод кода цвета (#RRGGBB)"
+
+msgid "Show or hide the colours to pick from"
+msgstr "Показать или скрыть цвета для выбора"

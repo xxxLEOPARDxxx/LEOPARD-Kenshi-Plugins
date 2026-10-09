@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PatientSelfAid\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Patient self-aid"
+msgstr "Patient self-aid"
+
+msgid "Treatment"
+msgstr "Treatment"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "A patient being treated treats himself too."
+msgstr "A patient being treated treats himself too."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "A patient being treated keeps treating himself instead of lying idle."
+msgstr "A patient being treated keeps treating himself instead of lying idle."
+
+msgid "Details in RE_Kenshi_log.txt: who is treated, who treats, what the patient is doing and whether the order took. Written only when the state changes."
+msgstr "Details in RE_Kenshi_log.txt: who is treated, who treats, what the patient is doing and whether the order took. Written only when the state changes."

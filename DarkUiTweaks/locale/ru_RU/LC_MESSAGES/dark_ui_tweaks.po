@@ -1,0 +1,137 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: DarkUiTweaks\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Interface tweaks"
+msgstr "Правки интерфейса"
+
+msgid "General"
+msgstr "Общее"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Research and crafting queues"
+msgstr "Очереди исследований и ремесла"
+
+msgid "Row height, px"
+msgstr "Высота строки, пикс."
+
+msgid "0 - the game's height."
+msgstr "0 - высота игры."
+
+msgid "Bar inset, px"
+msgstr "Отступ полосы, пикс."
+
+msgid "0 - the bar is left to the game."
+msgstr "0 - полоса остаётся игре."
+
+msgid "Squads tab"
+msgstr "Вкладка Отряды"
+
+msgid "Rows of portraits"
+msgstr "Рядов портретов"
+
+msgid "Grow with the largest squad"
+msgstr "Расти вместе с самым большим отрядом"
+
+msgid "Next level bar"
+msgstr "Полоса Следующий уровень"
+
+msgid "Frame padding, px"
+msgstr "Поле рамки, пикс."
+
+msgid "Lower by, px"
+msgstr "Опустить на, пикс."
+
+msgid "Raise the top edge by, px"
+msgstr "Поднять верхний край на, пикс."
+
+msgid "Description panels"
+msgstr "Панели описания"
+
+msgid "Scroll bar"
+msgstr "Полоса прокрутки"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Подробности в RE_Kenshi_log.txt."
+
+msgid "Interface fixes that layouts cannot do: queues, bars, squad cells, scrolling descriptions."
+msgstr "Правки интерфейса, которые не сделать вёрсткой: очереди, полосы, ячейки отрядов, прокрутка описаний."
+
+msgid "Interface fixes that layouts cannot do. Each one can be turned off below."
+msgstr "Правки интерфейса, которые не сделать вёрсткой. Каждую можно выключить ниже."
+
+msgid "Row height in the research and crafting queues. The game gives about 16 and Russian text does not fit. 0 - the game's height."
+msgstr "Высота строки в очередях исследований и ремесла. Игра даёт около 16, и русский текст не помещается. 0 - высота игры."
+
+msgid "Gap between the progress fill and the row frame. The plugin draws its own fill across the whole frame. 0 - the bar is left to the game."
+msgstr "Отступ заливки от рамки строки. Плагин рисует свою заливку во всю рамку. 0 - полоса остаётся игре."
+
+msgid "How many rows of portraits fit in a squad cell on the Squads tab without cutting. 0 - the game's height."
+msgstr "Сколько рядов портретов помещается в ячейке отряда на вкладке Отряды без обрезки. 0 - высота игры."
+
+msgid "When the largest squad needs more rows, all cells grow - the list has one height for all. Off - extra fighters go under the scroll."
+msgstr "Когда самому большому отряду нужно больше рядов, растут все ячейки - высота у списка одна. Выключено - лишние бойцы уходят под прокрутку."
+
+msgid "How much taller the frame of the Next level bar in the skill description is, at the top and the bottom. 0 - the bar is left to the game."
+msgstr "На сколько выше рамка полосы Следующий уровень в описании навыка, сверху и снизу. 0 - полоса остаётся игре."
+
+msgid "Moves the bar with its frame down without moving the text, so the text looks centred. Lines below move by the same amount."
+msgstr "Опускает полосу с рамкой, не трогая текст, чтобы он смотрелся по середине. Строки ниже сдвигаются на столько же."
+
+msgid "Raises only the top edge of the bar frame. The bottom edge and the text stay where they are."
+msgstr "Поднимает только верхний край рамки полосы. Нижний край и текст остаются на месте."
+
+msgid "A scroll bar in the description panels of research and items, so long text is not cut off."
+msgstr "Полоса прокрутки в панелях описания исследований и вещей, чтобы длинный текст не обрезался."
+
+msgid "Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."
+msgstr "Пишет в RE_Kenshi_log.txt все создаваемые панели описания и их флаги - пригодится, если полоса прокрутки не появилась."
+
+msgid "Hints"
+msgstr "Подсказки"
+
+msgid "Faction relation by the name"
+msgstr "Отношение фракции у имени"
+
+msgid "After the faction name of the selected character - that faction's relation to you, like in the factions window: green above zero, red from -10 down."
+msgstr "После фракции выбранного персонажа - её отношение к вам, как в окне фракций: зелёным выше нуля, красным от -10 и ниже."
+
+
+
+msgid "Item icon in the crafting list"
+msgstr "Иконка вещи в списке ремесла"
+
+msgid "On the Crafting tab, the icon of the item appears next to the mouse over a line of the Items list."
+msgstr "Во вкладке «Ремесло» при наведении на строку списка «Предметы» у мыши появляется иконка вещи."
+
+msgid "Draw icons of all items"
+msgstr "Нарисовать иконки всех вещей"
+
+msgid "The game draws an item icon only when the item first gets into an inventory. This draws them now for every item without one, a few per frame, in a loaded game. The pictures stay in data/icons."
+msgstr "Игра рисует иконку вещи, только когда та впервые попадает в инвентарь. Эта кнопка рисует их сразу для всех вещей без иконки, понемногу за кадр, в загруженной игре. Рисунки остаются в data/icons."
+
+msgid "Load a game first - icons are drawn in the game world."
+msgstr "Сначала загрузите игру - иконки рисуются в игровом мире."
+
+msgid "Drawing item icons: %u / %u"
+msgstr "Рисуются иконки вещей: %u / %u"
+
+msgid "Item icons done: %u drawn, %u could not be drawn"
+msgstr "Иконки готовы: нарисовано %u, не удалось %u"
+
+msgid "Icon key"
+msgstr "Клавиша иконки"
+
+msgid "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
+msgstr "Иконка видна, пока зажата эта клавиша. NONE (Backspace при назначении) - просто по наведению."

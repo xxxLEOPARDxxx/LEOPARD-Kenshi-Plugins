@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ItemMarkers\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "All marks on item icons."
+msgstr "物品图标上的所有标记。"
+
+msgid "Armour, weapons, crossbows and limbs get the colour of their grade, as in the item tooltip."
+msgstr "护甲、武器、弩和义肢按品级着色，与物品提示相同。"
+
+msgid "Badges"
+msgstr "徽标"
+
+msgid "Colour items of this grade and better. 0 and 1 are grey and beige - ordinary items; 2 - from blue."
+msgstr "为此品级及以上的物品着色。0 和 1 为灰色和米色的普通物品；2 - 从蓝色开始。"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "In RE_Kenshi_log.txt: the first 200 marked items (kind, level, grade) and how long marking takes."
+msgstr "写入 RE_Kenshi_log.txt：前 200 个标记的物品（种类、等级、品级）及标记耗时。"
+
+msgid "Faction uniform"
+msgstr "派系制服"
+
+msgid "Fill"
+msgstr "填充"
+
+msgid "Fill - the whole cell, frame - the edge with a glow inside, gradient - from the bottom, star - in the corner."
+msgstr "填充 - 整个格子，边框 - 带内发光的边缘，渐变 - 自下而上，星标 - 角落。"
+
+msgid "Frame"
+msgstr "边框"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Grade colour"
+msgstr "品级颜色"
+
+msgid "Gradient"
+msgstr "渐变"
+
+
+
+msgid "In pixels."
+msgstr "像素。"
+
+msgid "From grade"
+msgstr "起始品级"
+
+
+msgid "Marks on item icons: the colour of the item grade, stolen goods, faction uniforms."
+msgstr "物品图标上的标记：品级颜色、赃物、派系制服。"
+
+
+msgid "Star"
+msgstr "星标"
+
+msgid "Stolen"
+msgstr "赃物"
+
+msgid "Stolen badge size"
+msgstr "赃物徽标大小"
+
+msgid "Stolen badge strength"
+msgstr "赃物徽标明显度"
+
+msgid "Strength"
+msgstr "强度"
+
+msgid "Style"
+msgstr "样式"
+
+msgid "The game's hand pointer on armour that is a faction uniform: wearing it you look like one of them."
+msgstr "游戏的手形指针标在派系制服护甲上：穿上后会被当作该派系成员。"
+
+msgid "The game's steal pointer on stolen items."
+msgstr "游戏的偷窃指针标在赃物上。"
+
+msgid "Uniform badge size"
+msgstr "制服徽标大小"
+
+msgid "Uniform badge strength"
+msgstr "制服徽标明显度"
+
+msgid "Star corner"
+msgstr "星标位置"
+
+msgid "Where the star of the Star style goes."
+msgstr "“星标”样式中星标所在的角落。"
+
+msgid "Top left"
+msgstr "左上"
+
+msgid "Top right"
+msgstr "右上"
+
+msgid "Bottom left"
+msgstr "左下"
+
+msgid "Bottom right"
+msgstr "右下"
+
+
+
+
+
+msgid "Show key"
+msgstr "显示按键"
+
+
+msgid "How bright the grade colour is, 1-10 (10% steps)."
+msgstr "品级颜色亮度，1-10（每级 10%）。"
+
+msgid "How visible the badge is, 1-10 (10% steps)."
+msgstr "徽标明显度，1-10（每级 10%）。"
+
+msgid "The marks are shown while this key is held. NONE (Backspace when assigning) - always shown."
+msgstr "按住此键时显示标记。NONE（设定时按 Backspace）- 始终显示。"
+
+msgid "Eye on learned blueprints"
+msgstr "已学蓝图显示眼睛"
+
+msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
+msgstr "如果蓝图已学会，其图标左下角显示一只眼睛，无需再买。"

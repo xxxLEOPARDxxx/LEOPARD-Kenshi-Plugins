@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AssignedWorkers\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Assigned workers"
+msgstr "Закреплены"
+
+msgid "nobody"
+msgstr "никто"
+
+msgid "priority "
+msgstr "приоритет "
+
+msgid "working now"
+msgstr "работает сейчас"
+
+msgid "always"
+msgstr "всегда"
+
+msgid "Workers at buildings"
+msgstr "Работники построек"
+
+msgid "Panel"
+msgstr "Панель"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Who of the squad is assigned to the selected building - a panel next to its window."
+msgstr "Кто из отряда закреплён за выделенной постройкой - панель рядом с её окном."
+
+msgid "Show while held"
+msgstr "Показывать, пока зажата"
+
+msgid "The panel is visible only while this key is held."
+msgstr "Панель видна, только пока зажата эта клавиша."
+
+msgid "Show when nobody is assigned"
+msgstr "Показывать, когда никто не закреплён"
+
+msgid "Only at your own buildings."
+msgstr "Только у своих построек."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Подробности в RE_Kenshi_log.txt."
+
+msgid "Shows who of the squad is assigned to the selected building."
+msgstr "Показывает, кто из отряда закреплён за выделенной постройкой."
+
+msgid "The panel is shown only while this key is held. always - the panel is always shown."
+msgstr "Панель видна, только пока зажата эта клавиша. всегда - панель видна всегда."
+
+msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
+msgstr "У своей постройки, за которой никто не закреплён: панель с надписью никто. Выключено - панели нет. У чужих построек никто не пишется никогда."
+
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
+msgstr "Подробности в RE_Kenshi_log.txt: у каждой выделенной постройки - куда смотрят работы всех персонажей и кого нашли."
+
+msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+msgstr "Панель видна, только пока зажата эта клавиша. Щёлкните и нажмите клавишу; Backspace - без клавиши, панель видна всегда."

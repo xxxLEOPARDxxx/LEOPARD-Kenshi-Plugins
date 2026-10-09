@@ -1,0 +1,48 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ModConfigMenu\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mods"
+msgstr "模组"
+
+msgid "No mods with settings were found."
+msgstr "未找到带有设置的模组。"
+
+msgid "* Takes effect after the game is restarted."
+msgstr "* 重启游戏后生效。"
+
+msgid "Reset to defaults"
+msgstr "恢复默认"
+
+msgid "Press a key... Backspace - none"
+msgstr "请按一个键... Backspace - 无"
+
+msgid "none"
+msgstr "无"
+
+msgid "Press a key... Backspace - none, Esc - cancel"
+msgstr "请按一个键... Backspace - 无，Esc - 取消"
+
+msgid "Press a key... Backspace - none, click - cancel"
+msgstr "请按一个键... Backspace - 无，点击 - 取消"
+
+msgid "Palette"
+msgstr "调色板"
+
+msgid "Hide"
+msgstr "隐藏"
+
+msgid "Current colour"
+msgstr "当前颜色"
+
+msgid "Default"
+msgstr "默认"
+
+msgid "Switch between the palette and typing the colour code (#RRGGBB)"
+msgstr "切换：调色板或输入颜色代码（#RRGGBB）"
+
+msgid "Show or hide the colours to pick from"
+msgstr "显示或隐藏可选颜色"

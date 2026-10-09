@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AssignedWorkers\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Assigned workers"
+msgstr "指派的工人"
+
+msgid "nobody"
+msgstr "无人"
+
+msgid "priority "
+msgstr "优先级 "
+
+msgid "working now"
+msgstr "正在工作"
+
+msgid "always"
+msgstr "始终"
+
+msgid "Workers at buildings"
+msgstr "建筑工人"
+
+msgid "Panel"
+msgstr "面板"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Who of the squad is assigned to the selected building - a panel next to its window."
+msgstr "显示小队中谁被指派到所选建筑 - 在其窗口旁显示面板。"
+
+msgid "Show while held"
+msgstr "按住时显示"
+
+msgid "The panel is visible only while this key is held."
+msgstr "仅在按住此键时显示面板。"
+
+msgid "Show when nobody is assigned"
+msgstr "无人指派时也显示"
+
+msgid "Only at your own buildings."
+msgstr "仅限自己的建筑。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "Shows who of the squad is assigned to the selected building."
+msgstr "显示小队中谁被指派到所选建筑。"
+
+msgid "The panel is shown only while this key is held. always - the panel is always shown."
+msgstr "仅在按住此键时显示面板。始终 - 面板一直显示。"
+
+msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
+msgstr "自己的建筑无人指派时：显示写有无人的面板。关闭 - 不显示面板。他人的建筑从不显示无人。"
+
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
+msgstr "在 RE_Kenshi_log.txt 中记录：每个所选建筑上，每个角色的工作指向哪里以及找到了谁。"
+
+msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+msgstr "仅在按住此键时显示面板。点击后按下一个键；Backspace - 不设键，面板始终显示。"

@@ -1,0 +1,120 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WantedMap\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "dead"
+msgstr "已死亡"
+
+msgid "imprisoned"
+msgstr "被囚禁"
+
+msgid "approx."
+msgstr "大约"
+
+msgid "lives here"
+msgstr "住在这里"
+
+msgid "Wanted posters on the map"
+msgstr "地图上的通缉目标"
+
+msgid "Markers"
+msgstr "标记"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Markers on the big map for the targets of wanted posters held by the selected characters."
+msgstr "在大地图上为所选角色携带的通缉令目标显示标记。"
+
+msgid "Names next to markers"
+msgstr "在标记旁显示名字"
+
+msgid "Mark the home of targets not seen yet"
+msgstr "标记尚未出现的目标的住处"
+
+msgid "A yellow marker on the town or camp where the target's squad lives."
+msgstr "在目标小队所居住的城镇或营地上显示黄色标记。"
+
+msgid "Killed targets"
+msgstr "已击杀的目标"
+
+msgid "Remember seen and killed targets"
+msgstr "记住已见到和已击杀的目标"
+
+msgid "Kept per playthrough in the memory folder next to the plugin."
+msgstr "按存档分别保存在插件旁的 memory 文件夹中。"
+
+msgid "Show killed targets for, game hours"
+msgstr "显示已击杀目标的时长（游戏小时）"
+
+msgid "A grey marker where the target died. 0 - do not show killed targets."
+msgstr "在目标死亡处显示灰色标记。0 - 不显示已击杀的目标。"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "Poster check, seconds"
+msgstr "检查通缉令间隔（秒）"
+
+msgid "How often the selected characters' inventories are checked while the map is open."
+msgstr "地图打开时检查所选角色物品栏的频率。"
+
+msgid "Target search, seconds"
+msgstr "搜索目标间隔（秒）"
+
+msgid "How often all factions are searched for the targets' squads while the map is open."
+msgstr "地图打开时在所有派系中搜索目标小队的频率。"
+
+msgid "Words ignored in names"
+msgstr "名字中忽略的词"
+
+msgid "Comma-separated, any language. Used when posters are matched to targets."
+msgstr "用逗号分隔，任何语言均可。用于将通缉令与目标匹配。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt and the matched table next to the plugin."
+msgstr "在 RE_Kenshi_log.txt 中记录详细信息，并在插件旁生成匹配表。"
+
+msgid "Markers on the big map for the targets of the wanted posters the selected character carries."
+msgstr "在大地图上为所选角色携带的通缉令目标显示标记。"
+
+msgid "The target's name, and dead or imprisoned, next to its marker on the map."
+msgstr "在地图标记旁显示目标名字，以及已死亡或被囚禁。"
+
+msgid "If the target's squad has not appeared in the world yet: a yellow marker on the town or camp where it lives."
+msgstr "如果目标小队尚未在世界中出现：在其居住的城镇或营地上显示黄色标记。"
+
+msgid "Remembers which targets were already in the world and who was killed, where and when. Kept per playthrough in the memory folder next to the plugin."
+msgstr "记住哪些目标已在世界中出现过，以及谁在何时何地被击杀。按存档分别保存在插件旁的 memory 文件夹中。"
+
+msgid "How many game hours a grey marker stays where a target was killed. 0 - killed targets are not shown."
+msgstr "灰色标记在目标死亡处保留的游戏小时数。0 - 不显示已击杀的目标。"
+
+msgid "How often the selected characters' inventories and backpacks are checked for posters while the map is open."
+msgstr "地图打开时检查所选角色物品栏和背包中通缉令的频率。"
+
+msgid "How often all factions are searched for the targets' squads while the map is open. In between only the positions of found markers move."
+msgstr "地图打开时在所有派系中搜索目标小队的频率。两次搜索之间只更新已找到标记的位置。"
+
+msgid "Comma-separated words that do not count when a poster's name is compared with a character's name, such as king or leader. Any language."
+msgstr "比较通缉令名字与角色名字时不计入的词，用逗号分隔，例如国王或首领。任何语言均可。"
+
+msgid "Details in RE_Kenshi_log.txt: posters, targets and markers, and the matched table WantedMap_runtime_table.txt next to the plugin."
+msgstr "在 RE_Kenshi_log.txt 中记录通缉令、目标和标记，并在插件旁生成匹配表 WantedMap_runtime_table.txt。"
+
+msgid "the,of,and,wanted,king,boss,leader"
+msgstr "the,of,and,wanted,king,boss,leader,王,首领,头目,老大,通缉"
+
+msgid "Badge on the poster"
+msgstr "通缉令上的标记"
+
+msgid "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."
+msgstr "背包中的通缉令：绿色对勾 - 所有目标已死亡，锁 - 其余目标被囚禁，2/3 - 已完成的数量。"

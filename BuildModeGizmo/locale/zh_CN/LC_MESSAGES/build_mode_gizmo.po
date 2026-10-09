@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BuildModeGizmo\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Moving placed buildings"
+msgstr "移动已建建筑"
+
+msgid "Gizmo"
+msgstr "操纵轴"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Move arrows for placed buildings in the developer build mode (Shift+F12)."
+msgstr "在开发者建造模式（Shift+F12）中为已建建筑显示移动箭头。"
+
+msgid "Not while placing a new building"
+msgstr "放置新建筑时不显示"
+
+msgid "A click then places the building instead of grabbing an arrow. Turn off only if the arrows never appear."
+msgstr "此时点击会放置建筑而不是抓取箭头。仅在箭头始终不出现时关闭。"
+
+msgid "Write the move into the building"
+msgstr "将移动写入建筑"
+
+msgid "Only if a building moves on screen but the move is not saved."
+msgstr "仅在建筑在屏幕上移动但移动未被保存时使用。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "Move arrows for already placed buildings in the developer build mode."
+msgstr "在开发者建造模式中为已建成的建筑显示移动箭头。"
+
+msgid "Only if a building moves on screen but the move is not saved. Usually the game does it itself."
+msgstr "仅在建筑在屏幕上移动但移动未被保存时使用。通常游戏会自行处理。"
+
+msgid "Details in RE_Kenshi_log.txt: who called the arrows this frame - the game or the plugin, the selection and the transform window."
+msgstr "在 RE_Kenshi_log.txt 中记录：本帧由谁调出箭头 - 游戏还是插件，以及选择和变换窗口的状态。"
+
+msgid "Move arrows on your construction site: shift a placed building before it is built, without the developer menu."
+msgstr "在你的工地上显示移动箭头：建筑完工前即可移动已放置的建筑，无需开发者菜单。"
+
+msgid "Construction sites"
+msgstr "工地"
+
+msgid "Turns the whole plugin on or off."
+msgstr "开启或关闭整个插件。"
+
+msgid "Arrows on your construction site"
+msgstr "工地上的箭头"
+
+msgid "Select your building that is not built yet: move arrows appear on it. Drag an arrow to shift it, the window button switches to rotation. Close the window to hide them."
+msgstr "选中你尚未建成的建筑，上面会出现移动箭头。拖动箭头即可移动，窗口中的按钮可切换为旋转。关闭窗口即可隐藏。"
+
+msgid "Developer menu"
+msgstr "开发者菜单"
+
+msgid "Arrows in the developer build mode"
+msgstr "开发者建造模式中的箭头"
+
+msgid "The first version: arrows in the normal build mode of the developer menu (Shift+F12). Experimental, off by default."
+msgstr "第一版：开发者菜单（Shift+F12）普通建造模式中的箭头。实验性功能，默认关闭。"
+
+msgid "A click then places the building instead of grabbing an arrow. Developer menu only."
+msgstr "此时点击会放置建筑，而不是抓取箭头。仅用于开发者菜单。"
+
+msgid "Developer menu only: if a building moves on screen but the move is not saved."
+msgstr "仅用于开发者菜单：建筑在屏幕上移动但移动未被保存时使用。"
+
+msgid "Details in RE_Kenshi_log.txt: when the arrows open and close and where the building moved."
+msgstr "在 RE_Kenshi_log.txt 中记录详情：箭头何时打开和关闭，以及建筑移动到了哪里。"
+
+msgid "Settle on the ground after a move"
+msgstr "移动后落回地面"
+
+msgid "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."
+msgstr "松开箭头后，建筑会在新位置重建，游戏会把它放回地面。关闭时，它会保持你抬升到的高度。"

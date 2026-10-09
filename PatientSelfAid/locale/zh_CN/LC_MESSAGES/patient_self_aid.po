@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PatientSelfAid\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Patient self-aid"
+msgstr "病人自救"
+
+msgid "Treatment"
+msgstr "治疗"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "A patient being treated treats himself too."
+msgstr "正在接受治疗的病人也会自己治疗。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "A patient being treated keeps treating himself instead of lying idle."
+msgstr "正在接受治疗的病人会继续自我治疗，而不是闲躺着。"
+
+msgid "Details in RE_Kenshi_log.txt: who is treated, who treats, what the patient is doing and whether the order took. Written only when the state changes."
+msgstr "在 RE_Kenshi_log.txt 中记录：谁在接受治疗、谁在治疗、病人在做什么以及命令是否生效。仅在状态变化时写入。"

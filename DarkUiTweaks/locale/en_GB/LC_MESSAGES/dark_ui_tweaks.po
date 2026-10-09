@@ -1,0 +1,137 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: DarkUiTweaks\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Interface tweaks"
+msgstr "Interface tweaks"
+
+msgid "General"
+msgstr "General"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Research and crafting queues"
+msgstr "Research and crafting queues"
+
+msgid "Row height, px"
+msgstr "Row height, px"
+
+msgid "0 - the game's height."
+msgstr "0 - the game's height."
+
+msgid "Bar inset, px"
+msgstr "Bar inset, px"
+
+msgid "0 - the bar is left to the game."
+msgstr "0 - the bar is left to the game."
+
+msgid "Squads tab"
+msgstr "Squads tab"
+
+msgid "Rows of portraits"
+msgstr "Rows of portraits"
+
+msgid "Grow with the largest squad"
+msgstr "Grow with the largest squad"
+
+msgid "Next level bar"
+msgstr "Next level bar"
+
+msgid "Frame padding, px"
+msgstr "Frame padding, px"
+
+msgid "Lower by, px"
+msgstr "Lower by, px"
+
+msgid "Raise the top edge by, px"
+msgstr "Raise the top edge by, px"
+
+msgid "Description panels"
+msgstr "Description panels"
+
+msgid "Scroll bar"
+msgstr "Scroll bar"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "Interface fixes that layouts cannot do: queues, bars, squad cells, scrolling descriptions."
+msgstr "Interface fixes that layouts cannot do: queues, bars, squad cells, scrolling descriptions."
+
+msgid "Interface fixes that layouts cannot do. Each one can be turned off below."
+msgstr "Interface fixes that layouts cannot do. Each one can be turned off below."
+
+msgid "Row height in the research and crafting queues. The game gives about 16 and Russian text does not fit. 0 - the game's height."
+msgstr "Row height in the research and crafting queues. The game gives about 16 and Russian text does not fit. 0 - the game's height."
+
+msgid "Gap between the progress fill and the row frame. The plugin draws its own fill across the whole frame. 0 - the bar is left to the game."
+msgstr "Gap between the progress fill and the row frame. The plugin draws its own fill across the whole frame. 0 - the bar is left to the game."
+
+msgid "How many rows of portraits fit in a squad cell on the Squads tab without cutting. 0 - the game's height."
+msgstr "How many rows of portraits fit in a squad cell on the Squads tab without cutting. 0 - the game's height."
+
+msgid "When the largest squad needs more rows, all cells grow - the list has one height for all. Off - extra fighters go under the scroll."
+msgstr "When the largest squad needs more rows, all cells grow - the list has one height for all. Off - extra fighters go under the scroll."
+
+msgid "How much taller the frame of the Next level bar in the skill description is, at the top and the bottom. 0 - the bar is left to the game."
+msgstr "How much taller the frame of the Next level bar in the skill description is, at the top and the bottom. 0 - the bar is left to the game."
+
+msgid "Moves the bar with its frame down without moving the text, so the text looks centred. Lines below move by the same amount."
+msgstr "Moves the bar with its frame down without moving the text, so the text looks centred. Lines below move by the same amount."
+
+msgid "Raises only the top edge of the bar frame. The bottom edge and the text stay where they are."
+msgstr "Raises only the top edge of the bar frame. The bottom edge and the text stay where they are."
+
+msgid "A scroll bar in the description panels of research and items, so long text is not cut off."
+msgstr "A scroll bar in the description panels of research and items, so long text is not cut off."
+
+msgid "Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."
+msgstr "Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."
+
+msgid "Hints"
+msgstr "Hints"
+
+msgid "Faction relation by the name"
+msgstr "Faction relation by the name"
+
+msgid "After the faction name of the selected character - that faction's relation to you, like in the factions window: green above zero, red from -10 down."
+msgstr "After the faction name of the selected character - that faction's relation to you, like in the factions window: green above zero, red from -10 down."
+
+
+
+msgid "Item icon in the crafting list"
+msgstr "Item icon in the crafting list"
+
+msgid "On the Crafting tab, the icon of the item appears next to the mouse over a line of the Items list."
+msgstr "On the Crafting tab, the icon of the item appears next to the mouse over a line of the Items list."
+
+msgid "Draw icons of all items"
+msgstr "Draw icons of all items"
+
+msgid "The game draws an item icon only when the item first gets into an inventory. This draws them now for every item without one, a few per frame, in a loaded game. The pictures stay in data/icons."
+msgstr "The game draws an item icon only when the item first gets into an inventory. This draws them now for every item without one, a few per frame, in a loaded game. The pictures stay in data/icons."
+
+msgid "Load a game first - icons are drawn in the game world."
+msgstr "Load a game first - icons are drawn in the game world."
+
+msgid "Drawing item icons: %u / %u"
+msgstr "Drawing item icons: %u / %u"
+
+msgid "Item icons done: %u drawn, %u could not be drawn"
+msgstr "Item icons done: %u drawn, %u could not be drawn"
+
+msgid "Icon key"
+msgstr "Icon key"
+
+msgid "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
+msgstr "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."

@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AssignedWorkers\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Assigned workers"
+msgstr "Assigned workers"
+
+msgid "nobody"
+msgstr "nobody"
+
+msgid "priority "
+msgstr "priority "
+
+msgid "working now"
+msgstr "working now"
+
+msgid "always"
+msgstr "always"
+
+msgid "Workers at buildings"
+msgstr "Workers at buildings"
+
+msgid "Panel"
+msgstr "Panel"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Who of the squad is assigned to the selected building - a panel next to its window."
+msgstr "Who of the squad is assigned to the selected building - a panel next to its window."
+
+msgid "Show while held"
+msgstr "Show while held"
+
+msgid "The panel is visible only while this key is held."
+msgstr "The panel is visible only while this key is held."
+
+msgid "Show when nobody is assigned"
+msgstr "Show when nobody is assigned"
+
+msgid "Only at your own buildings."
+msgstr "Only at your own buildings."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "Shows who of the squad is assigned to the selected building."
+msgstr "Shows who of the squad is assigned to the selected building."
+
+msgid "The panel is shown only while this key is held. always - the panel is always shown."
+msgstr "The panel is shown only while this key is held. always - the panel is always shown."
+
+msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
+msgstr "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
+
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
+msgstr "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
+
+msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+msgstr "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."

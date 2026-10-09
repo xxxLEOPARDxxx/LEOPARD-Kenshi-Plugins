@@ -1,0 +1,259 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+
+msgid "Choose your beginning"
+msgstr "选择从哪里开始"
+
+msgid "Advanced options"
+msgstr "高级选项"
+
+msgid "Begin"
+msgstr "开始"
+
+msgid "BEGIN"
+msgstr "开始"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Difficulty:"
+msgstr "难度："
+
+msgid "Cash:"
+msgstr "现金："
+
+msgid "Play Style:"
+msgstr "游戏风格："
+
+msgid "Search:"
+msgstr "搜索："
+
+msgid "All races"
+msgstr "所有种族"
+
+msgid "Human (random)"
+msgstr "人类（随机）"
+
+msgid "EASY-HARD"
+msgstr "易-难"
+
+msgid "HARD-EASY"
+msgstr "难-易"
+
+msgid "Begin a new game with this start?"
+msgstr "以这个开局开始新游戏？"
+
+msgid "The \"Choose your beginning\" window as a list: search, sorting, race filter, advanced options beside it."
+msgstr "以列表显示“选择从哪里开始”窗口：搜索、排序、种族筛选，高级选项在旁边。"
+
+msgid "Window"
+msgstr "窗口"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Replace the game's start selection window with the list."
+msgstr "用列表替换游戏的开局选择窗口。"
+
+msgid "Layout"
+msgstr "布局"
+
+msgid "Wide"
+msgstr "宽"
+
+msgid "Compact"
+msgstr "紧凑"
+
+msgid "Wide: list on the left, description on the right. Compact: a narrow window, description under the list. The first button in the window switches it too."
+msgstr "宽：列表在左，描述在右。紧凑：窄窗口，描述在列表下方。窗口中的第一个按钮也可切换。"
+
+msgid "Sort"
+msgstr "排序"
+
+msgid "By name"
+msgstr "按名称"
+
+msgid "By difficulty"
+msgstr "按难度"
+
+msgid "Order of the list. The buttons in the window switch it too; pressing the active one reverses the order."
+msgstr "列表顺序。窗口中的按钮也可切换；再次点击当前按钮会反转顺序。"
+
+msgid "Reverse order"
+msgstr "倒序"
+
+msgid "Z-A, or hardest first."
+msgstr "Z-A，或最难的在前。"
+
+msgid "Confirm before starting"
+msgstr "开始前确认"
+
+msgid "Ask before starting the game, so a stray double click does not start it."
+msgstr "开始游戏前询问，以免误双击直接开始。"
+
+msgid "Right click resets an option"
+msgstr "右键重置选项"
+
+msgid "Right click on a line of the advanced options returns its default value."
+msgstr "在高级选项的某一行上右键，恢复其默认值。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt: every start with its difficulty and races, the advanced options and their defaults."
+msgstr "详情写入 RE_Kenshi_log.txt：每个开局的难度和种族，高级选项及其默认值。"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Compact view"
+msgstr "紧凑视图"
+
+msgid "Wide view"
+msgstr "宽视图"
+
+msgid "on"
+msgstr "开"
+
+msgid "off"
+msgstr "关"
+
+msgid "Default: %s. Right click resets it."
+msgstr "默认：%s。右键重置。"
+
+msgid "The game's options were not found."
+msgstr "未找到游戏选项。"
+
+msgid "Animals eat"
+msgstr "动物进食"
+
+msgid "Difficult healing"
+msgstr "治疗困难"
+
+msgid "Continue"
+msgstr "继续"
+
+msgid "Hunger time"
+msgstr "饥饿时间"
+
+msgid "This sets how long it takes characters to get hungry.  A higher number means it takes longer, therefore they need less food to get by."
+msgstr "设置了角色饥饿所需的时间。 数字越大意味着需要更长的时间，因此他们需要更少的食物。"
+
+msgid "Chance of death"
+msgstr "死亡可能性"
+
+msgid "Determines the overall likelyhood of any character dying (players or NPCs).  Directly affects rates of wound degeneration and blood loss (Higher=more likely to die)"
+msgstr "确定任何角色死亡（玩家或非玩家角色）的总体可能性。 直接影响伤口恶化和失血率（更高=更可能死亡）"
+
+msgid "Global damage multiplier"
+msgstr "全局伤害乘数"
+
+msgid "Overall combat damage for everything.  Doesn't necessarily make the game harder or easier, but affects the speed of battles"
+msgstr "一切的战斗伤害。 不一定会使游戏更难或更容易，但会影响战斗的速度"
+
+msgid "Production speed"
+msgstr "生产速度"
+
+msgid "Affects speed of item production such as mines and crafting (more than 1.0 == easier)"
+msgstr "影响物品生产的速度，如开采和手工制作（超过1.0 == 更容易）"
+
+msgid "Research speed"
+msgstr "研究速度"
+
+msgid "Affects speed of research (more than 1.0 == easier)"
+msgstr "影响研究速度（超过1.0 == 更容易）"
+
+msgid "Building speed"
+msgstr "建造速度"
+
+msgid "Affects speed of building (more than 1.0 == easier)"
+msgstr "影响建造速度（超过1.0 == 更容易）"
+
+msgid "Number of nests multiplier"
+msgstr "巢穴数量乘数"
+
+msgid "Affects number of animal nests, bandit camps etc that appear in the wilds.  Higher number makes life more dangerous."
+msgstr "影响动物巢穴数量，土匪营地等数量。 数字越大，生活就越危险。"
+
+msgid "Bandits loot the player"
+msgstr "强盗掠夺玩家"
+
+msgid "Makes life unfair"
+msgstr "让生活变得不公平"
+
+msgid "Easy prospecting"
+msgstr "简单探矿中"
+
+msgid "Town:"
+msgstr "城镇："
+
+msgid "Characters:"
+msgstr "角色："
+
+msgid "Relations:"
+msgstr "关系："
+
+msgid "Towns"
+msgstr "城镇"
+
+msgid "Relations"
+msgstr "关系"
+
+msgid "Random"
+msgstr "随机"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Window size"
+msgstr "窗口大小"
+
+msgid "Wide view width, %"
+msgstr "宽视图宽度，%"
+
+msgid "Width of the wide window, in percent of the screen width."
+msgstr "宽窗口的宽度，占屏幕宽度的百分比。"
+
+msgid "Compact view width, %"
+msgstr "紧凑视图宽度，%"
+
+msgid "Width of the compact window, in percent of the screen width."
+msgstr "紧凑窗口的宽度，占屏幕宽度的百分比。"
+
+msgid "Window height, %"
+msgstr "窗口高度，%"
+
+msgid "Height of the window, in percent of the screen height."
+msgstr "窗口的高度，占屏幕高度的百分比。"
+
+msgid "Custom difficulties"
+msgstr "自定义难度"
+
+msgid "Very easy (green)"
+msgstr "非常简单（绿色）"
+
+msgid "Easy (light green)"
+msgstr "简单（浅绿色）"
+
+msgid "Normal (yellow)"
+msgstr "普通（黄色）"
+
+msgid "Above normal (orange)"
+msgstr "中等偏上（橙色）"
+
+msgid "Hard (red-orange)"
+msgstr "困难（橙红色）"
+
+msgid "Very hard (red)"
+msgstr "非常困难（红色）"
+
+msgid "Difficulties of starts from other mods to show in this colour and sort as this level. Several - separated by commas; part of the word is enough."
+msgstr "其他模组开局的难度名称，用此颜色显示并按此等级排序。多个用逗号分隔；写出词的一部分即可。"
+
+msgid ", animals: %d"
+msgstr "，动物：%d"

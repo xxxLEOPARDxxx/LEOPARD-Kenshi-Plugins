@@ -1,0 +1,309 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GearCompare\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Cut resistance"
+msgstr "Cut resistance"
+
+msgid "Blunt resistance"
+msgstr "Blunt resistance"
+
+msgid "Harpoon resistance"
+msgstr "Harpoon resistance"
+
+msgid "Coverage: "
+msgstr "Coverage: "
+
+msgid "Attack"
+msgstr "Attack"
+
+msgid "Defence"
+msgstr "Defence"
+
+msgid "Perception"
+msgstr "Perception"
+
+msgid "Martial arts"
+msgstr "Martial arts"
+
+msgid "Stealth"
+msgstr "Stealth"
+
+msgid "Assassination"
+msgstr "Assassination"
+
+msgid "Athletics"
+msgstr "Athletics"
+
+msgid "Dexterity"
+msgstr "Dexterity"
+
+msgid "Dodge"
+msgstr "Dodge"
+
+msgid "Combat speed"
+msgstr "Combat speed"
+
+msgid "Damage"
+msgstr "Damage"
+
+msgid "Ranged skills"
+msgstr "Ranged skills"
+
+msgid "Fist injuries"
+msgstr "Fist injuries"
+
+msgid "Cut damage"
+msgstr "Cut damage"
+
+msgid "Blunt damage"
+msgstr "Blunt damage"
+
+msgid "Bleeding"
+msgstr "Bleeding"
+
+msgid "Indoors"
+msgstr "Indoors"
+
+msgid "Range"
+msgstr "Range"
+
+msgid "Shot speed"
+msgstr "Shot speed"
+
+msgid "Aim speed"
+msgstr "Aim speed"
+
+msgid "Spread"
+msgstr "Spread"
+
+msgid "Reload time"
+msgstr "Reload time"
+
+msgid "Shots"
+msgstr "Shots"
+
+msgid "Combat weight"
+msgstr "Combat weight"
+
+msgid "Weight"
+msgstr "Weight"
+
+msgid "Price"
+msgstr "Price"
+
+msgid "Head"
+msgstr "Head"
+
+msgid "Shirt"
+msgstr "Shirt"
+
+msgid "Armour"
+msgstr "Armour"
+
+msgid "Trousers"
+msgstr "Trousers"
+
+msgid "Boots"
+msgstr "Boots"
+
+msgid "Belt"
+msgstr "Belt"
+
+msgid "Backpack"
+msgstr "Backpack"
+
+msgid "Slot"
+msgstr "Slot"
+
+msgid "Weapon"
+msgstr "Weapon"
+
+msgid "better"
+msgstr "better"
+
+msgid "worse"
+msgstr "worse"
+
+msgid "mixed"
+msgstr "mixed"
+
+msgid "equal"
+msgstr "equal"
+
+msgid "worn"
+msgstr "worn"
+
+msgid "new"
+msgstr "new"
+
+msgid "change"
+msgstr "change"
+
+msgid "Worn"
+msgstr "Worn"
+
+msgid "No difference"
+msgstr "No difference"
+
+msgid "Protection"
+msgstr "Protection"
+
+msgid "Properties"
+msgstr "Properties"
+
+msgid "Weight, kg"
+msgstr "Weight, kg"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Verdict"
+msgstr "Verdict"
+
+msgid "no slot for it"
+msgstr "no slot for it"
+
+msgid "nothing"
+msgstr "nothing"
+
+msgid "Acid protection"
+msgstr "Acid protection"
+
+msgid "Gas protection"
+msgstr "Gas protection"
+
+msgid "Burning protection"
+msgstr "Burning protection"
+
+msgid "Dust storm protection"
+msgstr "Dust storm protection"
+
+msgid "Rain protection"
+msgstr "Rain protection"
+
+msgid "always"
+msgstr "always"
+
+msgid "Gear comparison"
+msgstr "Gear comparison"
+
+msgid "Panel"
+msgstr "Panel"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "A panel with what is worn next to the item description."
+msgstr "A panel with what is worn next to the item description."
+
+msgid "Show while held"
+msgstr "Show while held"
+
+msgid "The panel is visible only while this key is held."
+msgstr "The panel is visible only while this key is held."
+
+msgid "Compare with an empty slot"
+msgstr "Compare with an empty slot"
+
+msgid "Off - no panel when nothing suitable is worn."
+msgstr "Off - no panel when nothing suitable is worn."
+
+msgid "Total percentage"
+msgstr "Total percentage"
+
+msgid "The main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."
+msgstr "The main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."
+
+msgid "Per property, %"
+msgstr "Per property, %"
+
+msgid "Per extra kg, %"
+msgstr "Per extra kg, %"
+
+msgid "Colours"
+msgstr "Colours"
+
+msgid "Better"
+msgstr "Better"
+
+msgid "auto - as in the game's item tooltip, or #RRGGBB."
+msgstr "auto - as in the game's item tooltip, or #RRGGBB."
+
+msgid "Worse"
+msgstr "Worse"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "Compares the item under the cursor with what is worn: a panel next to the item description."
+msgstr "Compares the item under the cursor with what is worn: a panel next to the item description."
+
+msgid "The panel is shown only while this key is held. always - the panel is always shown."
+msgstr "The panel is shown only while this key is held. always - the panel is always shown."
+
+msgid "On - compare with an empty slot too, Worn: nothing. Off - no panel when nothing suitable is worn."
+msgstr "On - compare with an empty slot too, Worn: nothing. Off - no panel when nothing suitable is worn."
+
+msgid "A total at the bottom of the panel: the main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."
+msgstr "A total at the bottom of the panel: the main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."
+
+msgid "How many percent each property that got better adds to the total, and each one that got worse takes away."
+msgstr "How many percent each property that got better adds to the total, and each one that got worse takes away."
+
+msgid "How many percent each extra kilogram takes away from the total."
+msgstr "How many percent each extra kilogram takes away from the total."
+
+msgid "Colour of what gets better. auto - like the +2 in the game's item tooltip, or #RRGGBB."
+msgstr "Colour of what gets better. auto - like the +2 in the game's item tooltip, or #RRGGBB."
+
+msgid "Colour of what gets worse. auto - like the -1 in the game's item tooltip, or #RRGGBB."
+msgstr "Colour of what gets worse. auto - like the -1 in the game's item tooltip, or #RRGGBB."
+
+msgid "Details in RE_Kenshi_log.txt: the item under the cursor, for whom, what it is compared with and its raw numbers. Written only when the item changes."
+msgstr "Details in RE_Kenshi_log.txt: the item under the cursor, for whom, what it is compared with and its raw numbers. Written only when the item changes."
+
+msgid "Armour penetration"
+msgstr "Armour penetration"
+
+msgid "Cut resistance efficiency"
+msgstr "Cut resistance efficiency"
+
+msgid "Weapon length"
+msgstr "Weapon length"
+
+msgid "Length"
+msgstr "Length"
+
+msgid "Damage vs robots"
+msgstr "Damage vs robots"
+
+msgid "Damage vs humans"
+msgstr "Damage vs humans"
+
+msgid "Damage vs animals"
+msgstr "Damage vs animals"
+
+msgid "Damage vs"
+msgstr "Damage vs"
+
+msgid "Protection (with coverage)"
+msgstr "Protection (with coverage)"
+
+msgid "Damage (cut + blunt)"
+msgstr "Damage (cut + blunt)"
+
+msgid "Damage (per shot)"
+msgstr "Damage (per shot)"
+
+msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+msgstr "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."

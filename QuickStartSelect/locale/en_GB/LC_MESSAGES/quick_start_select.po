@@ -1,0 +1,259 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en_GB\n"
+
+msgid "Choose your beginning"
+msgstr "Choose your beginning"
+
+msgid "Advanced options"
+msgstr "Advanced options"
+
+msgid "Begin"
+msgstr "Begin"
+
+msgid "BEGIN"
+msgstr "BEGIN"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Difficulty:"
+msgstr "Difficulty:"
+
+msgid "Cash:"
+msgstr "Cash:"
+
+msgid "Play Style:"
+msgstr "Play Style:"
+
+msgid "Search:"
+msgstr "Search:"
+
+msgid "All races"
+msgstr "All races"
+
+msgid "Human (random)"
+msgstr "Human (random)"
+
+msgid "EASY-HARD"
+msgstr "EASY-HARD"
+
+msgid "HARD-EASY"
+msgstr "HARD-EASY"
+
+msgid "Begin a new game with this start?"
+msgstr "Begin a new game with this start?"
+
+msgid "The \"Choose your beginning\" window as a list: search, sorting, race filter, advanced options beside it."
+msgstr "The \"Choose your beginning\" window as a list: search, sorting, race filter, advanced options beside it."
+
+msgid "Window"
+msgstr "Window"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Replace the game's start selection window with the list."
+msgstr "Replace the game's start selection window with the list."
+
+msgid "Layout"
+msgstr "Layout"
+
+msgid "Wide"
+msgstr "Wide"
+
+msgid "Compact"
+msgstr "Compact"
+
+msgid "Wide: list on the left, description on the right. Compact: a narrow window, description under the list. The first button in the window switches it too."
+msgstr "Wide: list on the left, description on the right. Compact: a narrow window, description under the list. The first button in the window switches it too."
+
+msgid "Sort"
+msgstr "Sort"
+
+msgid "By name"
+msgstr "By name"
+
+msgid "By difficulty"
+msgstr "By difficulty"
+
+msgid "Order of the list. The buttons in the window switch it too; pressing the active one reverses the order."
+msgstr "Order of the list. The buttons in the window switch it too; pressing the active one reverses the order."
+
+msgid "Reverse order"
+msgstr "Reverse order"
+
+msgid "Z-A, or hardest first."
+msgstr "Z-A, or hardest first."
+
+msgid "Confirm before starting"
+msgstr "Confirm before starting"
+
+msgid "Ask before starting the game, so a stray double click does not start it."
+msgstr "Ask before starting the game, so a stray double click does not start it."
+
+msgid "Right click resets an option"
+msgstr "Right click resets an option"
+
+msgid "Right click on a line of the advanced options returns its default value."
+msgstr "Right click on a line of the advanced options returns its default value."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: every start with its difficulty and races, the advanced options and their defaults."
+msgstr "Details in RE_Kenshi_log.txt: every start with its difficulty and races, the advanced options and their defaults."
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Compact view"
+msgstr "Compact view"
+
+msgid "Wide view"
+msgstr "Wide view"
+
+msgid "on"
+msgstr "on"
+
+msgid "off"
+msgstr "off"
+
+msgid "Default: %s. Right click resets it."
+msgstr "Default: %s. Right click resets it."
+
+msgid "The game's options were not found."
+msgstr "The game's options were not found."
+
+msgid "Animals eat"
+msgstr "Animals eat"
+
+msgid "Difficult healing"
+msgstr "Difficult healing"
+
+msgid "Continue"
+msgstr "Continue"
+
+msgid "Hunger time"
+msgstr "Hunger time"
+
+msgid "This sets how long it takes characters to get hungry.  A higher number means it takes longer, therefore they need less food to get by."
+msgstr "This sets how long it takes characters to get hungry.  A higher number means it takes longer, therefore they need less food to get by."
+
+msgid "Chance of death"
+msgstr "Chance of death"
+
+msgid "Determines the overall likelyhood of any character dying (players or NPCs).  Directly affects rates of wound degeneration and blood loss (Higher=more likely to die)"
+msgstr "Determines the overall likelyhood of any character dying (players or NPCs).  Directly affects rates of wound degeneration and blood loss (Higher=more likely to die)"
+
+msgid "Global damage multiplier"
+msgstr "Global damage multiplier"
+
+msgid "Overall combat damage for everything.  Doesn't necessarily make the game harder or easier, but affects the speed of battles"
+msgstr "Overall combat damage for everything.  Doesn't necessarily make the game harder or easier, but affects the speed of battles"
+
+msgid "Production speed"
+msgstr "Production speed"
+
+msgid "Affects speed of item production such as mines and crafting (more than 1.0 == easier)"
+msgstr "Affects speed of item production such as mines and crafting (more than 1.0 == easier)"
+
+msgid "Research speed"
+msgstr "Research speed"
+
+msgid "Affects speed of research (more than 1.0 == easier)"
+msgstr "Affects speed of research (more than 1.0 == easier)"
+
+msgid "Building speed"
+msgstr "Building speed"
+
+msgid "Affects speed of building (more than 1.0 == easier)"
+msgstr "Affects speed of building (more than 1.0 == easier)"
+
+msgid "Number of nests multiplier"
+msgstr "Number of nests multiplier"
+
+msgid "Affects number of animal nests, bandit camps etc that appear in the wilds.  Higher number makes life more dangerous."
+msgstr "Affects number of animal nests, bandit camps etc that appear in the wilds.  Higher number makes life more dangerous."
+
+msgid "Bandits loot the player"
+msgstr "Bandits loot the player"
+
+msgid "Makes life unfair"
+msgstr "Makes life unfair"
+
+msgid "Easy prospecting"
+msgstr "Easy prospecting"
+
+msgid "Town:"
+msgstr "Town:"
+
+msgid "Characters:"
+msgstr "Characters:"
+
+msgid "Relations:"
+msgstr "Relations:"
+
+msgid "Towns"
+msgstr "Towns"
+
+msgid "Relations"
+msgstr "Relations"
+
+msgid "Random"
+msgstr "Random"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Window size"
+msgstr "Window size"
+
+msgid "Wide view width, %"
+msgstr "Wide view width, %"
+
+msgid "Width of the wide window, in percent of the screen width."
+msgstr "Width of the wide window, in percent of the screen width."
+
+msgid "Compact view width, %"
+msgstr "Compact view width, %"
+
+msgid "Width of the compact window, in percent of the screen width."
+msgstr "Width of the compact window, in percent of the screen width."
+
+msgid "Window height, %"
+msgstr "Window height, %"
+
+msgid "Height of the window, in percent of the screen height."
+msgstr "Height of the window, in percent of the screen height."
+
+msgid "Custom difficulties"
+msgstr "Custom difficulties"
+
+msgid "Very easy (green)"
+msgstr "Very easy (green)"
+
+msgid "Easy (light green)"
+msgstr "Easy (light green)"
+
+msgid "Normal (yellow)"
+msgstr "Normal (yellow)"
+
+msgid "Above normal (orange)"
+msgstr "Above normal (orange)"
+
+msgid "Hard (red-orange)"
+msgstr "Hard (red-orange)"
+
+msgid "Very hard (red)"
+msgstr "Very hard (red)"
+
+msgid "Difficulties of starts from other mods to show in this colour and sort as this level. Several - separated by commas; part of the word is enough."
+msgstr "Difficulties of starts from other mods to show in this colour and sort as this level. Several - separated by commas; part of the word is enough."
+
+msgid ", animals: %d"
+msgstr ", animals: %d"
