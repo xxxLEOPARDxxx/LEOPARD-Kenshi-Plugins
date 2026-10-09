@@ -500,8 +500,8 @@ namespace
         if (g_nameWidth > 300)
             g_nameWidth = 300;
         g_columnGap = static_cast<int>(GetPrivateProfileIntA("Bars", "ColumnGap", 8, ini.c_str()));
-        if (g_columnGap < 0)
-            g_columnGap = 0;
+        if (g_columnGap < -30)          // меньше нуля - колонки ближе (просьба 10.10.2026)
+            g_columnGap = -30;
         if (g_columnGap > 40)
             g_columnGap = 40;
 
@@ -1491,7 +1491,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "Bars", "HideWithGUI", Tr("Hide with the interface"), Tr("Hide the bars together with the game interface, F7. Off - the bars stay when the interface is hidden."), 1, 0);
     api->integer(api, "Bars", "RowSpacing", Tr("Space between rows, px"), Tr("Extra space between the rows of the bars. Below zero - the rows move closer."), 0, -8, 40, 0);
     api->integer(api, "Bars", "NameWidth", Tr("Skill name column, px"), Tr("Width of the skill name column: the level starts right after it. Smaller - the level moves closer to the name; too small cuts long names."), 150, 40, 300, 0);
-    api->integer(api, "Bars", "ColumnGap", Tr("Space between columns, px"), Tr("Space between the name, the level, the percentage and the bar."), 8, 0, 40, 0);
+    api->integer(api, "Bars", "ColumnGap", Tr("Space between columns, px"), Tr("Space between the name, the level, the percentage and the bar. Below zero - the columns move closer together."), 8, -30, 40, 0);
     api->integer(api, "Bars", "Width", Tr("Row width, px"), Tr("Width of a row: the skill name, level and percentage come first, the rest goes to the bar. The position is set with SHIFT+B."), 460, 240, 1200, 0);
     api->toggle(api, "Bars", "ColourLevel", Tr("Colour the level"), Tr("Colour the skill level by its value, with the level colours below."), 1, 0);
     api->toggle(api, "Bars", "ColourPercent", Tr("Colour the percentage"), Tr("Colour the percentage by progress to the next level: dim at the start, bright near the level."), 1, 0);

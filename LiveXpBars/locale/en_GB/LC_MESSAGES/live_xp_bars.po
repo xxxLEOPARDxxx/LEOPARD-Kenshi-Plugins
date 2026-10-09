@@ -194,5 +194,5 @@ msgstr "Width of the skill name column: the level starts right after it. Smaller
 msgid "Space between columns, px"
 msgstr "Space between columns, px"
 
-msgid "Space between the name, the level, the percentage and the bar."
-msgstr "Space between the name, the level, the percentage and the bar."
+msgid "Space between the name, the level, the percentage and the bar. Below zero - the columns move closer together."
+msgstr "Space between the name, the level, the percentage and the bar. Below zero - the columns move closer together."

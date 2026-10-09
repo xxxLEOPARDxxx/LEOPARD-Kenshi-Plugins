@@ -194,5 +194,5 @@ msgstr "技能名称列的宽度：等级紧随其后。越小等级越靠近名
 msgid "Space between columns, px"
 msgstr "列间距（像素）"
 
-msgid "Space between the name, the level, the percentage and the bar."
-msgstr "名称、等级、百分比与进度条之间的间距。"
+msgid "Space between the name, the level, the percentage and the bar. Below zero - the columns move closer together."
+msgstr "名称、等级、百分比与进度条之间的间距。小于零时各列相互靠近。"

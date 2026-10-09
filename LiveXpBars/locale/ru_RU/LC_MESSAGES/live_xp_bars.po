@@ -194,5 +194,5 @@ msgstr "Ширина колонки с названием навыка: уров
 msgid "Space between columns, px"
 msgstr "Промежуток между колонками, пикс."
 
-msgid "Space between the name, the level, the percentage and the bar."
-msgstr "Промежуток между названием, уровнем, процентами и полосой."
+msgid "Space between the name, the level, the percentage and the bar. Below zero - the columns move closer together."
+msgstr "Промежуток между названием, уровнем, процентами и полосой. Меньше нуля - колонки ближе друг к другу."
