@@ -97,7 +97,7 @@ msgid "Star corner"
 msgstr "Угол звезды"
 
 msgid "Where the star of the Star style goes."
-msgstr "В каком углу ячейки стоит звезда стиля «Звезда»."
+msgstr "В каком углу ячейки стоит звезда стиля \"Звезда\"."
 
 msgid "Top left"
 msgstr "Слева сверху"

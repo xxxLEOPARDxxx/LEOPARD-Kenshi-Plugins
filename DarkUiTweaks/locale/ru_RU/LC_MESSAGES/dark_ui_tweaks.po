@@ -113,7 +113,7 @@ msgid "Item icon in the crafting list"
 msgstr "Иконка вещи в списке ремесла"
 
 msgid "On the Crafting tab, the icon of the item appears next to the mouse over a line of the Items list."
-msgstr "Во вкладке «Ремесло» при наведении на строку списка «Предметы» у мыши появляется иконка вещи."
+msgstr "Во вкладке \"Ремесло\" при наведении на строку списка \"Предметы\" у мыши появляется иконка вещи."
 
 msgid "Draw icons of all items"
 msgstr "Нарисовать иконки всех вещей"
