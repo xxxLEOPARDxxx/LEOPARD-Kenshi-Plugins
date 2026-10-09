@@ -1,0 +1,186 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: LiveXpBars\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Drag to place. SHIFT+B when done."
+msgstr "拖动以放置。完成后按 SHIFT+B。"
+
+msgid "Live XP bars"
+msgstr "实时经验条"
+
+msgid "Bars"
+msgstr "进度条"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Bars of the skills being trained right now. SHIFT+B - move them."
+msgstr "正在提升的技能进度条。SHIFT+B - 移动位置。"
+
+msgid "Hold, seconds"
+msgstr "保持时间（秒）"
+
+msgid "How long a bar stays after experience is gained."
+msgstr "获得经验后进度条保持显示的时间。"
+
+msgid "Fade in, seconds"
+msgstr "淡入时间（秒）"
+
+msgid "Fade out, seconds"
+msgstr "淡出时间（秒）"
+
+msgid "Keep trained skills on screen"
+msgstr "保留已提升的技能"
+
+msgid "Until another character is selected."
+msgstr "直到选择其他角色为止。"
+
+msgid "Hide when several are selected"
+msgstr "选中多个角色时隐藏"
+
+msgid "Hide with the interface"
+msgstr "随界面一起隐藏"
+
+msgid "F7, Show main interface."
+msgstr "F7，显示主界面。"
+
+msgid "Row width, px"
+msgstr "行宽，像素"
+
+msgid "Colour the level"
+msgstr "为等级着色"
+
+msgid "Colour the percentage"
+msgstr "为百分比着色"
+
+msgid "Colours"
+msgstr "颜色"
+
+msgid "Colours from the interface theme"
+msgstr "使用界面主题颜色"
+
+msgid "0 - fallback colours only. Turn off first if the game crashes after loading a save."
+msgstr "0 - 仅使用备用颜色。如果读档后游戏崩溃，请首先关闭此项。"
+
+msgid "Smooth colours"
+msgstr "平滑颜色"
+
+msgid "Colours blend between the level steps below."
+msgstr "颜色在下方各等级之间平滑过渡。"
+
+msgid "Skill name"
+msgstr "技能名称"
+
+msgid "skin - as the game draws it, auto - interface theme, or #RRGGBB."
+msgstr "skin - 游戏默认，auto - 界面主题，或 #RRGGBB。"
+
+msgid "Level and percentage"
+msgstr "等级和百分比"
+
+msgid "When colouring is off. skin, auto or #RRGGBB."
+msgstr "关闭着色时使用。skin、auto 或 #RRGGBB。"
+
+msgid "Hint"
+msgstr "提示"
+
+msgid "skin, auto or #RRGGBB."
+msgstr "skin、auto 或 #RRGGBB。"
+
+msgid "Bar fill"
+msgstr "进度条填充"
+
+msgid "value - by progress, skin - as the game draws it, or #RRGGBB."
+msgstr "value - 按进度着色，skin - 游戏默认，或 #RRGGBB。"
+
+msgid "Background"
+msgstr "背景"
+
+msgid "none - no background, game - the game's panel, or #RRGGBB."
+msgstr "none - 无背景，game - 游戏面板，或 #RRGGBB。"
+
+msgid "Background opacity"
+msgstr "背景不透明度"
+
+msgid "0 - transparent, 1 - solid."
+msgstr "0 - 透明，1 - 不透明。"
+
+msgid "Skill level colours"
+msgstr "技能等级颜色"
+
+msgid "Above 100"
+msgstr "100 以上"
+
+msgid "#RRGGBB"
+msgstr "#RRGGBB"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "On-screen experience bars of the skills being trained right now."
+msgstr "在屏幕上显示正在提升的技能的经验条。"
+
+msgid "How long a bar stays after experience is gained. Without it a bar would only blink."
+msgstr "获得经验后进度条保持显示的时间。没有它进度条只会一闪而过。"
+
+msgid "How long a bar takes to appear."
+msgstr "进度条出现所需的时间。"
+
+msgid "How long a bar takes to fade after the hold time is over."
+msgstr "保持时间结束后进度条淡出所需的时间。"
+
+msgid "A skill that gained experience stays on screen until another character is selected. Off - it fades after the hold time."
+msgstr "获得经验的技能会一直显示，直到选择其他角色。关闭 - 保持时间结束后淡出。"
+
+msgid "Each character trains their own skills - with several selected the bars would be a mess."
+msgstr "每个角色提升的技能不同 - 选中多个角色时进度条会混在一起。"
+
+msgid "Hide the bars together with the game interface, F7. Off - the bars stay when the interface is hidden."
+msgstr "随游戏界面一起隐藏进度条（F7）。关闭 - 界面隐藏时进度条仍显示。"
+
+msgid "Width of a row: the skill name, level and percentage come first, the rest goes to the bar. The position is set with SHIFT+B."
+msgstr "每行的宽度：先放技能名称、等级和百分比，剩余部分给进度条。位置用 SHIFT+B 设置。"
+
+msgid "Colour the skill level by its value, with the level colours below."
+msgstr "按数值为技能等级着色，使用下方的等级颜色。"
+
+msgid "Colour the percentage by progress to the next level: dim at the start, bright near the level."
+msgstr "按距离下一级的进度为百分比着色：刚开始时较暗，接近升级时较亮。"
+
+msgid "Colours of the level, percentage and fill blend smoothly between the level steps below. Off - they change once every ten."
+msgstr "等级、百分比和填充的颜色在下方各等级之间平滑过渡。关闭 - 每十级变化一次。"
+
+msgid "When their colouring is off. skin - as the game draws it, auto - interface theme, or #RRGGBB."
+msgstr "关闭着色时使用。skin - 游戏默认，auto - 界面主题，或 #RRGGBB。"
+
+msgid "The hint in the setup mode, SHIFT+B. skin - as the game draws it, auto - interface theme, or #RRGGBB."
+msgstr "设置模式（SHIFT+B）中的提示。skin - 游戏默认，auto - 界面主题，或 #RRGGBB。"
+
+msgid "value - by progress, like the percentage, skin - as the game draws it, or #RRGGBB."
+msgstr "value - 按进度着色，与百分比相同，skin - 游戏默认，或 #RRGGBB。"
+
+msgid "Under the bars, where the ground is light. none - no background, game - the game's panel with a frame, or #RRGGBB."
+msgstr "进度条下方的背景，用于地面较亮时。none - 无背景，game - 带边框的游戏面板，或 #RRGGBB。"
+
+msgid "0 - transparent, 1 - solid. 0.5 to 0.7 - the text reads well and the world still shows through."
+msgstr "0 - 透明，1 - 不透明。0.5 到 0.7 - 文字清晰，又能看到下方的世界。"
+
+msgid "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+msgstr "此范围内技能数值的颜色，#RRGGBB。超过 100 仅在有装备加成时出现。"
+
+msgid "Details in RE_Kenshi_log.txt: who is selected, how many characters are selected and how many skills are growing."
+msgstr "在 RE_Kenshi_log.txt 中记录：选中了谁、选中了多少角色以及有多少技能在提升。"
+
+msgid "Space between rows, px"
+msgstr "行间距，像素"
+
+msgid "Extra space between the rows of the bars. Below zero - the rows move closer."
+msgstr "进度条各行之间的额外间距。小于零时行更紧凑。"

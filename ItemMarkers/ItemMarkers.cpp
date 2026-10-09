@@ -169,10 +169,10 @@ namespace
         return t == ARMOUR || t == WEAPON || t == CROSSBOW || t == LIMB_REPLACEMENT;
     }
 
-    // Броня, оружие, арбалеты, протезы - классы от Gear: уровень и форму
-    // фракции читаем из его полей. Виртуальные getLevel/isAFactionUniform
-    // через таблицу из заголовка KenshiLib не зовём: ошибись там номер
-    // ячейки - вызвалась бы чужая функция.
+    // Броня, оружие, арбалеты, протезы - классы от Gear: уровень читаем из
+    // его поля level_0_100 (виртуальный getLevel не нужен). Форма фракции и
+    // тип чертежа - виртуальными вызовами игры (ниже): поля для них игра не
+    // заполняет или там лежит другое (09.10.2026).
     int LevelOf(const Item* item)
     {
         return static_cast<const Gear*>(item)->level_0_100;
@@ -480,14 +480,37 @@ namespace
         entry.marks.clear();
     }
 
+    // Перерисовка из MCM идёт по уже открытым иконкам: вещь могла уйти
+    // раньше иконки - сбой одной иконки не должен ронять игру (ревью
+    // 09.10.2026; при создании иконки та же защита - SafeOnIcon).
+    bool SafeDecorate(MyGUI::Widget* root, IconEntry* entry)
+    {
+        __try
+        {
+            Decorate(root, *entry);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
     void RefreshAll()
     {
         g_coloursRead = false;
+        unsigned failed = 0;
         for (std::map<MyGUI::Widget*, IconEntry>::iterator it = g_icons.begin(); it != g_icons.end(); ++it)
         {
             Undecorate(it->second);
-            if (g_enabled)
-                Decorate(it->first, it->second);
+            if (g_enabled && !SafeDecorate(it->first, &it->second))
+                ++failed;
+        }
+        if (failed > 0)
+        {
+            char line[96];
+            sprintf_s(line, "ItemMarkers: %u icons could not be redrawn - skipped", failed);
+            ErrorLog(line);
         }
     }
 

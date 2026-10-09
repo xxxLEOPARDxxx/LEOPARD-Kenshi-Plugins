@@ -1,0 +1,204 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: StatColours\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Equipment bonus"
+msgstr "装备加成"
+
+msgid "Indoor weapon bonus"
+msgstr "室内武器加成"
+
+msgid "Equipment total"
+msgstr "装备合计"
+
+msgid "StatColours - colours for the numbers in the stats window."
+msgstr "StatColours - 属性窗口中数字的颜色。"
+
+msgid "Read once, when the game starts."
+msgstr "仅在游戏启动时读取一次。"
+
+msgid "A colour is #RRGGBB, as in HTML. A value that makes no sense"
+msgstr "颜色格式为 #RRGGBB，与 HTML 相同。无法识别的值"
+
+msgid "is ignored, and a line about it goes to the RE_Kenshi log."
+msgstr "会被忽略，并在 RE_Kenshi 日志中记录一行。"
+
+msgid "LevelN is the colour for skills from N to N+9. Level100 is"
+msgstr "LevelN 是技能 N 到 N+9 的颜色。Level100 为"
+
+msgid "exactly a hundred, Above100 is over it - which only happens"
+msgstr "正好一百，Above100 为一百以上 - 只有在"
+
+msgid "with a bonus from equipment."
+msgstr "装备加成时才会出现。"
+
+msgid "The bracket with the equipment correction: (+3) or (-4)."
+msgstr "装备修正的括号：(+3) 或 (-4)。"
+
+msgid "Brackets is the brackets themselves, Bonus and Penalty the"
+msgstr "Brackets 是括号本身，Bonus 和 Penalty 是"
+
+msgid "number inside. BracketSide is which side of the value it"
+msgstr "括号内的数字。BracketSide 是括号位于数值的哪一侧："
+
+msgid "goes on: left or right. On the left it can overlap a long"
+msgstr "left 或 right。放在左侧时可能与较长的"
+
+msgid "skill name - then put right, where it is in nobody's way."
+msgstr "技能名称重叠 - 此时请设为 right。"
+
+msgid "auto - take it from the game palette (kenshi_colours.xml),"
+msgstr "auto - 使用游戏调色板 (kenshi_colours.xml)，"
+
+msgid "that is, follow the interface theme and any mod over it."
+msgstr "即跟随界面主题及其模组。"
+
+msgid "Labels - the captions in the breakdown under the skill."
+msgstr "Labels - 技能说明下方明细中的标签。"
+
+msgid "Effective value"
+msgstr "有效值"
+
+msgid "XP MULTIPLIERS"
+msgstr "经验倍率"
+
+msgid "decimal point"
+msgstr "."
+
+msgid "Racial XP multipliers under the attributes: 1 shows them, 0 hides."
+msgstr "属性下方的种族经验倍率：1 显示，0 隐藏。"
+
+msgid "HoldKey: ALT, CTRL, SHIFT - shown only while held; NONE - always."
+msgstr "HoldKey：ALT、CTRL、SHIFT - 仅在按住时显示；NONE - 始终显示。"
+
+msgid "Current XP rate"
+msgstr "当前经验速度"
+
+msgid "ShowRate: current XP rate after the skill name in the description: 1 shows it, 0 hides."
+msgstr "ShowRate：在说明中的技能名称后显示当前经验速度：1 显示，0 隐藏。"
+
+msgid "always"
+msgstr "始终"
+
+msgid "left"
+msgstr "左侧"
+
+msgid "right"
+msgstr "右侧"
+
+msgid "Stat colours"
+msgstr "属性颜色"
+
+msgid "Racial XP"
+msgstr "种族经验"
+
+msgid "Racial XP multipliers"
+msgstr "种族经验倍率"
+
+msgid "Under the attributes in the character window."
+msgstr "显示在角色窗口的属性下方。"
+
+msgid "Show while held"
+msgstr "按住时显示"
+
+msgid "The multipliers are visible only while this key is held."
+msgstr "仅在按住此键时显示倍率。"
+
+msgid "After the skill name in the description."
+msgstr "显示在说明中的技能名称之后。"
+
+msgid "Colours"
+msgstr "颜色"
+
+msgid "Colours from the interface theme"
+msgstr "使用界面主题颜色"
+
+msgid "auto colours are taken from kenshi_colours.xml and an interface mod over it."
+msgstr "auto 颜色取自 kenshi_colours.xml 及覆盖它的界面模组。"
+
+msgid "Bracket side"
+msgstr "括号位置"
+
+msgid "On the left it can overlap a long skill name."
+msgstr "放在左侧时可能与较长的技能名称重叠。"
+
+msgid "Brackets"
+msgstr "括号"
+
+msgid "auto or #RRGGBB."
+msgstr "auto 或 #RRGGBB。"
+
+msgid "Bonus"
+msgstr "加成"
+
+msgid "Penalty"
+msgstr "惩罚"
+
+msgid "Labels"
+msgstr "标签"
+
+msgid "Skill level colours"
+msgstr "技能等级颜色"
+
+msgid "Above 100"
+msgstr "100 以上"
+
+msgid "#RRGGBB"
+msgstr "#RRGGBB"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "详细信息写入 RE_Kenshi_log.txt。"
+
+msgid "Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."
+msgstr "按等级为技能数值着色，列出装备加成，显示种族经验倍率和当前经验速度。"
+
+msgid "Racial XP multipliers under the attributes in the character window."
+msgstr "在角色窗口的属性下方显示种族经验倍率。"
+
+msgid "The multipliers are shown only while this key is held. always - always shown."
+msgstr "仅在按住此键时显示倍率。始终 - 一直显示。"
+
+msgid "The current XP rate in brackets after the skill name in the skill description."
+msgstr "在技能说明中技能名称后的括号里显示当前经验速度。"
+
+msgid "auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."
+msgstr "下方的 auto 颜色取自游戏调色板 kenshi_colours.xml，并跟随覆盖它的界面模组。关闭 - 使用内置颜色。"
+
+msgid "Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."
+msgstr "装备修正括号位于技能数值的哪一侧。放在左侧时可能与较长的技能名称重叠。"
+
+msgid "The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."
+msgstr "装备修正两侧的括号，例如 (+3)。auto - 取自调色板，或 #RRGGBB。"
+
+msgid "The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."
+msgstr "装备增加数值时括号内数字的颜色。auto - 取自调色板，或 #RRGGBB。"
+
+msgid "The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."
+msgstr "装备减少数值时括号内数字的颜色。auto - 取自调色板，或 #RRGGBB。"
+
+msgid "The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."
+msgstr "技能说明下方明细中的标签。auto - 取自调色板，或 #RRGGBB。"
+
+msgid "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+msgstr "此范围内技能数值的颜色，#RRGGBB。超过 100 仅在有装备加成时出现。"
+
+msgid "Details in RE_Kenshi_log.txt: the palette, the colours used and the breakdown under the skill."
+msgstr "在 RE_Kenshi_log.txt 中记录调色板、所用颜色以及技能下方的明细。"
+
+msgid "Robotic limbs"
+msgstr "机械肢体"
+
+msgid "The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."
+msgstr "仅在按住此键时显示倍率。点击后按下一个键；Backspace - 不设键，始终显示。"
+
+msgid "HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."
+msgstr "HoldKey：任意键（ALT、CTRL、SHIFT、F、CTRL+B...）- 仅在按住时显示；NONE - 始终显示。"

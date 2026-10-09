@@ -1,0 +1,186 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: LiveXpBars\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Drag to place. SHIFT+B when done."
+msgstr "Drag to place. SHIFT+B when done."
+
+msgid "Live XP bars"
+msgstr "Live XP bars"
+
+msgid "Bars"
+msgstr "Bars"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Bars of the skills being trained right now. SHIFT+B - move them."
+msgstr "Bars of the skills being trained right now. SHIFT+B - move them."
+
+msgid "Hold, seconds"
+msgstr "Hold, seconds"
+
+msgid "How long a bar stays after experience is gained."
+msgstr "How long a bar stays after experience is gained."
+
+msgid "Fade in, seconds"
+msgstr "Fade in, seconds"
+
+msgid "Fade out, seconds"
+msgstr "Fade out, seconds"
+
+msgid "Keep trained skills on screen"
+msgstr "Keep trained skills on screen"
+
+msgid "Until another character is selected."
+msgstr "Until another character is selected."
+
+msgid "Hide when several are selected"
+msgstr "Hide when several are selected"
+
+msgid "Hide with the interface"
+msgstr "Hide with the interface"
+
+msgid "F7, Show main interface."
+msgstr "F7, Show main interface."
+
+msgid "Row width, px"
+msgstr "Row width, px"
+
+msgid "Colour the level"
+msgstr "Colour the level"
+
+msgid "Colour the percentage"
+msgstr "Colour the percentage"
+
+msgid "Colours"
+msgstr "Colours"
+
+msgid "Colours from the interface theme"
+msgstr "Colours from the interface theme"
+
+msgid "0 - fallback colours only. Turn off first if the game crashes after loading a save."
+msgstr "0 - fallback colours only. Turn off first if the game crashes after loading a save."
+
+msgid "Smooth colours"
+msgstr "Smooth colours"
+
+msgid "Colours blend between the level steps below."
+msgstr "Colours blend between the level steps below."
+
+msgid "Skill name"
+msgstr "Skill name"
+
+msgid "skin - as the game draws it, auto - interface theme, or #RRGGBB."
+msgstr "skin - as the game draws it, auto - interface theme, or #RRGGBB."
+
+msgid "Level and percentage"
+msgstr "Level and percentage"
+
+msgid "When colouring is off. skin, auto or #RRGGBB."
+msgstr "When colouring is off. skin, auto or #RRGGBB."
+
+msgid "Hint"
+msgstr "Hint"
+
+msgid "skin, auto or #RRGGBB."
+msgstr "skin, auto or #RRGGBB."
+
+msgid "Bar fill"
+msgstr "Bar fill"
+
+msgid "value - by progress, skin - as the game draws it, or #RRGGBB."
+msgstr "value - by progress, skin - as the game draws it, or #RRGGBB."
+
+msgid "Background"
+msgstr "Background"
+
+msgid "none - no background, game - the game's panel, or #RRGGBB."
+msgstr "none - no background, game - the game's panel, or #RRGGBB."
+
+msgid "Background opacity"
+msgstr "Background opacity"
+
+msgid "0 - transparent, 1 - solid."
+msgstr "0 - transparent, 1 - solid."
+
+msgid "Skill level colours"
+msgstr "Skill level colours"
+
+msgid "Above 100"
+msgstr "Above 100"
+
+msgid "#RRGGBB"
+msgstr "#RRGGBB"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "On-screen experience bars of the skills being trained right now."
+msgstr "On-screen experience bars of the skills being trained right now."
+
+msgid "How long a bar stays after experience is gained. Without it a bar would only blink."
+msgstr "How long a bar stays after experience is gained. Without it a bar would only blink."
+
+msgid "How long a bar takes to appear."
+msgstr "How long a bar takes to appear."
+
+msgid "How long a bar takes to fade after the hold time is over."
+msgstr "How long a bar takes to fade after the hold time is over."
+
+msgid "A skill that gained experience stays on screen until another character is selected. Off - it fades after the hold time."
+msgstr "A skill that gained experience stays on screen until another character is selected. Off - it fades after the hold time."
+
+msgid "Each character trains their own skills - with several selected the bars would be a mess."
+msgstr "Each character trains their own skills - with several selected the bars would be a mess."
+
+msgid "Hide the bars together with the game interface, F7. Off - the bars stay when the interface is hidden."
+msgstr "Hide the bars together with the game interface, F7. Off - the bars stay when the interface is hidden."
+
+msgid "Width of a row: the skill name, level and percentage come first, the rest goes to the bar. The position is set with SHIFT+B."
+msgstr "Width of a row: the skill name, level and percentage come first, the rest goes to the bar. The position is set with SHIFT+B."
+
+msgid "Colour the skill level by its value, with the level colours below."
+msgstr "Colour the skill level by its value, with the level colours below."
+
+msgid "Colour the percentage by progress to the next level: dim at the start, bright near the level."
+msgstr "Colour the percentage by progress to the next level: dim at the start, bright near the level."
+
+msgid "Colours of the level, percentage and fill blend smoothly between the level steps below. Off - they change once every ten."
+msgstr "Colours of the level, percentage and fill blend smoothly between the level steps below. Off - they change once every ten."
+
+msgid "When their colouring is off. skin - as the game draws it, auto - interface theme, or #RRGGBB."
+msgstr "When their colouring is off. skin - as the game draws it, auto - interface theme, or #RRGGBB."
+
+msgid "The hint in the setup mode, SHIFT+B. skin - as the game draws it, auto - interface theme, or #RRGGBB."
+msgstr "The hint in the setup mode, SHIFT+B. skin - as the game draws it, auto - interface theme, or #RRGGBB."
+
+msgid "value - by progress, like the percentage, skin - as the game draws it, or #RRGGBB."
+msgstr "value - by progress, like the percentage, skin - as the game draws it, or #RRGGBB."
+
+msgid "Under the bars, where the ground is light. none - no background, game - the game's panel with a frame, or #RRGGBB."
+msgstr "Under the bars, where the ground is light. none - no background, game - the game's panel with a frame, or #RRGGBB."
+
+msgid "0 - transparent, 1 - solid. 0.5 to 0.7 - the text reads well and the world still shows through."
+msgstr "0 - transparent, 1 - solid. 0.5 to 0.7 - the text reads well and the world still shows through."
+
+msgid "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+msgstr "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+
+msgid "Details in RE_Kenshi_log.txt: who is selected, how many characters are selected and how many skills are growing."
+msgstr "Details in RE_Kenshi_log.txt: who is selected, how many characters are selected and how many skills are growing."
+
+msgid "Space between rows, px"
+msgstr "Space between rows, px"
+
+msgid "Extra space between the rows of the bars. Below zero - the rows move closer."
+msgstr "Extra space between the rows of the bars. Below zero - the rows move closer."

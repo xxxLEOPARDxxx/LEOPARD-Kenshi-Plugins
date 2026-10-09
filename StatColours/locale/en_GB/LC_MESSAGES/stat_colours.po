@@ -1,0 +1,204 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: StatColours\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Equipment bonus"
+msgstr "Equipment bonus"
+
+msgid "Indoor weapon bonus"
+msgstr "Indoor weapon bonus"
+
+msgid "Equipment total"
+msgstr "Equipment total"
+
+msgid "StatColours - colours for the numbers in the stats window."
+msgstr "StatColours - colours for the numbers in the stats window."
+
+msgid "Read once, when the game starts."
+msgstr "Read once, when the game starts."
+
+msgid "A colour is #RRGGBB, as in HTML. A value that makes no sense"
+msgstr "A colour is #RRGGBB, as in HTML. A value that makes no sense"
+
+msgid "is ignored, and a line about it goes to the RE_Kenshi log."
+msgstr "is ignored, and a line about it goes to the RE_Kenshi log."
+
+msgid "LevelN is the colour for skills from N to N+9. Level100 is"
+msgstr "LevelN is the colour for skills from N to N+9. Level100 is"
+
+msgid "exactly a hundred, Above100 is over it - which only happens"
+msgstr "exactly a hundred, Above100 is over it - which only happens"
+
+msgid "with a bonus from equipment."
+msgstr "with a bonus from equipment."
+
+msgid "The bracket with the equipment correction: (+3) or (-4)."
+msgstr "The bracket with the equipment correction: (+3) or (-4)."
+
+msgid "Brackets is the brackets themselves, Bonus and Penalty the"
+msgstr "Brackets is the brackets themselves, Bonus and Penalty the"
+
+msgid "number inside. BracketSide is which side of the value it"
+msgstr "number inside. BracketSide is which side of the value it"
+
+msgid "goes on: left or right. On the left it can overlap a long"
+msgstr "goes on: left or right. On the left it can overlap a long"
+
+msgid "skill name - then put right, where it is in nobody's way."
+msgstr "skill name - then put right, where it is in nobody's way."
+
+msgid "auto - take it from the game palette (kenshi_colours.xml),"
+msgstr "auto - take it from the game palette (kenshi_colours.xml),"
+
+msgid "that is, follow the interface theme and any mod over it."
+msgstr "that is, follow the interface theme and any mod over it."
+
+msgid "Labels - the captions in the breakdown under the skill."
+msgstr "Labels - the captions in the breakdown under the skill."
+
+msgid "Effective value"
+msgstr "Effective value"
+
+msgid "XP MULTIPLIERS"
+msgstr "XP MULTIPLIERS"
+
+msgid "decimal point"
+msgstr "."
+
+msgid "Racial XP multipliers under the attributes: 1 shows them, 0 hides."
+msgstr "Racial XP multipliers under the attributes: 1 shows them, 0 hides."
+
+msgid "HoldKey: ALT, CTRL, SHIFT - shown only while held; NONE - always."
+msgstr "HoldKey: ALT, CTRL, SHIFT - shown only while held; NONE - always."
+
+msgid "Current XP rate"
+msgstr "Current XP rate"
+
+msgid "ShowRate: current XP rate after the skill name in the description: 1 shows it, 0 hides."
+msgstr "ShowRate: current XP rate after the skill name in the description: 1 shows it, 0 hides."
+
+msgid "always"
+msgstr "always"
+
+msgid "left"
+msgstr "left"
+
+msgid "right"
+msgstr "right"
+
+msgid "Stat colours"
+msgstr "Stat colours"
+
+msgid "Racial XP"
+msgstr "Racial XP"
+
+msgid "Racial XP multipliers"
+msgstr "Racial XP multipliers"
+
+msgid "Under the attributes in the character window."
+msgstr "Under the attributes in the character window."
+
+msgid "Show while held"
+msgstr "Show while held"
+
+msgid "The multipliers are visible only while this key is held."
+msgstr "The multipliers are visible only while this key is held."
+
+msgid "After the skill name in the description."
+msgstr "After the skill name in the description."
+
+msgid "Colours"
+msgstr "Colours"
+
+msgid "Colours from the interface theme"
+msgstr "Colours from the interface theme"
+
+msgid "auto colours are taken from kenshi_colours.xml and an interface mod over it."
+msgstr "auto colours are taken from kenshi_colours.xml and an interface mod over it."
+
+msgid "Bracket side"
+msgstr "Bracket side"
+
+msgid "On the left it can overlap a long skill name."
+msgstr "On the left it can overlap a long skill name."
+
+msgid "Brackets"
+msgstr "Brackets"
+
+msgid "auto or #RRGGBB."
+msgstr "auto or #RRGGBB."
+
+msgid "Bonus"
+msgstr "Bonus"
+
+msgid "Penalty"
+msgstr "Penalty"
+
+msgid "Labels"
+msgstr "Labels"
+
+msgid "Skill level colours"
+msgstr "Skill level colours"
+
+msgid "Above 100"
+msgstr "Above 100"
+
+msgid "#RRGGBB"
+msgstr "#RRGGBB"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Details in RE_Kenshi_log.txt."
+
+msgid "Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."
+msgstr "Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."
+
+msgid "Racial XP multipliers under the attributes in the character window."
+msgstr "Racial XP multipliers under the attributes in the character window."
+
+msgid "The multipliers are shown only while this key is held. always - always shown."
+msgstr "The multipliers are shown only while this key is held. always - always shown."
+
+msgid "The current XP rate in brackets after the skill name in the skill description."
+msgstr "The current XP rate in brackets after the skill name in the skill description."
+
+msgid "auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."
+msgstr "auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."
+
+msgid "Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."
+msgstr "Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."
+
+msgid "The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."
+msgstr "The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."
+
+msgid "The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."
+msgstr "The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."
+
+msgid "The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."
+msgstr "The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."
+
+msgid "The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."
+msgstr "The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."
+
+msgid "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+msgstr "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+
+msgid "Details in RE_Kenshi_log.txt: the palette, the colours used and the breakdown under the skill."
+msgstr "Details in RE_Kenshi_log.txt: the palette, the colours used and the breakdown under the skill."
+
+msgid "Robotic limbs"
+msgstr "Robotic limbs"
+
+msgid "The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."
+msgstr "The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."
+
+msgid "HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."
+msgstr "HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."

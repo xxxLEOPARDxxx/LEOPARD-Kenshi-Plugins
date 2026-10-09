@@ -1,0 +1,204 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: StatColours\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Equipment bonus"
+msgstr "Общий бонус снаряжения"
+
+msgid "Indoor weapon bonus"
+msgstr "Бонус оружия в здании"
+
+msgid "Equipment total"
+msgstr "Итого от снаряжения"
+
+msgid "StatColours - colours for the numbers in the stats window."
+msgstr "StatColours - цвета чисел в окне характеристик."
+
+msgid "Read once, when the game starts."
+msgstr "Читается один раз при запуске игры."
+
+msgid "A colour is #RRGGBB, as in HTML. A value that makes no sense"
+msgstr "Формат цвета - #RRGGBB, как в HTML. Непонятное значение"
+
+msgid "is ignored, and a line about it goes to the RE_Kenshi log."
+msgstr "игнорируется, в журнал RE_Kenshi уходит строка об этом."
+
+msgid "LevelN is the colour for skills from N to N+9. Level100 is"
+msgstr "LevelN - цвет для навыков от N до N+9. Level100 - ровно сто,"
+
+msgid "exactly a hundred, Above100 is over it - which only happens"
+msgstr "Above100 - выше сотни, это бывает только с прибавкой"
+
+msgid "with a bonus from equipment."
+msgstr "от снаряжения."
+
+msgid "The bracket with the equipment correction: (+3) or (-4)."
+msgstr "Скобки с поправкой от снаряжения: (+3) или (-4)."
+
+msgid "Brackets is the brackets themselves, Bonus and Penalty the"
+msgstr "Brackets - сами скобки, Bonus и Penalty - число внутри."
+
+msgid "number inside. BracketSide is which side of the value it"
+msgstr "BracketSide - с какой стороны от числа: left или right."
+
+msgid "goes on: left or right. On the left it can overlap a long"
+msgstr "Слева скобка может налезать на длинные названия навыков -"
+
+msgid "skill name - then put right, where it is in nobody's way."
+msgstr "тогда поставьте right, справа она никому не мешает."
+
+msgid "auto - take it from the game palette (kenshi_colours.xml),"
+msgstr "auto - взять из палитры игры (kenshi_colours.xml),"
+
+msgid "that is, follow the interface theme and any mod over it."
+msgstr "то есть следовать теме интерфейса и её моду."
+
+msgid "Labels - the captions in the breakdown under the skill."
+msgstr "Labels - подписи в разбивке под описанием навыка."
+
+msgid "Effective value"
+msgstr "Итоговое значение"
+
+msgid "XP MULTIPLIERS"
+msgstr "МНОЖИТЕЛИ ОПЫТА"
+
+msgid "decimal point"
+msgstr ","
+
+msgid "Racial XP multipliers under the attributes: 1 shows them, 0 hides."
+msgstr "Расовые множители опыта под качествами: 1 - показывать, 0 - нет."
+
+msgid "HoldKey: ALT, CTRL, SHIFT - shown only while held; NONE - always."
+msgstr "HoldKey: ALT, CTRL, SHIFT - виден, пока клавиша зажата; NONE - всегда."
+
+msgid "Current XP rate"
+msgstr "Тек. скор. прокачки"
+
+msgid "ShowRate: current XP rate after the skill name in the description: 1 shows it, 0 hides."
+msgstr "ShowRate: скорость прокачки за названием навыка в описании: 1 - показывать, 0 - нет."
+
+msgid "always"
+msgstr "всегда"
+
+msgid "left"
+msgstr "слева"
+
+msgid "right"
+msgstr "справа"
+
+msgid "Stat colours"
+msgstr "Цвета характеристик"
+
+msgid "Racial XP"
+msgstr "Расовый опыт"
+
+msgid "Racial XP multipliers"
+msgstr "Расовые множители опыта"
+
+msgid "Under the attributes in the character window."
+msgstr "Под качествами в окне персонажа."
+
+msgid "Show while held"
+msgstr "Показывать, пока зажата"
+
+msgid "The multipliers are visible only while this key is held."
+msgstr "Множители видны, только пока зажата эта клавиша."
+
+msgid "After the skill name in the description."
+msgstr "За названием навыка в описании."
+
+msgid "Colours"
+msgstr "Цвета"
+
+msgid "Colours from the interface theme"
+msgstr "Цвета из темы интерфейса"
+
+msgid "auto colours are taken from kenshi_colours.xml and an interface mod over it."
+msgstr "Цвета auto берутся из kenshi_colours.xml и мода интерфейса поверх него."
+
+msgid "Bracket side"
+msgstr "Сторона скобок"
+
+msgid "On the left it can overlap a long skill name."
+msgstr "Слева может налезать на длинное название навыка."
+
+msgid "Brackets"
+msgstr "Скобки"
+
+msgid "auto or #RRGGBB."
+msgstr "auto или #RRGGBB."
+
+msgid "Bonus"
+msgstr "Прибавка"
+
+msgid "Penalty"
+msgstr "Штраф"
+
+msgid "Labels"
+msgstr "Подписи"
+
+msgid "Skill level colours"
+msgstr "Цвета уровней навыка"
+
+msgid "Above 100"
+msgstr "Выше 100"
+
+msgid "#RRGGBB"
+msgstr "#RRGGBB"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt."
+msgstr "Подробности в RE_Kenshi_log.txt."
+
+msgid "Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."
+msgstr "Красит числа навыков по уровню, расписывает бонусы снаряжения, показывает расовые множители и текущую скорость прокачки."
+
+msgid "Racial XP multipliers under the attributes in the character window."
+msgstr "Расовые множители опыта под качествами в окне персонажа."
+
+msgid "The multipliers are shown only while this key is held. always - always shown."
+msgstr "Множители видны, только пока зажата эта клавиша. всегда - видны всегда."
+
+msgid "The current XP rate in brackets after the skill name in the skill description."
+msgstr "Текущая скорость прокачки в скобках за названием навыка в его описании."
+
+msgid "auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."
+msgstr "Цвета auto ниже берутся из палитры игры, kenshi_colours.xml, и следуют за модом интерфейса поверх неё. Выключено - встроенные цвета."
+
+msgid "Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."
+msgstr "С какой стороны от значения навыка стоят скобки с поправкой от снаряжения. Слева они могут налезать на длинное название навыка."
+
+msgid "The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."
+msgstr "Скобки вокруг поправки от снаряжения, вроде (+3). auto - из палитры, или #RRGGBB."
+
+msgid "The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."
+msgstr "Число в скобках, когда снаряжение прибавляет. auto - из палитры, или #RRGGBB."
+
+msgid "The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."
+msgstr "Число в скобках, когда снаряжение отнимает. auto - из палитры, или #RRGGBB."
+
+msgid "The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."
+msgstr "Подписи в разбивке под описанием навыка. auto - из палитры, или #RRGGBB."
+
+msgid "Colour of skill values in this range, #RRGGBB. Above 100 happens only with an equipment bonus."
+msgstr "Цвет значений навыка в этом промежутке, #RRGGBB. Выше 100 бывает только с прибавкой от снаряжения."
+
+msgid "Details in RE_Kenshi_log.txt: the palette, the colours used and the breakdown under the skill."
+msgstr "Подробности в RE_Kenshi_log.txt: палитра, выбранные цвета и разбивка под навыком."
+
+msgid "Robotic limbs"
+msgstr "Протезы"
+
+msgid "The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."
+msgstr "Множители видны, только пока зажата эта клавиша. Щёлкните и нажмите клавишу; Backspace - без клавиши, видны всегда."
+
+msgid "HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."
+msgstr "HoldKey: любая клавиша (ALT, CTRL, SHIFT, F, CTRL+B...) - видно, только пока зажата; NONE - всегда."
