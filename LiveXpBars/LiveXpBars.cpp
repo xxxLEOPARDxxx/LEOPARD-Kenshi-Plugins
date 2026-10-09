@@ -196,6 +196,10 @@ namespace
     int g_top = 260;
     int g_width = 460;
     int g_rowGap = 0;               // расстояние между строками, px (08.10.2026)
+    // Ширина колонки названия и промежуток между колонками (10.10.2026,
+    // просьба Khripunoff: уровень поближе к названию навыка).
+    int g_nameWidth = 150;
+    int g_columnGap = 8;
 
 
     std::string IniPath()
@@ -490,6 +494,16 @@ namespace
             g_rowGap = -8;
         if (g_rowGap > 40)
             g_rowGap = 40;
+        g_nameWidth = static_cast<int>(GetPrivateProfileIntA("Bars", "NameWidth", 150, ini.c_str()));
+        if (g_nameWidth < 40)
+            g_nameWidth = 40;
+        if (g_nameWidth > 300)
+            g_nameWidth = 300;
+        g_columnGap = static_cast<int>(GetPrivateProfileIntA("Bars", "ColumnGap", 8, ini.c_str()));
+        if (g_columnGap < 0)
+            g_columnGap = 0;
+        if (g_columnGap > 40)
+            g_columnGap = 40;
 
         if (g_width < 240)
             g_width = 240;
@@ -601,10 +615,8 @@ namespace
     // ---------------------------------------------------------------
 
     const int kRowHeight = 24;
-    const int kNameWidth = 150;
     const int kLevelWidth = 40;
     const int kPercentWidth = 60;
-    const int kGap = 8;
     const int kBarHeight = 12;
     const int kSetupRows = 4;
 
@@ -663,11 +675,11 @@ namespace
         // видимых строк бывает до тридцати трёх.
         std::string label;          // подпись навыка
         int shownKey;               // значение в тысячных: уровень и 0.1%
-        int placedTop, placedLeft, placedBar, placedFill;
+        int placedTop, placedLeft, placedBar, placedFill, placedLevel;
 
         Row() : name(0), level(0), percent(0), groove(0), fill(0),
                 fraction(0.0f), alpha(0.0f), lastGain(0), shownKey(-1),
-                placedTop(-1), placedLeft(-1), placedBar(-1), placedFill(-1) {}
+                placedTop(-1), placedLeft(-1), placedBar(-1), placedFill(-1), placedLevel(-1) {}
     };
 
 
@@ -975,7 +987,7 @@ namespace
         Row row;
 
         row.name = g_panel->createWidget<MyGUI::TextBox>(
-            "Kenshi_TextboxStandardText", MyGUI::IntCoord(0, 0, kNameWidth, kRowHeight),
+            "Kenshi_TextboxStandardText", MyGUI::IntCoord(0, 0, g_nameWidth, kRowHeight),
             MyGUI::Align::Default, "");
         row.name->setCaption(label);
         if (!KeepSkin(g_colourName))
@@ -1074,9 +1086,9 @@ namespace
     void PlaceRow(Row& row, int index, int leftOffset, int topOffset)
     {
         const int top = topOffset + index * (kRowHeight + g_rowGap);
-        const int levelLeft = leftOffset + kNameWidth + kGap;
-        const int percentLeft = levelLeft + kLevelWidth + kGap;
-        const int barLeft = percentLeft + kPercentWidth + kGap;
+        const int levelLeft = leftOffset + g_nameWidth + g_columnGap;
+        const int percentLeft = levelLeft + kLevelWidth + g_columnGap;
+        const int barLeft = percentLeft + kPercentWidth + g_columnGap;
 
         // Полоса кончается там же, где строка: leftOffset + g_width. Было
         // «g_width - barLeft - kGap» - без левого поля и с лишним зазором,
@@ -1092,7 +1104,8 @@ namespace
 
         // Всё на своих местах - переставлять нечего.
         if (row.placedTop == top && row.placedLeft == leftOffset &&
-            row.placedBar == barWidth && row.placedFill == fillWidth)
+            row.placedBar == barWidth && row.placedFill == fillWidth &&
+            row.placedLevel == levelLeft)
         {
             return;
         }
@@ -1100,8 +1113,9 @@ namespace
         row.placedLeft = leftOffset;
         row.placedBar = barWidth;
         row.placedFill = fillWidth;
+        row.placedLevel = levelLeft;
 
-        row.name->setCoord(leftOffset, top, kNameWidth, kRowHeight);
+        row.name->setCoord(leftOffset, top, g_nameWidth, kRowHeight);
         row.level->setCoord(levelLeft, top, kLevelWidth, kRowHeight);
         row.percent->setCoord(percentLeft, top, kPercentWidth, kRowHeight);
         row.groove->setCoord(barLeft, top + (kRowHeight - kBarHeight) / 2,
@@ -1476,6 +1490,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "Bars", "HideForSquad", Tr("Hide when several are selected"), Tr("Each character trains their own skills - with several selected the bars would be a mess."), 1, 0);
     api->toggle(api, "Bars", "HideWithGUI", Tr("Hide with the interface"), Tr("Hide the bars together with the game interface, F7. Off - the bars stay when the interface is hidden."), 1, 0);
     api->integer(api, "Bars", "RowSpacing", Tr("Space between rows, px"), Tr("Extra space between the rows of the bars. Below zero - the rows move closer."), 0, -8, 40, 0);
+    api->integer(api, "Bars", "NameWidth", Tr("Skill name column, px"), Tr("Width of the skill name column: the level starts right after it. Smaller - the level moves closer to the name; too small cuts long names."), 150, 40, 300, 0);
+    api->integer(api, "Bars", "ColumnGap", Tr("Space between columns, px"), Tr("Space between the name, the level, the percentage and the bar."), 8, 0, 40, 0);
     api->integer(api, "Bars", "Width", Tr("Row width, px"), Tr("Width of a row: the skill name, level and percentage come first, the rest goes to the bar. The position is set with SHIFT+B."), 460, 240, 1200, 0);
     api->toggle(api, "Bars", "ColourLevel", Tr("Colour the level"), Tr("Colour the skill level by its value, with the level colours below."), 1, 0);
     api->toggle(api, "Bars", "ColourPercent", Tr("Colour the percentage"), Tr("Colour the percentage by progress to the next level: dim at the start, bright near the level."), 1, 0);

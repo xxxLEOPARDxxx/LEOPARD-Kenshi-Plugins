@@ -184,3 +184,15 @@ msgstr "Расстояние между строками, px"
 
 msgid "Extra space between the rows of the bars. Below zero - the rows move closer."
 msgstr "Добавочное расстояние между строками полос. Меньше нуля - строки ближе."
+
+msgid "Skill name column, px"
+msgstr "Колонка названия, пикс."
+
+msgid "Width of the skill name column: the level starts right after it. Smaller - the level moves closer to the name; too small cuts long names."
+msgstr "Ширина колонки с названием навыка: уровень идёт сразу за ней. Меньше - уровень ближе к названию; слишком мало - длинные названия обрежутся."
+
+msgid "Space between columns, px"
+msgstr "Промежуток между колонками, пикс."
+
+msgid "Space between the name, the level, the percentage and the bar."
+msgstr "Промежуток между названием, уровнем, процентами и полосой."

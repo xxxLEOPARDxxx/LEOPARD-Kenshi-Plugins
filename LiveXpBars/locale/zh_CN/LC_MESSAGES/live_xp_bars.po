@@ -184,3 +184,15 @@ msgstr "行间距，像素"
 
 msgid "Extra space between the rows of the bars. Below zero - the rows move closer."
 msgstr "进度条各行之间的额外间距。小于零时行更紧凑。"
+
+msgid "Skill name column, px"
+msgstr "技能名称列宽（像素）"
+
+msgid "Width of the skill name column: the level starts right after it. Smaller - the level moves closer to the name; too small cuts long names."
+msgstr "技能名称列的宽度：等级紧随其后。越小等级越靠近名称；过小会截断较长的名称。"
+
+msgid "Space between columns, px"
+msgstr "列间距（像素）"
+
+msgid "Space between the name, the level, the percentage and the bar."
+msgstr "名称、等级、百分比与进度条之间的间距。"
