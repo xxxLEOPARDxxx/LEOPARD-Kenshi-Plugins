@@ -50,6 +50,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <cstdio>
 #include <cstring>
@@ -158,7 +159,8 @@ namespace
         return w;
     }
 
-    std::string IniPath() { return ModuleDir() + "WantedMap.ini"; }
+    // Путь к ini игрока - см. shared/IniDefaults.h (11.10.2026).
+    std::string IniPath() { return IniDefaults::Prepare(ModuleDir() + "WantedMap.ini"); }
 
     // Зовётся при запуске и из MCM после изменения настройки.
     void __cdecl LoadSettings()
@@ -1040,7 +1042,10 @@ namespace
                     targetSquads[tsid] = p;
                 if (p->activePlatoon != NULL)
                 {
-                    lektor<RootObject*> chars;
+                    // У lektor нет деструктора (буфер игры не освобождается) -
+                    // один на всё время, иначе каждое сканирование теряло память.
+                    static lektor<RootObject*> chars;
+                    chars.clear();
                     p->activePlatoon->getCharactersInArea(chars, p->getPosition(), 1.0e7f, false);
                     for (uint32_t c = 0; c < chars.size(); ++c)
                     {

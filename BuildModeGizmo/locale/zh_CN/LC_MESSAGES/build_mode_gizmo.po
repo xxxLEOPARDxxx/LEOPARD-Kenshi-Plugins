@@ -85,3 +85,9 @@ msgstr "移动后落回地面"
 
 msgid "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."
 msgstr "松开箭头后，建筑会在新位置重建，游戏会把它放回地面。关闭时，它会保持你抬升到的高度。"
+
+msgid "Arrows on any building in the developer build mode"
+msgstr "开发者建造模式下任意建筑显示移动箭头"
+
+msgid "Developer menu (Shift+F12), normal build mode: select any building - yours or not, built or not - and move it with the arrows right away. In the interior mode the game does this itself."
+msgstr "开发者菜单（Shift+F12）普通建造模式：选中任意建筑（无论是否属于你、是否建成），即可直接用箭头移动。室内模式下游戏本身已支持。"

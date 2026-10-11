@@ -57,6 +57,7 @@
 #define NOMINMAX
 
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -183,7 +184,7 @@ namespace
     // Настройки
     // ---------------------------------------------------------------
 
-    std::string IniPath()
+    std::string IniFileName()
     {
         char modulePath[MAX_PATH] = {};
 
@@ -199,6 +200,14 @@ namespace
             return std::string();
 
         return path.substr(0, slash + 1) + "StatColours.ini";
+    }
+
+
+    // Путь к ini игрока; при первом обращении - копия или дописка из
+    // <Мод>.defaults.ini (shared/IniDefaults.h, 11.10.2026).
+    std::string IniPath()
+    {
+        return IniDefaults::Prepare(IniFileName());
     }
 
 
@@ -1199,7 +1208,10 @@ namespace
                     if (n == 1 && names[1] == names[0])
                         continue;
 
-                    lektor<StringPair> rows;
+                    // У lektor нет деструктора (буфер игры не освобождается) -
+                    // один на всё время, иначе каждое описание теряло память.
+                    static lektor<StringPair> rows;
+                    rows.clear();
                     if (!stats->getStatPenaltiesForGUI(
                             names[n], window->statProgress, rows))
                         continue;

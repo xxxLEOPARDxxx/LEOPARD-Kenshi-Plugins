@@ -30,6 +30,7 @@
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <cstdio>
 #include <string>
@@ -74,7 +75,7 @@ namespace
     bool  g_downed = false;           // опыт за лежачих (без сознания)
     bool  g_debug = true;             // строка в журнал на каждое попадание
 
-    std::string IniPath()
+    std::string IniFileName()
     {
         char path[MAX_PATH] = {};
         const DWORD n = GetModuleFileNameA(
@@ -85,6 +86,14 @@ namespace
         const std::string::size_type slash = s.find_last_of("\\/");
         return slash == std::string::npos
             ? std::string() : s.substr(0, slash + 1) + "RangedDamageXp.ini";
+    }
+
+
+    // Путь к ini игрока; при первом обращении - копия или дописка из
+    // <Мод>.defaults.ini (shared/IniDefaults.h, 11.10.2026).
+    std::string IniPath()
+    {
+        return IniDefaults::Prepare(IniFileName());
     }
 
     float ReadFloat(const std::string& ini, const char* key, float def)

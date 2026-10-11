@@ -1,6 +1,6 @@
-// DarkUiTweaks - доработки интерфейса, которые вёрсткой не делаются.
+// UITweaks - доработки интерфейса, которые вёрсткой не делаются.
 //
-// Отдельный мод mods\DarkUiTweaks. Сначала жил в папке мода
+// Отдельный мод mods\UITweaks. Сначала жил в папке мода
 // «Russian Dark UI simplistic», но от разметки не зависит: правит
 // размеры виджетов, которые игра строит сама, и работает с любым
 // интерфейсом (что где оговорено - README.txt). Правки разметки самого
@@ -57,11 +57,12 @@
 // Character Inspector давно работает через него.
 
 #define WIN32_LEAN_AND_MEAN
-#define KLOC_DOMAIN "dark_ui_tweaks"
+#define KLOC_DOMAIN "ui_tweaks"
 #include <Localization.h>
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <algorithm>
 #include <cstdio>
@@ -85,6 +86,8 @@
 #include <mygui/MyGUI_InputManager.h>
 #include <mygui/MyGUI_ImageBox.h>
 #include <mygui/MyGUI_RenderManager.h>
+#include <mygui/MyGUI_SubSkin.h>
+#include <mygui/MyGUI_ITexture.h>
 
 #include <OgreResourceGroupManager.h>
 #include <OgreTextureManager.h>
@@ -149,7 +152,7 @@ namespace
     bool g_debug = false;
 
 
-    std::string IniPath()
+    std::string IniFileName()
     {
         char path[MAX_PATH] = {};
 
@@ -167,6 +170,45 @@ namespace
     }
 
 
+    // До 11.10.2026 мод назывался DarkUiTweaks. Своего ini ещё нет -
+    // забираем настройки старого: в той же папке (Мастерская обновляет
+    // предмет на месте) или в соседней папке DarkUiTweaks (ручная установка).
+    void TakeOverOldIni(const std::string& ini)
+    {
+        if (ini.empty() || GetFileAttributesA(ini.c_str()) != INVALID_FILE_ATTRIBUTES)
+            return;
+
+        const std::string::size_type slash = ini.find_last_of("\\/");
+        const std::string dir = slash == std::string::npos ? std::string() : ini.substr(0, slash + 1);
+        const char* const places[] = { "DarkUiTweaks.ini", "..\\DarkUiTweaks\\DarkUiTweaks.ini" };
+        for (size_t i = 0; i < sizeof(places) / sizeof(places[0]); ++i)
+        {
+            const std::string old = dir + places[i];
+            if (GetFileAttributesA(old.c_str()) != INVALID_FILE_ATTRIBUTES &&
+                CopyFileA(old.c_str(), ini.c_str(), TRUE))
+            {
+                DebugLog("UITweaks: settings taken over from " + old);
+                return;
+            }
+        }
+    }
+
+
+    // Путь к ini игрока; при первом обращении - копия или дописка из
+    // <Мод>.defaults.ini (shared/IniDefaults.h, 11.10.2026).
+    std::string IniPath()
+    {
+        static bool tookOver = false;
+        const std::string ini = IniFileName();
+        if (!tookOver)
+        {
+            tookOver = true;
+            TakeOverOldIni(ini);
+        }
+        return IniDefaults::Prepare(ini);
+    }
+
+
     // По-английски: правило стенда - в бинарнике кириллицы нет. Русский
     // .ini кладётся рядом с DLL при установке.
     void WriteDefaultIni(const std::string& ini)
@@ -175,7 +217,7 @@ namespace
         if (fopen_s(&f, ini.c_str(), "w") != 0 || f == NULL)
             return;
 
-        fputs("; DarkUiTweaks - what the layout files cannot do.\n", f);
+        fputs("; UITweaks - what the layout files cannot do.\n", f);
         fputs(";\n", f);
         fputs("; QueueRowHeight - height of a row in the research and\n", f);
         fputs(";   crafting queues, in pixels. The game gives them about\n", f);
@@ -331,9 +373,9 @@ namespace
     // строкой. Метка живёт и умирает вместе с виджетом, поэтому, в
     // отличие от множества указателей, не врёт после загрузки сохранения:
     // новый ящик на месте старого по адресу метки не несёт.
-    const char* const TAG_ROWS = "DarkUiTweaksRows";   // ящику задана высота
-    const char* const TAG_FILL = "DarkUiTweaksFill";   // наша заливка
-    const char* const TAG_WIDE = "DarkUiTweaksWide";   // уже жаловались в журнал
+    const char* const TAG_ROWS = "UITweaksRows";   // ящику задана высота
+    const char* const TAG_FILL = "UITweaksFill";   // наша заливка
+    const char* const TAG_WIDE = "UITweaksWide";   // уже жаловались в журнал
 
 
     bool Tagged(MyGUI::Widget* widget, const char* tag)
@@ -406,7 +448,7 @@ namespace
         {
             char note[224];
             sprintf_s(note,
-                      "DarkUiTweaks: itembox '%s' rows set to %d "
+                      "UITweaks: itembox '%s' rows set to %d "
                       "(size %dx%d)",
                       box->getName().c_str(), g_rowHeight,
                       size.width, size.height);
@@ -516,7 +558,7 @@ namespace
 
             char note[200];
             sprintf_s(note,
-                "DarkUiTweaks: game bar %d is wider than the assumed "
+                "UITweaks: game bar %d is wider than the assumed "
                 "100%% %.0f", bar->getWidth(), whole);
             DebugLog(note);
         }
@@ -552,7 +594,7 @@ namespace
             {
                 char note[320];
                 sprintf_s(note,
-                    "DarkUiTweaks: bar fill created - row %d, plate %d at %d, "
+                    "UITweaks: bar fill created - row %d, plate %d at %d, "
                     "game 100%% %.0f (value text width), frame %d, "
                     "game bar %d at %d",
                     row->getWidth(), plate->getWidth(), plate->getLeft(),
@@ -626,7 +668,7 @@ namespace
     // ящик портретов 161 -> 212, два ряда по 106.
     // ---------------------------------------------------------------
 
-    const char* const TAG_SQUADS = "DarkUiTweaksSquads";
+    const char* const TAG_SQUADS = "UITweaksSquads";
 
     int g_squadExtra = 0;         // прибавка к высоте ячейки отряда
     int g_squadCellHeight = 0;    // высота, которую мы отдали последней
@@ -708,7 +750,7 @@ namespace
                 sprintf_s(hex, "%02X ", code[i]);
                 bytes += hex;
             }
-            DebugLog("DarkUiTweaks: squads - getCellDimension code: " + bytes);
+            DebugLog("UITweaks: squads - getCellDimension code: " + bytes);
         }
 
         for (int i = 0; i + 9 <= SPAN; ++i)
@@ -765,7 +807,7 @@ namespace
             return;
 
         last = note;
-        DebugLog("DarkUiTweaks: squads - " + note);
+        DebugLog("UITweaks: squads - " + note);
     }
 
 
@@ -968,7 +1010,7 @@ namespace
             g_squadHeightVar = FindSquadHeightVar();
             if (g_squadHeightVar == NULL)
             {
-                ErrorLog("DarkUiTweaks: squad cell height not found in "
+                ErrorLog("UITweaks: squad cell height not found in "
                          "the game code, squad cells stay as they are");
             }
         }
@@ -1005,7 +1047,7 @@ namespace
                           "wrong variable, leaving it alone",
                           value, cell->getHeight());
                 SquadNote(note);
-                ErrorLog(std::string("DarkUiTweaks: ") + note);
+                ErrorLog(std::string("UITweaks: ") + note);
                 g_squadHeightVar = NULL;
                 return;
             }
@@ -1074,7 +1116,7 @@ namespace
         // только раздули бы ячейку. Откатываемся к игровой высоте.
         if (g_squadLastHave >= 0 && have == g_squadLastHave)
         {
-            ErrorLog("DarkUiTweaks: squad portraits do not grow with the "
+            ErrorLog("UITweaks: squad portraits do not grow with the "
                      "cell, leaving the game's height");
             g_squadStuck = true;
             g_squadExtra = 0;
@@ -1109,6 +1151,10 @@ namespace
 
     void StyleDescriptionBars(MyGUI::Widget* panel);
 
+    // Панель описания окна навыков, найденная обходом, - её же правим
+    // перед отрисовкой (раздел «Полоса описания навыка - перед отрисовкой»).
+    WidgetRef g_statsPanel;
+
 
     void WalkWidgets(MyGUI::Widget* widget, int depth)
     {
@@ -1141,6 +1187,8 @@ namespace
             (EndsWith(widget->getName(), STATS_DESCRIPTION) ||
              widget->getName() == STATS_DESCRIPTION + 1))
         {
+            if (g_statsPanel.get() != widget)
+                g_statsPanel.set(widget);
             StyleDescriptionBars(widget);
             return;
         }
@@ -1210,18 +1258,34 @@ namespace
     // берётся из ширины, которую поставила игра.
     // ---------------------------------------------------------------
 
-    const char* const TAG_DUMPED = "DarkUiTweaksDumped";
-    const char* const KEY_BASE = "DarkUiTweaksBase";   // координаты от игры
-    const char* const KEY_SET = "DarkUiTweaksSet";     // координаты от нас
+    const char* const TAG_DUMPED = "UITweaksDumped";
+    const char* const KEY_BASE = "UITweaksBase";   // координаты от игры
+    const char* const KEY_SET = "UITweaksSet";     // координаты от нас
 
     // Отступы игровой заливки от подложки - из журнала (слева +7).
     const int GAME_FILL_X = 7;
 
-    // Кайма подложки - та же, что у строки очереди исследований
-    // (FRAME_PX сверху и снизу, QueueBarInset по бокам). Первая версия
-    // брала отступы игры (7 слева, 3 сверху) - по снимку заливка легла
-    // поверх верхней и нижней чёрной линии, а слева между линией и
-    // заливкой остался серый кусок подложки.
+    // Кайма подложки сверху и снизу. Подложка - кнопка Kenshi_Button1Skin:
+    // девять кусков, края по 6 px, и они не растягиваются, сколько бы ни
+    // выросла подложка. Видимая кайма в них тоньше (11.10.2026, по
+    // текстурам): в ванили тёмная линия 2 px сверху и 3 снизу, в Dark UI -
+    // 2 px прозрачных и 2 чёрных. С отступом 6 под заливкой оставалась
+    // полоска самой подложки - в ванили тёмная, и выглядело так, будто
+    // заливка не доходит до низа. 4 - вплотную к чёрной линии Dark UI и
+    // почти до края в ванили; 3 уже ложится на чёрную линию.
+    const int DESC_FRAME_PX = 4;
+
+    // Заливка вышла толстой (11.10.2026, пользователь): у неё сверху срезаем
+    // 3 px, снизу 2. Подложка, подпись и строки ниже - на месте (первая
+    // попытка резала и подложку - пользователь: «верни, только заливку»).
+    const int BAR_TRIM_TOP = 3;
+    const int BAR_TRIM_BOTTOM = 2;
+
+    // По бокам - QueueBarInset, как у строки очереди исследований. Первая
+    // версия брала отступы игры (7 слева, 3 сверху) - по снимку заливка
+    // легла поверх верхней и нижней чёрной линии, а слева между линией и
+    // заливкой остался серый кусок подложки. Потом сверху и снизу стоял
+    // FRAME_PX (6) от очереди - см. DESC_FRAME_PX выше.
 
 
     std::string CoordText(const MyGUI::IntCoord& c)
@@ -1243,11 +1307,26 @@ namespace
 
     // Координаты, которые поставила игра: если сейчас стоят наши - база
     // из памяти, иначе текущие (игра их переписала) и они новая база.
+    // Для журнала: кто сейчас правит полосу и сколько раз он застал
+    // заливку, переписанную игрой после нашей прошлой правки.
+    const char* g_restyleWho = "frame";
+    std::map<std::string, int> g_rewrites;
+    MyGUI::Widget* g_watchFill = NULL;
+
     MyGUI::IntCoord BaseCoord(MyGUI::Widget* widget)
     {
         const std::string set = widget->getUserString(KEY_SET);
         if (!set.empty() && set == CoordText(widget->getCoord()))
             return ParseCoord(widget->getUserString(KEY_BASE));
+
+        if (g_debug && widget == g_watchFill && !set.empty())
+        {
+            const int n = ++g_rewrites[g_restyleWho];
+            if (n <= 5 || n % 200 == 0)
+                DebugLog(std::string("UITweaks: fill rewritten, found by ") +
+                         g_restyleWho + " #" + std::to_string(static_cast<long long>(n)) +
+                         ": ours " + set + " now " + CoordText(widget->getCoord()));
+        }
 
         const MyGUI::IntCoord base = widget->getCoord();
         widget->setUserString(KEY_BASE, CoordText(base));
@@ -1276,11 +1355,20 @@ namespace
     }
 
 
-    bool Inside(const MyGUI::IntCoord& inner, const MyGUI::IntCoord& outer)
+    // Заливка - виджет, чей левый верхний угол внутри подложки. Целиком
+    // внутри она быть не обязана: игра переписывает ей только размер, а
+    // место остаётся нашим (выше, чем у игры), и высота от игры бывает
+    // разная - 8, 9, 10, 12 px (11.10.2026). У Крепости игра ставила 12, низ
+    // вылезал за подложку, строка не находилась - и всю панель мы
+    // пропускали: заливка оставалась игровой. Отсюда «у разных навыков и
+    // интерфейсов по-разному»: зависит от высоты, которую дала игра, и от
+    // того, где подложка в разметке интерфейса.
+    bool StartsInside(const MyGUI::IntCoord& inner,
+                      const MyGUI::IntCoord& outer)
     {
         return inner.left >= outer.left && inner.top >= outer.top &&
-               inner.left + inner.width <= outer.left + outer.width &&
-               inner.top + inner.height <= outer.top + outer.height;
+               inner.left < outer.left + outer.width &&
+               inner.top < outer.top + outer.height;
     }
 
 
@@ -1306,6 +1394,41 @@ namespace
     }
 
 
+    // Для журнала: какой кусок какой текстуры рисует виджет (в пикселях
+    // текстуры). Поле UV у SubSkin защищённое - читаем через наследника.
+    struct SubSkinPeek : MyGUI::SubSkin
+    {
+        static MyGUI::FloatRect Uv(MyGUI::SubSkin* skin)
+        {
+            return skin->*(&SubSkinPeek::mCurrentTexture);
+        }
+    };
+
+
+    std::string DescribeTexture(MyGUI::Widget* widget)
+    {
+        const std::string& name = widget->_getTextureName();
+        MyGUI::ISubWidgetRect* const main = widget->getSubWidgetMain();
+        if (main == NULL || !main->isType<MyGUI::SubSkin>())
+            return " tex '" + name + "' no subskin";
+
+        const MyGUI::FloatRect uv =
+            SubSkinPeek::Uv(static_cast<MyGUI::SubSkin*>(main));
+        MyGUI::ITexture* const texture = name.empty() ? NULL
+            : MyGUI::RenderManager::getInstance().getTexture(name);
+        const int w = texture != NULL ? texture->getWidth() : 0;
+        const int h = texture != NULL ? texture->getHeight() : 0;
+
+        const MyGUI::IntCoord sub = main->getCoord();
+        char text[260];
+        sprintf_s(text, " tex '%s' %dx%d uv %.0f %.0f %.0f %.0f alpha %.2f sub %d %d %d %d",
+                  name.c_str(), w, h, uv.left * w, uv.top * h,
+                  (uv.right - uv.left) * w, (uv.bottom - uv.top) * h,
+                  widget->getAlpha(), sub.left, sub.top, sub.width, sub.height);
+        return text;
+    }
+
+
     void BarNote(const std::string& note)
     {
         static std::string last;
@@ -1313,7 +1436,7 @@ namespace
             return;
 
         last = note;
-        DebugLog("DarkUiTweaks: bar - " + note);
+        DebugLog("UITweaks: bar - " + note);
     }
 
 
@@ -1343,7 +1466,7 @@ namespace
                 if (j == i || IsText(children[j]) || IsPlate(children[j]))
                     continue;
 
-                if (Inside(bases[j], bases[i]))
+                if (StartsInside(bases[j], bases[i]))
                 {
                     BarRow row = { children[i], bases[i], children[j] };
                     rows.push_back(row);
@@ -1352,8 +1475,36 @@ namespace
             }
         }
 
+        // Подробный журнал: все дети холста - тип, скин, базовые координаты,
+        // видимость (11.10.2026: на ванильном интерфейсе заливка местами
+        // оставалась игровой - выяснить, что лежит внутри подложки).
+        if (g_debug)
+        {
+            std::string dump;
+            for (size_t i = 0; i < count; ++i)
+            {
+                char line[200];
+                sprintf_s(line, " [%u %s '%s' %s%s%s]", static_cast<unsigned>(i),
+                          children[i]->getTypeName().c_str(), children[i]->getName().c_str(),
+                          CoordText(bases[i]).c_str(), children[i]->getVisible() ? "" : " hidden",
+                          IsPlate(children[i]) ? " plate" : (IsText(children[i]) ? " text" : ""));
+                dump += line;
+            }
+            for (size_t r = 0; r < rows.size(); ++r)
+            {
+                char line[120];
+                sprintf_s(line, " row%u: fill %s", static_cast<unsigned>(r), CoordText(BaseCoord(rows[r].fill)).c_str());
+                dump += line;
+                dump += DescribeTexture(rows[r].fill) + " plate" +
+                        DescribeTexture(rows[r].plate);
+            }
+            BarNote("canvas" + dump);
+        }
+
         if (rows.empty())
             return;
+
+        g_watchFill = rows[0].fill;
 
         const int grow = 2 * g_progressPad;
         const int drop = g_progressDrop;
@@ -1400,10 +1551,12 @@ namespace
                     share = 1.0f;
 
                 want.left = plate.left + g_barInset;
-                want.top = plate.top + shift + drop - up + FRAME_PX;
+                want.top = plate.top + shift + drop - up + BAR_TRIM_TOP +
+                           DESC_FRAME_PX;
                 want.width = static_cast<int>(
                     share * (plate.width - 2 * g_barInset) + 0.5f);
-                want.height = plate.height + grow + up - 2 * FRAME_PX;
+                want.height = plate.height + grow + up - BAR_TRIM_TOP -
+                              BAR_TRIM_BOTTOM - 2 * DESC_FRAME_PX;
             }
             else if (own != NULL && IsText(child))
             {
@@ -1431,8 +1584,9 @@ namespace
         {
             const BarRow& row = rows[0];
             BarNote("plate" + DescribeWidget("", row.plate) + ", fill" +
-                    DescribeWidget("", row.fill) + ", game plate " +
-                    CoordText(row.plateBase));
+                    DescribeWidget("", row.fill) + DescribeTexture(row.fill) +
+                    ", game plate " + CoordText(row.plateBase) + " by " +
+                    g_restyleWho);
         }
     }
 
@@ -1476,7 +1630,7 @@ namespace
         if (!widget->getVisible())
             line += " hidden";
 
-        DebugLog("DarkUiTweaks: tree " + line);
+        DebugLog("UITweaks: tree " + line);
 
         const size_t count = widget->getChildCount();
         for (size_t i = 0; i < count; ++i)
@@ -1535,7 +1689,7 @@ namespace
         if (g_debug)
         {
             char note[256];
-            sprintf_s(note, "DarkUiTweaks: datapanel '%s' scrolls %d -> %d",
+            sprintf_s(note, "UITweaks: datapanel '%s' scrolls %d -> %d",
                       name.c_str(), scrolls ? 1 : 0, wanted ? 1 : 0);
             DebugLog(note);
         }
@@ -1605,6 +1759,87 @@ namespace
 
 
     // ---------------------------------------------------------------
+    // Полоса описания навыка - перед отрисовкой
+    //
+    // У навыка, который сейчас качается, игра переписывает размер
+    // заливки каждый кадр (11.10.2026, Khripunoff: «в некоторых навыках
+    // не доходит до низа» - Сила, Крепость, Тяжёлое оружие, Боевые
+    // искусства, Скрытность). Журнал: наша заливка 15 px, к следующему
+    // кадру снова игровые 8-9 px - и так каждый кадр. Пишет её не
+    // обновление панели (DatapanelGUI::update), не обновление строки и не
+    // заполнение строки - перехваты на них почти ничего не ловили. Кто
+    // бы ни писал, последнее слово должно быть за нами, поэтому полосу
+    // правим прямо перед тем, как MyGUI рисует интерфейс:
+    // LayerManager::renderToTarget из MyGUIEngine_x64.dll.
+    //
+    // Панель находит обычный обход кадра (g_statsPanel), здесь только
+    // правка этой одной панели - без обхода всего интерфейса.
+    // ---------------------------------------------------------------
+
+    void RestyleStatsPanel()
+    {
+        MyGUI::Widget* const root = g_statsPanel.get();
+        if (root == NULL || !root->getInheritedVisible())
+            return;
+
+        g_restyleWho = "render";
+        StyleDescriptionBars(root);
+        g_restyleWho = "frame";
+
+        if (g_debug)
+        {
+            static int calls = 0;
+            if (++calls == 1 || calls % 1000 == 0)
+                DebugLog("UITweaks: bar restyled before drawing, #" +
+                         std::to_string(static_cast<long long>(calls)));
+        }
+    }
+
+
+    void SafeRestyleStatsPanel()
+    {
+        __try
+        {
+            RestyleStatsPanel();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            g_statsPanel.reset();
+            ErrorLog("UITweaks: skill bar restyle failed");
+        }
+    }
+
+
+    void (*g_origRenderToTarget)(void* thisptr, void* target, bool update) = NULL;
+
+    void RenderToTarget_hook(void* thisptr, void* target, bool update)
+    {
+        if (g_enabled && g_progressPad > 0 && g_statsPanel.get() != NULL)
+            SafeRestyleStatsPanel();
+
+        g_origRenderToTarget(thisptr, target, update);
+    }
+
+
+    void HookSkillBars()
+    {
+        HMODULE const mygui = GetModuleHandleA("MyGUIEngine_x64.dll");
+        void* const target = mygui == NULL ? NULL : reinterpret_cast<void*>(
+            GetProcAddress(mygui,
+                "?renderToTarget@LayerManager@MyGUI@@QEAAXPEAVIRenderTarget@2@_N@Z"));
+
+        if (target == NULL ||
+            KenshiLib::SUCCESS != KenshiLib::AddHook(
+                target, RenderToTarget_hook,
+                reinterpret_cast<void**>(&g_origRenderToTarget)))
+        {
+            ErrorLog("UITweaks: could not hook the interface drawing, "
+                     "the bar of a skill being trained may stay short");
+        }
+    }
+
+
+    // ---------------------------------------------------------------
     // Отношение фракции у имени выбранного персонажа
     // ---------------------------------------------------------------
     //
@@ -1665,7 +1900,7 @@ namespace
             {
                 g_namePanelRef->set(found);
                 if (g_debug)
-                    DebugLog(("DarkUiTweaks: name plate found: " + found->getName()).c_str());
+                    DebugLog(("UITweaks: name plate found: " + found->getName()).c_str());
                 return found;
             }
         }
@@ -1830,7 +2065,7 @@ namespace
         if (g_debug)
         {
             char line[96];
-            sprintf_s(line, "DarkUiTweaks: %u items with rendered icons", static_cast<unsigned>(index.size()));
+            sprintf_s(line, "UITweaks: %u items with rendered icons", static_cast<unsigned>(index.size()));
             DebugLog(line);
         }
         return index;
@@ -1894,7 +2129,7 @@ namespace
             }
         }
         if (g_debug)
-            DebugLog(("DarkUiTweaks: craft icon for '" + data->name + "' = '" + texture + "'").c_str());
+            DebugLog(("UITweaks: craft icon for '" + data->name + "' = '" + texture + "'").c_str());
         cache[data] = texture;
         return texture;
     }
@@ -1988,7 +2223,7 @@ namespace
         if (g_debug)
         {
             char line[96];
-            sprintf_s(line, "DarkUiTweaks: crafting bench has %u recipes", crafts.size());
+            sprintf_s(line, "UITweaks: crafting bench has %u recipes", crafts.size());
             DebugLog(line);
         }
     }
@@ -2049,7 +2284,7 @@ namespace
             return NULL;
         }
         if (g_debug)
-            DebugLog(("DarkUiTweaks: recipe '" + caption + "' found by name").c_str());
+            DebugLog(("UITweaks: recipe '" + caption + "' found by name").c_str());
         return &(g_recipes[caption] = r);
     }
 
@@ -2117,7 +2352,7 @@ namespace
         Item* const item = ou->theFactory->createItem(state);
         container->destroyData(state);
         if (g_debug)
-            DebugLog(("DarkUiTweaks: item from a state for '" + r.item->name + "': " + (item != NULL ? "ok" : "failed")).c_str());
+            DebugLog(("UITweaks: item from a state for '" + r.item->name + "': " + (item != NULL ? "ok" : "failed")).c_str());
         return item;
     }
 
@@ -2153,7 +2388,7 @@ namespace
             if (item == NULL && g_debug)
             {
                 char line[200];
-                sprintf_s(line, "DarkUiTweaks: createItem try %u failed for ", static_cast<unsigned>(t));
+                sprintf_s(line, "UITweaks: createItem try %u failed for ", static_cast<unsigned>(t));
                 DebugLog((line + r.item->name).c_str());
             }
         }
@@ -2164,9 +2399,9 @@ namespace
         std::string name;
         iVector2 size;
         InventoryIcon::createIconImage(item, name, size);
-        ou->destroy(item, false, "DarkUiTweaks craft icon");
+        ou->destroy(item, false, "UITweaks craft icon");
         if (g_debug)
-            DebugLog(("DarkUiTweaks: rendered icon for '" + r.item->name + "' = '" + name + "'").c_str());
+            DebugLog(("UITweaks: rendered icon for '" + r.item->name + "' = '" + name + "'").c_str());
         return name;
     }
 
@@ -2392,7 +2627,7 @@ namespace
             if (g_debug)
             {
                 char line[256];
-                sprintf_s(line, "DarkUiTweaks: hover icon %s - grid %dx%d, texture %dx%d, shown %dx%d",
+                sprintf_s(line, "UITweaks: hover icon %s - grid %dx%d, texture %dx%d, shown %dx%d",
                           texture.c_str(), grid.width, grid.height, img.width, img.height, w, h);
                 DebugLog(line);
             }
@@ -2438,7 +2673,7 @@ namespace
             if (g_debug && !chain.empty() && chain != lastChain)
             {
                 lastChain = chain;
-                DebugLog(("DarkUiTweaks: no recipe under the mouse: " + chain).c_str());
+                DebugLog(("UITweaks: no recipe under the mouse: " + chain).c_str());
             }
             HideHoverIcon();
             return;
@@ -2465,7 +2700,7 @@ namespace
             if (!told)
             {
                 told = true;
-                ErrorLog("DarkUiTweaks: the craft icon failed once - skipped");
+                ErrorLog("UITweaks: the craft icon failed once - skipped");
             }
         }
     }
@@ -2556,14 +2791,14 @@ namespace
             FILE* f = NULL;
             if (fopen_s(&f, report.c_str(), "wb") == 0 && f != NULL)
             {
-                fputs("DarkUiTweaks: items whose icon could not be drawn (name | string ID | type)\r\n", f);
+                fputs("UITweaks: items whose icon could not be drawn (name | string ID | type)\r\n", f);
                 fclose(f);
             }
         }
         g_iconJobStarted = GetTickCount();
         g_iconJobRunning = true;
         char line[128];
-        sprintf_s(line, "DarkUiTweaks: drawing icons for %u items without one", static_cast<unsigned>(g_iconJob.size()));
+        sprintf_s(line, "UITweaks: drawing icons for %u items without one", static_cast<unsigned>(g_iconJob.size()));
         DebugLog(line);
         return 0;
     }
@@ -2599,7 +2834,7 @@ namespace
             g_iconJobRunning = false;
             std::vector<GameData*>().swap(g_iconJob);
             SetIconJobText(std::string());
-            DebugLog("DarkUiTweaks: drawing all icons stopped - the game was unloaded");
+            DebugLog("UITweaks: drawing all icons stopped - the game was unloaded");
             return;
         }
         if (!g_iconJobRunning)
@@ -2638,7 +2873,7 @@ namespace
             if (g_iconJobPos % 100 == 0)
             {
                 char line[160];
-                sprintf_s(line, "DarkUiTweaks: icons %u / %u (drawn %u, failed %u)", static_cast<unsigned>(g_iconJobPos),
+                sprintf_s(line, "UITweaks: icons %u / %u (drawn %u, failed %u)", static_cast<unsigned>(g_iconJobPos),
                           static_cast<unsigned>(g_iconJob.size()), g_iconJobMade, g_iconJobFailed);
                 DebugLog(line);
             }
@@ -2657,7 +2892,7 @@ namespace
         sprintf_s(text, TrFmt("Item icons done: %u drawn, %u could not be drawn"), g_iconJobMade, g_iconJobFailed);
         SetIconJobText(text);
         char line[200];
-        sprintf_s(line, "DarkUiTweaks: icons done in %u s - drawn %u, failed %u",
+        sprintf_s(line, "UITweaks: icons done in %u s - drawn %u, failed %u",
                   static_cast<unsigned>((GetTickCount() - g_iconJobStarted) / 1000), g_iconJobMade, g_iconJobFailed);
         DebugLog(line);
     }
@@ -2671,7 +2906,7 @@ namespace
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
             g_iconJobRunning = false;
-            ErrorLog("DarkUiTweaks: drawing all icons failed - stopped");
+            ErrorLog("UITweaks: drawing all icons failed - stopped");
         }
     }
 
@@ -2702,7 +2937,7 @@ namespace
 extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 {
     static const std::string ini = IniPath();
-    api->beginMod(api, "DarkUiTweaks", "Dark Ui Tweaks", ini.c_str(), &LoadSettings);
+    api->beginMod(api, "UITweaks", "UI Tweaks", ini.c_str(), &LoadSettings);
     if (api->version >= 2)
         api->info(api, Tr("Interface fixes that layouts cannot do: queues, bars, squad cells, scrolling descriptions."));
     api->section(api, Tr("General"));
@@ -2732,11 +2967,20 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 
 __declspec(dllexport) void startPlugin()
 {
+    // Старый DarkUiTweaks (до переименования) тоже загружен - два плагина
+    // правили бы одно и то же. Работает старый, этот молчит.
+    if (GetModuleHandleA("DarkUiTweaks.dll") != NULL)
+    {
+        ErrorLog("UITweaks: the old DarkUiTweaks plugin is loaded too - remove the "
+                 "DarkUiTweaks mod folder (UI Tweaks replaces it); UITweaks stays off");
+        return;
+    }
+
     LoadSettings();
 
     if (!g_enabled)
     {
-        DebugLog("DarkUiTweaks: disabled in the ini");
+        DebugLog("UITweaks: disabled in the ini");
         return;
     }
 
@@ -2754,7 +2998,7 @@ __declspec(dllexport) void startPlugin()
                                CreateDatapanel_hook,
                                &g_origCreateDatapanel))
         {
-            ErrorLog("DarkUiTweaks: could not hook createDatapanel, "
+            ErrorLog("UITweaks: could not hook createDatapanel, "
                      "description panels stay as they are");
         }
     }
@@ -2772,22 +3016,26 @@ __declspec(dllexport) void startPlugin()
                 target, RefreshDescription_hook,
                 reinterpret_cast<void**>(&g_origRefreshDescription)))
         {
-            ErrorLog("DarkUiTweaks: could not hook the description refresh, "
+            ErrorLog("UITweaks: could not hook the description refresh, "
                      "the scrollbar will jump back to the top");
         }
     }
     else if (g_scrollDescription)
     {
-        ErrorLog("DarkUiTweaks: slot table not recognised, "
+        ErrorLog("UITweaks: slot table not recognised, "
                  "the scrollbar will jump back to the top");
     }
+
+    // Полоса навыка: правка сразу после того, как её тронула игра.
+    if (g_progressPad > 0)
+        HookSkillBars();
 
     // Иконка вещи у мыши во вкладке «Ремесло» - нужно знать её станок.
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(KenshiLib::GetRealAddress(&ManagementScreen::setCraftingBench),
                            SetCraftingBench_hook, &g_origSetCraftingBench))
     {
-        ErrorLog("DarkUiTweaks: could not hook the crafting tab, no item icons there");
+        ErrorLog("UITweaks: could not hook the crafting tab, no item icons there");
     }
 
     if (KenshiLib::SUCCESS !=
@@ -2795,10 +3043,10 @@ __declspec(dllexport) void startPlugin()
                            GuiUpdate_hook,
                            &g_origGuiUpdate))
     {
-        ErrorLog("DarkUiTweaks: could not hook the interface update, "
+        ErrorLog("UITweaks: could not hook the interface update, "
                  "queue rows stay as they are");
         return;
     }
 
-    DebugLog("DarkUiTweaks: installed");
+    DebugLog("UITweaks: installed");
 }

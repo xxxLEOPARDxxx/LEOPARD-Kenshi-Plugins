@@ -85,3 +85,9 @@ msgstr "Опускать на землю после сдвига"
 
 msgid "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."
 msgstr "Когда стрелку отпускают, здание перестраивается на новом месте, и игра ставит его на землю. Выкл. - остаётся на той высоте, до которой его подняли."
+
+msgid "Arrows on any building in the developer build mode"
+msgstr "Стрелочки на любом здании в меню разработчика"
+
+msgid "Developer menu (Shift+F12), normal build mode: select any building - yours or not, built or not - and move it with the arrows right away. In the interior mode the game does this itself."
+msgstr "Меню разработчика (Shift+F12), обычный режим строительства: выделите любое здание - своё или чужое, достроенное или нет - и сразу двигайте его стрелочками. В режиме интерьеров это делает сама игра."

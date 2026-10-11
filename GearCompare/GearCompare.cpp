@@ -47,6 +47,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <cctype>
 #include <cmath>
@@ -108,7 +109,7 @@ namespace
     const float kSameThreshold = 2.0f;
 
 
-    std::string IniPath()
+    std::string IniFileName()
     {
         char path[MAX_PATH] = {};
         const DWORD length = GetModuleFileNameA(
@@ -120,6 +121,14 @@ namespace
         const std::string::size_type dot = file.rfind('.');
         return dot == std::string::npos ? std::string()
                                         : file.substr(0, dot) + ".ini";
+    }
+
+
+    // Путь к ini игрока; при первом обращении - копия или дописка из
+    // <Мод>.defaults.ini (shared/IniDefaults.h, 11.10.2026).
+    std::string IniPath()
+    {
+        return IniDefaults::Prepare(IniFileName());
     }
 
 

@@ -38,6 +38,7 @@
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <cstdio>
 #include <map>
@@ -84,7 +85,7 @@ namespace
     const float NEAR_UNITS = 60.0f;
 
 
-    std::string IniPath()
+    std::string IniFileName()
     {
         char path[MAX_PATH] = {};
 
@@ -99,6 +100,14 @@ namespace
         const std::string::size_type dot = file.rfind('.');
         return dot == std::string::npos ? std::string()
                                         : file.substr(0, dot) + ".ini";
+    }
+
+
+    // Путь к ini игрока; при первом обращении - копия или дописка из
+    // <Мод>.defaults.ini (shared/IniDefaults.h, 11.10.2026).
+    std::string IniPath()
+    {
+        return IniDefaults::Prepare(IniFileName());
     }
 
 

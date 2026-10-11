@@ -32,6 +32,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <algorithm>
 #include <cmath>
@@ -1100,6 +1101,14 @@ namespace
             return;                         // поле строка создаёт при показе
         if (field->getVisible())
             field->setVisible(false);
+        // У строки сброса подписи нет, а поле подписи в ванильном скине -
+        // светлая плашка: слева от кнопки висело пустое поле (11.10.2026).
+        if (b.what == OWN_RESET)
+        {
+            MyGUI::Widget* const name = t->getNameBox();
+            if (name != NULL && name->getVisible())
+                name->setVisible(false);
+        }
         MyGUI::Widget* const row = field->getParent();
         MyGUI::Widget* button = b.ref->get();
         if (button != NULL && button->getParent() != row)
@@ -2530,7 +2539,8 @@ extern "C" __declspec(dllexport) void __cdecl MCM_OpenPage(const char* modId)
 
 __declspec(dllexport) void startPlugin()
 {
-    const std::string ini = ModuleDir() + "ModConfigMenu.ini";
+    // ini игрока - см. shared/IniDefaults.h (11.10.2026).
+    const std::string ini = IniDefaults::Prepare(ModuleDir() + "ModConfigMenu.ini");
     g_debug = GetPrivateProfileIntA("ModConfigMenu", "Debug", 0, ini.c_str()) != 0;
 
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(

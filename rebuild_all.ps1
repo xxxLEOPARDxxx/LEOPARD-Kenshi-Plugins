@@ -130,10 +130,9 @@ BuildPlugin "$ROOT\ours\StatColours"               "StatColours"       "StatColo
 $scMod = "$KENSHI\mods\StatColours"
 if (Test-Path $scMod) {
     Copy-Item "$ROOT\ours\StatColours\README.txt" $scMod -Force
-    if (-not (Test-Path "$scMod\StatColours.ini")) {
-        Copy-Item "$ROOT\ours\StatColours\StatColours.ini" $scMod
-        Write-Host "  положен StatColours.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\StatColours\StatColours.ini" "$scMod\StatColours.defaults.ini" -Force
 }
 BuildPlugin "$ROOT\ours\BuildModeGizmo"            "BuildModeGizmo"    "BuildModeGizmo"
 # Настройки и описание - как у StatColours: эталон в ours\, в моде копия,
@@ -141,10 +140,9 @@ BuildPlugin "$ROOT\ours\BuildModeGizmo"            "BuildModeGizmo"    "BuildMod
 $bgMod = "$KENSHI\mods\BuildModeGizmo"
 if (Test-Path $bgMod) {
     Copy-Item "$ROOT\ours\BuildModeGizmo\README.txt" $bgMod -Force
-    if (-not (Test-Path "$bgMod\BuildModeGizmo.ini")) {
-        Copy-Item "$ROOT\ours\BuildModeGizmo\BuildModeGizmo.ini" $bgMod
-        Write-Host "  положен BuildModeGizmo.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\BuildModeGizmo\BuildModeGizmo.ini" "$bgMod\BuildModeGizmo.defaults.ini" -Force
 }
 BuildPlugin "$F\KillCounter-src"                  "KillCounter"       "KillCounter"
 # Свой плагин: полосы опыта тех навыков, которые качаются прямо сейчас.
@@ -153,24 +151,22 @@ BuildPlugin "$ROOT\ours\LiveXpBars"               "LiveXpBars"        "LiveXpBar
 # Доработки интерфейса - отдельный мод: от разметки не зависят и
 # работают с любым интерфейсом. Правки разметки Dark UI (fix_darkui_*)
 # остаются в самом моде интерфейса.
-BuildPlugin "$ROOT\ours\DarkUiTweaks"             "DarkUiTweaks"      "DarkUiTweaks"
-$duMod = "$KENSHI\mods\DarkUiTweaks"
+BuildPlugin "$ROOT\ours\UITweaks"             "UITweaks"      "UITweaks"
+$duMod = "$KENSHI\mods\UITweaks"
 if (Test-Path $duMod) {
-    Copy-Item "$ROOT\ours\DarkUiTweaks\README.txt" $duMod -Force
-    if (-not (Test-Path "$duMod\DarkUiTweaks.ini")) {
-        Copy-Item "$ROOT\ours\DarkUiTweaks\DarkUiTweaks.ini" $duMod
-        Write-Host "  положен DarkUiTweaks.ini" -ForegroundColor Green
-    }
+    Copy-Item "$ROOT\ours\UITweaks\README.txt" $duMod -Force
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\UITweaks\UITweaks.ini" "$duMod\UITweaks.defaults.ini" -Force
 }
 # Настройки и описание - как у остальных наших: эталон в ours\, в моде
 # копия, уже правленный игроком ini не трогаем.
 $lxMod = "$KENSHI\mods\LiveXpBars"
 if (Test-Path $lxMod) {
     Copy-Item "$ROOT\ours\LiveXpBars\README.txt" $lxMod -Force
-    if (-not (Test-Path "$lxMod\LiveXpBars.ini")) {
-        Copy-Item "$ROOT\ours\LiveXpBars\LiveXpBars.ini" $lxMod
-        Write-Host "  положен LiveXpBars.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\LiveXpBars\LiveXpBars.ini" "$lxMod\LiveXpBars.defaults.ini" -Force
 }
 # Плагин Асура: навыки растут до 100. Собирается у нас, потому что его
 # готовая DLL требует KenshiLib с экспортом CharStats::xp* (см.
@@ -188,10 +184,9 @@ $gcMod = "$KENSHI\mods\GearCompare"
 if (Test-Path $gcMod) {
     Copy-Item "$ROOT\ours\GearCompare\README.txt" $gcMod -Force
     Copy-Item "$ROOT\ours\GearCompare\locale" $gcMod -Recurse -Force
-    if (-not (Test-Path "$gcMod\GearCompare.ini")) {
-        Copy-Item "$ROOT\ours\GearCompare\GearCompare.ini" $gcMod
-        Write-Host "  положен GearCompare.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\GearCompare\GearCompare.ini" "$gcMod\GearCompare.defaults.ini" -Force
 }
 # Свой плагин: пациент лечит себя сам, пока его лечат. Настройки и
 # описание - как у остальных наших.
@@ -202,20 +197,18 @@ $awMod = "$KENSHI\mods\AssignedWorkers"
 if (Test-Path $awMod) {
     Copy-Item "$ROOT\ours\AssignedWorkers\README.txt" $awMod -Force
     Copy-Item "$ROOT\ours\AssignedWorkers\locale" $awMod -Recurse -Force
-    if (-not (Test-Path "$awMod\AssignedWorkers.ini")) {
-        Copy-Item "$ROOT\ours\AssignedWorkers\AssignedWorkers.ini" $awMod
-        Write-Host "  положен AssignedWorkers.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\AssignedWorkers\AssignedWorkers.ini" "$awMod\AssignedWorkers.defaults.ini" -Force
 }
 # Опыт стрелку за нанесённый урон: ловит раны от снарядов (addWound).
 BuildPlugin "$ROOT\ours\RangedDamageXp"           "RangedDamageXp"    "RangedDamageXp"
 $rdMod = "$KENSHI\mods\RangedDamageXp"
 if (Test-Path $rdMod) {
     Copy-Item "$ROOT\ours\RangedDamageXp\README.txt" $rdMod -Force
-    if (-not (Test-Path "$rdMod\RangedDamageXp.ini")) {
-        Copy-Item "$ROOT\ours\RangedDamageXp\RangedDamageXp.ini" $rdMod
-        Write-Host "  положен RangedDamageXp.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\RangedDamageXp\RangedDamageXp.ini" "$rdMod\RangedDamageXp.defaults.ini" -Force
 }
 # ModConfigMenu: вкладка «Моды» в настройках игры (shared\ModConfigMenu.h).
 BuildPlugin "$ROOT\ours\ModConfigMenu"            "ModConfigMenu"     "ModConfigMenu"
@@ -231,9 +224,9 @@ if (Test-Path $mcmMod) {
     # игра кладёт её в группу ресурсов GUI, где её ищет MyGUI.
     New-Item -ItemType Directory -Force "$mcmMod\gui\gfx" | Out-Null
     Copy-Item "$ROOT\ours\ModConfigMenu\gui\gfx\MCM_Caption.png" "$mcmMod\gui\gfx" -Force
-    if (-not (Test-Path "$mcmMod\ModConfigMenu.ini")) {
-        Copy-Item "$ROOT\ours\ModConfigMenu\ModConfigMenu.ini" $mcmMod
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\ModConfigMenu\ModConfigMenu.ini" "$mcmMod\ModConfigMenu.defaults.ini" -Force
 }
 
 # Форки модов Emkej - в репо forks\LEOPARD-Kenshi-Forks (09.10.2026; старые
@@ -267,19 +260,17 @@ if (Test-Path $wmMod) {
     Copy-Item "$ROOT\tools\wanted_overrides.txt" "$wmMod\WantedMap_overrides.txt" -Force
     Remove-Item "$wmMod\WantedMap_targets.txt" -ErrorAction SilentlyContinue
     Copy-Item "$ROOT\ours\WantedMap\locale" $wmMod -Recurse -Force
-    if (-not (Test-Path "$wmMod\WantedMap.ini")) {
-        Copy-Item "$ROOT\ours\WantedMap\WantedMap.ini" $wmMod
-        Write-Host "  положен WantedMap.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\WantedMap\WantedMap.ini" "$wmMod\WantedMap.defaults.ini" -Force
 }
 BuildPlugin "$ROOT\ours\PatientSelfAid"           "PatientSelfAid"    "PatientSelfAid"
 $psMod = "$KENSHI\mods\PatientSelfAid"
 if (Test-Path $psMod) {
     Copy-Item "$ROOT\ours\PatientSelfAid\README.txt" $psMod -Force
-    if (-not (Test-Path "$psMod\PatientSelfAid.ini")) {
-        Copy-Item "$ROOT\ours\PatientSelfAid\PatientSelfAid.ini" $psMod
-        Write-Host "  положен PatientSelfAid.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\PatientSelfAid\PatientSelfAid.ini" "$psMod\PatientSelfAid.defaults.ini" -Force
 }
 
 BuildPlugin "$ROOT\ours\QuickStartSelect"         "QuickStartSelect"  "QuickStartSelect"
@@ -287,10 +278,22 @@ $qsMod = "$KENSHI\mods\QuickStartSelect"
 if (Test-Path $qsMod) {
     Copy-Item "$ROOT\ours\QuickStartSelect\README.txt" $qsMod -Force
     Copy-Item "$ROOT\ours\QuickStartSelect\locale" $qsMod -Recurse -Force
-    if (-not (Test-Path "$qsMod\QuickStartSelect.ini")) {
-        Copy-Item "$ROOT\ours\QuickStartSelect\QuickStartSelect.ini" $qsMod
-        Write-Host "  положен QuickStartSelect.ini" -ForegroundColor Green
-    }
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\QuickStartSelect\QuickStartSelect.ini" "$qsMod\QuickStartSelect.defaults.ini" -Force
+}
+
+# Значки на иконках вещей (сорт, краденое, форма, изученные чертежи) -
+# замена модов LtEast; до 11.10.2026 ставился вручную.
+BuildPlugin "$ROOT\ours\ItemMarkers"              "ItemMarkers"       "ItemMarkers"
+$imMod = "$KENSHI\mods\ItemMarkers"
+if (Test-Path $imMod) {
+    Copy-Item "$ROOT\ours\ItemMarkers\README.txt" $imMod -Force
+    Copy-Item "$ROOT\ours\ItemMarkers\locale" $imMod -Recurse -Force
+    Copy-Item "$ROOT\ours\ItemMarkers\gui" $imMod -Recurse -Force
+    # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
+    # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
+    Copy-Item "$ROOT\ours\ItemMarkers\ItemMarkers.ini" "$imMod\ItemMarkers.defaults.ini" -Force
 }
 
 # Formations собирается MSVC 2022, а не VC10: автор не линкует KenshiLib
@@ -320,7 +323,7 @@ Step "Контроль: в собранных DLL не должно быть к�
 # каком виде, весь перевод живёт в .po.
 # Formations в списке нет намеренно: он не линкует KenshiLib, а значит не
 # может спросить у игры язык, и его русский лежит прямо в бинарнике.
-foreach ($m in @("SquadAutonomy", "MoreImmersiveBars", "Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "DarkUiTweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
+foreach ($m in @("SquadAutonomy", "MoreImmersiveBars", "Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
     $dll = Get-ChildItem "$KENSHI\mods\$m" -Filter *.dll -ErrorAction SilentlyContinue |
            Where-Object { $_.Name -notlike "*.orig" } | Select-Object -First 1
     if (-not $dll) { continue }

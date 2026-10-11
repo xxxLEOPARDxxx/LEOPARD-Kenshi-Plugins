@@ -34,6 +34,7 @@
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <algorithm>
 #include <cstdio>
@@ -105,7 +106,7 @@ namespace
     std::string g_customDifficulty[6];
 
 
-    std::string IniPath()
+    std::string IniFileName()
     {
         char path[MAX_PATH] = {};
         const DWORD length = GetModuleFileNameA(
@@ -115,6 +116,14 @@ namespace
         std::string file(path, length);
         const std::string::size_type dot = file.rfind('.');
         return dot == std::string::npos ? std::string() : file.substr(0, dot) + ".ini";
+    }
+
+
+    // Путь к ini игрока; при первом обращении - копия или дописка из
+    // <Мод>.defaults.ini (shared/IniDefaults.h, 11.10.2026).
+    std::string IniPath()
+    {
+        return IniDefaults::Prepare(IniFileName());
     }
 
 

@@ -85,3 +85,9 @@ msgstr "Settle on the ground after a move"
 
 msgid "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."
 msgstr "When the arrow is released, the building is rebuilt where it now stands, and the game puts it on the ground. Off - it stays at the height you raised it to."
+
+msgid "Arrows on any building in the developer build mode"
+msgstr "Arrows on any building in the developer build mode"
+
+msgid "Developer menu (Shift+F12), normal build mode: select any building - yours or not, built or not - and move it with the arrows right away. In the interior mode the game does this itself."
+msgstr "Developer menu (Shift+F12), normal build mode: select any building - yours or not, built or not - and move it with the arrows right away. In the interior mode the game does this itself."

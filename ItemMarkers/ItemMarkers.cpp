@@ -28,6 +28,7 @@
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <IniDefaults.h>
 
 #include <cctype>
 #include <cstdio>
@@ -106,7 +107,8 @@ namespace
         return dot == std::string::npos ? std::string() : file.substr(0, dot) + ext;
     }
 
-    std::string IniPath() { return ModulePath(".ini"); }
+    // Путь к ini игрока - см. shared/IniDefaults.h (11.10.2026).
+    std::string IniPath() { return IniDefaults::Prepare(ModulePath(".ini")); }
 
     float ReadFloat(const std::string& ini, const char* key, float def, float lo, float hi)
     {
