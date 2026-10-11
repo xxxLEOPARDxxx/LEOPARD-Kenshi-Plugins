@@ -149,6 +149,7 @@ namespace
     // Клавиша иконки (09.10.2026, просьба тестеров; задержку убрали):
     // иконка - пока зажата; NONE - просто по наведению.
     HoldKey::Key g_craftIconKey;
+    HoldKey::Key g_factionKey;       // отношение фракции - пока зажата (NONE - всегда)
     bool g_debug = false;
 
 
@@ -265,6 +266,7 @@ namespace
         fputs("ProgressBarGrowUp=1\n", f);
         fputs("ScrollDescription=1\n", f);
         fputs("FactionRelation=1\n", f);
+        fputs("FactionRelationKey=NONE\n", f);
         fputs("CraftIcon=1\n", f);
         fputs("CraftIconKey=ALT\n", f);
         fputs("Debug=0\n", f);
@@ -304,6 +306,11 @@ namespace
                                   ini.c_str()) != 0;
         g_factionRelation =
             GetPrivateProfileIntA("Tweaks", "FactionRelation", 1, ini.c_str()) != 0;
+        {
+            char key[64] = {};
+            GetPrivateProfileStringA("Tweaks", "FactionRelationKey", "NONE", key, sizeof(key), ini.c_str());
+            g_factionKey = HoldKey::Parse(key);
+        }
         g_craftIcon =
             GetPrivateProfileIntA("Tweaks", "CraftIcon", 1, ini.c_str()) != 0;
         {
@@ -1916,6 +1923,10 @@ namespace
         RootObject* selected = ou->player->selectedObject.getRootObject();
         if (selected == NULL)
             return false;
+        // Только персонажи (12.10.2026, игроки): у построек тоже есть фракция,
+        // и приписка выходила и у них.
+        if (selected->getDataType() != CHARACTER)
+            return false;
         Faction* faction = selected->getFaction();
         Faction* mine = ou->player->getFaction();
         if (faction == NULL || mine == NULL || faction == mine || faction->relations == NULL)
@@ -1947,6 +1958,17 @@ namespace
         {
             if (!g_factionRelation)
                 RestoreFactionText();
+            return;
+        }
+
+        // По желанию - только пока зажата клавиша (FactionRelationKey; NONE -
+        // всегда). Отпустили - возвращаем надпись игры; нажали - полный путь
+        // ниже (запомненная надпись сброшена, быстрый путь не сработает).
+        if (g_factionKey.vk != 0 && !HoldKey::Held(g_factionKey))
+        {
+            if (!g_factionShown.empty())
+                RestoreFactionText();
+            g_factionShownU.clear();
             return;
         }
 
@@ -2956,6 +2978,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "Tweaks", "ScrollDescription", Tr("Scroll bar"), Tr("A scroll bar in the description panels of research and items, so long text is not cut off."), 1, MCM_RESTART);
     api->section(api, Tr("Hints"));
     api->toggle(api, "Tweaks", "FactionRelation", Tr("Faction relation by the name"), Tr("After the faction name of the selected character - that faction's relation to you, like in the factions window: green above zero, red from -10 down."), 1, 0);
+    api->hotkey(api, "Tweaks", "FactionRelationKey", Tr("Faction relation key"), Tr("The relation shows while this key is held. NONE (Backspace when assigning) - always."), "NONE", 0);
     api->toggle(api, "Tweaks", "CraftIcon", Tr("Item icon in the crafting list"), Tr("On the Crafting tab, the icon of the item appears next to the mouse over a line of the Items list."), 1, 0);
     if (api->version >= 3)
         api->action(api, Tr("Draw icons of all items"), Tr("The game draws an item icon only when the item first gets into an inventory. This draws them now for every item without one, a few per frame, in a loaded game. The pictures stay in data/icons."), &StartIconJob, NULL, 0);

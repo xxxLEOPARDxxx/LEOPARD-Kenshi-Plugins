@@ -135,3 +135,9 @@ msgstr "图标按键"
 
 msgid "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
 msgstr "按住此键时显示图标。NONE（设定时按 Backspace）- 鼠标悬停即显示。"
+
+msgid "Faction relation key"
+msgstr "派系关系按键"
+
+msgid "The relation shows while this key is held. NONE (Backspace when assigning) - always."
+msgstr "按住此键时显示关系。NONE（设置时按 Backspace）- 始终显示。"

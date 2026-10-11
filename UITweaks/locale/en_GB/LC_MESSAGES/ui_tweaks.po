@@ -135,3 +135,9 @@ msgstr "Icon key"
 
 msgid "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
 msgstr "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
+
+msgid "Faction relation key"
+msgstr "Faction relation key"
+
+msgid "The relation shows while this key is held. NONE (Backspace when assigning) - always."
+msgstr "The relation shows while this key is held. NONE (Backspace when assigning) - always."

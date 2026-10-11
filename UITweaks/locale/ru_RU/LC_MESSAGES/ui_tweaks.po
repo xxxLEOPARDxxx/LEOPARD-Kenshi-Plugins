@@ -135,3 +135,9 @@ msgstr "Клавиша иконки"
 
 msgid "The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."
 msgstr "Иконка видна, пока зажата эта клавиша. NONE (Backspace при назначении) - просто по наведению."
+
+msgid "Faction relation key"
+msgstr "Клавиша отношения фракции"
+
+msgid "The relation shows while this key is held. NONE (Backspace when assigning) - always."
+msgstr "Отношение видно, пока зажата эта клавиша. NONE (Backspace при назначении) - всегда."
