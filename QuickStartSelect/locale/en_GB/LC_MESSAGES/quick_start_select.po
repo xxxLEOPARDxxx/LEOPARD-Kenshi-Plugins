@@ -257,3 +257,6 @@ msgstr "Difficulties of starts from other mods to show in this colour and sort a
 
 msgid ", animals: %d"
 msgstr ", animals: %d"
+
+msgid "Random start"
+msgstr "Random start"

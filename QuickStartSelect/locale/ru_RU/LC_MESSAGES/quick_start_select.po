@@ -257,3 +257,6 @@ msgstr "Сложности стартов из других модов, кото
 
 msgid ", animals: %d"
 msgstr ", животные: %d"
+
+msgid "Random start"
+msgstr "Случайный старт"

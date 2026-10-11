@@ -257,3 +257,6 @@ msgstr "其他模组开局的难度名称，用此颜色显示并按此等级排
 
 msgid ", animals: %d"
 msgstr "，动物：%d"
+
+msgid "Random start"
+msgstr "随机开局"

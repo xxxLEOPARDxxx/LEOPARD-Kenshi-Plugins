@@ -1264,6 +1264,34 @@ namespace
         RequestBegin();
     }
 
+    // Случайный старт (12.10.2026, просьба игроков): то же, что щелчок по
+    // случайной строке списка, - меняется только выбор старта, настройки
+    // окна и «Дополнительные настройки» не трогаются. Выбор - среди строк,
+    // что сейчас в списке: без поиска и фильтра расы это все старты, с
+    // фильтром - случайный среди отобранных. Тот же старт подряд не выпадает.
+    void OnRandomButton(MyGUI::Widget*)
+    {
+        if (g_rows.empty())
+            return;
+        static unsigned int seed = 0;
+        if (seed == 0)
+            seed = GetTickCount() | 1u;
+        size_t pick = 0;
+        for (int attempt = 0; attempt < 8; ++attempt)
+        {
+            seed ^= seed << 13;
+            seed ^= seed >> 17;
+            seed ^= seed << 5;
+            pick = seed % g_rows.size();
+            if (g_rows.size() < 2 || g_rows[pick].start != g_selected)
+                break;
+        }
+        g_selected = g_rows[pick].start;
+        g_lastClickRow = -1;            // не превращать в «двойной щелчок»
+        ShowDetails();
+        ScrollToSelected();
+    }
+
     void OnWindowButton(MyGUI::Window*, const std::string& name)
     {
         if (name == "close")
@@ -2115,6 +2143,12 @@ namespace
         const int beginW = std::max(cw / 4, TextWidth(g_btnBegin) + 48);
         g_btnBegin->setCoord(cw - PAD - beginW, by, beginW, rh);
         g_btnBegin->eventMouseButtonClick += MyGUI::newDelegate(&OnBeginButton);
+
+        // Слева от «Начать» - случайный старт.
+        MyGUI::Button* const random = MakeButton(client, Tr("Random start"), 0, by, 10, rh);
+        const int randomW = TextWidth(random) + 32;
+        random->setCoord(cw - PAD - beginW - GAP - randomW, by, randomW, rh);
+        random->eventMouseButtonClick += MyGUI::newDelegate(&OnRandomButton);
 
         BuildList();
         MyGUI::InputManager::getInstance().setKeyFocusWidget(g_search);
