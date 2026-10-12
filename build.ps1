@@ -59,6 +59,21 @@ if ($FromVcxproj) {
                       ForEach-Object { $_.Substring(13).TrimEnd('\') } |
                       Where-Object { $_ -ne '' })
     }
+    # Defines of the Release configuration (the one with NDEBUG): projects
+    # switch features on with them - KenshiJobManagement's job transfer and
+    # batch actions (KJM_*_VERIFIED) stayed off without them (13.10.2026).
+    # _CONSOLE/NDEBUG and %(...) are dropped, BOOST_* too - boost linking
+    # is set up here.
+    $rel = @([regex]::Matches($xml, '<PreprocessorDefinitions>([^<]*)</PreprocessorDefinitions>') |
+             Where-Object { $_.Groups[1].Value -match '(^|;)NDEBUG(;|$)' } |
+             Select-Object -First 1)
+    if ($rel.Count -gt 0) {
+        $Define += @($rel[0].Groups[1].Value.Split(';') |
+                     Where-Object { $_ -ne '' -and $_ -notlike '%(*' -and
+                                    $_ -ne '_CONSOLE' -and $_ -ne 'NDEBUG' -and
+                                    $_ -notlike 'BOOST_*' })
+        if ($Define.Count -gt 0) { Write-Host ("Defines: " + ($Define -join ' ')) -ForegroundColor Cyan }
+    }
 }
 $extraInc = @($Include | Select-Object -Unique | ForEach-Object { Join-Path $SrcDir $_ })
 $env:INCLUDE = (@("$VC\include", "$SDK\Include", $KLINC, "$KLINC\ogre", $BST,
