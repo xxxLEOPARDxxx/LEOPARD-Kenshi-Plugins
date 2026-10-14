@@ -654,6 +654,23 @@ namespace
                  " failed outside the editor, site arrows are off until restart");
     }
 
+    // Заголовок окна стрелочек - название здания. show() его не ставит:
+    // игра пишет его сама, когда выделяет здание своим путём, а наши
+    // стрелочки (обычный режим стройки, выделение нашим щелчком) оставляли
+    // окно с пустым заголовком (14.10.2026).
+    bool SafeCaption(TransformWindow* t, const std::string& caption)
+    {
+        __try
+        {
+            t->setCaption(caption);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
     void OpenSite(Building* b, const hand& h)
     {
         TransformWindow* const t = TransformWindow::getSingleton();
@@ -675,6 +692,8 @@ namespace
             Broken("TransformWindow::show");
             return;
         }
+        const std::string caption = b->getName();
+        SafeCaption(t, caption);
 
         g_siteOpen = true;
         g_siteTarget = h;
