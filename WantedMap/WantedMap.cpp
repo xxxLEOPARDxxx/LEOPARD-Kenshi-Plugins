@@ -110,6 +110,7 @@ namespace
     bool g_townFallback = true;
     bool g_rememberSeen = true;
     bool g_posterBadge = true;      // значок на листовке: цели убиты / в плену
+    bool g_allInventories = false;  // листовки у всех своих персонажей, не только у выделенных
     double g_deadHours = 24.0;
     bool g_debug = false;
     std::set<std::wstring> g_stopWords;
@@ -176,6 +177,7 @@ namespace
         g_townFallback = GetPrivateProfileIntA(sec, "TownFallback", 1, ini.c_str()) != 0;
         g_rememberSeen = GetPrivateProfileIntA(sec, "RememberSeen", 1, ini.c_str()) != 0;
         g_posterBadge = GetPrivateProfileIntA(sec, "PosterBadge", 1, ini.c_str()) != 0;
+        g_allInventories = GetPrivateProfileIntA(sec, "AllInventories", 0, ini.c_str()) != 0;
         g_deadHours = GetPrivateProfileIntA(sec, "DeadMarkerHours", 24, ini.c_str());
         g_debug = GetPrivateProfileIntA(sec, "Debug", 0, ini.c_str()) != 0;
 
@@ -834,7 +836,8 @@ namespace
     }
 
     // Только у выделенных («навигатор»). Никто не выделен - false и метки
-    // остаются прежними.
+    // остаются прежними. AllInventories=1 - у всех своих персонажей, кто бы
+    // ни был выделен (просьба игрока, 14.10.2026).
     bool ScanPosters()
     {
         std::map<std::string, std::string> found;
@@ -845,7 +848,7 @@ namespace
             for (uint32_t i = 0; i < squad.size(); ++i)
             {
                 Character* const c = squad[i];
-                if (c == NULL || !ou->player->isObjectSelected(c))
+                if (c == NULL || (!g_allInventories && !ou->player->isObjectSelected(c)))
                     continue;
                 anySelected = true;
                 CollectBooks(c->getInventory(), found, 0);
@@ -1585,6 +1588,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
         api->info(api, Tr("Markers on the big map for the targets of the wanted posters the selected character carries."));
     api->section(api, Tr("Markers"));
     api->toggle(api, "WantedMap", "Enabled", Tr("Enabled"), Tr("Markers on the big map for the targets of wanted posters held by the selected characters."), 1, 0);
+    api->toggle(api, "WantedMap", "AllInventories", Tr("Posters of the whole squad"), Tr("Look for wanted posters in the inventories of all your characters. Off - only the selected characters (the navigator)."), 0, 0);
     api->toggle(api, "WantedMap", "PosterBadge", Tr("Badge on the poster"), Tr("On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."), 1, 0);
     api->toggle(api, "WantedMap", "ShowLabels", Tr("Names next to markers"), Tr("The target's name, and dead or imprisoned, next to its marker on the map."), 1, 0);
     api->toggle(api, "WantedMap", "TownFallback", Tr("Mark the home of targets not seen yet"), Tr("If the target's squad has not appeared in the world yet: a yellow marker on the town or camp where it lives."), 1, 0);

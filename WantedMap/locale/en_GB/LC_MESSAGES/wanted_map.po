@@ -118,3 +118,9 @@ msgstr "Badge on the poster"
 
 msgid "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."
 msgstr "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."
+
+msgid "Posters of the whole squad"
+msgstr "Posters of the whole squad"
+
+msgid "Look for wanted posters in the inventories of all your characters. Off - only the selected characters (the navigator)."
+msgstr "Look for wanted posters in the inventories of all your characters. Off - only the selected characters (the navigator)."

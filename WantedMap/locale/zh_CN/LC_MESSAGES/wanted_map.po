@@ -118,3 +118,9 @@ msgstr "通缉令上的标记"
 
 msgid "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."
 msgstr "背包中的通缉令：绿色对勾 - 所有目标已死亡，锁 - 其余目标被囚禁，2/3 - 已完成的数量。"
+
+msgid "Posters of the whole squad"
+msgstr "全队的通缉令"
+
+msgid "Look for wanted posters in the inventories of all your characters. Off - only the selected characters (the navigator)."
+msgstr "在你所有角色的物品栏中查找通缉令。关闭 - 只查找选中的角色(领航员)。"

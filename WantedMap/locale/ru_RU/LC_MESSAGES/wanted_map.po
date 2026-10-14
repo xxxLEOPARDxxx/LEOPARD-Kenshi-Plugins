@@ -118,3 +118,9 @@ msgstr "Значок на листовке"
 
 msgid "On the poster in the inventory: a green tick - all its targets are dead, a lock - the rest are imprisoned, 2/3 - how many are done."
 msgstr "На листовке в инвентаре: зелёная галка - все её цели убиты, замок - остальные в плену, 2/3 - сколько уже сделано."
+
+msgid "Posters of the whole squad"
+msgstr "Листовки всего отряда"
+
+msgid "Look for wanted posters in the inventories of all your characters. Off - only the selected characters (the navigator)."
+msgstr "Искать листовки в инвентарях всех своих персонажей. Выключено - только у выделенных (навигатор)."
