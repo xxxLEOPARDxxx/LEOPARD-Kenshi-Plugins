@@ -1547,6 +1547,26 @@ namespace
         }
     }
 
+    // Данные вкладки (их читает окно настроек) - не держать адрес удалённой
+    // панели: очищаем сразу после удаления, новую кладём, только если она
+    // создалась (замечание Асура, 14.10.2026).
+    void ClearTabPanelDataRaw()
+    {
+        if (g_window != NULL && g_window->tabs != NULL && g_tab != NULL)
+            g_window->tabs->setItemData(g_tab, MyGUI::Any::Null);
+    }
+
+    void ClearTabPanelData()
+    {
+        __try
+        {
+            ClearTabPanelDataRaw();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
     bool RecreatePanel(ModEntry* m)
     {
         if (g_right == NULL || gui == NULL)
@@ -1558,6 +1578,7 @@ namespace
             g_panel->show(false);
             gui->destroy(g_panel);
             g_panel = NULL;
+            ClearTabPanelData();
         }
         MyGUI::Gui& mygui = MyGUI::Gui::getInstance();
         if (g_area != NULL)
@@ -2149,6 +2170,7 @@ namespace
             ErrorLog("ModConfigMenu: building the Mods tab crashed; tab skipped");
             g_panel = NULL;
             g_current = NULL;
+            ClearTabPanelData();
         }
     }
 

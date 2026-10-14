@@ -37,6 +37,7 @@
 #include <Windows.h>
 #include <IniDefaults.h>
 #include <FontRefresh.h>
+#include <WidgetRef.h>
 
 #include <cmath>
 #include <cstdio>
@@ -694,6 +695,13 @@ namespace
 
 
     MyGUI::Widget* g_panel = 0;
+    // Удалил панель кто-то другой (не McmReload) - узнаём от MyGUI и
+    // собираем заново, а не пишем в удалённую (замечание Асура, 14.10.2026).
+    WidgetRef& PanelRef()
+    {
+        static WidgetRef* ref = new WidgetRef();   // не разрушается: MyGUI держит его в списке
+        return *ref;
+    }
     MyGUI::Widget* g_backdrop = 0;
     MyGUI::TextBox* g_hint = 0;
     std::map<int, Row> g_rows;
@@ -881,6 +889,7 @@ namespace
         g_panel = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
             "PanelEmpty", MyGUI::IntCoord(g_left, g_top, g_width, kRowHeight),
             MyGUI::Align::Default, "Window", "LiveXpBars_Panel");
+        PanelRef().set(g_panel);
 
         // Полосы - индикатор, а не орган управления: сквозь них должно
         // кликаться по миру. Мышь панель ловит только в настройке.
@@ -1257,6 +1266,17 @@ namespace
         if (gui == NULL)
             return;
 
+        // панель удалили не мы - все её указатели забыть, соберётся заново
+        if (g_panel != NULL && PanelRef().get() == NULL)
+        {
+            g_panel = 0;
+            g_backdrop = 0;
+            g_hint = 0;
+            g_rows.clear();
+            g_setup = false;
+            g_dragging = false;
+        }
+
         // Пока игра не построила таблицу названий, показывать нечего -
         // и в интерфейс лезть незачем.
         const std::vector<std::pair<int, std::string> >& list = StatList(now);
@@ -1476,8 +1496,9 @@ static void __cdecl McmReload()
     g_pendingTheme.clear();
     LoadSettings();
     g_themeResolved = false;
-    if (g_panel != NULL)
+    if (g_panel != NULL && PanelRef().get() != NULL)
         MyGUI::Gui::getInstance().destroyWidget(g_panel);
+    PanelRef().reset();
     g_panel = 0;
     g_backdrop = 0;
     g_hint = 0;
