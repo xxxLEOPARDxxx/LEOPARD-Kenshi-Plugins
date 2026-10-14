@@ -46,3 +46,15 @@ msgstr "Switch between the palette and typing the colour code (#RRGGBB)"
 
 msgid "Show or hide the colours to pick from"
 msgstr "Show or hide the colours to pick from"
+
+msgid "Settings of the mods in this tab."
+msgstr "Settings of the mods in this tab."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: which mods were found and what was written."
+msgstr "Details in RE_Kenshi_log.txt: which mods were found and what was written."

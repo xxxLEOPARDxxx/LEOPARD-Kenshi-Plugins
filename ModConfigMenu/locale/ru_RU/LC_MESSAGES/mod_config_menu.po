@@ -46,3 +46,15 @@ msgstr "Переключить: палитра или ввод кода цвет
 
 msgid "Show or hide the colours to pick from"
 msgstr "Показать или скрыть цвета для выбора"
+
+msgid "Settings of the mods in this tab."
+msgstr "Настройки модов в этой вкладке."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt: which mods were found and what was written."
+msgstr "Подробности в RE_Kenshi_log.txt: какие моды найдены и что записано."

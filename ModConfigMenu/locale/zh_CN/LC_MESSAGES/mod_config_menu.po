@@ -46,3 +46,15 @@ msgstr "切换：调色板或输入颜色代码（#RRGGBB）"
 
 msgid "Show or hide the colours to pick from"
 msgstr "显示或隐藏可选颜色"
+
+msgid "Settings of the mods in this tab."
+msgstr "此选项卡中各模组的设置。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt: which mods were found and what was written."
+msgstr "详情写入 RE_Kenshi_log.txt:找到了哪些模组以及写入了什么。"

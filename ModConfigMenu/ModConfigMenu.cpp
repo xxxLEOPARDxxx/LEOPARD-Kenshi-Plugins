@@ -2538,6 +2538,24 @@ extern "C" __declspec(dllexport) void __cdecl MCM_OpenPage(const char* modId)
 }
 
 
+// Своя страница в списке модов (просьба пользователя, 14.10.2026): MCM
+// находит MCM_Describe во всех загруженных DLL, в том числе в своей.
+static void __cdecl McmSelfReload()
+{
+    const std::string ini = ModuleDir() + "ModConfigMenu.ini";
+    g_debug = GetPrivateProfileIntA("ModConfigMenu", "Debug", 0, ini.c_str()) != 0;
+}
+
+extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
+{
+    static const std::string ini = ModuleDir() + "ModConfigMenu.ini";
+    api->beginMod(api, "ModConfigMenu", "Mod Config Menu", ini.c_str(), &McmSelfReload);
+    if (api->version >= 2)
+        api->info(api, Tr("Settings of the mods in this tab."));
+    api->section(api, Tr("Diagnostics"));
+    api->toggle(api, "ModConfigMenu", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: which mods were found and what was written."), 0, 0);
+}
+
 __declspec(dllexport) void startPlugin()
 {
     // ini игрока - см. shared/IniDefaults.h (11.10.2026).
