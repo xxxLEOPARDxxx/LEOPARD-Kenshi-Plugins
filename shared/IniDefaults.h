@@ -109,4 +109,23 @@ namespace IniDefaults
 
         return ini;
     }
+
+    // mod-config.json форков Emkej - то же правило: файл игрока не
+    // раздаём, в раздаче mod-config.defaults.json. Нет файла - копия
+    // defaults (раньше плагин писал в журнал «could not read
+    // mod-config.json» и брал значения из кода, а defaults не читал никто;
+    // жалоба из сборки Second Life of Kenshi, 14.10.2026).
+    inline std::string PrepareJson(const std::string& json)
+    {
+        if (!json.empty() && !Exists(json))
+        {
+            const std::string::size_type slash = json.find_last_of("\\/");
+            const std::string defaults =
+                (slash == std::string::npos ? std::string() : json.substr(0, slash + 1)) +
+                "mod-config.defaults.json";
+            if (Exists(defaults))
+                CopyFileA(defaults.c_str(), json.c_str(), TRUE);
+        }
+        return json;
+    }
 }
