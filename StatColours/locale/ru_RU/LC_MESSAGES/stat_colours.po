@@ -202,3 +202,12 @@ msgstr "Множители видны, только пока зажата эта
 
 msgid "HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."
 msgstr "HoldKey: любая клавиша (ALT, CTRL, SHIFT, F, CTRL+B...) - видно, только пока зажата; NONE - всегда."
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Turns the whole plugin on or off."
+msgstr "Включает и выключает плагин целиком."
+
+msgid "0 turns the whole plugin off (after a restart)."
+msgstr "0 отключает плагин целиком (после перезапуска игры)."

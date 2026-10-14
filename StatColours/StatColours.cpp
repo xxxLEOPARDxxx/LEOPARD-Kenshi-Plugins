@@ -391,6 +391,8 @@ namespace
                 fprintf(f, "; %s\n", Tr(HEAD[i]));
         }
 
+        fprintf(f, "\n[StatColours]\n; %s\nEnabled=1\n", Tr("0 turns the whole plugin off (after a restart)."));
+
         fputs("\n[Colours]\n", f);
 
         for (int i = 0; i < PALETTE_SIZE; ++i)
@@ -2075,6 +2077,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->beginMod(api, "StatColours", "Stat Colours", ini.c_str(), &McmReload);
     if (api->version >= 2)
         api->info(api, Tr("Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."));
+    api->toggle(api, "StatColours", "Enabled", Tr("Enabled"), Tr("Turns the whole plugin on or off."), 1, MCM_RESTART);
     api->section(api, Tr("Racial XP"));
     api->toggle(api, "RacialXP", "Show", Tr("Racial XP multipliers"), Tr("Racial XP multipliers under the attributes in the character window."), 1, 0);
     api->hotkey(api, "RacialXP", "HoldKey", Tr("Show while held"), Tr("The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."), "ALT", 0);
@@ -2108,6 +2111,18 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 
 __declspec(dllexport) void startPlugin()
 {
+    // Выключатель всего плагина (15.10.2026): окно характеристик он
+    // перекрашивает и растягивает, на ходу это не снять - без хука до
+    // перезапуска. Страница MCM остаётся, чтобы включить обратно.
+    {
+        const std::string ini = IniPath();
+        if (!ini.empty() && GetPrivateProfileIntA("StatColours", "Enabled", 1, ini.c_str()) == 0)
+        {
+            DebugLog("StatColours: turned off in the ini, nothing is coloured");
+            return;
+        }
+    }
+
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(
             KenshiLib::GetRealAddress(

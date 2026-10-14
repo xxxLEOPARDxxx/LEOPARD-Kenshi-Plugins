@@ -202,3 +202,12 @@ msgstr "仅在按住此键时显示倍率。点击后按下一个键；Backspace
 
 msgid "HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."
 msgstr "HoldKey：任意键（ALT、CTRL、SHIFT、F、CTRL+B...）- 仅在按住时显示；NONE - 始终显示。"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Turns the whole plugin on or off."
+msgstr "启用或关闭整个插件。"
+
+msgid "0 turns the whole plugin off (after a restart)."
+msgstr "0 关闭整个插件(重启游戏后生效)。"
