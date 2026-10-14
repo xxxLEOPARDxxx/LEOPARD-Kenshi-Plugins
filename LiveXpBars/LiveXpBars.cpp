@@ -36,6 +36,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <IniDefaults.h>
+#include <FontRefresh.h>
 
 #include <cmath>
 #include <cstdio>
@@ -1538,6 +1539,11 @@ __declspec(dllexport) void startPlugin()
         DebugLog("LiveXpBars: disabled in the ini");
         return;
     }
+
+    // Полосы с текстом всегда на экране: после пересоздания шрифтов игрой
+    // (размер шрифта, окно настроек) их текст держал удалённую текстуру -
+    // вылет при отрисовке (14.10.2026). См. shared/FontRefresh.h.
+    FontRefresh::Install();
 
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(

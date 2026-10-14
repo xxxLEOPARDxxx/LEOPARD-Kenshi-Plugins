@@ -241,17 +241,58 @@ namespace
         std::vector<MyGUI::Widget*> marks;     // дети корня иконки
     };
     std::map<MyGUI::Widget*, IconEntry> g_icons;   // корень иконки -> вещь
+    // пометка -> корень её иконки. Игра может удалить детей иконки сама
+    // (перестройка иконки), и указатель в marks остаётся висеть: потом
+    // RefreshAll (смена настроек в MCM) удалял его второй раз, а клавиша
+    // показа звала setVisible - порча кучи и падение при отрисовке
+    // интерфейса (дампы 13-14.10.2026, «поменял заливку - вылет»).
+    std::map<MyGUI::Widget*, MyGUI::Widget*> g_markRoot;
     bool g_shown = true;                            // показаны ли пометки сейчас
 
+    void ForgetMarks(IconEntry& entry)
+    {
+        for (size_t k = 0; k < entry.marks.size(); ++k)
+            g_markRoot.erase(entry.marks[k]);
+        entry.marks.clear();
+    }
+
     // MyGUI сообщает о каждом удаляемом виджете: корень иконки ушёл -
-    // забыть его (пометки - его дети, уходят с ним).
+    // забыть его вместе с пометками; ушла сама пометка - убрать её из
+    // списка иконки.
     class Unlinker : public MyGUI::IUnlinkWidget
     {
     public:
         virtual void _unlinkWidget(MyGUI::Widget* widget)
         {
+            if (!g_markRoot.empty())
+            {
+                std::map<MyGUI::Widget*, MyGUI::Widget*>::iterator mark = g_markRoot.find(widget);
+                if (mark != g_markRoot.end())
+                {
+                    std::map<MyGUI::Widget*, IconEntry>::iterator icon = g_icons.find(mark->second);
+                    if (icon != g_icons.end())
+                    {
+                        std::vector<MyGUI::Widget*>& marks = icon->second.marks;
+                        for (size_t k = 0; k < marks.size(); ++k)
+                            if (marks[k] == widget)
+                            {
+                                marks.erase(marks.begin() + k);
+                                break;
+                            }
+                    }
+                    g_markRoot.erase(mark);
+                    return;
+                }
+            }
             if (!g_icons.empty())
-                g_icons.erase(widget);
+            {
+                std::map<MyGUI::Widget*, IconEntry>::iterator icon = g_icons.find(widget);
+                if (icon != g_icons.end())
+                {
+                    ForgetMarks(icon->second);
+                    g_icons.erase(icon);
+                }
+            }
         }
     };
     Unlinker* g_unlinker = NULL;       // живёт, пока жива DLL
@@ -373,6 +414,7 @@ namespace
                             edge->setAlpha(g_rarityAlpha);
                             SetDepthLast(edge, BACK_DEPTH);
                             entry.marks.push_back(edge);
+                            g_markRoot[edge] = root;
                         }
                     }
                 }
@@ -392,6 +434,7 @@ namespace
                             back->setAlpha(g_style == 0 ? g_rarityAlpha * 0.5f : g_rarityAlpha);
                             SetDepthLast(back, BACK_DEPTH);
                             entry.marks.push_back(back);
+                            g_markRoot[back] = root;
                         }
                     }
                 }
@@ -418,6 +461,7 @@ namespace
                     star->setColour(g_gradeColour[GradeOf(item)]);
                     SetDepthLast(star, FRONT_DEPTH);
                     entry.marks.push_back(star);
+                    g_markRoot[star] = root;
                 }
             }
         }
@@ -435,6 +479,7 @@ namespace
                 mark->setAlpha(g_stolenAlpha);
                 SetDepthLast(mark, FRONT_DEPTH);
                 entry.marks.push_back(mark);
+                g_markRoot[mark] = root;
                 corner += g_stolenSize + 1;
             }
         }
@@ -448,6 +493,7 @@ namespace
                 mark->setAlpha(g_factionAlpha);
                 SetDepthLast(mark, FRONT_DEPTH);
                 entry.marks.push_back(mark);
+                g_markRoot[mark] = root;
             }
         }
 
@@ -468,6 +514,7 @@ namespace
                     eye->setImageTexture(texture);
                     SetDepthLast(eye, FRONT_DEPTH);
                     entry.marks.push_back(eye);
+                    g_markRoot[eye] = root;
                 }
             }
         }
@@ -476,10 +523,12 @@ namespace
     void Undecorate(IconEntry& entry)
     {
         MyGUI::Gui* const gui = MyGUI::Gui::getInstancePtr();
-        for (size_t k = 0; k < entry.marks.size(); ++k)
-            if (gui != NULL && entry.marks[k] != NULL)
-                gui->destroyWidget(entry.marks[k]);
-        entry.marks.clear();
+        // копия: каждое удаление через Unlinker правит entry.marks
+        const std::vector<MyGUI::Widget*> marks = entry.marks;
+        for (size_t k = 0; k < marks.size(); ++k)
+            if (gui != NULL && marks[k] != NULL)
+                gui->destroyWidget(marks[k]);
+        ForgetMarks(entry);
     }
 
     // Перерисовка из MCM идёт по уже открытым иконкам: вещь могла уйти
@@ -532,7 +581,7 @@ namespace
             return;                         // без него корни не забыть - не рискуем
         IconEntry& entry = g_icons[root];
         entry.item = item;
-        entry.marks.clear();
+        ForgetMarks(entry);
         Decorate(root, entry);
         if (g_debug && item->getClassType() == BLUEPRINT)
         {

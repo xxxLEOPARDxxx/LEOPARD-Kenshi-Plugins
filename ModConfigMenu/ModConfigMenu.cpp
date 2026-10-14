@@ -58,6 +58,7 @@
 #include <mygui/MyGUI_ImageBox.h>
 #include <mygui/MyGUI_ComboBox.h>
 #include <WidgetRef.h>
+#include <FontRefresh.h>
 #include <GameTheme.h>
 
 #include <kenshi/Globals.h>
@@ -2564,5 +2565,7 @@ __declspec(dllexport) void startPlugin()
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&OptionsWindow::saveOptions), Save_hook, &g_origSave))
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::saveOptions");
+    // текст всех модов переживает пересоздание шрифтов игрой (14.10.2026)
+    FontRefresh::Install();
     DebugLog("ModConfigMenu: installed");
 }
