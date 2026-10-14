@@ -1683,7 +1683,12 @@ namespace
         if (y < 0)
             y = 0;
 
-        g_panel->setCoord(x, y, g_panelWidth, g_panelHeight);
+        // Только если место сменилось: setCoord заново раскладывает весь
+        // текст панели, а Place зовётся каждый кадр, пока зажата клавиша
+        // (FPS падал почти вдвое при сравнении, 14.10.2026).
+        const MyGUI::IntCoord want(x, y, g_panelWidth, g_panelHeight);
+        if (g_panel->getCoord() != want)
+            g_panel->setCoord(want);
     }
 
 
@@ -1788,8 +1793,17 @@ namespace
     }
 
 
+    // Кеш «с чем сравнивать» (Update): сбрасывается, когда панель прячется -
+    // за это время надетое могли продать или выбросить.
+    Counterpart g_pair;
+    Item* g_pairNext = NULL;
+    Character* g_pairOwner = NULL;
+    DWORD g_pairAt = 0;
+
     void Hide()
     {
+        g_pairNext = NULL;
+        g_pairOwner = NULL;
         if (g_panel != NULL && g_panel->getVisible())
             g_panel->setVisible(false);
         g_cachedNext = g_cachedWorn = NULL;
@@ -1869,7 +1883,17 @@ namespace
             return;
         }
 
-        const Counterpart pair = FindCounterpart(owner, next);
+        // С чем сравнивать - заново при смене вещи или владельца и раз в
+        // 300 мс (переодели, пока окошко открыто); не каждый кадр.
+        const DWORD now = GetTickCount();
+        if (next != g_pairNext || owner != g_pairOwner || now - g_pairAt > 300)
+        {
+            g_pair = FindCounterpart(owner, next);
+            g_pairNext = next;
+            g_pairOwner = owner;
+            g_pairAt = now;
+        }
+        const Counterpart& pair = g_pair;
         const bool wornItself = pair.wornItself;
         Item* const worn = pair.worn;
 
