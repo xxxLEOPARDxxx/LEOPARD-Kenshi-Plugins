@@ -141,3 +141,12 @@ msgstr "派系关系按键"
 
 msgid "The relation shows while this key is held. NONE (Backspace when assigning) - always."
 msgstr "按住此键时显示关系。NONE（设置时按 Backspace）- 始终显示。"
+
+msgid "Trader window"
+msgstr "商人窗口"
+
+msgid "Money at the centre"
+msgstr "金钱居中"
+
+msgid "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
+msgstr "商人的金钱显示在商人窗口的中央。仅当金钱栏与窗口同宽时(Dark UI)生效;原版窗口保持不变。"

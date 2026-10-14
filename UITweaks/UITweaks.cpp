@@ -146,6 +146,7 @@ namespace
     int g_progressGrowUp = 1;
     bool g_factionRelation = true;   // отношение фракции у имени выбранного
     bool g_craftIcon = true;         // иконка вещи у мыши в списке рецептов
+    bool g_traderMoneyCentre = true; // деньги торговца по центру окна (Dark UI)
     // Клавиша иконки (09.10.2026, просьба тестеров; задержку убрали):
     // иконка - пока зажата; NONE - просто по наведению.
     HoldKey::Key g_craftIconKey;
@@ -253,6 +254,8 @@ namespace
         fputs(";   next to the mouse over a line of the Items list.\n", f);
         fputs("; CraftIconKey - the icon shows while this key is held (ALT,\n", f);
         fputs(";   CTRL+B, ...); NONE - on hover alone.\n", f);
+        fputs("; TraderMoneyCentre - the trader's money at the centre of the\n", f);
+        fputs(";   trader window, when the money plate is as wide as the window.\n", f);
         fputs("; Debug - log every datapanel the game creates, every\n", f);
         fputs(";   queue box found and the sizes of every bar fill.\n", f);
         fputs("\n[Tweaks]\n", f);
@@ -269,6 +272,7 @@ namespace
         fputs("FactionRelationKey=NONE\n", f);
         fputs("CraftIcon=1\n", f);
         fputs("CraftIconKey=ALT\n", f);
+        fputs("TraderMoneyCentre=1\n", f);
         fputs("Debug=0\n", f);
 
         fclose(f);
@@ -313,6 +317,8 @@ namespace
         }
         g_craftIcon =
             GetPrivateProfileIntA("Tweaks", "CraftIcon", 1, ini.c_str()) != 0;
+        g_traderMoneyCentre =
+            GetPrivateProfileIntA("Tweaks", "TraderMoneyCentre", 1, ini.c_str()) != 0;
         {
             char key[64] = {};
             GetPrivateProfileStringA("Tweaks", "CraftIconKey", "ALT", key, sizeof(key), ini.c_str());
@@ -2937,6 +2943,147 @@ namespace
     // Кадр интерфейса
     // ---------------------------------------------------------------
 
+    // ---------------------------------------------------------------
+    // Деньги торговца по центру окна (15.10.2026, Dark UI)
+    //
+    // Строка денег - блок datapanel в плашке у верха окна торговца.
+    // Журнал её устройства:
+    //
+    //   плашка      660x54  (окно 1041 - игра расширила его под инвентарь
+    //                        уже после загрузки разметки)
+    //   datapanel   638x25
+    //     Widget    638x25  HStretch VStretch
+    //       Widget  638x25  - строка
+    //         TextBox 612x22 «Нал.:»    - у левого края
+    //         TextBox 612x22 «к.10 030» - у правого края
+    //
+    // Подпись и сумма - две надписи во всю ширину строки. Поставить сумму
+    // по центру окна, оставив подпись слева, разметка не может: правый
+    // край блока пришлось бы сдвигать на половину прироста окна. Плашку и
+    // блок растягивает разметка (fix_darkui_tradermoney.py), а здесь -
+    // строка на всю ширину блока и правый край надписи суммы на центр
+    // окна плюс половина ширины текста.
+    //
+    // Только когда плашка шириной почти во всё окно: в ванили она узкая,
+    // слева, и окно остаётся как есть.
+    // ---------------------------------------------------------------
+
+    WidgetRef& TraderMoneyRef()
+    {
+        static WidgetRef* ref = new WidgetRef();   // не разрушается: MyGUI держит его в списке
+        return *ref;
+    }
+    DWORD g_traderMoneyScanAt = 0;
+
+    bool HasDigit(const MyGUI::UString& text)
+    {
+        for (size_t i = 0; i < text.size(); ++i)
+            if (text[i] >= '0' && text[i] <= '9')
+                return true;
+        return false;
+    }
+
+    // Надпись суммы, если это блок с одной строкой «подпись - число».
+    MyGUI::TextBox* MoneyValueOf(MyGUI::Widget* datapanel)
+    {
+        if (datapanel->getChildCount() != 1)
+            return NULL;
+        MyGUI::Widget* const holder = datapanel->getChildAt(0);
+        if (holder->getChildCount() != 1)
+            return NULL;
+        MyGUI::Widget* const line = holder->getChildAt(0);
+        if (line->getChildCount() != 2)
+            return NULL;
+        MyGUI::TextBox* const label = line->getChildAt(0)->castType<MyGUI::TextBox>(false);
+        MyGUI::TextBox* const value = line->getChildAt(1)->castType<MyGUI::TextBox>(false);
+        if (label == NULL || value == NULL || HasDigit(label->getCaption()) ||
+            !HasDigit(value->getCaption()))
+        {
+            return NULL;
+        }
+        return value;
+    }
+
+    MyGUI::TextBox* FindTraderMoney(MyGUI::Widget* widget, int depth)
+    {
+        if (widget == NULL || depth > 5 || !widget->getVisible())
+            return NULL;
+        if (EndsWith(widget->getName(), "_datapanel"))
+            return MoneyValueOf(widget);
+        for (size_t i = 0; i < widget->getChildCount(); ++i)
+        {
+            MyGUI::TextBox* const found = FindTraderMoney(widget->getChildAt(i), depth + 1);
+            if (found != NULL)
+                return found;
+        }
+        return NULL;
+    }
+
+    void CentreTraderMoney()
+    {
+        if (!g_traderMoneyCentre)
+            return;
+
+        MyGUI::Widget* found = TraderMoneyRef().get();
+        if (found == NULL || !found->getInheritedVisible())
+        {
+            // окно ищем не каждый кадр
+            const DWORD now = GetTickCount();
+            if (now - g_traderMoneyScanAt < 250)
+                return;
+            g_traderMoneyScanAt = now;
+            TraderMoneyRef().reset();
+            found = NULL;
+            MyGUI::Gui* const gui = MyGUI::Gui::getInstancePtr();
+            if (gui == NULL)
+                return;
+            MyGUI::EnumeratorWidgetPtr roots = gui->getEnumerator();
+            while (found == NULL && roots.next())
+                found = FindTraderMoney(roots.current(), 0);
+            if (found == NULL)
+                return;
+            TraderMoneyRef().set(found);
+        }
+
+        MyGUI::TextBox* const value = found->castType<MyGUI::TextBox>(false);
+        MyGUI::Widget* const line = value != NULL ? value->getParent() : NULL;
+        MyGUI::Widget* const holder = line != NULL ? line->getParent() : NULL;
+        MyGUI::Widget* const datapanel = holder != NULL ? holder->getParent() : NULL;
+        MyGUI::Widget* const plate = datapanel != NULL ? datapanel->getParent() : NULL;
+        MyGUI::Widget* const window = plate != NULL ? plate->getParent() : NULL;
+        if (window == NULL || plate->getWidth() < window->getWidth() * 8 / 10)
+            return;
+
+        if (line->getWidth() != holder->getWidth())
+            line->setSize(holder->getWidth(), line->getHeight());
+
+        // по правому краю надписи, верх/низ - как было
+        const MyGUI::Align align = value->getTextAlign();
+        const MyGUI::Align right = MyGUI::Align::Right |
+            (align.isTop() ? MyGUI::Align::Top
+                           : align.isBottom() ? MyGUI::Align::Bottom : MyGUI::Align::VCenter);
+        if (align != right)
+            value->setTextAlign(right);
+
+        const int textWidth = value->getTextSize().width;
+        const int centre = window->getAbsoluteLeft() + window->getWidth() / 2;
+        const int width = centre + textWidth / 2 - value->getAbsoluteLeft();
+        if (width > textWidth && width != value->getWidth())
+            value->setSize(width, value->getHeight());
+    }
+
+    void SafeCentreTraderMoney()
+    {
+        __try
+        {
+            CentreTraderMoney();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            TraderMoneyRef().reset();
+        }
+    }
+
     void (*g_origGuiUpdate)(ForgottenGUI* thisptr) = NULL;
 
     void GuiUpdate_hook(ForgottenGUI* thisptr)
@@ -2949,6 +3096,7 @@ namespace
             UpdateFactionRelation();
             SafeCraftHover();
             SafeTickIconJob();
+            SafeCentreTraderMoney();
         }
     }
 }
@@ -2983,6 +3131,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     if (api->version >= 3)
         api->action(api, Tr("Draw icons of all items"), Tr("The game draws an item icon only when the item first gets into an inventory. This draws them now for every item without one, a few per frame, in a loaded game. The pictures stay in data/icons."), &StartIconJob, NULL, 0);
     api->hotkey(api, "Tweaks", "CraftIconKey", Tr("Icon key"), Tr("The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."), "ALT", 0);
+    api->section(api, Tr("Trader window"));
+    api->toggle(api, "Tweaks", "TraderMoneyCentre", Tr("Money at the centre"), Tr("The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }

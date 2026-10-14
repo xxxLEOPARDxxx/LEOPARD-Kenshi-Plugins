@@ -141,3 +141,12 @@ msgstr "Клавиша отношения фракции"
 
 msgid "The relation shows while this key is held. NONE (Backspace when assigning) - always."
 msgstr "Отношение видно, пока зажата эта клавиша. NONE (Backspace при назначении) - всегда."
+
+msgid "Trader window"
+msgstr "Окно торговца"
+
+msgid "Money at the centre"
+msgstr "Деньги по центру"
+
+msgid "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
+msgstr "Деньги торговца - по центру окна торговца. Только когда плашка денег шириной во всё окно (Dark UI); ванильное окно остаётся как есть."

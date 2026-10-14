@@ -141,3 +141,12 @@ msgstr "Faction relation key"
 
 msgid "The relation shows while this key is held. NONE (Backspace when assigning) - always."
 msgstr "The relation shows while this key is held. NONE (Backspace when assigning) - always."
+
+msgid "Trader window"
+msgstr "Trader window"
+
+msgid "Money at the centre"
+msgstr "Money at the centre"
+
+msgid "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
+msgstr "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
