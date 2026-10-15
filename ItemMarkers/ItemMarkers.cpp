@@ -229,6 +229,7 @@ namespace
     // интерфейса (его прописывает, например, наш Dark UI); нет ключа - цвет
     // ItemGrade5, как у игры (15.10.2026, просьба пользователя и Асура).
     MyGUI::Colour g_meitouColour;
+    std::string g_meitouHex;            // как в палитре, в нижнем регистре
     bool g_coloursRead = false;
 
     // Класс оружия «Meitou» (rebirth.mod, тип записи 50) - по строковому
@@ -288,8 +289,10 @@ namespace
             g_gradeHex[g] = hex;
             g_gradeColour[g] = GameTheme::Parse(hex.c_str(), MyGUI::Colour::White);
         }
-        g_meitouColour = GameTheme::Parse(
-            GameTheme::Hex("ItemGradeMeitou", g_gradeHex[GRADES - 1].c_str()), g_gradeColour[GRADES - 1]);
+        g_meitouHex = GameTheme::Hex("ItemGradeMeitou", g_gradeHex[GRADES - 1].c_str());
+        for (size_t k = 0; k < g_meitouHex.size(); ++k)
+            g_meitouHex[k] = static_cast<char>(tolower(static_cast<unsigned char>(g_meitouHex[k])));
+        g_meitouColour = GameTheme::Parse(g_meitouHex.c_str(), g_gradeColour[GRADES - 1]);
     }
 
     // Цвет пометки вещи: сорт, у мейто - свой
@@ -580,7 +583,13 @@ namespace
                                                    MyGUI::Align::Right | MyGUI::Align::Top);
             if (bag != NULL)
             {
-                bag->setItemResource("pic_PointerSteal");
+                // Белый мешочек (из значка кражи игры, обесцвечен): красный
+                // значок игры при перекраске оставался красным.
+                const std::string& texture = Texture("itemmarkers_bag.png");
+                if (!texture.empty())
+                    bag->setImageTexture(texture);
+                else
+                    bag->setItemResource("pic_PointerSteal");
                 bag->setColour(HeldByPlayer(item) ? g_boughtColour : g_soldColour);
                 SetDepthLast(bag, FRONT_DEPTH);
                 entry.marks.push_back(bag);
@@ -743,6 +752,90 @@ namespace
         }
     }
 
+    // Строка класса в подсказке оружия («[Модель # Мейто]») игра красит
+    // цветом ItemGrade5 - тем же, что у мастерского. У мейто этот цвет в
+    // строках подсказки меняется на цвет мейто (15.10.2026). Цвет в строке -
+    // тег MyGUI «#rrggbb» (регистр любой) или «#{ItemGrade5}».
+    void RecolourMeitouText(std::string& text)
+    {
+        const std::string& from = g_gradeHex[GRADES - 1];
+        if (from.size() != 7 || g_meitouHex.size() != 7 || from == g_meitouHex)
+            return;
+        for (size_t i = 0; i + 7 <= text.size(); ++i)
+        {
+            if (text[i] != '#')
+                continue;
+            bool same = true;
+            for (size_t k = 1; k < 7 && same; ++k)
+                same = tolower(static_cast<unsigned char>(text[i + k])) == from[k];
+            if (same)
+                text.replace(i, 7, g_meitouHex);
+        }
+        const std::string tag = "#{ItemGrade5}";
+        for (std::string::size_type at = text.find(tag); at != std::string::npos; at = text.find(tag, at))
+            text.replace(at, tag.size(), g_meitouHex);
+    }
+
+    void RecolourMeitouLines(Item* item, Ogre::vector<StringPair>::type& lines)
+    {
+        if (!g_enabled || !g_rarity || !IsMeitou(item))
+            return;
+        ReadColours();
+        for (size_t i = 0; i < lines.size(); ++i)
+        {
+            RecolourMeitouText(lines[i].s1);
+            RecolourMeitouText(lines[i].s2);
+        }
+        if (g_debug)
+        {
+            static int logged = 0;
+            if (logged < 2)
+            {
+                ++logged;
+                for (size_t i = 0; i < lines.size(); ++i)
+                    DebugLog(("ItemMarkers: meitou tooltip line [" + lines[i].s1 + "] [" + lines[i].s2 + "]").c_str());
+            }
+        }
+    }
+
+    void SafeRecolourMeitou(Item* item, Ogre::vector<StringPair>::type* lines)
+    {
+        __try
+        {
+            RecolourMeitouLines(item, *lines);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
+    typedef void (*TooltipFn)(Item*, Ogre::vector<StringPair>::type&);
+    TooltipFn g_origWeaponTip1 = NULL;
+    TooltipFn g_origWeaponTip2 = NULL;
+    TooltipFn g_origSwordTip1 = NULL;
+    TooltipFn g_origSwordTip2 = NULL;
+
+    void WeaponTip1_hook(Item* self, Ogre::vector<StringPair>::type& lines)
+    {
+        g_origWeaponTip1(self, lines);
+        SafeRecolourMeitou(self, &lines);
+    }
+    void WeaponTip2_hook(Item* self, Ogre::vector<StringPair>::type& lines)
+    {
+        g_origWeaponTip2(self, lines);
+        SafeRecolourMeitou(self, &lines);
+    }
+    void SwordTip1_hook(Item* self, Ogre::vector<StringPair>::type& lines)
+    {
+        g_origSwordTip1(self, lines);
+        SafeRecolourMeitou(self, &lines);
+    }
+    void SwordTip2_hook(Item* self, Ogre::vector<StringPair>::type& lines)
+    {
+        g_origSwordTip2(self, lines);
+        SafeRecolourMeitou(self, &lines);
+    }
+
     InventoryIcon* (*g_origIconCtor)(InventoryIcon*, Item*, const MyGUI::IntPoint&, MyGUI::Widget*) = NULL;
 
     InventoryIcon* IconCtor_hook(InventoryIcon* self, Item* item, const MyGUI::IntPoint& position,
@@ -846,5 +939,15 @@ __declspec(dllexport) void startPlugin()
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&ForgottenGUI::update), GuiUpdate_hook, &g_origGuiUpdate))
         ErrorLog("ItemMarkers: could not hook the interface update - the show key does not work");
+    // строка класса мейто в подсказке оружия - цветом мейто
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&Weapon::_NV_getTooltipData1), WeaponTip1_hook, &g_origWeaponTip1) ||
+        KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&Weapon::_NV_getTooltipData2), WeaponTip2_hook, &g_origWeaponTip2) ||
+        KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&Sword::_NV_getTooltipData1), SwordTip1_hook, &g_origSwordTip1) ||
+        KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&Sword::_NV_getTooltipData2), SwordTip2_hook, &g_origSwordTip2))
+        ErrorLog("ItemMarkers: could not hook the weapon tooltip - the Meitou line keeps the game's colour");
     DebugLog("ItemMarkers: installed");
 }
