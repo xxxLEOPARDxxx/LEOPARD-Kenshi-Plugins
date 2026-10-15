@@ -203,6 +203,13 @@ namespace GameTheme
 
     inline bool& ModPaletteFlag();
 
+    // Файл палитры, который выбран (для журнала: у игроков бывает не тот).
+    inline std::string& PalettePath()
+    {
+        static std::string path;
+        return path;
+    }
+
     inline const std::map<std::string, std::string>& Table()
     {
         static std::map<std::string, std::string> table;
@@ -254,6 +261,7 @@ namespace GameTheme
         }
 
         ParseFile(chosen, table);
+        PalettePath() = chosen;
         ModPaletteFlag() = chosen != root + "data\\" + suffix;
         return table;
     }

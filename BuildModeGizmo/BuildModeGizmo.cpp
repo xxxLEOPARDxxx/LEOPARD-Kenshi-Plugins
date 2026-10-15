@@ -96,6 +96,7 @@
 #include <kenshi/gui/InteriorModeButtonWindow.h>
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/InputHandler.h>
+#include <ois/OISKeyboard.h>
 #include <kenshi/Faction.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
@@ -1085,6 +1086,21 @@ namespace
         else
             g_clickPrevDown = false;
 
+        // Окно закрыли (крестиком или Esc) - снова откроется по щелчку по
+        // миру: по той же постройке тоже (15.10.2026: после Esc ту же
+        // постройку было не выбрать). Щелчок по интерфейсу не в счёт.
+        {
+            static bool s_down = false;
+            const bool down = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+            if (down && !s_down && g_siteDismissed != NULL)
+            {
+                MyGUI::InputManager* const input = MyGUI::InputManager::getInstancePtr();
+                if (input == NULL || input->getMouseFocusWidget() == NULL)
+                    g_siteDismissed = NULL;
+            }
+            s_down = down;
+        }
+
         // Выделение: в редакторе - его (если там что-то есть), иначе игрока.
         const hand selection = g_inEditor && g_editor != NULL &&
                                g_editor->selectedObject.getRootObject() != NULL
@@ -1300,9 +1316,41 @@ namespace
         }
     }
 
+    // Esc на уровне события клавиши: окно стрелочек открыто - закрываем его,
+    // а игре нажатие не отдаём (иначе открывалось меню паузы и снималось
+    // выделение; 15.10.2026). Так же Wall-B-Gone гасит Esc своего окна.
+    bool g_keyHooked = false;
+    void (*g_origKeyDown)(InputHandler*, OIS::KeyCode) = NULL;
+
+    bool SafeEscClosesSite()
+    {
+        __try
+        {
+            if (!g_siteOpen)
+                return false;
+            TransformWindow* const t = TransformWindow::getSingleton();
+            if (t == NULL || !t->isVisible())
+                return false;
+            t->close();
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    void KeyDown_hook(InputHandler* self, OIS::KeyCode code)
+    {
+        if (code == OIS::KC_ESCAPE && SafeEscClosesSite())
+            return;
+        g_origKeyDown(self, code);
+    }
+
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
-        SafeEscCloseSite();
+        if (!g_keyHooked)
+            SafeEscCloseSite();     // запасной путь, если перехват клавиш не встал
         g_origGuiUpdate(thisptr);
         TickSite();
     }
@@ -1373,6 +1421,11 @@ __declspec(dllexport) void startPlugin()
         DebugLog("BuildModeGizmo: disabled in the ini");
         return;
     }
+
+    g_keyHooked = KenshiLib::SUCCESS == KenshiLib::AddHook(
+        KenshiLib::GetRealAddress(&InputHandler::keyDownEvent), KeyDown_hook, &g_origKeyDown);
+    if (!g_keyHooked)
+        ErrorLog("BuildModeGizmo: could not hook the key event - Esc may also open the game menu");
 
     // Основной режим: покадровое обновление интерфейса игры.
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(

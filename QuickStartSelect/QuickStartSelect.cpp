@@ -643,13 +643,31 @@ namespace
     // надписи на пергаменте не читались, а «Kenshi_GenericTextBox» там -
     // пергаментная плашка; надписи теперь на прозрачном
     // «Kenshi_TextboxStandardText»).
-    bool Parchment()
+    bool ParchmentChoice()
     {
         if (g_textTheme == 1)
             return false;
         if (g_textTheme == 2)
             return true;
         return !GameTheme::PaletteFromMod();
+    }
+
+    // Раз за запуск - в журнал, какую палитру нашёл плагин и какой текст
+    // выбрал: у части игроков текст тёмный на тёмном, а у нас нет (15.10.2026).
+    bool Parchment()
+    {
+        const bool parchment = ParchmentChoice();
+        static bool told = false;
+        if (!told)
+        {
+            told = true;
+            const std::string& path = GameTheme::PalettePath();
+            DebugLog("QuickStartSelect: palette " + (path.empty() ? std::string("not found") : path) +
+                     (GameTheme::PaletteFromMod() ? " (interface mod)" : " (vanilla)") +
+                     ", text " + (parchment ? "dark" : "light") +
+                     (g_textTheme == 0 ? " (auto)" : " (set in MCM)"));
+        }
+        return parchment;
     }
 
     // Цвет «для тёмного фона» - на пергаменте темнее.
@@ -2442,6 +2460,19 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 
 __declspec(dllexport) void startPlugin()
 {
+    // Две копии мода (из Мастерской и вручную в mods) - обе подменяли окно
+    // выбора предыстории, и у игрока открывалось два окна (15.10.2026).
+    // Работает первая загруженная, эта молчит.
+    {
+        HMODULE const first = GetModuleHandleA("QuickStartSelect.dll");
+        if (first != NULL && first != reinterpret_cast<HMODULE>(&__ImageBase))
+        {
+            ErrorLog("QuickStartSelect: another copy of this plugin is already loaded - this one stays off. "
+                     "Remove one of the two QuickStartSelect mod folders (Workshop or Kenshi\\mods).");
+            return;
+        }
+    }
+
     LoadSettings();
 
     if (!g_enabled)
