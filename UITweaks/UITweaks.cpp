@@ -3004,6 +3004,40 @@ namespace
         return value;
     }
 
+    // Окно торговца - по именам из разметки (как узнаёт его Organize-the-
+    // Trader): ARRANGE, сетка с прокруткой, блок денег и ни кнопки рюкзака,
+    // ни заголовка окна персонажа. Иначе блок из одной строки с числом
+    // нашёлся бы и в окне контейнера или животного (вес).
+    struct TraderMarkers
+    {
+        bool arrange, scroll, backpack, data, equipment;
+        TraderMarkers() : arrange(false), scroll(false), backpack(false), data(false), equipment(false) {}
+    };
+
+    void CollectTraderMarkers(MyGUI::Widget* widget, TraderMarkers& markers, bool root)
+    {
+        if (widget == NULL || (!root && widget->getTypeName() == "Window"))
+            return;
+        const std::string& name = widget->getName();
+        const bool scroll = name.find("scrollview_backpack_content") != std::string::npos;
+        markers.arrange |= name.find("ArrangeButton") != std::string::npos;
+        markers.scroll |= scroll;
+        markers.backpack |= !scroll && name.find("backpack_content") != std::string::npos;
+        markers.data |= name.find("datapanel") != std::string::npos;
+        markers.equipment |= name.find("OpenBagButton") != std::string::npos
+            || name.find("InventoryMainTitle") != std::string::npos;
+        for (size_t i = 0; i < widget->getChildCount(); ++i)
+            CollectTraderMarkers(widget->getChildAt(i), markers, false);
+    }
+
+    bool IsTraderWindow(MyGUI::Widget* root)
+    {
+        TraderMarkers markers;
+        CollectTraderMarkers(root, markers, true);
+        return markers.arrange && markers.scroll && markers.backpack &&
+               markers.data && !markers.equipment;
+    }
+
     MyGUI::TextBox* FindTraderMoney(MyGUI::Widget* widget, int depth)
     {
         if (widget == NULL || depth > 5 || !widget->getVisible())
@@ -3039,7 +3073,11 @@ namespace
                 return;
             MyGUI::EnumeratorWidgetPtr roots = gui->getEnumerator();
             while (found == NULL && roots.next())
-                found = FindTraderMoney(roots.current(), 0);
+            {
+                MyGUI::Widget* const root = roots.current();
+                if (root != NULL && root->getVisible() && IsTraderWindow(root))
+                    found = FindTraderMoney(root, 0);
+            }
             if (found == NULL)
                 return;
             TraderMoneyRef().set(found);
