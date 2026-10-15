@@ -867,9 +867,13 @@ namespace
     // открыты окна, раз в 0,4 с видимые иконки спрашиваются заново; сменилось
     // - пометки иконки рисуются заново. Вещь - по ссылке игры, не по
     // указателю: слитая в стопку вещь удалена, ссылка тогда пустая.
-    void RecheckTradeBags()
+    void RecheckTradeBags(ForgottenGUI* gui)
     {
-        if (!g_enabled || !g_tradeBags || !g_shown || g_icons.empty())
+        if (!g_enabled || !g_tradeBags || !g_shown || g_icons.empty() || gui == NULL)
+            return;
+        // Только пока идёт торговля (участники окна торговли заданы): вне
+        // торговли «вещей сделки» не бывает (ревью 15.10.2026).
+        if (gui->tradeA.getRootObject() == NULL && gui->tradeB.getRootObject() == NULL)
             return;
         static DWORD s_last = 0;
         const DWORD now = GetTickCount();
@@ -897,7 +901,7 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
-        RecheckTradeBags();
+        RecheckTradeBags(self);
         if (g_debug && g_statIcons > 0)
         {
             static DWORD s_last = 0;
