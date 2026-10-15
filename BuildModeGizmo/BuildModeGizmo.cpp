@@ -1340,15 +1340,38 @@ namespace
         }
     }
 
+    // Меню паузы игра открывает по своему флагу Esc, а не по этому событию
+    // (проверено: без события Esc меню всё равно открывалось). Флаг гасим
+    // сразу и ещё несколько кадров - перед обновлением интерфейса игры.
+    int g_swallowEscFrames = 0;
+
+    void ClearEscFlags()
+    {
+        if (key != NULL)
+        {
+            key->escape = false;
+            key->escape_msg = false;
+        }
+    }
+
     void KeyDown_hook(InputHandler* self, OIS::KeyCode code)
     {
         if (code == OIS::KC_ESCAPE && SafeEscClosesSite())
+        {
+            ClearEscFlags();
+            g_swallowEscFrames = 3;
             return;
+        }
         g_origKeyDown(self, code);
     }
 
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
+        if (g_swallowEscFrames > 0)
+        {
+            --g_swallowEscFrames;
+            ClearEscFlags();
+        }
         if (!g_keyHooked)
             SafeEscCloseSite();     // запасной путь, если перехват клавиш не встал
         g_origGuiUpdate(thisptr);

@@ -2460,19 +2460,6 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 
 __declspec(dllexport) void startPlugin()
 {
-    // Две копии мода (из Мастерской и вручную в mods) - обе подменяли окно
-    // выбора предыстории, и у игрока открывалось два окна (15.10.2026).
-    // Работает первая загруженная, эта молчит.
-    {
-        HMODULE const first = GetModuleHandleA("QuickStartSelect.dll");
-        if (first != NULL && first != reinterpret_cast<HMODULE>(&__ImageBase))
-        {
-            ErrorLog("QuickStartSelect: another copy of this plugin is already loaded - this one stays off. "
-                     "Remove one of the two QuickStartSelect mod folders (Workshop or Kenshi\\mods).");
-            return;
-        }
-    }
-
     LoadSettings();
 
     if (!g_enabled)
