@@ -321,6 +321,9 @@ namespace
     {
         Item* item;
         std::vector<MyGUI::Widget*> marks;     // дети корня иконки
+        hand handle;                           // вещь по ссылке игры: удалена - пусто
+        bool bag;                              // нарисован мешочек сделки
+        IconEntry() : item(NULL), bag(false) {}
     };
     std::map<MyGUI::Widget*, IconEntry> g_icons;   // корень иконки -> вещь
     // пометка -> корень её иконки. Игра может удалить детей иконки сама
@@ -584,7 +587,8 @@ namespace
         // торговли перешли из рук в руки; её же функцией и узнаём. У нашего
         // персонажа - куплена, иначе (у торговца) - продана. Новое окно -
         // новые иконки, а игра сделку уже забыла: пометка уходит сама.
-        if (g_tradeBags && TradedNow(item))
+        entry.bag = g_tradeBags && TradedNow(item);
+        if (entry.bag)
         {
             const int side = g_stolenSize;
             int right = 2;
@@ -692,6 +696,7 @@ namespace
             return;                         // без него корни не забыть - не рискуем
         IconEntry& entry = g_icons[root];
         entry.item = item;
+        entry.handle = item->getHandle();
         ForgetMarks(entry);
         Decorate(root, entry);
         if (g_debug && item->getClassType() == BLUEPRINT)
@@ -857,12 +862,42 @@ namespace
         return result;
     }
 
+    // Продали или купили в уже лежащую стопку - игра новую иконку не
+    // создаёт, только число меняет: мешочка не было (15.10.2026). Пока
+    // открыты окна, раз в 0,4 с видимые иконки спрашиваются заново; сменилось
+    // - пометки иконки рисуются заново. Вещь - по ссылке игры, не по
+    // указателю: слитая в стопку вещь удалена, ссылка тогда пустая.
+    void RecheckTradeBags()
+    {
+        if (!g_enabled || !g_tradeBags || !g_shown || g_icons.empty())
+            return;
+        static DWORD s_last = 0;
+        const DWORD now = GetTickCount();
+        if (now - s_last < 400)
+            return;
+        s_last = now;
+        for (std::map<MyGUI::Widget*, IconEntry>::iterator it = g_icons.begin(); it != g_icons.end(); ++it)
+        {
+            IconEntry& entry = it->second;
+            if (!it->first->getInheritedVisible())
+                continue;
+            Item* const live = entry.handle.getItem();
+            if (live == NULL || live != entry.item)
+                continue;
+            if (TradedNow(live) == entry.bag)
+                continue;
+            Undecorate(entry);
+            SafeDecorate(it->first, &entry);
+        }
+    }
+
     // Клавиша показа: каждый кадр - только опрос клавиши.
     void (*g_origGuiUpdate)(ForgottenGUI*) = NULL;
 
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
+        RecheckTradeBags();
         if (g_debug && g_statIcons > 0)
         {
             static DWORD s_last = 0;
