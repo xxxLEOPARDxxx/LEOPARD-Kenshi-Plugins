@@ -296,6 +296,16 @@ if (Test-Path $imMod) {
     Copy-Item "$ROOT\ours\ItemMarkers\ItemMarkers.ini" "$imMod\ItemMarkers.defaults.ini" -Force
 }
 
+# Значок над нанимаемыми - замена LtEast's Recruitable NPC Highlighter (16.10.2026).
+BuildPlugin "$ROOT\ours\RecruitMarkers"           "RecruitMarkers"    "RecruitMarkers"
+$rmMod = "$KENSHI\mods\RecruitMarkers"
+if (Test-Path $rmMod) {
+    Copy-Item "$ROOT\ours\RecruitMarkers\README.txt" $rmMod -Force
+    Copy-Item "$ROOT\ours\RecruitMarkers\locale" $rmMod -Recurse -Force
+    Copy-Item "$ROOT\ours\RecruitMarkers\gui" $rmMod -Recurse -Force
+    Copy-Item "$ROOT\ours\RecruitMarkers\RecruitMarkers.ini" "$rmMod\RecruitMarkers.defaults.ini" -Force
+}
+
 # Formations собирается MSVC 2022, а не VC10: автор не линкует KenshiLib
 # и достаёт MyGUI через GetProcAddress, поэтому старый тулсет ему не нужен.
 & "$ROOT\build_formations.ps1" | Select-String -Pattern "OK:|НЕ УДАЛАСЬ|установлен"

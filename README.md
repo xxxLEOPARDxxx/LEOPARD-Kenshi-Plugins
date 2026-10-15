@@ -15,6 +15,7 @@
 | PatientSelfAid | пациент лечит себя, пока его лечат |
 | QuickStartSelect | список предысторий с поиском и сортировкой |
 | RangedDamageXp | опыт стрелку за нанесённый урон |
+| RecruitMarkers | значок над теми, кого можно нанять (замена LtEast's Recruitable NPC Highlighter) |
 | StatColours | цвета навыков и поправок снаряжения |
 | WantedMap | метки разыскиваемых на большой карте |
 

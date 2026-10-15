@@ -1,0 +1,111 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: RecruitMarkers\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps)."
+msgstr "1-10（每级 10%）。"
+
+msgid "A marker over the heads of characters you can recruit."
+msgstr "可招募角色头顶显示标记。"
+
+msgid "Animals that can join you."
+msgstr "可以加入你的动物。"
+
+msgid "Animals"
+msgstr "动物"
+
+msgid "Bar recruits, drifters and other ordinary characters who can join you."
+msgstr "酒吧招募者、流浪者等可以加入你的普通角色。"
+
+msgid "Characters farther than this from the centre of the camera are not marked."
+msgstr "距离镜头中心超过此距离的角色不显示标记。"
+
+msgid "Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."
+msgstr "像游戏一样检查对话条件：金钱、关系、囚禁等，以你最近的选中角色为准。关闭 - 显示所有对话中可以加入队伍的角色。"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Distance, m"
+msgstr "距离（米）"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Height above the head, cm"
+msgstr "头顶高度（厘米）"
+
+msgid "How high over the head bone the marker hangs."
+msgstr "标记悬挂在头部骨骼上方的高度。"
+
+msgid "In RE_Kenshi_log.txt: who was found recruitable, and every 10 seconds how many are marked and checked."
+msgstr "写入 RE_Kenshi_log.txt：哪些角色可招募，并每 10 秒记录标记和检查的数量。"
+
+msgid "Width in pixels."
+msgstr "宽度，单位为像素。"
+
+msgid "Look"
+msgstr "外观"
+
+msgid "Marker colour of ordinary recruits and animals, #RRGGBB."
+msgstr "普通招募者和动物的标记颜色，#RRGGBB。"
+
+msgid "Marker colour of unique characters, #RRGGBB."
+msgstr "独特角色的标记颜色，#RRGGBB。"
+
+msgid "Marker size"
+msgstr "标记大小"
+
+msgid "Markers at most"
+msgstr "标记数量上限"
+
+msgid "Markers over characters you can recruit."
+msgstr "在可招募角色上方显示标记。"
+
+msgid "Named characters who can join you."
+msgstr "可以加入你的有名字的角色。"
+
+msgid "Only if recruitable right now"
+msgstr "仅显示当前可招募的"
+
+msgid "Opacity"
+msgstr "不透明度"
+
+msgid "Ordinary colour"
+msgstr "普通颜色"
+
+msgid "Ordinary recruits"
+msgstr "普通招募者"
+
+msgid "Pulse on unique"
+msgstr "独特角色闪烁"
+
+msgid "Show key"
+msgstr "显示按键"
+
+msgid "The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."
+msgstr "按住此键时显示标记。NONE（设置时按 Backspace）- 始终显示。"
+
+msgid "The markers of unique characters gently pulse."
+msgstr "独特角色的标记会轻微闪烁。"
+
+msgid "The nearest ones are shown."
+msgstr "显示最近的角色。"
+
+msgid "Unique characters"
+msgstr "独特角色"
+
+msgid "Unique colour"
+msgstr "独特颜色"
+
+msgid "Who"
+msgstr "标记对象"

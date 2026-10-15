@@ -1,0 +1,111 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: RecruitMarkers\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps)."
+msgstr "1-10 (шаг 10%)."
+
+msgid "A marker over the heads of characters you can recruit."
+msgstr "Значок над головой у тех, кого можно нанять."
+
+msgid "Animals that can join you."
+msgstr "Животные, которых можно взять в отряд."
+
+msgid "Animals"
+msgstr "Животные"
+
+msgid "Bar recruits, drifters and other ordinary characters who can join you."
+msgstr "Наёмники из баров, бродяги и другие обычные персонажи, которых можно нанять."
+
+msgid "Characters farther than this from the centre of the camera are not marked."
+msgstr "Персонажи дальше этого расстояния от центра камеры не отмечаются."
+
+msgid "Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."
+msgstr "Проверять условия диалога так же, как игра: деньги, отношения, плен и прочее - для ближайшего выделенного персонажа. Выключено - все, чей диалог вообще может закончиться вступлением в отряд."
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Distance, m"
+msgstr "Расстояние, м"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "General"
+msgstr "Общее"
+
+msgid "Height above the head, cm"
+msgstr "Высота над головой, см"
+
+msgid "How high over the head bone the marker hangs."
+msgstr "Насколько выше кости головы висит значок."
+
+msgid "In RE_Kenshi_log.txt: who was found recruitable, and every 10 seconds how many are marked and checked."
+msgstr "В RE_Kenshi_log.txt: кого признали нанимаемым и раз в 10 секунд - сколько отмечено и проверено."
+
+msgid "Width in pixels."
+msgstr "Ширина в пикселях."
+
+msgid "Look"
+msgstr "Вид"
+
+msgid "Marker colour of ordinary recruits and animals, #RRGGBB."
+msgstr "Цвет значка обычных наёмников и животных, #RRGGBB."
+
+msgid "Marker colour of unique characters, #RRGGBB."
+msgstr "Цвет значка уникальных персонажей, #RRGGBB."
+
+msgid "Marker size"
+msgstr "Размер значка"
+
+msgid "Markers at most"
+msgstr "Значков не больше"
+
+msgid "Markers over characters you can recruit."
+msgstr "Значки над теми, кого можно нанять."
+
+msgid "Named characters who can join you."
+msgstr "Именные персонажи, которых можно взять в отряд."
+
+msgid "Only if recruitable right now"
+msgstr "Только кого можно нанять сейчас"
+
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+msgid "Ordinary colour"
+msgstr "Цвет обычных"
+
+msgid "Ordinary recruits"
+msgstr "Обычные наёмники"
+
+msgid "Pulse on unique"
+msgstr "Пульсация у уникальных"
+
+msgid "Show key"
+msgstr "Клавиша показа"
+
+msgid "The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."
+msgstr "Значки видны, пока зажата эта клавиша. NONE (Backspace при назначении) - видны всегда."
+
+msgid "The markers of unique characters gently pulse."
+msgstr "Значки уникальных персонажей мягко пульсируют."
+
+msgid "The nearest ones are shown."
+msgstr "Показываются ближайшие."
+
+msgid "Unique characters"
+msgstr "Уникальные персонажи"
+
+msgid "Unique colour"
+msgstr "Цвет уникальных"
+
+msgid "Who"
+msgstr "Кого отмечать"
