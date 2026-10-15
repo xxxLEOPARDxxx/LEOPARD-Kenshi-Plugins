@@ -95,6 +95,7 @@
 #include <kenshi/gui/TransformWindow.h>
 #include <kenshi/gui/InteriorModeButtonWindow.h>
 #include <kenshi/gui/ForgottenGUI.h>
+#include <kenshi/InputHandler.h>
 #include <kenshi/Faction.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
@@ -1255,8 +1256,31 @@ namespace
 
     void (*g_origGuiUpdate)(ForgottenGUI* thisptr) = NULL;
 
+    // Esc закрывает окно стрелочек (15.10.2026: в обычном режиме стройки
+    // оно по Esc не закрывалось). Нажатие забираем до игры - иначе Esc
+    // открыл бы ещё и меню игры. Закрытое окно - как закрытое крестиком:
+    // до выделения другого здания не открывается (TickSite).
+    void SafeEscCloseSite()
+    {
+        __try
+        {
+            if (!g_siteOpen || key == NULL || !(key->escape || key->escape_msg))
+                return;
+            TransformWindow* const t = TransformWindow::getSingleton();
+            if (t == NULL || !t->isVisible())
+                return;
+            key->escape = false;
+            key->escape_msg = false;
+            t->close();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
+        SafeEscCloseSite();
         g_origGuiUpdate(thisptr);
         TickSite();
     }
