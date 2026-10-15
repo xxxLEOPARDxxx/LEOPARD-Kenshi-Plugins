@@ -265,11 +265,22 @@ namespace
         return ok && !lines.empty();
     }
 
-    // У нашего персонажа (купили) или у торговца (продали)
+    // У нашего персонажа (купили) или у торговца (продали). Вещь может
+    // лежать в рюкзаке - тогда хозяин инвентаря сам рюкзак, а персонаж -
+    // хозяин рюкзака: поднимаемся по цепочке (15.10.2026: купленное в
+    // рюкзаке получало мешочек проданного).
     bool HeldByPlayer(Item* item)
     {
-        Character* const holder = item->_whosInventoryWeAreIn.getCharacter();
-        return holder != NULL && holder->isPlayerCharacter();
+        const Item* current = item;
+        for (int depth = 0; depth < 4 && current != NULL; ++depth)
+        {
+            const hand& holder = current->_whosInventoryWeAreIn;
+            Character* const character = holder.getCharacter();
+            if (character != NULL)
+                return character->isPlayerCharacter();
+            current = holder.getItem();
+        }
+        return false;
     }
 
     void ReadColours()
