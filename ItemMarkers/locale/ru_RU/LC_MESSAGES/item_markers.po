@@ -133,3 +133,21 @@ msgstr "Глаз на изученных чертежах"
 
 msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 msgstr "Глаз в левом нижнем углу значка чертежа, если он уже изучен - покупать незачем."
+
+msgid "Bought and sold in this trade"
+msgstr "Куплено и продано в этой сделке"
+
+msgid "A bag in the top right corner of items that changed hands in the open trade window: gold - you sold it, green - you bought it. Gone in the next trade window."
+msgstr "Мешочек в правом верхнем углу вещей, которые перешли из рук в руки в открытом окне торговли: золотой - вы продали, зелёный - купили. В следующем окне торговли пометки нет."
+
+msgid "Sold bag"
+msgstr "Мешочек проданного"
+
+msgid "Colour of the bag on items you sold, #RRGGBB."
+msgstr "Цвет мешочка на проданных вещах, #RRGGBB."
+
+msgid "Bought bag"
+msgstr "Мешочек купленного"
+
+msgid "Colour of the bag on items you bought, #RRGGBB."
+msgstr "Цвет мешочка на купленных вещах, #RRGGBB."

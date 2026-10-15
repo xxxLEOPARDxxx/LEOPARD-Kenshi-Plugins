@@ -60,6 +60,8 @@
 #include <kenshi/GameWorld.h>
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/Research.h>
+#include <kenshi/Character.h>
+#include <kenshi/util/StringPair.h>
 
 #include <GameTheme.h>
 #include <HoldKey.h>
@@ -87,6 +89,11 @@ namespace
     int g_starCorner = 2;              // 0 лев. верх, 1 прав. верх, 2 лев. низ, 3 прав. низ
     int g_minGrade = 2;                // красить с этого сорта (0, 1 - серый и бежевый, обычные вещи)
     bool g_stolen = true;
+    // Мешочек на вещах этой сделки (15.10.2026): продали - золотой, купили -
+    // зелёный; правый верхний угол.
+    bool g_tradeBags = true;
+    MyGUI::Colour g_soldColour(0.91f, 0.72f, 0.19f);
+    MyGUI::Colour g_boughtColour(0.37f, 0.83f, 0.37f);
     int g_stolenSize = 16;
     float g_stolenAlpha = 0.85f;
     bool g_faction = true;
@@ -145,6 +152,14 @@ namespace
         g_minGrade = ReadInt(ini, "MinGrade", 2, 0, 5);
         g_starCorner = ReadInt(ini, "StarCorner", 2, 0, 3);
         g_stolen = ReadInt(ini, "Stolen", 1, 0, 1) != 0;
+        g_tradeBags = ReadInt(ini, "TradeBags", 1, 0, 1) != 0;
+        {
+            char hex[32] = {};
+            GetPrivateProfileStringA("ItemMarkers", "TradeSoldColour", "#e8b830", hex, sizeof(hex), ini.c_str());
+            g_soldColour = GameTheme::Parse(hex, MyGUI::Colour(0.91f, 0.72f, 0.19f));
+            GetPrivateProfileStringA("ItemMarkers", "TradeBoughtColour", "#5fd35f", hex, sizeof(hex), ini.c_str());
+            g_boughtColour = GameTheme::Parse(hex, MyGUI::Colour(0.37f, 0.83f, 0.37f));
+        }
         g_stolenSize = ReadInt(ini, "StolenSize", 16, 8, 40);
         g_stolenAlpha = ReadInt(ini, "StolenStrength", 9, 1, 10) / 10.0f;
         g_faction = ReadInt(ini, "Faction", 1, 0, 1) != 0;
@@ -222,6 +237,38 @@ namespace
     {
         const GameData* const material = item != NULL ? item->materialData : NULL;
         return material != NULL && material->stringID == "52293-rebirth.mod";
+    }
+
+    // Вещь перешла из рук в руки в открытом окне торговли: у неё игра
+    // пишет «Выкупить» (Item::getBuyBackGUIInfo даёт строку).
+    void BuyBackLinesRaw(Item* item, Ogre::vector<StringPair>::type* lines, bool* ok)
+    {
+        __try
+        {
+            item->getBuyBackGUIInfo(*lines);
+            *ok = true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            *ok = false;
+        }
+    }
+
+    bool TradedNow(Item* item)
+    {
+        if (item == NULL)
+            return false;
+        Ogre::vector<StringPair>::type lines;
+        bool ok = false;
+        BuyBackLinesRaw(item, &lines, &ok);
+        return ok && !lines.empty();
+    }
+
+    // У нашего персонажа (купили) или у торговца (продали)
+    bool HeldByPlayer(Item* item)
+    {
+        Character* const holder = item->_whosInventoryWeAreIn.getCharacter();
+        return holder != NULL && holder->isPlayerCharacter();
     }
 
     void ReadColours()
@@ -518,6 +565,29 @@ namespace
             }
         }
 
+        // Мешочек сделки - в правом верхнем углу (звезда там - левее неё).
+        // «Выкупить» в подсказке игра пишет у вещей, которые в этом окне
+        // торговли перешли из рук в руки; её же функцией и узнаём. У нашего
+        // персонажа - куплена, иначе (у торговца) - продана. Новое окно -
+        // новые иконки, а игра сделку уже забыла: пометка уходит сама.
+        if (g_tradeBags && TradedNow(item))
+        {
+            const int side = g_stolenSize;
+            int right = 2;
+            if (g_rarity && g_style == 3 && g_starCorner == 1 && GradeOf(item) >= g_minGrade)
+                right += (size.width < 80 ? 16 : 20) + 2;
+            MyGUI::ImageBox* const bag = MakeImage(root, MyGUI::IntCoord(size.width - side - right, 2, side, side),
+                                                   MyGUI::Align::Right | MyGUI::Align::Top);
+            if (bag != NULL)
+            {
+                bag->setItemResource("pic_PointerSteal");
+                bag->setColour(HeldByPlayer(item) ? g_boughtColour : g_soldColour);
+                SetDepthLast(bag, FRONT_DEPTH);
+                entry.marks.push_back(bag);
+                g_markRoot[bag] = root;
+            }
+        }
+
         // Глаз на изученном чертеже - в левом нижнем углу: у торговца сразу
         // видно, что покупать незачем (перенесено из DarkUiTweaks 09.10.2026).
         if (g_blueprint && BlueprintLearned(item))
@@ -750,6 +820,9 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "ItemMarkers", "Stolen", Tr("Stolen"), Tr("The game's steal pointer on stolen items."), 1, 0);
     api->integer(api, "ItemMarkers", "StolenSize", Tr("Stolen badge size"), Tr("In pixels."), 16, 8, 40, 0);
     api->integer(api, "ItemMarkers", "StolenStrength", Tr("Stolen badge strength"), Tr("How visible the badge is, 1-10 (10% steps)."), 9, 1, 10, 0);
+    api->toggle(api, "ItemMarkers", "TradeBags", Tr("Bought and sold in this trade"), Tr("A bag in the top right corner of items that changed hands in the open trade window: gold - you sold it, green - you bought it. Gone in the next trade window."), 1, 0);
+    api->colour(api, "ItemMarkers", "TradeSoldColour", Tr("Sold bag"), Tr("Colour of the bag on items you sold, #RRGGBB."), "#e8b830", 0);
+    api->colour(api, "ItemMarkers", "TradeBoughtColour", Tr("Bought bag"), Tr("Colour of the bag on items you bought, #RRGGBB."), "#5fd35f", 0);
     api->toggle(api, "ItemMarkers", "Faction", Tr("Faction uniform"), Tr("The game's hand pointer on armour that is a faction uniform: wearing it you look like one of them."), 1, 0);
     api->integer(api, "ItemMarkers", "FactionSize", Tr("Uniform badge size"), Tr("In pixels."), 16, 8, 40, 0);
     api->integer(api, "ItemMarkers", "FactionStrength", Tr("Uniform badge strength"), Tr("How visible the badge is, 1-10 (10% steps)."), 9, 1, 10, 0);

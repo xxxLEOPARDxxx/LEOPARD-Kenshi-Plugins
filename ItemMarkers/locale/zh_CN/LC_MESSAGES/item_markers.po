@@ -133,3 +133,21 @@ msgstr "已学蓝图显示眼睛"
 
 msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 msgstr "如果蓝图已学会，其图标左下角显示一只眼睛，无需再买。"
+
+msgid "Bought and sold in this trade"
+msgstr "本次交易买入和卖出"
+
+msgid "A bag in the top right corner of items that changed hands in the open trade window: gold - you sold it, green - you bought it. Gone in the next trade window."
+msgstr "在打开的交易窗口中易手的物品右上角显示钱袋:金色 - 你卖出的,绿色 - 你买入的。下次交易窗口不再显示。"
+
+msgid "Sold bag"
+msgstr "卖出钱袋"
+
+msgid "Colour of the bag on items you sold, #RRGGBB."
+msgstr "你卖出物品上钱袋的颜色,#RRGGBB。"
+
+msgid "Bought bag"
+msgstr "买入钱袋"
+
+msgid "Colour of the bag on items you bought, #RRGGBB."
+msgstr "你买入物品上钱袋的颜色,#RRGGBB。"

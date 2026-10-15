@@ -133,3 +133,21 @@ msgstr "Eye on learned blueprints"
 
 msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 msgstr "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
+
+msgid "Bought and sold in this trade"
+msgstr "Bought and sold in this trade"
+
+msgid "A bag in the top right corner of items that changed hands in the open trade window: gold - you sold it, green - you bought it. Gone in the next trade window."
+msgstr "A bag in the top right corner of items that changed hands in the open trade window: gold - you sold it, green - you bought it. Gone in the next trade window."
+
+msgid "Sold bag"
+msgstr "Sold bag"
+
+msgid "Colour of the bag on items you sold, #RRGGBB."
+msgstr "Colour of the bag on items you sold, #RRGGBB."
+
+msgid "Bought bag"
+msgstr "Bought bag"
+
+msgid "Colour of the bag on items you bought, #RRGGBB."
+msgstr "Colour of the bag on items you bought, #RRGGBB."
