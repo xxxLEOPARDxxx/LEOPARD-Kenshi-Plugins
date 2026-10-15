@@ -260,3 +260,18 @@ msgstr "，动物：%d"
 
 msgid "Random start"
 msgstr "随机开局"
+
+msgid "Text colour"
+msgstr "文字颜色"
+
+msgid "auto - by the interface palette: dark text on the vanilla parchment, light on dark interfaces. If the text is hard to read with your interface, pick light or dark. Applies when the window opens."
+msgstr "自动 - 按界面调色板:原版羊皮纸上为深色,深色界面上为浅色。如果在你的界面下文字难以阅读,请选择浅色或深色。打开窗口时生效。"
+
+msgid "auto"
+msgstr "自动"
+
+msgid "light"
+msgstr "浅色"
+
+msgid "dark"
+msgstr "深色"

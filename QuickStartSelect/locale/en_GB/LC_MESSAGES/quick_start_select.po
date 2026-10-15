@@ -260,3 +260,18 @@ msgstr ", animals: %d"
 
 msgid "Random start"
 msgstr "Random start"
+
+msgid "Text colour"
+msgstr "Text colour"
+
+msgid "auto - by the interface palette: dark text on the vanilla parchment, light on dark interfaces. If the text is hard to read with your interface, pick light or dark. Applies when the window opens."
+msgstr "auto - by the interface palette: dark text on the vanilla parchment, light on dark interfaces. If the text is hard to read with your interface, pick light or dark. Applies when the window opens."
+
+msgid "auto"
+msgstr "auto"
+
+msgid "light"
+msgstr "light"
+
+msgid "dark"
+msgstr "dark"

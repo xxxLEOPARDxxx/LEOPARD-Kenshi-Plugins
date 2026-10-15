@@ -1260,17 +1260,39 @@ namespace
     // оно по Esc не закрывалось). Нажатие забираем до игры - иначе Esc
     // открыл бы ещё и меню игры. Закрытое окно - как закрытое крестиком:
     // до выделения другого здания не открывается (TickSite).
+    // Флага игры мало: в обычном режиме Esc игра сама забирает раньше
+    // (снимает выделение), а без выделения окно стрелочек нарочно не
+    // закрывается. Поэтому само нажатие - с клавиатуры, пока окно игры
+    // активно (проверено в игре 15.10.2026: по одному флагу не закрывалось).
+    bool EscPressedNow()
+    {
+        static bool s_down = false;
+        DWORD pid = 0;
+        GetWindowThreadProcessId(GetForegroundWindow(), &pid);
+        const bool down = pid == GetCurrentProcessId() && (GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0;
+        const bool pressed = down && !s_down;
+        s_down = down;
+        return pressed;
+    }
+
     void SafeEscCloseSite()
     {
         __try
         {
-            if (!g_siteOpen || key == NULL || !(key->escape || key->escape_msg))
+            const bool pressed = EscPressedNow();
+            if (!g_siteOpen)
+                return;
+            const bool flag = key != NULL && (key->escape || key->escape_msg);
+            if (!pressed && !flag)
                 return;
             TransformWindow* const t = TransformWindow::getSingleton();
             if (t == NULL || !t->isVisible())
                 return;
-            key->escape = false;
-            key->escape_msg = false;
+            if (key != NULL)
+            {
+                key->escape = false;
+                key->escape_msg = false;
+            }
             t->close();
         }
         __except (EXCEPTION_EXECUTE_HANDLER)

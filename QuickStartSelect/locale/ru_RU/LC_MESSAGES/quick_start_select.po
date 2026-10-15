@@ -260,3 +260,18 @@ msgstr ", животные: %d"
 
 msgid "Random start"
 msgstr "Случайный старт"
+
+msgid "Text colour"
+msgstr "Цвет текста"
+
+msgid "auto - by the interface palette: dark text on the vanilla parchment, light on dark interfaces. If the text is hard to read with your interface, pick light or dark. Applies when the window opens."
+msgstr "авто - по палитре интерфейса: на ванильном пергаменте тёмный, на тёмных интерфейсах светлый. Если с вашим интерфейсом текст плохо читается - выберите светлый или тёмный. Применяется при открытии окна."
+
+msgid "auto"
+msgstr "авто"
+
+msgid "light"
+msgstr "светлый"
+
+msgid "dark"
+msgstr "тёмный"

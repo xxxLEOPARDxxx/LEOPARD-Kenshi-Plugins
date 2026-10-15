@@ -96,6 +96,10 @@ namespace
     bool g_sortDesc = false;        // Z-A, HARD-EASY
     bool g_confirm = true;          // спросить перед «Начать»
     bool g_rightClickReset = true;  // правый клик по настройке - по умолчанию
+    // Цвет текста (15.10.2026): 0 - сам по палитре интерфейса, 1 - светлый
+    // (тёмные окна), 2 - тёмный (пергамент ванили). У части игроков тёмный
+    // интерфейс без своей палитры - текст выходил тёмным на тёмном.
+    int g_textTheme = 0;
     // Размер окна - доля экрана, % (пожелание Асура 08.10.2026).
     int g_wideWidth = 74;
     int g_compactWidth = 32;
@@ -165,6 +169,11 @@ namespace
         g_sortDesc = GetPrivateProfileIntA(SECTION, "SortDesc", 0, ini.c_str()) != 0;
         g_confirm = GetPrivateProfileIntA(SECTION, "ConfirmBegin", 1, ini.c_str()) != 0;
         g_rightClickReset = GetPrivateProfileIntA(SECTION, "RightClickReset", 1, ini.c_str()) != 0;
+        {
+            char theme[16] = {};
+            GetPrivateProfileStringA(SECTION, "TextColour", "auto", theme, sizeof(theme), ini.c_str());
+            g_textTheme = _stricmp(theme, "light") == 0 ? 1 : _stricmp(theme, "dark") == 0 ? 2 : 0;
+        }
         g_wideWidth = std::max(50, std::min(100, static_cast<int>(GetPrivateProfileIntA(SECTION, "WideWidth", 74, ini.c_str()))));
         g_compactWidth = std::max(25, std::min(70, static_cast<int>(GetPrivateProfileIntA(SECTION, "CompactWidth", 32, ini.c_str()))));
         g_windowHeight = std::max(50, std::min(100, static_cast<int>(GetPrivateProfileIntA(SECTION, "WindowHeight", 86, ini.c_str()))));
@@ -636,6 +645,10 @@ namespace
     // «Kenshi_TextboxStandardText»).
     bool Parchment()
     {
+        if (g_textTheme == 1)
+            return false;
+        if (g_textTheme == 2)
+            return true;
         return !GameTheme::PaletteFromMod();
     }
 
@@ -2395,6 +2408,13 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
                 Tr("Ask before starting the game, so a stray double click does not start it."), 1, 0);
     api->toggle(api, SECTION, "RightClickReset", Tr("Right click resets an option"),
                 Tr("Right click on a line of the advanced options returns its default value."), 1, 0);
+    {
+        static const char* const values[] = { "auto", "light", "dark" };
+        const char* const labels[] = { Tr("auto"), Tr("light"), Tr("dark") };
+        api->choice(api, SECTION, "TextColour", Tr("Text colour"),
+                    Tr("auto - by the interface palette: dark text on the vanilla parchment, light on dark interfaces. If the text is hard to read with your interface, pick light or dark. Applies when the window opens."),
+                    "auto", values, labels, 3, 0);
+    }
 
     api->section(api, Tr("Window size"));
     api->integer(api, SECTION, "WideWidth", Tr("Wide view width, %"),
