@@ -209,7 +209,20 @@ namespace
     // Цвета сортов - из палитры игры (kenshi_colours.xml с модами).
     std::string g_gradeHex[GRADES];
     MyGUI::Colour g_gradeColour[GRADES];
+    // Мейто - высший класс оружия; у игры он того же сорта и цвета, что
+    // мастерский (ItemGrade5). Свой цвет - ключ ItemGradeMeitou в палитре
+    // интерфейса (его прописывает, например, наш Dark UI); нет ключа - цвет
+    // ItemGrade5, как у игры (15.10.2026, просьба пользователя и Асура).
+    MyGUI::Colour g_meitouColour;
     bool g_coloursRead = false;
+
+    // Класс оружия «Meitou» (rebirth.mod, тип записи 50) - по строковому
+    // ID записи класса: название переводят, ID - нет.
+    bool IsMeitou(const Item* item)
+    {
+        const GameData* const material = item != NULL ? item->materialData : NULL;
+        return material != NULL && material->stringID == "52293-rebirth.mod";
+    }
 
     void ReadColours()
     {
@@ -228,6 +241,14 @@ namespace
             g_gradeHex[g] = hex;
             g_gradeColour[g] = GameTheme::Parse(hex.c_str(), MyGUI::Colour::White);
         }
+        g_meitouColour = GameTheme::Parse(
+            GameTheme::Hex("ItemGradeMeitou", g_gradeHex[GRADES - 1].c_str()), g_gradeColour[GRADES - 1]);
+    }
+
+    // Цвет пометки вещи: сорт, у мейто - свой
+    const MyGUI::Colour& GradeColourOf(const Item* item, int grade)
+    {
+        return IsMeitou(item) ? g_meitouColour : g_gradeColour[grade];
     }
 
 
@@ -386,7 +407,7 @@ namespace
             if (grade >= g_minGrade)
             {
                 ReadColours();
-                const MyGUI::Colour& colour = g_gradeColour[grade];
+                const MyGUI::Colour& colour = GradeColourOf(item, grade);
                 if (g_style == 1)
                 {
                     // Рамка - четыре полосы по краям, толщина в пикселях:
@@ -458,7 +479,7 @@ namespace
                 if (star != NULL)
                 {
                     star->setImageTexture(texture);
-                    star->setColour(g_gradeColour[GradeOf(item)]);
+                    star->setColour(GradeColourOf(item, GradeOf(item)));
                     SetDepthLast(star, FRONT_DEPTH);
                     entry.marks.push_back(star);
                     g_markRoot[star] = root;

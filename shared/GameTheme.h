@@ -81,12 +81,12 @@ namespace GameTheme
 
     // Корень игры ищем не отсчётом уровней, а по признаку: там лежит
     // data/mods.cfg. Плагин может стоять в папке любой глубины.
-    inline std::string FindGameRoot()
+    // Папка игры - вверх от файла, пока не найдётся data\mods.cfg.
+    inline std::string GameRootAbove(HMODULE module)
     {
         char modulePath[MAX_PATH] = {};
 
-        const DWORD length = GetModuleFileNameA(
-            reinterpret_cast<HMODULE>(&__ImageBase), modulePath, MAX_PATH);
+        const DWORD length = GetModuleFileNameA(module, modulePath, MAX_PATH);
 
         if (length == 0 || length >= MAX_PATH)
             return std::string();
@@ -106,6 +106,65 @@ namespace GameTheme
         }
 
         return std::string();
+    }
+
+    // От самой игры (kenshi_x64.exe), потом от DLL плагина: плагин из
+    // Мастерской лежит в workshop\content\233860\<id>, вне папки игры
+    // (15.10.2026).
+    inline std::string FindGameRoot()
+    {
+        const std::string root = GameRootAbove(NULL);
+        return root.empty() ? GameRootAbove(reinterpret_cast<HMODULE>(&__ImageBase)) : root;
+    }
+
+    // Моды, подписанные в Мастерской Steam, лежат в
+    // ...\steamapps\workshop\content\233860\<id>\<Мод>.mod, а не в
+    // Kenshi\mods\<Мод>. Имя мода -> его папка
+    // (15.10.2026: палитра интерфейса из Мастерской не находилась).
+    inline const std::map<std::string, std::string>& WorkshopMods(const std::string& root)
+    {
+        static std::map<std::string, std::string> index;
+        static bool built = false;
+        if (built)
+            return index;
+        built = true;
+
+        // root - ...\steamapps\common\Kenshi, нужна ...\steamapps\workshop\content\233860
+        std::string base = root;
+        // два шага вверх: Kenshi -> common -> steamapps
+        for (int up = 0; up < 2 && !base.empty(); ++up)
+        {
+            base.resize(base.size() - 1);
+            const std::string::size_type slash = base.find_last_of("\\/");
+            if (slash == std::string::npos)
+                return index;
+            base.resize(slash + 1);
+        }
+        const std::string workshop = base + "workshop\\content\\233860\\";
+
+        WIN32_FIND_DATAA item;
+        HANDLE items = FindFirstFileA((workshop + "*").c_str(), &item);
+        if (items == INVALID_HANDLE_VALUE)
+            return index;
+        do
+        {
+            if (!(item.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || item.cFileName[0] == '.')
+                continue;
+            const std::string dir = workshop + item.cFileName + "\\";
+            WIN32_FIND_DATAA mod;
+            HANDLE mods = FindFirstFileA((dir + "*.mod").c_str(), &mod);
+            if (mods == INVALID_HANDLE_VALUE)
+                continue;
+            do
+            {
+                std::string name = mod.cFileName;
+                name.resize(name.size() - 4);
+                index[name] = dir;
+            } while (FindNextFileA(mods, &mod));
+            FindClose(mods);
+        } while (FindNextFileA(items, &item));
+        FindClose(items);
+        return index;
     }
 
 
@@ -175,10 +234,20 @@ namespace GameTheme
                 if (dot == std::string::npos || dot + 4 != line.size())
                     continue;
 
-                const std::string candidate =
-                    root + "mods\\" + line.substr(0, dot) + "\\" + suffix;
+                const std::string name = line.substr(0, dot);
+                std::string candidate = root + "mods\\" + name + "\\" + suffix;
 
                 std::ifstream probe(candidate.c_str());
+                if (!probe.is_open())
+                {
+                    // не в Kenshi\mods - может, подписан в Мастерской
+                    const std::map<std::string, std::string>& workshop = WorkshopMods(root);
+                    const std::map<std::string, std::string>::const_iterator found = workshop.find(name);
+                    if (found == workshop.end())
+                        continue;
+                    candidate = found->second + suffix;
+                    probe.open(candidate.c_str());
+                }
                 if (probe.is_open())
                     chosen = candidate;     // побеждает последний
             }
