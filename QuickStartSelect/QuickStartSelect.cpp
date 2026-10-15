@@ -2229,11 +2229,11 @@ namespace
             DebugLog("QuickStartSelect: the game has no starts, keeping its own window");
             return;
         }
-        // Старт, который сейчас у игры, - выбранным.
+        // Список открывается с начала, выбрана первая строка. Раньше
+        // выбирался старт, который сейчас у игры, и список прокручивался к
+        // нему - в середину (жалобы игроков, 16.10.2026). BuildList при
+        // g_selected = -1 берёт первый видимый.
         g_selected = -1;
-        for (size_t i = 0; i < g_starts.size(); ++i)
-            if (g_starts[i].index == w->currentStart)
-                g_selected = static_cast<int>(i);
         g_needLayout = g_needList = g_needBegin = g_needClose = g_needConfirmClose = false;
         g_open = true;
         if (!g_frameHooked)

@@ -34,12 +34,14 @@ MCM. Слева — список модов, у которых есть наст
 
 Любой плагин RE_Kenshi, который описал свои настройки для MCM (см.
 ниже). Наши уже умеют: Live Xp Bars, Stat Colours, Gear Compare Alt,
-Assigned Workers, Dark Ui Tweaks, Patient Self Aid, Wanted Map, Build
-Mode Gizmo, Ranged Damage Xp, Quick Start Select, Item Markers; и наши форки модов
-Emkej8: Auto-Pause on Load, Container Highlight, Hidden Faction
-Relations, Job B Gone, Loot Scoot Execute, Map markers, Organize the
-Trader, Vital Read, Vital Sense, Wall B Gone. Для всех них MCM не
-обязателен: без него они читают свой ini, как раньше.
+Assigned Workers, UI Tweaks, Patient Self Aid, Wanted Map, Build Mode
+Gizmo, Ranged Damage Xp, Quick Start Select, Item Markers, Recruit
+Markers; наши форки модов Emkej8: Auto-Pause on Load, Container
+Highlight, Hidden Faction Relations, Job B Gone, Loot Scoot Execute, Map
+markers, Organize the Crafting Stations, Organize the Trader, Vital
+Read, Vital Sense, Wall B Gone; и форки модов других авторов: Better
+Looting (XxAtreuSSxX), Kenshi Job Management (SirixKC). Для всех них
+MCM не обязателен: без него они читают свои настройки, как раньше.
 
 
 ДЛЯ АВТОРОВ ПЛАГИНОВ

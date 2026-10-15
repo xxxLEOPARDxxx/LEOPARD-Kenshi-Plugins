@@ -62,6 +62,7 @@
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <intrin.h>
 #include <IniDefaults.h>
 
 #include <algorithm>
@@ -3038,6 +3039,167 @@ namespace
                markers.data && !markers.equipment;
     }
 
+    // ---------------------------------------------------------------
+    // ПКМ сквозь окно обмена (16.10.2026). На паузе в торговле щелчок ПКМ
+    // по окну уходил и в мир: после закрытия окна (пауза снимается)
+    // персонаж бежал в эту точку.
+    //
+    // Разбор по журналу с диагностикой: приказ отдаёт
+    // Character::playerMoveOrderDefault - прямо при ОТПУСКАНИИ ПКМ над
+    // backpack_content своего персонажа в окне торговли (игра считает, что
+    // курсор над миром). Остальные пути приказа перехватываем тоже.
+    //
+    // Правило: если ПКМ нажата над окном инвентаря (открыто окно
+    // инвентаря или торговли, у курсора фокус мыши MyGUI), это нажатие
+    // «чужое» - приказы игрока отбрасываются, пока ПКМ не нажмут снова
+    // над миром. Нажатие ловим по переходу кнопки из отпущенной в нажатую
+    // - каждый кадр и в самих хуках (если игра отдаст приказ раньше
+    // нашего кадра).
+    // ---------------------------------------------------------------
+
+    bool g_rmbWasDown = false;
+    bool g_rmbStale = false;            // последнее нажатие ПКМ было над интерфейсом
+    std::string g_rmbWhere;
+
+    // «Над интерфейсом» - только когда открыто окно инвентаря (в торговле
+    // их три) и курсор над его элементом. Не шире: ПКМ по большой карте -
+    // тоже приказ идти, его трогать нельзя; а с открытым инвентарём можно
+    // водить персонажей щелчками по миру.
+    bool PressOverInterface(std::string& where)
+    {
+        if (gui == NULL || gui->inventoryWindowsOpen.empty())
+            return false;
+        MyGUI::InputManager* const input = MyGUI::InputManager::getInstancePtr();
+        MyGUI::Widget* const focus = input != NULL ? input->getMouseFocusWidget() : NULL;
+        if (focus == NULL)
+            return false;
+        where = focus->getName();
+        return true;
+    }
+
+    void TrackRightButton()
+    {
+        const int vk = GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON;
+        const bool down = (GetAsyncKeyState(vk) & 0x8000) != 0;
+        if (down && !g_rmbWasDown)
+        {
+            std::string where;
+            try
+            {
+                g_rmbStale = PressOverInterface(where);
+            }
+            catch (...)
+            {
+                g_rmbStale = false;
+            }
+            g_rmbWhere = where;
+        }
+        g_rmbWasDown = down;
+    }
+
+    DWORD g_lastDropLogMs = 0;
+
+    // Кто отдал приказ: модуль (игра или DLL мода) и смещение в нём.
+    std::string CallerOf(void* address)
+    {
+        HMODULE module = NULL;
+        char name[MAX_PATH] = "?";
+        if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               reinterpret_cast<LPCSTR>(address), &module) && module != NULL)
+        {
+            char path[MAX_PATH] = {};
+            const DWORD n = GetModuleFileNameA(module, path, MAX_PATH);
+            const char* slash = n > 0 ? strrchr(path, '\\') : NULL;
+            strcpy_s(name, slash != NULL ? slash + 1 : path);
+        }
+        char out[MAX_PATH + 32];
+        sprintf_s(out, "%s+0x%IX", name,
+                  reinterpret_cast<uintptr_t>(address) - reinterpret_cast<uintptr_t>(module));
+        return out;
+    }
+
+    void* g_dropCaller = NULL;
+
+    // task - тип задачи приказа или -1, если у функции его нет.
+    bool DropOrder(const char* what, int task)
+    {
+        TrackRightButton();
+        if (!g_rmbStale)
+            return false;
+        // одна строка на серию: пока ПКМ зажата, игра может отдавать приказ каждый кадр
+        const DWORD now = GetTickCount();
+        if (now - g_lastDropLogMs > 1000)
+        {
+            char kind[32] = "";
+            if (task >= 0)
+                sprintf_s(kind, " task=%d", task);
+            DebugLog(std::string("UITweaks: a right click made over the interface was not sent to the world (") +
+                     what + kind + ", pressed over widget " + g_rmbWhere + ", called from " +
+                     CallerOf(g_dropCaller) + ")");
+        }
+        g_lastDropLogMs = now;
+        return true;
+    }
+
+    void (*g_origAddOrder)(PlayerInterface*, Building*, TaskType, RootObject*, bool, bool,
+                           const Ogre::Vector3&) = NULL;
+    void (*g_origNewTask)(PlayerInterface*, TaskType, const hand&, Building*, const Ogre::Vector3&,
+                          bool) = NULL;
+    void (*g_origMoveWaypoint)(PlayerInterface*, const Ogre::Vector3&, Building*) = NULL;
+
+    void AddOrder_hook(PlayerInterface* self, Building* indoors, TaskType task, RootObject* subject,
+                       bool shift, bool addDontClear, const Ogre::Vector3& location)
+    {
+        g_dropCaller = _ReturnAddress();
+        if (DropOrder("addOrderSelectedCharacters", static_cast<int>(task)))
+            return;
+        g_origAddOrder(self, indoors, task, subject, shift, addDontClear, location);
+    }
+
+    void NewTask_hook(PlayerInterface* self, TaskType task, const hand& target, Building* indoors,
+                      const Ogre::Vector3& click, bool addDontClear)
+    {
+        g_dropCaller = _ReturnAddress();
+        if (DropOrder("newPlayerTaskSelectedCharacters", static_cast<int>(task)))
+            return;
+        g_origNewTask(self, task, target, indoors, click, addDontClear);
+    }
+
+    void MoveWaypoint_hook(PlayerInterface* self, const Ogre::Vector3& location, Building* dest)
+    {
+        g_dropCaller = _ReturnAddress();
+        if (DropOrder("updateLastMoveWaypointSelectedCharacters", -1))
+            return;
+        g_origMoveWaypoint(self, location, dest);
+    }
+
+    void (*g_origPlayerMove)(PlayerInterface*, const Ogre::Vector3&, Building*) = NULL;
+    void (*g_origCharMoveOrder)(Character*, Building*, RootObject*, const Ogre::Vector3&) = NULL;
+
+    void PlayerMove_hook(PlayerInterface* self, const Ogre::Vector3& pos, Building* dest)
+    {
+        g_dropCaller = _ReturnAddress();
+        if (DropOrder("playerMove", -1))
+            return;
+        g_origPlayerMove(self, pos, dest);
+    }
+
+    void CharMoveOrder_hook(Character* self, Building* dest, RootObject* subject, const Ogre::Vector3& location)
+    {
+        g_dropCaller = _ReturnAddress();
+        if (DropOrder("playerMoveOrderDefault", -1))
+            return;
+        g_origCharMoveOrder(self, dest, subject, location);
+    }
+
+    void HookByExport(const char* name, void* hook, void** orig)
+    {
+        HMODULE const lib = GetModuleHandleA("KenshiLib.dll");
+        void* const stub = lib != NULL ? reinterpret_cast<void*>(GetProcAddress(lib, name)) : NULL;
+        if (stub == NULL || KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(stub), hook, orig))
+            ErrorLog(std::string("UITweaks: could not hook ") + name);
+    }
+
     MyGUI::TextBox* FindTraderMoney(MyGUI::Widget* widget, int depth)
     {
         if (widget == NULL || depth > 5 || !widget->getVisible())
@@ -3127,6 +3289,7 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
         g_origGuiUpdate(thisptr);
+        TrackRightButton();             // ПКМ над интерфейсом - не приказ в мир
 
         if (g_enabled)
         {
@@ -3240,6 +3403,25 @@ __declspec(dllexport) void startPlugin()
     // Полоса навыка: правка сразу после того, как её тронула игра.
     if (g_progressPad > 0)
         HookSkillBars();
+
+    // ПКМ сквозь окно инвентаря/торговли - не приказ в мир.
+    if (KenshiLib::SUCCESS !=
+            KenshiLib::AddHook(KenshiLib::GetRealAddress(&PlayerInterface::addOrderSelectedCharacters),
+                               AddOrder_hook, &g_origAddOrder) ||
+        KenshiLib::SUCCESS !=
+            KenshiLib::AddHook(KenshiLib::GetRealAddress(&PlayerInterface::newPlayerTaskSelectedCharacters),
+                               NewTask_hook, &g_origNewTask))
+    {
+        ErrorLog("UITweaks: could not hook the player orders, "
+                 "right clicks may still pass through the inventory window");
+    }
+    // закрытые в заголовках - адрес по имени экспорта
+    HookByExport("?updateLastMoveWaypointSelectedCharacters@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
+                 reinterpret_cast<void*>(&MoveWaypoint_hook), reinterpret_cast<void**>(&g_origMoveWaypoint));
+    HookByExport("?playerMove@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
+                 reinterpret_cast<void*>(&PlayerMove_hook), reinterpret_cast<void**>(&g_origPlayerMove));
+    HookByExport("?_NV_playerMoveOrderDefault@Character@@QEAAXPEAVBuilding@@PEAVRootObject@@AEBVVector3@Ogre@@@Z",
+                 reinterpret_cast<void*>(&CharMoveOrder_hook), reinterpret_cast<void**>(&g_origCharMoveOrder));
 
     // Иконка вещи у мыши во вкладке «Ремесло» - нужно знать её станок.
     if (KenshiLib::SUCCESS !=
