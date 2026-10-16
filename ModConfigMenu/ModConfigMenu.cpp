@@ -122,6 +122,7 @@ namespace
         void* get;
         void* set;
         bool fnHasDef;              // API v5: значение по умолчанию в def
+        bool dyn;                   // API v6: строка из rows - пересобирается при показе
 
         // Выпадающий список: пункт, замеченный в самом списке в прошлом
         // кадре и ещё не принятый (см. PollChoiceCombo).
@@ -138,7 +139,7 @@ namespace
 
         Setting() : kind(K_TEXT), flags(0), fmin(0), fmax(1), decimals(0), b(false), f(0), i(0),
                     line(NULL), lastMoveMs(0), hasBaseline(false), touched(false), fn(false), ud(NULL), get(NULL),
-                    set(NULL), fnHasDef(false), comboSeen(-1), colourHex(false), colourOpen(false),
+                    set(NULL), fnHasDef(false), dyn(false), comboSeen(-1), colourHex(false), colourOpen(false),
                     colourHasBase(false) {}
     };
 
@@ -152,6 +153,13 @@ namespace
         MCM_DetachFn detach;
         void* areaUd;
         int areaPercent;
+        // API v6: блоки строк, которые строятся при показе страницы. at - перед
+        // какой постоянной строкой блок стоит (их число на момент вызова rows).
+        struct RowsBlock { MCM_RowsFn fn; void* ud; size_t at; };
+        std::vector<RowsBlock> blocks;
+        // Строки прошлых показов не удаляем: на них может ещё смотреть
+        // захват клавиши или кнопка. Это десяток байт на строку за показ.
+        std::vector<Setting*> retired;
         ModEntry() : apply(NULL), attach(NULL), detach(NULL), areaUd(NULL), areaPercent(0) {}
     };
 
@@ -387,6 +395,17 @@ namespace
         s->fnHasDef = true;
     }
 
+    void __cdecl Api_rows(MCM_Api*, MCM_RowsFn fn, void* ud)
+    {
+        if (g_building == NULL || fn == NULL)
+            return;
+        ModEntry::RowsBlock b;
+        b.fn = fn;
+        b.ud = ud;
+        b.at = g_building->settings.size();
+        g_building->blocks.push_back(b);
+    }
+
     MCM_Api MakeApi()
     {
         MCM_Api api;
@@ -412,6 +431,7 @@ namespace
         api.action = &Api_action;
         api.customArea = &Api_customArea;
         api.defaultValue = &Api_defaultValue;
+        api.rows = &Api_rows;
         return api;
     }
 
@@ -1627,12 +1647,62 @@ namespace
         return r;
     }
 
+    bool SafeRows(MCM_RowsFn fn, MCM_Api* api, void* ud)
+    {
+        __try
+        {
+            fn(api, ud);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    // API v6: строки блоков rows - заново, на свои места среди постоянных.
+    void RebuildRows(ModEntry* m)
+    {
+        if (m == NULL || m->blocks.empty())
+            return;
+        std::vector<Setting*> base;
+        for (size_t k = 0; k < m->settings.size(); ++k)
+            if (m->settings[k]->dyn)
+                m->retired.push_back(m->settings[k]);
+            else
+                base.push_back(m->settings[k]);
+        ModEntry* const saved = g_building;
+        g_building = m;
+        MCM_Api api = MakeApi();
+        std::vector<Setting*> out;
+        size_t bi = 0;
+        for (size_t k = 0; k <= base.size(); ++k)
+        {
+            for (; bi < m->blocks.size() && m->blocks[bi].at <= k; ++bi)
+            {
+                m->settings.clear();
+                if (!SafeRows(m->blocks[bi].fn, &api, m->blocks[bi].ud))
+                    ErrorLog("ModConfigMenu: page rows crashed in " + m->id);
+                for (size_t r = 0; r < m->settings.size(); ++r)
+                {
+                    m->settings[r]->dyn = true;
+                    out.push_back(m->settings[r]);
+                }
+            }
+            if (k < base.size())
+                out.push_back(base[k]);
+        }
+        m->settings.swap(out);
+        g_building = saved;
+    }
+
     void ShowMod(ModEntry* m)
     {
         // Недописанное на прежней странице (ползунок, текст) - сейчас,
         // пока её строки живы.
         if (g_current != NULL && g_panel != NULL)
             Poll(true);
+        RebuildRows(m);
         g_current = m;
         g_resetLine = NULL;
         g_actionLines.clear();
