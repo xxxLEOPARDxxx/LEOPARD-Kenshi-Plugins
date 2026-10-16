@@ -688,7 +688,12 @@ namespace
             // панель игры: при включённом «Блоке» она показывает
             // «Защита: 27 (+11)», а без стойки вышло бы 7 и «-9».
             // Спорить с соседним окном игры мы не хотим.
-            return stats->getMeleeDefence(true);
+            //
+            // И тоже _melee, как у атаки: общий getMeleeDefence у
+            // безоружного отдаёт защиту в рукопашной (от боевых искусств).
+            // 16.10.2026: голый персонаж с рюкзаком, защита 48, боевые
+            // искусства 0 - строка показывала «(-49) 48».
+            return stats->getMeleeDefence_melee(true);
         case STAT_MARTIALARTS:
             return stats->getMeleeAttack_unarmed(true);
         case STAT_DODGE:
