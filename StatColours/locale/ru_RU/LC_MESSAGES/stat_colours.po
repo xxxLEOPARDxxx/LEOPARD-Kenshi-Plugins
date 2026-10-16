@@ -35,8 +35,8 @@ msgstr "Above100 - выше сотни, это бывает только с пр
 msgid "with a bonus from equipment."
 msgstr "от снаряжения."
 
-msgid "The bracket with the equipment correction: (+3) or (-4)."
-msgstr "Скобки с поправкой от снаряжения: (+3) или (-4)."
+msgid "The bracket with the correction - everything that changes the skill now: (+3) or (-4)."
+msgstr "Скобки с поправкой - всё, что сейчас меняет навык: (+3) или (-4)."
 
 msgid "Brackets is the brackets themselves, Bonus and Penalty the"
 msgstr "Brackets - сами скобки, Bonus и Penalty - число внутри."
@@ -158,8 +158,8 @@ msgstr "Подробный журнал"
 msgid "Details in RE_Kenshi_log.txt."
 msgstr "Подробности в RE_Kenshi_log.txt."
 
-msgid "Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."
-msgstr "Красит числа навыков по уровню, расписывает бонусы снаряжения, показывает расовые множители и текущую скорость прокачки."
+msgid "Colours the skill numbers by level, breaks down what changes them, shows racial XP multipliers and the current XP rate."
+msgstr "Красит числа навыков по уровню, расписывает, что их меняет, показывает расовые множители и текущую скорость прокачки."
 
 msgid "Racial XP multipliers under the attributes in the character window."
 msgstr "Расовые множители опыта под качествами в окне персонажа."
@@ -173,17 +173,17 @@ msgstr "Текущая скорость прокачки в скобках за 
 msgid "auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."
 msgstr "Цвета auto ниже берутся из палитры игры, kenshi_colours.xml, и следуют за модом интерфейса поверх неё. Выключено - встроенные цвета."
 
-msgid "Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."
-msgstr "С какой стороны от значения навыка стоят скобки с поправкой от снаряжения. Слева они могут налезать на длинное название навыка."
+msgid "Which side of the skill value the brackets with the correction go. The correction is everything that changes the skill right now: equipment, robotic limbs, injuries, hunger, load, indoor combat, combat stance. On the left they can overlap a long skill name."
+msgstr "С какой стороны от значения навыка стоят скобки с поправкой. Поправка - всё, что сейчас меняет навык: снаряжение, протезы, увечья, голод, вес ноши, бой в здании, боевая стойка. Слева скобки могут налезать на длинное название навыка."
 
-msgid "The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."
-msgstr "Скобки вокруг поправки от снаряжения, вроде (+3). auto - из палитры, или #RRGGBB."
+msgid "The brackets around the correction, like (+3). auto - from the palette, or #RRGGBB."
+msgstr "Скобки вокруг поправки, вроде (+3). auto - из палитры, или #RRGGBB."
 
-msgid "The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."
-msgstr "Число в скобках, когда снаряжение прибавляет. auto - из палитры, или #RRGGBB."
+msgid "The number in the brackets when the correction adds. auto - from the palette, or #RRGGBB."
+msgstr "Число в скобках, когда поправка прибавляет. auto - из палитры, или #RRGGBB."
 
-msgid "The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."
-msgstr "Число в скобках, когда снаряжение отнимает. auto - из палитры, или #RRGGBB."
+msgid "The number in the brackets when the correction takes away. auto - from the palette, or #RRGGBB."
+msgstr "Число в скобках, когда поправка отнимает. auto - из палитры, или #RRGGBB."
 
 msgid "The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."
 msgstr "Подписи в разбивке под описанием навыка. auto - из палитры, или #RRGGBB."
@@ -211,3 +211,6 @@ msgstr "Включает и выключает плагин целиком."
 
 msgid "0 turns the whole plugin off (after a restart)."
 msgstr "0 отключает плагин целиком (после перезапуска игры)."
+
+msgid "Combat stance"
+msgstr "Боевая стойка"

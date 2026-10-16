@@ -362,7 +362,7 @@ namespace
         };
 
         static const char* const TAIL[] = {
-            "The bracket with the equipment correction: (+3) or (-4).",
+            "The bracket with the correction - everything that changes the skill now: (+3) or (-4).",
             "Brackets is the brackets themselves, Bonus and Penalty the",
             "number inside. BracketSide is which side of the value it",
             "goes on: left or right. On the left it can overlap a long",
@@ -998,12 +998,13 @@ namespace
         int statePercent;
         int indoors;
         int gear;
+        int stance;
 
         bool operator!=(const DescribedKey& o) const
         {
             return character != o.character || stat != o.stat ||
                    delta != o.delta || statePercent != o.statePercent ||
-                   indoors != o.indoors || gear != o.gear;
+                   indoors != o.indoors || gear != o.gear || stance != o.stance;
         }
     };
 
@@ -1040,6 +1041,20 @@ namespace
         default:
             return 0;
         }
+    }
+
+
+    // Прибавка боевой стойки («Блок» на панели приказов) к защите:
+    // разница между защитой со стойкой и без неё. В скобку она входит
+    // (итог защиты берём со стойкой, как боевая панель игры), а в
+    // разборе её не было - со включённым «Блоком» строки не
+    // складывались в скобку (16.10.2026).
+    int StanceBonus(CharStats* stats, StatsEnumerated stat)
+    {
+        if (stat != STAT_MELEE_DEFENCE)
+            return 0;
+        const float d = stats->getMeleeDefence_melee(true) - stats->getMeleeDefence_melee(false);
+        return static_cast<int>(d >= 0.0f ? d + 0.5f : d - 0.5f);
     }
 
 
@@ -1080,6 +1095,15 @@ namespace
             sprintf_s(number, "%+d", indoors);
             g_describedRows.push_back(
                 std::make_pair(std::string(Tr("Indoor weapon bonus")) + ":",
+                               std::string(number)));
+        }
+
+        const int stance = StanceBonus(stats, stat);
+        if (stance != 0)
+        {
+            sprintf_s(number, "%+d", stance);
+            g_describedRows.push_back(
+                std::make_pair(std::string(Tr("Combat stance")) + ":",
                                std::string(number)));
         }
     }
@@ -1161,6 +1185,7 @@ namespace
         key.statePercent = 0;
         key.indoors = 0;
         key.gear = 0;
+        key.stance = 0;
 
         if (known)
         {
@@ -1169,6 +1194,7 @@ namespace
             key.statePercent = stats->getStatPenaltiesTotalForGUI(
                 nameIt->second, window->statProgress);
             key.indoors = IndoorBonus(stats, window->statProgress);
+            key.stance = StanceBonus(stats, window->statProgress);
             EquipmentDelta(nameIt->second, stats, key.gear);
         }
 
@@ -1197,7 +1223,7 @@ namespace
             const int statePercent = key.statePercent;
             const int indoors = key.indoors;
 
-            if (known && (delta != 0 || statePercent != 0 || indoors != 0))
+            if (known && (delta != 0 || statePercent != 0 || indoors != 0 || key.stance != 0))
             {
                 // Имя стата у окна и у CharStats иногда расходится, а
                 // разбивку игра отдаёт только по «своему» написанию.
@@ -2081,7 +2107,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     static const std::string ini = IniPath();
     api->beginMod(api, "StatColours", "Stat Colours", ini.c_str(), &McmReload);
     if (api->version >= 2)
-        api->info(api, Tr("Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."));
+        api->info(api, Tr("Colours the skill numbers by level, breaks down what changes them, shows racial XP multipliers and the current XP rate."));
     api->toggle(api, "StatColours", "Enabled", Tr("Enabled"), Tr("Turns the whole plugin on or off."), 1, MCM_RESTART);
     api->section(api, Tr("Racial XP"));
     api->toggle(api, "RacialXP", "Show", Tr("Racial XP multipliers"), Tr("Racial XP multipliers under the attributes in the character window."), 1, 0);
@@ -2092,11 +2118,11 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     {
         static const char* const values[] = { "left", "right" };
         const char* const labels[] = { Tr("left"), Tr("right") };
-        api->choice(api, "Colours", "BracketSide", Tr("Bracket side"), Tr("Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."), "left", values, labels, 2, 0);
+        api->choice(api, "Colours", "BracketSide", Tr("Bracket side"), Tr("Which side of the skill value the brackets with the correction go. The correction is everything that changes the skill right now: equipment, robotic limbs, injuries, hunger, load, indoor combat, combat stance. On the left they can overlap a long skill name."), "left", values, labels, 2, 0);
     }
-    api->colour(api, "Colours", "Brackets", Tr("Brackets"), Tr("The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."), "auto", 0);
-    api->colour(api, "Colours", "Bonus", Tr("Bonus"), Tr("The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."), "auto", 0);
-    api->colour(api, "Colours", "Penalty", Tr("Penalty"), Tr("The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."), "auto", 0);
+    api->colour(api, "Colours", "Brackets", Tr("Brackets"), Tr("The brackets around the correction, like (+3). auto - from the palette, or #RRGGBB."), "auto", 0);
+    api->colour(api, "Colours", "Bonus", Tr("Bonus"), Tr("The number in the brackets when the correction adds. auto - from the palette, or #RRGGBB."), "auto", 0);
+    api->colour(api, "Colours", "Penalty", Tr("Penalty"), Tr("The number in the brackets when the correction takes away. auto - from the palette, or #RRGGBB."), "auto", 0);
     api->colour(api, "Colours", "Labels", Tr("Labels"), Tr("The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."), "auto", 0);
     api->section(api, Tr("Skill level colours"));
     {

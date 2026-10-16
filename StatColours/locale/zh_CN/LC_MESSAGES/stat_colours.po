@@ -35,8 +35,8 @@ msgstr "正好一百，Above100 为一百以上 - 只有在"
 msgid "with a bonus from equipment."
 msgstr "装备加成时才会出现。"
 
-msgid "The bracket with the equipment correction: (+3) or (-4)."
-msgstr "装备修正的括号：(+3) 或 (-4)。"
+msgid "The bracket with the correction - everything that changes the skill now: (+3) or (-4)."
+msgstr "修正值括号——当前改变技能的一切：(+3) 或 (-4)。"
 
 msgid "Brackets is the brackets themselves, Bonus and Penalty the"
 msgstr "Brackets 是括号本身，Bonus 和 Penalty 是"
@@ -158,8 +158,8 @@ msgstr "详细日志"
 msgid "Details in RE_Kenshi_log.txt."
 msgstr "详细信息写入 RE_Kenshi_log.txt。"
 
-msgid "Colours the skill numbers by level, breaks down equipment bonuses, shows racial XP multipliers and the current XP rate."
-msgstr "按等级为技能数值着色，列出装备加成，显示种族经验倍率和当前经验速度。"
+msgid "Colours the skill numbers by level, breaks down what changes them, shows racial XP multipliers and the current XP rate."
+msgstr "按等级为技能数值着色，列出改变数值的各项，显示种族经验倍率和当前升级速度。"
 
 msgid "Racial XP multipliers under the attributes in the character window."
 msgstr "在角色窗口的属性下方显示种族经验倍率。"
@@ -173,17 +173,17 @@ msgstr "在技能说明中技能名称后的括号里显示当前经验速度。
 msgid "auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."
 msgstr "下方的 auto 颜色取自游戏调色板 kenshi_colours.xml，并跟随覆盖它的界面模组。关闭 - 使用内置颜色。"
 
-msgid "Which side of the skill value the brackets with the equipment correction go. On the left they can overlap a long skill name."
-msgstr "装备修正括号位于技能数值的哪一侧。放在左侧时可能与较长的技能名称重叠。"
+msgid "Which side of the skill value the brackets with the correction go. The correction is everything that changes the skill right now: equipment, robotic limbs, injuries, hunger, load, indoor combat, combat stance. On the left they can overlap a long skill name."
+msgstr "修正值括号位于技能数值的哪一侧。修正值是当前改变技能的一切：装备、机械肢体、伤势、饥饿、负重、室内战斗、战斗姿态。放在左侧可能与较长的技能名重叠。"
 
-msgid "The brackets around the equipment correction, like (+3). auto - from the palette, or #RRGGBB."
-msgstr "装备修正两侧的括号，例如 (+3)。auto - 取自调色板，或 #RRGGBB。"
+msgid "The brackets around the correction, like (+3). auto - from the palette, or #RRGGBB."
+msgstr "修正值两侧的括号，如 (+3)。auto - 取自调色板，或 #RRGGBB。"
 
-msgid "The number in the brackets when equipment adds. auto - from the palette, or #RRGGBB."
-msgstr "装备增加数值时括号内数字的颜色。auto - 取自调色板，或 #RRGGBB。"
+msgid "The number in the brackets when the correction adds. auto - from the palette, or #RRGGBB."
+msgstr "修正值为正时括号内数字的颜色。auto - 取自调色板，或 #RRGGBB。"
 
-msgid "The number in the brackets when equipment takes away. auto - from the palette, or #RRGGBB."
-msgstr "装备减少数值时括号内数字的颜色。auto - 取自调色板，或 #RRGGBB。"
+msgid "The number in the brackets when the correction takes away. auto - from the palette, or #RRGGBB."
+msgstr "修正值为负时括号内数字的颜色。auto - 取自调色板，或 #RRGGBB。"
 
 msgid "The captions in the breakdown under the skill description. auto - from the palette, or #RRGGBB."
 msgstr "技能说明下方明细中的标签。auto - 取自调色板，或 #RRGGBB。"
@@ -211,3 +211,6 @@ msgstr "启用或关闭整个插件。"
 
 msgid "0 turns the whole plugin off (after a restart)."
 msgstr "0 关闭整个插件(重启游戏后生效)。"
+
+msgid "Combat stance"
+msgstr "战斗姿态"
