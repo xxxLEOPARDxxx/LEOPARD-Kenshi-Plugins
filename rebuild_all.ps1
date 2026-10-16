@@ -79,7 +79,6 @@ $patches = @(
     "fix_bl_vc10",               # BetterLooting: приведение к тулсету v100
     "feat_bl_mygui",             # BetterLooting: окно настроек на интерфейс игры
     "feat_kc_localization",      # KillCounter: перевод подписей, свой цвет убран
-    "feat_formations_ru",        # Formations: подсказка и пояснения настроек по-русски
     "feat_xpo_slots",            # XP_Overhaul: адреса xp* из таблицы KenshiLib, без Mod Hub
     "fix_xpo_adjustlevel",       # XP_Overhaul: центральная функция из файла exe, без разгона
     "fix_xpo_carry",             # XP_Overhaul: остаток прибавки, не влезший во float
@@ -315,7 +314,7 @@ if (Test-Path $rmMod) {
 # и достаёт MyGUI через GetProcAddress, поэтому старый тулсет ему не нужен.
 & "$ROOT\build_formations.ps1" | Select-String -Pattern "OK:|НЕ УДАЛАСЬ|установлен"
 if (-not $NoDeploy -and (Test-Path "$KENSHI\mods\Formations")) {
-    Copy-Item "$F\Formations-src\README.txt" "$KENSHI\mods\Formations" -Force
+    Copy-Item "$F\LEOPARD-Kenshi-Forks\Formations\README.txt" "$KENSHI\mods\Formations" -Force
 }
 
 Step "Переводы наших плагинов (ours\*\locale -> мод)"
