@@ -31,7 +31,7 @@
 
 #pragma once
 
-#define MCM_API_VERSION 5
+#define MCM_API_VERSION 6
 
 // Флаги настройки
 #define MCM_RESTART 0x1u   // действует после перезапуска игры
@@ -72,6 +72,14 @@ typedef void (__cdecl *MCM_DetachFn)(void* ud);
 //   typedef void (__cdecl *MCM_OpenPageFn)(const char* modId);
 //   GetProcAddress(GetModuleHandleA("ModConfigMenu.dll"), "MCM_OpenPage")
 typedef void (__cdecl *MCM_OpenPageFn)(const char* modId);
+
+// --- версия 6: строки, которые строятся при показе страницы ---
+// Для того, что меняется по ходу игры (отряды загруженного сейва и т.п.).
+// MCM зовёт fn при каждом показе страницы; fn добавляет строки теми же
+// вызовами (section и строки на функциях v3, defaultValue), и они встают
+// туда, где был вызван rows. Строки прошлого показа убираются. Указатели
+// ud строк плагин держит живыми, пока игра идёт (статические массивы).
+typedef void (__cdecl *MCM_RowsFn)(MCM_Api* api, void* ud);
 
 struct MCM_Api
 {
@@ -156,4 +164,9 @@ struct MCM_Api
     // выбора, текст, клавиша CTRL+B, цвет #RRGGBB. С ним у страницы есть
     // «Сбросить по умолчанию»: значение уходит через setter строки.
     void (__cdecl *defaultValue)(MCM_Api* api, const char* value);
+
+    // --- версия 6 ---
+    // Строки, которые строятся при каждом показе страницы (см. MCM_RowsFn).
+    // Проверять api->version >= 6.
+    void (__cdecl *rows)(MCM_Api* api, MCM_RowsFn fn, void* ud);
 };

@@ -223,6 +223,35 @@ if (open) open("MyPlugin");   // the id from beginMod
 
 ---
 
+## Rows built each time the page is shown (version 6)
+
+For things that change during play: the squads of the loaded save, items
+found and so on. The plugin registers a function; MCM calls it every time
+the page is shown and puts its rows where `rows` was called:
+
+```cpp
+static void __cdecl SquadRows(MCM_Api* api, void* ud)
+{
+    for (int i = 0; i < squadCount; ++i)
+        api->choiceFn(api, squadName[i], "Squad formation", &GetShape, &SetShape, &squad[i],
+                      values, labels, count, 0);
+    if (squadCount == 0)
+        api->section(api, "Squads appear once a game is loaded");
+}
+...
+if (api->version >= 6)
+{
+    api->section(api, "Squads");
+    api->rows(api, &SquadRows, NULL);
+}
+```
+
+The function can use the same calls as `MCM_Describe`: `section`, rows on
+functions (version 3) and `defaultValue`. The rows of the previous show are
+removed. The rows' `ud` must live as long as the game runs (a static array) -
+MCM may still reach them. Captions on a page must differ: the game's panel
+keys rows by their caption, equal ones merge into one.
+
 ## Before you publish
 
 - **Page title.** While your page is selected, the `title` from

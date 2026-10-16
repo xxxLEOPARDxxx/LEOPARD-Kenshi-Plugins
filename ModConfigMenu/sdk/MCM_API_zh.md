@@ -198,6 +198,33 @@ if (open) open("MyPlugin");   // beginMod 中的 id
 
 ---
 
+## 每次显示页面时生成的行（版本 6）
+
+用于游戏过程中会变化的内容：已载入存档的小队、找到的物品等。插件注册一个
+函数，MCM 在每次显示页面时调用它，并把生成的行放在调用 `rows` 的位置：
+
+```cpp
+static void __cdecl SquadRows(MCM_Api* api, void* ud)
+{
+    for (int i = 0; i < squadCount; ++i)
+        api->choiceFn(api, squadName[i], "Squad formation", &GetShape, &SetShape, &squad[i],
+                      values, labels, count, 0);
+    if (squadCount == 0)
+        api->section(api, "Squads appear once a game is loaded");
+}
+...
+if (api->version >= 6)
+{
+    api->section(api, "Squads");
+    api->rows(api, &SquadRows, NULL);
+}
+```
+
+函数中可使用与 `MCM_Describe` 相同的调用：`section`、基于函数的行（版本 3）
+和 `defaultValue`。上一次显示的行会被移除。行的 `ud` 必须在游戏运行期间
+一直有效（静态数组）——MCM 仍可能访问它们。同一页面上的标题必须各不相同：
+游戏面板按标题保存行，相同的标题会合并为一行。
+
 ## 发布之前
 
 - **页面标题。** 选中你的页面时，`beginMod` 中的 `title` 会以大字显示在

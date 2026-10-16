@@ -40,7 +40,8 @@ Markers; наши форки модов Emkej8: Auto-Pause on Load, Container
 Highlight, Hidden Faction Relations, Job B Gone, Loot Scoot Execute, Map
 markers, Organize the Crafting Stations, Organize the Trader, Vital
 Read, Vital Sense, Wall B Gone; и форки модов других авторов: Better
-Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Kenshi
+Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Formations
+Extended (Slinkysalmon03), Kenshi
 Job Management (SirixKC). Для всех них
 MCM не обязателен: без него они читают свои настройки, как раньше.
 
