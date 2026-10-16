@@ -43,7 +43,14 @@ function BuildPlugin($srcDir, $name, $modFolder, [switch]$FromVcxproj) {
     # при провале сборки в мод уезжала предыдущая DLL, а в журнале при этом
     # значилось «установлен» - ровно так однажды и вышло.
     $before = if (Test-Path $dll) { (Get-Item $dll).LastWriteTimeUtc } else { [datetime]::MinValue }
-    & "$ROOT\build.ps1" -SrcDir $srcDir -Name $name -FromVcxproj:$FromVcxproj
+    # Ключ - только когда он нужен: обёртка $ROOT\build.ps1 пересылает
+    # аргументы через @args, и PowerShell 5.1 теряет в ней «:$false» -
+    # без этого любой плагин собирался как проект с .vcxproj.
+    if ($FromVcxproj) {
+        & "$ROOT\build.ps1" -SrcDir $srcDir -Name $name -FromVcxproj
+    } else {
+        & "$ROOT\build.ps1" -SrcDir $srcDir -Name $name
+    }
     $after = if (Test-Path $dll) { (Get-Item $dll).LastWriteTimeUtc } else { [datetime]::MinValue }
     if ($after -le $before) {
         Write-Host "  СБОРКА НЕ УДАЛАСЬ, установка пропущена: $name" -ForegroundColor Red
@@ -64,16 +71,11 @@ Step "Правки поверх исходников авторов"
 # fix_hookid правит KenshiLib и здесь не нужен: он накатывается отдельно,
 # после make_kenshilib.ps1. См. README.
 $patches = @(
-    "fix_sa_taskdata_include",   # SquadAutonomy.h: недостающее подключение AITaskSystem.h
-    "fix_firstload",             # загрузка сейва без файла настроек
-    "fix_addai_crash",           # вылет по кнопке добавления пакета ИИ
-    "fix_dropbox_align",         # положение выпадающего списка
     "feat_weather_resists",      # защита от среды в Character Inspector
     "fix_ci_piececols",          # ширина колонок в строке брони
     "feat_ci_lighttext",         # названия предметов светлым тоном заголовка
     "feat_ci_theme",             # цвета надписей - из палитры игры
     "feat_ci_localization",      # локализация Character Inspector
-    "feat_au2942_localization",  # локализация SquadAutonomy и MoreImmersiveBars
     "fix_bl_vc10",               # BetterLooting: приведение к тулсету v100
     "feat_bl_mygui",             # BetterLooting: окно настроек на интерфейс игры
     "feat_kc_localization",      # KillCounter: перевод подписей, свой цвет убран
@@ -92,12 +94,6 @@ Step "Правки поверх чужих модов (не исходники, 
 # Эти моды обновляются через мастерскую и затирают наши правки. Скрипты
 # идемпотентны: если правка стоит, они молча это скажут.
 $modPatches = @(
-    "fix_gec_skin",      # Guild Escort Contracts: центровка и кегль кнопок
-    "gec_shorten_ui",    # Guild Escort Contracts: подписи, не влезавшие в кнопки
-    "gec_locale",        # он же пересобирает ru.json из порций перевода
-    "fix_gec_category",  # Guild Escort Contracts: категория «The Mercenarie» -> «Гильдия»
-    "fix_gec_dialogue",  # Guild Escort Contracts: реплики диалогов из .mod по-русски
-    "fix_gec_bounty_lang", # Guild Escort Contracts: реплики охоты за наградой - ru вместо en (DLL)
     "fix_darkui_stats",     # Russian Dark UI: обрезанная «Кулинария» в навыках
     "fix_darkui_research",  # Russian Dark UI: тесное описание на вкладке изучения
     "fix_darkui_queuerow",  # Russian Dark UI: перекошенная строка очереди
@@ -106,7 +102,18 @@ $modPatches = @(
 )
 foreach ($p in $modPatches) {
     Write-Host ("  {0,-28}" -f $p)
-    python "$ROOT\$p.py" | ForEach-Object { Write-Host "      $_" }
+    # Чужой мод могут удалить или убрать из игры (так 16.10.2026 ушёл Guild Escort
+    # Contracts): его правка пропускается, сборка плагинов идёт дальше.
+    $old = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $out = & python "$ROOT\$p.py" 2>&1
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $old
+    if ($code -ne 0) {
+        Write-Host "      ПРОПУЩЕНО (код $code): $($out | Select-Object -Last 1)" -ForegroundColor Yellow
+    } else {
+        $out | ForEach-Object { Write-Host "      $_" }
+    }
 }
 
 Step "Компиляция каталогов перевода (.po -> .mo)"
@@ -117,8 +124,6 @@ python "$ROOT\po2mo.py"
 
 Step "Сборка"
 $F = "$ROOT\forks"
-BuildPlugin "$F\Au2942-plugins\SquadAutonomy"     "SquadAutonomy"     "SquadAutonomy"
-BuildPlugin "$F\Au2942-plugins\MoreImmersiveBars" "MoreImmersiveBars" "MoreImmersiveBars"
 BuildPlugin "$F\CharacterInspector-src\CharacterInspector\CharacterInspector\src" `
             "CharacterInspector" "Character Inspector"
 BuildPlugin "$F\LEOPARD-Kenshi-Forks\BetterLooting\Source"         "BetterLooting"     "BetterLooting"
@@ -333,7 +338,7 @@ Step "Контроль: в собранных DLL не должно быть к�
 # каком виде, весь перевод живёт в .po.
 # Formations в списке нет намеренно: он не линкует KenshiLib, а значит не
 # может спросить у игры язык, и его русский лежит прямо в бинарнике.
-foreach ($m in @("SquadAutonomy", "MoreImmersiveBars", "Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
+foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
     $dll = Get-ChildItem "$KENSHI\mods\$m" -Filter *.dll -ErrorAction SilentlyContinue |
            Where-Object { $_.Name -notlike "*.orig" } | Select-Object -First 1
     if (-not $dll) { continue }

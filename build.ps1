@@ -40,8 +40,8 @@ Get-ChildItem $out -Filter "*.obj" -ErrorAction SilentlyContinue | Remove-Item -
 
 # 'ogre' subdir is needed too: headers under ogre/Math/... include "OgreConfig.h"
 # by plain name, which only resolves if ogre/ itself is on the include path.
-# Sibling plugin folders are on the include path too: Au2942 shares headers
-# between plugins (SquadAutonomy includes MoreImmersiveBars/lektorExtension.h).
+# Sibling plugin folders are on the include path too, so one plugin can
+# include another's header by plain name.
 $siblings = @(Get-ChildItem (Split-Path $SrcDir -Parent) -Directory |
               ForEach-Object { $_.FullName })
 # shared\ — наш общий код на все плагины (сейчас там Localization.h)
