@@ -150,3 +150,15 @@ msgstr "Money at the centre"
 
 msgid "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
 msgstr "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
+
+msgid "Random"
+msgstr "Random"
+
+msgid "Character editor"
+msgstr "Character editor"
+
+msgid "Random name button"
+msgstr "Random name button"
+
+msgid "A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."
+msgstr "A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."

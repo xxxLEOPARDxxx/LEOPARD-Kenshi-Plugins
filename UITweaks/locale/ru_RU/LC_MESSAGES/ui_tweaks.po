@@ -150,3 +150,15 @@ msgstr "Деньги по центру"
 
 msgid "The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."
 msgstr "Деньги торговца - по центру окна торговца. Только когда плашка денег шириной во всё окно (Dark UI); ванильное окно остаётся как есть."
+
+msgid "Random"
+msgstr "Случайно"
+
+msgid "Character editor"
+msgstr "Редактор персонажа"
+
+msgid "Random name button"
+msgstr "Кнопка случайного имени"
+
+msgid "A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."
+msgstr "Кнопка рядом с именем в редакторе персонажа (новая игра, найм, хирург): случайное имя из списков игры, мужское или женское по персонажу. Мод, подменяющий эти списки, тоже учитывается."

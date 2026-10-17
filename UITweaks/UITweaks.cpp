@@ -104,6 +104,15 @@
 #undef private
 #undef protected
 
+// Окно редактора персонажа: поле имени и nameChanged закрыты в заголовке.
+// Его зависимости - заранее, чтобы подмена private их не задела.
+#include <mygui/MyGUI_EditBox.h>
+#include <mygui/common/baselayout/BaseLayout.h>
+#include <kenshi/AppearanceManager.h>
+#define private public
+#include <kenshi/gui/CharacterEditWindow.h>
+#undef private
+
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/gui/SquadManagementScreen.h>
 #include <kenshi/gui/InventoryGUI.h>
@@ -148,6 +157,7 @@ namespace
     bool g_factionRelation = true;   // отношение фракции у имени выбранного
     bool g_craftIcon = true;         // иконка вещи у мыши в списке рецептов
     bool g_traderMoneyCentre = true; // деньги торговца по центру окна (Dark UI)
+    bool g_randomName = true;        // кнопка случайного имени в редакторе персонажа
     // Клавиша иконки (09.10.2026, просьба тестеров; задержку убрали):
     // иконка - пока зажата; NONE - просто по наведению.
     HoldKey::Key g_craftIconKey;
@@ -257,6 +267,9 @@ namespace
         fputs(";   CTRL+B, ...); NONE - on hover alone.\n", f);
         fputs("; TraderMoneyCentre - the trader's money at the centre of the\n", f);
         fputs(";   trader window, when the money plate is as wide as the window.\n", f);
+        fputs("; RandomName - a button next to the name in the character editor:\n", f);
+        fputs(";   a random name from the game's name lists (namesM/namesF/namesMF.txt;\n", f);
+        fputs(";   a mod that replaces them wins, as for the game itself).\n", f);
         fputs("; Debug - log every datapanel the game creates, every\n", f);
         fputs(";   queue box found and the sizes of every bar fill.\n", f);
         fputs("\n[Tweaks]\n", f);
@@ -274,6 +287,7 @@ namespace
         fputs("CraftIcon=1\n", f);
         fputs("CraftIconKey=ALT\n", f);
         fputs("TraderMoneyCentre=1\n", f);
+        fputs("RandomName=1\n", f);
         fputs("Debug=0\n", f);
 
         fclose(f);
@@ -320,6 +334,8 @@ namespace
             GetPrivateProfileIntA("Tweaks", "CraftIcon", 1, ini.c_str()) != 0;
         g_traderMoneyCentre =
             GetPrivateProfileIntA("Tweaks", "TraderMoneyCentre", 1, ini.c_str()) != 0;
+        g_randomName =
+            GetPrivateProfileIntA("Tweaks", "RandomName", 1, ini.c_str()) != 0;
         {
             char key[64] = {};
             GetPrivateProfileStringA("Tweaks", "CraftIconKey", "ALT", key, sizeof(key), ini.c_str());
@@ -3284,6 +3300,194 @@ namespace
         }
     }
 
+    // ---------------------------------------------------------------
+    // Случайное имя в редакторе персонажа (18.10.2026)
+    //
+    // Просьба пользователя: в окне редактора (новая игра, найм, хирург)
+    // кнопка рядом с именем - случайное имя из списков игры, чтобы быстро
+    // сменить неудачное.
+    //
+    // Своей функции «случайное имя» игра не экспортирует. Имена лежат в
+    // namesM.txt (мужские), namesF.txt (женские) и namesMF.txt (общие) -
+    // ресурсы игры: мод, который их подменяет (Expanded Name Set), лежит
+    // файлами в своей папке. Читаем их загрузчиком ресурсов Ogre - тем же,
+    // что и игра, поэтому берётся тот же список, что видит она. Мужчине -
+    // мужские и общие, женщине - женские и общие (пол - из окна редактора).
+    //
+    // Имя ставим в поле и зовём обработчик самого окна nameChanged - его
+    // игра вызывает на ввод с клавиатуры: имя доходит до персонажа так же.
+    // Кнопка - ребёнок того же виджета, что поле имени: уходит вместе с
+    // окном. Поле делаем уже на ширину кнопки.
+    // ---------------------------------------------------------------
+
+    std::vector<std::string> g_namesMale;
+    std::vector<std::string> g_namesFemale;
+    bool g_namesLoaded = false;
+
+    void ReadNames(const char* file, std::vector<std::string>& a, std::vector<std::string>* b)
+    {
+        try
+        {
+            Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+            if (!rgm.resourceExistsInAnyGroup(file))
+            {
+                DebugLog(std::string("UITweaks: no name list ") + file);
+                return;
+            }
+            Ogre::DataStreamPtr stream = rgm.openResource(
+                file, Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, true);
+            if (stream.isNull())
+                return;
+            size_t count = 0;
+            while (!stream->eof())
+            {
+                std::string line = stream->getLine(true);
+                if (count == 0 && line.size() >= 3 && line.compare(0, 3, "\xEF\xBB\xBF") == 0)
+                    line.erase(0, 3);               // BOM в начале файла
+                if (line.empty())
+                    continue;
+                a.push_back(line);
+                if (b != NULL)
+                    b->push_back(line);
+                ++count;
+            }
+            char note[160];
+            sprintf_s(note, "UITweaks: name list %s - %u names (group %s)", file,
+                      static_cast<unsigned>(count), rgm.findGroupContainingResource(file).c_str());
+            DebugLog(note);
+        }
+        catch (...)
+        {
+            ErrorLog(std::string("UITweaks: could not read the name list ") + file);
+        }
+    }
+
+    void LoadNames()
+    {
+        if (g_namesLoaded)
+            return;
+        g_namesLoaded = true;
+        ReadNames("namesM.txt", g_namesMale, NULL);
+        ReadNames("namesF.txt", g_namesFemale, NULL);
+        ReadNames("namesMF.txt", g_namesMale, &g_namesFemale);
+    }
+
+    // Свой генератор: rand() игры трогать незачем.
+    unsigned __int64 NextRandom()
+    {
+        static unsigned __int64 state = 0;
+        if (state == 0)
+        {
+            LARGE_INTEGER t;
+            QueryPerformanceCounter(&t);
+            state = static_cast<unsigned __int64>(t.QuadPart) ^ 0x9E3779B97F4A7C15ULL;
+            if (state == 0)
+                state = 1;
+        }
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        return state;
+    }
+
+    CharacterEditWindow* g_editWindow = NULL;            // окно с нашей кнопкой
+    WidgetRef* g_nameButton = new WidgetRef();           // не удаляется: см. WidgetRef.h
+
+    void RandomNameClick(MyGUI::Widget* sender)
+    {
+        CharacterEditWindow* const window = g_editWindow;
+        if (window == NULL || sender != g_nameButton->get() || window->txtName == NULL)
+            return;
+        LoadNames();
+        const bool female = window->currentGender.value == AppearanceManager::Gender::FEMALE;
+        const std::vector<std::string>& pool = female ? g_namesFemale : g_namesMale;
+        if (pool.empty())
+            return;
+        // То же имя, что сейчас, - ещё раз (несколько попыток).
+        const std::string current = window->txtName->getCaption().asUTF8();
+        std::string name;
+        for (int attempt = 0; attempt < 5; ++attempt)
+        {
+            name = pool[static_cast<size_t>(NextRandom() % pool.size())];
+            if (name != current)
+                break;
+        }
+        window->txtName->setCaption(MyGUI::UString(name));
+        window->nameChanged(window->txtName);
+        if (g_debug)
+            DebugLog("UITweaks: random name '" + name + "'");
+    }
+
+    // Кнопка у поля имени - раз на окно; если игра вернула полю прежнюю
+    // ширину, сужаем снова.
+    void EnsureNameButton(CharacterEditWindow* window)
+    {
+        MyGUI::EditBox* const field = window->txtName;
+        if (field == NULL || field->getParent() == NULL)
+            return;
+        MyGUI::Button* button = g_nameButton->get() != NULL
+            ? g_nameButton->get()->castType<MyGUI::Button>(false) : NULL;
+        if (button != NULL && (g_editWindow != window || button->getParent() != field->getParent()))
+        {
+            MyGUI::Gui::getInstance().destroyWidget(button);   // от прежнего окна
+            g_nameButton->reset();
+            button = NULL;
+        }
+        if (button == NULL)
+        {
+            const MyGUI::IntCoord c = field->getCoord();
+            button = field->getParent()->createWidget<MyGUI::Button>(
+                "Kenshi_Button1", MyGUI::IntCoord(c.left + c.width, c.top, 10, c.height),
+                MyGUI::Align::Default, "UIT_RandomName");
+            if (button == NULL)
+                return;
+            button->setCaption(Tr("Random"));
+            const int width = std::max(c.height, button->getTextSize().width + 20);
+            button->setCoord(c.left + c.width - width, c.top, width, c.height);
+            button->setNeedKeyFocus(false);
+            button->eventMouseButtonClick += MyGUI::newDelegate(&RandomNameClick);
+            g_nameButton->set(button);
+            g_editWindow = window;
+        }
+        // Поле - до кнопки, с зазором.
+        const int right = button->getLeft() - 4;
+        if (field->getLeft() + field->getWidth() > right && right > field->getLeft() + 40)
+            field->setSize(right - field->getLeft(), field->getHeight());
+    }
+
+    void (*g_origEditUpdate)(CharacterEditWindow* self) = NULL;
+
+    void EditUpdate_hook(CharacterEditWindow* self)
+    {
+        g_origEditUpdate(self);
+        if (!g_randomName)
+            return;
+        __try
+        {
+            EnsureNameButton(self);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static bool told = false;
+            if (!told)
+            {
+                told = true;
+                ErrorLog("UITweaks: the random name button failed once - skipped");
+            }
+        }
+    }
+
+    // Окно удаляют - забываем его: кнопка ушла вместе с ним.
+    void (*g_origEditDestructor)(CharacterEditWindow* self) = NULL;
+
+    void EditDestructor_hook(CharacterEditWindow* self)
+    {
+        if (self == g_editWindow)
+            g_editWindow = NULL;
+        g_origEditDestructor(self);
+    }
+
+
     void (*g_origGuiUpdate)(ForgottenGUI* thisptr) = NULL;
 
     void GuiUpdate_hook(ForgottenGUI* thisptr)
@@ -3334,6 +3538,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->hotkey(api, "Tweaks", "CraftIconKey", Tr("Icon key"), Tr("The icon shows while this key is held. NONE (Backspace when assigning) - on hover alone."), "ALT", 0);
     api->section(api, Tr("Trader window"));
     api->toggle(api, "Tweaks", "TraderMoneyCentre", Tr("Money at the centre"), Tr("The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."), 1, 0);
+    api->section(api, Tr("Character editor"));
+    api->toggle(api, "Tweaks", "RandomName", Tr("Random name button"), Tr("A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."), 1, MCM_RESTART);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }
@@ -3429,6 +3635,18 @@ __declspec(dllexport) void startPlugin()
                            SetCraftingBench_hook, &g_origSetCraftingBench))
     {
         ErrorLog("UITweaks: could not hook the crafting tab, no item icons there");
+    }
+
+    // Кнопка случайного имени в редакторе персонажа.
+    if (g_randomName &&
+        (KenshiLib::SUCCESS !=
+             KenshiLib::AddHook(KenshiLib::GetRealAddress(&CharacterEditWindow::update),
+                                EditUpdate_hook, &g_origEditUpdate) ||
+         KenshiLib::SUCCESS !=
+             KenshiLib::AddHook(KenshiLib::GetRealAddress(&CharacterEditWindow::_DESTRUCTOR),
+                                EditDestructor_hook, &g_origEditDestructor)))
+    {
+        ErrorLog("UITweaks: could not hook the character editor, no random name button");
     }
 
     if (KenshiLib::SUCCESS !=
