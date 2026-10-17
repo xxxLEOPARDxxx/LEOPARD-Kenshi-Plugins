@@ -183,7 +183,17 @@ namespace
         if (item == NULL || item->data == NULL)
             return false;
         const itemType t = item->data->type;
-        return t == ARMOUR || t == WEAPON || t == CROSSBOW || t == LIMB_REPLACEMENT;
+        if (t == ARMOUR)
+        {
+            // Броня, которая ничего не закрывает (деревянные сандалии, часть
+            // штанов): сорт у неё в данных есть, но ни на что не влияет, и
+            // игра его не показывает. Мод LtEast красил и её - игрок на
+            // Nexus (17.10.2026): «vanilla doesn't show any quality for it
+            // because it has no armor coverage». Спрашиваем у самой игры.
+            Armour* const armour = const_cast<Item*>(item)->isArmour();
+            return armour != NULL && armour->hasArmourCoverage();
+        }
+        return t == WEAPON || t == CROSSBOW || t == LIMB_REPLACEMENT;
     }
 
     // Броня, оружие, арбалеты, протезы - классы от Gear: уровень читаем из

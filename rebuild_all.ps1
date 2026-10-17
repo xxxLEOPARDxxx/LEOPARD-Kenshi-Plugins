@@ -251,6 +251,9 @@ foreach ($e in @("Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone
         Copy-Item $defaults $eDir -Force
     }
 }
+# Character Highlight (форк BFrizzleFoShizzle, 16.10.2026): DLL CharacterHighlight, папка мода
+# Character-Highlight; до 17.10 собирался вручную и в этом списке не был.
+BuildPlugin "$ROOT\forks\LEOPARD-Kenshi-Forks\Character-Highlight" "CharacterHighlight" "Character-Highlight" -FromVcxproj
 # Исходники в папку мода больше не кладём (09.10.2026): они на GitHub -
 # LEOPARD-Kenshi-Plugins и LEOPARD-Kenshi-Forks; Nexus держал архивы с
 # исходниками на карантине.
@@ -337,7 +340,7 @@ Step "Контроль: в собранных DLL не должно быть к�
 # каком виде, весь перевод живёт в .po.
 # Formations в списке нет намеренно: он не линкует KenshiLib, а значит не
 # может спросить у игры язык, и его русский лежит прямо в бинарнике.
-foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
+foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
     $dll = Get-ChildItem "$KENSHI\mods\$m" -Filter *.dll -ErrorAction SilentlyContinue |
            Where-Object { $_.Name -notlike "*.orig" } | Select-Object -First 1
     if (-not $dll) { continue }
