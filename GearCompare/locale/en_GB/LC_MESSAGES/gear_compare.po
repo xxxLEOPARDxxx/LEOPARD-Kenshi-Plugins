@@ -307,3 +307,21 @@ msgstr "Damage (per shot)"
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+
+msgid "Limb HP"
+msgstr "Limb HP"
+
+msgid "Unarmed damage"
+msgstr "Unarmed damage"
+
+msgid "B against A"
+msgstr "B against A"
+
+msgid "Crafting"
+msgstr "Crafting"
+
+msgid "Compare recipes"
+msgstr "Compare recipes"
+
+msgid "On the Crafting tab, right-click two lines of the Items list: the first is marked green (A), the second blue (B), and a panel compares them. Right-click a marked line to unmark it. Armour and limbs are compared at masterwork grade, weapons at the model of the line."
+msgstr "On the Crafting tab, right-click two lines of the Items list: the first is marked green (A), the second blue (B), and a panel compares them. Right-click a marked line to unmark it. Armour and limbs are compared at masterwork grade, weapons at the model of the line."

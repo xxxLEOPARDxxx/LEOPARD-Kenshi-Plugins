@@ -78,6 +78,20 @@
 #include <kenshi/util/StringPair.h>
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/gui/ToolTip.h>
+#include <kenshi/gui/ManagementScreen.h>
+#include <kenshi/Building/CraftingBuilding.h>
+#include <kenshi/RootObjectFactory.h>
+#include <kenshi/GameDataManager.h>
+#include <kenshi/CharStats.h>
+
+#include <mygui/MyGUI_InputManager.h>
+#include <mygui/MyGUI_ImageBox.h>
+#include <mygui/MyGUI_ScrollView.h>
+#include <WidgetRef.h>
+
+#define private public
+#include <kenshi/gui/CharacterStatsWindow.h>
+#undef private
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -95,6 +109,9 @@ namespace
     // Сравнивать и с пустым слотом («Надето: ничего»). Тестеры попросили
     // выключить: при пустом слоте панель лишь повторяет окошко вещи.
     bool g_compareEmpty = false;
+
+    // Сравнение рецептов во вкладке «Ремесло»: ПКМ по двум строкам.
+    bool g_craftCompare = true;
 
     // Клавиша, пока зажата которая видна панель; 0 - видна всегда.
     HoldKey::Key g_holdKey;    // ALT; vk 0 - показывать всегда (см. HoldKey.h)
@@ -163,6 +180,7 @@ namespace
         g_debug = GetPrivateProfileIntA("GearCompare", "Debug", 0, ini.c_str()) != 0;
         g_showTotal = GetPrivateProfileIntA("GearCompare", "ShowTotal", 0, ini.c_str()) != 0;
         g_compareEmpty = GetPrivateProfileIntA("GearCompare", "CompareEmptySlot", 0, ini.c_str()) != 0;
+        g_craftCompare = GetPrivateProfileIntA("GearCompare", "CraftCompare", 1, ini.c_str()) != 0;
 
         g_holdKey = HoldKey::Parse(ReadString(ini, "HoldKey", "ALT"));   // любая клавиша, «NONE» - всегда
         g_totalPerProperty = ReadFloat(ini, "TotalPerProperty", g_totalPerProperty);
@@ -572,6 +590,40 @@ namespace
     }
 
 
+    // Имя стата как в окне персонажа (уже переведено игрой), иначе -
+    // внутреннее имя из CharStats.
+    std::string StatLabel(StatsEnumerated stat)
+    {
+        CharacterStatsWindow::Stat* const entry = CharacterStatsWindow::getStat(stat);
+        if (entry != NULL && !entry->name.empty())
+            return entry->name;
+        return CharStats::getStatName(stat);
+    }
+
+    // Протез (18.10.2026, сравнение во вкладке «Ремесло»): прочность, урон
+    // без оружия и множители статов - поля RobotLimbItem.
+    void DescribeLimb(RobotLimbItem* l, Summary& s)
+    {
+        s.isArmour = false;
+        s.main = l->maxHP;
+        s.mainLabel = Tr("Limb HP");
+        AddIfSet(s.rows, Tr("Limb HP"), PLAIN, +1, l->maxHP);
+        AddIfSet(s.rows, Tr("Unarmed damage"), PLAIN, +1, static_cast<float>(l->unarmedDamage));
+
+        // По порядку статов, а не как лежат в таблице: так строки двух
+        // протезов идут одинаково.
+        std::map<int, float> mults;
+        for (ogre_unordered_map<StatsEnumerated, float>::type::const_iterator it = l->statMults.begin();
+             it != l->statMults.end(); ++it)
+            mults[static_cast<int>(it->first)] = it->second;
+        for (std::map<int, float>::const_iterator it = mults.begin(); it != mults.end(); ++it)
+        {
+            const std::string label = StatLabel(static_cast<StatsEnumerated>(it->first));
+            AddIfSet(s.rows, label.c_str(), MULT, +1, it->second);
+        }
+    }
+
+
     bool Describe(Item* item, Summary& s)
     {
         s.rows.clear();
@@ -586,10 +638,13 @@ namespace
             DescribeArmour(armour, s);
         else if (Weapon* const weapon = item->isWeapon())
             DescribeWeapon(weapon, s);
+        else if (item->getClassType() == LIMB_REPLACEMENT)
+            DescribeLimb(static_cast<RobotLimbItem*>(item), s);
         else
             return false;
 
-        DescribeFromTooltip(item, s);
+        if (item->getClassType() != LIMB_REPLACEMENT)
+            DescribeFromTooltip(item, s);
 
         s.weight = item->getItemWeight();
         AddIfSet(s.rows, Tr("Weight"), KG, -1, s.weight);
@@ -1040,6 +1095,17 @@ namespace
 
     std::string g_slotLabel;        // слот для заголовка панели
 
+    // Панель общая на два режима: описание вещи (Update) и два рецепта
+    // ремесла (CraftUpdate). Кто заполнял её последним: 0 - никто,
+    // 1 - описание вещи, 2 - ремесло. Прячет панель только её хозяин.
+    int g_panelOwner = 0;
+    bool g_tipShown = false;        // описание вещи показало панель в этом кадре
+    bool g_fillCraft = false;       // Fill: заголовок и колонки «A / B»
+
+    // Цвета пометок строк ремесла (просьба пользователя: зелёный и синий).
+    const MyGUI::Colour kMarkA(0.36f, 0.78f, 0.36f);
+    const MyGUI::Colour kMarkB(0.36f, 0.62f, 0.95f);
+
     // Цвета по ролям - как в игровом окошке вещи. Асур справедливо заметил,
     // что прежние были не игровые: одна «Main» из палитры на всё, а строки
     // осей целиком зелёные или красные. Теперь каждую роль берём у самого
@@ -1461,10 +1527,15 @@ namespace
         RowSpec spec;
         spec.wide = false;
         spec.text[0] = "";
-        spec.text[1] = Tr("worn");
-        spec.text[2] = Tr("new");
+        spec.text[1] = g_fillCraft ? "A" : Tr("worn");
+        spec.text[2] = g_fillCraft ? "B" : Tr("new");
         spec.text[3] = Tr("change");
         spec.colour[0] = spec.colour[1] = spec.colour[2] = spec.colour[3] = g_header;
+        if (g_fillCraft)
+        {
+            spec.colour[1] = kMarkA;
+            spec.colour[2] = kMarkB;
+        }
         g_specs.push_back(spec);
     }
 
@@ -1593,9 +1664,15 @@ namespace
         g_specs.clear();
 
         // Заголовок панели - цветом названия вещи в окошке.
-        AddWide(worn != NULL
-                    ? std::string(Tr("Worn")) + " (" + g_slotLabel + "): " + worn->name
-                    : std::string(notice), g_title);
+        if (g_fillCraft && worn != NULL)
+        {
+            AddWide("A: " + worn->name, kMarkA);
+            AddWide("B: " + next.name, kMarkB);
+        }
+        else
+            AddWide(worn != NULL
+                        ? std::string(Tr("Worn")) + " (" + g_slotLabel + "): " + worn->name
+                        : std::string(notice), g_title);
 
         if (worn != NULL && cmp != NULL)
         {
@@ -1657,7 +1734,7 @@ namespace
             }
 
             const VerdictKind verdict = Verdict(*cmp, mainForVerdict);
-            AddSummary(Tr("Verdict"), VerdictText(verdict),
+            AddSummary(g_fillCraft ? Tr("B against A") : Tr("Verdict"), VerdictText(verdict),
                        VerdictColour(verdict == V_MIXED ? 0 : static_cast<int>(verdict)));
         }
 
@@ -1804,7 +1881,7 @@ namespace
     {
         g_pairNext = NULL;
         g_pairOwner = NULL;
-        if (g_panel != NULL && g_panel->getVisible())
+        if (g_panel != NULL && g_panel->getVisible() && g_panelOwner != 2)
             g_panel->setVisible(false);
         g_cachedNext = g_cachedWorn = NULL;
         g_cachedOwner = NULL;
@@ -1855,6 +1932,7 @@ namespace
 
     void Update()
     {
+        g_tipShown = false;
         if (!HoldKeyDown())
         {
             Hide();
@@ -1940,7 +2018,9 @@ namespace
 
                 Comparison cmp;
                 Compare(nothing, nextSummary, cmp);
+                g_fillCraft = false;
                 g_cachedRows = Fill(nextSummary, &nothing, &cmp, "");
+                g_panelOwner = 1;
             }
             else
             {
@@ -1949,13 +2029,15 @@ namespace
 
                 Comparison cmp;
                 Compare(wornSummary, nextSummary, cmp);
+                g_fillCraft = false;
                 g_cachedRows = Fill(nextSummary, &wornSummary, &cmp, "");
+                g_panelOwner = 1;
             }
         }
 
         if (g_cachedRows == 0)
         {
-            if (g_panel->getVisible())
+            if (g_panel->getVisible() && g_panelOwner != 2)
                 g_panel->setVisible(false);
             return;
         }
@@ -1963,6 +2045,711 @@ namespace
         Place(g_tip->panel);
         if (!g_panel->getVisible())
             g_panel->setVisible(true);
+        g_tipShown = true;
+    }
+
+
+    // ---------------------------------------------------------------
+    // Сравнение рецептов во вкладке «Ремесло» (18.10.2026)
+    //
+    // Идея пользователя: ПКМ по строке списка «Предметы» помечает её
+    // (первая - зелёным, A; вторая - синим, B), и рядом со списком
+    // появляется та же панель сравнения, что у описания вещи. ПКМ по
+    // помеченной строке снимает пометку; по третьей - заменяет B.
+    // Пометки снимаются, когда окно закрыли.
+    //
+    // Качество (решение пользователя): броня и протезы - мастерское,
+    // последний сорт; оружие - ровно та модель, что в строке (у оружия
+    // модели - отдельные строки рецептов).
+    //
+    // Как узнаём рецепт строки - код UITweaks (иконка у мыши в этом же
+    // списке), перенесён как есть: подпись строки -> вещь и материал по
+    // рецептам станка (getAvailableCrafts), иначе по именам. Свойства
+    // берём у временной вещи (фабрика игры), сразу её удаляем - в пометке
+    // остаётся только описание (Summary).
+    //
+    // Соседи: UITweaks тоже перехватывает setCraftingBench (цепочка цела,
+    // исходную зовём первой); поиск Organize-the-Crafting-Stations
+    // подставляет в те же строки другие надписи - поэтому пометка
+    // привязана к рецепту, а подсветка раз в 250 мс сверяется с подписью
+    // строки и, если надо, переезжает на нужную строку.
+    // ---------------------------------------------------------------
+
+    // Станок вкладки «Ремесло» - его задаёт игра (setCraftingBench).
+    hand g_benchHandle;
+    bool g_benchKnown = false;
+    void (*g_origSetCraftingBench)(ManagementScreen* self, const hand& building) = NULL;
+
+    void SetCraftingBench_hook(ManagementScreen* self, const hand& building)
+    {
+        g_origSetCraftingBench(self, building);
+        g_benchHandle = building;
+        g_benchKnown = true;
+    }
+
+    // Подпись строки списка «Предметы» -> вещь и материал рецепта. Игра
+    // пишет «Вещь», «Вещь - Цвет» (броня) или «Вещь, Производитель» (оружие).
+    struct Recipe
+    {
+        GameData* item;
+        GameData* material;
+    };
+    // Подпись -> рецепт. Копится за всю игру и не чистится: указатели на
+    // записи данных живут всю сессию. Неудачи - отдельно, чтобы не искать
+    // заново.
+    std::map<std::string, Recipe> g_recipes;
+    std::set<std::string> g_recipeMisses;
+    std::set<Building*> g_recipesFrom;      // станки, чьи рецепты уже взяты
+
+    // Пробелы схлопнуть и обрезать: у игры бывает «юбка -  черного цвета».
+    std::string Squeeze(const std::string& text)
+    {
+        std::string out;
+        for (size_t k = 0; k < text.size(); ++k)
+        {
+            const char c = text[k];
+            if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
+            {
+                if (!out.empty() && out[out.size() - 1] != ' ')
+                    out += ' ';
+            }
+            else
+                out += c;
+        }
+        while (!out.empty() && out[out.size() - 1] == ' ')
+            out.erase(out.size() - 1);
+        return out;
+    }
+
+    void RefreshRecipes(Building* bench)
+    {
+        if (bench == NULL || !g_recipesFrom.insert(bench).second)
+            return;
+        g_recipeMisses.clear();             // у нового станка могут быть они
+        static lektor<GameDataGroup> crafts;   // один на всё время: память у игры
+        crafts.clear();
+        static_cast<CraftingBuilding*>(bench)->getAvailableCrafts(crafts);
+        for (uint32_t i = 0; i < crafts.size(); ++i)
+        {
+            GameData* const item = crafts[i].g1;
+            GameData* const material = crafts[i].g2;
+            if (item == NULL)
+                continue;
+            Recipe r = { item, material };
+            g_recipes[Squeeze(item->name)] = r;
+            if (material != NULL)
+            {
+                // Броня: «Вещь - Цвет», оружие: «Вещь, Производитель».
+                g_recipes[Squeeze(item->name + " - " + material->name)] = r;
+                g_recipes[Squeeze(item->name + ", " + material->name)] = r;
+            }
+        }
+        if (g_debug)
+        {
+            char line[96];
+            sprintf_s(line, "GearCompare: crafting bench has %u recipes", crafts.size());
+            DebugLog(line);
+        }
+    }
+
+    // Запись по имени - поиском самой игры (getDataByName) среди типов.
+    GameData* DataByName(const std::string& name, const itemType* types, size_t count)
+    {
+        if (ou == NULL || name.empty())
+            return NULL;
+        for (size_t i = 0; i < count; ++i)
+            if (GameData* const d = ou->gamedata.getDataByName(name, types[i]))
+                return d;
+        return NULL;
+    }
+
+    // Рецепт по подписи строки. Сначала - рецепты станков, иначе разбор
+    // подписи «Вещь», «Вещь - Цвет», «Вещь, Производитель» по именам: так
+    // работает и станок, выбранный в «Пунктах» самой вкладки (его игра
+    // задаёт мимо setCraftingBench).
+    const Recipe* FindRecipe(const std::string& caption, const std::string& raw)
+    {
+        std::map<std::string, Recipe>::const_iterator it = g_recipes.find(caption);
+        if (it != g_recipes.end())
+            return &it->second;
+        if (g_recipeMisses.count(caption) != 0)
+            return NULL;
+        static const itemType itemTypes[] = { WEAPON, ARMOUR, ITEM, CROSSBOW, LIMB_REPLACEMENT, CONTAINER };
+        static const itemType materialTypes[] = { MATERIAL_SPECS_WEAPON, MATERIAL_SPECS_CLOTHING,
+                                                  WEAPON_MANUFACTURER, MATERIAL_SPEC, COLOR_DATA };
+        const size_t nItems = sizeof(itemTypes) / sizeof(itemTypes[0]);
+        const size_t nMaterials = sizeof(materialTypes) / sizeof(materialTypes[0]);
+        // Сначала - текст как есть: двойной пробел бывает частью имени вещи
+        // («Бронированная тряпичная юбка -  черного цвета» из Mediocre All
+        // Black Armor - одна вещь, не «вещь - цвет»).
+        Recipe r = { DataByName(raw, itemTypes, nItems), NULL };
+        if (r.item == NULL)
+            r.item = DataByName(caption, itemTypes, nItems);
+        if (r.item == NULL)
+        {
+            const char* const seps[] = { ", ", " - " };
+            for (size_t k = 0; k < 2 && r.item == NULL; ++k)
+            {
+                const std::string::size_type at = caption.rfind(seps[k]);
+                if (at == std::string::npos)
+                    continue;
+                r.item = DataByName(Squeeze(caption.substr(0, at)), itemTypes, nItems);
+                if (r.item == NULL)
+                    continue;
+                const std::string tail = caption.substr(at + strlen(seps[k]));
+                r.material = DataByName(Squeeze(tail), materialTypes, nMaterials);
+                if (r.material == NULL)
+                    r.material = DataByName(" " + Squeeze(tail), materialTypes, nMaterials);
+            }
+        }
+        if (r.item == NULL)
+        {
+            g_recipeMisses.insert(caption);
+            return NULL;
+        }
+        if (g_debug)
+            DebugLog("GearCompare: recipe '" + caption + "' found by name");
+        return &(g_recipes[caption] = r);
+    }
+
+    // Текст надписи без цветовых тегов MyGUI («#RRGGBB»; «##» - это «#»).
+    std::string PlainText(MyGUI::Widget* w)
+    {
+        MyGUI::TextBox* const text = w != NULL ? w->castType<MyGUI::TextBox>(false) : NULL;
+        if (text == NULL)
+            return std::string();
+        const std::string raw = text->getCaption().asUTF8();
+        std::string out;
+        for (size_t k = 0; k < raw.size(); ++k)
+        {
+            if (raw[k] == '#' && k + 1 < raw.size() && raw[k + 1] == '#')
+            {
+                out += '#';
+                ++k;
+            }
+            else if (raw[k] == '#' && k + 6 < raw.size())
+                k += 6;
+            else
+                out += raw[k];
+        }
+        return out;
+    }
+
+    bool InManagementScreen(ManagementScreen* screen, MyGUI::Widget* w)
+    {
+        MyGUI::Widget* root = w;
+        while (root != NULL && root->getParent() != NULL)
+            root = root->getParent();
+        MyGUI::Widget* tabRoot = screen->getTab(0);
+        while (tabRoot != NULL && tabRoot->getParent() != NULL)
+            tabRoot = tabRoot->getParent();
+        return tabRoot != NULL && root == tabRoot;
+    }
+
+    // Рецепт по надписи на одной высоте со строкой под мышью: надписи
+    // строк лежат рядом с их кнопками в общем контейнере списка, и первая
+    // попавшаяся надпись была бы чужой строкой.
+    const Recipe* RecipeInRow(MyGUI::Widget* w, int depth, int rowTop, int rowBottom,
+                              MyGUI::Widget* skip = NULL)
+    {
+        if (w == NULL || w == skip || !w->getVisible())
+            return NULL;
+        // Сначала дешёвое - высота, текст - только у надписи своей строки.
+        const MyGUI::IntCoord c = w->getAbsoluteCoord();
+        // Ветки по прямоугольнику НЕ отсекаем: контейнер строк бывает размером
+        // с видимую часть, а строки ниже лежат за его пределами.
+        const int middle = c.top + c.height / 2;
+        if (middle >= rowTop && middle <= rowBottom && w->castType<MyGUI::TextBox>(false) != NULL)
+        {
+            const std::string rawText = PlainText(w);
+            const std::string text = Squeeze(rawText);
+            if (!text.empty())
+                if (const Recipe* found = FindRecipe(text, rawText))
+                    return found;
+        }
+        if (depth <= 0)
+            return NULL;
+        const size_t children = w->getChildCount();
+        for (size_t c = 0; c < children; ++c)
+            if (const Recipe* found = RecipeInRow(w->getChildAt(c), depth - 1, rowTop, rowBottom, skip))
+                return found;
+        return NULL;
+    }
+
+    // Рецепт строки: тот же обход, что у мыши в UITweaks (HoveredRecipe), -
+    // от виджета строки вверх по родителям до списка. list - ScrollView
+    // списка, если встретился.
+    const Recipe* RecipeOfRow(MyGUI::Widget* row, MyGUI::Widget** list)
+    {
+        if (list != NULL)
+            *list = NULL;
+        const MyGUI::IntCoord rc = row->getAbsoluteCoord();
+        if (rc.height <= 0 || rc.height > 80)
+            return NULL;                    // не строка, а целая панель
+        MyGUI::Widget* done = NULL;         // эту ветку уже прошли уровнем ниже
+        MyGUI::Widget* w = row;
+        for (int depth = 0; w != NULL && depth < 4; ++depth, done = w, w = w->getParent())
+        {
+            if (w->castType<MyGUI::ScrollView>(false) != NULL)
+            {
+                if (list != NULL)
+                    *list = w;
+                break;
+            }
+            if (const Recipe* found = RecipeInRow(w, 3, rc.top, rc.top + rc.height, done))
+            {
+                if (list != NULL)
+                    for (MyGUI::Widget* up = w; up != NULL; up = up->getParent())
+                        if (up->castType<MyGUI::ScrollView>(false) != NULL)
+                        {
+                            *list = up;
+                            break;
+                        }
+                return found;
+            }
+        }
+        return NULL;
+    }
+
+    bool SameRecipe(const Recipe* r, GameData* item, GameData* material)
+    {
+        return r != NULL && r->item == item && r->material == material;
+    }
+
+    // Временная вещь из записи-состояния, как при загрузке сохранения
+    // (UITweaks, так же делает Emkejs-Test-Kit): фабрика по аргументам
+    // создаёт оружие, только если его выпускает какой-то производитель.
+    Item* CreateFromState(const Recipe& r, int level)
+    {
+        static GameDataContainer* container = NULL;     // не удаляется: живёт всю игру
+        if (container == NULL)
+            container = new GameDataContainer();
+        GameData* const state = container->createNewData(INVENTORY_ITEM_STATE, "", "gc_compare_state");
+        if (state == NULL)
+            return NULL;
+        const bool weapon = r.item->type == WEAPON;
+        GameData* const model = weapon ? r.material : NULL;
+        GameData* const company = weapon ? CraftingBuilding::playerManufacturerData() : NULL;
+        GameData* const material = weapon ? NULL : r.material;
+        const hand none;
+        ogre_unordered_map<std::string, int>::type::const_iterator fn = r.item->idata.find("item function");
+        state->addString("uniform", "", "", true);
+        state->addString("color sid", "", "", true);
+        state->addString("material sid", model != NULL ? model->stringID
+                                         : (material != NULL ? material->stringID : std::string()), "", true);
+        state->addString("company sid", company != NULL ? company->stringID : std::string(), "", true);
+        state->addString("section", "back", "", true);
+        state->addString("base data sid", r.item->stringID, "", true);
+        state->add("item function", fn != r.item->idata.end() ? fn->second : static_cast<int>(ITEM_WEAPON), "", true);
+        state->add("inventory x", 0, "", true);
+        state->add("inventory y", 0, "", true);
+        state->add("level", level, "", true);
+        state->add("quantity", 1, "", true);
+        state->add("insideBuildingI", none.index, "", true);
+        state->add("insideBuildingC", none.container, "", true);
+        state->add("insideBuildingS", none.serial, "", true);
+        state->add("insideBuildingCS", none.containerSerial, "", true);
+        state->add("insideBuildingTYPE", static_cast<int>(none.type), "", true);
+        state->add("ownedbyI", none.index, "", true);
+        state->add("ownedbyC", none.container, "", true);
+        state->add("ownedbyS", none.serial, "", true);
+        state->add("ownedbyCS", none.containerSerial, "", true);
+        state->add("ownedbyTYPE", static_cast<int>(none.type), "", true);
+        Item* const item = ou->theFactory->createItem(state);
+        container->destroyData(state);
+        if (g_debug)
+            DebugLog("GearCompare: item from a state for '" + r.item->name + "': " + (item != NULL ? "ok" : "failed"));
+        return item;
+    }
+
+    // Мастерский сорт: уровень 0..100, у брони сорт растёт с ним (ItemMarkers:
+    // выше 80 - последний сорт).
+    const int kMasterLevel = 100;
+
+    // Описание рецепта по временной вещи. Попытки фабрики - как у иконки
+    // в UITweaks (оружие: модель и производитель игрока), только броня и
+    // протезы - сразу мастерского уровня.
+    bool DescribeRecipe(const Recipe& r, Summary& s)
+    {
+        if (ou == NULL || ou->theFactory == NULL || r.item == NULL)
+            return false;
+        // Сравнивать есть что только у снаряжения; книги, вьюки и прочее -
+        // без временной вещи (в журнале 18.10 их создавали зря).
+        const itemType type = r.item->type;
+        if (type != WEAPON && type != CROSSBOW && type != ARMOUR && type != LIMB_REPLACEMENT)
+            return false;
+        const bool weapon = r.material != NULL && r.material->type == MATERIAL_SPECS_WEAPON;
+        GameData* const maker = CraftingBuilding::playerManufacturerData();
+        struct Attempt
+        {
+            GameData* a;
+            GameData* b;
+            int level;
+        };
+        const Attempt weaponTries[] = {
+            { r.material, maker, 0 }, { r.material, maker, 1 }, { maker, r.material, 1 },
+            { r.material, NULL, 1 }, { NULL, maker, 1 }, { NULL, r.material, 1 }, { NULL, NULL, 1 },
+            { NULL, NULL, 0 } };
+        const Attempt otherTries[] = {
+            { NULL, r.material, kMasterLevel }, { NULL, NULL, kMasterLevel } };
+        const Attempt* const tries = weapon ? weaponTries : otherTries;
+        const size_t count = weapon ? sizeof(weaponTries) / sizeof(weaponTries[0])
+                                    : sizeof(otherTries) / sizeof(otherTries[0]);
+        // Оружие - сразу из записи-состояния: в игре (18.10.2026) все восемь
+        // попыток фабрики по аргументам у оружия ремесла не вышли ни разу,
+        // а состояние даёт ровно вещь из строки - модель и производитель
+        // игрока, уровень по модели (Старый клинок 25, Катун N.3 40, Тип II 55).
+        Item* item = weapon ? CreateFromState(r, 0) : NULL;
+        for (size_t t = 0; t < count && item == NULL; ++t)
+            item = ou->theFactory->createItem(r.item, hand(), tries[t].a, tries[t].b, tries[t].level, NULL);
+        if (item == NULL && !weapon)
+            item = CreateFromState(r, kMasterLevel);
+        if (item == NULL)
+            return false;
+
+        const bool ok = Describe(item, s);
+        if (g_debug)
+        {
+            Gear* const gear = item->isGear();
+            char line[160];
+            _snprintf_s(line, _TRUNCATE, " - level %.2f, level_0_100 %d, main %.3f, rows %u, class %d",
+                        gear != NULL ? gear->level : -1.0f, gear != NULL ? gear->level_0_100 : -1,
+                        s.main, static_cast<unsigned>(s.rows.size()), static_cast<int>(item->getClassType()));
+            DebugLog("GearCompare: recipe item '" + item->displayName + "'" + line);
+        }
+        ou->destroy(item, false, "GearCompare craft compare");
+        return ok;
+    }
+
+    // Пометка строки. WidgetRef - не удаляются (см. WidgetRef.h).
+    struct Mark
+    {
+        bool set;
+        GameData* item;
+        GameData* material;
+        Summary summary;
+        WidgetRef* row;         // виджет строки, на котором подсветка
+        WidgetRef* glow;        // наша заливка (ребёнок строки)
+        WidgetRef* bar;         // и полоса слева
+    };
+    Mark g_marks[2];
+    WidgetRef* g_craftList = new WidgetRef();   // ScrollView списка «Предметы»
+    bool g_craftFilled = false;                 // панель сейчас показывает пару
+    DWORD g_craftCheckAt = 0;
+
+    void InitMarks()
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            g_marks[i].set = false;
+            g_marks[i].item = g_marks[i].material = NULL;
+            g_marks[i].row = new WidgetRef();
+            g_marks[i].glow = new WidgetRef();
+            g_marks[i].bar = new WidgetRef();
+        }
+    }
+
+    void DropGlow(Mark& m)
+    {
+        if (MyGUI::Widget* const glow = m.glow->get())
+            MyGUI::Gui::getInstance().destroyWidget(glow);
+        if (MyGUI::Widget* const bar = m.bar->get())
+            MyGUI::Gui::getInstance().destroyWidget(bar);
+        m.glow->reset();
+        m.bar->reset();
+        m.row->reset();
+    }
+
+    // Подсветка: заливка цветом пометки и полоса слева. Ребёнок строки -
+    // прокручивается и обрезается вместе с ней. Мышь не ловит.
+    void PutGlow(Mark& m, MyGUI::Widget* row, const MyGUI::Colour& colour)
+    {
+        DropGlow(m);
+        const int w = row->getWidth();
+        const int h = row->getHeight();
+        MyGUI::ImageBox* const fill = row->createWidget<MyGUI::ImageBox>(
+            "ImageBox", MyGUI::IntCoord(0, 0, w, h), MyGUI::Align::Stretch);
+        if (fill == NULL)
+            return;
+        fill->setNeedMouseFocus(false);
+        fill->setNeedKeyFocus(false);
+        fill->setImageTexture("gearcompare_fill.png");
+        fill->setColour(colour);
+        fill->setAlpha(0.28f);
+        MyGUI::ImageBox* const bar = row->createWidget<MyGUI::ImageBox>(
+            "ImageBox", MyGUI::IntCoord(0, 0, 4, h), MyGUI::Align::Left | MyGUI::Align::VStretch);
+        if (bar != NULL)
+        {
+            bar->setNeedMouseFocus(false);
+            bar->setNeedKeyFocus(false);
+            bar->setImageTexture("gearcompare_fill.png");
+            bar->setColour(colour);
+            m.bar->set(bar);
+        }
+        m.glow->set(fill);
+        m.row->set(row);
+    }
+
+    void ClearMarks()
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            DropGlow(g_marks[i]);
+            g_marks[i].set = false;
+            g_marks[i].item = g_marks[i].material = NULL;
+        }
+        g_craftFilled = false;
+    }
+
+    // Строка списка с этим рецептом: надписи строк и их виджеты - соседи
+    // в одном контейнере; строка - не надпись, ловит мышь, на одной высоте.
+    void CollectRows(MyGUI::Widget* w, int depth, std::vector<MyGUI::Widget*>& rows,
+                     std::vector<MyGUI::Widget*>& labels)
+    {
+        if (w == NULL || !w->getVisible())
+            return;
+        const MyGUI::IntCoord c = w->getAbsoluteCoord();
+        if (c.height > 0 && c.height <= 80)
+        {
+            if (w->castType<MyGUI::TextBox>(false) != NULL && !PlainText(w).empty())
+                labels.push_back(w);
+            else if (w->getNeedMouseFocus())
+                rows.push_back(w);
+        }
+        if (depth <= 0)
+            return;
+        const size_t children = w->getChildCount();
+        for (size_t i = 0; i < children; ++i)
+            CollectRows(w->getChildAt(i), depth - 1, rows, labels);
+    }
+
+    MyGUI::Widget* FindRow(MyGUI::Widget* list, GameData* item, GameData* material)
+    {
+        std::vector<MyGUI::Widget*> rows;
+        std::vector<MyGUI::Widget*> labels;
+        CollectRows(list, 6, rows, labels);
+        for (size_t i = 0; i < labels.size(); ++i)
+        {
+            const std::string raw = PlainText(labels[i]);
+            if (!SameRecipe(FindRecipe(Squeeze(raw), raw), item, material))
+                continue;
+            const MyGUI::IntCoord lc = labels[i]->getAbsoluteCoord();
+            const int middle = lc.top + lc.height / 2;
+            for (size_t k = 0; k < rows.size(); ++k)
+            {
+                if (rows[k]->getParent() != labels[i]->getParent())
+                    continue;
+                const MyGUI::IntCoord rc = rows[k]->getAbsoluteCoord();
+                if (middle >= rc.top && middle <= rc.top + rc.height)
+                    return rows[k];
+            }
+        }
+        return NULL;
+    }
+
+    // ПКМ по строке: пометить, снять или заменить B.
+    void OnRightClick()
+    {
+        ManagementScreen* const screen = ManagementScreen::getSingleton();
+        MyGUI::InputManager* const input = MyGUI::InputManager::getInstancePtr();
+        MyGUI::Widget* const row = input != NULL ? input->getMouseFocusWidget() : NULL;
+        if (screen == NULL || row == NULL || !InManagementScreen(screen, row))
+            return;
+        if (g_benchKnown)
+            RefreshRecipes(g_benchHandle.getBuilding());
+        MyGUI::Widget* list = NULL;
+        const Recipe* const recipe = RecipeOfRow(row, &list);
+        if (recipe == NULL || list == NULL)
+        {
+            if (g_debug)
+                DebugLog("GearCompare: right click - no recipe under the mouse ('" + row->getName() + "')");
+            return;
+        }
+
+        // Уже помечена - снять.
+        for (int i = 0; i < 2; ++i)
+        {
+            if (g_marks[i].set && SameRecipe(recipe, g_marks[i].item, g_marks[i].material))
+            {
+                DropGlow(g_marks[i]);
+                g_marks[i].set = false;
+                g_craftFilled = false;
+                if (g_debug)
+                    DebugLog(std::string("GearCompare: unmarked ") + (i == 0 ? "A" : "B"));
+                return;
+            }
+        }
+
+        Summary s;
+        if (!DescribeRecipe(*recipe, s))
+        {
+            if (g_debug)
+                DebugLog("GearCompare: right click - '" + recipe->item->name + "' is not gear");
+            return;
+        }
+
+        const int slot = !g_marks[0].set ? 0 : 1;
+        Mark& m = g_marks[slot];
+        m.set = true;
+        m.item = recipe->item;
+        m.material = recipe->material;
+        m.summary = s;
+        PutGlow(m, row, slot == 0 ? kMarkA : kMarkB);
+        g_craftList->set(list);
+        g_craftFilled = false;
+        if (g_debug)
+            DebugLog(std::string("GearCompare: marked ") + (slot == 0 ? "A" : "B") + " '" + s.name + "'" +
+                     (recipe->material != NULL ? " / " + recipe->material->name : std::string()));
+    }
+
+    // Раз в 250 мс: подсветка всё ещё на строке своего рецепта? Поиск
+    // ставит в строки другие надписи, игра пересобирает список при смене
+    // станка. Нет - снимаем и ищем нужную строку в списке.
+    void CheckGlows()
+    {
+        MyGUI::Widget* const list = g_craftList->get();
+        for (int i = 0; i < 2; ++i)
+        {
+            Mark& m = g_marks[i];
+            if (!m.set)
+                continue;
+            MyGUI::Widget* const row = m.row->get();
+            if (row != NULL && m.glow->get() != NULL && row->getInheritedVisible()
+                && SameRecipe(RecipeOfRow(row, NULL), m.item, m.material))
+                continue;
+            DropGlow(m);
+            if (list == NULL || !list->getInheritedVisible())
+                continue;
+            if (MyGUI::Widget* const found = FindRow(list, m.item, m.material))
+                PutGlow(m, found, i == 0 ? kMarkA : kMarkB);
+        }
+    }
+
+    // Справа от списка, иначе слева; по верху списка.
+    void PlaceBeside(MyGUI::Widget* list)
+    {
+        const MyGUI::IntCoord at = list->getAbsoluteCoord();
+        const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
+        int x = at.left + at.width + 8;
+        if (x + g_panelWidth > view.width)
+            x = at.left - 8 - g_panelWidth;
+        if (x < 0)
+            x = 0;
+        int y = at.top;
+        if (y + g_panelHeight > view.height)
+            y = view.height - g_panelHeight;
+        if (y < 0)
+            y = 0;
+        const MyGUI::IntCoord want(x, y, g_panelWidth, g_panelHeight);
+        if (g_panel->getCoord() != want)
+            g_panel->setCoord(want);
+    }
+
+    void HideCraftPanel()
+    {
+        if (g_panelOwner == 2)
+        {
+            if (g_panel != NULL && g_panel->getVisible())
+                g_panel->setVisible(false);
+            g_panelOwner = 0;
+        }
+        g_craftFilled = false;
+    }
+
+    void CraftUpdate()
+    {
+        if (!g_craftCompare)
+        {
+            if (g_marks[0].set || g_marks[1].set)
+                ClearMarks();
+            HideCraftPanel();
+            return;
+        }
+
+        ManagementScreen* const screen = ManagementScreen::getSingleton();
+        if (screen == NULL || !screen->getVisible())
+        {
+            if (g_marks[0].set || g_marks[1].set)
+                ClearMarks();
+            HideCraftPanel();
+            return;
+        }
+
+        // ПКМ - по нажатию (переход «отпущена -> нажата»).
+        static HoldKey::Key rmb;
+        static bool rmbReady = false;
+        if (!rmbReady)
+        {
+            rmb.vk = VK_RBUTTON;
+            rmb.ctrl = rmb.shift = rmb.alt = false;
+            rmbReady = true;
+        }
+        static bool wasDown = false;
+        const bool down = HoldKey::Held(rmb);
+        if (down && !wasDown)
+            OnRightClick();
+        wasDown = down;
+
+        if (!g_marks[0].set && !g_marks[1].set)
+        {
+            HideCraftPanel();
+            return;
+        }
+
+        const DWORD now = GetTickCount();
+        if (now - g_craftCheckAt > 250)
+        {
+            g_craftCheckAt = now;
+            CheckGlows();
+        }
+
+        MyGUI::Widget* const list = g_craftList->get();
+        if (!g_marks[0].set || !g_marks[1].set || list == NULL || !list->getInheritedVisible())
+        {
+            HideCraftPanel();
+            return;
+        }
+
+        // Описание вещи сейчас занято панелью - ему и отдаём.
+        if (g_tipShown)
+        {
+            g_craftFilled = false;
+            return;
+        }
+
+        EnsurePanel();
+        if (!g_craftFilled || g_panelOwner != 2)
+        {
+            Comparison cmp;
+            Compare(g_marks[0].summary, g_marks[1].summary, cmp);
+            g_fillCraft = true;
+            Fill(g_marks[1].summary, &g_marks[0].summary, &cmp, "");
+            g_fillCraft = false;
+            g_panelOwner = 2;
+            g_craftFilled = true;
+            g_cachedNext = NULL;    // описанию вещи - заполнить заново
+        }
+        PlaceBeside(list);
+        if (!g_panel->getVisible())
+            g_panel->setVisible(true);
+    }
+
+    // ПКМ и подсветка трогают виджеты игры - сбой не должен ронять игру.
+    void SafeCraftUpdate()
+    {
+        __try
+        {
+            CraftUpdate();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static bool told = false;
+            if (!told)
+            {
+                told = true;
+                ErrorLog("GearCompare: crafting comparison failed once - skipped");
+            }
+        }
     }
 
 
@@ -1972,6 +2759,7 @@ namespace
     {
         g_origGuiUpdate(thisptr);
         Update();
+        SafeCraftUpdate();
     }
 }
 
@@ -1988,6 +2776,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "GearCompare", "Enabled", Tr("Enabled"), Tr("A panel with what is worn next to the item description."), 1, MCM_RESTART);
     api->hotkey(api, "GearCompare", "HoldKey", Tr("Show while held"), Tr("The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."), "ALT", 0);
     api->toggle(api, "GearCompare", "CompareEmptySlot", Tr("Compare with an empty slot"), Tr("On - compare with an empty slot too, Worn: nothing. Off - no panel when nothing suitable is worn."), 0, 0);
+    api->section(api, Tr("Crafting"));
+    api->toggle(api, "GearCompare", "CraftCompare", Tr("Compare recipes"), Tr("On the Crafting tab, right-click two lines of the Items list: the first is marked green (A), the second blue (B), and a panel compares them. Right-click a marked line to unmark it. Armour and limbs are compared at masterwork grade, weapons at the model of the line."), 1, 0);
     api->section(api, Tr("Total"));
     api->toggle(api, "GearCompare", "ShowTotal", Tr("Total percentage"), Tr("A total at the bottom of the panel: the main axis, plus a bonus for each better property, minus one for each worse property and for extra weight."), 0, 0);
     api->number(api, "GearCompare", "TotalPerProperty", Tr("Per property, %"), Tr("How many percent each property that got better adds to the total, and each one that got worse takes away."), 3.0f, 0.0f, 20.0f, 1, 0);
@@ -2050,6 +2840,17 @@ __declspec(dllexport) void startPlugin()
             ErrorLog(std::string("GearCompare: could not hook ") + hooks[i].name);
             return;
         }
+    }
+
+    // Станок вкладки «Ремесло» - для рецептов строк. UITweaks перехватывает
+    // ту же функцию; исходную зовём первой. Не вышло - строки узнаются по
+    // именам (FindRecipe), сравнение всё равно работает.
+    InitMarks();
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&ManagementScreen::setCraftingBench),
+            SetCraftingBench_hook, &g_origSetCraftingBench))
+    {
+        ErrorLog("GearCompare: could not hook the crafting tab, recipes are found by name");
     }
 
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(

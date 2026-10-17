@@ -188,6 +188,8 @@ $gcMod = "$KENSHI\mods\GearCompare"
 if (Test-Path $gcMod) {
     Copy-Item "$ROOT\ours\GearCompare\README.txt" $gcMod -Force
     Copy-Item "$ROOT\ours\GearCompare\locale" $gcMod -Recurse -Force
+    # Белая текстура подсветки строк ремесла (сравнение рецептов, 18.10.2026)
+    Copy-Item "$ROOT\ours\GearCompare\gui" $gcMod -Recurse -Force
     # ini игрока не раздаём и не трогаем: плагин сам создаёт его из
     # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
     Copy-Item "$ROOT\ours\GearCompare\GearCompare.ini" "$gcMod\GearCompare.defaults.ini" -Force

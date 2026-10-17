@@ -307,3 +307,21 @@ msgstr "Урон (за выстрел)"
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "Панель видна, только пока зажата эта клавиша. Щёлкните и нажмите клавишу; Backspace - без клавиши, панель видна всегда."
+
+msgid "Limb HP"
+msgstr "Прочность протеза"
+
+msgid "Unarmed damage"
+msgstr "Урон без оружия"
+
+msgid "B against A"
+msgstr "B против A"
+
+msgid "Crafting"
+msgstr "Ремесло"
+
+msgid "Compare recipes"
+msgstr "Сравнение рецептов"
+
+msgid "On the Crafting tab, right-click two lines of the Items list: the first is marked green (A), the second blue (B), and a panel compares them. Right-click a marked line to unmark it. Armour and limbs are compared at masterwork grade, weapons at the model of the line."
+msgstr "Во вкладке \"Ремесло\" нажмите ПКМ по двум строкам списка \"Предметы\": первая помечается зелёным (A), вторая синим (B), и рядом появляется панель сравнения. ПКМ по помеченной строке снимает пометку. Броня и протезы сравниваются в мастерском качестве, оружие - в модели из строки."

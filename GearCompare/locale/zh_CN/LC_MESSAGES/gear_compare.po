@@ -307,3 +307,21 @@ msgstr "伤害（每发）"
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "仅在按住此键时显示面板。点击后按下一个键；Backspace - 不设键，面板始终显示。"
+
+msgid "Limb HP"
+msgstr "义肢耐久"
+
+msgid "Unarmed damage"
+msgstr "徒手伤害"
+
+msgid "B against A"
+msgstr "B 对比 A"
+
+msgid "Crafting"
+msgstr "制作"
+
+msgid "Compare recipes"
+msgstr "比较配方"
+
+msgid "On the Crafting tab, right-click two lines of the Items list: the first is marked green (A), the second blue (B), and a panel compares them. Right-click a marked line to unmark it. Armour and limbs are compared at masterwork grade, weapons at the model of the line."
+msgstr "在\"制作\"页中，右键点击\"物品\"列表的两行：第一行标为绿色 (A)，第二行标为蓝色 (B)，旁边会出现比较面板。右键点击已标记的行可取消标记。护甲和义肢按大师级品质比较，武器按该行的型号比较。"
