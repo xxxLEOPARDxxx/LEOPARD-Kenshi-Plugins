@@ -59,6 +59,7 @@
 #include <Windows.h>
 #include <IniDefaults.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -89,6 +90,11 @@
 #include <mygui/MyGUI_TextBox.h>
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
+#include <mygui/MyGUI_RenderManager.h>
+
+#include <kenshi/PlayerInterface.h>
+#include <kenshi/RootObject.h>
+#include <WidgetRef.h>
 
 
 namespace
@@ -173,6 +179,11 @@ namespace
     // [RacialXP] HoldKey - блок виден, только пока клавиша зажата (как
     // GearCompare и AssignedWorkers). 0 - виден всегда.
     HoldKey::Key g_racialHoldKey;   // ALT; vk 0 - всегда (см. HoldKey.h)
+
+    // [RacialXP] Selected=0 - не показывать множители над именем
+    // выделенного персонажа в мире (18.10.2026); SelectedKey - клавиша.
+    bool g_showSelectedRacial = true;
+    HoldKey::Key g_selectedRacialKey;   // ALT; vk 0 - всегда
 
     const char* COLOUR_PLAIN = g_colourBracket;
     const char* COLOUR_PLUS  = g_colourPlus;
@@ -416,7 +427,8 @@ namespace
         fprintf(f, "\n; %s\n", Tr("Racial XP multipliers under the attributes: 1 shows them, 0 hides."));
         fprintf(f, "; %s\n", Tr("HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."));
         fprintf(f, "; %s\n", Tr("ShowRate: current XP rate after the skill name in the description: 1 shows it, 0 hides."));
-        fputs("[RacialXP]\nShow=1\nHoldKey=ALT\nShowRate=1\n", f);
+        fprintf(f, "; %s\n", Tr("Selected: racial XP multipliers above the name of the selected character in the world, while SelectedKey is held: 1 shows them, 0 hides."));
+        fputs("[RacialXP]\nShow=1\nHoldKey=ALT\nShowRate=1\nSelected=1\nSelectedKey=ALT\n", f);
 
         fclose(f);
     }
@@ -470,6 +482,14 @@ namespace
             GetPrivateProfileStringA("RacialXP", "HoldKey", "ALT", key,
                                      sizeof(key), ini.c_str());
             g_racialHoldKey = HoldKey::Parse(key);   // любая клавиша, «NONE» - всегда
+        }
+        g_showSelectedRacial = GetPrivateProfileIntA("RacialXP", "Selected", 1,
+                                                     ini.c_str()) != 0;
+        {
+            char key[32] = {};
+            GetPrivateProfileStringA("RacialXP", "SelectedKey", "ALT", key,
+                                     sizeof(key), ini.c_str());
+            g_selectedRacialKey = HoldKey::Parse(key);
         }
         g_debug = (GetPrivateProfileIntA("Debug", "Debug", 0,
                                          ini.c_str()) != 0);
@@ -2046,6 +2066,263 @@ namespace
     }
 
 
+    // ---------------------------------------------------------------
+    // Множители расы над именем выделенного (18.10.2026)
+    //
+    // Просьба пользователя: перед наймом выделить персонажа, зажать
+    // клавишу - и над плашкой с его именем видны множители опыта его
+    // расы, как в окне статов (рас в сборке много, все не упомнишь).
+    // Работает для любого выделенного персонажа - своего, чужого, зверя.
+    //
+    // Плашку игры не трогаем: панель - свой виджет над ней (приписку
+    // отношения фракции к той же плашке делает UITweaks). Плашку ищем,
+    // как UITweaks (NamePanel): виджет с именем на «NameText» - но с
+    // двумя надписями внутри (FindNamePlate); поиск не чаще раза в
+    // секунду, найденный - в WidgetRef. Строки пересобираются, только
+    // когда сменилась раса; место - каждый кадр от плашки (она
+    // выдвигается). Клавиша отпущена - за кадр одна проверка клавиши.
+    // ---------------------------------------------------------------
+
+    WidgetRef* g_namePanelRef = new WidgetRef();   // не удаляются: см. WidgetRef.h
+    DWORD g_namePanelSearchMs = 0;
+    WidgetRef* g_selPanelRef = new WidgetRef();
+    std::string g_selSignature;                    // что сейчас в панели
+
+    // Надписей внутри виджета (с вложенными), до limit.
+    int CountTexts(MyGUI::Widget* widget, int depth, int limit)
+    {
+        if (widget == NULL || depth > 5)
+            return 0;
+        int n = widget->castType<MyGUI::TextBox>(false) != NULL ? 1 : 0;
+        for (size_t i = 0; i < widget->getChildCount() && n < limit; ++i)
+            n += CountTexts(widget->getChildAt(i), depth + 1, limit - n);
+        return n;
+    }
+
+    // Плашка выделенного - виджет на «NameText» с именем и фракцией
+    // внутри (две надписи и больше). Подпись под портретом в панели
+    // отряда тоже кончается на «NameText», но это одна надпись: первая
+    // сборка (18.10.2026) нашла её и встала над портретами.
+    MyGUI::Widget* FindNamePlate(MyGUI::Widget* widget, int depth)
+    {
+        if (widget == NULL || depth > 12)
+            return NULL;
+        if (EndsWith(widget->getName(), "NameText") && CountTexts(widget, 0, 2) >= 2)
+            return widget;
+        for (size_t i = 0; i < widget->getChildCount(); ++i)
+            if (MyGUI::Widget* found = FindNamePlate(widget->getChildAt(i), depth + 1))
+                return found;
+        return NULL;
+    }
+
+    MyGUI::Widget* NamePanel()
+    {
+        if (MyGUI::Widget* cached = g_namePanelRef->get())
+            return cached;
+        const DWORD now = GetTickCount();
+        if (g_namePanelSearchMs != 0 && now - g_namePanelSearchMs < 1000)
+            return NULL;                // ищем не чаще раза в секунду
+        g_namePanelSearchMs = now;
+        MyGUI::Gui* gui = MyGUI::Gui::getInstancePtr();
+        if (gui == NULL)
+            return NULL;
+        MyGUI::EnumeratorWidgetPtr roots = gui->getEnumerator();
+        while (roots.next())
+        {
+            if (MyGUI::Widget* found = FindNamePlate(roots.current(), 0))
+            {
+                g_namePanelRef->set(found);
+                if (g_debug)
+                    DebugLog(("StatColours: name plate found: " + found->getName()).c_str());
+                return found;
+            }
+        }
+        return NULL;
+    }
+
+    void HideSelectedRacial()
+    {
+        if (MyGUI::Widget* const panel = g_selPanelRef->get())
+            if (panel->getVisible())
+                panel->setVisible(false);
+    }
+
+    MyGUI::TextBox* PanelText(MyGUI::Widget* panel, MyGUI::Align align, const MyGUI::Colour& colour,
+                              const std::string& caption)
+    {
+        MyGUI::TextBox* const box = panel->createWidget<MyGUI::TextBox>(
+            "Kenshi_TextboxStandardText", MyGUI::IntCoord(0, 0, 10, 10), MyGUI::Align::Default, "");
+        box->setNeedMouseFocus(false);
+        box->setNeedKeyFocus(false);
+        box->setTextAlign(align | MyGUI::Align::VCenter);
+        box->setTextColour(colour);
+        box->setCaption(caption);
+        return box;
+    }
+
+    // Строки панели для расы: пересобираются только при смене расы.
+    void BuildSelectedRacial(MyGUI::Widget* panel, RaceData* race)
+    {
+        while (panel->getChildCount() > 0)
+            MyGUI::Gui::getInstance().destroyWidget(panel->getChildAt(0));
+
+        // Строки - те же, что в окне статов: множители, отличные от x1.
+        std::vector<RacialRow> rows;
+        for (int i = 0; i < RACIAL_COUNT; ++i)
+        {
+            const float mult = race->getStatMod(RACIAL_STATS[i]);
+            if (mult <= 0.001f || std::fabs(mult - 1.0f) < 0.005f)
+                continue;
+            CharacterStatsWindow::Stat* const entry = CharacterStatsWindow::getStat(RACIAL_STATS[i]);
+            RacialRow row;
+            row.name = entry != NULL && !entry->name.empty()
+                ? entry->name : CharStats::getStatName(RACIAL_STATS[i]);
+            row.mult = mult;
+            rows.push_back(row);
+        }
+
+        const int pad = 10;
+        const int gap = 18;
+        const std::string raceName = race->data != NULL ? race->data->name : std::string();
+        MyGUI::TextBox* const title = PanelText(panel, MyGUI::Align::Left, g_labelColour,
+            std::string(Tr("XP MULTIPLIERS")) + (raceName.empty() ? "" : ": " + raceName));
+        const int rowHeight = title->getFontHeight() + 3;
+
+        // Ширина - по самому длинному тексту: имя расы и названия навыков
+        // целиком (первая сборка резала заголовок по ширине плашки).
+        std::vector<MyGUI::TextBox*> names;
+        std::vector<MyGUI::TextBox*> values;
+        int columnWidth = 0;
+        for (size_t i = 0; i < rows.size(); ++i)
+        {
+            MyGUI::TextBox* const name = PanelText(panel, MyGUI::Align::Left, g_labelColour, rows[i].name);
+            MyGUI::TextBox* const value = PanelText(panel, MyGUI::Align::Right,
+                rows[i].mult > 1.0f ? g_plusColour : g_minusColour, DecimalText("x%.2f", rows[i].mult));
+            names.push_back(name);
+            values.push_back(value);
+            columnWidth = std::max(columnWidth, name->getTextSize().width + 12 + value->getTextSize().width);
+        }
+        if (rows.empty())
+        {
+            MyGUI::TextBox* const none = PanelText(panel, MyGUI::Align::Left, g_labelColour, Tr("all x1"));
+            names.push_back(none);
+            columnWidth = none->getTextSize().width;
+        }
+
+        // Две колонки, если строк много: столбик в три десятка строк над
+        // плашкой ушёл бы за верх экрана.
+        const int columns = rows.size() > 12 ? 2 : 1;
+        const int count = static_cast<int>(names.size());
+        const int perColumn = (count + columns - 1) / columns;
+        const int inner = std::max(title->getTextSize().width, columnWidth * columns + gap * (columns - 1));
+        if (columns == 1)
+            columnWidth = inner;
+        title->setCoord(pad, pad, inner, rowHeight);
+
+        const int top = pad + rowHeight + 4;
+        for (int i = 0; i < count; ++i)
+        {
+            const int x = pad + (i / perColumn) * (columnWidth + gap);
+            const int y = top + (i % perColumn) * rowHeight;
+            names[i]->setCoord(x, y, columnWidth, rowHeight);
+            if (i < static_cast<int>(values.size()))
+                values[i]->setCoord(x, y, columnWidth, rowHeight);
+        }
+        panel->setSize(inner + pad * 2, top + perColumn * rowHeight + pad);
+
+        if (g_debug)
+        {
+            char note[128];
+            sprintf_s(note, "StatColours: selected racial panel - %u multipliers, %d columns",
+                      static_cast<unsigned>(rows.size()), columns);
+            DebugLog(std::string(note) + ", race '" + raceName + "'");
+        }
+    }
+
+    void UpdateSelectedRacial()
+    {
+        if (!g_showSelectedRacial || ou == NULL || ou->player == NULL ||
+            (g_selectedRacialKey.vk != 0 && !HoldKey::Held(g_selectedRacialKey)))
+        {
+            HideSelectedRacial();
+            return;
+        }
+
+        RootObject* const selected = ou->player->selectedObject.getRootObject();
+        RaceData* const race = selected != NULL && selected->getDataType() == CHARACTER
+            ? selected->getRace() : NULL;
+        MyGUI::Widget* const plate = race != NULL ? NamePanel() : NULL;
+        if (plate == NULL || !plate->getInheritedVisible())
+        {
+            HideSelectedRacial();
+            return;
+        }
+
+        // Плашка на экране - интерфейс давно в работе, палитру спросить можно.
+        ResolveThemeColours();
+
+        MyGUI::Widget* panel = g_selPanelRef->get();
+        if (panel == NULL)
+        {
+            panel = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
+                "Kenshi_FloatingPanelSkin", MyGUI::IntCoord(0, 0, 100, 100),
+                MyGUI::Align::Default, "ToolTip", "StatColours_SelectedRacial");
+            if (panel == NULL)
+                return;
+            panel->setNeedMouseFocus(false);
+            panel->setNeedKeyFocus(false);
+            g_selPanelRef->set(panel);
+            g_selSignature.clear();
+        }
+
+        char signature[32];
+        sprintf_s(signature, "%p", static_cast<void*>(race));
+        if (g_selSignature != signature)
+        {
+            BuildSelectedRacial(panel, race);
+            g_selSignature = signature;
+        }
+
+        // Место - каждый кадр от плашки: она выдвигается вместе с панелью
+        // выделенного (кнопка со стрелкой), панель едет за ней.
+        const MyGUI::IntCoord pc = plate->getAbsoluteCoord();
+        const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
+        // Сдвиг на глаз пользователя (18.10.2026): на 4 px левее и на 14 px
+        // выше плашки - так ровно с её рамкой. За левый край экрана пускаем:
+        // рамки панелей игры у края тоже заходят за него.
+        int left = pc.left - 4;
+        if (left + panel->getWidth() > view.width)
+            left = view.width - panel->getWidth();
+        int top = pc.top - panel->getHeight() - 18;
+        if (top < 0)
+            top = 0;
+        const MyGUI::IntPoint want(left < -8 ? -8 : left, top);
+        if (panel->getPosition() != want)
+            panel->setPosition(want);
+        if (!panel->getVisible())
+            panel->setVisible(true);
+    }
+
+    // Панель - украшение: сбой не должен ронять игру.
+    void SafeSelectedRacial()
+    {
+        __try
+        {
+            UpdateSelectedRacial();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static bool told = false;
+            if (!told)
+            {
+                told = true;
+                ErrorLog("StatColours: the selected character's racial panel failed once - skipped");
+            }
+            g_selSignature.clear();
+        }
+    }
+
+
     void (*g_origMainLoop)(GameWorld* thisptr, float time) = NULL;
 
     void MainLoop_hook(GameWorld* thisptr, float time)
@@ -2054,6 +2331,8 @@ namespace
 
         if (!gui)
             return;
+
+        SafeSelectedRacial();
 
         Ogre::vector<CharacterStatsWindow*>::type& windows =
             gui->characterStatsWindows;
@@ -2101,6 +2380,7 @@ static void __cdecl McmReload()
     LoadColours();
     g_themeResolved = false;
     g_described.clear();
+    g_selSignature.clear();     // панель над именем - новыми цветами
 }
 extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 {
@@ -2112,6 +2392,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Racial XP"));
     api->toggle(api, "RacialXP", "Show", Tr("Racial XP multipliers"), Tr("Racial XP multipliers under the attributes in the character window."), 1, 0);
     api->hotkey(api, "RacialXP", "HoldKey", Tr("Show while held"), Tr("The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."), "ALT", 0);
+    api->toggle(api, "RacialXP", "Selected", Tr("Above the selected character"), Tr("Racial XP multipliers above the name of the selected character in the world - anyone: a recruit, a trader, your own. Handy before recruiting."), 1, 0);
+    api->hotkey(api, "RacialXP", "SelectedKey", Tr("Key above the name"), Tr("The multipliers above the name are shown only while this key is held. Backspace - no key, always shown."), "ALT", 0);
     api->toggle(api, "RacialXP", "ShowRate", Tr("Current XP rate"), Tr("The current XP rate in brackets after the skill name in the skill description."), 1, 0);
     api->section(api, Tr("Colours"));
     api->toggle(api, "Colours", "UseGameTheme", Tr("Colours from the interface theme"), Tr("auto colours below are taken from the game palette, kenshi_colours.xml, and follow an interface mod over it. Off - built-in colours."), 1, 0);

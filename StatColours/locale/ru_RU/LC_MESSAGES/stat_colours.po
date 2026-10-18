@@ -214,3 +214,21 @@ msgstr "0 отключает плагин целиком (после перез�
 
 msgid "Combat stance"
 msgstr "Боевая стойка"
+
+msgid "Selected: racial XP multipliers above the name of the selected character in the world, while SelectedKey is held: 1 shows them, 0 hides."
+msgstr "Selected: множители опыта расы над именем выделенного персонажа в мире, пока зажата клавиша SelectedKey: 1 - показывать, 0 - нет."
+
+msgid "Above the selected character"
+msgstr "Над выделенным персонажем"
+
+msgid "Racial XP multipliers above the name of the selected character in the world - anyone: a recruit, a trader, your own. Handy before recruiting."
+msgstr "Множители опыта расы над именем выделенного персонажа в мире - любого: кандидата в найм, торговца, своего. Удобно перед наймом."
+
+msgid "Key above the name"
+msgstr "Клавиша над именем"
+
+msgid "The multipliers above the name are shown only while this key is held. Backspace - no key, always shown."
+msgstr "Множители над именем видны, только пока зажата эта клавиша. Backspace - без клавиши, видны всегда."
+
+msgid "all x1"
+msgstr "все x1"
