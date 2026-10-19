@@ -1273,13 +1273,25 @@ namespace
                     const float result = stats->getStat(stat, false);
                     const float gap = result - stats->getStat(stat, true) * factor;
                     const float tolerance = std::max(1.5f, fabsf(result) * 0.005f * percentRows);
-                    const int missing = fabsf(gap) >= tolerance ? Rounded(gap) : 0;
+                    // Процентом, как строки самой игры (Discord, 19.10.2026:
+                    // «на скрытность - процентные, разве нет?»): штрафы
+                    // скрытности одежды - множители (x0,90, x0,40), и строка
+                    // перемножается с остальными в «Всего».
+                    const float expected = stats->getStat(stat, true) * factor;
+                    int missing = 0;
+                    if (fabsf(gap) >= tolerance && expected > 0.01f)
+                        missing = Rounded((result / expected - 1.0f) * 100.0f);
                     const bool addMissing = game.size() >= 2 && missing != 0;
                     const size_t limit = static_cast<size_t>(room) - (addMissing ? 1 : 0);
                     for (size_t i = 0; i + 1 < game.size() && g_describedRows.size() < limit - 1; ++i)
                         g_describedRows.push_back(game[i]);
                     if (addMissing)
-                        AddRow("Equipment and other", missing);
+                    {
+                        char number[32];
+                        sprintf_s(number, "%+d%%", missing);
+                        g_describedRows.push_back(std::make_pair(
+                            std::string(Tr("Equipment and other")) + ":", std::string(number)));
+                    }
                     if (!game.empty())
                         g_describedRows.push_back(game.back());
 
