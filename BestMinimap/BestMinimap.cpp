@@ -188,6 +188,15 @@ namespace
     bool g_mapMarkers = true;
     bool g_wanted = true;
     bool g_pinToEdge = true;
+    bool g_alert = true;                // оповещение: нашего персонажа атакуют
+    unsigned g_alertColour = 0xFFFF3B30u;
+    int g_alertSeconds = 8;             // сколько держится метка после последней атаки
+    bool g_alertMessage = true;         // ещё и сообщение игры
+    bool g_alertFlash = true;           // рамка мигает цветом тревоги
+    bool g_camRange = true;             // круг: докуда долетает камера
+    int g_camRangeSet = 0;              // метров; 0 - узнаём сами (см. LearnCameraRange)
+    float g_camRangeLearned = 0.0f;
+    unsigned g_camRangeColour = 0xFFE8E2D0u;
     int g_maxSource = 4096;
     bool g_swapRB = false;
     bool g_debug = false;
@@ -289,6 +298,17 @@ namespace
         g_mapMarkers = ReadBool(ini, "MapMarkers", true);
         g_wanted = ReadBool(ini, "WantedMarkers", true);
         g_pinToEdge = ReadBool(ini, "PinToEdge", true);
+
+        bool unused = false;
+        g_alert = ReadBool(ini, "AttackAlert", true);
+        ReadColour(ini, "AlertColour", "#FF3B30", unused, g_alertColour);
+        g_alertSeconds = ReadInt(ini, "AlertSeconds", 8, 2, 120);
+        g_alertMessage = ReadBool(ini, "AlertMessage", true);
+        g_alertFlash = ReadBool(ini, "AlertFlashFrame", true);
+        g_camRange = ReadBool(ini, "ShowCameraRange", true);
+        g_camRangeSet = ReadInt(ini, "CameraRange", 0, 0, 50000);
+        g_camRangeLearned = static_cast<float>(ReadInt(ini, "CameraRangeLearned", 0, 0, 50000));
+        ReadColour(ini, "CameraRangeColour", "#E8E2D0", unused, g_camRangeColour);
 
         g_keyToggle = HoldKey::Parse(ReadText(ini, "KeyToggle", "CTRL+M"));
         g_keyZoomIn = HoldKey::Parse(ReadText(ini, "KeyZoomIn", "="));
@@ -867,6 +887,134 @@ namespace
 
 
     // ---------------------------------------------------------------
+    // Тревога: нашего персонажа атакуют
+    // ---------------------------------------------------------------
+
+    // Атакуют - если у персонажа есть нападающие (getAllAttackersCount, как
+    // в Formations). Опрос 4 раза в секунду по своим персонажам, без хуков:
+    // своих - десятки, а хук на удар пришлось бы ставить на ближний бой,
+    // стрельбу и прочее по отдельности. Метка держится AlertSeconds после
+    // последней атаки, чтобы не мигала между ударами.
+    //
+    // Указатель на персонажа - только ключ: разыменовываем лишь тех, кто
+    // сейчас в списке игры; позиция запоминается, и ушедший из загрузки
+    // персонаж остаётся меткой там, где его атаковали.
+    struct Alert
+    {
+        Ogre::Vector3 pos;
+        DWORD last;
+    };
+
+    std::map<Character*, Alert> g_alerts;
+    DWORD g_alertScan = 0;
+    DWORD g_lastMessage = 0;
+    std::vector<std::string> g_alertNames;  // ещё не объявленные в сообщении
+
+    void ScanAttacks(DWORD now)
+    {
+        if (!g_alert)
+        {
+            g_alerts.clear();
+            g_alertNames.clear();
+            return;
+        }
+        if (now - g_alertScan < 250)
+            return;
+        g_alertScan = now;
+        const DWORD hold = static_cast<DWORD>(g_alertSeconds) * 1000;
+        const lektor<Character*>& mine = ou->player->playerCharacters;
+        for (uint32_t i = 0; i < mine.size(); ++i)
+        {
+            Character* const c = mine[i];
+            if (c == NULL || c->isDead() || c->getAllAttackersCount() <= 0)
+                continue;
+            std::map<Character*, Alert>::iterator it = g_alerts.find(c);
+            if (it == g_alerts.end() || now - it->second.last > hold)
+                g_alertNames.push_back(c->getName());   // новая тревога
+            Alert& a = g_alerts[c];
+            a.pos = c->getPosition();
+            a.last = now;
+        }
+        for (std::map<Character*, Alert>::iterator it = g_alerts.begin(); it != g_alerts.end();)
+        {
+            if (now - it->second.last > hold)
+                g_alerts.erase(it++);
+            else
+                ++it;
+        }
+        // Сообщение игры - не чаще раза в 3 с, всех новых разом: в большой
+        // драке иначе выйдет по строке на каждого.
+        if (!g_alertNames.empty() && now - g_lastMessage >= 3000)
+        {
+            if (g_alertMessage)
+            {
+                std::string text = Tr("Under attack: ");
+                for (size_t i = 0; i < g_alertNames.size() && i < 4; ++i)
+                    text += (i > 0 ? ", " : "") + g_alertNames[i];
+                if (g_alertNames.size() > 4)
+                    text += ", ...";
+                ou->showPlayerAMessage(text, false);
+            }
+            g_alertNames.clear();
+            g_lastMessage = now;
+        }
+    }
+
+
+    // ---------------------------------------------------------------
+    // Докуда долетает камера
+    // ---------------------------------------------------------------
+
+    // Игра держит камеру рядом со своими персонажами (CameraClass::
+    // restrictPosition), но сам предел в заголовках KenshiLib не виден.
+    // Поэтому CameraRange=0 - узнаём его сами: самое большое расстояние от
+    // центра камеры до ближайшего своего персонажа, какое удалось увидеть.
+    // Отвели камеру до упора - предел записан (CameraRangeLearned в ini).
+    // В свободной камере не учимся: там предела нет.
+    DWORD g_camLearnSaved = 0;
+    float g_camLearnSavedValue = 0.0f;
+
+    float CameraRange()
+    {
+        return g_camRangeSet > 0 ? static_cast<float>(g_camRangeSet) : g_camRangeLearned;
+    }
+
+    DWORD g_camLearnAt = 0;
+
+    void LearnCameraRange(DWORD now)
+    {
+        if (g_camRangeSet > 0 || !g_camRange || now - g_camLearnAt < 250)
+            return;
+        g_camLearnAt = now;
+        CameraClass* const cam = ou->player->camera;
+        if (cam == NULL || cam->isFreeCameraMode())
+            return;
+        const Ogre::Vector3 c = ou->getCameraCenter();
+        const lektor<Character*>& mine = ou->player->playerCharacters;
+        float best = -1.0f;
+        for (uint32_t i = 0; i < mine.size(); ++i)
+        {
+            Character* const ch = mine[i];
+            if (ch == NULL || ch->isDead())
+                continue;
+            const Ogre::Vector3 p = ch->getPosition();
+            const float d = std::sqrt((p.x - c.x) * (p.x - c.x) + (p.z - c.z) * (p.z - c.z));
+            if (best < 0.0f || d < best)
+                best = d;
+        }
+        if (best > g_camRangeLearned && best < 50000.0f)
+            g_camRangeLearned = best;
+        // В ini - когда выросло хотя бы на 10 м и не чаще раза в 5 с.
+        if (g_camRangeLearned >= g_camLearnSavedValue + 10.0f && now - g_camLearnSaved >= 5000)
+        {
+            g_camLearnSaved = now;
+            g_camLearnSavedValue = g_camRangeLearned;
+            WriteInt("CameraRangeLearned", static_cast<int>(g_camRangeLearned + 0.5f));
+        }
+    }
+
+
+    // ---------------------------------------------------------------
     // Виджеты и текстура
     // ---------------------------------------------------------------
 
@@ -1239,11 +1387,11 @@ namespace
     }
 
     // Метку за краем прижимаем к краю (PinToEdge) или пропускаем.
-    bool PlacePin(float& x, float& y, float inset)
+    bool PlacePin(float& x, float& y, float inset, bool force = false)
     {
         if (InsideShape(x, y, g_viewW, g_viewH, inset) > 0.5f)
             return true;
-        if (!g_pinToEdge)
+        if (!g_pinToEdge && !force)
             return false;
         const float cx = g_viewW * 0.5f, cy = g_viewH * 0.5f;
         float dx = x - cx, dy = y - cy;
@@ -1265,6 +1413,92 @@ namespace
             y = cy + dy * k;
         }
         return true;
+    }
+
+    // Кольцо толщиной thick (со сглаживанием), обрезанное по форме карты.
+    void DrawRing(float cx, float cy, float r, float thick, unsigned colour, float alpha)
+    {
+        const float outer = r + thick * 0.5f + 1.0f;
+        const int x0 = Hi(0, static_cast<int>(cx - outer)), x1 = Lo(g_viewW - 1, static_cast<int>(cx + outer));
+        const int y0 = Hi(0, static_cast<int>(cy - outer)), y1 = Lo(g_viewH - 1, static_cast<int>(cy + outer));
+        for (int y = y0; y <= y1; ++y)
+            for (int x = x0; x <= x1; ++x)
+            {
+                const float fx = x + 0.5f - cx, fy = y + 0.5f - cy;
+                const float d = std::sqrt(fx * fx + fy * fy);
+                const float cover = Clamp(thick * 0.5f + 0.5f - std::fabs(d - r), 0.0f, 1.0f);
+                if (cover <= 0.0f)
+                    continue;
+                const size_t i = static_cast<size_t>(y) * g_viewW + x;
+                g_buf[i] = Blend(g_buf[i], colour, cover * alpha * (g_mask[i] / 255.0f));
+            }
+    }
+
+    // Граница области, докуда долетает камера: объединение кругов радиусом
+    // CameraRange вокруг своих персонажей - рисуем только те точки круга,
+    // что не лежат внутри другого круга. Окружность - точками по углу: так
+    // дешевле, чем считать расстояние до всех центров в каждом пикселе.
+    void DrawCameraRange(const std::vector<Ogre::Vector3>& centresWorld, float pxPerMetre,
+                         void (*toScreen)(const Ogre::Vector3&, float&, float&))
+    {
+        const float range = CameraRange();
+        if (!g_camRange || range < 20.0f || centresWorld.empty())
+            return;
+        const float r = range * pxPerMetre;
+        if (r < 3.0f)
+            return;
+        // Центры на экране; почти совпадающие (отряд в куче) - один раз.
+        std::vector<float> cx, cy;
+        for (size_t i = 0; i < centresWorld.size(); ++i)
+        {
+            float x, y;
+            toScreen(centresWorld[i], x, y);
+            bool dup = false;
+            for (size_t j = 0; j < cx.size() && !dup; ++j)
+                dup = std::fabs(cx[j] - x) < 1.5f && std::fabs(cy[j] - y) < 1.5f;
+            if (!dup)
+            {
+                cx.push_back(x);
+                cy.push_back(y);
+            }
+        }
+        const float w = static_cast<float>(g_viewW), h = static_cast<float>(g_viewH);
+        const float r2in = (r - 0.75f) * (r - 0.75f);
+        const int steps = Clamp(static_cast<int>(6.2832f * r * 1.5f), 32, 40000);
+        for (size_t i = 0; i < cx.size(); ++i)
+        {
+            // Круг целиком мимо миникарты - пропускаем.
+            if (cx[i] + r < -2 || cy[i] + r < -2 || cx[i] - r > w + 2 || cy[i] - r > h + 2)
+                continue;
+            for (int k = 0; k < steps; ++k)
+            {
+                const float a = 6.2832f * k / steps;
+                const float x = cx[i] + r * std::cos(a), y = cy[i] + r * std::sin(a);
+                if (x < -1 || y < -1 || x > w + 1 || y > h + 1)
+                    continue;
+                bool inside = false;
+                for (size_t j = 0; j < cx.size() && !inside; ++j)
+                    if (j != i)
+                        inside = (x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]) < r2in;
+                if (inside)
+                    continue;
+                const int px = static_cast<int>(x), py = static_cast<int>(y);
+                if (px < 0 || py < 0 || px >= g_viewW || py >= g_viewH)
+                    continue;
+                const size_t idx = static_cast<size_t>(py) * g_viewW + px;
+                g_buf[idx] = Blend(g_buf[idx], g_camRangeColour, 0.7f * (g_mask[idx] / 255.0f));
+            }
+        }
+    }
+
+    // Для DrawCameraRange: мир -> экран текущего вида (вид живёт на время Render).
+    const void* g_renderView = NULL;
+    void WorldToScreenCb(const Ogre::Vector3& p, float& x, float& y)
+    {
+        const View& v = *static_cast<const View*>(g_renderView);
+        double u, vv;
+        g_map.apply(p.x, p.z, u, vv);
+        ToScreen(v, u, vv, x, y);
     }
 
     std::vector<Dot> g_dots;
@@ -1379,6 +1613,19 @@ namespace
             }
         }
 
+        // --- граница полёта камеры ---
+        if (g_camRange)
+        {
+            std::vector<Ogre::Vector3> mineAlive;
+            const lektor<Character*>& mine = ou->player->playerCharacters;
+            for (uint32_t i = 0; i < mine.size(); ++i)
+                if (mine[i] != NULL && !mine[i]->isDead())
+                    mineAlive.push_back(mine[i]->getPosition());
+            g_renderView = &v;
+            DrawCameraRange(mineAlive, static_cast<float>(pxPerMetre / v.scale), &WorldToScreenCb);
+            g_renderView = NULL;
+        }
+
         // --- персонажи ---
         const float reach = static_cast<float>(g_range * (g_shape == SHAPE_RECT ? 1.8 : 1.5));
         CollectDots(g_dots, center, reach, now);
@@ -1401,6 +1648,23 @@ namespace
                 DrawDisc(x, y, r, d.colour, outline, d.dead ? 0.45f : 1.0f);
             }
 
+        // --- тревога: наших атакуют ---
+        // Пульсирующее кольцо на месте атаки; за краем - у края, всегда
+        // (это важнее настройки PinToEdge).
+        const float pulse = 0.5f + 0.5f * std::sin(now * 0.008f);
+        if (g_alert)
+            for (std::map<Character*, Alert>::const_iterator it = g_alerts.begin(); it != g_alerts.end(); ++it)
+            {
+                double u, vv;
+                g_map.apply(it->second.pos.x, it->second.pos.z, u, vv);
+                float x, y;
+                ToScreen(v, u, vv, x, y);
+                const float r = g_dot * 0.8f + 4.0f + 3.0f * pulse;
+                PlacePin(x, y, frameW + r + 2.0f, true);
+                DrawRing(x, y, r, 2.2f, dark, 0.8f);
+                DrawRing(x, y, r, 1.6f, g_alertColour, 1.0f);
+            }
+
         // --- куда смотрит камера ---
         if (g_showView)
         {
@@ -1414,11 +1678,15 @@ namespace
         }
 
         // --- рамка ---
-        if (g_frame == FRAME_LINE || (g_frame == FRAME_GAME && g_shape == SHAPE_CIRCLE))
+        // Пока идёт тревога - рамка мигает её цветом (и без рамки тоже).
+        const bool flash = g_alert && g_alertFlash && !g_alerts.empty();
+        if (flash || g_frame == FRAME_LINE || (g_frame == FRAME_GAME && g_shape == SHAPE_CIRCLE))
         {
             unsigned fc = g_frameColour;
             if (g_frameAuto)
                 fc = FromColour(GameTheme::Colour("Main", "#AFA68B"));
+            if (flash)
+                fc = Blend(fc | 0xFF000000u, g_alertColour, 0.35f + 0.65f * pulse);
             for (int y = 0; y < h; ++y)
                 for (int x = 0; x < w; ++x)
                 {
@@ -1581,6 +1849,10 @@ namespace
         if (ou == NULL || ou->player == NULL)
             return Hide("no game world");
         PollKeys(now);
+        // Тревога и учёт предела камеры - и при скрытой миникарте: сообщение
+        // игры об атаке нужно и без неё.
+        ScanAttacks(now);
+        LearnCameraRange(now);
         if (!g_visible)
             return Hide("switched off by the key (Visible=0)");
         MapScreen* const map = GetMapScreen();
@@ -1719,6 +1991,18 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "MapMarkers", Tr("Map-markers markers"), Tr("Markers of the Map-markers mod, from the current save."), 1, 0);
     api->toggle(api, kSec, "WantedMarkers", Tr("WantedMap targets"), Tr("Targets of the WantedMap mod, as of the last look at the big map."), 1, 0);
     api->toggle(api, kSec, "PinToEdge", Tr("Pin to the edge"), Tr("Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."), 1, 0);
+
+    api->section(api, Tr("Attack alert"));
+    api->toggle(api, kSec, "AttackAlert", Tr("Alert when your people are attacked"), Tr("A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."), 1, 0);
+    api->colour(api, kSec, "AlertColour", Tr("Alert colour"), NULL, "#FF3B30", 0);
+    api->integer(api, kSec, "AlertSeconds", Tr("Alert lasts, s"), Tr("How long the ring stays after the last attack."), 8, 2, 120, 0);
+    api->toggle(api, kSec, "AlertMessage", Tr("Message in the game"), Tr("Under attack: and the names - in the game's message line, at most once in 3 seconds."), 1, 0);
+    api->toggle(api, kSec, "AlertFlashFrame", Tr("Flash the frame"), Tr("While someone is attacked the frame of the minimap blinks in the alert colour."), 1, 0);
+
+    api->section(api, Tr("Camera range"));
+    api->toggle(api, kSec, "ShowCameraRange", Tr("Show how far the camera can go"), Tr("A thin line around your characters: the camera cannot be moved farther."), 1, 0);
+    api->integer(api, kSec, "CameraRange", Tr("Camera range, m"), Tr("0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."), 0, 0, 50000, 0);
+    api->colour(api, kSec, "CameraRangeColour", Tr("Camera line colour"), NULL, "#E8E2D0", 0);
 
     // Подписи цветов - свои, не те же, что у переключателей выше: панель
     // настроек игры различает строки по подписи, и одноимённые строки

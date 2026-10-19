@@ -226,3 +226,54 @@ msgstr "Цвет животных"
 
 msgid "The rectangle is 16:10, its width is the Size."
 msgstr "Прямоугольник - 16:10, его ширина - это \"Размер\"."
+
+msgid "Attack alert"
+msgstr "Тревога"
+
+msgid "Alert when your people are attacked"
+msgstr "Тревога, когда атакуют ваших"
+
+msgid "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+msgstr "Пульсирующее кольцо на миникарте там, где атакуют персонажа вашей фракции; за пределами обзора - у края, в его сторону."
+
+msgid "Alert colour"
+msgstr "Цвет тревоги"
+
+msgid "Alert lasts, s"
+msgstr "Тревога держится, с"
+
+msgid "How long the ring stays after the last attack."
+msgstr "Сколько кольцо держится после последней атаки."
+
+msgid "Message in the game"
+msgstr "Сообщение в игре"
+
+msgid "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+msgstr "\"Под атакой:\" и имена - в строке сообщений игры, не чаще раза в 3 секунды."
+
+msgid "Flash the frame"
+msgstr "Мигать рамкой"
+
+msgid "While someone is attacked the frame of the minimap blinks in the alert colour."
+msgstr "Пока кого-то атакуют, рамка миникарты мигает цветом тревоги."
+
+msgid "Camera range"
+msgstr "Дальность камеры"
+
+msgid "Show how far the camera can go"
+msgstr "Показывать, докуда долетает камера"
+
+msgid "A thin line around your characters: the camera cannot be moved farther."
+msgstr "Тонкая линия вокруг ваших персонажей: дальше неё камеру не отвести."
+
+msgid "Camera range, m"
+msgstr "Дальность камеры, м"
+
+msgid "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+msgstr "0 - узнаётся само: один раз отведите камеру от своих до упора, и линия встанет на это расстояние."
+
+msgid "Camera line colour"
+msgstr "Цвет линии камеры"
+
+msgid "Under attack: "
+msgstr "Под атакой: "

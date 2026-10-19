@@ -226,3 +226,54 @@ msgstr "动物颜色"
 
 msgid "The rectangle is 16:10, its width is the Size."
 msgstr "矩形为 16:10，宽度即“大小”。"
+
+msgid "Attack alert"
+msgstr "遇袭警报"
+
+msgid "Alert when your people are attacked"
+msgstr "己方遇袭时警报"
+
+msgid "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+msgstr "己方角色遇袭时，小地图上该位置出现脉动圆环；超出范围时显示在边缘并指示方向。"
+
+msgid "Alert colour"
+msgstr "警报颜色"
+
+msgid "Alert lasts, s"
+msgstr "警报持续（秒）"
+
+msgid "How long the ring stays after the last attack."
+msgstr "最后一次攻击后圆环保留的时间。"
+
+msgid "Message in the game"
+msgstr "游戏内消息"
+
+msgid "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+msgstr "在游戏消息栏显示“遭受攻击：”及名字，最多每 3 秒一次。"
+
+msgid "Flash the frame"
+msgstr "边框闪烁"
+
+msgid "While someone is attacked the frame of the minimap blinks in the alert colour."
+msgstr "有人遇袭时，小地图边框以警报颜色闪烁。"
+
+msgid "Camera range"
+msgstr "镜头范围"
+
+msgid "Show how far the camera can go"
+msgstr "显示镜头可移动的范围"
+
+msgid "A thin line around your characters: the camera cannot be moved farther."
+msgstr "你的角色周围的细线：镜头无法移出此范围。"
+
+msgid "Camera range, m"
+msgstr "镜头范围（米）"
+
+msgid "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+msgstr "0 - 自动获取：将镜头从你的角色处移到最远一次，线条就会采用该距离。"
+
+msgid "Camera line colour"
+msgstr "镜头线颜色"
+
+msgid "Under attack: "
+msgstr "遭受攻击："

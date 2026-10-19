@@ -226,3 +226,54 @@ msgstr "Animals colour"
 
 msgid "The rectangle is 16:10, its width is the Size."
 msgstr "The rectangle is 16:10, its width is the Size."
+
+msgid "Attack alert"
+msgstr "Attack alert"
+
+msgid "Alert when your people are attacked"
+msgstr "Alert when your people are attacked"
+
+msgid "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+msgstr "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+
+msgid "Alert colour"
+msgstr "Alert colour"
+
+msgid "Alert lasts, s"
+msgstr "Alert lasts, s"
+
+msgid "How long the ring stays after the last attack."
+msgstr "How long the ring stays after the last attack."
+
+msgid "Message in the game"
+msgstr "Message in the game"
+
+msgid "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+msgstr "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+
+msgid "Flash the frame"
+msgstr "Flash the frame"
+
+msgid "While someone is attacked the frame of the minimap blinks in the alert colour."
+msgstr "While someone is attacked the frame of the minimap blinks in the alert colour."
+
+msgid "Camera range"
+msgstr "Camera range"
+
+msgid "Show how far the camera can go"
+msgstr "Show how far the camera can go"
+
+msgid "A thin line around your characters: the camera cannot be moved farther."
+msgstr "A thin line around your characters: the camera cannot be moved farther."
+
+msgid "Camera range, m"
+msgstr "Camera range, m"
+
+msgid "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+msgstr "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+
+msgid "Camera line colour"
+msgstr "Camera line colour"
+
+msgid "Under attack: "
+msgstr "Under attack: "
