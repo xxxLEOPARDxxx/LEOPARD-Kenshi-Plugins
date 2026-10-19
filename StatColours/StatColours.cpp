@@ -1213,12 +1213,23 @@ namespace
 
                 if (combat && (rich || delta != 0))
                 {
-                    // Своё «Всего» игры у боевого навыка - не итог (оружие,
-                    // броня и стойка в нём не учтены): его не пишем.
-                    const size_t keep = game.empty() ? 0 : game.size() - 1;
-                    for (size_t i = 0; i < keep && static_cast<int>(g_describedRows.size()) < room - 4; ++i)
-                        g_describedRows.push_back(game[i]);
+                    // Свои строки - первыми: место в панели ограничено, и
+                    // итог не должен уйти за край из-за длинной росписи.
                     AddCombatBonusRows(stats, stat);
+                    std::vector<std::pair<std::string, std::string> > own;
+                    own.swap(g_describedRows);
+
+                    // Своё «Всего» игры у боевого навыка - не итог (оружие,
+                    // броня и стойка в нём не учтены): его не пишем. У
+                    // уворота раны уже в своих строках (getDodgePenalty_*) -
+                    // из росписи игры только «Навык», иначе раны дважды.
+                    size_t keep = game.empty() ? 0 : game.size() - 1;
+                    if (stat == STAT_DODGE && keep > 1)
+                        keep = 1;
+                    const size_t space = static_cast<size_t>(room) - 1 - own.size();
+                    for (size_t i = 0; i < keep && i < space; ++i)
+                        g_describedRows.push_back(game[i]);
+                    g_describedRows.insert(g_describedRows.end(), own.begin(), own.end());
 
                     char number[32];
                     sprintf_s(number, "%d", static_cast<int>(floorf(EffectiveValue(stats, stat))));
