@@ -315,6 +315,28 @@ if (Test-Path $rmMod) {
     Copy-Item "$ROOT\ours\RecruitMarkers\RecruitMarkers.ini" "$rmMod\RecruitMarkers.defaults.ini" -Force
 }
 
+# Миникарта (20.10.2026). Новый мод: при первой установке папки мода ещё
+# нет - заводим её сами: RE_Kenshi.json и .mod-пустышка (копия пустышки
+# RecruitMarkers), чтобы мод увидел лаунчер. Дальше - как у остальных.
+$bmMod = "$KENSHI\mods\BestMinimap"
+if (-not $NoDeploy -and $null -eq (ModDir "BestMinimap")) {
+    New-Item -ItemType Directory -Force -Path $bmMod | Out-Null
+    '{ "Plugins": [ "BestMinimap.dll" ] }' | Set-Content "$bmMod\RE_Kenshi.json" -Encoding ASCII
+    if (Test-Path "$KENSHI\mods\RecruitMarkers\RecruitMarkers.mod") {
+        Copy-Item "$KENSHI\mods\RecruitMarkers\RecruitMarkers.mod" "$bmMod\BestMinimap.mod" -Force
+    } else {
+        Write-Host "  BestMinimap: нет RecruitMarkers.mod для пустышки - создайте BestMinimap.mod в FCS" -ForegroundColor Yellow
+    }
+    Write-Host "  BestMinimap: папка мода создана, включите мод в лаунчере" -ForegroundColor Yellow
+}
+BuildPlugin "$ROOT\ours\BestMinimap"              "BestMinimap"       "BestMinimap"
+$bmMod = ModDir "BestMinimap"
+if ($null -ne $bmMod) {
+    Copy-Item "$ROOT\ours\BestMinimap\README.txt" $bmMod -Force
+    Copy-Item "$ROOT\ours\BestMinimap\locale" $bmMod -Recurse -Force
+    Copy-Item "$ROOT\ours\BestMinimap\BestMinimap.ini" "$bmMod\BestMinimap.defaults.ini" -Force
+}
+
 # Formations собирается MSVC 2022, а не VC10: автор не линкует KenshiLib
 # и достаёт MyGUI через GetProcAddress, поэтому старый тулсет ему не нужен.
 & "$ROOT\build_formations.ps1" | Select-String -Pattern "OK:|НЕ УДАЛАСЬ|установлен"
@@ -342,7 +364,7 @@ Step "Контроль: в собранных DLL не должно быть к�
 # каком виде, весь перевод живёт в .po.
 # Formations в списке нет намеренно: он не линкует KenshiLib, а значит не
 # может спросить у игры язык, и его русский лежит прямо в бинарнике.
-foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers")) {
+foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers", "BestMinimap")) {
     $dll = Get-ChildItem "$KENSHI\mods\$m" -Filter *.dll -ErrorAction SilentlyContinue |
            Where-Object { $_.Name -notlike "*.orig" } | Select-Object -First 1
     if (-not $dll) { continue }

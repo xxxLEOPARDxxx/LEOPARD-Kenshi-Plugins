@@ -1,0 +1,213 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BestMinimap\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps). Only the map: the markers stay opaque."
+msgstr "1-10（每级 10%）。只影响地图：标记始终不透明。"
+
+msgid "A bigger map picture is scaled down in memory to this size."
+msgstr "更大的地图图片会在内存中缩小到此尺寸。"
+
+msgid "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+msgstr "屏幕角落的小地图：游戏的地图图片、附近的角色、Map-markers 和 WantedMap 的标记。"
+
+msgid "A small arrow in the centre."
+msgstr "中心的小箭头。"
+
+msgid "Allies"
+msgstr "盟友"
+
+msgid "Animals"
+msgstr "动物"
+
+msgid "Background"
+msgstr "背景"
+
+msgid "Bigger key"
+msgstr "放大小地图按键"
+
+msgid "Camera direction"
+msgstr "镜头方向"
+
+msgid "Centre on the selected"
+msgstr "以选中角色为中心"
+
+msgid "Circle"
+msgstr "圆形"
+
+msgid "Colour where the map picture ends."
+msgstr "地图图片之外区域的颜色。"
+
+msgid "Colours"
+msgstr "颜色"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+msgstr "圆形的直径、正方形的边长、矩形的宽度。在小地图上按住 CTRL 滚动滚轮也可调整。"
+
+msgid "Dimmed."
+msgstr "暗淡显示。"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Enemies"
+msgstr "敌人"
+
+msgid "Frame"
+msgstr "边框"
+
+msgid "Frame colour"
+msgstr "边框颜色"
+
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
+msgstr "从中心到边缘的距离。在小地图上滚动滚轮或使用缩放按键也可调整。"
+
+msgid "Game panel"
+msgstr "游戏面板"
+
+msgid "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+msgstr "游戏面板 - 使用游戏自带面板（及界面模组）的外观；圆形则使用游戏配色的线条。"
+
+msgid "General"
+msgstr "常规"
+
+msgid "If the colours of the minimap look wrong (blue sand)."
+msgstr "如果小地图颜色不对（沙子变成蓝色）。"
+
+msgid "In RE_Kenshi_log.txt."
+msgstr "写入 RE_Kenshi_log.txt。"
+
+msgid "Line"
+msgstr "线条"
+
+msgid "Lock position"
+msgstr "锁定位置"
+
+msgid "Look"
+msgstr "外观"
+
+msgid "Lower - less work for the processor."
+msgstr "越低，处理器负担越小。"
+
+msgid "Makes the minimap itself bigger on the screen."
+msgstr "让小地图本身在屏幕上变大。"
+
+msgid "Map"
+msgstr "地图"
+
+msgid "Map picture limit, px"
+msgstr "地图图片上限（像素）"
+
+msgid "Map-markers markers"
+msgstr "Map-markers 标记"
+
+msgid "Marker size, px"
+msgstr "标记大小（像素）"
+
+msgid "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+msgstr "超出范围的 Map-markers 和 WantedMap 标记停留在边缘，指示方向。"
+
+msgid "Markers of the Map-markers mod, from the current save."
+msgstr "来自当前存档的 Map-markers 模组标记。"
+
+msgid "Neutrals"
+msgstr "中立"
+
+msgid "None"
+msgstr "无"
+
+msgid "Off - drag the minimap with the left mouse button."
+msgstr "关闭时可用鼠标左键拖动小地图。"
+
+msgid "Off - no minimap at all."
+msgstr "关闭时完全不显示小地图。"
+
+msgid "Off - north is always up."
+msgstr "关闭时北方始终朝上。"
+
+msgid "Off - on the centre of the camera."
+msgstr "关闭时以镜头中心为中心。"
+
+msgid "Opacity"
+msgstr "不透明度"
+
+msgid "Pin to the edge"
+msgstr "固定在边缘"
+
+msgid "Range, m"
+msgstr "范围（米）"
+
+msgid "Rectangle"
+msgstr "矩形"
+
+msgid "Rectangle height, px"
+msgstr "矩形高度（像素）"
+
+msgid "Rotate with the camera"
+msgstr "随镜头旋转"
+
+msgid "Shape"
+msgstr "形状"
+
+msgid "Show / hide key"
+msgstr "显示 / 隐藏按键"
+
+msgid "Shown"
+msgstr "已显示"
+
+msgid "Shows or hides the minimap."
+msgstr "显示或隐藏小地图。"
+
+msgid "Size, px"
+msgstr "大小（像素）"
+
+msgid "Smaller key"
+msgstr "缩小小地图按键"
+
+msgid "Square"
+msgstr "正方形"
+
+msgid "Swap red and blue"
+msgstr "交换红色和蓝色"
+
+msgid "Targets of the WantedMap mod, as of the last look at the big map."
+msgstr "WantedMap 模组的目标，以最后一次查看大地图时为准。"
+
+msgid "The dead"
+msgstr "死者"
+
+msgid "The same switch as the show / hide key."
+msgstr "与显示 / 隐藏按键相同的开关。"
+
+msgid "Updates per second"
+msgstr "每秒刷新次数"
+
+msgid "WantedMap targets"
+msgstr "WantedMap 目标"
+
+msgid "Who is shown"
+msgstr "显示对象"
+
+msgid "Your squad"
+msgstr "你的小队"
+
+msgid "Zoom in key"
+msgstr "拉近按键"
+
+msgid "Zoom out key"
+msgstr "拉远按键"
+
+msgid "auto - from the palette of the game (and of interface mods)."
+msgstr "auto - 使用游戏（及界面模组）的配色。"
+
+msgid "auto - the colour the game gives this character on the big map."
+msgstr "auto - 使用游戏在大地图上标记该角色的颜色。"

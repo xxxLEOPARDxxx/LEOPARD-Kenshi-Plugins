@@ -1,0 +1,213 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BestMinimap\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps). Only the map: the markers stay opaque."
+msgstr "1-10 (10% steps). Only the map: the markers stay opaque."
+
+msgid "A bigger map picture is scaled down in memory to this size."
+msgstr "A bigger map picture is scaled down in memory to this size."
+
+msgid "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+msgstr "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+
+msgid "A small arrow in the centre."
+msgstr "A small arrow in the centre."
+
+msgid "Allies"
+msgstr "Allies"
+
+msgid "Animals"
+msgstr "Animals"
+
+msgid "Background"
+msgstr "Background"
+
+msgid "Bigger key"
+msgstr "Bigger key"
+
+msgid "Camera direction"
+msgstr "Camera direction"
+
+msgid "Centre on the selected"
+msgstr "Centre on the selected"
+
+msgid "Circle"
+msgstr "Circle"
+
+msgid "Colour where the map picture ends."
+msgstr "Colour where the map picture ends."
+
+msgid "Colours"
+msgstr "Colours"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+msgstr "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+
+msgid "Dimmed."
+msgstr "Dimmed."
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Enemies"
+msgstr "Enemies"
+
+msgid "Frame"
+msgstr "Frame"
+
+msgid "Frame colour"
+msgstr "Frame colour"
+
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
+msgstr "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
+
+msgid "Game panel"
+msgstr "Game panel"
+
+msgid "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+msgstr "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+
+msgid "General"
+msgstr "General"
+
+msgid "If the colours of the minimap look wrong (blue sand)."
+msgstr "If the colours of the minimap look wrong (blue sand)."
+
+msgid "In RE_Kenshi_log.txt."
+msgstr "In RE_Kenshi_log.txt."
+
+msgid "Line"
+msgstr "Line"
+
+msgid "Lock position"
+msgstr "Lock position"
+
+msgid "Look"
+msgstr "Look"
+
+msgid "Lower - less work for the processor."
+msgstr "Lower - less work for the processor."
+
+msgid "Makes the minimap itself bigger on the screen."
+msgstr "Makes the minimap itself bigger on the screen."
+
+msgid "Map"
+msgstr "Map"
+
+msgid "Map picture limit, px"
+msgstr "Map picture limit, px"
+
+msgid "Map-markers markers"
+msgstr "Map-markers markers"
+
+msgid "Marker size, px"
+msgstr "Marker size, px"
+
+msgid "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+msgstr "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+
+msgid "Markers of the Map-markers mod, from the current save."
+msgstr "Markers of the Map-markers mod, from the current save."
+
+msgid "Neutrals"
+msgstr "Neutrals"
+
+msgid "None"
+msgstr "None"
+
+msgid "Off - drag the minimap with the left mouse button."
+msgstr "Off - drag the minimap with the left mouse button."
+
+msgid "Off - no minimap at all."
+msgstr "Off - no minimap at all."
+
+msgid "Off - north is always up."
+msgstr "Off - north is always up."
+
+msgid "Off - on the centre of the camera."
+msgstr "Off - on the centre of the camera."
+
+msgid "Opacity"
+msgstr "Opacity"
+
+msgid "Pin to the edge"
+msgstr "Pin to the edge"
+
+msgid "Range, m"
+msgstr "Range, m"
+
+msgid "Rectangle"
+msgstr "Rectangle"
+
+msgid "Rectangle height, px"
+msgstr "Rectangle height, px"
+
+msgid "Rotate with the camera"
+msgstr "Rotate with the camera"
+
+msgid "Shape"
+msgstr "Shape"
+
+msgid "Show / hide key"
+msgstr "Show / hide key"
+
+msgid "Shown"
+msgstr "Shown"
+
+msgid "Shows or hides the minimap."
+msgstr "Shows or hides the minimap."
+
+msgid "Size, px"
+msgstr "Size, px"
+
+msgid "Smaller key"
+msgstr "Smaller key"
+
+msgid "Square"
+msgstr "Square"
+
+msgid "Swap red and blue"
+msgstr "Swap red and blue"
+
+msgid "Targets of the WantedMap mod, as of the last look at the big map."
+msgstr "Targets of the WantedMap mod, as of the last look at the big map."
+
+msgid "The dead"
+msgstr "The dead"
+
+msgid "The same switch as the show / hide key."
+msgstr "The same switch as the show / hide key."
+
+msgid "Updates per second"
+msgstr "Updates per second"
+
+msgid "WantedMap targets"
+msgstr "WantedMap targets"
+
+msgid "Who is shown"
+msgstr "Who is shown"
+
+msgid "Your squad"
+msgstr "Your squad"
+
+msgid "Zoom in key"
+msgstr "Zoom in key"
+
+msgid "Zoom out key"
+msgstr "Zoom out key"
+
+msgid "auto - from the palette of the game (and of interface mods)."
+msgstr "auto - from the palette of the game (and of interface mods)."
+
+msgid "auto - the colour the game gives this character on the big map."
+msgstr "auto - the colour the game gives this character on the big map."

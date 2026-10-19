@@ -1,0 +1,213 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BestMinimap\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps). Only the map: the markers stay opaque."
+msgstr "1-10 (шаг 10%). Только карта: метки остаются непрозрачными."
+
+msgid "A bigger map picture is scaled down in memory to this size."
+msgstr "Картинка карты больше этого размера уменьшается в памяти до него."
+
+msgid "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+msgstr "Миникарта в углу экрана: картинка карты игры, персонажи рядом, метки Map-markers и WantedMap."
+
+msgid "A small arrow in the centre."
+msgstr "Маленькая стрелка в центре."
+
+msgid "Allies"
+msgstr "Союзники"
+
+msgid "Animals"
+msgstr "Животные"
+
+msgid "Background"
+msgstr "Фон"
+
+msgid "Bigger key"
+msgstr "Клавиша «больше»"
+
+msgid "Camera direction"
+msgstr "Направление камеры"
+
+msgid "Centre on the selected"
+msgstr "Центр - на выделенных"
+
+msgid "Circle"
+msgstr "Круг"
+
+msgid "Colour where the map picture ends."
+msgstr "Цвет там, где картинка карты кончается."
+
+msgid "Colours"
+msgstr "Цвета"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+msgstr "Диаметр круга, сторона квадрата, ширина прямоугольника. Меняется и колесом с CTRL над миникартой."
+
+msgid "Dimmed."
+msgstr "Блёкло."
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Enemies"
+msgstr "Враги"
+
+msgid "Frame"
+msgstr "Рамка"
+
+msgid "Frame colour"
+msgstr "Цвет рамки"
+
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
+msgstr "От центра до края. Меняется и колесом над миникартой, и клавишами масштаба."
+
+msgid "Game panel"
+msgstr "Панель игры"
+
+msgid "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+msgstr "Панель игры - оформление родных панелей игры (и модов на интерфейс); у круга - линия цвета палитры игры."
+
+msgid "General"
+msgstr "Общее"
+
+msgid "If the colours of the minimap look wrong (blue sand)."
+msgstr "Если цвета миникарты не те (синий песок)."
+
+msgid "In RE_Kenshi_log.txt."
+msgstr "В RE_Kenshi_log.txt."
+
+msgid "Line"
+msgstr "Линия"
+
+msgid "Lock position"
+msgstr "Закрепить на месте"
+
+msgid "Look"
+msgstr "Вид"
+
+msgid "Lower - less work for the processor."
+msgstr "Меньше - меньше работы процессору."
+
+msgid "Makes the minimap itself bigger on the screen."
+msgstr "Делает саму миникарту больше на экране."
+
+msgid "Map"
+msgstr "Карта"
+
+msgid "Map picture limit, px"
+msgstr "Предел картинки карты, пикс."
+
+msgid "Map-markers markers"
+msgstr "Метки Map-markers"
+
+msgid "Marker size, px"
+msgstr "Размер точки, пикс."
+
+msgid "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+msgstr "Метки Map-markers и WantedMap за пределами миникарты остаются у края и показывают направление."
+
+msgid "Markers of the Map-markers mod, from the current save."
+msgstr "Метки мода Map-markers из текущего сохранения."
+
+msgid "Neutrals"
+msgstr "Нейтралы"
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Off - drag the minimap with the left mouse button."
+msgstr "Выключено - миникарту можно тащить левой кнопкой мыши."
+
+msgid "Off - no minimap at all."
+msgstr "Выключено - миникарты нет вовсе."
+
+msgid "Off - north is always up."
+msgstr "Выключено - север всегда сверху."
+
+msgid "Off - on the centre of the camera."
+msgstr "Выключено - на центре камеры."
+
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+msgid "Pin to the edge"
+msgstr "Прижимать к краю"
+
+msgid "Range, m"
+msgstr "Обзор, м"
+
+msgid "Rectangle"
+msgstr "Прямоугольник"
+
+msgid "Rectangle height, px"
+msgstr "Высота прямоугольника, пикс."
+
+msgid "Rotate with the camera"
+msgstr "Поворачивать за камерой"
+
+msgid "Shape"
+msgstr "Форма"
+
+msgid "Show / hide key"
+msgstr "Клавиша «показать / скрыть»"
+
+msgid "Shown"
+msgstr "Показана"
+
+msgid "Shows or hides the minimap."
+msgstr "Показывает или прячет миникарту."
+
+msgid "Size, px"
+msgstr "Размер, пикс."
+
+msgid "Smaller key"
+msgstr "Клавиша «меньше»"
+
+msgid "Square"
+msgstr "Квадрат"
+
+msgid "Swap red and blue"
+msgstr "Поменять красный и синий"
+
+msgid "Targets of the WantedMap mod, as of the last look at the big map."
+msgstr "Цели мода WantedMap - на момент последнего взгляда на большую карту."
+
+msgid "The dead"
+msgstr "Мёртвые"
+
+msgid "The same switch as the show / hide key."
+msgstr "Тот же переключатель, что и клавиша «показать / скрыть»."
+
+msgid "Updates per second"
+msgstr "Обновлений в секунду"
+
+msgid "WantedMap targets"
+msgstr "Цели WantedMap"
+
+msgid "Who is shown"
+msgstr "Кого показывать"
+
+msgid "Your squad"
+msgstr "Ваш отряд"
+
+msgid "Zoom in key"
+msgstr "Клавиша «приблизить»"
+
+msgid "Zoom out key"
+msgstr "Клавиша «отдалить»"
+
+msgid "auto - from the palette of the game (and of interface mods)."
+msgstr "auto - из палитры игры (и модов на интерфейс)."
+
+msgid "auto - the colour the game gives this character on the big map."
+msgstr "auto - цвет, которым игра отмечает этого персонажа на большой карте."
