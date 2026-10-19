@@ -277,3 +277,114 @@ msgstr "Camera line colour"
 
 msgid "Under attack: "
 msgstr "Under attack: "
+
+msgid "A gold ring and the sum on characters with a price on their head, as your character sees it."
+msgstr "A gold ring and the sum on characters with a price on their head, as your character sees it."
+
+msgid "A name under every dot. Many dots - many names."
+msgstr "A name under every dot. Many dots - many names."
+
+msgid "A small nose on each dot: where the character looks."
+msgstr "A small nose on each dot: where the character looks."
+
+msgid "A thin white circle: how far the town reaches."
+msgstr "A thin white circle: how far the town reaches."
+
+msgid "All squads"
+msgstr "All squads"
+
+msgid "Also the places you have not found yet."
+msgstr "Also the places you have not found yet."
+
+msgid "Bounties"
+msgstr "Bounties"
+
+msgid "Bounty colour"
+msgstr "Bounty colour"
+
+msgid "Camera line style"
+msgstr "Camera line style"
+
+msgid "Character names"
+msgstr "Character names"
+
+msgid "Dotted"
+msgstr "Dotted"
+
+msgid "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+msgstr "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+
+msgid "Facing"
+msgstr "Facing"
+
+msgid "Flip the facing"
+msgstr "Flip the facing"
+
+msgid "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+msgstr "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+
+msgid "If the noses point backwards."
+msgstr "If the noses point backwards."
+
+msgid "Names up to range, m"
+msgstr "Names up to range, m"
+
+msgid "Other squads"
+msgstr "Other squads"
+
+msgid "Right click - go there"
+msgstr "Right click - go there"
+
+msgid "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+msgstr "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+
+msgid "Solid"
+msgstr "Solid"
+
+msgid "Squad name colour"
+msgstr "Squad name colour"
+
+msgid "Squad names"
+msgstr "Squad names"
+
+msgid "The name of a squad over its leader."
+msgstr "The name of a squad over its leader."
+
+msgid "Tooltips"
+msgstr "Tooltips"
+
+msgid "Town colour"
+msgstr "Town colour"
+
+msgid "Town names"
+msgstr "Town names"
+
+msgid "Town names are shown while the range is not wider than this: on the whole map they would merge."
+msgstr "Town names are shown while the range is not wider than this: on the whole map they would merge."
+
+msgid "Town radius"
+msgstr "Town radius"
+
+msgid "Towns"
+msgstr "Towns"
+
+msgid "Towns and places"
+msgstr "Towns and places"
+
+msgid "Undiscovered too"
+msgstr "Undiscovered too"
+
+msgid "ally"
+msgstr "ally"
+
+msgid "auto - by the relations of the town's faction to yours: red hostile, green ally."
+msgstr "auto - by the relations of the town's faction to yours: red hostile, green ally."
+
+msgid "hostile"
+msgstr "hostile"
+
+msgid "neutral"
+msgstr "neutral"
+
+msgid "your faction"
+msgstr "your faction"

@@ -63,6 +63,7 @@
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
 #include <mygui/MyGUI_ImageBox.h>
+#include <mygui/MyGUI_TextBox.h>
 #include <mygui/MyGUI_InputManager.h>
 #include <mygui/MyGUI_RenderManager.h>
 #include <mygui/MyGUI_ITexture.h>
@@ -89,6 +90,11 @@
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
+#include <kenshi/Platoon.h>
+#include <kenshi/Town.h>
+#include <kenshi/Faction.h>
+#include <kenshi/FactionRelations.h>
+#include <kenshi/util/UtilityT.h>
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -197,6 +203,23 @@ namespace
     int g_camRangeSet = 0;              // метров; 0 - узнаём сами (см. LearnCameraRange)
     float g_camRangeLearned = 0.0f;
     unsigned g_camRangeColour = 0xFFE8E2D0u;
+    bool g_camRangeDots = true;         // пунктиром (dots) или сплошной (line)
+    bool g_showFacing = true;           // «носик» у точки: куда смотрит персонаж
+    bool g_facingFlip = false;          // если носики смотрят назад
+    int g_squadLabels = 1;              // подписи отрядов: 0 нет, 1 чужие, 2 все
+    unsigned g_squadLabelColour = 0xFFE6C84Au;
+    bool g_showTowns = true;            // поселения и постройки на карте
+    bool g_townNames = true;
+    bool g_townRadius = true;           // круг радиуса поселения
+    bool g_showUndiscovered = false;
+    unsigned g_townColour = 0xFFF0E6C8u;
+    bool g_rightClickMove = true;       // ПКМ по миникарте - идти туда
+    bool g_showBounty = true;           // кольцо и сумма награды за голову
+    unsigned g_bountyColour = 0xFFF2C230u;
+    bool g_tooltips = true;             // подсказка при наведении мыши
+    bool g_charNames = false;           // имена персонажей рядом с точками
+    int g_townNamesRange = 8000;        // имена поселений - при обзоре не больше, м
+    bool g_townAutoColour = true;       // цвет поселения по отношениям фракций
     int g_maxSource = 4096;
     bool g_swapRB = false;
     bool g_debug = false;
@@ -204,7 +227,7 @@ namespace
     HoldKey::Key g_keyToggle, g_keyZoomIn, g_keyZoomOut, g_keyBigger, g_keySmaller;
 
     const float kRangeMin = 30.0f;
-    const float kRangeMax = 20000.0f;
+    const float kRangeMax = 150000.0f;     // половина мира (worldBounds +-147 км) - вся карта
     const int kSizeMin = 80;
     const int kSizeMax = 900;
     const float kZoomStep = 1.25f;
@@ -309,6 +332,25 @@ namespace
         g_camRangeSet = ReadInt(ini, "CameraRange", 0, 0, 50000);
         g_camRangeLearned = static_cast<float>(ReadInt(ini, "CameraRangeLearned", 0, 0, 50000));
         ReadColour(ini, "CameraRangeColour", "#E8E2D0", unused, g_camRangeColour);
+        g_camRangeDots = ReadText(ini, "CameraRangeStyle", "dots") != "line";
+        g_showFacing = ReadBool(ini, "ShowFacing", true);
+        g_facingFlip = ReadBool(ini, "FacingFlip", false);
+        const std::string labels = ReadText(ini, "SquadLabels", "others");
+        g_squadLabels = labels == "none" ? 0 : (labels == "all" ? 2 : 1);
+        ReadColour(ini, "SquadLabelColour", "#E6C84A", unused, g_squadLabelColour);
+        g_showTowns = ReadBool(ini, "ShowTowns", true);
+        g_townNames = ReadBool(ini, "TownNames", true);
+        g_townRadius = ReadBool(ini, "TownRadius", true);
+        g_showUndiscovered = ReadBool(ini, "ShowUndiscovered", false);
+        g_rightClickMove = ReadBool(ini, "RightClickMove", true);
+        g_showBounty = ReadBool(ini, "ShowBounty", true);
+        ReadColour(ini, "BountyColour", "#F2C230", unused, g_bountyColour);
+        g_tooltips = ReadBool(ini, "Tooltips", true);
+        g_charNames = ReadBool(ini, "CharacterNames", false);
+        g_townNamesRange = ReadInt(ini, "TownNamesRange", 8000, 0, 150000);
+        ReadColour(ini, "TownColour", "auto", g_townAutoColour, g_townColour);
+        if (g_townAutoColour)
+            g_townColour = 0xFFF0E6C8u;
 
         g_keyToggle = HoldKey::Parse(ReadText(ini, "KeyToggle", "CTRL+M"));
         g_keyZoomIn = HoldKey::Parse(ReadText(ini, "KeyZoomIn", "="));
@@ -332,6 +374,11 @@ namespace
         std::string texture;    // имя текстуры, с которой читали
         int w, h;               // размер в памяти (уже уменьшенный)
         std::vector<unsigned> px;
+        // Уменьшенные вдвое копии (мип-уровни): при сильном отдалении на
+        // пиксель миникарты приходятся десятки пикселей картинки, и выборка
+        // из полной рябила бы. Берём уровень под масштаб.
+        struct Level { int w, h; std::vector<unsigned> px; };
+        std::vector<Level> mips;
         Source() : w(0), h(0) {}
         bool ok() const { return w > 0 && h > 0; }
     };
@@ -479,6 +526,33 @@ namespace
                 }
         }
         g_src.px.swap(px);
+        // Мип-уровни: среднее 2x2, пока сторона не меньше 8.
+        g_src.mips.clear();
+        {
+            int lw = ow, lh = oh;
+            const std::vector<unsigned>* prev = &g_src.px;
+            while (lw >= 16 && lh >= 16)
+            {
+                Source::Level lv;
+                lv.w = lw / 2;
+                lv.h = lh / 2;
+                lv.px.resize(static_cast<size_t>(lv.w) * lv.h);
+                for (int y = 0; y < lv.h; ++y)
+                    for (int x = 0; x < lv.w; ++x)
+                    {
+                        const unsigned* const a = &(*prev)[static_cast<size_t>(2 * y) * lw + 2 * x];
+                        const unsigned* const b = a + lw;
+                        lv.px[static_cast<size_t>(y) * lv.w + x] = Pack(
+                            (ChR(a[0]) + ChR(a[1]) + ChR(b[0]) + ChR(b[1]) + 2) / 4,
+                            (ChG(a[0]) + ChG(a[1]) + ChG(b[0]) + ChG(b[1]) + 2) / 4,
+                            (ChB(a[0]) + ChB(a[1]) + ChB(b[0]) + ChB(b[1]) + 2) / 4, 255);
+                    }
+                g_src.mips.push_back(lv);
+                prev = &g_src.mips.back().px;
+                lw = lv.w;
+                lh = lv.h;
+            }
+        }
         g_src.w = ow;
         g_src.h = oh;
         return true;
@@ -635,11 +709,17 @@ namespace
         unsigned colour;
         bool selected;
         bool dead;
+        int cat;
+        float fx, fz;           // куда смотрит, мировые x/z (единичный)
+        ActivePlatoon* platoon;
+        bool leader;            // лидер своего отряда - на нём подпись
+        int bounty;             // награда за голову, 0 - нет
+        std::string name;
     };
 
     // Категория персонажа считается не каждый кадр: isEnemy/isAlly не
     // бесплатны, а отношения меняются редко. Кэш на секунду.
-    struct CatCache { int cat; DWORD at; };
+    struct CatCache { int cat; int bounty; DWORD at; };
     std::map<Character*, CatCache> g_catCache;
     DWORD g_catCacheCleared = 0;
 
@@ -649,6 +729,12 @@ namespace
         if (p->playerCharacters.size() > 0)
             return p->playerCharacters[0];
         return NULL;
+    }
+
+    int BountyOf(Character* c)
+    {
+        std::map<Character*, CatCache>::const_iterator it = g_catCache.find(c);
+        return it == g_catCache.end() ? 0 : it->second.bounty;
     }
 
     int CategoryOf(Character* c, Character* ref, DWORD now)
@@ -665,7 +751,12 @@ namespace
             cat = CAT_ENEMY;
         else if (ref != NULL && c->isAlly(ref, true))
             cat = CAT_ALLY;
+        // Награда за голову - как её видит наш персонаж (getPercievedBounty).
+        int bounty = 0;
+        if (g_showBounty && ref != NULL && cat != CAT_SQUAD)
+            bounty = c->crimes.getPercievedBounty(ref);
         CatCache& e = g_catCache[c];
+        e.bounty = bounty;
         e.cat = cat;
         e.at = now;
         return cat;
@@ -725,6 +816,17 @@ namespace
             d.dead = dead;
             d.selected = cat == CAT_SQUAD && Contains(g_selected, c);
             d.colour = g_colourAuto[cat] ? FromColour(MapScreen::getMarkerColor(c)) : g_colour[cat];
+            d.cat = cat;
+            d.bounty = BountyOf(c);
+            d.name = (g_tooltips || g_charNames) ? c->getName() : std::string();
+            // Вперёд у персонажа - ось +Z его ориентации (FacingFlip=1 -
+            // если на деле наоборот).
+            const Ogre::Vector3 f = c->getOrientation() * Ogre::Vector3::UNIT_Z;
+            const float fl = std::sqrt(f.x * f.x + f.z * f.z);
+            d.fx = fl > 1e-4f ? f.x / fl * (g_facingFlip ? -1.0f : 1.0f) : 0.0f;
+            d.fz = fl > 1e-4f ? f.z / fl * (g_facingFlip ? -1.0f : 1.0f) : 0.0f;
+            d.platoon = c->getPlatoon();
+            d.leader = d.platoon != NULL && d.platoon->squadleader == c;
             dots.push_back(d);
         }
     }
@@ -1105,8 +1207,15 @@ namespace
     bool g_dragging = false;
     MyGUI::IntPoint g_dragMouse, g_dragOrigin;
 
+    void MoveSelectedTo();          // ниже, после Render: нужен последний вид
+
     void OnPressed(MyGUI::Widget*, int, int, MyGUI::MouseButton button)
     {
+        if (button == MyGUI::MouseButton::Right)
+        {
+            MoveSelectedTo();
+            return;
+        }
         if (button != MyGUI::MouseButton::Left || g_locked)
             return;
         g_dragging = true;
@@ -1482,6 +1591,15 @@ namespace
                         inside = (x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]) < r2in;
                 if (inside)
                     continue;
+                if (g_camRangeDots)
+                {
+                    // Пунктир: точка каждые ~7 пикселей дуги.
+                    const float arc = 6.2832f * r * k / steps;
+                    if (std::fmod(arc, 7.0f) > 0.7f)
+                        continue;
+                    DrawDisc(x, y, 1.1f, g_camRangeColour, g_camRangeColour, 0.85f);
+                    continue;
+                }
                 const int px = static_cast<int>(x), py = static_cast<int>(y);
                 if (px < 0 || py < 0 || px >= g_viewW || py >= g_viewH)
                     continue;
@@ -1490,6 +1608,11 @@ namespace
             }
         }
     }
+
+    // Последний нарисованный вид: по нему ПКМ переводит точку на миникарте в
+    // мир.
+    View g_lastView;
+    bool g_haveView = false;
 
     // Для DrawCameraRange: мир -> экран текущего вида (вид живёт на время Render).
     const void* g_renderView = NULL;
@@ -1500,6 +1623,205 @@ namespace
         g_map.apply(p.x, p.z, u, vv);
         ToScreen(v, u, vv, x, y);
     }
+
+    // Закрашенный треугольник (4 выборки на пиксель), обрезанный по форме.
+    void DrawTri(float ax, float ay, float bx, float by, float cx, float cy, unsigned colour, float alpha)
+    {
+        const int x0 = Hi(0, static_cast<int>(Lo(Lo(ax, bx), cx)) - 1);
+        const int x1 = Lo(g_viewW - 1, static_cast<int>(Hi(Hi(ax, bx), cx)) + 1);
+        const int y0 = Hi(0, static_cast<int>(Lo(Lo(ay, by), cy)) - 1);
+        const int y1 = Lo(g_viewH - 1, static_cast<int>(Hi(Hi(ay, by), cy)) + 1);
+        for (int y = y0; y <= y1; ++y)
+            for (int x = x0; x <= x1; ++x)
+            {
+                int hits = 0;
+                for (int k = 0; k < 4; ++k)
+                {
+                    const float px = x + 0.25f + 0.5f * (k & 1), py = y + 0.25f + 0.5f * (k >> 1);
+                    const float e1 = (bx - ax) * (py - ay) - (by - ay) * (px - ax);
+                    const float e2 = (cx - bx) * (py - by) - (cy - by) * (px - bx);
+                    const float e3 = (ax - cx) * (py - cy) - (ay - cy) * (px - cx);
+                    if ((e1 >= 0 && e2 >= 0 && e3 >= 0) || (e1 <= 0 && e2 <= 0 && e3 <= 0))
+                        ++hits;
+                }
+                if (hits == 0)
+                    continue;
+                const size_t i = static_cast<size_t>(y) * g_viewW + x;
+                g_buf[i] = Blend(g_buf[i], colour, hits / 4.0f * alpha * (g_mask[i] / 255.0f));
+            }
+    }
+
+    // ---- подписи: пул TextBox поверх картинки ----
+    // Текст рисует MyGUI (шрифт игры), а не наш буфер: так буквы чёткие и
+    // на любом языке. Пул постоянный: виджеты создаются по мере нужды и
+    // прячутся, когда не нужны; ссылки - WidgetRef, обнулятся сами, если
+    // игра пересоздаст интерфейс.
+    const int kLabelPool = 64;
+    WidgetRef g_labelRefs[kLabelPool];
+    int g_labelsUsed = 0;
+
+    void PlaceLabel(const std::string& text, float x, float y, unsigned colour)
+    {
+        if (text.empty() || g_labelsUsed >= kLabelPool)
+            return;
+        // Подпись - только если её точка внутри формы карты.
+        if (InsideShape(x, y, g_viewW, g_viewH, 2.0f) < 0.5f)
+            return;
+        MyGUI::Widget* const root = g_rootRef.get();
+        if (root == NULL)
+            return;
+        WidgetRef& ref = g_labelRefs[g_labelsUsed++];
+        MyGUI::TextBox* box = ref.get() ? ref.get()->castType<MyGUI::TextBox>(false) : NULL;
+        if (box == NULL)
+        {
+            box = root->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
+                MyGUI::IntCoord(0, 0, 200, 20), MyGUI::Align::Default, "");
+            box->setNeedMouseFocus(false);
+            box->setTextShadow(true);
+            ref.set(box);
+        }
+        if (box->getUserString("bm_text") != text)
+        {
+            box->setUserString("bm_text", text);
+            box->setCaption(MyGUI::UString(text));
+        }
+        box->setTextColour(MyGUI::Colour(ChR(colour) / 255.0f, ChG(colour) / 255.0f, ChB(colour) / 255.0f));
+        const MyGUI::IntSize ts = box->getTextSize();
+        const int pad = GamePad();
+        int left = pad + static_cast<int>(x) - ts.width / 2;
+        int top = pad + static_cast<int>(y) - ts.height;
+        left = Clamp(left, pad, Hi(pad, pad + g_viewW - ts.width));
+        top = Clamp(top, pad, Hi(pad, pad + g_viewH - ts.height));
+        box->setCoord(left, top, ts.width + 2, ts.height);
+        box->setVisible(true);
+    }
+
+    void HideUnusedLabels()
+    {
+        for (int i = g_labelsUsed; i < kLabelPool; ++i)
+            if (MyGUI::Widget* const w = g_labelRefs[i].get())
+                w->setVisible(false);
+    }
+
+    // ---- подсказка при наведении ----
+    WidgetRef g_tipRef;
+
+    void ShowTooltip(const std::string& text, float x, float y)
+    {
+        MyGUI::Widget* const root = g_rootRef.get();
+        if (root == NULL)
+            return;
+        MyGUI::TextBox* box = g_tipRef.get() ? g_tipRef.get()->castType<MyGUI::TextBox>(false) : NULL;
+        if (box == NULL)
+        {
+            box = root->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
+                MyGUI::IntCoord(0, 0, 300, 40), MyGUI::Align::Default, "");
+            box->setNeedMouseFocus(false);
+            box->setTextShadow(true);
+            g_tipRef.set(box);
+        }
+        if (box->getUserString("bm_text") != text)
+        {
+            box->setUserString("bm_text", text);
+            box->setCaption(MyGUI::UString(text));
+        }
+        const MyGUI::IntSize ts = box->getTextSize();
+        const int pad = GamePad();
+        int left = pad + static_cast<int>(x) + 12, top = pad + static_cast<int>(y) + 10;
+        if (left + ts.width > pad + g_viewW)
+            left = pad + static_cast<int>(x) - 12 - ts.width;
+        if (top + ts.height > pad + g_viewH)
+            top = pad + static_cast<int>(y) - 10 - ts.height;
+        box->setCoord(Hi(0, left), Hi(0, top), ts.width + 2, ts.height);
+        box->setVisible(true);
+    }
+
+    void HideTooltip()
+    {
+        if (MyGUI::Widget* const w = g_tipRef.get())
+            w->setVisible(false);
+    }
+
+    // ---- поселения: с меток большой карты ----
+    // Список берём у самой карты (mapMarkersTowns): там ровно то, что игра
+    // отмечает на большой карте, с модами. Открыто ли - isDiscovered.
+    struct TownInfo
+    {
+        Ogre::Vector3 pos;
+        float radius;
+        std::string name;
+        unsigned colour;
+        std::string tip;
+    };
+    std::vector<TownInfo> g_towns;
+
+    std::string RelationText(Faction* f, Faction* player, unsigned& colour)
+    {
+        colour = g_townColour;
+        if (f == NULL || player == NULL)
+            return std::string();
+        if (f == player)
+        {
+            colour = g_colour[CAT_SQUAD];
+            return Tr("your faction");
+        }
+        if (f->relations == NULL)
+            return std::string();
+        const int value = static_cast<int>(f->relations->getFactionRelation(player));
+        char num[24];
+        sprintf_s(num, " (%d)", value);
+        if (f->relations->isEnemy(player))
+        {
+            colour = 0xFFE63C32u;
+            return std::string(Tr("hostile")) + num;
+        }
+        if (f->relations->isAlly(player))
+        {
+            colour = 0xFF5AD25Au;
+            return std::string(Tr("ally")) + num;
+        }
+        return std::string(Tr("neutral")) + num;
+    }
+
+    void CollectTowns(MapScreen* map, const Ogre::Vector3& center, float reach)
+    {
+        g_towns.clear();
+        if (!g_showTowns || map == NULL)
+            return;
+        Faction* const player = ou->player->getFaction();
+        typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
+        const Towns& towns = map->mapMarkersTowns;
+        for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
+        {
+            TownBase* const t = it->first.getTown();
+            if (t == NULL)
+                continue;
+            const bool discovered = t->isDiscovered();
+            if (!discovered && !g_showUndiscovered)
+                continue;
+            TownInfo info;
+            info.pos = t->getPosition();
+            info.radius = t->getRadius();
+            const float dx = info.pos.x - center.x, dz = info.pos.z - center.z;
+            const float lim = reach + info.radius;
+            if (dx * dx + dz * dz > lim * lim)
+                continue;
+            info.name = t->getKnownName();
+            Faction* const f = t->getFaction();
+            unsigned relColour = g_townColour;
+            const std::string rel = RelationText(f, player, relColour);
+            info.colour = g_townAutoColour ? relColour : g_townColour;
+            info.tip = info.name;
+            if (f != NULL)
+                info.tip += "\n" + f->getName() + (rel.empty() ? std::string() : " - " + rel);
+            g_towns.push_back(info);
+        }
+    }
+
+    // ---- флажок «идти сюда» после ПКМ ----
+    Ogre::Vector3 g_movePos;
+    DWORD g_moveAt = 0;
+    const DWORD kMoveFlagMs = 3000;
 
     std::vector<Dot> g_dots;
 
@@ -1554,6 +1876,14 @@ namespace
         const float alpha = g_opacity / 10.0f;
         const unsigned back = g_backColour;
         const bool haveSrc = g_src.ok();
+        // Уровень картинки под масштаб: 2^level пикселей на пиксель миникарты.
+        int level = 0;
+        while (level < static_cast<int>(g_src.mips.size()) && v.scale >= 2.0 * (1 << level))
+            ++level;
+        const unsigned* const lpx = level == 0 ? (g_src.px.empty() ? NULL : &g_src.px[0]) : &g_src.mips[level - 1].px[0];
+        const int lw = level == 0 ? v.sw : g_src.mips[level - 1].w;
+        const int lh = level == 0 ? v.sh : g_src.mips[level - 1].h;
+        const double lk = 1.0 / (1 << level);
         for (int y = 0; y < h; ++y)
         {
             const double dy = (y + 0.5 - v.cy) * v.scale;
@@ -1567,14 +1897,14 @@ namespace
                 if (haveSrc)
                 {
                     const double dx = (x + 0.5 - v.cx) * v.scale;
-                    const double sx = v.su + v.c * dx - v.s * dy - 0.5;
-                    const double sy = v.sv + v.s * dx + v.c * dy - 0.5;
-                    if (sx >= 0 && sy >= 0 && sx < v.sw - 1 && sy < v.sh - 1)
+                    const double sx = (v.su + v.c * dx - v.s * dy) * lk - 0.5;
+                    const double sy = (v.sv + v.s * dx + v.c * dy) * lk - 0.5;
+                    if (lpx != NULL && sx >= 0 && sy >= 0 && sx < lw - 1 && sy < lh - 1)
                     {
                         const int ix = static_cast<int>(sx), iy = static_cast<int>(sy);
                         const float tx = static_cast<float>(sx - ix), ty = static_cast<float>(sy - iy);
-                        const unsigned* const row = &g_src.px[static_cast<size_t>(iy) * v.sw + ix];
-                        const unsigned p00 = row[0], p10 = row[1], p01 = row[v.sw], p11 = row[v.sw + 1];
+                        const unsigned* const row = &lpx[static_cast<size_t>(iy) * lw + ix];
+                        const unsigned p00 = row[0], p10 = row[1], p01 = row[lw], p11 = row[lw + 1];
                         const float w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty), w01 = (1 - tx) * ty, w11 = tx * ty;
                         const int r = static_cast<int>(ChR(p00) * w00 + ChR(p10) * w10 + ChR(p01) * w01 + ChR(p11) * w11 + 0.5f);
                         const int g = static_cast<int>(ChG(p00) * w00 + ChG(p10) * w10 + ChG(p01) * w01 + ChG(p11) * w11 + 0.5f);
@@ -1588,6 +1918,30 @@ namespace
 
         const float frameW = g_frame == FRAME_LINE ? 2.0f : 0.0f;
         const unsigned dark = 0xFF101010u;
+
+        g_labelsUsed = 0;
+        const float pxPerMetreScreen = static_cast<float>(pxPerMetre / v.scale);
+
+        // --- поселения: круг радиуса и значок ---
+        MapScreen* const map = GetMapScreen();
+        CollectTowns(map, center, static_cast<float>(g_range * 1.5));
+        for (size_t i = 0; i < g_towns.size(); ++i)
+        {
+            const TownInfo& t = g_towns[i];
+            double u, vv;
+            g_map.apply(t.pos.x, t.pos.z, u, vv);
+            float x, y;
+            ToScreen(v, u, vv, x, y);
+            const float rr = t.radius * pxPerMetreScreen;
+            if (g_townRadius && rr >= 6.0f)
+                DrawRing(x, y, rr, 1.2f, 0xFFFFFFFFu, 0.55f);
+            // Значок - ромб с тёмной обводкой.
+            const float k = Hi(3.5f, g_dot * 0.8f);
+            DrawTri(x, y - k - 1.2f, x + k + 1.2f, y, x, y + k + 1.2f, 0xFF101010u, 0.9f);
+            DrawTri(x, y - k - 1.2f, x - k - 1.2f, y, x, y + k + 1.2f, 0xFF101010u, 0.9f);
+            DrawTri(x, y - k, x + k, y, x, y + k, t.colour, 1.0f);
+            DrawTri(x, y - k, x - k, y, x, y + k, t.colour, 1.0f);
+        }
 
         // --- метки Map-markers и WantedMap ---
         const float pinR = Hi(2.5f, g_dot * 0.7f);
@@ -1614,6 +1968,8 @@ namespace
         }
 
         // --- граница полёта камеры ---
+        g_lastView = v;
+        g_haveView = true;
         if (g_camRange)
         {
             std::vector<Ogre::Vector3> mineAlive;
@@ -1645,7 +2001,28 @@ namespace
                     continue;
                 const float r = g_dot * 0.5f + (d.selected ? 1.0f : 0.0f);
                 const unsigned outline = d.selected ? 0xFFFFFFFFu : dark;
+                // Носик: куда смотрит. Направление мира -> экран тем же
+                // поворотом, что и карта.
+                if (g_showFacing && !d.dead && (d.fx != 0.0f || d.fz != 0.0f))
+                {
+                    const double ex = g_map.au * v.sw * d.fx + g_map.bu * v.sw * d.fz;
+                    const double ey = g_map.av * v.sh * d.fx + g_map.bv * v.sh * d.fz;
+                    float nx = static_cast<float>(v.c * ex + v.s * ey);
+                    float ny = static_cast<float>(-v.s * ex + v.c * ey);
+                    const float nl = std::sqrt(nx * nx + ny * ny);
+                    if (nl > 1e-6f)
+                    {
+                        nx /= nl;
+                        ny /= nl;
+                        const float tip = r + 3.5f, half = r * 0.75f + 0.5f;
+                        DrawTri(x + nx * (tip + 1.0f), y + ny * (tip + 1.0f), x - ny * (half + 1.0f), y + nx * (half + 1.0f),
+                                x + ny * (half + 1.0f), y - nx * (half + 1.0f), dark, 0.9f);
+                        DrawTri(x + nx * tip, y + ny * tip, x - ny * half, y + nx * half, x + ny * half, y - nx * half, d.colour, 1.0f);
+                    }
+                }
                 DrawDisc(x, y, r, d.colour, outline, d.dead ? 0.45f : 1.0f);
+                if (g_showBounty && d.bounty > 0)
+                    DrawRing(x, y, r + 2.5f, 1.5f, g_bountyColour, 1.0f);
             }
 
         // --- тревога: наших атакуют ---
@@ -1664,6 +2041,18 @@ namespace
                 DrawRing(x, y, r, 2.2f, dark, 0.8f);
                 DrawRing(x, y, r, 1.6f, g_alertColour, 1.0f);
             }
+
+        // --- флажок «идти сюда» ---
+        if (g_moveAt != 0 && now - g_moveAt < kMoveFlagMs)
+        {
+            double u, vv;
+            g_map.apply(g_movePos.x, g_movePos.z, u, vv);
+            float x, y;
+            ToScreen(v, u, vv, x, y);
+            const float fade = 1.0f - static_cast<float>(now - g_moveAt) / kMoveFlagMs;
+            DrawRing(x, y, 5.0f + 3.0f * (1.0f - fade), 1.6f, 0xFF3CC85Au, fade);
+            DrawDisc(x, y, 3.0f, 0xFF3CC85Au, dark, Hi(0.3f, fade));
+        }
 
         // --- куда смотрит камера ---
         if (g_showView)
@@ -1702,6 +2091,97 @@ namespace
                 }
         }
 
+        // --- подписи (виджеты MyGUI поверх картинки) ---
+        // Поселения - пока обзор не шире TownNamesRange: на всей карте их
+        // сотни, и подписи слились бы в кашу.
+        if (g_showTowns && g_townNames && g_range <= g_townNamesRange)
+            for (size_t i = 0; i < g_towns.size(); ++i)
+            {
+                double u, vv;
+                g_map.apply(g_towns[i].pos.x, g_towns[i].pos.z, u, vv);
+                float x, y;
+                ToScreen(v, u, vv, x, y);
+                PlaceLabel(g_towns[i].name, x, y - 5.0f, g_towns[i].colour);
+            }
+        for (size_t i = 0; i < g_dots.size(); ++i)
+        {
+            const Dot& d = g_dots[i];
+            double u, vv;
+            g_map.apply(d.pos.x, d.pos.z, u, vv);
+            float x, y;
+            ToScreen(v, u, vv, x, y);
+            const float r = g_dot * 0.5f + 2.0f;
+            // Подпись отряда - над его лидером.
+            const bool squadOk = g_squadLabels == 2 || (g_squadLabels == 1 && d.cat != CAT_SQUAD);
+            if (squadOk && d.leader && d.platoon != NULL && !d.dead)
+                PlaceLabel(d.platoon->getName(), x, y - r, g_squadLabelColour);
+            if (g_showBounty && d.bounty > 0)
+            {
+                char text[32];
+                sprintf_s(text, "%d c", d.bounty);
+                PlaceLabel(text, x + 18.0f, y + 8.0f, g_bountyColour);
+            }
+            if (g_charNames && !d.dead)
+                PlaceLabel(d.name, x, y + r + 14.0f, d.colour);
+        }
+        HideUnusedLabels();
+
+        // Подсказка: ближайшее к мыши поселение или персонаж.
+        bool tip = false;
+        if (g_tooltips)
+            if (MyGUI::Widget* const img = g_imageRef.get())
+            {
+                const MyGUI::IntPoint m = MyGUI::InputManager::getInstance().getMousePosition();
+                const MyGUI::IntPoint a = img->getAbsolutePosition();
+                const float mx = static_cast<float>(m.left - a.left), my = static_cast<float>(m.top - a.top);
+                if (mx >= 0 && my >= 0 && mx < w && my < h && InsideShape(mx, my, w, h, 0.0f) > 0.5f)
+                {
+                    float best = 81.0f;
+                    std::string text;
+                    for (size_t i = 0; i < g_towns.size(); ++i)
+                    {
+                        double u, vv;
+                        g_map.apply(g_towns[i].pos.x, g_towns[i].pos.z, u, vv);
+                        float x, y;
+                        ToScreen(v, u, vv, x, y);
+                        const float d2 = (x - mx) * (x - mx) + (y - my) * (y - my);
+                        if (d2 < best)
+                        {
+                            best = d2;
+                            text = g_towns[i].tip;
+                        }
+                    }
+                    for (size_t i = 0; i < g_dots.size(); ++i)
+                    {
+                        double u, vv;
+                        g_map.apply(g_dots[i].pos.x, g_dots[i].pos.z, u, vv);
+                        float x, y;
+                        ToScreen(v, u, vv, x, y);
+                        const float d2 = (x - mx) * (x - mx) + (y - my) * (y - my);
+                        if (d2 < best && d2 < 49.0f)
+                        {
+                            best = d2;
+                            text = g_dots[i].name;
+                            if (g_dots[i].platoon != NULL && !g_dots[i].platoon->getName().empty())
+                                text += "\n" + g_dots[i].platoon->getName();
+                            if (g_dots[i].bounty > 0)
+                            {
+                                char b[32];
+                                sprintf_s(b, "\n%d c", g_dots[i].bounty);
+                                text += b;
+                            }
+                        }
+                    }
+                    if (!text.empty())
+                    {
+                        ShowTooltip(text, mx, my);
+                        tip = true;
+                    }
+                }
+            }
+        if (!tip)
+            HideTooltip();
+
         // --- в текстуру ---
         void* const data = g_tex->lock(MyGUI::TextureUsage::Write);
         if (data == NULL)
@@ -1721,6 +2201,49 @@ namespace
                 memcpy(row, src, static_cast<size_t>(w) * sizeof(unsigned));
         }
         g_tex->unlock();
+    }
+
+
+    // ПКМ по миникарте - выделенные идут в эту точку, как по ПКМ по земле
+    // (PlayerInterface::playerMove). Точку мира считаем обратным нашим же
+    // преобразованием: mapCoordsToWorld игры принимает целые пиксели большой
+    // карты, а на её мелком масштабе пиксель - это больше сотни метров.
+    // Высота - по земле (UtilityT::getTerrainHeight), если там она есть.
+    void MoveSelectedTo()
+    {
+        if (!g_rightClickMove || !g_haveView || !g_map.ok || ou == NULL || ou->player == NULL)
+            return;
+        MyGUI::Widget* const img = g_imageRef.get();
+        if (img == NULL)
+            return;
+        const MyGUI::IntPoint m = MyGUI::InputManager::getInstance().getMousePosition();
+        const MyGUI::IntPoint a = img->getAbsolutePosition();
+        const View& v = g_lastView;
+        const double dx = (m.left - a.left + 0.5 - v.cx) * v.scale;
+        const double dy = (m.top - a.top + 0.5 - v.cy) * v.scale;
+        const double u = (v.su + v.c * dx - v.s * dy) / v.sw;
+        const double vv = (v.sv + v.s * dx + v.c * dy) / v.sh;
+        const Affine& f = g_map;
+        const double det = f.au * f.bv - f.bu * f.av;
+        if (std::fabs(det) < 1e-18)
+            return;
+        Ogre::Vector3 pos;
+        pos.x = static_cast<float>((f.bv * (u - f.cu) - f.bu * (vv - f.cv)) / det);
+        pos.z = static_cast<float>((-f.av * (u - f.cu) + f.au * (vv - f.cv)) / det);
+        pos.y = ou->getCameraCenter().y;
+        const float ground = UtilityT::getTerrainHeight(pos.x, pos.z);
+        if (ground == ground && ground > -100000.0f && ground < 100000.0f)
+            pos.y = ground;
+        ou->player->playerMove(pos, NULL);
+        g_movePos = pos;
+        g_moveAt = GetTickCount();
+        g_lastRender = 0;
+        if (g_debug)
+        {
+            char note[128];
+            sprintf_s(note, "BestMinimap: move order to %.0f %.0f %.0f", pos.x, pos.y, pos.z);
+            DebugLog(note);
+        }
     }
 
 
@@ -1982,12 +2505,34 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "RotateWithCamera", Tr("Rotate with the camera"), Tr("Off - north is always up."), 0, 0);
     api->toggle(api, kSec, "CenterOnSelected", Tr("Centre on the selected"), Tr("Off - on the centre of the camera."), 0, 0);
     api->toggle(api, kSec, "ShowView", Tr("Camera direction"), Tr("A small arrow in the centre."), 1, 0);
+    api->toggle(api, kSec, "RightClickMove", Tr("Right click - go there"), Tr("Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."), 1, 0);
+    api->toggle(api, kSec, "Tooltips", Tr("Tooltips"), Tr("Hover a town or a character on the minimap: name, faction and relations, squad, bounty."), 1, 0);
 
     api->section(api, Tr("Who is shown"));
     static const char* const catLabels[CAT_COUNT] = { "Your squad", "Allies", "Neutrals", "Enemies", "Animals" };
     for (int i = 0; i < CAT_COUNT; ++i)
         api->toggle(api, kSec, (std::string("Show") + CAT_KEY[i]).c_str(), Tr(catLabels[i]), NULL, 1, 0);
     api->toggle(api, kSec, "ShowDead", Tr("The dead"), Tr("Dimmed."), 0, 0);
+    api->toggle(api, kSec, "ShowFacing", Tr("Facing"), Tr("A small nose on each dot: where the character looks."), 1, 0);
+    api->toggle(api, kSec, "FacingFlip", Tr("Flip the facing"), Tr("If the noses point backwards."), 0, 0);
+    api->toggle(api, kSec, "CharacterNames", Tr("Character names"), Tr("A name under every dot. Many dots - many names."), 0, 0);
+    api->toggle(api, kSec, "ShowBounty", Tr("Bounties"), Tr("A gold ring and the sum on characters with a price on their head, as your character sees it."), 1, 0);
+    api->colour(api, kSec, "BountyColour", Tr("Bounty colour"), NULL, "#F2C230", 0);
+    static const char* const squadValues[] = { "none", "others", "all" };
+    static const char* squadLabels[3];
+    squadLabels[0] = Tr("None");
+    squadLabels[1] = Tr("Other squads");
+    squadLabels[2] = Tr("All squads");
+    api->choice(api, kSec, "SquadLabels", Tr("Squad names"), Tr("The name of a squad over its leader."), "others", squadValues, squadLabels, 3, 0);
+    api->colour(api, kSec, "SquadLabelColour", Tr("Squad name colour"), NULL, "#E6C84A", 0);
+
+    api->section(api, Tr("Towns"));
+    api->toggle(api, kSec, "ShowTowns", Tr("Towns and places"), Tr("Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."), 1, 0);
+    api->toggle(api, kSec, "TownNames", Tr("Town names"), NULL, 1, 0);
+    api->integer(api, kSec, "TownNamesRange", Tr("Names up to range, m"), Tr("Town names are shown while the range is not wider than this: on the whole map they would merge."), 8000, 0, 150000, 0);
+    api->toggle(api, kSec, "TownRadius", Tr("Town radius"), Tr("A thin white circle: how far the town reaches."), 1, 0);
+    api->toggle(api, kSec, "ShowUndiscovered", Tr("Undiscovered too"), Tr("Also the places you have not found yet."), 0, 0);
+    api->colour(api, kSec, "TownColour", Tr("Town colour"), Tr("auto - by the relations of the town's faction to yours: red hostile, green ally."), "auto", 0);
     api->toggle(api, kSec, "MapMarkers", Tr("Map-markers markers"), Tr("Markers of the Map-markers mod, from the current save."), 1, 0);
     api->toggle(api, kSec, "WantedMarkers", Tr("WantedMap targets"), Tr("Targets of the WantedMap mod, as of the last look at the big map."), 1, 0);
     api->toggle(api, kSec, "PinToEdge", Tr("Pin to the edge"), Tr("Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."), 1, 0);
@@ -2003,6 +2548,11 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowCameraRange", Tr("Show how far the camera can go"), Tr("A thin line around your characters: the camera cannot be moved farther."), 1, 0);
     api->integer(api, kSec, "CameraRange", Tr("Camera range, m"), Tr("0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."), 0, 0, 50000, 0);
     api->colour(api, kSec, "CameraRangeColour", Tr("Camera line colour"), NULL, "#E8E2D0", 0);
+    static const char* const rangeStyles[] = { "dots", "line" };
+    static const char* rangeStyleLabels[2];
+    rangeStyleLabels[0] = Tr("Dotted");
+    rangeStyleLabels[1] = Tr("Solid");
+    api->choice(api, kSec, "CameraRangeStyle", Tr("Camera line style"), NULL, "dots", rangeStyles, rangeStyleLabels, 2, 0);
 
     // Подписи цветов - свои, не те же, что у переключателей выше: панель
     // настроек игры различает строки по подписи, и одноимённые строки

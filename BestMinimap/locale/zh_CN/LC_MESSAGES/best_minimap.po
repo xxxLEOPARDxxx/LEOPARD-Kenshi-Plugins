@@ -277,3 +277,114 @@ msgstr "镜头线颜色"
 
 msgid "Under attack: "
 msgstr "遭受攻击："
+
+msgid "A gold ring and the sum on characters with a price on their head, as your character sees it."
+msgstr "悬赏目标显示金色圆环和金额，以你的角色所见为准。"
+
+msgid "A name under every dot. Many dots - many names."
+msgstr "每个点下显示名字。点多则名字多。"
+
+msgid "A small nose on each dot: where the character looks."
+msgstr "每个点上的小尖角：角色面朝的方向。"
+
+msgid "A thin white circle: how far the town reaches."
+msgstr "细白圈：城镇的范围。"
+
+msgid "All squads"
+msgstr "所有小队"
+
+msgid "Also the places you have not found yet."
+msgstr "也显示尚未发现的地点。"
+
+msgid "Bounties"
+msgstr "悬赏"
+
+msgid "Bounty colour"
+msgstr "悬赏颜色"
+
+msgid "Camera line style"
+msgstr "镜头线样式"
+
+msgid "Character names"
+msgstr "角色名字"
+
+msgid "Dotted"
+msgstr "虚线"
+
+msgid "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+msgstr "大地图上标记的一切：城镇、前哨、营地、巢穴、遗迹 - 按游戏所知显示。"
+
+msgid "Facing"
+msgstr "朝向"
+
+msgid "Flip the facing"
+msgstr "反转朝向"
+
+msgid "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+msgstr "将鼠标悬停在小地图上的城镇或角色上：名字、派系与关系、小队、悬赏。"
+
+msgid "If the noses point backwards."
+msgstr "如果尖角朝向反了。"
+
+msgid "Names up to range, m"
+msgstr "名称显示的最大范围（米）"
+
+msgid "Other squads"
+msgstr "其他小队"
+
+msgid "Right click - go there"
+msgstr "右键 - 前往该处"
+
+msgid "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+msgstr "在小地图上右键，选中的角色会前往该位置，与右键点击地面相同。"
+
+msgid "Solid"
+msgstr "实线"
+
+msgid "Squad name colour"
+msgstr "小队名称颜色"
+
+msgid "Squad names"
+msgstr "小队名称"
+
+msgid "The name of a squad over its leader."
+msgstr "小队名称显示在队长上方。"
+
+msgid "Tooltips"
+msgstr "提示"
+
+msgid "Town colour"
+msgstr "城镇颜色"
+
+msgid "Town names"
+msgstr "城镇名称"
+
+msgid "Town names are shown while the range is not wider than this: on the whole map they would merge."
+msgstr "范围不超过此值时显示城镇名称：在整张地图上它们会挤成一团。"
+
+msgid "Town radius"
+msgstr "城镇范围"
+
+msgid "Towns"
+msgstr "城镇"
+
+msgid "Towns and places"
+msgstr "城镇与地点"
+
+msgid "Undiscovered too"
+msgstr "包括未发现的"
+
+msgid "ally"
+msgstr "盟友"
+
+msgid "auto - by the relations of the town's faction to yours: red hostile, green ally."
+msgstr "auto - 按城镇派系与你的关系着色：红色敌对，绿色盟友。"
+
+msgid "hostile"
+msgstr "敌对"
+
+msgid "neutral"
+msgstr "中立"
+
+msgid "your faction"
+msgstr "你的派系"

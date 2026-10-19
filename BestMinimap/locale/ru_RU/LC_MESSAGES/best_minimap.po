@@ -277,3 +277,114 @@ msgstr "Цвет линии камеры"
 
 msgid "Under attack: "
 msgstr "Под атакой: "
+
+msgid "A gold ring and the sum on characters with a price on their head, as your character sees it."
+msgstr "Золотое кольцо и сумма у тех, за чью голову назначена награда, - как её видит ваш персонаж."
+
+msgid "A name under every dot. Many dots - many names."
+msgstr "Имя под каждой точкой. Много точек - много имён."
+
+msgid "A small nose on each dot: where the character looks."
+msgstr "Маленький носик у каждой точки: куда смотрит персонаж."
+
+msgid "A thin white circle: how far the town reaches."
+msgstr "Тонкий белый круг: докуда простирается поселение."
+
+msgid "All squads"
+msgstr "Все отряды"
+
+msgid "Also the places you have not found yet."
+msgstr "Ещё и места, которые вы пока не нашли."
+
+msgid "Bounties"
+msgstr "Награды за голову"
+
+msgid "Bounty colour"
+msgstr "Цвет награды"
+
+msgid "Camera line style"
+msgstr "Вид линии камеры"
+
+msgid "Character names"
+msgstr "Имена персонажей"
+
+msgid "Dotted"
+msgstr "Пунктир"
+
+msgid "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+msgstr "Всё, что отмечает большая карта: города, заставы, лагеря, гнёзда, руины - как их знает игра."
+
+msgid "Facing"
+msgstr "Направление взгляда"
+
+msgid "Flip the facing"
+msgstr "Перевернуть направление"
+
+msgid "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+msgstr "Наведите мышь на поселение или персонажа на миникарте: имя, фракция и отношения, отряд, награда."
+
+msgid "If the noses point backwards."
+msgstr "Если носики смотрят назад."
+
+msgid "Names up to range, m"
+msgstr "Названия до обзора, м"
+
+msgid "Other squads"
+msgstr "Чужие отряды"
+
+msgid "Right click - go there"
+msgstr "ПКМ - идти туда"
+
+msgid "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+msgstr "ПКМ по миникарте отправляет выделенных персонажей в эту точку, как ПКМ по земле."
+
+msgid "Solid"
+msgstr "Сплошная"
+
+msgid "Squad name colour"
+msgstr "Цвет названий отрядов"
+
+msgid "Squad names"
+msgstr "Названия отрядов"
+
+msgid "The name of a squad over its leader."
+msgstr "Название отряда над его лидером."
+
+msgid "Tooltips"
+msgstr "Подсказки"
+
+msgid "Town colour"
+msgstr "Цвет поселений"
+
+msgid "Town names"
+msgstr "Названия поселений"
+
+msgid "Town names are shown while the range is not wider than this: on the whole map they would merge."
+msgstr "Названия поселений видны, пока обзор не шире этого: на всей карте они слились бы."
+
+msgid "Town radius"
+msgstr "Радиус поселений"
+
+msgid "Towns"
+msgstr "Поселения"
+
+msgid "Towns and places"
+msgstr "Поселения и места"
+
+msgid "Undiscovered too"
+msgstr "И неоткрытые"
+
+msgid "ally"
+msgstr "союзник"
+
+msgid "auto - by the relations of the town's faction to yours: red hostile, green ally."
+msgstr "auto - по отношениям фракции поселения к вашей: красное - враги, зелёное - союзники."
+
+msgid "hostile"
+msgstr "враги"
+
+msgid "neutral"
+msgstr "нейтрально"
+
+msgid "your faction"
+msgstr "ваша фракция"
