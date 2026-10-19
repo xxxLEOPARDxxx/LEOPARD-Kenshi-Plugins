@@ -169,8 +169,9 @@ namespace
     int g_size = 220;                   // круг и квадрат: сторона; прямоугольник: ширина
     int g_height = 160;                 // высота прямоугольника
     int g_left = -1, g_top = -1;        // -1 - правый верхний угол
+    bool g_placed = false;              // место выбрано (см. ClampPosition)
     bool g_locked = false;
-    float g_range = 250.0f;             // метров от центра до края
+    float g_range = 2000.0f;            // метров от центра до края
     bool g_rotate = false;
     bool g_centerOnSelected = false;
     int g_opacity = 10;
@@ -262,8 +263,9 @@ namespace
         g_height = ReadInt(ini, "Height", 160, kSizeMin, kSizeMax);
         g_left = ReadInt(ini, "Left", -1, -1, 10000);
         g_top = ReadInt(ini, "Top", -1, -1, 10000);
+        g_placed = g_left >= 0 && g_top >= 0;
         g_locked = ReadBool(ini, "Locked", false);
-        g_range = static_cast<float>(ReadInt(ini, "Range", 250, static_cast<int>(kRangeMin), static_cast<int>(kRangeMax)));
+        g_range = static_cast<float>(ReadInt(ini, "Range", 2000, static_cast<int>(kRangeMin), static_cast<int>(kRangeMax)));
         g_rotate = ReadBool(ini, "RotateWithCamera", false);
         g_centerOnSelected = ReadBool(ini, "CenterOnSelected", false);
         g_opacity = ReadInt(ini, "Opacity", 10, 1, 10);
@@ -895,30 +897,30 @@ namespace
         g_lastRender = 0;
     }
 
-    // Текстура - под размер карты. Ширину округляем до 64 пикселей: тогда
-    // строка текстуры ровно 256 байт * k, и шаг строки у видеокарты совпадает
-    // с нашим (MyGUI отдаёт указатель без шага строки).
+    // Одна текстура на всё время игры - 1024x1024, больше самой большой
+    // миникарты (kSizeMax). Видна только её часть размером с миникарту
+    // (setImageCoord), рисуем тоже только в неё.
     //
-    // Старую текстуру не удаляем здесь, а отдаём в retired: удалить её можно
-    // только после того, как картинка переключится на новую, - иначе она
-    // успеет сослаться на удалённую.
-    bool EnsureTexture(int w, int h, MyGUI::ITexture*& retired)
+    // Первая версия пересоздавала текстуру под каждый размер, и после первой
+    // же смены размера или формы миникарта пропадала (20.10.2026): картинка
+    // MyGUI не переживала подмену текстуры. Одна неизменная текстура это
+    // снимает, а 4 МБ видеопамяти - не цена.
+    //
+    // Ширина кратна 64 пикселям: строка - ровно 4 КБ, шаг строки у
+    // видеокарты совпадает с нашим (MyGUI отдаёт указатель без шага строки).
+    const int kTexSize = 1024;
+
+    bool EnsureTexture()
     {
-        retired = NULL;
-        const int tw = (w + 63) / 64 * 64;
-        if (g_tex != NULL && g_texW == tw && g_texH == h)
+        if (g_tex != NULL)
             return true;
-        retired = g_tex;
-        g_tex = NULL;
-        g_texName.clear();
-        g_texW = g_texH = 0;
         char name[64];
         sprintf_s(name, "BestMinimap_View_%d", ++g_texSerial);
         try
         {
             MyGUI::RenderManager& rm = MyGUI::RenderManager::getInstance();
             g_tex = rm.createTexture(name);
-            g_tex->createManual(tw, h, MyGUI::TextureUsage::Dynamic | MyGUI::TextureUsage::Write,
+            g_tex->createManual(kTexSize, kTexSize, MyGUI::TextureUsage::Dynamic | MyGUI::TextureUsage::Write,
                                 MyGUI::PixelFormat::R8G8B8A8);
         }
         catch (...)
@@ -931,17 +933,21 @@ namespace
             return false;
         }
         g_texName = name;
-        g_texW = tw;
-        g_texH = h;
+        g_texW = kTexSize;
+        g_texH = kTexSize;
         return true;
     }
+
+    // Место ещё не выбрано (Left/Top = -1 в ini) - правый верхний угол.
+    // Отдельным флагом, а не «g_left < 0»: при перетаскивании за край экрана
+    // координата становится отрицательной, и раньше это принималось за «места
+    // нет» - миникарта отскакивала из угла на место по умолчанию (20.10.2026).
 
     void ClampPosition(int w, int h)
     {
         const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
-        if (g_left < 0 || g_top < 0)
+        if (!g_placed)
         {
-            // По умолчанию - правый верхний угол, с отступом.
             g_left = view.width - w - 24;
             g_top = 24;
         }
@@ -967,6 +973,7 @@ namespace
         if (!g_dragging || root == NULL)
             return;
         const MyGUI::IntPoint mouse = MyGUI::InputManager::getInstance().getMousePosition();
+        g_placed = true;
         g_left = g_dragOrigin.left + (mouse.left - g_dragMouse.left);
         g_top = g_dragOrigin.top + (mouse.top - g_dragMouse.top);
         ClampPosition(root->getWidth(), root->getHeight());
@@ -1068,10 +1075,10 @@ namespace
         }
         root->setNeedMouseFocus(true);
 
-        MyGUI::ITexture* retired = NULL;
-        const bool ok = EnsureTexture(w, h, retired);
+        if (!EnsureTexture())
+            return false;
         MyGUI::ImageBox* const box = image->castType<MyGUI::ImageBox>();
-        if (ok && (g_viewW != w || g_viewH != h || box->_getTextureName() != g_texName))
+        if (g_viewW != w || g_viewH != h || box->_getTextureName() != g_texName)
         {
             box->setCoord(pad, pad, w, h);
             box->setImageTexture(g_texName);
@@ -1080,13 +1087,7 @@ namespace
             g_viewH = h;
             g_dirtyMask = true;
         }
-        if (retired != NULL)
-        {
-            if (!ok)
-                box->setImageTexture("");   // новой нет - от старой картинку отвязываем
-            MyGUI::RenderManager::getInstance().destroyTexture(retired);
-        }
-        return ok;
+        return true;
     }
 
     void Show(bool on)
@@ -1452,8 +1453,6 @@ namespace
                 }
             else
                 memcpy(row, src, static_cast<size_t>(w) * sizeof(unsigned));
-            for (int x = w; x < g_texW; ++x)
-                row[x] = 0;
         }
         g_tex->unlock();
     }
@@ -1692,7 +1691,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     shapeLabels[2] = Tr("Rectangle");
     api->choice(api, kSec, "Shape", Tr("Shape"), NULL, "circle", shapes, shapeLabels, 3, 0);
     api->integer(api, kSec, "Size", Tr("Size, px"), Tr("Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."), 220, kSizeMin, kSizeMax, 0);
-    api->integer(api, kSec, "Height", Tr("Rectangle height, px"), NULL, 160, kSizeMin, kSizeMax, 0);
+    api->integer(api, kSec, "Height", Tr("Rectangle height, px"), Tr("Only for the Rectangle shape. The width is the Size above."), 160, kSizeMin, kSizeMax, 0);
     static const char* const frames[] = { "none", "line", "game" };
     static const char* frameLabels[3];
     frameLabels[0] = Tr("None");
@@ -1706,7 +1705,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "Locked", Tr("Lock position"), Tr("Off - drag the minimap with the left mouse button."), 0, 0);
 
     api->section(api, Tr("Map"));
-    api->integer(api, kSec, "Range", Tr("Range, m"), Tr("From the centre to the edge. The wheel over the minimap and the zoom keys change it too."), 250, static_cast<int>(kRangeMin), static_cast<int>(kRangeMax), 0);
+    api->integer(api, kSec, "Range", Tr("Range, m"), Tr("From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."), 2000, static_cast<int>(kRangeMin), static_cast<int>(kRangeMax), 0);
     api->hotkey(api, kSec, "KeyZoomIn", Tr("Zoom in key"), NULL, "=", 0);
     api->hotkey(api, kSec, "KeyZoomOut", Tr("Zoom out key"), NULL, "-", 0);
     api->hotkey(api, kSec, "KeyBigger", Tr("Bigger key"), Tr("Makes the minimap itself bigger on the screen."), "CTRL+=", 0);

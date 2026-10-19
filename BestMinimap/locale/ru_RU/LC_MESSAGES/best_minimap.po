@@ -68,8 +68,8 @@ msgstr "Рамка"
 msgid "Frame colour"
 msgstr "Цвет рамки"
 
-msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
-msgstr "От центра до края. Меняется и колесом над миникартой, и клавишами масштаба."
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+msgstr "От центра до края. Меняется и колесом над миникартой, и клавишами масштаба. В картинке карты игры около 70 м на пиксель, поэтому ближе примерно 1500 м она расплывается."
 
 msgid "Game panel"
 msgstr "Панель игры"
@@ -226,3 +226,6 @@ msgstr "Цвет врагов"
 
 msgid "Animals colour"
 msgstr "Цвет животных"
+
+msgid "Only for the Rectangle shape. The width is the Size above."
+msgstr "Только для формы «Прямоугольник». Ширина - это «Размер» выше."

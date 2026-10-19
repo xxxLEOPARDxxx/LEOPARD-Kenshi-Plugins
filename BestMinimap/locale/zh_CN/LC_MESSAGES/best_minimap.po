@@ -68,8 +68,8 @@ msgstr "边框"
 msgid "Frame colour"
 msgstr "边框颜色"
 
-msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
-msgstr "从中心到边缘的距离。在小地图上滚动滚轮或使用缩放按键也可调整。"
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+msgstr "从中心到边缘的距离。在小地图上滚动滚轮或使用缩放按键也可调整。游戏地图图片每像素约 70 米，因此低于约 1500 米时会变模糊。"
 
 msgid "Game panel"
 msgstr "游戏面板"
@@ -226,3 +226,6 @@ msgstr "敌人颜色"
 
 msgid "Animals colour"
 msgstr "动物颜色"
+
+msgid "Only for the Rectangle shape. The width is the Size above."
+msgstr "仅用于矩形。宽度即上方的“大小”。"

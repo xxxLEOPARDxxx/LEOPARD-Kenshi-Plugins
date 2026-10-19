@@ -68,8 +68,8 @@ msgstr "Frame"
 msgid "Frame colour"
 msgstr "Frame colour"
 
-msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
-msgstr "From the centre to the edge. The wheel over the minimap and the zoom keys change it too."
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+msgstr "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
 
 msgid "Game panel"
 msgstr "Game panel"
@@ -226,3 +226,6 @@ msgstr "Enemies colour"
 
 msgid "Animals colour"
 msgstr "Animals colour"
+
+msgid "Only for the Rectangle shape. The width is the Size above."
+msgstr "Only for the Rectangle shape. The width is the Size above."
