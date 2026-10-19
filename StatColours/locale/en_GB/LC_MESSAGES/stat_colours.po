@@ -215,14 +215,14 @@ msgstr "0 turns the whole plugin off (after a restart)."
 msgid "Combat stance"
 msgstr "Combat stance"
 
-msgid "Selected: racial XP multipliers above the name of the selected character in the world, while SelectedKey is held: 1 shows them, 0 hides."
-msgstr "Selected: racial XP multipliers above the name of the selected character in the world, while SelectedKey is held: 1 shows them, 0 hides."
+msgid "Selected: racial XP multipliers above the name of the selected recruit in the world (anyone - with Debug=1), while SelectedKey is held: 1 shows them, 0 hides."
+msgstr "Selected: racial XP multipliers above the name of the selected recruit in the world (anyone - with Debug=1), while SelectedKey is held: 1 shows them, 0 hides."
 
-msgid "Above the selected character"
-msgstr "Above the selected character"
+msgid "Above the selected recruit"
+msgstr "Above the selected recruit"
 
-msgid "Racial XP multipliers above the name of the selected character in the world - anyone: a recruit, a trader, your own. Handy before recruiting."
-msgstr "Racial XP multipliers above the name of the selected character in the world - anyone: a recruit, a trader, your own. Handy before recruiting."
+msgid "Racial XP multipliers above the name of the selected character in the world, if they can be recruited - handy before recruiting. With the detailed log on (Diagnostics) - for anyone."
+msgstr "Racial XP multipliers above the name of the selected character in the world, if they can be recruited - handy before recruiting. With the detailed log on (Diagnostics) - for anyone."
 
 msgid "Key above the name"
 msgstr "Key above the name"

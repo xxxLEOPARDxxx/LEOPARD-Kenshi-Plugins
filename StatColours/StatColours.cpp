@@ -94,7 +94,16 @@
 
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/RootObject.h>
+#include <kenshi/GameData.h>
 #include <WidgetRef.h>
+
+// Нанимаемость по диалогу (как в RecruitMarkers): conversationsMain у
+// Dialogue закрытый.
+#define private public
+#define protected public
+#include <kenshi/Dialogue.h>
+#undef private
+#undef protected
 
 
 namespace
@@ -427,7 +436,7 @@ namespace
         fprintf(f, "\n; %s\n", Tr("Racial XP multipliers under the attributes: 1 shows them, 0 hides."));
         fprintf(f, "; %s\n", Tr("HoldKey: any key (ALT, CTRL, SHIFT, F, CTRL+B...) - shown only while held; NONE - always."));
         fprintf(f, "; %s\n", Tr("ShowRate: current XP rate after the skill name in the description: 1 shows it, 0 hides."));
-        fprintf(f, "; %s\n", Tr("Selected: racial XP multipliers above the name of the selected character in the world, while SelectedKey is held: 1 shows them, 0 hides."));
+        fprintf(f, "; %s\n", Tr("Selected: racial XP multipliers above the name of the selected recruit in the world (anyone - with Debug=1), while SelectedKey is held: 1 shows them, 0 hides."));
         fputs("[RacialXP]\nShow=1\nHoldKey=ALT\nShowRate=1\nSelected=1\nSelectedKey=ALT\n", f);
 
         fclose(f);
@@ -2239,6 +2248,156 @@ namespace
         }
     }
 
+    // ---- Нанимаемость: код RecruitMarkers (16.10.2026), перенесён как есть ----
+    //
+    // Решение пользователя (19.10.2026): панель - только у тех, кого можно
+    // нанять; у всех подряд - при включённом подробном журнале ([Debug]).
+    // Нанимаемый - у кого в живом диалоге «игрок заговорил со мной» есть
+    // открытая реплика с действием «вступить в отряд».
+
+    const bool g_checkConditions = true;
+    const int kNodeLimit = 4000;        // реплик за один обход диалога
+    const int kDepthLimit = 40;
+    const DWORD kCacheMs = 10000;       // ответ по персонажу живёт 10 с
+
+    struct ScanState
+    {
+        Dialogue* dialogue;
+        Character* target;              // собеседник - персонаж игрока
+        GameData* me;                   // данные самого персонажа
+        int nodes;
+    };
+
+    bool IsJoinLine(DialogLineData* line)
+    {
+        const lektor<DialogLineData::DialogAction*>& actions = line->actions;
+        for (uint32_t i = 0; i < actions.size(); ++i)
+        {
+            const DialogLineData::DialogAction* a = actions[i];
+            if (a != NULL && (a->key == DA_JOIN_SQUAD_WITH_EDIT || a->key == DA_JOIN_SQUAD_FAST))
+                return true;
+        }
+        return false;
+    }
+
+    bool LineOpen(ScanState& s, DialogLineData* line, bool root)
+    {
+        if (s.dialogue->isLocked(line))
+            return false;
+        if (line->onceOnly && line->saidItBefore())
+            return false;
+        // Разговор для другого конкретного персонажа из общего пакета.
+        if (root && s.me != NULL && line->hasSpecificCharacterRequirement() &&
+            !line->isForSpecificCharacter(s.me))
+            return false;
+        if (g_checkConditions && s.target != NULL &&
+            !line->checkConditions(s.dialogue, s.target, false))
+            return false;
+        return true;
+    }
+
+    bool FindJoin(ScanState& s, DialogChoiceList* list, int depth, bool root)
+    {
+        if (list == NULL || depth > kDepthLimit)
+            return false;
+        const lektor<DialogLineData*>& choices = list->conversationChoices;
+        for (uint32_t i = 0; i < choices.size(); ++i)
+        {
+            DialogLineData* const line = choices[i];
+            if (line == NULL || ++s.nodes > kNodeLimit)
+                return false;
+            if (!LineOpen(s, line, root))
+                continue;
+            if (IsJoinLine(line))
+                return true;
+            if (FindJoin(s, line->children, depth + 1, false))
+                return true;
+        }
+        return false;
+    }
+
+    // 1 - нанимаемый, 0 - нет, -1 - диалог не прочитался (сбой)
+    int ScanDialogueRaw(Character* c, Character* target, int& nodes)
+    {
+        Dialogue* const dialogue = c->dialogue;
+        if (dialogue == NULL)
+            return 0;
+        ScanState s;
+        s.dialogue = dialogue;
+        s.target = target;
+        s.me = c->data;
+        s.nodes = 0;
+        int found = 0;
+        typedef std::map<EventTriggerEnum, DialogChoiceList*, std::less<EventTriggerEnum>,
+                         Ogre::STLAllocator<std::pair<EventTriggerEnum const, DialogChoiceList*>,
+                                            Ogre::GeneralAllocPolicy> > Lists;
+        const Lists& lists = dialogue->conversationsMain;
+        Lists::const_iterator it = lists.find(EV_PLAYER_TALK_TO_ME);
+        if (it != lists.end() && FindJoin(s, it->second, 0, true))
+            found = 1;
+        nodes = s.nodes;
+        return found;
+    }
+
+    int ScanDialogue(Character* c, Character* target, int& nodes)
+    {
+        __try
+        {
+            return ScanDialogueRaw(c, target, nodes);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return -1;
+        }
+    }
+
+    Character* Talker(Character* npc)
+    {
+        if (ou == NULL || ou->player == NULL)
+            return NULL;
+        const Ogre::Vector3 pos = npc->getPosition();
+        Character* c = ou->player->getNearestSelectedCharacterTo(pos);
+        if (c == NULL)
+            c = ou->player->getNearestCharacterTo(pos);
+        return c;
+    }
+
+    Character* SafeTalker(Character* npc)
+    {
+        __try
+        {
+            return Talker(npc);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return NULL;
+        }
+    }
+
+    // Ответ по выделенному - на 10 с (диалог за это время не меняется, а
+    // обход - сотни реплик): пока клавиша зажата, каждый кадр не ходим.
+    Character* g_recruitFor = NULL;
+    DWORD g_recruitAt = 0;
+    bool g_recruitable = false;
+
+    bool SelectedRecruitable(Character* c)
+    {
+        const DWORD now = GetTickCount();
+        if (c == g_recruitFor && now - g_recruitAt < kCacheMs)
+            return g_recruitable;
+        g_recruitFor = c;
+        g_recruitAt = now;
+        int nodes = 0;
+        g_recruitable = !c->isPlayerCharacter() && ScanDialogue(c, SafeTalker(c), nodes) == 1;
+        if (g_debug)
+        {
+            char note[96];
+            sprintf_s(note, "StatColours: recruitable=%d (%d dialogue lines)", g_recruitable ? 1 : 0, nodes);
+            DebugLog(std::string(note) + " - " + c->displayName);
+        }
+        return g_recruitable;
+    }
+
     void UpdateSelectedRacial()
     {
         if (!g_showSelectedRacial || ou == NULL || ou->player == NULL ||
@@ -2249,8 +2408,11 @@ namespace
         }
 
         RootObject* const selected = ou->player->selectedObject.getRootObject();
-        RaceData* const race = selected != NULL && selected->getDataType() == CHARACTER
-            ? selected->getRace() : NULL;
+        Character* const who = selected != NULL && selected->getDataType() == CHARACTER
+            ? static_cast<Character*>(selected) : NULL;
+        // Только нанимаемых; всех - при подробном журнале ([Debug] Debug=1).
+        RaceData* const race = who != NULL && (g_debug || SelectedRecruitable(who))
+            ? who->getRace() : NULL;
         MyGUI::Widget* const plate = race != NULL ? NamePanel() : NULL;
         if (plate == NULL || !plate->getInheritedVisible())
         {
@@ -2392,7 +2554,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Racial XP"));
     api->toggle(api, "RacialXP", "Show", Tr("Racial XP multipliers"), Tr("Racial XP multipliers under the attributes in the character window."), 1, 0);
     api->hotkey(api, "RacialXP", "HoldKey", Tr("Show while held"), Tr("The multipliers are shown only while this key is held. Click and press a key; Backspace - no key, always shown."), "ALT", 0);
-    api->toggle(api, "RacialXP", "Selected", Tr("Above the selected character"), Tr("Racial XP multipliers above the name of the selected character in the world - anyone: a recruit, a trader, your own. Handy before recruiting."), 1, 0);
+    api->toggle(api, "RacialXP", "Selected", Tr("Above the selected recruit"), Tr("Racial XP multipliers above the name of the selected character in the world, if they can be recruited - handy before recruiting. With the detailed log on (Diagnostics) - for anyone."), 1, 0);
     api->hotkey(api, "RacialXP", "SelectedKey", Tr("Key above the name"), Tr("The multipliers above the name are shown only while this key is held. Backspace - no key, always shown."), "ALT", 0);
     api->toggle(api, "RacialXP", "ShowRate", Tr("Current XP rate"), Tr("The current XP rate in brackets after the skill name in the skill description."), 1, 0);
     api->section(api, Tr("Colours"));

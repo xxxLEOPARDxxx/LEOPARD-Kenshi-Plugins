@@ -215,14 +215,14 @@ msgstr "0 关闭整个插件(重启游戏后生效)。"
 msgid "Combat stance"
 msgstr "战斗姿态"
 
-msgid "Selected: racial XP multipliers above the name of the selected character in the world, while SelectedKey is held: 1 shows them, 0 hides."
-msgstr "Selected：按住 SelectedKey 时，在世界中被选中角色的名字上方显示种族经验倍率：1 显示，0 隐藏。"
+msgid "Selected: racial XP multipliers above the name of the selected recruit in the world (anyone - with Debug=1), while SelectedKey is held: 1 shows them, 0 hides."
+msgstr "Selected：按住 SelectedKey 时，在世界中被选中的可招募者名字上方显示种族经验倍率（Debug=1 时任何角色）：1 显示，0 隐藏。"
 
-msgid "Above the selected character"
-msgstr "在选中角色上方"
+msgid "Above the selected recruit"
+msgstr "在选中的可招募者上方"
 
-msgid "Racial XP multipliers above the name of the selected character in the world - anyone: a recruit, a trader, your own. Handy before recruiting."
-msgstr "在世界中被选中角色的名字上方显示种族经验倍率——任何角色：可招募者、商人、自己人。招募前很方便。"
+msgid "Racial XP multipliers above the name of the selected character in the world, if they can be recruited - handy before recruiting. With the detailed log on (Diagnostics) - for anyone."
+msgstr "在世界中被选中角色的名字上方显示种族经验倍率（仅限可招募者）——招募前很方便。开启详细日志（诊断）时——对任何角色显示。"
 
 msgid "Key above the name"
 msgstr "名字上方按键"
