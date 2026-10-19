@@ -241,3 +241,6 @@ msgstr "负重"
 
 msgid "Load, weapon and other"
 msgstr "负重、武器及其他"
+
+msgid "Equipment and other"
+msgstr "装备及其他"

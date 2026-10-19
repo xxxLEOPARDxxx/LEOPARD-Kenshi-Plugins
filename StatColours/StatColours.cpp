@@ -992,6 +992,24 @@ namespace
         return static_cast<int>(v < 0.0f ? v - 0.5f : v + 0.5f);
     }
 
+    // Произведение процентов из строк росписи игры («+56%», «-16%»; с
+    // тегами цвета). Строки без процента («Навык», «Всего») - мимо.
+    float RowsFactor(const std::vector<std::pair<std::string, std::string> >& rows, int& count)
+    {
+        float factor = 1.0f;
+        count = 0;
+        for (size_t i = 0; i < rows.size(); ++i)
+        {
+            const std::string text = StripTags(rows[i].second);
+            if (text.empty() || text[text.size() - 1] != '%')
+                continue;
+            const float percent = static_cast<float>(atof(text.c_str()));
+            factor *= 1.0f + percent / 100.0f;
+            ++count;
+        }
+        return factor;
+    }
+
     void AddRow(const char* label, int value)
     {
         if (value == 0)
@@ -1239,8 +1257,31 @@ namespace
                 else if (!combat && (rich || delta != 0))
                 {
                     // Её «Всего» и есть итог - своего не дописываем (было два).
-                    for (size_t i = 0; i < game.size() && static_cast<int>(g_describedRows.size()) < room; ++i)
+                    //
+                    // Но роспись игры бывает неполной: у скрытности она не
+                    // пишет множители скрытности надетого - «Навык 12, Всего
+                    // 1» без строк между ними (Discord, 19.10.2026: рюкзак,
+                    // штаны и ботинки режут скрытность). Что строки не
+                    // объясняют, ставим перед её «Всего»: навык, умноженный
+                    // на проценты строк, против итога игры (getStat(false)).
+                    // Проценты у игры целые («+29%» при множителе 1,30), и
+                    // без допуска на это округление вылезало бы «+1» на
+                    // ровном месте: на каждую строку с процентом - полпроцента
+                    // итога, но не меньше полутора пунктов.
+                    int percentRows = 0;
+                    const float factor = RowsFactor(game, percentRows);
+                    const float result = stats->getStat(stat, false);
+                    const float gap = result - stats->getStat(stat, true) * factor;
+                    const float tolerance = std::max(1.5f, fabsf(result) * 0.005f * percentRows);
+                    const int missing = fabsf(gap) >= tolerance ? Rounded(gap) : 0;
+                    const bool addMissing = game.size() >= 2 && missing != 0;
+                    const size_t limit = static_cast<size_t>(room) - (addMissing ? 1 : 0);
+                    for (size_t i = 0; i + 1 < game.size() && g_describedRows.size() < limit - 1; ++i)
                         g_describedRows.push_back(game[i]);
+                    if (addMissing)
+                        AddRow("Equipment and other", missing);
+                    if (!game.empty())
+                        g_describedRows.push_back(game.back());
 
                     // Росписи нет совсем - хотя бы саму поправку и итог.
                     if (game.empty())

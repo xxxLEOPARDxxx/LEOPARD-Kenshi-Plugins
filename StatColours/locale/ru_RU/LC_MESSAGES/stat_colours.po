@@ -241,3 +241,6 @@ msgstr "Вес ноши"
 
 msgid "Load, weapon and other"
 msgstr "Вес ноши, оружие и прочее"
+
+msgid "Equipment and other"
+msgstr "Снаряжение и прочее"

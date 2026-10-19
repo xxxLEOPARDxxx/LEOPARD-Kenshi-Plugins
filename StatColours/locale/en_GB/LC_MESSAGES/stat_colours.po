@@ -241,3 +241,6 @@ msgstr "Load"
 
 msgid "Load, weapon and other"
 msgstr "Load, weapon and other"
+
+msgid "Equipment and other"
+msgstr "Equipment and other"
