@@ -211,3 +211,18 @@ msgstr "auto - from the palette of the game (and of interface mods)."
 
 msgid "auto - the colour the game gives this character on the big map."
 msgstr "auto - the colour the game gives this character on the big map."
+
+msgid "Your squad colour"
+msgstr "Your squad colour"
+
+msgid "Allies colour"
+msgstr "Allies colour"
+
+msgid "Neutrals colour"
+msgstr "Neutrals colour"
+
+msgid "Enemies colour"
+msgstr "Enemies colour"
+
+msgid "Animals colour"
+msgstr "Animals colour"

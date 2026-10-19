@@ -1548,22 +1548,49 @@ namespace
         return ou->getCameraCenter();
     }
 
+    // Почему миникарта сейчас скрыта - в журнал при каждой смене причины
+    // (не каждый кадр). Без этого «не появилась» нечем разбирать: первая
+    // версия молча пряталась, потому что MapScreen::getVisible() отвечает
+    // «видна» и при закрытом окне карты (20.10.2026).
+    std::string g_reason = "start";
+
+    void Reason(const std::string& why)
+    {
+        if (why == g_reason)
+            return;
+        g_reason = why;
+        DebugLog(why.empty() ? std::string("BestMinimap: shown") : "BestMinimap: hidden - " + why);
+    }
+
+    void Hide(const std::string& why)
+    {
+        Show(false);
+        Reason(why);
+    }
+
+    // Открыта ли большая карта. MapScreen::getVisible() не годится: виджет
+    // вкладки карты остаётся «видимым» и в закрытом окне управления -
+    // смотрим видимость с учётом всех родителей.
+    bool BigMapOpen(MapScreen* map)
+    {
+        return map->mainWidget != NULL && map->mainWidget->getInheritedVisible();
+    }
+
     void Tick()
     {
         const DWORD now = GetTickCount();
-        if (!g_enabled || ou == NULL || ou->player == NULL)
-        {
-            Show(false);
-            return;
-        }
+        if (!g_enabled)
+            return Hide("disabled (Enabled=0)");
+        if (ou == NULL || ou->player == NULL)
+            return Hide("no game world");
         PollKeys(now);
+        if (!g_visible)
+            return Hide("switched off by the key (Visible=0)");
         MapScreen* const map = GetMapScreen();
-        // Большая карта открыта - миникарта не нужна.
-        if (!g_visible || map == NULL || map->mapImage == NULL || map->getVisible())
-        {
-            Show(false);
-            return;
-        }
+        if (map == NULL || map->mapImage == NULL)
+            return Hide("the game has no map screen yet");
+        if (BigMapOpen(map))
+            return Hide("the big map is open");
 
         const std::string texture = map->mapImage->_getTextureName();
         if (texture != g_src.texture && texture != g_srcFailed)
@@ -1588,18 +1615,19 @@ namespace
             }
             if (!g_map.ok)
             {
-                Show(false);
-                return;
+                char why[200];
+                sprintf_s(why, "map placement unknown yet (map image %dx%d, worldBounds %.0f %.0f %.0f %.0f)",
+                          map->mapImage->getWidth(), map->mapImage->getHeight(), map->worldBounds.x,
+                          map->worldBounds.y, map->worldBounds.z, map->worldBounds.w);
+                return Hide(why);
             }
         }
 
         if (!EnsureWidgets())
-        {
-            Show(false);
-            return;
-        }
+            return Hide("could not create the minimap widgets or texture");
         if (g_hidden)
             Show(true);
+        Reason("");
 
         const DWORD period = 1000 / static_cast<DWORD>(g_fps);
         if (g_lastRender != 0 && now - g_lastRender < period)
@@ -1633,7 +1661,7 @@ namespace
         g_origGuiUpdate(self);
         if (!g_hidden && GetTickCount() - g_lastWorldFrame > 300)
         {
-            Show(false);
+            Hide("the game loop stopped (main menu or loading)");
             g_map = Affine();
             g_catCache.clear();
             g_mapPinsFile.clear();
@@ -1696,9 +1724,14 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "WantedMarkers", Tr("WantedMap targets"), Tr("Targets of the WantedMap mod, as of the last look at the big map."), 1, 0);
     api->toggle(api, kSec, "PinToEdge", Tr("Pin to the edge"), Tr("Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."), 1, 0);
 
+    // Подписи цветов - свои, не те же, что у переключателей выше: панель
+    // настроек игры различает строки по подписи, и одноимённые строки
+    // сливались - раздел «Цвета» был пустым (20.10.2026).
     api->section(api, Tr("Colours"));
+    static const char* const colourLabels[CAT_COUNT] = {
+        "Your squad colour", "Allies colour", "Neutrals colour", "Enemies colour", "Animals colour" };
     for (int i = 0; i < CAT_COUNT; ++i)
-        api->colour(api, kSec, (std::string("Colour") + CAT_KEY[i]).c_str(), Tr(catLabels[i]),
+        api->colour(api, kSec, (std::string("Colour") + CAT_KEY[i]).c_str(), Tr(colourLabels[i]),
                     Tr("auto - the colour the game gives this character on the big map."), CAT_DEFAULT[i], 0);
 
     api->section(api, Tr("Diagnostics"));

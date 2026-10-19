@@ -211,3 +211,18 @@ msgstr "auto - 使用游戏（及界面模组）的配色。"
 
 msgid "auto - the colour the game gives this character on the big map."
 msgstr "auto - 使用游戏在大地图上标记该角色的颜色。"
+
+msgid "Your squad colour"
+msgstr "你的小队颜色"
+
+msgid "Allies colour"
+msgstr "盟友颜色"
+
+msgid "Neutrals colour"
+msgstr "中立颜色"
+
+msgid "Enemies colour"
+msgstr "敌人颜色"
+
+msgid "Animals colour"
+msgstr "动物颜色"

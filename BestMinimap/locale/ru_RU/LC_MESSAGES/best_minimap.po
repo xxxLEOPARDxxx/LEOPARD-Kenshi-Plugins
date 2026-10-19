@@ -211,3 +211,18 @@ msgstr "auto - из палитры игры (и модов на интерфей
 
 msgid "auto - the colour the game gives this character on the big map."
 msgstr "auto - цвет, которым игра отмечает этого персонажа на большой карте."
+
+msgid "Your squad colour"
+msgstr "Цвет вашего отряда"
+
+msgid "Allies colour"
+msgstr "Цвет союзников"
+
+msgid "Neutrals colour"
+msgstr "Цвет нейтралов"
+
+msgid "Enemies colour"
+msgstr "Цвет врагов"
+
+msgid "Animals colour"
+msgstr "Цвет животных"
