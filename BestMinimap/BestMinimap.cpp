@@ -167,7 +167,6 @@ namespace
     bool g_visible = true;              // переключается клавишей, хранится в ini
     Shape g_shape = SHAPE_CIRCLE;
     int g_size = 220;                   // круг и квадрат: сторона; прямоугольник: ширина
-    int g_height = 160;                 // высота прямоугольника
     int g_left = -1, g_top = -1;        // -1 - правый верхний угол
     bool g_placed = false;              // место выбрано (см. ClampPosition)
     bool g_locked = false;
@@ -260,7 +259,6 @@ namespace
         const std::string shape = ReadText(ini, "Shape", "circle");
         g_shape = shape == "square" ? SHAPE_SQUARE : (shape == "rect" ? SHAPE_RECT : SHAPE_CIRCLE);
         g_size = ReadInt(ini, "Size", 220, kSizeMin, kSizeMax);
-        g_height = ReadInt(ini, "Height", 160, kSizeMin, kSizeMax);
         g_left = ReadInt(ini, "Left", -1, -1, 10000);
         g_top = ReadInt(ini, "Top", -1, -1, 10000);
         g_placed = g_left >= 0 && g_top >= 0;
@@ -888,7 +886,8 @@ namespace
     bool g_hidden = true;
 
     int ViewWidth() { return g_size; }
-    int ViewHeight() { return g_shape == SHAPE_RECT ? g_height : g_size; }
+    // Прямоугольник - всегда 16:10, как экран: ширина - Size, высота из неё.
+    int ViewHeight() { return g_shape == SHAPE_RECT ? (g_size * 10 + 8) / 16 : g_size; }
     int GamePad() { return g_frame == FRAME_GAME && g_shape != SHAPE_CIRCLE ? 8 : 0; }
 
     void Invalidate()
@@ -1000,11 +999,6 @@ namespace
     {
         g_size = Clamp(g_size + delta, kSizeMin, kSizeMax);
         WriteInt("Size", g_size);
-        if (g_shape == SHAPE_RECT)
-        {
-            g_height = Clamp(g_height + delta * 3 / 4, kSizeMin, kSizeMax);
-            WriteInt("Height", g_height);
-        }
         Invalidate();
     }
 
@@ -1081,8 +1075,12 @@ namespace
         if (g_viewW != w || g_viewH != h || box->_getTextureName() != g_texName)
         {
             box->setCoord(pad, pad, w, h);
-            box->setImageTexture(g_texName);
-            box->setImageCoord(MyGUI::IntCoord(0, 0, w, h));
+            // Текстура, часть её и «плитка» - одним вызовом. По отдельности
+            // нельзя: размер плитки ImageBox запоминает при первой установке
+            // и сам не меняет, и после смены размера миникарты показывался
+            // кусок старого размера, растянутый на новый, - центр уезжал
+            // (20.10.2026).
+            box->setImageInfo(g_texName, MyGUI::IntCoord(0, 0, w, h), MyGUI::IntSize(w, h));
             g_viewW = w;
             g_viewH = h;
             g_dirtyMask = true;
@@ -1689,9 +1687,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     shapeLabels[0] = Tr("Circle");
     shapeLabels[1] = Tr("Square");
     shapeLabels[2] = Tr("Rectangle");
-    api->choice(api, kSec, "Shape", Tr("Shape"), NULL, "circle", shapes, shapeLabels, 3, 0);
+    api->choice(api, kSec, "Shape", Tr("Shape"), Tr("The rectangle is 16:10, its width is the Size."), "circle", shapes, shapeLabels, 3, 0);
     api->integer(api, kSec, "Size", Tr("Size, px"), Tr("Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."), 220, kSizeMin, kSizeMax, 0);
-    api->integer(api, kSec, "Height", Tr("Rectangle height, px"), Tr("Only for the Rectangle shape. The width is the Size above."), 160, kSizeMin, kSizeMax, 0);
     static const char* const frames[] = { "none", "line", "game" };
     static const char* frameLabels[3];
     frameLabels[0] = Tr("None");

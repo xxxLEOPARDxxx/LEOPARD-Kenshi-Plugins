@@ -27,7 +27,7 @@ msgid "Background"
 msgstr "Фон"
 
 msgid "Bigger key"
-msgstr "Клавиша «больше»"
+msgstr "Клавиша \"больше\""
 
 msgid "Camera direction"
 msgstr "Направление камеры"
@@ -149,9 +149,6 @@ msgstr "Обзор, м"
 msgid "Rectangle"
 msgstr "Прямоугольник"
 
-msgid "Rectangle height, px"
-msgstr "Высота прямоугольника, пикс."
-
 msgid "Rotate with the camera"
 msgstr "Поворачивать за камерой"
 
@@ -159,7 +156,7 @@ msgid "Shape"
 msgstr "Форма"
 
 msgid "Show / hide key"
-msgstr "Клавиша «показать / скрыть»"
+msgstr "Клавиша \"показать / скрыть\""
 
 msgid "Shown"
 msgstr "Показана"
@@ -171,7 +168,7 @@ msgid "Size, px"
 msgstr "Размер, пикс."
 
 msgid "Smaller key"
-msgstr "Клавиша «меньше»"
+msgstr "Клавиша \"меньше\""
 
 msgid "Square"
 msgstr "Квадрат"
@@ -186,7 +183,7 @@ msgid "The dead"
 msgstr "Мёртвые"
 
 msgid "The same switch as the show / hide key."
-msgstr "Тот же переключатель, что и клавиша «показать / скрыть»."
+msgstr "Тот же переключатель, что и клавиша \"показать / скрыть\"."
 
 msgid "Updates per second"
 msgstr "Обновлений в секунду"
@@ -201,10 +198,10 @@ msgid "Your squad"
 msgstr "Ваш отряд"
 
 msgid "Zoom in key"
-msgstr "Клавиша «приблизить»"
+msgstr "Клавиша \"приблизить\""
 
 msgid "Zoom out key"
-msgstr "Клавиша «отдалить»"
+msgstr "Клавиша \"отдалить\""
 
 msgid "auto - from the palette of the game (and of interface mods)."
 msgstr "auto - из палитры игры (и модов на интерфейс)."
@@ -227,5 +224,5 @@ msgstr "Цвет врагов"
 msgid "Animals colour"
 msgstr "Цвет животных"
 
-msgid "Only for the Rectangle shape. The width is the Size above."
-msgstr "Только для формы «Прямоугольник». Ширина - это «Размер» выше."
+msgid "The rectangle is 16:10, its width is the Size."
+msgstr "Прямоугольник - 16:10, его ширина - это \"Размер\"."

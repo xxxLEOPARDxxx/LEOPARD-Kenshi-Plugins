@@ -149,9 +149,6 @@ msgstr "范围（米）"
 msgid "Rectangle"
 msgstr "矩形"
 
-msgid "Rectangle height, px"
-msgstr "矩形高度（像素）"
-
 msgid "Rotate with the camera"
 msgstr "随镜头旋转"
 
@@ -227,5 +224,5 @@ msgstr "敌人颜色"
 msgid "Animals colour"
 msgstr "动物颜色"
 
-msgid "Only for the Rectangle shape. The width is the Size above."
-msgstr "仅用于矩形。宽度即上方的“大小”。"
+msgid "The rectangle is 16:10, its width is the Size."
+msgstr "矩形为 16:10，宽度即“大小”。"

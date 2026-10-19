@@ -149,9 +149,6 @@ msgstr "Range, m"
 msgid "Rectangle"
 msgstr "Rectangle"
 
-msgid "Rectangle height, px"
-msgstr "Rectangle height, px"
-
 msgid "Rotate with the camera"
 msgstr "Rotate with the camera"
 
@@ -227,5 +224,5 @@ msgstr "Enemies colour"
 msgid "Animals colour"
 msgstr "Animals colour"
 
-msgid "Only for the Rectangle shape. The width is the Size above."
-msgstr "Only for the Rectangle shape. The width is the Size above."
+msgid "The rectangle is 16:10, its width is the Size."
+msgstr "The rectangle is 16:10, its width is the Size."
