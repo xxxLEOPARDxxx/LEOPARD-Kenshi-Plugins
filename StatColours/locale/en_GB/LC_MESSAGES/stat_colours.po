@@ -232,3 +232,12 @@ msgstr "The multipliers above the name are shown only while this key is held. Ba
 
 msgid "all x1"
 msgstr "all x1"
+
+msgid "Injuries"
+msgstr "Injuries"
+
+msgid "Load"
+msgstr "Load"
+
+msgid "Load, weapon and other"
+msgstr "Load, weapon and other"

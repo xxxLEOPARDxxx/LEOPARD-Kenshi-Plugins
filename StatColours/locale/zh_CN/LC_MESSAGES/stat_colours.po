@@ -232,3 +232,12 @@ msgstr "仅在按住此键时显示名字上方的倍率。Backspace——不设
 
 msgid "all x1"
 msgstr "全部 x1"
+
+msgid "Injuries"
+msgstr "伤势"
+
+msgid "Load"
+msgstr "负重"
+
+msgid "Load, weapon and other"
+msgstr "负重、武器及其他"

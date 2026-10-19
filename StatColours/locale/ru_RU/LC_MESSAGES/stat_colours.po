@@ -232,3 +232,12 @@ msgstr "Множители над именем видны, только пока
 
 msgid "all x1"
 msgstr "все x1"
+
+msgid "Injuries"
+msgstr "Ранения"
+
+msgid "Load"
+msgstr "Вес ноши"
+
+msgid "Load, weapon and other"
+msgstr "Вес ноши, оружие и прочее"

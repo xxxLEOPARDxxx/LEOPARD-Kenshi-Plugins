@@ -766,122 +766,10 @@ namespace
     }
 
 
-    // Уворот считается мимо getStat: база берётся из навыка, а поправки
-    // складываются поверх тремя отдельными слагаемыми. Журнал:
-    // dodge 2.263 -> 1.358 при gear=+0.226, inj=-1.131, enc=-0.000.
-    // Нам нужно только первое.
-    bool DodgeGearBonus(CharStats* stats, StatsEnumerated stat, float& bonus)
-    {
-        if (stat != STAT_DODGE)
-            return false;
-
-        bonus = stats->getDodgePenalty_gear();
-        return true;
-    }
-
-
-    // Поправка от снаряжения.
-    //
-    // Два разных случая, и путать их нельзя - на этом я обжёгся дважды.
-    //
-    // Атака, защита и боевые искусства: игра держит их прибавку
-    // отдельным целым полем, и есть геттеры, которые его отдают. Именно
-    // это число она показывает в своей подсказке как «Общий бонус
-    // снаряжения». А getMeleeAttack и getMeleeDefence возвращают совсем
-    // другое - боевой рейтинг, он и отрицательным бывает, и сравнивать
-    // его с уровнем навыка бессмысленно: отсюда брались «Защита (-7) 1»
-    // у голого новичка.
-    //
-    // Все прочие статы: разница между значением с модификаторами и без
-    // - НО из неё сперва надо вынуть состояние тела. getStat(false)
-    // складывает всё вместе: и множители от надетого, и увечья с
-    // голодом. У Силы это видно в упор - base 1.000, mod 0.559, и вся
-    // разница от ран, снаряжение силу не трогает вовсе.
-    //
-    // Долю состояния игра отдаёт отдельно и процентом:
-    // getStatPenaltiesTotalForGUI. Проверено по журналу на восьми
-    // статах - base*(1 - p/100) сходится с mod до сотых. Значит вклад
-    // снаряжения = mod - base*(1 - p/100).
-    //
-    // Считаем во float и показываем, только если набралось хотя бы
-    // полбалла. Иначе навык 1,0 при множителе 0,97 давал «(-1)», и
-    // такой минус висел почти на каждой строке.
-    // Протезы (роботизированные конечности) правят навыки СВОИМ
-    // множителем - MedicalSystem::getStatRoboticsMultiplier. 07.10.2026:
-    // у Архонта (руки-протезы) катаны 100 -> 110, а разбор называл эти +10
-    // «снаряжением», хотя надето было ни при чём. Теперь это отдельная
-    // строка, а снаряжению остаётся остаток.
-    float RoboticsMultiplier(CharStats* stats, StatsEnumerated stat)
-    {
-        if (stats == NULL || stats->medical == NULL)
-            return 1.0f;
-        const float m = stats->medical->getStatRoboticsMultiplier(stat);
-        return (m > 0.0f && fabsf(m - 1.0f) > 0.001f) ? m : 1.0f;
-    }
-
-    // Вклад протезов в целых пунктах: основа с учётом состояния тела,
-    // умноженная на (множитель - 1).
-    int RoboticsDelta(CharStats* stats, StatsEnumerated stat,
-                      const std::string& name)
-    {
-        const float m = RoboticsMultiplier(stats, stat);
-        if (m == 1.0f)
-            return 0;
-        const int statePercent = stats->getStatPenaltiesTotalForGUI(name, stat);
-        const float diff = stats->getStat(stat, true)
-            * (1.0f - statePercent / 100.0f) * (m - 1.0f);
-        if (diff > -0.5f && diff < 0.5f)
-            return 0;
-        return static_cast<int>(diff < 0.0f ? diff - 0.5f : diff + 0.5f);
-    }
-
-    bool EquipmentDelta(const std::string& key, CharStats* stats,
-                        int& delta)
-    {
-        if (stats == NULL || key.empty())
-            return false;
-
-        std::map<std::string, StatsEnumerated>::const_iterator it =
-            g_byName.find(StripTags(key));
-        if (it == g_byName.end())
-            return false;
-
-        int flat = 0;
-        if (FlatEquipmentBonus(stats, it->second, flat))
-        {
-            delta = flat;
-            return true;
-        }
-
-        float dodge = 0.0f;
-        if (DodgeGearBonus(stats, it->second, dodge))
-        {
-            delta = static_cast<int>(dodge < 0.0f ? dodge - 0.5f
-                                                  : dodge + 0.5f);
-            if (dodge > -0.5f && dodge < 0.5f)
-                delta = 0;
-            return true;
-        }
-
-        const float base = stats->getStat(it->second, true);
-        const int statePercent =
-            stats->getStatPenaltiesTotalForGUI(StripTags(key), it->second);
-
-        // Протезы - не снаряжение: их множитель входит в «без надетого»
-        // (см. RoboticsMultiplier), иначе их прибавка числилась бы здесь.
-        const float withoutGear = base * (1.0f - statePercent / 100.0f)
-            * RoboticsMultiplier(stats, it->second);
-        const float diff = stats->getStat(it->second, false) - withoutGear;
-
-        if (diff > -0.5f && diff < 0.5f)
-        {
-            delta = 0;
-            return true;
-        }
-
-        delta = static_cast<int>(diff < 0.0f ? diff - 0.5f : diff + 0.5f);
-        return true;
-    }
+    // Протезы и надетое у небоевых навыков - в росписи самой игры
+    // («Роботехника», «Доспех/снаряжение», процентами). Своих расчётов
+    // вклада протезов и снаряжения больше нет (19.10.2026): они учитывали
+    // протезы дважды.
 
 
     // Полная поправка - всё, что игра прибавила к навыку: снаряжение,
@@ -1087,56 +975,71 @@ namespace
     }
 
 
-    // Слагаемые, которых нет в росписи игры: она знает только про
-    // состояние тела. Подписи взяты из её собственной подсказки боевой
-    // панели - «Общий бонус снаряжения» и «Штраф оружия в здании», - но
-    // со второй мы от игры отступили: в помещении безоружный получает
-    // ПЛЮС, и «Штраф: +8» читалось противоречиво. У нас «Бонус оружия
-    // в здании», знак числа и так на месте.
-    //
-    // Снаряжение считаем для любого стата, а не только для трёх боевых.
-    void AddCombatBonusRows(CharStats* stats, StatsEnumerated stat,
-                            const std::string& name)
+    // Боевые навыки: их итог считает не getStat, а боевые геттеры
+    // (EffectiveValue), и роспись игры (getStatPenaltiesForGUI) о
+    // прибавках оружия, брони и стойки не знает - у Атаки она пишет
+    // «Всего: 19», когда в бою 26 (дамп 19.10.2026). Для них строки свои.
+    bool IsCombatStat(StatsEnumerated stat)
     {
-        char number[32];
-
-        const int robotics = RoboticsDelta(stats, stat, name);
-        if (robotics != 0)
-        {
-            sprintf_s(number, "%+d", robotics);
-            g_describedRows.push_back(
-                std::make_pair(std::string(Tr("Robotic limbs")) + ":",
-                               std::string(number)));
-        }
-
-        int gear = 0;
-        if (EquipmentDelta(name, stats, gear) && gear != 0)
-        {
-            sprintf_s(number, "%+d", gear);
-            g_describedRows.push_back(
-                std::make_pair(std::string(Tr("Equipment bonus")) + ":",
-                               std::string(number)));
-        }
-
-        const int indoors = IndoorBonus(stats, stat);
-        if (indoors != 0)
-        {
-            sprintf_s(number, "%+d", indoors);
-            g_describedRows.push_back(
-                std::make_pair(std::string(Tr("Indoor weapon bonus")) + ":",
-                               std::string(number)));
-        }
-
-        const int stance = StanceBonus(stats, stat);
-        if (stance != 0)
-        {
-            sprintf_s(number, "%+d", stance);
-            g_describedRows.push_back(
-                std::make_pair(std::string(Tr("Combat stance")) + ":",
-                               std::string(number)));
-        }
+        return stat == STAT_MELEE_ATTACK || stat == STAT_MELEE_DEFENCE ||
+               stat == STAT_MARTIALARTS || stat == STAT_DODGE;
     }
 
+    int Rounded(float v)
+    {
+        if (v > -0.5f && v < 0.5f)
+            return 0;
+        return static_cast<int>(v < 0.0f ? v - 0.5f : v + 0.5f);
+    }
+
+    void AddRow(const char* label, int value)
+    {
+        if (value == 0)
+            return;
+        char number[32];
+        sprintf_s(number, "%+d", value);
+        g_describedRows.push_back(
+            std::make_pair(std::string(Tr(label)) + ":", std::string(number)));
+    }
+
+    // Строки боевого навыка сверх росписи игры. Сумма их с навыком (уже
+    // с ранами и протезами - getStat(false)) всегда равна итогу: всё, что
+    // не нашло своей строки, уходит в остаток «прочее» - иначе строки
+    // снова не складывались бы в скобку (у игроков «Защита (-85)» при
+    // одной строке «-1»).
+    void AddCombatBonusRows(CharStats* stats, StatsEnumerated stat)
+    {
+        const float effective = EffectiveValue(stats, stat);
+        float known = stats->getStat(stat, false);
+
+        if (stat == STAT_DODGE)
+        {
+            // Уворот - мимо getStat: навык + надетое + раны + вес ноши.
+            const float gear = stats->getDodgePenalty_gear();
+            const float injuries = stats->getDodgePenalty_injuries();
+            const float load = stats->getDodgePenalty_encumbrance();
+            known = stats->getStat(stat, true) + gear + injuries + load;
+            AddRow("Equipment bonus", Rounded(gear));
+            AddRow("Injuries", Rounded(injuries));
+            AddRow("Load", Rounded(load));
+        }
+        else
+        {
+            int flat = 0;
+            FlatEquipmentBonus(stats, stat, flat);
+            const int indoors = IndoorBonus(stats, stat);
+            const int stance = StanceBonus(stats, stat);
+            known += static_cast<float>(flat + indoors) +
+                     (stat == STAT_MELEE_DEFENCE
+                          ? stats->getMeleeDefence_melee(true) - stats->getMeleeDefence_melee(false)
+                          : 0.0f);
+            AddRow("Equipment bonus", flat);
+            AddRow("Indoor weapon bonus", indoors);
+            AddRow("Combat stance", stance);
+        }
+
+        AddRow("Load, weapon and other", Rounded(effective - known));
+    }
 
     // Все числа, какими игра описывает один навык, одной строкой в
     // журнал. Включается [Debug] Debug=1. Сравнивать с тем, что
@@ -1185,6 +1088,32 @@ namespace
             stats->getDodgePenalty_encumbrance());
 
         DebugLog(line);
+
+        // 19.10.2026: всё, что игра знает про протезы и про роспись, -
+        // отдельной строкой. По этому дампу и нашлось, что процент росписи
+        // игры уже содержит протезы.
+        MedicalSystem* const med = stats->medical;
+        char robo[320];
+        sprintf_s(robo,
+            "StatColours DUMP2 %s: roboticsMult=%.3f _getRoboticsStatMult=%.3f "
+            "hasRobotics=%d missingArmMult=%.3f weatherMult=%.3f",
+            name.c_str(),
+            med != NULL ? med->getStatRoboticsMultiplier(stat) : -1.0f,
+            med != NULL ? med->_getRoboticsStatMult(stat) : -1.0f,
+            med != NULL && med->hasRobotics() ? 1 : 0,
+            med != NULL ? med->getMissingArmPenaltyMult() : -1.0f,
+            med != NULL ? med->getWeatherStatPenaltyMult() : -1.0f);
+        DebugLog(robo);
+
+        static lektor<StringPair> gameRows;     // буфер игры не освобождается - один на всё время
+        gameRows.clear();
+        const bool got = stats->getStatPenaltiesForGUI(name, stat, gameRows);
+        char head[96];
+        sprintf_s(head, "StatColours DUMP3 %s: game rows ok=%d count=%u", name.c_str(),
+                  got ? 1 : 0, static_cast<unsigned>(gameRows.size()));
+        DebugLog(head);
+        for (uint32_t i = 0; i < gameRows.size(); ++i)
+            DebugLog("StatColours DUMP3   '" + gameRows[i].s1 + "' | '" + gameRows[i].s2 + "'");
     }
 
 
@@ -1224,7 +1153,7 @@ namespace
                 nameIt->second, window->statProgress);
             key.indoors = IndoorBonus(stats, window->statProgress);
             key.stance = StanceBonus(stats, window->statProgress);
-            EquipmentDelta(nameIt->second, stats, key.gear);
+            FlatEquipmentBonus(stats, window->statProgress, key.gear);
         }
 
         // Пересчитываем, только когда поменялось что-то из ключа:
@@ -1245,85 +1174,72 @@ namespace
             if (g_debug && known)
                 DumpStat(stats, window->statProgress, nameIt->second);
 
-            // Условие - «есть что сказать», а не «есть скобка».
-            // Состояние тела и бой в помещении к надетому не относятся,
-            // но объяснить их надо: на скриншоте у Силы 1 боевая панель
-            // писала 0 (-1), и без этой строки непонятно, откуда минус.
-            const int statePercent = key.statePercent;
-            const int indoors = key.indoors;
-
-            if (known && (delta != 0 || statePercent != 0 || indoors != 0 || key.stance != 0))
+            // Роспись - игры, слово в слово (19.10.2026): «Навык», раны,
+            // протезы («Роботехника +56%»), надетое («Доспех/снаряжение
+            // +20%») и «Всего». Числа в ней перемножаются ровно в итог.
+            // Прежде плагин считал протезы и снаряжение сам и учитывал
+            // протезы дважды: процент игры их уже содержит («Протезы
+            // +43 / снаряжение -43» при скобке +36). А саму роспись не
+            // показывал вовсе, если у персонажа одни прибавки: функция
+            // игры отвечает true, только когда есть ШТРАФ, строки же
+            // заполняет всегда - смотрим на их число.
+            if (known)
             {
-                // Имя стата у окна и у CharStats иногда расходится, а
-                // разбивку игра отдаёт только по «своему» написанию.
-                // Пробуем оба, прежде чем решить, что её нет.
+                const StatsEnumerated stat = window->statProgress;
+                const bool combat = IsCombatStat(stat);
+
+                std::vector<std::pair<std::string, std::string> > game;
                 const std::string names[2] =
                 {
                     nameIt->second,
-                    CharStats::getStatName(window->statProgress)
+                    CharStats::getStatName(stat)
                 };
-
-                for (int n = 0; n < 2 && g_describedRows.empty(); ++n)
+                for (int n = 0; n < 2 && game.empty(); ++n)
                 {
-                    if (names[n].empty())
+                    if (names[n].empty() || (n == 1 && names[1] == names[0]))
                         continue;
-                    if (n == 1 && names[1] == names[0])
-                        continue;
-
                     // У lektor нет деструктора (буфер игры не освобождается) -
                     // один на всё время, иначе каждое описание теряло память.
                     static lektor<StringPair> rows;
                     rows.clear();
-                    if (!stats->getStatPenaltiesForGUI(
-                            names[n], window->statProgress, rows))
-                        continue;
+                    stats->getStatPenaltiesForGUI(names[n], stat, rows);
+                    for (uint32_t i = 0; i < rows.size(); ++i)
+                        game.push_back(std::make_pair(rows[i].s1, rows[i].s2));
+                }
 
-                    for (uint32_t i = 0; i < rows.size() &&
-                         static_cast<int>(g_describedRows.size()) < PENALTY_SLOTS - 1; ++i)
+                // Есть что сказать: больше, чем «Навык» и «Всего», или скобка.
+                const bool rich = game.size() > 2;
+                const int room = PENALTY_SLOTS - 1;
+
+                if (combat && (rich || delta != 0))
+                {
+                    // Своё «Всего» игры у боевого навыка - не итог (оружие,
+                    // броня и стойка в нём не учтены): его не пишем.
+                    const size_t keep = game.empty() ? 0 : game.size() - 1;
+                    for (size_t i = 0; i < keep && static_cast<int>(g_describedRows.size()) < room - 4; ++i)
+                        g_describedRows.push_back(game[i]);
+                    AddCombatBonusRows(stats, stat);
+
+                    char number[32];
+                    sprintf_s(number, "%d", static_cast<int>(floorf(EffectiveValue(stats, stat))));
+                    g_describedRows.push_back(
+                        std::make_pair(std::string(Tr("Effective value")) + ":", std::string(number)));
+                }
+                else if (!combat && (rich || delta != 0))
+                {
+                    // Её «Всего» и есть итог - своего не дописываем (было два).
+                    for (size_t i = 0; i < game.size() && static_cast<int>(g_describedRows.size()) < room; ++i)
+                        g_describedRows.push_back(game[i]);
+
+                    // Росписи нет совсем - хотя бы саму поправку и итог.
+                    if (game.empty())
                     {
+                        AddRow("Equipment total", delta);
+                        char number[32];
+                        sprintf_s(number, "%d", static_cast<int>(floorf(EffectiveValue(stats, stat))));
                         g_describedRows.push_back(
-                            std::make_pair(rows[i].s1, rows[i].s2));
+                            std::make_pair(std::string(Tr("Effective value")) + ":", std::string(number)));
                     }
-                }
-
-                // Снаряжение дописываем ВСЕГДА, а не только когда у
-                // игры разбивки нет.
-                //
-                // Её «Всего» подводит итог лишь тому, что перечислено
-                // выше него, - у атаки это навык и травмы. Прибавку от
-                // надетого игра считает отдельным механизмом и в эту
-                // роспись не кладёт: она в её же подсказке боевой панели
-                // как «Общий бонус снаряжения». Поэтому дописываем её
-                // сами, иначе «Всего: 12» спорит со скобкой «(-3)» и с
-                // боевой панелью, где стоит «9 (-3)».
-                const int before = static_cast<int>(g_describedRows.size());
-                AddCombatBonusRows(stats, window->statProgress,
-                                   nameIt->second);
-
-                // Если слагаемых не нашлось ни одного, называем хотя
-                // бы саму поправку - иначе скобка есть, а под ней пусто,
-                // и непонятно, посчитали мы что-то или промолчали.
-                if (static_cast<int>(g_describedRows.size()) == before &&
-                    delta != 0)
-                {
-                    char number[32];
-                    sprintf_s(number, "%+d", delta);
-                    g_describedRows.push_back(
-                        std::make_pair(std::string(Tr("Equipment total")) + ":",
-                                       std::string(number)));
-                }
-
-                // И само итоговое значение - то, которым игра
-                // пользуется. Скобка говорит, насколько изменилось, эта
-                // строка - до чего именно.
-                if (delta != 0)
-                {
-                    char number[32];
-                    sprintf_s(number, "%d", static_cast<int>(floorf(
-                        EffectiveValue(stats, window->statProgress))));
-                    g_describedRows.push_back(
-                        std::make_pair(std::string(Tr("Effective value")) + ":",
-                                       std::string(number)));
                 }
             }
 
@@ -1366,9 +1282,13 @@ namespace
             // прибавку, красное на штраф. Подпись - цветом скобок.
             if (line != NULL && !right.empty())
             {
+                // Знак - зелёный или красный; число без знака («Навык: 39»,
+                // «Всего: 43» из росписи игры) - цветом подписи.
                 const bool minus = (right.find('-') != std::string::npos);
+                const bool plus = (right.find('+') != std::string::npos);
                 if (line->w2 != NULL)
-                    line->w2->setTextColour(minus ? g_minusColour : g_plusColour);
+                    line->w2->setTextColour(minus ? g_minusColour
+                                                  : (plus ? g_plusColour : g_labelColour));
                 if (line->w1 != NULL)
                     line->w1->setTextColour(g_labelColour);
             }
