@@ -206,7 +206,7 @@ namespace
     const int kShot = 1024;             // снимок за раз, пикселей в дело
     const int kMargin = 64;             // и поля вокруг - для подгонки яркости к соседям
     const int kFrame = kShot + 2 * kMargin;
-    enum { FLAG_FAR = 1 };              // дальний: снят издалека, без построек - переснять вблизи
+    enum { FLAG_RETAKE = 1 };           // снят наспех (издалека или в сумерки) - переснять
     const int kMinLevel = 4;            // самый мелкий уровень плитки
     std::string g_folder;               // папка плиток (с «\» в конце)
 
@@ -274,9 +274,9 @@ namespace
     struct Stored
     {
         int quality;
-        bool distant;
-        Stored() : quality(0), distant(false) {}
-        Stored(int q, bool f) : quality(q), distant(f) {}
+        bool retake;
+        Stored() : quality(0), retake(false) {}
+        Stored(int q, bool f) : quality(q), retake(f) {}
     };
     std::map<long long, Stored> g_stored;   // что снято
     std::vector<long long> g_fresh;         // снятые, ещё не отданные потоку рисования
@@ -314,7 +314,7 @@ namespace
                 continue;
             Header hd;
             if (ReadHeader(f, hd))
-                g_stored[key] = Stored(hd.quality, (hd.flags & FLAG_FAR) != 0);
+                g_stored[key] = Stored(hd.quality, (hd.flags & FLAG_RETAKE) != 0);
             fclose(f);
         } while (FindNextFileA(h, &fd));
         FindClose(h);
@@ -371,10 +371,10 @@ namespace
         int shot;                       // который снимаем
         int wait;                       // кадров до чтения
         float groundY;                  // высота земли в центре плитки (мир)
-        bool distant;                       // дальний (см. FLAG_FAR)
+        bool retake;                    // наспех (см. FLAG_RETAKE)
         DWORD started;
         Job() : active(false), tx(0), tz(0), variant(Satellite::DAY), quality(0), n(1), shot(0), wait(0),
-                groundY(0), distant(false), started(0) {}
+                groundY(0), retake(false), started(0) {}
     };
     Job g_job;
     DWORD g_nextPlan = 0;
@@ -654,7 +654,7 @@ namespace
         LONG gen;
         int tx, tz, quality, n, shot;
         Satellite::Variant variant;
-        bool distant;
+        bool retake;
         DWORD started;
         std::vector<unsigned> px;       // снимок с полями, kFrame x kFrame
     };
@@ -664,7 +664,7 @@ namespace
         LONG gen;
         int tx, tz, quality;
         Satellite::Variant variant;
-        bool distant, ok;
+        bool retake, ok;
         DWORD ms;
         float minGain, maxGain;
     };
@@ -688,7 +688,7 @@ namespace
         LONG gen;
         int tx, tz, quality, n;
         Satellite::Variant variant;
-        bool distant;
+        bool retake;
         DWORD started;
         std::vector<int> sizes;
         std::vector<std::vector<unsigned char> > blocks;
@@ -744,7 +744,8 @@ namespace
         if (fopen_s(&f, TileFile(g_enc.tx + dx[side], g_enc.tz + dz[side], g_enc.variant).c_str(), "rb") != 0 || f == NULL)
             return nb;
         Header h;
-        if (ReadHeader(f, h))
+        // Снятое наспех (в сумерки) - не образец яркости для настоящего.
+        if (ReadHeader(f, h) && (g_enc.retake || (h.flags & FLAG_RETAKE) == 0))
         {
             int level = static_cast<int>(h.sizes.size()) - 1;
             for (size_t i = 0; i < h.sizes.size(); ++i)
@@ -879,7 +880,7 @@ namespace
         if (fopen_s(&f, temp.c_str(), "wb") != 0 || f == NULL)
             return false;
         const int levels = static_cast<int>(g_enc.sizes.size());
-        const int flags = g_enc.distant ? FLAG_FAR : 0;
+        const int flags = g_enc.retake ? FLAG_RETAKE : 0;
         bool ok = fwrite("BMS2", 1, 4, f) == 4 && fwrite(&g_enc.quality, 4, 1, f) == 1 && fwrite(&flags, 4, 1, f) == 1 &&
                   fwrite(&levels, 4, 1, f) == 1 && fwrite(&g_enc.sizes[0], 4, levels, f) == static_cast<size_t>(levels);
         for (int i = 0; ok && i < levels; ++i)
@@ -911,7 +912,7 @@ namespace
             g_enc.variant = m->variant;
             g_enc.quality = m->quality;
             g_enc.n = m->n;
-            g_enc.distant = m->distant;
+            g_enc.retake = m->retake;
             g_enc.started = m->started;
             g_enc.minGain = 10.0f;
             g_enc.maxGain = 0.0f;
@@ -933,7 +934,7 @@ namespace
             res.tz = m->tz;
             res.quality = m->quality;
             res.variant = m->variant;
-            res.distant = m->distant;
+            res.retake = m->retake;
             res.ok = false;
             res.ms = GetTickCount() - m->started;
             res.minGain = res.maxGain = 1.0f;
@@ -975,7 +976,7 @@ namespace
         res.tz = g_enc.tz;
         res.quality = g_enc.quality;
         res.variant = g_enc.variant;
-        res.distant = g_enc.distant;
+        res.retake = g_enc.retake;
         res.ok = WriteTile();
         res.ms = GetTickCount() - g_enc.started;
         res.minGain = g_enc.minGain;
@@ -1043,7 +1044,7 @@ namespace
         SetEvent(g_encWake);
     }
 
-    bool Begin(int tx, int tz, Satellite::Variant v, bool distant)
+    bool Begin(int tx, int tz, Satellite::Variant v, bool retake)
     {
         if (!StartEncoder())
             return false;
@@ -1051,9 +1052,9 @@ namespace
         g_job.tx = tx;
         g_job.tz = tz;
         g_job.variant = v;
-        g_job.distant = distant;
-        // Дальнее - быстро, в 1024: его всё равно переснимут вблизи.
-        g_job.quality = distant ? kShot : g_quality;
+        g_job.retake = retake;
+        // Наспех - быстро, в 1024: его всё равно переснимут.
+        g_job.quality = retake ? kShot : g_quality;
         g_job.n = g_job.quality / kShot;
         // Высота земли - в центре плитки; нет её там (край мира) - 0.
         const float cx = (tx + 0.5f) * Satellite::kTileMetres, cz = (tz + 0.5f) * Satellite::kTileMetres;
@@ -1076,7 +1077,7 @@ namespace
         m->n = g_job.n;
         m->shot = 0;
         m->variant = v;
-        m->distant = distant;
+        m->retake = retake;
         m->started = g_job.started;
         Post(m);
         return true;
@@ -1099,33 +1100,38 @@ namespace
             g_encoding = false;
             char note[220];
             sprintf_s(note, "tile %d %d (%s, %d px%s) %s in %u ms, brightness x%.2f-%.2f", r.tx, r.tz,
-                      r.variant == Satellite::DAY ? "day" : "night", r.quality, r.distant ? ", far" : "",
+                      r.variant == Satellite::DAY ? "day" : "night", r.quality, r.retake ? ", retake later" : "",
                       r.ok ? "taken" : "could not be saved", r.ms, r.minGain, r.maxGain);
             Log(note);
             if (!r.ok)
                 continue;
             const long long key = Satellite::Key(r.tx, r.tz, r.variant);
-            g_stored[key] = Stored(r.quality, r.distant);
+            g_stored[key] = Stored(r.quality, r.retake);
             g_fresh.push_back(key);
         }
     }
 
-    // Какой вариант снимать в это время суток (VARIANT_COUNT - никакой:
-    // сумерки, свет меняется).
-    Satellite::Variant VariantAt(double hour)
+    // Какой вариант снимать в это время суток. Настоящее время - день 9-16,
+    // ночь 22-4. В сумерки (и утром, и вечером) снимаем только то, чего нет
+    // совсем, наспех и с пометкой: придёт день или ночь - переснимем. Иначе
+    // полсуток игры мир вокруг не снимался бы вовсе (20.10.2026).
+    Satellite::Variant VariantAt(double hour, bool& proper)
     {
+        proper = true;
         if (hour >= 9.0 && hour < 16.0)
             return Satellite::DAY;
         if (hour >= 22.0 || hour < 4.0)
             return Satellite::NIGHT;
-        return Satellite::VARIANT_COUNT;
+        proper = false;
+        return (hour >= 7.0 && hour < 19.0) ? Satellite::DAY : Satellite::NIGHT;
     }
 
     // Следующая плитка. Сначала ближние (центр плитки не дальше 1,4 км от
-    // центра камеры: там игра держит мир целиком) - которых нет, они
-    // дальние или хуже нынешнего качества. Нет таких - дальние (до 4 км,
-    // только рельеф): их снимаем быстро, в 1024, и переснимем вблизи.
-    bool PickTile(const Ogre::Vector3& c, Satellite::Variant v, int& outX, int& outZ, bool& distant)
+    // центра камеры: там игра держит мир целиком), потом дальние (до 4 км,
+    // только рельеф). В настоящее время суток ближние - которых нет, снятые
+    // наспех или хуже нынешнего качества; дальние - которых нет (наспех, в
+    // 1024: переснимем вблизи). В сумерки - только которых нет, наспех.
+    bool PickTile(const Ogre::Vector3& c, Satellite::Variant v, bool proper, int& outX, int& outZ, bool& retake)
     {
         const float nearR = 1400.0f, farR = 4100.0f;
         const int cx = static_cast<int>(std::floor(c.x / Satellite::kTileMetres));
@@ -1139,16 +1145,22 @@ namespace
                 const int tx = cx + dx, tz = cz + dz;
                 const float mx = (tx + 0.5f) * Satellite::kTileMetres - c.x, mz = (tz + 0.5f) * Satellite::kTileMetres - c.z;
                 const float d2 = mx * mx + mz * mz;
+                if (d2 >= farR * farR)
+                    continue;
                 std::map<long long, Stored>::const_iterator it = g_stored.find(Satellite::Key(tx, tz, v));
                 const bool have = it != g_stored.end();
-                if (d2 < bestNear && (!have || it->second.distant || it->second.quality < g_quality))
+                const bool nearby = d2 < nearR * nearR;
+                const bool need = !have || (proper && nearby && (it->second.retake || it->second.quality < g_quality));
+                if (!need)
+                    continue;
+                if (nearby && d2 < bestNear)
                 {
                     bestNear = d2;
                     nx = tx;
                     nz = tz;
                     foundNear = true;
                 }
-                else if (d2 < bestFar && !have)
+                else if (!nearby && d2 < bestFar)
                 {
                     bestFar = d2;
                     fx = tx;
@@ -1160,14 +1172,14 @@ namespace
         {
             outX = nx;
             outZ = nz;
-            distant = false;
+            retake = !proper;
             return true;
         }
         if (foundFar)
         {
             outX = fx;
             outZ = fz;
-            distant = true;
+            retake = true;
             return true;
         }
         return false;
@@ -1311,14 +1323,15 @@ namespace Satellite
             if (!allowed || !g_capture || g_encoding || now < g_nextPlan)
                 return;
             g_nextPlan = now + 500;
-            const Variant v = VariantAt(hourOfDay);
+            bool proper = true;
+            const Variant v = VariantAt(hourOfDay, proper);
             int tx = 0, tz = 0;
-            bool distant = false;
-            if (v == VARIANT_COUNT || !PickTile(cameraCentre, v, tx, tz, distant))
+            bool retake = false;
+            if (!PickTile(cameraCentre, v, proper, tx, tz, retake))
                 return;
             try
             {
-                Begin(tx, tz, v, distant);
+                Begin(tx, tz, v, retake);
             }
             catch (const Ogre::Exception& e)
             {
@@ -1366,7 +1379,7 @@ namespace Satellite
             end->n = g_job.n;
             end->shot = 0;
             end->variant = g_job.variant;
-            end->distant = g_job.distant;
+            end->retake = g_job.retake;
             end->started = g_job.started;
             Post(end);
             g_encoding = true;

@@ -452,8 +452,8 @@ msgstr "Static - the picture of the game map. Dynamic from satellite - real shot
 msgid "Take satellite shots"
 msgstr "Take satellite shots"
 
-msgid "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
-msgstr "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
+msgid "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours; at dusk and dawn only missing areas, quickly, retaken later. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
+msgstr "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours; at dusk and dawn only missing areas, quickly, retaken later. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
 
 msgid "Render quality"
 msgstr "Render quality"

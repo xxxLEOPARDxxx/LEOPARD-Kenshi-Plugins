@@ -1143,6 +1143,13 @@ namespace
         if (!g_mapMarkers || now - g_mapPinsChecked < 2000)
             return;
         g_mapPinsChecked = now;
+        // Файл меток остаётся в сейве и без мода: мода нет - и меток нет.
+        if (GetModuleHandleA("Map-markers.dll") == NULL)
+        {
+            g_mapPins.clear();
+            g_mapPinsFile.clear();
+            return;
+        }
         SaveFileSystem* const fs = SaveFileSystem::getSingleton();
         const std::string dir = fs == NULL ? std::string() : fs->getActiveSave();
         if (dir.empty())
@@ -3806,7 +3813,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     backLabels[0] = Tr("Dynamic from satellite");
     backLabels[1] = Tr("Static");
     api->choice(api, kSec, "Background", Tr("Minimap render"), Tr("Static - the picture of the game map. Dynamic from satellite - real shots of the world from above, as the game draws it, taken while you play; where there are none yet - the map picture."), "satellite", backValues, backLabels, 2, 0);
-    api->toggle(api, kSec, "SatelliteCapture", Tr("Take satellite shots"), Tr("While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."), 1, 0);
+    api->toggle(api, kSec, "SatelliteCapture", Tr("Take satellite shots"), Tr("While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours; at dusk and dawn only missing areas, quickly, retaken later. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."), 1, 0);
     static const char* const qualityValues[] = { "1024", "2048", "4096", "8192" };
     api->choice(api, kSec, "SatelliteQuality", Tr("Render quality"), Tr("Detail of the satellite render: pixels per 1024 m of the world. Above 1024 an area is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64 (longer, but no more video memory). On disk per area and lighting about 0.7, 2.8, 11 and 45 MB. Areas taken at a lower quality are taken again."), "1024", qualityValues, qualityValues, 4, 0);
     static const char* const lightValues[] = { "time", "day" };

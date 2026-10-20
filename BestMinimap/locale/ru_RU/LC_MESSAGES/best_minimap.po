@@ -452,8 +452,8 @@ msgstr "Статичная - картинка карты игры. Динами�
 msgid "Take satellite shots"
 msgstr "Снимать спутник"
 
-msgid "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
-msgstr "Пока вы играете, миникарта снимает мир вокруг камеры: днём с 9 до 16 и ночью с 22 до 4 игровых часов. Сначала ближние участки в выбранном качестве, потом дальние, до 4 км, быстро и без построек: подойдёт камера - переснимутся. Каждый снимок - несколько кадров, в которые мир рисуется дважды."
+msgid "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours; at dusk and dawn only missing areas, quickly, retaken later. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
+msgstr "Пока вы играете, миникарта снимает мир вокруг камеры: днём с 9 до 16 и ночью с 22 до 4 игровых часов; в сумерки - только недостающие участки, наспех, потом переснимутся. Сначала ближние участки в выбранном качестве, потом дальние, до 4 км, быстро и без построек: подойдёт камера - переснимутся. Каждый снимок - несколько кадров, в которые мир рисуется дважды."
 
 msgid "Render quality"
 msgstr "Качество рендера"
