@@ -47,6 +47,7 @@
 #include <HoldKey.h>
 #include <WidgetRef.h>
 #include <WantedMapApi.h>
+#include "Satellite.h"
 
 #include <cmath>
 #include <cstdio>
@@ -159,6 +160,14 @@ namespace
     // Путь к ini игрока - см. shared/IniDefaults.h.
     std::string IniPath() { return IniDefaults::Prepare(ModulePath(".ini")); }
 
+    // Папка DLL (с «\\» в конце).
+    std::string ModuleFolder()
+    {
+        const std::string path = ModulePath(".dll");
+        const std::string::size_type slash = path.find_last_of("\\/");
+        return slash == std::string::npos ? std::string() : path.substr(0, slash + 1);
+    }
+
     const char* const kSec = "BestMinimap";
 
 
@@ -231,6 +240,7 @@ namespace
     bool g_debug = false;
 
     HoldKey::Key g_keyToggle, g_keyZoomIn, g_keyZoomOut, g_keyBigger, g_keySmaller;
+    HoldKey::Key g_keySatProbe;         // проба «вида со спутника» (см. Satellite.cpp)
 
     const float kRangeMin = 30.0f;
     const float kRangeMax = 150000.0f;     // половина мира (worldBounds +-147 км) - вся карта
@@ -390,6 +400,7 @@ namespace
         g_keyZoomOut = HoldKey::Parse(ReadText(ini, "KeyZoomOut", "-"));
         g_keyBigger = HoldKey::Parse(ReadText(ini, "KeyBigger", "CTRL+="));
         g_keySmaller = HoldKey::Parse(ReadText(ini, "KeySmaller", "CTRL+-"));
+        g_keySatProbe = HoldKey::Parse(ReadText(ini, "SatelliteProbeKey", "CTRL+SHIFT+F9"));
 
         g_maxSource = ReadInt(ini, "MaxSourceSize", 4096, 512, 8192);
         g_swapRB = ReadBool(ini, "SwapRedBlue", false);
@@ -3323,7 +3334,8 @@ namespace
         }
     };
 
-    Edge g_eToggle, g_eZoomIn, g_eZoomOut, g_eBigger, g_eSmaller;
+    Edge g_eToggle, g_eZoomIn, g_eZoomOut, g_eBigger, g_eSmaller, g_eSatProbe;
+    bool g_probeRequested = false;
 
     void PollKeys(DWORD now)
     {
@@ -3334,6 +3346,8 @@ namespace
             g_visible = !g_visible;
             WriteInt("Visible", g_visible ? 1 : 0);
         }
+        if (g_eSatProbe.fire(!typing && Exact(g_keySatProbe), now, false))
+            g_probeRequested = true;
         if (!g_visible)
             return;
         if (g_eZoomIn.fire(!typing && Exact(g_keyZoomIn), now, true))
@@ -3464,6 +3478,13 @@ namespace
             }
         }
 
+        // Проба спутника - вокруг того же центра, квадрат на весь обзор.
+        if (g_probeRequested)
+        {
+            g_probeRequested = false;
+            Satellite::RequestProbe(center, Clamp(g_range * 2.0f, 200.0f, 30000.0f), ModuleFolder());
+        }
+
         if (!EnsureWidgets())
             return Hide("could not create the minimap widgets or texture");
         if (g_hidden)
@@ -3495,6 +3516,7 @@ namespace
         g_origMainLoop(self, time);
         g_lastWorldFrame = GetTickCount();
         Tick();
+        Satellite::Tick();
     }
 
     // В главном меню и на загрузке цикл мира не идёт - миникарту прячем,
@@ -3507,6 +3529,7 @@ namespace
         {
             Hide("the game loop stopped (main menu or loading)");
             FlushWrites();
+            Satellite::Reset();
             // Другой сейв - другие персонажи, поселения и метки большой
             // карты: всё, что держит их указатели, - забыть. Иначе после
             // загрузки значки поселений брались бы из уже удалённых меток.
