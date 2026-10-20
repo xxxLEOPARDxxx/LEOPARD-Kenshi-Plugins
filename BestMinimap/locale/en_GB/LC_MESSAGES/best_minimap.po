@@ -278,8 +278,8 @@ msgstr "Camera line colour"
 msgid "Under attack: "
 msgstr "Under attack: "
 
-msgid "A gold ring and the sum on characters with a price on their head, as your character sees it."
-msgstr "A gold ring and the sum on characters with a price on their head, as your character sees it."
+msgid "A gold ring and the sum on characters with a price on their head."
+msgstr "A gold ring and the sum on characters with a price on their head."
 
 msgid "A name under every dot. Many dots - many names."
 msgstr "A name under every dot. Many dots - many names."

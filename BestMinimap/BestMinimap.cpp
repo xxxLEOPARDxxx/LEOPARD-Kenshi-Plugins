@@ -777,10 +777,13 @@ namespace
             cat = CAT_ENEMY;
         else if (ref != NULL && c->isAlly(ref, true))
             cat = CAT_ALLY;
-        // Награда за голову - как её видит наш персонаж (getPercievedBounty).
+        // Награда за голову - вся (getTotalBounty), как «$» над головой.
+        // «Как видит наш персонаж» (getPercievedBounty) почти всегда 0:
+        // игра отдаёт её, только когда наш персонаж разыскиваемого узнал
+        // (20.10.2026).
         int bounty = 0;
-        if (g_showBounty && ref != NULL && cat != CAT_SQUAD)
-            bounty = c->crimes.getPercievedBounty(ref);
+        if (g_showBounty && cat != CAT_SQUAD)
+            bounty = c->crimes.getTotalBounty();
         CatCache& e = g_catCache[c];
         e.bounty = bounty;
         e.cat = cat;
@@ -1375,7 +1378,30 @@ namespace
 
         if (root->getWidth() != w + 2 * pad || root->getHeight() != h + 2 * pad)
         {
+            // Размер меняется - держим тот край, к которому миникарта ближе:
+            // стоит справа - растёт влево, снизу - вверх. Раньше всегда рос
+            // вправо-вниз от левого верхнего угла, и миникарта в правом углу
+            // уезжала (20.10.2026).
+            static bool sized = false;
+            const int wasLeft = g_left, wasTop = g_top;
+            if (sized && g_placed)
+            {
+                const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
+                const int oldW = root->getWidth(), oldH = root->getHeight();
+                if (g_left + oldW / 2 > view.width / 2)
+                    g_left += oldW - (w + 2 * pad);
+                if (g_top + oldH / 2 > view.height / 2)
+                    g_top += oldH - (h + 2 * pad);
+            }
+            sized = true;
             ClampPosition(w + 2 * pad, h + 2 * pad);
+            // Новое место - в ini: иначе перечитка настроек (MCM) вернула бы
+            // старое.
+            if (g_placed && (g_left != wasLeft || g_top != wasTop))
+            {
+                WriteInt("Left", g_left);
+                WriteInt("Top", g_top);
+            }
             root->setCoord(g_left, g_top, w + 2 * pad, h + 2 * pad);
             if (back != NULL)
                 back->setSize(w + 2 * pad, h + 2 * pad);
@@ -3270,7 +3296,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowFacing", Tr("Facing"), Tr("A small nose on each dot: where the character looks."), 1, 0);
     api->toggle(api, kSec, "FacingFlip", Tr("Flip the facing"), Tr("If the noses point backwards."), 0, 0);
     api->toggle(api, kSec, "CharacterNames", Tr("Character names"), Tr("A name under every dot. Many dots - many names."), 0, 0);
-    api->toggle(api, kSec, "ShowBounty", Tr("Bounties"), Tr("A gold ring and the sum on characters with a price on their head, as your character sees it."), 1, 0);
+    api->toggle(api, kSec, "ShowBounty", Tr("Bounties"), Tr("A gold ring and the sum on characters with a price on their head."), 1, 0);
     api->colour(api, kSec, "BountyColour", Tr("Bounty colour"), NULL, "#F2C230", 0);
     static const char* const squadValues[] = { "none", "others", "all" };
     static const char* squadLabels[3];

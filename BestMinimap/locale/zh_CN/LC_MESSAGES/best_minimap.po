@@ -278,8 +278,8 @@ msgstr "镜头线颜色"
 msgid "Under attack: "
 msgstr "遭受攻击："
 
-msgid "A gold ring and the sum on characters with a price on their head, as your character sees it."
-msgstr "悬赏目标显示金色圆环和金额，以你的角色所见为准。"
+msgid "A gold ring and the sum on characters with a price on their head."
+msgstr "悬赏角色显示金色圆环和金额。"
 
 msgid "A name under every dot. Many dots - many names."
 msgstr "每个点下显示名字。点多则名字多。"

@@ -278,8 +278,8 @@ msgstr "Цвет линии камеры"
 msgid "Under attack: "
 msgstr "Под атакой: "
 
-msgid "A gold ring and the sum on characters with a price on their head, as your character sees it."
-msgstr "Золотое кольцо и сумма у тех, за чью голову назначена награда, - как её видит ваш персонаж."
+msgid "A gold ring and the sum on characters with a price on their head."
+msgstr "Золотое кольцо и сумма у персонажей, за голову которых назначена награда."
 
 msgid "A name under every dot. Many dots - many names."
 msgstr "Имя под каждой точкой. Много точек - много имён."
