@@ -7,18 +7,17 @@
 // игры берём по имени у её же рабочего набора (Renderer::workspace), так что
 // картинка - как в игре, с модами на графику.
 //
-// Своя камера не годится: две пробы (20.10.2026) дали чёрный мир и с
-// ортогональной, и с перспективной камерой - игра готовит мир (освещение,
-// тени, что видно) только для своей главной камеры. Поэтому третья проба:
-//   1. набор игры в нашу текстуру с её же камерой, как есть - работает ли
-//      вывод в свою текстуру вообще;
-//   2. то же, но камеру игры на два кадра переносим высоко над местом
-//      взглядом вниз (на экране мигнёт вид сверху), потом возвращаем всё как
-//      было: место, поворот, угол обзора, пропорции.
-//
-// Интерфейс MyGUI рисуется в любую цель рендера. Поэтому на кадр, который
-// читаем, корневые окна интерфейса прячутся и потом получают прежнюю
-// видимость (мигнёт на кадр). Курсор - не окно, он на снимке остаётся.
+// История проб (20.10.2026):
+//   1-2. своя камера (ортогональная, потом перспективная) - чёрный мир, на
+//        снимке только интерфейс и курсор;
+//   3.   камера игры, перенесённая на два кадра наверх, - мир сверху есть
+//        (на экране мигает вид сверху). Своя камера, видимо, не была
+//        прикреплена к узлу сцены (у камеры игры узел есть) - Ogre не знал,
+//        где она.
+//   4.   своя камера на своём узле сцены: вид игры и вид сверху; для
+//        сравнения - снова камера игры. Интерфейс не прячем, а выключаем
+//        оверлеи у областей вывода нашей текстуры: MyGUI рисуется только в
+//        области с оверлеями. Сработает - экран не мигает совсем.
 //
 // ПРОБА. Пока это опыт: по клавише (SatelliteShotKey), снимки - в папку
 // мода картинками BMP. Пока набор включён, игра рисует мир дважды - пара
@@ -34,11 +33,10 @@
 
 #include <Debug.h>
 
-#include <mygui/MyGUI_Gui.h>
-#include <mygui/MyGUI_Widget.h>
-
 #include <OgreRoot.h>
 #include <OgreCamera.h>
+#include <OgreSceneNode.h>
+#include <OgreViewport.h>
 #include <OgreSceneManager.h>
 #include <OgreTextureManager.h>
 #include <OgreTexture.h>
@@ -80,10 +78,14 @@ namespace
 
     Ogre::TexturePtr g_target;
     Ogre::CompositorWorkspace* g_workspace = NULL;
+    Ogre::IdString g_defName;           // набор компоновщиков игры
+    Ogre::Camera* g_own = NULL;         // своя камера
+    Ogre::SceneNode* g_ownNode = NULL;  // и её узел
 
     // Шаги пробы, ещё не сделанные (с конца): fov 0 - камера игры как есть,
     // иначе - перенесена наверх с этим углом обзора.
-    struct Step { const char* name; float fov; };
+    enum Mode { OWN_GAME_VIEW, OWN_TOP, GAME_TOP };
+    struct Step { const char* name; Mode mode; float fov; };
     std::vector<Step> g_steps;
 
     // Камера игры до переноса.
@@ -103,9 +105,6 @@ namespace
     int g_wait = 0;
     DWORD g_started = 0;
 
-    // Спрятанные на кадр снимка окна интерфейса.
-    std::vector<MyGUI::Widget*> g_hiddenGui;
-
     Renderer* GameRenderer()
     {
         return ::au == NULL ? NULL : ::au->render;
@@ -116,39 +115,16 @@ namespace
         DebugLog("BestMinimap: satellite: " + text);
     }
 
-    void HideGui()
+    // Интерфейс MyGUI - не в нашу текстуру: оверлеи выключены у всех её
+    // областей вывода (их создаёт набор компоновщиков).
+    int NoOverlays()
     {
-        g_hiddenGui.clear();
-        MyGUI::EnumeratorWidgetPtr roots = MyGUI::Gui::getInstance().getEnumerator();
-        while (roots.next())
-        {
-            MyGUI::Widget* const w = roots.current();
-            if (w != NULL && w->getVisible())
-            {
-                w->setVisible(false);
-                g_hiddenGui.push_back(w);
-            }
-        }
-    }
-
-    // Вернуть видимость. Окна за этот кадр могли удалить - возвращаем только
-    // тем, кто ещё среди корневых.
-    void RestoreGui()
-    {
-        if (g_hiddenGui.empty())
-            return;
-        MyGUI::EnumeratorWidgetPtr roots = MyGUI::Gui::getInstance().getEnumerator();
-        while (roots.next())
-        {
-            MyGUI::Widget* const w = roots.current();
-            for (size_t i = 0; i < g_hiddenGui.size(); ++i)
-                if (g_hiddenGui[i] == w)
-                {
-                    w->setVisible(true);
-                    break;
-                }
-        }
-        g_hiddenGui.clear();
+        Ogre::RenderTarget* const rt = g_target->getBuffer()->getRenderTarget();
+        const unsigned short n = rt->getNumViewports();
+        for (unsigned short i = 0; i < n; ++i)
+            if (Ogre::Viewport* const vp = rt->getViewport(i))
+                vp->setOverlaysEnabled(false);
+        return n;
     }
 
     void StopWorkspace()
@@ -193,11 +169,11 @@ namespace
     // картинке карты он вверху) - вверху снимка. Высота - такая, чтобы при
     // угле fov квадрат g_size на уровне центра влез ровно в кадр. Камера может
     // висеть на узле сцены - тогда место и поворот задаём относительно узла.
-    void MoveGameCamera(float fov)
+    // Камеру cam - наверх (для своей камеры сохранять нечего).
+    void AimDown(Ogre::Camera* cam, float fov)
     {
         Renderer* const r = GameRenderer();
-        Ogre::Camera* const cam = r->camera;
-        if (!g_saved.saved)
+        if (cam == r->camera && !g_saved.saved)
         {
             g_saved.position = cam->getPosition();
             g_saved.orientation = cam->getOrientation();
@@ -217,20 +193,41 @@ namespace
         const Ogre::Quaternion down(Ogre::Degree(-90.0f), Ogre::Vector3::UNIT_X);
         Ogre::Vector3 position = scene;
         Ogre::Quaternion orientation = down;
-        if (Ogre::Node* const parent = cam->getParentNode())
+        if (cam == g_own && g_ownNode != NULL)
         {
-            const Ogre::Quaternion inv = parent->_getDerivedOrientation().Inverse();
-            position = inv * (scene - parent->_getDerivedPosition());
-            orientation = inv * down;
+            // Своя - двигаем её узел, сама камера в нём без сдвига.
+            g_ownNode->setPosition(position);
+            g_ownNode->setOrientation(orientation);
         }
-        cam->setPosition(position);
-        cam->setOrientation(orientation);
+        else
+        {
+            if (Ogre::Node* const parent = cam->getParentNode())
+            {
+                const Ogre::Quaternion inv = parent->_getDerivedOrientation().Inverse();
+                position = inv * (scene - parent->_getDerivedPosition());
+                orientation = inv * down;
+            }
+            cam->setPosition(position);
+            cam->setOrientation(orientation);
+        }
         cam->setFOVy(Ogre::Degree(fov));
         cam->setAspectRatio(1.0f);
         // Глубина - только вокруг земли: так её точности хватает и с
         // десятка километров.
         cam->setNearClipDistance(height > 4005.0f ? height - 4000.0f : 5.0f);
         cam->setFarClipDistance(height + 4000.0f);
+    }
+
+    // Свою камеру - туда же, куда смотрит камера игры.
+    void AimLikeGame()
+    {
+        Ogre::Camera* const game = GameRenderer()->camera;
+        g_ownNode->setPosition(game->getDerivedPosition());
+        g_ownNode->setOrientation(game->getDerivedOrientation());
+        g_own->setFOVy(game->getFOVy());
+        g_own->setAspectRatio(1.0f);
+        g_own->setNearClipDistance(game->getNearClipDistance());
+        g_own->setFarClipDistance(game->getFarClipDistance());
     }
 
     void RestoreGameCamera()
@@ -251,19 +248,19 @@ namespace
         g_saved.saved = false;
     }
 
-    void LogShot(float fov)
+    void LogShot(const Step& step)
     {
         Renderer* const r = GameRenderer();
         const Ogre::Vector3 origin = r->getSceneRelativeOrigin();
         Ogre::Camera* const cam = r->camera;
         char note[400];
-        if (fov <= 0.0f)
-            sprintf_s(note, "shot 'game view': game camera at %.0f %.0f %.0f (scene), on a node: %s, fov %.1f, aspect %.2f",
-                      cam->getDerivedPosition().x, cam->getDerivedPosition().y, cam->getDerivedPosition().z,
-                      cam->getParentNode() != NULL ? "yes" : "no", cam->getFOVy().valueDegrees(), cam->getAspectRatio());
+        if (step.mode == OWN_GAME_VIEW)
+            sprintf_s(note, "shot '%s': own camera where the game camera is (%.0f %.0f %.0f scene, fov %.1f)",
+                      step.name, cam->getDerivedPosition().x, cam->getDerivedPosition().y, cam->getDerivedPosition().z,
+                      cam->getFOVy().valueDegrees());
         else
-            sprintf_s(note, "shot from above with %.0f deg: %.0f m over world %.0f %.0f %.0f (scene origin %.0f %.0f %.0f)",
-                      fov, g_size * 0.5f / std::tan(fov * 0.5f * 3.14159265f / 180.0f),
+            sprintf_s(note, "shot '%s' with %.0f deg: %.0f m over world %.0f %.0f %.0f (scene origin %.0f %.0f %.0f)",
+                      step.name, step.fov, g_size * 0.5f / std::tan(step.fov * 0.5f * 3.14159265f / 180.0f),
                       g_center.x, g_center.y, g_center.z, origin.x, origin.y, origin.z);
         Log(note);
     }
@@ -271,7 +268,7 @@ namespace
     bool Begin()
     {
         Renderer* const r = GameRenderer();
-        if (r == NULL || r->root == NULL || r->scene == NULL || r->workspace == NULL)
+        if (r == NULL || r->root == NULL || r->scene == NULL || r->workspace == NULL || r->camera == NULL)
         {
             Log("the game renderer is not ready");
             return false;
@@ -282,25 +279,51 @@ namespace
             Log("the game workspace has no definition");
             return false;
         }
-        const Ogre::IdString defName = WorkspaceDefAccess::Name(def);
+        g_defName = WorkspaceDefAccess::Name(def);
         if (g_target.isNull())
         {
             g_target = Ogre::TextureManager::getSingleton().createManual(
                 "BestMinimap_Satellite", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                 Ogre::TEX_TYPE_2D, kSide, kSide, 1, 0, Ogre::PF_A8R8G8B8, Ogre::TU_RENDERTARGET);
         }
-        Ogre::RenderTarget* const rt = g_target->getBuffer()->getRenderTarget();
-        if (r->camera == NULL)
+        if (g_own == NULL)
         {
-            Log("the game has no camera");
-            return false;
+            g_own = r->scene->createCamera("BestMinimap_SatelliteCamera");
+            g_own->setFixedYawAxis(false);
+            g_own->setAspectRatio(1.0f);
+            const bool attached = g_own->getParentNode() != NULL;
+            if (attached)
+                g_own->detachFromParent();
+            g_ownNode = r->scene->getRootSceneNode()->createChildSceneNode();
+            g_ownNode->attachObject(g_own);
+            g_own->setPosition(Ogre::Vector3::ZERO);
+            g_own->setOrientation(Ogre::Quaternion::IDENTITY);
+            Log(std::string("own camera created; Ogre had attached it to a node by itself: ") + (attached ? "yes" : "no"));
         }
-        g_workspace = r->root->getCompositorManager2()->addWorkspace(r->scene, rt, r->camera, defName, true, 0);
         char note[160];
-        sprintf_s(note, "started: %.0f m square, %dx%d, game workspace definition %08X",
-                  g_size, kSide, kSide, defName.mHash);
+        sprintf_s(note, "started: %.0f m square, %dx%d, game workspace definition %08X", g_size, kSide, kSide,
+                  g_defName.mHash);
         Log(note);
-        return g_workspace != NULL;
+        return true;
+    }
+
+    // Набор компоновщиков на шаг - со своей камерой или с камерой игры.
+    void StartStep(const Step& step)
+    {
+        StopWorkspace();
+        Renderer* const r = GameRenderer();
+        Ogre::Camera* const cam = step.mode == GAME_TOP ? r->camera : g_own;
+        if (step.mode == OWN_GAME_VIEW)
+            AimLikeGame();
+        else if (step.mode == OWN_TOP)
+            AimDown(g_own, step.fov);
+        Ogre::RenderTarget* const rt = g_target->getBuffer()->getRenderTarget();
+        g_workspace = r->root->getCompositorManager2()->addWorkspace(r->scene, rt, cam, g_defName, true, 0);
+        char note[80];
+        sprintf_s(note, "viewports with overlays turned off: %d", NoOverlays());
+        Log(note);
+        LogShot(step);
+        g_wait = kSettleFrames;
     }
 
     void SaveShot(const char* label)
@@ -322,7 +345,6 @@ namespace
         Log("failed: " + why);
         g_steps.clear();
         RestoreGameCamera();
-        RestoreGui();
         StopWorkspace();
     }
 }
@@ -341,14 +363,12 @@ namespace Satellite
         try
         {
             if (!Begin())
-            {
-                StopWorkspace();
                 return;
-            }
-            const Step steps[] = { { "top_fov60", 60.0f }, { "top_fov20", 20.0f }, { "game_view", 0.0f } };
+            const Step steps[] = { { "game_top_fov20", GAME_TOP, 20.0f },
+                                   { "own_top_fov20", OWN_TOP, 20.0f },
+                                   { "own_game_view", OWN_GAME_VIEW, 0.0f } };
             g_steps.assign(steps, steps + 3);
-            LogShot(g_steps.back().fov);
-            g_wait = kSettleFrames;
+            StartStep(g_steps.back());
         }
         catch (const Ogre::Exception& e)
         {
@@ -368,23 +388,19 @@ namespace Satellite
         try
         {
             const Step step = g_steps.back();
-            // Два последних кадра перед чтением - камера наверху (ставим
-            // каждый кадр: игра может двигать свою камеру сама), последний
-            // - ещё и без интерфейса.
-            if (g_wait <= 2 && g_wait > 0 && step.fov > 0.0f)
-                MoveGameCamera(step.fov);
-            if (g_wait == 1)
-                HideGui();
+            // Камеру игры - наверх на два последних кадра (ставим каждый
+            // кадр: игра может двигать её сама).
+            if (g_wait <= 2 && g_wait > 0 && step.mode == GAME_TOP)
+                AimDown(GameRenderer()->camera, step.fov);
+            NoOverlays();
             if (g_wait > 0)
                 return;
             SaveShot(step.name);
             RestoreGameCamera();
-            RestoreGui();
             g_steps.pop_back();
             if (!g_steps.empty())
             {
-                LogShot(g_steps.back().fov);
-                g_wait = kSettleFrames;
+                StartStep(g_steps.back());
                 return;
             }
             char note[96];
@@ -408,7 +424,6 @@ namespace Satellite
         try
         {
             RestoreGameCamera();
-            RestoreGui();           // только тем окнам, что ещё есть
             StopWorkspace();
         }
         catch (...)
