@@ -293,9 +293,6 @@ msgstr "Тонкий белый круг: докуда простирается 
 msgid "All squads"
 msgstr "Все отряды"
 
-msgid "Also the places you have not found yet."
-msgstr "Ещё и места, которые вы пока не нашли."
-
 msgid "Bounties"
 msgstr "Награды за голову"
 
@@ -371,9 +368,6 @@ msgstr "Поселения"
 msgid "Towns and places"
 msgstr "Поселения и места"
 
-msgid "Undiscovered too"
-msgstr "И неоткрытые"
-
 msgid "ally"
 msgstr "союзник"
 
@@ -388,3 +382,18 @@ msgstr "нейтрально"
 
 msgid "your faction"
 msgstr "ваша фракция"
+
+msgid "Town icons"
+msgstr "Значки поселений"
+
+msgid "As on the game map"
+msgstr "Как на карте игры"
+
+msgid "Diamonds"
+msgstr "Ромбы"
+
+msgid "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+msgstr "Как на карте игры - значки большой карты, из интерфейса игры и модов на интерфейс. Местам, для которых у большой карты значка нет, - ромб."
+
+msgid "Town icon size, px"
+msgstr "Размер значков поселений, пикс."

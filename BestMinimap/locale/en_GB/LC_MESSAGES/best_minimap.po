@@ -293,9 +293,6 @@ msgstr "A thin white circle: how far the town reaches."
 msgid "All squads"
 msgstr "All squads"
 
-msgid "Also the places you have not found yet."
-msgstr "Also the places you have not found yet."
-
 msgid "Bounties"
 msgstr "Bounties"
 
@@ -371,9 +368,6 @@ msgstr "Towns"
 msgid "Towns and places"
 msgstr "Towns and places"
 
-msgid "Undiscovered too"
-msgstr "Undiscovered too"
-
 msgid "ally"
 msgstr "ally"
 
@@ -388,3 +382,18 @@ msgstr "neutral"
 
 msgid "your faction"
 msgstr "your faction"
+
+msgid "Town icons"
+msgstr "Town icons"
+
+msgid "As on the game map"
+msgstr "As on the game map"
+
+msgid "Diamonds"
+msgstr "Diamonds"
+
+msgid "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+msgstr "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+
+msgid "Town icon size, px"
+msgstr "Town icon size, px"

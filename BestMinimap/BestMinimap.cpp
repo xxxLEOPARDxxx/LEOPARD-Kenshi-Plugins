@@ -214,7 +214,8 @@ namespace
     bool g_showTowns = true;            // поселения и постройки на карте
     bool g_townNames = true;
     bool g_townRadius = true;           // круг радиуса поселения
-    bool g_showUndiscovered = false;
+    bool g_townGameIcons = true;        // значки как на большой карте игры
+    int g_townIconSize = 22;            // их высота, пикселей
     unsigned g_townColour = 0xFFF0E6C8u;
     bool g_rightClickMove = true;       // ПКМ по миникарте - идти туда
     bool g_showBounty = true;           // кольцо и сумма награды за голову
@@ -344,7 +345,8 @@ namespace
         g_showTowns = ReadBool(ini, "ShowTowns", true);
         g_townNames = ReadBool(ini, "TownNames", true);
         g_townRadius = ReadBool(ini, "TownRadius", true);
-        g_showUndiscovered = ReadBool(ini, "ShowUndiscovered", false);
+        g_townGameIcons = ReadText(ini, "TownIcons", "game") != "diamond";
+        g_townIconSize = ReadInt(ini, "TownIconSize", 22, 10, 64);
         g_rightClickMove = ReadBool(ini, "RightClickMove", true);
         g_showBounty = ReadBool(ini, "ShowBounty", true);
         ReadColour(ini, "BountyColour", "#F2C230", unused, g_bountyColour);
@@ -454,15 +456,16 @@ namespace
         }
     }
 
-    // Из Ogre::Image - в g_src, с уменьшением шагом step (точечная выборка:
-    // для картинки карты хватает, а память на усреднение 8192x8192 не нужна).
-    bool FillFromImage(Ogre::Image& img)
+    // Из Ogre::Image - в out, с уменьшением шагом step до maxSize (точечная
+    // выборка: для картинки карты хватает, а память на усреднение 8192x8192
+    // не нужна). mips - строить ли уменьшенные копии.
+    bool FillFromImage(Ogre::Image& img, Source& out, int maxSize, bool mips)
     {
         const int w = static_cast<int>(img.getWidth()), h = static_cast<int>(img.getHeight());
         const Ogre::PixelFormat f = img.getFormat();
         if (w <= 0 || h <= 0 || img.getData() == NULL)
             return false;
-        const int step = Hi(1, (Hi(w, h) + g_maxSource - 1) / g_maxSource);
+        const int step = Hi(1, (Hi(w, h) + maxSize - 1) / maxSize);
         const int ow = (w + step - 1) / step, oh = (h + step - 1) / step;
         std::vector<unsigned> px(static_cast<size_t>(ow) * oh, 0xFF000000u);
         const unsigned char* const data = img.getData();
@@ -473,7 +476,7 @@ namespace
                              f == Ogre::PF_DXT4 || f == Ogre::PF_DXT5;
             if (!dxt)
             {
-                ErrorLog("BestMinimap: map picture is in an unsupported compressed format " +
+                ErrorLog("BestMinimap: picture is in an unsupported compressed format " +
                          Ogre::PixelUtil::getFormatName(f));
                 return false;
             }
@@ -528,12 +531,13 @@ namespace
                     px[static_cast<size_t>(y) * ow + x] = Pack(r, g, b, a);
                 }
         }
-        g_src.px.swap(px);
+        out.px.swap(px);
         // Мип-уровни: среднее 2x2, пока сторона не меньше 8.
-        g_src.mips.clear();
+        out.mips.clear();
+        if (mips)
         {
             int lw = ow, lh = oh;
-            const std::vector<unsigned>* prev = &g_src.px;
+            const std::vector<unsigned>* prev = &out.px;
             while (lw >= 16 && lh >= 16)
             {
                 Source::Level lv;
@@ -550,30 +554,30 @@ namespace
                             (ChG(a[0]) + ChG(a[1]) + ChG(b[0]) + ChG(b[1]) + 2) / 4,
                             (ChB(a[0]) + ChB(a[1]) + ChB(b[0]) + ChB(b[1]) + 2) / 4, 255);
                     }
-                g_src.mips.push_back(lv);
-                prev = &g_src.mips.back().px;
+                out.mips.push_back(lv);
+                prev = &out.mips.back().px;
                 lw = lv.w;
                 lh = lv.h;
             }
         }
-        g_src.w = ow;
-        g_src.h = oh;
+        out.w = ow;
+        out.h = oh;
         return true;
     }
 
-    bool LoadSource(const std::string& texture)
+    // Текстуру игры - в память: файлом через Ogre, а не вышло - копией с
+    // видеокарты.
+    bool ReadTexture(const std::string& texture, Source& out, int maxSize, bool mips, std::string& how)
     {
-        g_src = Source();
+        out = Source();
         if (texture.empty())
             return false;
-        const DWORD started = GetTickCount();
         bool ok = false;
-        std::string how;
         try
         {
             Ogre::Image img;
             img.load(texture, Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-            ok = FillFromImage(img);
+            ok = FillFromImage(img, out, maxSize, mips);
             how = "file";
         }
         catch (...)
@@ -589,7 +593,7 @@ namespace
                 {
                     Ogre::Image img;
                     tex->convertToImage(img);
-                    ok = FillFromImage(img);
+                    ok = FillFromImage(img, out, maxSize, mips);
                     how = "gpu copy";
                 }
             }
@@ -599,13 +603,26 @@ namespace
             }
         }
         if (!ok)
+            out = Source();
+        else
+            out.texture = texture;
+        return ok;
+    }
+
+    bool LoadSource(const std::string& texture)
+    {
+        const DWORD started = GetTickCount();
+        std::string how;
+        const bool ok = ReadTexture(texture, g_src, g_maxSource, true, how);
+        if (texture.empty())
+            return false;
+        if (!ok)
         {
             g_src = Source();
             g_srcFailed = texture;
             ErrorLog("BestMinimap: could not read the map picture '" + texture + "', the minimap shows no terrain");
             return false;
         }
-        g_src.texture = texture;
         char note[256];
         sprintf_s(note, "BestMinimap: map picture '%s' read (%s), %dx%d in memory, %u ms",
                   texture.c_str(), how.c_str(), g_src.w, g_src.h, GetTickCount() - started);
@@ -1131,8 +1148,13 @@ namespace
     int g_texW = 0, g_texH = 0;     // размер текстуры (ширина кратна 64)
     int g_viewW = 0, g_viewH = 0;   // видимая часть = размер карты на экране
     int g_texSerial = 0;
+    // Рисует отдельный поток (см. «Поток рисования»): буфер, маска и их
+    // размер - его; основной поток трогает их, только пока поток свободен.
     std::vector<unsigned> g_buf;
     std::vector<unsigned char> g_mask;  // 0..255: внутри формы
+    int g_rw = 0, g_rh = 0;             // размер, под который рисует поток
+    int g_rshape = 0;                   // форма, под которую построена маска
+    int g_frameW = 0;                   // ширина, под которую построена маска
     bool g_dirtyMask = true;
     DWORD g_lastRender = 0;
     DWORD g_lastWorldFrame = 0;
@@ -1160,19 +1182,39 @@ namespace
     //
     // Ширина кратна 64 пикселям: строка - ровно 4 КБ, шаг строки у
     // видеокарты совпадает с нашим (MyGUI отдаёт указатель без шага строки).
-    const int kTexSize = 1024;
 
-    bool EnsureTexture()
+    // Текстура - степень двойки не меньше миникарты (от 256): чем меньше,
+    // тем дешевле её запись каждую перерисовку. Растёт при увеличении
+    // миникарты; прежняя удаляется кадром позже, когда картинка уже
+    // переключена на новую.
+    MyGUI::ITexture* g_oldTex = NULL;
+
+    int TexSide(int n)
     {
-        if (g_tex != NULL)
+        int side = 256;
+        while (side < n)
+            side <<= 1;
+        return side;
+    }
+
+    bool EnsureTexture(int w, int h)
+    {
+        if (g_oldTex != NULL)
+        {
+            MyGUI::RenderManager::getInstance().destroyTexture(g_oldTex);
+            g_oldTex = NULL;
+        }
+        if (g_tex != NULL && g_texW >= w && g_texH >= h)
             return true;
+        const int tw = TexSide(Hi(w, g_texW)), th = TexSide(Hi(h, g_texH));
+        MyGUI::ITexture* const was = g_tex;
         char name[64];
         sprintf_s(name, "BestMinimap_View_%d", ++g_texSerial);
         try
         {
             MyGUI::RenderManager& rm = MyGUI::RenderManager::getInstance();
             g_tex = rm.createTexture(name);
-            g_tex->createManual(kTexSize, kTexSize, MyGUI::TextureUsage::Dynamic | MyGUI::TextureUsage::Write,
+            g_tex->createManual(tw, th, MyGUI::TextureUsage::Dynamic | MyGUI::TextureUsage::Write,
                                 MyGUI::PixelFormat::R8G8B8A8);
         }
         catch (...)
@@ -1181,12 +1223,14 @@ namespace
         }
         if (g_tex == NULL)
         {
+            g_tex = was;
             ErrorLog("BestMinimap: could not create the minimap texture");
-            return false;
+            return was != NULL && g_texW >= w && g_texH >= h;
         }
+        g_oldTex = was;
         g_texName = name;
-        g_texW = kTexSize;
-        g_texH = kTexSize;
+        g_texW = tw;
+        g_texH = th;
         return true;
     }
 
@@ -1329,7 +1373,7 @@ namespace
         }
         root->setNeedMouseFocus(true);
 
-        if (!EnsureTexture())
+        if (!EnsureTexture(w, h))
             return false;
         MyGUI::ImageBox* const box = image->castType<MyGUI::ImageBox>();
         if (g_viewW != w || g_viewH != h || box->_getTextureName() != g_texName)
@@ -1366,7 +1410,7 @@ namespace
     // Рисование
     // ---------------------------------------------------------------
 
-    float InsideShape(float fx, float fy, int w, int h, float inset);
+    float InsideShapeOf(int shape, float fx, float fy, int w, int h, float inset);
 
     struct FrameCov { unsigned index; float alpha; };
     std::vector<FrameCov> g_frameCov;
@@ -1377,13 +1421,13 @@ namespace
         g_mask.assign(static_cast<size_t>(w) * h, 0);
         const float cx = w * 0.5f, cy = h * 0.5f;
         const float radius = Lo(w, h) * 0.5f - 0.5f;
-        const float corner = g_shape == SHAPE_CIRCLE ? 0.0f : 3.0f;
+        const float corner = g_rshape == SHAPE_CIRCLE ? 0.0f : 3.0f;
         for (int y = 0; y < h; ++y)
             for (int x = 0; x < w; ++x)
             {
                 float inside;
                 const float fx = x + 0.5f, fy = y + 0.5f;
-                if (g_shape == SHAPE_CIRCLE)
+                if (g_rshape == SHAPE_CIRCLE)
                 {
                     const float d = std::sqrt((fx - cx) * (fx - cx) + (fy - cy) * (fy - cy));
                     inside = radius - d + 0.5f;
@@ -1409,7 +1453,7 @@ namespace
                 const size_t i = static_cast<size_t>(y) * w + x;
                 if (g_mask[i] == 0)
                     continue;
-                const float inner = InsideShape(x + 0.5f, y + 0.5f, w, h, 2.0f);
+                const float inner = InsideShapeOf(g_rshape, x + 0.5f, y + 0.5f, w, h, 2.0f);
                 if (inner >= 1.0f)
                     continue;
                 FrameCov c;
@@ -1417,14 +1461,13 @@ namespace
                 c.alpha = (1.0f - inner) * (g_mask[i] / 255.0f);
                 g_frameCov.push_back(c);
             }
-        g_dirtyMask = false;
     }
 
     // Насколько точка внутри формы с отступом inset (для рамки): 0..1.
-    float InsideShape(float fx, float fy, int w, int h, float inset)
+    float InsideShapeOf(int shape, float fx, float fy, int w, int h, float inset)
     {
         const float cx = w * 0.5f, cy = h * 0.5f;
-        if (g_shape == SHAPE_CIRCLE)
+        if (shape == SHAPE_CIRCLE)
         {
             const float radius = Lo(w, h) * 0.5f - inset;
             const float d = std::sqrt((fx - cx) * (fx - cx) + (fy - cy) * (fy - cy));
@@ -1432,6 +1475,12 @@ namespace
         }
         const float dx = cx - inset - std::fabs(fx - cx), dy = cy - inset - std::fabs(fy - cy);
         return Clamp(Lo(dx, dy) + 0.5f, 0.0f, 1.0f);
+    }
+
+    // То же для текущей формы - в основном потоке (метки, подписи, мышь).
+    float InsideShape(float fx, float fy, int w, int h, float inset)
+    {
+        return InsideShapeOf(g_shape, fx, fy, w, h, inset);
     }
 
     inline unsigned Blend(unsigned dst, unsigned src, float a)
@@ -1451,7 +1500,7 @@ namespace
     // Диск с тёмной обводкой; clip - обрезать по форме карты.
     void DrawDisc(float cx, float cy, float r, unsigned fill, unsigned outline, float alpha)
     {
-        const int w = g_viewW, h = g_viewH;
+        const int w = g_rw, h = g_rh;
         const int x0 = Hi(0, static_cast<int>(cx - r - 2)), x1 = Lo(w - 1, static_cast<int>(cx + r + 2));
         const int y0 = Hi(0, static_cast<int>(cy - r - 2)), y1 = Lo(h - 1, static_cast<int>(cy + r + 2));
         // Корень - только на краю: внутри (без сглаживания) и снаружи
@@ -1486,18 +1535,18 @@ namespace
     }
 
     // Треугольник «куда смотрит камера» в центре.
-    void DrawView(float cx, float cy, float dirX, float dirY, unsigned colour)
+    void DrawView(float cx, float cy, float dirX, float dirY, float len, unsigned colour)
     {
-        const float len = Hi(8.0f, g_dot * 2.2f), half = len * 0.55f;
+        const float half = len * 0.55f;
         const float tipX = cx + dirX * len, tipY = cy + dirY * len;
         const float nx = -dirY, ny = dirX;
         const float bx = cx - dirX * len * 0.35f, by = cy - dirY * len * 0.35f;
         const float ax = bx + nx * half, ay = by + ny * half;
         const float cx2 = bx - nx * half, cy2 = by - ny * half;
         const int x0 = Hi(0, static_cast<int>(Lo(Lo(tipX, ax), cx2)) - 1);
-        const int x1 = Lo(g_viewW - 1, static_cast<int>(Hi(Hi(tipX, ax), cx2)) + 1);
+        const int x1 = Lo(g_rw - 1, static_cast<int>(Hi(Hi(tipX, ax), cx2)) + 1);
         const int y0 = Hi(0, static_cast<int>(Lo(Lo(tipY, ay), cy2)) - 1);
-        const int y1 = Lo(g_viewH - 1, static_cast<int>(Hi(Hi(tipY, ay), cy2)) + 1);
+        const int y1 = Lo(g_rh - 1, static_cast<int>(Hi(Hi(tipY, ay), cy2)) + 1);
         for (int y = y0; y <= y1; ++y)
             for (int x = x0; x <= x1; ++x)
             {
@@ -1514,7 +1563,7 @@ namespace
                 }
                 if (hits == 0)
                     continue;
-                const size_t i = static_cast<size_t>(y) * g_viewW + x;
+                const size_t i = static_cast<size_t>(y) * g_rw + x;
                 g_buf[i] = Blend(g_buf[i], colour, hits / 4.0f * (g_mask[i] / 255.0f) * 0.85f);
             }
     }
@@ -1571,8 +1620,8 @@ namespace
     void DrawRing(float cx, float cy, float r, float thick, unsigned colour, float alpha)
     {
         const float outer = r + thick * 0.5f + 1.0f;
-        const int x0 = Hi(0, static_cast<int>(cx - outer)), x1 = Lo(g_viewW - 1, static_cast<int>(cx + outer));
-        const int y0 = Hi(0, static_cast<int>(cy - outer)), y1 = Lo(g_viewH - 1, static_cast<int>(cy + outer));
+        const int x0 = Hi(0, static_cast<int>(cx - outer)), x1 = Lo(g_rw - 1, static_cast<int>(cx + outer));
+        const int y0 = Hi(0, static_cast<int>(cy - outer)), y1 = Lo(g_rh - 1, static_cast<int>(cy + outer));
         for (int y = y0; y <= y1; ++y)
             for (int x = x0; x <= x1; ++x)
             {
@@ -1581,7 +1630,7 @@ namespace
                 const float cover = Clamp(thick * 0.5f + 0.5f - std::fabs(d - r), 0.0f, 1.0f);
                 if (cover <= 0.0f)
                     continue;
-                const size_t i = static_cast<size_t>(y) * g_viewW + x;
+                const size_t i = static_cast<size_t>(y) * g_rw + x;
                 g_buf[i] = Blend(g_buf[i], colour, cover * alpha * (g_mask[i] / 255.0f));
             }
     }
@@ -1595,23 +1644,18 @@ namespace
     // задевающие миникарту; центры ближе пары пикселей (отряд в куче)
     // склеиваем; каждую точку проверяем лишь по соседним кругам; пунктир -
     // сразу точками через 7 пикселей, без промежуточных выборок.
-    void DrawCameraRange(const std::vector<Ogre::Vector3>& centresWorld, float pxPerMetre,
-                         void (*toScreen)(const Ogre::Vector3&, float&, float&))
+    void DrawCameraRange(const std::vector<float>& sx, const std::vector<float>& sy, float r, bool dotted,
+                         unsigned colour)
     {
-        const float range = CameraRange();
-        if (!g_camRange || range < 20.0f || centresWorld.empty())
+        if (r < 3.0f || sx.empty())
             return;
-        const float r = range * pxPerMetre;
-        if (r < 3.0f)
-            return;
-        const float w = static_cast<float>(g_viewW), h = static_cast<float>(g_viewH);
+        const float w = static_cast<float>(g_rw), h = static_cast<float>(g_rh);
         const float r2 = r * r;
         const float merge = Hi(1.5f, r * 0.02f);
         std::vector<float> cx, cy;
-        for (size_t i = 0; i < centresWorld.size(); ++i)
+        for (size_t i = 0; i < sx.size(); ++i)
         {
-            float x, y;
-            toScreen(centresWorld[i], x, y);
+            const float x = sx[i], y = sy[i];
             // Круг не задевает миникарту - не нужен ни для линии, ни для
             // проверки «внутри».
             const float nx = Clamp(x, 0.0f, w), ny = Clamp(y, 0.0f, h);
@@ -1632,7 +1676,7 @@ namespace
         }
         const float r2in = (r - 0.75f) * (r - 0.75f);
         const float circ = 6.2832f * r;
-        const int steps = g_camRangeDots ? Hi(8, static_cast<int>(circ / 7.0f))
+        const int steps = dotted ? Hi(8, static_cast<int>(circ / 7.0f))
                                          : Clamp(static_cast<int>(circ * 1.5f), 32, 20000);
         std::vector<size_t> nearby;
         for (size_t i = 0; i < cx.size(); ++i)
@@ -1656,16 +1700,16 @@ namespace
                 }
                 if (inside)
                     continue;
-                if (g_camRangeDots)
+                if (dotted)
                 {
-                    DrawDisc(x, y, 1.1f, g_camRangeColour, g_camRangeColour, 0.85f);
+                    DrawDisc(x, y, 1.1f, colour, colour, 0.85f);
                     continue;
                 }
                 const int px = static_cast<int>(x), py = static_cast<int>(y);
-                if (px < 0 || py < 0 || px >= g_viewW || py >= g_viewH)
+                if (px < 0 || py < 0 || px >= g_rw || py >= g_rh)
                     continue;
-                const size_t idx = static_cast<size_t>(py) * g_viewW + px;
-                g_buf[idx] = Blend(g_buf[idx], g_camRangeColour, 0.7f * (g_mask[idx] / 255.0f));
+                const size_t idx = static_cast<size_t>(py) * g_rw + px;
+                g_buf[idx] = Blend(g_buf[idx], colour, 0.7f * (g_mask[idx] / 255.0f));
             }
         }
     }
@@ -1675,23 +1719,14 @@ namespace
     View g_lastView;
     bool g_haveView = false;
 
-    // Для DrawCameraRange: мир -> экран текущего вида (вид живёт на время Render).
-    const void* g_renderView = NULL;
-    void WorldToScreenCb(const Ogre::Vector3& p, float& x, float& y)
-    {
-        const View& v = *static_cast<const View*>(g_renderView);
-        double u, vv;
-        g_map.apply(p.x, p.z, u, vv);
-        ToScreen(v, u, vv, x, y);
-    }
 
     // Закрашенный треугольник (4 выборки на пиксель), обрезанный по форме.
     void DrawTri(float ax, float ay, float bx, float by, float cx, float cy, unsigned colour, float alpha)
     {
         const int x0 = Hi(0, static_cast<int>(Lo(Lo(ax, bx), cx)) - 1);
-        const int x1 = Lo(g_viewW - 1, static_cast<int>(Hi(Hi(ax, bx), cx)) + 1);
+        const int x1 = Lo(g_rw - 1, static_cast<int>(Hi(Hi(ax, bx), cx)) + 1);
         const int y0 = Hi(0, static_cast<int>(Lo(Lo(ay, by), cy)) - 1);
-        const int y1 = Lo(g_viewH - 1, static_cast<int>(Hi(Hi(ay, by), cy)) + 1);
+        const int y1 = Lo(g_rh - 1, static_cast<int>(Hi(Hi(ay, by), cy)) + 1);
         for (int y = y0; y <= y1; ++y)
             for (int x = x0; x <= x1; ++x)
             {
@@ -1707,7 +1742,7 @@ namespace
                 }
                 if (hits == 0)
                     continue;
-                const size_t i = static_cast<size_t>(y) * g_viewW + x;
+                const size_t i = static_cast<size_t>(y) * g_rw + x;
                 g_buf[i] = Blend(g_buf[i], colour, hits / 4.0f * alpha * (g_mask[i] / 255.0f));
             }
     }
@@ -1861,6 +1896,8 @@ namespace
         std::string name;
         unsigned colour;
         std::string tip;
+        // Значок большой карты, готовый к рисованию (NULL - ромб).
+        const struct Icon* icon;
     };
     std::vector<TownInfo> g_towns;
 
@@ -1892,11 +1929,167 @@ namespace
         return std::string(Tr("neutral")) + num;
     }
 
+    // ---- значки поселений как на большой карте ----
+    // Значок большой карты - ImageBox метки поселения (MapMarkerTown::image).
+    // Текстура у него открыта (_getTextureName), а кусок атласа - в закрытых
+    // полях ImageBox. Читаем их через класс с той же раскладкой полей
+    // (MyGUI 3.2 из заголовков игры) и проверяем раскладку по размеру
+    // текстуры: не сошёлся - значка нет, будет ромб.
+    class ImageBoxPeek : public MyGUI::Widget, public MyGUI::MemberObsolete<MyGUI::ImageBox>
+    {
+    public:
+        MyGUI::IntRect mRectImage;
+        MyGUI::IntSize mSizeTile;
+        MyGUI::IntSize mSizeTexture;
+        size_t mIndexSelect;
+        MyGUI::VectorImages mItems;
+    };
+
+    // Значок, вырезанный из атласа, уменьшенный до TownIconSize (и
+    // тонированный tint). Атлас читается в память один раз (как
+    // картинка карты); значки копятся в кэше по ключу и не удаляются - поток
+    // рисования берёт их по указателю.
+    struct Icon
+    {
+        int w, h;
+        std::vector<unsigned> px;   // ARGB, не умноженный на альфу
+    };
+
+    std::map<std::string, Source> g_atlases;
+    std::map<std::string, Icon> g_icons;
+
+    const Icon* IconFor(const std::string& texture, const MyGUI::IntCoord& c, int texW, int texH,
+                        const MyGUI::Colour& tint, int height)
+    {
+        char key[320];
+        sprintf_s(key, "%s|%d,%d,%d,%d|%d|%.3f,%.3f,%.3f,%.3f", texture.c_str(), c.left, c.top, c.width, c.height,
+                  height, tint.red, tint.green, tint.blue, tint.alpha);
+        std::map<std::string, Icon>::iterator it = g_icons.find(key);
+        if (it != g_icons.end())
+            return it->second.px.empty() ? NULL : &it->second;
+        if (g_icons.size() > 2000)
+            return NULL;
+        Icon& icon = g_icons[key];
+        icon.w = icon.h = 0;
+        std::map<std::string, Source>::iterator a = g_atlases.find(texture);
+        if (a == g_atlases.end())
+        {
+            const DWORD started = GetTickCount();
+            std::string how;
+            a = g_atlases.insert(std::make_pair(texture, Source())).first;
+            const bool ok = ReadTexture(texture, a->second, 8192, false, how);
+            char note[300];
+            sprintf_s(note, "BestMinimap: map icons '%s' %s (%s), %dx%d, %u ms", texture.c_str(),
+                      ok ? "read" : "could not be read", how.c_str(), a->second.w, a->second.h,
+                      GetTickCount() - started);
+            DebugLog(note);
+        }
+        const Source& atlas = a->second;
+        if (!atlas.ok() || texW <= 0 || texH <= 0)
+            return NULL;
+        // Атлас в памяти может быть другого размера, чем текстура.
+        const float sx = static_cast<float>(atlas.w) / texW, sy = static_cast<float>(atlas.h) / texH;
+        const int left = static_cast<int>(c.left * sx), top = static_cast<int>(c.top * sy);
+        const int cw = Hi(1, static_cast<int>(c.width * sx)), ch = Hi(1, static_cast<int>(c.height * sy));
+        if (left < 0 || top < 0 || left + cw > atlas.w || top + ch > atlas.h)
+            return NULL;
+        icon.h = height;
+        icon.w = Hi(1, cw * height / ch);
+        icon.px.assign(static_cast<size_t>(icon.w) * icon.h, 0);
+        // Уменьшение средним по площади, с весом альфы (края не темнеют).
+        for (int y = 0; y < icon.h; ++y)
+        {
+            const int y0 = top + y * ch / icon.h, y1 = Hi(y0 + 1, top + (y + 1) * ch / icon.h);
+            for (int x = 0; x < icon.w; ++x)
+            {
+                const int x0 = left + x * cw / icon.w, x1 = Hi(x0 + 1, left + (x + 1) * cw / icon.w);
+                double sa = 0, sr = 0, sg = 0, sb = 0;
+                int n = 0;
+                for (int yy = y0; yy < y1; ++yy)
+                    for (int xx = x0; xx < x1; ++xx)
+                    {
+                        const unsigned p = atlas.px[static_cast<size_t>(yy) * atlas.w + xx];
+                        const double al = ChA(p);
+                        sa += al;
+                        sr += ChR(p) * al;
+                        sg += ChG(p) * al;
+                        sb += ChB(p) * al;
+                        ++n;
+                    }
+                if (sa <= 0.0)
+                    continue;
+                const int r = static_cast<int>(sr / sa * tint.red + 0.5);
+                const int g = static_cast<int>(sg / sa * tint.green + 0.5);
+                const int b = static_cast<int>(sb / sa * tint.blue + 0.5);
+                const int al = static_cast<int>(sa / n * tint.alpha + 0.5);
+                icon.px[static_cast<size_t>(y) * icon.w + x] = Pack(Clamp(r, 0, 255), Clamp(g, 0, 255),
+                                                                    Clamp(b, 0, 255), Clamp(al, 0, 255));
+            }
+        }
+        return &icon;
+    }
+
+    bool IconOf(MyGUI::ImageBox* img, std::string& texture, MyGUI::IntCoord& coord, int& texW, int& texH)
+    {
+        if (img == NULL)
+            return false;
+        texture = img->_getTextureName();
+        if (texture.empty())
+            return false;
+        MyGUI::ITexture* const tex = MyGUI::RenderManager::getInstance().getTexture(texture);
+        if (tex == NULL || tex->getWidth() <= 0 || tex->getHeight() <= 0)
+            return false;
+        const ImageBoxPeek* const peek = reinterpret_cast<const ImageBoxPeek*>(img);
+        if (peek->mSizeTexture.width != tex->getWidth() || peek->mSizeTexture.height != tex->getHeight())
+            return false;       // раскладка не та - не читаем дальше
+        const size_t count = peek->mItems.size();
+        if (peek->mIndexSelect >= count || count > 4096 || peek->mItems[peek->mIndexSelect].images.empty())
+            return false;
+        const MyGUI::FloatRect& uv = peek->mItems[peek->mIndexSelect].images[0];
+        texW = tex->getWidth();
+        texH = tex->getHeight();
+        const float tw = static_cast<float>(texW), th = static_cast<float>(texH);
+        coord = MyGUI::IntCoord(static_cast<int>(uv.left * tw + 0.5f), static_cast<int>(uv.top * th + 0.5f),
+                                static_cast<int>((uv.right - uv.left) * tw + 0.5f),
+                                static_cast<int>((uv.bottom - uv.top) * th + 0.5f));
+        return coord.width > 0 && coord.height > 0 && coord.left >= 0 && coord.top >= 0 &&
+               coord.right() <= tex->getWidth() && coord.bottom() <= tex->getHeight();
+    }
+
+    // Метки большой карты по поселению (по ссылке игры, а если её не
+    // вышло получить - по подписи метки).
+    std::map<TownBase*, MapScreen::MapMarkerTown*> g_markerByTown;
+    std::map<std::string, MapScreen::MapMarkerTown*> g_markerByName;
+
+    void IndexMarkers(MapScreen* map)
+    {
+        g_markerByTown.clear();
+        g_markerByName.clear();
+        if (map == NULL || !g_townGameIcons)
+            return;
+        typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
+        const Towns& towns = map->mapMarkersTowns;
+        for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
+        {
+            MapScreen::MapMarkerTown* const m = it->second;
+            if (m == NULL || m->image == NULL)
+                continue;
+            TownBase* t = it->first.getTown();
+            if (t == NULL)
+                t = m->handle.getTown();
+            if (t != NULL)
+                g_markerByTown[t] = m;
+            if (m->label != NULL)
+                g_markerByName[m->label->getCaption().asUTF8()] = m;
+        }
+    }
+
     void AddTown(TownBase* t, Faction* player, const Ogre::Vector3& center, float reach)
     {
-        if (!t->isDiscovered() && !g_showUndiscovered)
+        if (!t->isDiscovered())
             return;
         TownInfo info;
+        info.icon = NULL;
         info.pos = t->getPosition();
         info.radius = t->getRadius();
         const float dx = info.pos.x - center.x, dz = info.pos.z - center.z;
@@ -1911,6 +2104,21 @@ namespace
         info.tip = info.name;
         if (f != NULL)
             info.tip += "\n" + f->getName() + (rel.empty() ? std::string() : " - " + rel);
+        if (g_townGameIcons)
+        {
+            std::map<TownBase*, MapScreen::MapMarkerTown*>::const_iterator m = g_markerByTown.find(t);
+            MapScreen::MapMarkerTown* marker = m != g_markerByTown.end() ? m->second : NULL;
+            if (marker == NULL)
+            {
+                std::map<std::string, MapScreen::MapMarkerTown*>::const_iterator n = g_markerByName.find(info.name);
+                marker = n != g_markerByName.end() ? n->second : NULL;
+            }
+            std::string texture;
+            MyGUI::IntCoord coord;
+            int texW = 0, texH = 0;
+            if (marker != NULL && IconOf(marker->image, texture, coord, texW, texH))
+                info.icon = IconFor(texture, coord, texW, texH, MyGUI::Colour::White, g_townIconSize);
+        }
         g_towns.push_back(info);
     }
 
@@ -1923,6 +2131,7 @@ namespace
         if (!g_showTowns)
             return;
         Faction* const player = ou->player->getFaction();
+        IndexMarkers(map);
         std::set<TownBase*> seen;
         if (shou != NULL && shou->townList != NULL)
         {
@@ -1951,10 +2160,18 @@ namespace
         if (g_debug && !logged)
         {
             logged = true;
-            char note[160];
-            sprintf_s(note, "BestMinimap: %u towns and nests known to the game, %u near the view",
-                      static_cast<unsigned>(seen.size()), static_cast<unsigned>(g_towns.size()));
+            unsigned withIcon = 0;
+            for (size_t i = 0; i < g_towns.size(); ++i)
+                withIcon += g_towns[i].icon != NULL ? 1 : 0;
+            char note[300];
+            sprintf_s(note, "BestMinimap: %u towns and nests known to the game, %u near the view (%u with a map icon); "
+                            "big map markers %u, matched by reference %u",
+                      static_cast<unsigned>(seen.size()), static_cast<unsigned>(g_towns.size()), withIcon,
+                      map == NULL ? 0u : static_cast<unsigned>(map->mapMarkersTowns.size()),
+                      static_cast<unsigned>(g_markerByTown.size()));
             DebugLog(note);
+            if (withIcon == 0 && !g_towns.empty())
+                logged = false;     // ещё раз, когда значки появятся (после первого открытия карты)
         }
     }
 
@@ -1974,7 +2191,7 @@ namespace
     // ---- замер времени перерисовки (Debug=1) ----
     // Раз в 5 с в журнал: сколько в среднем занимает каждая часть - чтобы
     // искать тормоза по цифрам.
-    enum { ST_MAP, ST_TOWNS, ST_RANGE, ST_CHARS, ST_FRAME, ST_LABELS, ST_UPLOAD, ST_COUNT };
+    enum { ST_TOWNS, ST_CHARS, ST_LABELS, ST_UPLOAD, ST_DRAW, ST_COUNT };
     double g_stageMs[ST_COUNT] = {};
     int g_perfRenders = 0, g_perfDots = 0, g_perfTowns = 0, g_perfLabels = 0;
     DWORD g_perfLogAt = 0;
@@ -2007,15 +2224,13 @@ namespace
         if (now - g_perfLogAt < 5000)
             return;
         const double n = g_perfRenders;
-        double total = 0.0;
-        for (int i = 0; i < ST_COUNT; ++i)
-            total += g_stageMs[i];
+        const double game = g_stageMs[ST_TOWNS] + g_stageMs[ST_CHARS] + g_stageMs[ST_LABELS] + g_stageMs[ST_UPLOAD];
         char note[400];
-        sprintf_s(note, "BestMinimap: render %.2f ms avg, %.1f/s (map %.2f, towns %.2f [%d], camera range %.2f, "
-                        "characters %.2f [%d], frame %.2f, labels %.2f [%d], upload %.2f)",
-                  total / n, n * 1000.0 / (now - g_perfLogAt), g_stageMs[ST_MAP] / n, g_stageMs[ST_TOWNS] / n,
-                  g_perfTowns, g_stageMs[ST_RANGE] / n, g_stageMs[ST_CHARS] / n, g_perfDots,
-                  g_stageMs[ST_FRAME] / n, g_stageMs[ST_LABELS] / n, g_perfLabels, g_stageMs[ST_UPLOAD] / n);
+        sprintf_s(note, "BestMinimap: render %.1f/s; game thread %.2f ms avg (towns %.2f [%d], characters %.2f [%d], "
+                        "labels %.2f [%d], upload %.2f); drawing thread %.2f ms",
+                  n * 1000.0 / (now - g_perfLogAt), game / n, g_stageMs[ST_TOWNS] / n, g_perfTowns,
+                  g_stageMs[ST_CHARS] / n, g_perfDots, g_stageMs[ST_LABELS] / n, g_perfLabels,
+                  g_stageMs[ST_UPLOAD] / n, g_stageMs[ST_DRAW] / n);
         DebugLog(note);
         g_perfRenders = 0;
         for (int i = 0; i < ST_COUNT; ++i)
@@ -2023,15 +2238,296 @@ namespace
         g_perfLogAt = now;
     }
 
-    void Render(const Ogre::Vector3& center, DWORD now)
+    // ---------------------------------------------------------------
+    // Поток рисования
+    // ---------------------------------------------------------------
+
+    // Пиксели миникарты считает отдельный поток: картинка карты, точки,
+    // кольца, носики - миллисекунды работы, и в основном потоке игры они
+    // ложились на каждый третий-четвёртый кадр рывком (20.10.2026). Основной
+    // поток только собирает кадр (Render: что и где рисовать - списком
+    // команд) и потом пишет готовые пиксели в текстуру (UploadJob):
+    // текстуру и MyGUI трогать можно только из него.
+    //
+    // Обмен - через одно задание g_job и его состояние: пока поток рисует,
+    // основной поток задание не трогает и нового не собирает.
+    enum { OP_DISC, OP_RING, OP_TRI, OP_VIEW, OP_CAMRANGE, OP_ICON };
+
+    struct Op
+    {
+        int kind;
+        float f[6];
+        unsigned colour, outline;
+        float alpha;
+        const Icon* icon;
+    };
+
+    struct Job
+    {
+        int w, h, shape;
+        bool rebuildMask;
+        View v;
+        float alpha;            // непрозрачность карты
+        unsigned back;          // цвет за краем картинки
+        std::vector<Op> ops;
+        std::vector<float> camX, camY;
+        float camR;
+        bool camDots;
+        unsigned camColour;
+        bool frame;
+        unsigned frameColour;
+        double drawMs;          // сколько рисовал поток
+    };
+
+    enum { JOB_IDLE, JOB_DRAWING, JOB_DONE };
+    Job g_job;
+    volatile LONG g_jobState = JOB_IDLE;
+    HANDLE g_jobEvent = NULL;
+    bool g_threadFailed = false;
+
+    void QDisc(float x, float y, float r, unsigned fill, unsigned outline, float alpha)
+    {
+        Op op = { OP_DISC, { x, y, r, 0, 0, 0 }, fill, outline, alpha, NULL };
+        g_job.ops.push_back(op);
+    }
+
+    void QRing(float x, float y, float r, float thick, unsigned colour, float alpha)
+    {
+        Op op = { OP_RING, { x, y, r, thick, 0, 0 }, colour, 0, alpha, NULL };
+        g_job.ops.push_back(op);
+    }
+
+    void QTri(float ax, float ay, float bx, float by, float cx, float cy, unsigned colour, float alpha)
+    {
+        Op op = { OP_TRI, { ax, ay, bx, by, cx, cy }, colour, 0, alpha, NULL };
+        g_job.ops.push_back(op);
+    }
+
+    void QView(float x, float y, float dirX, float dirY, float len, unsigned colour)
+    {
+        Op op = { OP_VIEW, { x, y, dirX, dirY, len, 0 }, colour, 0, 1.0f, NULL };
+        g_job.ops.push_back(op);
+    }
+
+    void QIcon(float x, float y, const Icon* icon)
+    {
+        Op op = { OP_ICON, { x, y, 0, 0, 0, 0 }, 0, 0, 1.0f, icon };
+        g_job.ops.push_back(op);
+    }
+
+    // Значок по центру x, y, обрезанный по форме карты.
+    void DrawIcon(float cx, float cy, const Icon& icon)
+    {
+        const int left = static_cast<int>(cx - icon.w * 0.5f + 0.5f), top = static_cast<int>(cy - icon.h * 0.5f + 0.5f);
+        for (int y = Hi(0, -top); y < icon.h && top + y < g_rh; ++y)
+            for (int x = Hi(0, -left); x < icon.w && left + x < g_rw; ++x)
+            {
+                const unsigned p = icon.px[static_cast<size_t>(y) * icon.w + x];
+                if (ChA(p) == 0)
+                    continue;
+                const size_t i = static_cast<size_t>(top + y) * g_rw + left + x;
+                g_buf[i] = Blend(g_buf[i], p | 0xFF000000u, ChA(p) / 255.0f * (g_mask[i] / 255.0f));
+            }
+    }
+
+    // Картинка карты под вид v. Точка картинки линейна по x строки,
+    // поэтому идём шагом в фиксированной точке 16.16, а смесь 4 соседей -
+    // целыми, по два канала за раз.
+    void DrawBackground(const Job& j)
+    {
+        const View& v = j.v;
+        const int w = j.w, h = j.h;
+        const bool haveSrc = g_src.ok();
+        // Уровень картинки под масштаб: 2^level пикселей на пиксель миникарты.
+        int level = 0;
+        while (level < static_cast<int>(g_src.mips.size()) && v.scale >= 2.0 * (1 << level))
+            ++level;
+        const unsigned* const lpx = level == 0 ? (g_src.px.empty() ? NULL : &g_src.px[0]) : &g_src.mips[level - 1].px[0];
+        const int lw = level == 0 ? v.sw : g_src.mips[level - 1].w;
+        const int lh = level == 0 ? v.sh : g_src.mips[level - 1].h;
+        const double lk = 1.0 / (1 << level);
+        unsigned alphaOf[256];
+        for (int m = 0; m < 256; ++m)
+            alphaOf[m] = static_cast<unsigned>(m * j.alpha + 0.5f) << 24;
+        const unsigned backRgb = j.back & 0x00FFFFFFu;
+        const double kx = v.scale * lk * 65536.0;
+        const long long stepX = static_cast<long long>(v.c * kx), stepY = static_cast<long long>(v.s * kx);
+        const long long maxX = static_cast<long long>(lw - 1) << 16, maxY = static_cast<long long>(lh - 1) << 16;
+        const bool sample = haveSrc && lpx != NULL;
+        for (int y = 0; y < h; ++y)
+        {
+            const double dy = (y + 0.5 - v.cy) * v.scale;
+            const double dx0 = (0.5 - v.cx) * v.scale;
+            long long fx = static_cast<long long>(((v.su + v.c * dx0 - v.s * dy) * lk - 0.5) * 65536.0);
+            long long fy = static_cast<long long>(((v.sv + v.s * dx0 + v.c * dy) * lk - 0.5) * 65536.0);
+            const unsigned char* const mrow = &g_mask[static_cast<size_t>(y) * w];
+            unsigned* const brow = &g_buf[static_cast<size_t>(y) * w];
+            for (int x = 0; x < w; ++x, fx += stepX, fy += stepY)
+            {
+                const unsigned m = mrow[x];
+                if (m == 0)
+                    continue;
+                unsigned c = backRgb;
+                if (sample && fx >= 0 && fy >= 0 && fx < maxX && fy < maxY)
+                {
+                    const int ix = static_cast<int>(fx >> 16), iy = static_cast<int>(fy >> 16);
+                    const unsigned tx = static_cast<unsigned>(fx >> 8) & 0xFFu, ty = static_cast<unsigned>(fy >> 8) & 0xFFu;
+                    const unsigned* const p = &lpx[static_cast<size_t>(iy) * lw + ix];
+                    const unsigned p00 = p[0], p10 = p[1], p01 = p[lw], p11 = p[lw + 1];
+                    // Веса в сумме ровно 256.
+                    const unsigned w11 = (tx * ty) >> 8, w10 = tx - w11, w01 = ty - w11, w00 = 256 - tx - ty + w11;
+                    const unsigned rb = ((p00 & 0x00FF00FFu) * w00 + (p10 & 0x00FF00FFu) * w10 +
+                                         (p01 & 0x00FF00FFu) * w01 + (p11 & 0x00FF00FFu) * w11) >> 8;
+                    const unsigned g = ((p00 & 0x0000FF00u) * w00 + (p10 & 0x0000FF00u) * w10 +
+                                        (p01 & 0x0000FF00u) * w01 + (p11 & 0x0000FF00u) * w11) >> 8;
+                    c = (rb & 0x00FF00FFu) | (g & 0x0000FF00u);
+                }
+                brow[x] = c | alphaOf[m];
+            }
+        }
+    }
+
+    void DrawJob(Job& j)
+    {
+        LARGE_INTEGER freq, t0, t1;
+        QueryPerformanceFrequency(&freq);
+        QueryPerformanceCounter(&t0);
+        g_rw = j.w;
+        g_rh = j.h;
+        const size_t n = static_cast<size_t>(j.w) * j.h;
+        if (j.rebuildMask || g_rshape != j.shape || g_mask.size() != n || g_frameW != j.w)
+        {
+            g_rshape = j.shape;
+            g_frameW = j.w;
+            BuildMask(j.w, j.h);
+        }
+        g_buf.assign(n, 0);
+        DrawBackground(j);
+        for (size_t i = 0; i < j.ops.size(); ++i)
+        {
+            const Op& o = j.ops[i];
+            switch (o.kind)
+            {
+            case OP_DISC: DrawDisc(o.f[0], o.f[1], o.f[2], o.colour, o.outline, o.alpha); break;
+            case OP_RING: DrawRing(o.f[0], o.f[1], o.f[2], o.f[3], o.colour, o.alpha); break;
+            case OP_TRI: DrawTri(o.f[0], o.f[1], o.f[2], o.f[3], o.f[4], o.f[5], o.colour, o.alpha); break;
+            case OP_VIEW: DrawView(o.f[0], o.f[1], o.f[2], o.f[3], o.f[4], o.colour); break;
+            case OP_CAMRANGE: DrawCameraRange(j.camX, j.camY, j.camR, j.camDots, j.camColour); break;
+            case OP_ICON: DrawIcon(o.f[0], o.f[1], *o.icon); break;
+            }
+        }
+        if (j.frame)
+            for (size_t k = 0; k < g_frameCov.size(); ++k)
+            {
+                const unsigned i = g_frameCov[k].index;
+                const unsigned c = Blend(g_buf[i], j.frameColour, g_frameCov[k].alpha);
+                g_buf[i] = (c & 0x00FFFFFFu) | (static_cast<unsigned>(g_mask[i]) << 24);
+            }
+        QueryPerformanceCounter(&t1);
+        j.drawMs = (t1.QuadPart - t0.QuadPart) * 1000.0 / freq.QuadPart;
+    }
+
+    DWORD WINAPI DrawThread(LPVOID)
+    {
+        for (;;)
+        {
+            WaitForSingleObject(g_jobEvent, INFINITE);
+            if (g_jobState != JOB_DRAWING)
+                continue;
+            try
+            {
+                DrawJob(g_job);
+            }
+            catch (...)
+            {
+                g_job.w = 0;    // не вышло (нет памяти) - кадр пропустим
+            }
+            InterlockedExchange(&g_jobState, JOB_DONE);
+        }
+    }
+
+    // Отдать задание потоку. Поток не запустился - рисуем сами, как раньше.
+    void SubmitJob()
+    {
+        if (g_jobEvent == NULL && !g_threadFailed)
+        {
+            g_jobEvent = CreateEventA(NULL, FALSE, FALSE, NULL);
+            HANDLE const thread = g_jobEvent == NULL ? NULL : CreateThread(NULL, 0, &DrawThread, NULL, 0, NULL);
+            if (thread == NULL)
+            {
+                g_threadFailed = true;
+                ErrorLog("BestMinimap: could not start the drawing thread - drawing in the game thread");
+            }
+            else
+                CloseHandle(thread);
+        }
+        if (g_threadFailed)
+        {
+            DrawJob(g_job);
+            InterlockedExchange(&g_jobState, JOB_DONE);
+            return;
+        }
+        InterlockedExchange(&g_jobState, JOB_DRAWING);
+        SetEvent(g_jobEvent);
+    }
+
+    // Готовый кадр - в текстуру (основной поток, каждый кадр игры).
+    void UploadJob()
+    {
+        if (g_jobState != JOB_DONE)
+            return;
+        Stopwatch watch;
+        const Job& j = g_job;
+        g_stageMs[ST_DRAW] += j.drawMs;
+        // Миникарту за это время переделали (размер, форма) - кадр устарел.
+        if (j.w > 0 && j.w == g_viewW && j.h == g_viewH && j.shape == g_shape && g_tex != NULL &&
+            j.w <= g_texW && j.h <= g_texH)
+        {
+            void* const data = g_tex->lock(MyGUI::TextureUsage::Write);
+            if (data != NULL)
+            {
+                unsigned* const dst = static_cast<unsigned*>(data);
+                for (int y = 0; y < j.h; ++y)
+                {
+                    unsigned* const row = dst + static_cast<size_t>(y) * g_texW;
+                    const unsigned* const src = &g_buf[static_cast<size_t>(y) * j.w];
+                    if (g_swapRB)
+                        for (int x = 0; x < j.w; ++x)
+                        {
+                            const unsigned c = src[x];
+                            row[x] = (c & 0xFF00FF00u) | ((c >> 16) & 0xFFu) | ((c & 0xFFu) << 16);
+                        }
+                    else
+                        memcpy(row, src, static_cast<size_t>(j.w) * sizeof(unsigned));
+                }
+                g_tex->unlock();
+            }
+        }
+        watch.lap(ST_UPLOAD);
+        InterlockedExchange(&g_jobState, JOB_IDLE);
+    }
+
+    // Собрать кадр для потока рисования: вид, что и где рисовать (списком
+    // команд), подписи и подсказку - сразу. Здесь только то, что требует
+    // игры и MyGUI; пиксели считает поток. false - поток ещё занят.
+    bool Render(const Ogre::Vector3& center, DWORD now)
     {
         Stopwatch watch;
         const int w = g_viewW, h = g_viewH;
         if (w <= 0 || h <= 0 || g_tex == NULL)
-            return;
-        if (g_dirtyMask || g_mask.size() != static_cast<size_t>(w) * h)
-            BuildMask(w, h);
-        g_buf.assign(static_cast<size_t>(w) * h, 0);
+            return true;
+        if (g_jobState != JOB_IDLE)
+            return false;
+        Job& job = g_job;
+        job.w = w;
+        job.h = h;
+        job.shape = g_shape;
+        job.rebuildMask = g_dirtyMask;
+        g_dirtyMask = false;
+        job.ops.clear();
+        job.camX.clear();
+        job.camY.clear();
+        job.frame = false;
 
         // --- вид: центр, масштаб, поворот ---
         View v;
@@ -2071,65 +2567,13 @@ namespace
         v.cx = w * 0.5f;
         v.cy = h * 0.5f;
 
-        // --- фон: картинка карты ---
-        const float alpha = g_opacity / 10.0f;
-        const unsigned back = g_backColour;
-        const bool haveSrc = g_src.ok();
-        // Уровень картинки под масштаб: 2^level пикселей на пиксель миникарты.
-        int level = 0;
-        while (level < static_cast<int>(g_src.mips.size()) && v.scale >= 2.0 * (1 << level))
-            ++level;
-        const unsigned* const lpx = level == 0 ? (g_src.px.empty() ? NULL : &g_src.px[0]) : &g_src.mips[level - 1].px[0];
-        const int lw = level == 0 ? v.sw : g_src.mips[level - 1].w;
-        const int lh = level == 0 ? v.sh : g_src.mips[level - 1].h;
-        const double lk = 1.0 / (1 << level);
-        // Точка картинки линейна по x строки, поэтому идём шагом, в
-        // фиксированной точке 16.16, а смесь 4 соседей - целыми, по два
-        // канала за раз. Раньше - double и float на каждый пиксель: 3 мс на
-        // перерисовку при миникарте 500 пикселей (20.10.2026).
-        unsigned alphaOf[256];
-        for (int m = 0; m < 256; ++m)
-            alphaOf[m] = static_cast<unsigned>(m * alpha + 0.5f) << 24;
-        const unsigned backRgb = back & 0x00FFFFFFu;
-        const double kx = v.scale * lk * 65536.0;
-        const long long stepX = static_cast<long long>(v.c * kx), stepY = static_cast<long long>(v.s * kx);
-        const long long maxX = static_cast<long long>(lw - 1) << 16, maxY = static_cast<long long>(lh - 1) << 16;
-        const bool sample = haveSrc && lpx != NULL;
-        for (int y = 0; y < h; ++y)
-        {
-            const double dy = (y + 0.5 - v.cy) * v.scale;
-            const double dx0 = (0.5 - v.cx) * v.scale;
-            long long fx = static_cast<long long>(((v.su + v.c * dx0 - v.s * dy) * lk - 0.5) * 65536.0);
-            long long fy = static_cast<long long>(((v.sv + v.s * dx0 + v.c * dy) * lk - 0.5) * 65536.0);
-            const unsigned char* const mrow = &g_mask[static_cast<size_t>(y) * w];
-            unsigned* const brow = &g_buf[static_cast<size_t>(y) * w];
-            for (int x = 0; x < w; ++x, fx += stepX, fy += stepY)
-            {
-                const unsigned m = mrow[x];
-                if (m == 0)
-                    continue;
-                unsigned c = backRgb;
-                if (sample && fx >= 0 && fy >= 0 && fx < maxX && fy < maxY)
-                {
-                    const int ix = static_cast<int>(fx >> 16), iy = static_cast<int>(fy >> 16);
-                    const unsigned tx = static_cast<unsigned>(fx >> 8) & 0xFFu, ty = static_cast<unsigned>(fy >> 8) & 0xFFu;
-                    const unsigned* const p = &lpx[static_cast<size_t>(iy) * lw + ix];
-                    const unsigned p00 = p[0], p10 = p[1], p01 = p[lw], p11 = p[lw + 1];
-                    // Веса в сумме ровно 256.
-                    const unsigned w11 = (tx * ty) >> 8, w10 = tx - w11, w01 = ty - w11, w00 = 256 - tx - ty + w11;
-                    const unsigned rb = ((p00 & 0x00FF00FFu) * w00 + (p10 & 0x00FF00FFu) * w10 +
-                                         (p01 & 0x00FF00FFu) * w01 + (p11 & 0x00FF00FFu) * w11) >> 8;
-                    const unsigned g = ((p00 & 0x0000FF00u) * w00 + (p10 & 0x0000FF00u) * w10 +
-                                        (p01 & 0x0000FF00u) * w01 + (p11 & 0x0000FF00u) * w11) >> 8;
-                    c = (rb & 0x00FF00FFu) | (g & 0x0000FF00u);
-                }
-                brow[x] = c | alphaOf[m];
-            }
-        }
+        // --- фон: картинку карты рисует поток (DrawBackground) ---
+        job.v = v;
+        job.alpha = g_opacity / 10.0f;
+        job.back = g_backColour;
 
         const float frameW = g_frame == FRAME_LINE ? 2.0f : 0.0f;
         const unsigned dark = 0xFF101010u;
-        watch.lap(ST_MAP);
 
         g_labelsUsed = 0;
         g_labelRects.clear();
@@ -2154,13 +2598,19 @@ namespace
             ToScreen(v, u, vv, x, y);
             const float rr = t.radius * pxPerMetreScreen;
             if (g_townRadius && rr >= 6.0f)
-                DrawRing(x, y, rr, 1.2f, 0xFFFFFFFFu, 0.55f);
-            // Значок - ромб с тёмной обводкой.
+                QRing(x, y, rr, 1.2f, 0xFFFFFFFFu, 0.55f);
+            // Значок большой карты - виджетом поверх; нет его - ромб с
+            // тёмной обводкой.
+            if (t.icon != NULL)
+            {
+                QIcon(x, y, t.icon);
+                continue;
+            }
             const float k = Hi(3.5f, g_dot * 0.8f);
-            DrawTri(x, y - k - 1.2f, x + k + 1.2f, y, x, y + k + 1.2f, 0xFF101010u, 0.9f);
-            DrawTri(x, y - k - 1.2f, x - k - 1.2f, y, x, y + k + 1.2f, 0xFF101010u, 0.9f);
-            DrawTri(x, y - k, x + k, y, x, y + k, t.colour, 1.0f);
-            DrawTri(x, y - k, x - k, y, x, y + k, t.colour, 1.0f);
+            QTri(x, y - k - 1.2f, x + k + 1.2f, y, x, y + k + 1.2f, 0xFF101010u, 0.9f);
+            QTri(x, y - k - 1.2f, x - k - 1.2f, y, x, y + k + 1.2f, 0xFF101010u, 0.9f);
+            QTri(x, y - k, x + k, y, x, y + k, t.colour, 1.0f);
+            QTri(x, y - k, x - k, y, x, y + k, t.colour, 1.0f);
         }
         watch.lap(ST_TOWNS);
 
@@ -2183,26 +2633,36 @@ namespace
                 // Цель WantedMap - ромбом не рисуем, а двойным кольцом: так её
                 // не спутать с персонажем и с меткой игрока.
                 if (list == 1)
-                    DrawDisc(x, y, pinR + 2.0f, dark, dark, 1.0f);
-                DrawDisc(x, y, pinR + (list == 1 ? 1.0f : 0.0f), pins[i].colour, dark, 1.0f);
+                    QDisc(x, y, pinR + 2.0f, dark, dark, 1.0f);
+                QDisc(x, y, pinR + (list == 1 ? 1.0f : 0.0f), pins[i].colour, dark, 1.0f);
             }
         }
 
         // --- граница полёта камеры ---
         g_lastView = v;
         g_haveView = true;
-        if (g_camRange)
+        const float camR = CameraRange() * pxPerMetreScreen;
+        if (g_camRange && CameraRange() >= 20.0f && camR >= 3.0f)
         {
-            std::vector<Ogre::Vector3> mineAlive;
             const lektor<Character*>& mine = ou->player->playerCharacters;
             for (uint32_t i = 0; i < mine.size(); ++i)
                 if (mine[i] != NULL && !mine[i]->isDead())
-                    mineAlive.push_back(mine[i]->getPosition());
-            g_renderView = &v;
-            DrawCameraRange(mineAlive, static_cast<float>(pxPerMetre / v.scale), &WorldToScreenCb);
-            g_renderView = NULL;
+                {
+                    const Ogre::Vector3 p = mine[i]->getPosition();
+                    double u, vv;
+                    g_map.apply(p.x, p.z, u, vv);
+                    float x, y;
+                    ToScreen(v, u, vv, x, y);
+                    job.camX.push_back(x);
+                    job.camY.push_back(y);
+                }
+            job.camR = camR;
+            job.camDots = g_camRangeDots;
+            job.camColour = g_camRangeColour;
+            Op op = {};
+            op.kind = OP_CAMRANGE;
+            job.ops.push_back(op);
         }
-        watch.lap(ST_RANGE);
 
         // --- персонажи ---
         const float reach = static_cast<float>(g_range * (g_shape == SHAPE_RECT ? 1.8 : 1.5));
@@ -2237,16 +2697,15 @@ namespace
                         nx /= nl;
                         ny /= nl;
                         const float tip = r + 3.5f, half = r * 0.75f + 0.5f;
-                        DrawTri(x + nx * (tip + 1.0f), y + ny * (tip + 1.0f), x - ny * (half + 1.0f), y + nx * (half + 1.0f),
+                        QTri(x + nx * (tip + 1.0f), y + ny * (tip + 1.0f), x - ny * (half + 1.0f), y + nx * (half + 1.0f),
                                 x + ny * (half + 1.0f), y - nx * (half + 1.0f), dark, 0.9f);
-                        DrawTri(x + nx * tip, y + ny * tip, x - ny * half, y + nx * half, x + ny * half, y - nx * half, d.colour, 1.0f);
+                        QTri(x + nx * tip, y + ny * tip, x - ny * half, y + nx * half, x + ny * half, y - nx * half, d.colour, 1.0f);
                     }
                 }
-                DrawDisc(x, y, r, d.colour, outline, d.dead ? 0.45f : 1.0f);
+                QDisc(x, y, r, d.colour, outline, d.dead ? 0.45f : 1.0f);
                 if (g_showBounty && d.bounty > 0)
-                    DrawRing(x, y, r + 2.5f, 1.5f, g_bountyColour, 1.0f);
+                    QRing(x, y, r + 2.5f, 1.5f, g_bountyColour, 1.0f);
             }
-        watch.lap(ST_CHARS);
 
         // --- тревога: наших атакуют ---
         // Пульсирующее кольцо на месте атаки; за краем - у края, всегда
@@ -2261,8 +2720,8 @@ namespace
                 ToScreen(v, u, vv, x, y);
                 const float r = g_dot * 0.8f + 4.0f + 3.0f * pulse;
                 PlacePin(x, y, frameW + r + 2.0f, true);
-                DrawRing(x, y, r, 2.2f, dark, 0.8f);
-                DrawRing(x, y, r, 1.6f, g_alertColour, 1.0f);
+                QRing(x, y, r, 2.2f, dark, 0.8f);
+                QRing(x, y, r, 1.6f, g_alertColour, 1.0f);
             }
 
         // --- флажок «идти сюда» ---
@@ -2273,8 +2732,8 @@ namespace
             float x, y;
             ToScreen(v, u, vv, x, y);
             const float fade = 1.0f - static_cast<float>(now - g_moveAt) / kMoveFlagMs;
-            DrawRing(x, y, 5.0f + 3.0f * (1.0f - fade), 1.6f, 0xFF3CC85Au, fade);
-            DrawDisc(x, y, 3.0f, 0xFF3CC85Au, dark, Hi(0.3f, fade));
+            QRing(x, y, 5.0f + 3.0f * (1.0f - fade), 1.6f, 0xFF3CC85Au, fade);
+            QDisc(x, y, 3.0f, 0xFF3CC85Au, dark, Hi(0.3f, fade));
         }
 
         // --- куда смотрит камера ---
@@ -2286,7 +2745,7 @@ namespace
                 dirX = 0.0f;
                 dirY = -1.0f;
             }
-            DrawView(v.cx, v.cy, dirX, dirY, 0xFFF0EAD8u);
+            QView(v.cx, v.cy, dirX, dirY, Hi(8.0f, g_dot * 2.2f), 0xFFF0EAD8u);
         }
 
         // --- рамка ---
@@ -2299,15 +2758,10 @@ namespace
                 fc = FromColour(GameTheme::Colour("Main", "#AFA68B"));
             if (flash)
                 fc = Blend(fc | 0xFF000000u, g_alertColour, 0.35f + 0.65f * pulse);
-            for (size_t k = 0; k < g_frameCov.size(); ++k)
-            {
-                const unsigned i = g_frameCov[k].index;
-                const unsigned c = Blend(g_buf[i], fc, g_frameCov[k].alpha);
-                g_buf[i] = (c & 0x00FFFFFFu) | (static_cast<unsigned>(g_mask[i]) << 24);
-            }
+            job.frame = true;
+            job.frameColour = fc;
         }
-
-        watch.lap(ST_FRAME);
+        watch.lap(ST_CHARS);
 
         // --- подписи (виджеты MyGUI поверх картинки) ---
         // Поселения - пока обзор не шире TownNamesRange: на всей карте их
@@ -2404,29 +2858,11 @@ namespace
         g_perfTowns = static_cast<int>(g_towns.size());
         g_perfLabels = g_labelsUsed;
 
-        // --- в текстуру ---
-        void* const data = g_tex->lock(MyGUI::TextureUsage::Write);
-        if (data == NULL)
-            return;
-        unsigned* const dst = static_cast<unsigned*>(data);
-        for (int y = 0; y < h; ++y)
-        {
-            unsigned* const row = dst + static_cast<size_t>(y) * g_texW;
-            const unsigned* const src = &g_buf[static_cast<size_t>(y) * w];
-            if (g_swapRB)
-                for (int x = 0; x < w; ++x)
-                {
-                    const unsigned c = src[x];
-                    row[x] = (c & 0xFF00FF00u) | ((c >> 16) & 0xFFu) | ((c & 0xFFu) << 16);
-                }
-            else
-                memcpy(row, src, static_cast<size_t>(w) * sizeof(unsigned));
-        }
-        g_tex->unlock();
-        watch.lap(ST_UPLOAD);
+        // --- отдать потоку ---
+        SubmitJob();
         LogPerf(now);
+        return true;
     }
-
 
     // ПКМ по миникарте - выделенные идут в эту точку, как по ПКМ по земле
     // (PlayerInterface::playerMove). Точку мира считаем обратным нашим же
@@ -2624,6 +3060,10 @@ namespace
         const std::string texture = map->mapImage->_getTextureName();
         if (texture != g_src.texture && texture != g_srcFailed)
         {
+            // Картинку карты читает поток рисования - меняем, только когда
+            // он свободен.
+            if (g_jobState == JOB_DRAWING)
+                return;
             LoadSource(texture);
             g_map = Affine();
         }
@@ -2658,9 +3098,12 @@ namespace
             Show(true);
         Reason("");
 
+        UploadJob();
         const DWORD period = 1000 / static_cast<DWORD>(g_fps);
         if (g_lastRender != 0 && now - g_lastRender < period)
             return;
+        if (g_jobState != JOB_IDLE)
+            return;             // поток ещё рисует прошлый кадр
         g_lastRender = now;
         RefreshMapMarkers(now);
         RefreshWanted(now);
@@ -2768,7 +3211,12 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "TownNames", Tr("Town names"), NULL, 1, 0);
     api->integer(api, kSec, "TownNamesRange", Tr("Names up to range, m"), Tr("Town names are shown while the range is not wider than this: on the whole map they would merge."), 8000, 0, 150000, 0);
     api->toggle(api, kSec, "TownRadius", Tr("Town radius"), Tr("A thin white circle: how far the town reaches."), 1, 0);
-    api->toggle(api, kSec, "ShowUndiscovered", Tr("Undiscovered too"), Tr("Also the places you have not found yet."), 0, 0);
+    static const char* const iconValues[] = { "game", "diamond" };
+    static const char* iconLabels[2];
+    iconLabels[0] = Tr("As on the game map");
+    iconLabels[1] = Tr("Diamonds");
+    api->choice(api, kSec, "TownIcons", Tr("Town icons"), Tr("As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."), "game", iconValues, iconLabels, 2, 0);
+    api->integer(api, kSec, "TownIconSize", Tr("Town icon size, px"), NULL, 22, 10, 64, 0);
     api->colour(api, kSec, "TownColour", Tr("Town colour"), Tr("auto - by the relations of the town's faction to yours: red hostile, green ally."), "auto", 0);
     api->toggle(api, kSec, "MapMarkers", Tr("Map-markers markers"), Tr("Markers of the Map-markers mod, from the current save."), 1, 0);
     api->toggle(api, kSec, "WantedMarkers", Tr("WantedMap targets"), Tr("Targets of the WantedMap mod, as of the last look at the big map."), 1, 0);

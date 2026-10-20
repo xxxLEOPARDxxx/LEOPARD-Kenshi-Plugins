@@ -293,9 +293,6 @@ msgstr "细白圈：城镇的范围。"
 msgid "All squads"
 msgstr "所有小队"
 
-msgid "Also the places you have not found yet."
-msgstr "也显示尚未发现的地点。"
-
 msgid "Bounties"
 msgstr "悬赏"
 
@@ -371,9 +368,6 @@ msgstr "城镇"
 msgid "Towns and places"
 msgstr "城镇与地点"
 
-msgid "Undiscovered too"
-msgstr "包括未发现的"
-
 msgid "ally"
 msgstr "盟友"
 
@@ -388,3 +382,18 @@ msgstr "中立"
 
 msgid "your faction"
 msgstr "你的派系"
+
+msgid "Town icons"
+msgstr "城镇图标"
+
+msgid "As on the game map"
+msgstr "与游戏地图相同"
+
+msgid "Diamonds"
+msgstr "菱形"
+
+msgid "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+msgstr "与游戏地图相同 - 使用大地图的图标, 来自游戏界面和界面模组。大地图没有图标的地点显示为菱形。"
+
+msgid "Town icon size, px"
+msgstr "城镇图标大小, 像素"
