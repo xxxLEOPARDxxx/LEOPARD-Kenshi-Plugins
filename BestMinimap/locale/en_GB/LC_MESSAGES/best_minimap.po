@@ -433,3 +433,54 @@ msgstr "Todo"
 
 msgid "Note"
 msgstr "Note"
+
+msgid "Satellite view"
+msgstr "Satellite view"
+
+msgid "Satellite where taken"
+msgstr "Satellite where taken"
+
+msgid "Game map picture"
+msgstr "Game map picture"
+
+msgid "Minimap background"
+msgstr "Minimap background"
+
+msgid "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
+msgstr "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
+
+msgid "Take satellite shots"
+msgstr "Take satellite shots"
+
+msgid "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
+msgstr "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
+
+msgid "Satellite quality"
+msgstr "Satellite quality"
+
+msgid "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
+msgstr "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
+
+msgid "By the time of day"
+msgstr "By the time of day"
+
+msgid "Always day"
+msgstr "Always day"
+
+msgid "Lighting"
+msgstr "Lighting"
+
+msgid "By the time of day - night shots at night (with the lamps), day shots by day, mixed at dawn and dusk."
+msgstr "By the time of day - night shots at night (with the lamps), day shots by day, mixed at dawn and dusk."
+
+msgid "Satellite up to range, m"
+msgstr "Satellite up to range, m"
+
+msgid "Wider than this - the map picture."
+msgstr "Wider than this - the map picture."
+
+msgid "Satellite shot key"
+msgstr "Satellite shot key"
+
+msgid "Takes the tile under the minimap centre at once, whatever the hour."
+msgstr "Takes the tile under the minimap centre at once, whatever the hour."

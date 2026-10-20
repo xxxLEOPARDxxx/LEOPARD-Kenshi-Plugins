@@ -433,3 +433,54 @@ msgstr "Сделать"
 
 msgid "Note"
 msgstr "Заметка"
+
+msgid "Satellite view"
+msgstr "Вид со спутника"
+
+msgid "Satellite where taken"
+msgstr "Спутник, где снят"
+
+msgid "Game map picture"
+msgstr "Картинка карты игры"
+
+msgid "Minimap background"
+msgstr "Фон миникарты"
+
+msgid "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
+msgstr "Спутник - снимки мира сверху там, где они сняты; в остальных местах - картинка карты."
+
+msgid "Take satellite shots"
+msgstr "Снимать спутник"
+
+msgid "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
+msgstr "Пока вы играете, миникарта снимает мир вокруг камеры: днём с 8 до 17 и ночью с 22 до 4 игровых часов. Каждый снимок - несколько кадров, в которые мир рисуется дважды."
+
+msgid "Satellite quality"
+msgstr "Качество спутника"
+
+msgid "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
+msgstr "Пикселей на плитку 1024 м. Больше 1024 плитка снимается мозаикой: 2048 - 4 снимка, 4096 - 16, 8192 - 64. На диске на плитку и вариант примерно 0,7, 2,8, 11 и 45 МБ. Плитки худшего качества переснимаются."
+
+msgid "By the time of day"
+msgstr "По времени суток"
+
+msgid "Always day"
+msgstr "Всегда день"
+
+msgid "Lighting"
+msgstr "Освещение"
+
+msgid "By the time of day - night shots at night (with the lamps), day shots by day, mixed at dawn and dusk."
+msgstr "По времени суток - ночью ночные снимки (с огнями фонарей), днём дневные, на рассвете и закате они смешиваются."
+
+msgid "Satellite up to range, m"
+msgstr "Спутник до обзора, м"
+
+msgid "Wider than this - the map picture."
+msgstr "Обзор шире - картинка карты."
+
+msgid "Satellite shot key"
+msgstr "Клавиша снимка спутника"
+
+msgid "Takes the tile under the minimap centre at once, whatever the hour."
+msgstr "Снимает плитку под центром миникарты сразу, в любое время суток."
