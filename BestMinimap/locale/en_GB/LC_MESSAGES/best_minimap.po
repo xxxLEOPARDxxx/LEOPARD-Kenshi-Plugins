@@ -95,8 +95,8 @@ msgstr "Lock position"
 msgid "Look"
 msgstr "Look"
 
-msgid "Lower - less work for the processor."
-msgstr "Lower - less work for the processor."
+msgid "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+msgstr "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
 
 msgid "Makes the minimap itself bigger on the screen."
 msgstr "Makes the minimap itself bigger on the screen."
@@ -433,3 +433,9 @@ msgstr "Todo"
 
 msgid "Note"
 msgstr "Note"
+
+msgid "Camera arrow colour"
+msgstr "Camera arrow colour"
+
+msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
+msgstr "The white arrow is hard to see on light sand - pick a brighter or darker one."

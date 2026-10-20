@@ -95,8 +95,8 @@ msgstr "锁定位置"
 msgid "Look"
 msgstr "外观"
 
-msgid "Lower - less work for the processor."
-msgstr "越低，处理器负担越小。"
+msgid "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+msgstr "整个小地图每秒重绘的次数: 地图、点、名称、镜头箭头。越高镜头移动时越流畅, 处理器负担稍大; 不影响游戏帧率。"
 
 msgid "Makes the minimap itself bigger on the screen."
 msgstr "让小地图本身在屏幕上变大。"
@@ -433,3 +433,9 @@ msgstr "待办"
 
 msgid "Note"
 msgstr "笔记"
+
+msgid "Camera arrow colour"
+msgstr "镜头箭头颜色"
+
+msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
+msgstr "白色箭头在浅色沙地上不易看清 - 可选更亮或更暗的颜色。"

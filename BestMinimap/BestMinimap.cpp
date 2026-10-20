@@ -207,6 +207,7 @@ namespace
     int g_camRangeSet = 0;              // метров; 0 - узнаём сами (см. LearnCameraRange)
     float g_camRangeLearned = 0.0f;
     unsigned g_camRangeColour = 0xFFE8E2D0u;
+    unsigned g_viewColour = 0xFFF0EAD8u;    // стрелка камеры в центре
     bool g_camRangeDots = true;         // пунктиром (dots) или сплошной (line)
     bool g_showFacing = true;           // «носик» у точки: куда смотрит персонаж
     bool g_facingFlip = false;          // если носики смотрят назад
@@ -349,6 +350,10 @@ namespace
         }
         g_showDead = ReadBool(ini, "ShowDead", false);
         g_showView = ReadBool(ini, "ShowView", true);
+        {
+            bool unused = false;
+            ReadColour(ini, "ViewColour", "#F0EAD8", unused, g_viewColour);
+        }
         g_mapMarkers = ReadBool(ini, "MapMarkers", true);
         g_wanted = ReadBool(ini, "WantedMarkers", true);
         g_pinToEdge = ReadBool(ini, "PinToEdge", true);
@@ -3097,7 +3102,7 @@ namespace
                 dirX = 0.0f;
                 dirY = -1.0f;
             }
-            QView(v.cx, v.cy, dirX, dirY, Hi(8.0f, g_dot * 2.2f), 0xFFF0EAD8u);
+            QView(v.cx, v.cy, dirX, dirY, Hi(8.0f, g_dot * 2.2f), g_viewColour);
         }
 
         // --- рамка ---
@@ -3579,6 +3584,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "RotateWithCamera", Tr("Rotate with the camera"), Tr("Off - north is always up."), 0, 0);
     api->toggle(api, kSec, "CenterOnSelected", Tr("Centre on the selected"), Tr("Off - on the centre of the camera."), 0, 0);
     api->toggle(api, kSec, "ShowView", Tr("Camera direction"), Tr("A small arrow in the centre."), 1, 0);
+    api->colour(api, kSec, "ViewColour", Tr("Camera arrow colour"), Tr("The white arrow is hard to see on light sand - pick a brighter or darker one."), "#F0EAD8", 0);
     api->toggle(api, kSec, "RightClickMove", Tr("Right click - go there"), Tr("Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."), 1, 0);
     api->toggle(api, kSec, "Tooltips", Tr("Tooltips"), Tr("Hover a town or a character on the minimap: name, faction and relations, squad, bounty."), 1, 0);
 
@@ -3645,7 +3651,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
                     Tr("auto - the colour the game gives this character on the big map."), CAT_DEFAULT[i], 0);
 
     api->section(api, Tr("Diagnostics"));
-    api->integer(api, kSec, "UpdateFps", Tr("Updates per second"), Tr("Lower - less work for the processor."), 20, 2, 60, 0);
+    api->integer(api, kSec, "UpdateFps", Tr("Updates per second"), Tr("How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."), 20, 2, 60, 0);
     api->integer(api, kSec, "MaxSourceSize", Tr("Map picture limit, px"), Tr("A bigger map picture is scaled down in memory to this size."), 4096, 512, 8192, MCM_RESTART);
     api->toggle(api, kSec, "SwapRedBlue", Tr("Swap red and blue"), Tr("If the colours of the minimap look wrong (blue sand)."), 0, 0);
     api->toggle(api, kSec, "Debug", Tr("Detailed log"), Tr("In RE_Kenshi_log.txt."), 0, 0);

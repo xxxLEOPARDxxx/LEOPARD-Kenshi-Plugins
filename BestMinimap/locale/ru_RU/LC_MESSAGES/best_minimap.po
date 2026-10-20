@@ -95,8 +95,8 @@ msgstr "Закрепить на месте"
 msgid "Look"
 msgstr "Вид"
 
-msgid "Lower - less work for the processor."
-msgstr "Меньше - меньше работы процессору."
+msgid "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+msgstr "Как часто перерисовывается вся миникарта: карта, точки, подписи, стрелка камеры. Больше - плавнее при движении камеры и чуть больше работы процессору; на FPS игры не влияет."
 
 msgid "Makes the minimap itself bigger on the screen."
 msgstr "Делает саму миникарту больше на экране."
@@ -433,3 +433,9 @@ msgstr "Сделать"
 
 msgid "Note"
 msgstr "Заметка"
+
+msgid "Camera arrow colour"
+msgstr "Цвет стрелки камеры"
+
+msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
+msgstr "Белую стрелку плохо видно на светлом песке - выберите поярче или потемнее."
