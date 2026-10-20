@@ -719,7 +719,7 @@ namespace
 
     // Категория персонажа считается не каждый кадр: isEnemy/isAlly не
     // бесплатны, а отношения меняются редко. Кэш на секунду.
-    struct CatCache { int cat; int bounty; DWORD at; };
+    struct CatCache { int cat; int bounty; unsigned colour; std::string name; DWORD at; };
     std::map<Character*, CatCache> g_catCache;
     DWORD g_catCacheCleared = 0;
 
@@ -731,17 +731,14 @@ namespace
         return NULL;
     }
 
-    int BountyOf(Character* c)
-    {
-        std::map<Character*, CatCache>::const_iterator it = g_catCache.find(c);
-        return it == g_catCache.end() ? 0 : it->second.bounty;
-    }
-
-    int CategoryOf(Character* c, Character* ref, DWORD now)
+    // Обновление размазано по времени (1-1,5 с, по адресу персонажа): иначе
+    // раз в секунду все сотни персонажей пересчитывались бы в одном кадре.
+    const CatCache& CategoryOf(Character* c, Character* ref, DWORD now)
     {
         std::map<Character*, CatCache>::iterator it = g_catCache.find(c);
-        if (it != g_catCache.end() && now - it->second.at < 1000)
-            return it->second.cat;
+        const DWORD life = 1000 + static_cast<DWORD>((reinterpret_cast<size_t>(c) >> 4) % 500);
+        if (it != g_catCache.end() && now - it->second.at < life)
+            return it->second;
         int cat = CAT_NEUTRAL;
         if (c->isPlayerCharacter())
             cat = CAT_SQUAD;
@@ -758,8 +755,10 @@ namespace
         CatCache& e = g_catCache[c];
         e.bounty = bounty;
         e.cat = cat;
+        e.colour = FromColour(MapScreen::getMarkerColor(c));
+        e.name = (g_tooltips || g_charNames) ? c->getName() : std::string();
         e.at = now;
-        return cat;
+        return e;
     }
 
     // Выделенные персонажи - указателями. Набор selectedCharacters игры
@@ -808,17 +807,18 @@ namespace
             const bool dead = c->isDead();
             if (dead && !g_showDead)
                 continue;
-            const int cat = CategoryOf(c, ref, now);
+            const CatCache& info = CategoryOf(c, ref, now);
+            const int cat = info.cat;
             if (!g_show[cat])
                 continue;
             Dot d;
             d.pos = p;
             d.dead = dead;
             d.selected = cat == CAT_SQUAD && Contains(g_selected, c);
-            d.colour = g_colourAuto[cat] ? FromColour(MapScreen::getMarkerColor(c)) : g_colour[cat];
+            d.colour = g_colourAuto[cat] ? info.colour : g_colour[cat];
             d.cat = cat;
-            d.bounty = BountyOf(c);
-            d.name = (g_tooltips || g_charNames) ? c->getName() : std::string();
+            d.bounty = info.bounty;
+            d.name = info.name;
             // Вперёд у персонажа - ось +Z его ориентации (FacingFlip=1 -
             // если на деле наоборот).
             const Ogre::Vector3 f = c->getOrientation() * Ogre::Vector3::UNIT_Z;
@@ -1338,6 +1338,10 @@ namespace
             // кусок старого размера, растянутый на новый, - центр уезжал
             // (20.10.2026).
             box->setImageInfo(g_texName, MyGUI::IntCoord(0, 0, w, h), MyGUI::IntSize(w, h));
+            // И кадр выбрать: setImageInfo кадр не выбирает (в отличие от
+            // setImageCoord), а без кадра ImageBox не рисует ничего - карта
+            // пропадала совсем, оставались одни подписи (20.10.2026).
+            box->setImageIndex(0);
             g_viewW = w;
             g_viewH = h;
             g_dirtyMask = true;
@@ -1547,6 +1551,11 @@ namespace
     // CameraRange вокруг своих персонажей - рисуем только те точки круга,
     // что не лежат внутри другого круга. Окружность - точками по углу: так
     // дешевле, чем считать расстояние до всех центров в каждом пикселе.
+    //
+    // Своих бывает под сотню (аванпосты), поэтому: берём только круги,
+    // задевающие миникарту; центры ближе пары пикселей (отряд в куче)
+    // склеиваем; каждую точку проверяем лишь по соседним кругам; пунктир -
+    // сразу точками через 7 пикселей, без промежуточных выборок.
     void DrawCameraRange(const std::vector<Ogre::Vector3>& centresWorld, float pxPerMetre,
                          void (*toScreen)(const Ogre::Vector3&, float&, float&))
     {
@@ -1556,29 +1565,44 @@ namespace
         const float r = range * pxPerMetre;
         if (r < 3.0f)
             return;
-        // Центры на экране; почти совпадающие (отряд в куче) - один раз.
+        const float w = static_cast<float>(g_viewW), h = static_cast<float>(g_viewH);
+        const float r2 = r * r;
+        const float merge = Hi(1.5f, r * 0.02f);
         std::vector<float> cx, cy;
         for (size_t i = 0; i < centresWorld.size(); ++i)
         {
             float x, y;
             toScreen(centresWorld[i], x, y);
+            // Круг не задевает миникарту - не нужен ни для линии, ни для
+            // проверки «внутри».
+            const float nx = Clamp(x, 0.0f, w), ny = Clamp(y, 0.0f, h);
+            if ((nx - x) * (nx - x) + (ny - y) * (ny - y) > (r + 2.0f) * (r + 2.0f))
+                continue;
+            // Круг накрывает всю миникарту - линии в ней нет вовсе.
+            const float fx = Hi(std::fabs(x), std::fabs(x - w)), fy = Hi(std::fabs(y), std::fabs(y - h));
+            if (fx * fx + fy * fy < r2)
+                return;
             bool dup = false;
             for (size_t j = 0; j < cx.size() && !dup; ++j)
-                dup = std::fabs(cx[j] - x) < 1.5f && std::fabs(cy[j] - y) < 1.5f;
+                dup = std::fabs(cx[j] - x) < merge && std::fabs(cy[j] - y) < merge;
             if (!dup)
             {
                 cx.push_back(x);
                 cy.push_back(y);
             }
         }
-        const float w = static_cast<float>(g_viewW), h = static_cast<float>(g_viewH);
         const float r2in = (r - 0.75f) * (r - 0.75f);
-        const int steps = Clamp(static_cast<int>(6.2832f * r * 1.5f), 32, 40000);
+        const float circ = 6.2832f * r;
+        const int steps = g_camRangeDots ? Hi(8, static_cast<int>(circ / 7.0f))
+                                         : Clamp(static_cast<int>(circ * 1.5f), 32, 20000);
+        std::vector<size_t> nearby;
         for (size_t i = 0; i < cx.size(); ++i)
         {
-            // Круг целиком мимо миникарты - пропускаем.
-            if (cx[i] + r < -2 || cy[i] + r < -2 || cx[i] - r > w + 2 || cy[i] - r > h + 2)
-                continue;
+            // Соседи: только их круги могут закрыть точки этого.
+            nearby.clear();
+            for (size_t j = 0; j < cx.size(); ++j)
+                if (j != i && (cx[j] - cx[i]) * (cx[j] - cx[i]) + (cy[j] - cy[i]) * (cy[j] - cy[i]) < 4.0f * r2)
+                    nearby.push_back(j);
             for (int k = 0; k < steps; ++k)
             {
                 const float a = 6.2832f * k / steps;
@@ -1586,17 +1610,15 @@ namespace
                 if (x < -1 || y < -1 || x > w + 1 || y > h + 1)
                     continue;
                 bool inside = false;
-                for (size_t j = 0; j < cx.size() && !inside; ++j)
-                    if (j != i)
-                        inside = (x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]) < r2in;
+                for (size_t n = 0; n < nearby.size() && !inside; ++n)
+                {
+                    const size_t j = nearby[n];
+                    inside = (x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]) < r2in;
+                }
                 if (inside)
                     continue;
                 if (g_camRangeDots)
                 {
-                    // Пунктир: точка каждые ~7 пикселей дуги.
-                    const float arc = 6.2832f * r * k / steps;
-                    if (std::fmod(arc, 7.0f) > 0.7f)
-                        continue;
                     DrawDisc(x, y, 1.1f, g_camRangeColour, g_camRangeColour, 0.85f);
                     continue;
                 }
@@ -1659,6 +1681,41 @@ namespace
     const int kLabelPool = 64;
     WidgetRef g_labelRefs[kLabelPool];
     int g_labelsUsed = 0;
+    // Уже поставленные в этой перерисовке: новая подпись, налезающая на
+    // них, не ставится - при дальнем обзоре иначе каша. Кто раньше, тот и
+    // виден: поэтому сначала важное (свои, поселения), потом прочее.
+    std::vector<MyGUI::IntCoord> g_labelRects;
+    // Размер текста по строке: мерить можно только виджетом, а менять ему
+    // подпись ради замера каждый кадр - лишняя перекладка текста.
+    std::map<std::string, MyGUI::IntSize> g_textSizes;
+
+    MyGUI::TextBox* LabelBox(int slot)
+    {
+        MyGUI::Widget* const root = g_rootRef.get();
+        if (root == NULL)
+            return NULL;
+        WidgetRef& ref = g_labelRefs[slot];
+        MyGUI::TextBox* box = ref.get() ? ref.get()->castType<MyGUI::TextBox>(false) : NULL;
+        if (box == NULL)
+        {
+            box = root->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
+                MyGUI::IntCoord(0, 0, 200, 20), MyGUI::Align::Default, "");
+            box->setNeedMouseFocus(false);
+            box->setTextShadow(true);
+            box->setVisible(false);
+            ref.set(box);
+        }
+        return box;
+    }
+
+    void SetLabelText(MyGUI::TextBox* box, const std::string& text)
+    {
+        if (box->getUserString("bm_text") != text)
+        {
+            box->setUserString("bm_text", text);
+            box->setCaption(MyGUI::UString(text));
+        }
+    }
 
     void PlaceLabel(const std::string& text, float x, float y, unsigned colour)
     {
@@ -1667,40 +1724,53 @@ namespace
         // Подпись - только если её точка внутри формы карты.
         if (InsideShape(x, y, g_viewW, g_viewH, 2.0f) < 0.5f)
             return;
-        MyGUI::Widget* const root = g_rootRef.get();
-        if (root == NULL)
-            return;
-        WidgetRef& ref = g_labelRefs[g_labelsUsed++];
-        MyGUI::TextBox* box = ref.get() ? ref.get()->castType<MyGUI::TextBox>(false) : NULL;
+        MyGUI::TextBox* const box = LabelBox(g_labelsUsed);
         if (box == NULL)
+            return;
+        std::map<std::string, MyGUI::IntSize>::const_iterator known = g_textSizes.find(text);
+        MyGUI::IntSize ts;
+        if (known != g_textSizes.end())
+            ts = known->second;
+        else
         {
-            box = root->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
-                MyGUI::IntCoord(0, 0, 200, 20), MyGUI::Align::Default, "");
-            box->setNeedMouseFocus(false);
-            box->setTextShadow(true);
-            ref.set(box);
+            SetLabelText(box, text);
+            ts = box->getTextSize();
+            if (g_textSizes.size() > 1024)
+                g_textSizes.clear();
+            g_textSizes[text] = ts;
         }
-        if (box->getUserString("bm_text") != text)
-        {
-            box->setUserString("bm_text", text);
-            box->setCaption(MyGUI::UString(text));
-        }
-        box->setTextColour(MyGUI::Colour(ChR(colour) / 255.0f, ChG(colour) / 255.0f, ChB(colour) / 255.0f));
-        const MyGUI::IntSize ts = box->getTextSize();
         const int pad = GamePad();
         int left = pad + static_cast<int>(x) - ts.width / 2;
         int top = pad + static_cast<int>(y) - ts.height;
         left = Clamp(left, pad, Hi(pad, pad + g_viewW - ts.width));
         top = Clamp(top, pad, Hi(pad, pad + g_viewH - ts.height));
-        box->setCoord(left, top, ts.width + 2, ts.height);
-        box->setVisible(true);
+        const MyGUI::IntCoord rc(left, top, ts.width + 2, ts.height);
+        for (size_t i = 0; i < g_labelRects.size(); ++i)
+        {
+            const MyGUI::IntCoord& o = g_labelRects[i];
+            if (rc.left < o.left + o.width && o.left < rc.left + rc.width &&
+                rc.top < o.top + o.height - 2 && o.top < rc.top + rc.height - 2)
+                return;
+        }
+        g_labelRects.push_back(rc);
+        ++g_labelsUsed;
+        SetLabelText(box, text);
+        const MyGUI::Colour tc(ChR(colour) / 255.0f, ChG(colour) / 255.0f, ChB(colour) / 255.0f);
+        const MyGUI::Colour& was = box->getTextColour();
+        if (was.red != tc.red || was.green != tc.green || was.blue != tc.blue)
+            box->setTextColour(tc);
+        if (box->getCoord() != rc)
+            box->setCoord(rc);
+        if (!box->getVisible())
+            box->setVisible(true);
     }
 
     void HideUnusedLabels()
     {
         for (int i = g_labelsUsed; i < kLabelPool; ++i)
             if (MyGUI::Widget* const w = g_labelRefs[i].get())
-                w->setVisible(false);
+                if (w->getVisible())
+                    w->setVisible(false);
     }
 
     // ---- подсказка при наведении ----
@@ -1825,8 +1895,67 @@ namespace
 
     std::vector<Dot> g_dots;
 
+    // Поселения стоят на месте: список - раз в секунду, или сразу, если
+    // сменился обзор или центр ушёл на четверть обзора.
+    DWORD g_townsAt = 0;
+    double g_townsRange = -1.0;
+    Ogre::Vector3 g_townsCenter;
+
+    // ---- замер времени перерисовки (Debug=1) ----
+    // Раз в 5 с в журнал: сколько в среднем занимает каждая часть - чтобы
+    // искать тормоза по цифрам.
+    enum { ST_MAP, ST_TOWNS, ST_RANGE, ST_CHARS, ST_FRAME, ST_LABELS, ST_UPLOAD, ST_COUNT };
+    double g_stageMs[ST_COUNT] = {};
+    int g_perfRenders = 0, g_perfDots = 0, g_perfTowns = 0, g_perfLabels = 0;
+    DWORD g_perfLogAt = 0;
+
+    struct Stopwatch
+    {
+        LARGE_INTEGER freq, at;
+        Stopwatch() { QueryPerformanceFrequency(&freq); QueryPerformanceCounter(&at); }
+        void lap(int stage)
+        {
+            LARGE_INTEGER t;
+            QueryPerformanceCounter(&t);
+            g_stageMs[stage] += (t.QuadPart - at.QuadPart) * 1000.0 / freq.QuadPart;
+            at = t;
+        }
+    };
+
+    void LogPerf(DWORD now)
+    {
+        ++g_perfRenders;
+        if (!g_debug)
+        {
+            g_perfRenders = 0;
+            for (int i = 0; i < ST_COUNT; ++i)
+                g_stageMs[i] = 0.0;
+            return;
+        }
+        if (g_perfLogAt == 0)
+            g_perfLogAt = now;
+        if (now - g_perfLogAt < 5000)
+            return;
+        const double n = g_perfRenders;
+        double total = 0.0;
+        for (int i = 0; i < ST_COUNT; ++i)
+            total += g_stageMs[i];
+        char note[400];
+        sprintf_s(note, "BestMinimap: render %.2f ms avg, %.1f/s (map %.2f, towns %.2f [%d], camera range %.2f, "
+                        "characters %.2f [%d], frame %.2f, labels %.2f [%d], upload %.2f)",
+                  total / n, n * 1000.0 / (now - g_perfLogAt), g_stageMs[ST_MAP] / n, g_stageMs[ST_TOWNS] / n,
+                  g_perfTowns, g_stageMs[ST_RANGE] / n, g_stageMs[ST_CHARS] / n, g_perfDots,
+                  g_stageMs[ST_FRAME] / n, g_stageMs[ST_LABELS] / n, g_perfLabels, g_stageMs[ST_UPLOAD] / n);
+        DebugLog(note);
+        g_perfRenders = 0;
+        for (int i = 0; i < ST_COUNT; ++i)
+            g_stageMs[i] = 0.0;
+        g_perfLogAt = now;
+    }
+
     void Render(const Ogre::Vector3& center, DWORD now)
     {
+        Stopwatch watch;
         const int w = g_viewW, h = g_viewH;
         if (w <= 0 || h <= 0 || g_tex == NULL)
             return;
@@ -1918,13 +2047,22 @@ namespace
 
         const float frameW = g_frame == FRAME_LINE ? 2.0f : 0.0f;
         const unsigned dark = 0xFF101010u;
+        watch.lap(ST_MAP);
 
         g_labelsUsed = 0;
+        g_labelRects.clear();
         const float pxPerMetreScreen = static_cast<float>(pxPerMetre / v.scale);
 
         // --- поселения: круг радиуса и значок ---
-        MapScreen* const map = GetMapScreen();
-        CollectTowns(map, center, static_cast<float>(g_range * 1.5));
+        const float townsMoved = std::sqrt((center.x - g_townsCenter.x) * (center.x - g_townsCenter.x) +
+                                           (center.z - g_townsCenter.z) * (center.z - g_townsCenter.z));
+        if (now - g_townsAt >= 1000 || g_townsRange != g_range || townsMoved > g_range * 0.25)
+        {
+            g_townsAt = now;
+            g_townsRange = g_range;
+            g_townsCenter = center;
+            CollectTowns(GetMapScreen(), center, static_cast<float>(g_range * 2.1));
+        }
         for (size_t i = 0; i < g_towns.size(); ++i)
         {
             const TownInfo& t = g_towns[i];
@@ -1942,6 +2080,7 @@ namespace
             DrawTri(x, y - k, x + k, y, x, y + k, t.colour, 1.0f);
             DrawTri(x, y - k, x - k, y, x, y + k, t.colour, 1.0f);
         }
+        watch.lap(ST_TOWNS);
 
         // --- метки Map-markers и WantedMap ---
         const float pinR = Hi(2.5f, g_dot * 0.7f);
@@ -1981,6 +2120,7 @@ namespace
             DrawCameraRange(mineAlive, static_cast<float>(pxPerMetre / v.scale), &WorldToScreenCb);
             g_renderView = NULL;
         }
+        watch.lap(ST_RANGE);
 
         // --- персонажи ---
         const float reach = static_cast<float>(g_range * (g_shape == SHAPE_RECT ? 1.8 : 1.5));
@@ -2024,6 +2164,7 @@ namespace
                 if (g_showBounty && d.bounty > 0)
                     DrawRing(x, y, r + 2.5f, 1.5f, g_bountyColour, 1.0f);
             }
+        watch.lap(ST_CHARS);
 
         // --- тревога: наших атакуют ---
         // Пульсирующее кольцо на месте атаки; за краем - у края, всегда
@@ -2090,6 +2231,8 @@ namespace
                     g_buf[i] = (g_buf[i] & 0x00FFFFFFu) | (static_cast<unsigned>(g_mask[i]) << 24);
                 }
         }
+
+        watch.lap(ST_FRAME);
 
         // --- подписи (виджеты MyGUI поверх картинки) ---
         // Поселения - пока обзор не шире TownNamesRange: на всей карте их
@@ -2181,6 +2324,10 @@ namespace
             }
         if (!tip)
             HideTooltip();
+        watch.lap(ST_LABELS);
+        g_perfDots = static_cast<int>(g_dots.size());
+        g_perfTowns = static_cast<int>(g_towns.size());
+        g_perfLabels = g_labelsUsed;
 
         // --- в текстуру ---
         void* const data = g_tex->lock(MyGUI::TextureUsage::Write);
@@ -2201,6 +2348,8 @@ namespace
                 memcpy(row, src, static_cast<size_t>(w) * sizeof(unsigned));
         }
         g_tex->unlock();
+        watch.lap(ST_UPLOAD);
+        LogPerf(now);
     }
 
 
