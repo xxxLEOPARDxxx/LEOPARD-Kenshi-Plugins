@@ -34,10 +34,16 @@
 // (UseableStuff::currentOperators): эти работают здесь в любом случае.
 //
 // СВОБОДНЫЕ. По клавише SelectIdleKey (CTRL+SHIFT+I) выделяются все
-// свои персонажи, кто ничем не занят и ни к чему не приписан: список работ
-// пуст, приказов игрока нет (идти, бить, следовать...), не в бою, в
-// сознании, не в клетке. Животные - нет. Сверху экрана на 2 с - сколько
-// выделено (или что свободных нет: иначе нажатие выглядело бы сломанным).
+// свои персонажи без цели - в окне персонажа «Цель: Нет цели» (текущая
+// цель OrdersReceiver пуста), в сознании, не в клетке; животные - нет.
+// Две галочки: без работ в списке (SelectIdleNoJobs) и с работами, но
+// всё равно без цели (SelectIdleWithJobs) - например, машина занята или
+// нечего делать. Сверху экрана на 2 с - сколько выделено (или что
+// свободных нет: иначе нажатие выглядело бы сломанным).
+//
+// Первая версия считала свободным того, у кого нет приказов игрока и кто
+// не в бою, - и у игрока с «Нет цели» в окне писала «Свободных нет»
+// (20.10.2026). Смотрим ту же цель, что показывает игра.
 //
 // ИСТОРИЯ. Первая версия дописывала строки в саму нижнюю панель
 // (setLine). Не годится: getGUIData зовётся для каждой из пяти её частей
@@ -112,6 +118,8 @@ namespace
     bool g_debug = false;
     HoldKey::Key g_holdKey;    // ALT; vk 0 - показывать всегда (см. HoldKey.h)
     HoldKey::Key g_idleKey;    // выделить свободных; vk 0 - нет клавиши
+    bool g_idleNoJobs = true;      // выделять без цели и без работ
+    bool g_idleWithJobs = false;   // выделять без цели, но с работами
 
 
     std::string IniFileName()
@@ -164,6 +172,10 @@ namespace
         GetPrivateProfileStringA(section, "SelectIdleKey", "CTRL+SHIFT+I", idle,
                                  sizeof(idle), ini.c_str());
         g_idleKey = HoldKey::Parse(idle);  // «NONE» - vk 0, без клавиши
+        g_idleNoJobs =
+            GetPrivateProfileIntA(section, "SelectIdleNoJobs", 1, ini.c_str()) != 0;
+        g_idleWithJobs =
+            GetPrivateProfileIntA(section, "SelectIdleWithJobs", 0, ini.c_str()) != 0;
     }
 
 
@@ -828,19 +840,28 @@ namespace
     // Свободные персонажи
     // ---------------------------------------------------------------
 
-    // Ничем не занят и ни к чему не приписан.
+    // Цель персонажа (как «Цель:» в его окне); NULL_TASK - нет цели.
+    TaskType GoalOf(Character* c)
+    {
+        OrdersReceiver* const orders = c->getOrdersReciever();
+        if (orders == NULL)
+            return NULL_TASK;
+        const TaskMatch& goal = orders->getCurrentGoal();
+        return goal.taskData == NULL ? NULL_TASK : goal.key();
+    }
+
+
+    // Без цели; с работами или без - по настройкам.
     bool IsIdle(Character* c)
     {
         if (c->isDead() || c->isUnconcious() || c->isAnimal() != NULL)
             return false;
         if (c->inSomething == IN_PRISON)
             return false;
-        if (c->getPermajobCount() > 0)
-            return false;              // есть работы в списке
-        if (c->isInCombatMode(true, true))
+        const TaskType goal = GoalOf(c);
+        if (goal != NULL_TASK && goal != IDLE)
             return false;
-        OrdersReceiver* const orders = c->getOrdersReciever();
-        return orders == NULL || !orders->hasPlayerOrders();
+        return c->getPermajobCount() > 0 ? g_idleWithJobs : g_idleNoJobs;
     }
 
 
@@ -896,13 +917,10 @@ namespace
                 idle.push_back(c);
             if (g_debug)
             {
-                OrdersReceiver* const orders = c->getOrdersReciever();
                 char note[160];
-                sprintf_s(note, " - jobs %d, player orders %d, combat %d, goal %d%s",
-                          c->getPermajobCount(),
-                          orders != NULL && orders->hasPlayerOrders() ? 1 : 0,
-                          c->isInCombatMode(true, true) ? 1 : 0,
-                          orders != NULL ? static_cast<int>(orders->getCurrentGoal().key()) : -1,
+                sprintf_s(note, " - goal %d, jobs %d, unconscious %d, caged %d%s",
+                          static_cast<int>(GoalOf(c)), c->getPermajobCount(),
+                          c->isUnconcious() ? 1 : 0, c->inSomething == IN_PRISON ? 1 : 0,
                           isFree ? " - FREE" : "");
                 DebugLog("AssignedWorkers: " + c->getName() + note);
             }
@@ -928,7 +946,7 @@ namespace
     {
         if (g_notice != NULL && g_notice->getVisible() && GetTickCount() > g_noticeUntil)
             g_notice->setVisible(false);
-        if (g_idleKey.vk == 0)
+        if (g_idleKey.vk == 0 || (!g_idleNoJobs && !g_idleWithJobs))
             return;
         // Печатает игрок в поле - клавиши не наши.
         const bool typing = MyGUI::InputManager::getInstance().getKeyFocusWidget() != NULL;
@@ -1003,7 +1021,9 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->hotkey(api, "AssignedWorkers", "HoldKey", Tr("Show while held"), Tr("The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."), "ALT", 0);
     api->toggle(api, "AssignedWorkers", "ShowNobody", Tr("Show when nobody is assigned"), Tr("At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."), 1, 0);
     api->section(api, Tr("Free characters"));
-    api->hotkey(api, "AssignedWorkers", "SelectIdleKey", Tr("Select free characters"), Tr("Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."), "CTRL+SHIFT+I", 0);
+    api->hotkey(api, "AssignedWorkers", "SelectIdleKey", Tr("Select free characters"), Tr("Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."), "CTRL+SHIFT+I", 0);
+    api->toggle(api, "AssignedWorkers", "SelectIdleNoJobs", Tr("Without jobs"), Tr("Select characters with no goal and an empty job list - not assigned to anything."), 1, 0);
+    api->toggle(api, "AssignedWorkers", "SelectIdleWithJobs", Tr("With jobs"), Tr("Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."), 0, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "AssignedWorkers", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."), 0, 0);
 }

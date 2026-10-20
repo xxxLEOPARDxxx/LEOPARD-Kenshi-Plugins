@@ -74,11 +74,23 @@ msgstr "Free characters"
 msgid "Select free characters"
 msgstr "Select free characters"
 
-msgid "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
-msgstr "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
+msgid "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
+msgstr "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
 
 msgid "Nobody is free"
 msgstr "Nobody is free"
 
 msgid "Free characters selected: "
 msgstr "Free characters selected: "
+
+msgid "Without jobs"
+msgstr "Without jobs"
+
+msgid "Select characters with no goal and an empty job list - not assigned to anything."
+msgstr "Select characters with no goal and an empty job list - not assigned to anything."
+
+msgid "With jobs"
+msgstr "With jobs"
+
+msgid "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
+msgstr "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."

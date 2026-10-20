@@ -74,11 +74,23 @@ msgstr "Свободные персонажи"
 msgid "Select free characters"
 msgstr "Выделить свободных"
 
-msgid "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
-msgstr "Выделяет всех ваших персонажей, кто ничем не занят и ни к чему не приписан: список работ пуст, приказов нет, не в бою, в сознании. Щёлкнуть и нажать клавишу; Backspace - без клавиши."
+msgid "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
+msgstr "Выделяет всех ваших персонажей без цели (в окне персонажа «Нет цели»), в сознании, не в клетке. Каких именно - две строки ниже. Щёлкнуть и нажать клавишу; Backspace - без клавиши."
 
 msgid "Nobody is free"
 msgstr "Свободных нет"
 
 msgid "Free characters selected: "
 msgstr "Выделено свободных: "
+
+msgid "Without jobs"
+msgstr "Без работ"
+
+msgid "Select characters with no goal and an empty job list - not assigned to anything."
+msgstr "Выделять персонажей без цели с пустым списком работ - ни к чему не приписанных."
+
+msgid "With jobs"
+msgstr "С работами"
+
+msgid "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
+msgstr "Выделять персонажей без цели, хотя в их списке есть работы (приписаны к машине, станку...): работе нечего делать или место занято."

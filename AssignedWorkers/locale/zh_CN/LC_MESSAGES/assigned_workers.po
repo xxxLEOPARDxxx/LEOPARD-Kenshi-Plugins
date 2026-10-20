@@ -74,11 +74,23 @@ msgstr "空闲角色"
 msgid "Select free characters"
 msgstr "选中空闲角色"
 
-msgid "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
-msgstr "选中你所有空闲且未分配任何工作的角色: 工作列表为空, 没有命令, 不在战斗中, 意识清醒。点击后按下一个键; Backspace - 不设键。"
+msgid "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
+msgstr "选中你所有没有目标的角色(角色窗口显示"无目标"), 意识清醒, 不在笼中。具体选哪些 - 见下面两行。点击后按下一个键; Backspace - 不设键。"
 
 msgid "Nobody is free"
 msgstr "没有空闲角色"
 
 msgid "Free characters selected: "
 msgstr "已选中空闲角色: "
+
+msgid "Without jobs"
+msgstr "无工作"
+
+msgid "Select characters with no goal and an empty job list - not assigned to anything."
+msgstr "选中没有目标且工作列表为空的角色 - 未分配任何工作。"
+
+msgid "With jobs"
+msgstr "有工作"
+
+msgid "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
+msgstr "选中没有目标但工作列表中有工作的角色(分配到机器、工作台等): 工作无事可做或位置已被占用。"
