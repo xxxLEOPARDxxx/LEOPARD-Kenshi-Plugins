@@ -259,6 +259,17 @@ namespace
     int g_quality = 1024;
     bool g_scanned = false;
 
+    // Имя файла плитки -> ключ; false - не наш файл.
+    bool KeyOfFile(const char* name, long long& key)
+    {
+        int tx = 0, tz = 0;
+        char variant[16] = {};
+        if (sscanf_s(name, "tile_%d_%d_%15[a-z].bms", &tx, &tz, variant, static_cast<unsigned>(sizeof(variant))) != 3)
+            return false;
+        key = Satellite::Key(tx, tz, strcmp(variant, "night") == 0 ? Satellite::NIGHT : Satellite::DAY);
+        return true;
+    }
+
     void ScanFolder()
     {
         g_scanned = true;
@@ -270,17 +281,15 @@ namespace
             return;
         do
         {
-            int tx = 0, tz = 0;
-            char variant[16] = {};
-            if (sscanf_s(fd.cFileName, "tile_%d_%d_%15[a-z].bms", &tx, &tz, variant, static_cast<unsigned>(sizeof(variant))) != 3)
+            long long key = 0;
+            if (!KeyOfFile(fd.cFileName, key))
                 continue;
-            const Satellite::Variant v = strcmp(variant, "night") == 0 ? Satellite::NIGHT : Satellite::DAY;
             FILE* f = NULL;
             if (fopen_s(&f, (g_folder + fd.cFileName).c_str(), "rb") != 0 || f == NULL)
                 continue;
             Header hd;
             if (ReadHeader(f, hd))
-                g_stored[Satellite::Key(tx, tz, v)] = hd.quality;
+                g_stored[key] = hd.quality;
             fclose(f);
         } while (FindNextFileA(h, &fd));
         FindClose(h);
@@ -740,6 +749,29 @@ namespace
     };
     std::map<long long, FileInfo> g_files;
 
+    // Какие плитки есть на диске - свой список потока рисования: папка
+    // читается один раз, снятые потом добавляет Forget. Без него при
+    // широком обзоре поток раз в 5 с открывал бы файл каждого из тысяч
+    // участков в кадре.
+    std::map<long long, bool> g_onDisk;
+    bool g_onDiskScanned = false;
+
+    void ScanOnDisk()
+    {
+        g_onDiskScanned = true;
+        WIN32_FIND_DATAA fd;
+        HANDLE const h = FindFirstFileA((g_folder + "tile_*.bms").c_str(), &fd);
+        if (h == INVALID_HANDLE_VALUE)
+            return;
+        do
+        {
+            long long key = 0;
+            if (KeyOfFile(fd.cFileName, key))
+                g_onDisk[key] = true;
+        } while (FindNextFileA(h, &fd));
+        FindClose(h);
+    }
+
     struct Cached
     {
         std::vector<unsigned> px;
@@ -754,6 +786,14 @@ namespace
 
     const FileInfo& Info(long long key)
     {
+        static FileInfo none;
+        if (!g_onDiskScanned)
+            ScanOnDisk();
+        if (g_onDisk.find(key) == g_onDisk.end())
+        {
+            none.exists = false;
+            return none;
+        }
         const DWORD now = GetTickCount();
         std::map<long long, FileInfo>::iterator it = g_files.find(key);
         // Нет файла - проверяем снова не чаще раза в 5 с.
@@ -930,6 +970,7 @@ namespace Satellite
     {
         for (size_t i = 0; i < keys.size(); ++i)
         {
+            g_onDisk[keys[i]] = true;
             g_files.erase(keys[i]);
             for (CacheMap::iterator it = g_cache.begin(); it != g_cache.end();)
             {

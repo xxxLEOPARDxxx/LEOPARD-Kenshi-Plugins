@@ -240,7 +240,7 @@ namespace
     bool g_satCapture = true;           // снимать плитки самим
     int g_satQuality = 1024;            // пикселей на плитку 1024 м
     bool g_satByTime = true;            // день / ночь по времени суток (иначе всегда день)
-    int g_satMaxRange = 8000;           // обзор шире - только картинка карты
+    int g_satMaxRange = 30000;          // обзор шире - только картинка карты
     bool g_swapRB = false;
     bool g_debug = false;
 
@@ -412,7 +412,9 @@ namespace
         g_satCapture = ReadBool(ini, "SatelliteCapture", true);
         g_satQuality = ReadInt(ini, "SatelliteQuality", 1024, 1024, 8192);
         g_satByTime = ReadText(ini, "SatelliteLighting", "time") != "day";
-        g_satMaxRange = ReadInt(ini, "SatelliteMaxRange", 8000, 0, 150000);
+        // Ключ - не прежний SatelliteMaxRange: там у игроков уже записано
+        // тесное 8000 (обзор 10 км оставался статичным, 20.10.2026).
+        g_satMaxRange = ReadInt(ini, "SatelliteRange", 30000, 0, 150000);
         Satellite::Configure(g_satCapture, g_satQuality, ModuleFolder() + "satellite\\");
         g_swapRB = ReadBool(ini, "SwapRedBlue", false);
         g_debug = ReadBool(ini, "Debug", false);
@@ -2554,7 +2556,7 @@ namespace
     // искать тормоза по цифрам.
     enum { ST_TOWNS, ST_CHARS, ST_LABELS, ST_UPLOAD, ST_DRAW, ST_COUNT };
     double g_stageMs[ST_COUNT] = {};
-    int g_perfRenders = 0, g_perfDots = 0, g_perfTowns = 0, g_perfLabels = 0;
+    int g_perfRenders = 0, g_perfDots = 0, g_perfTowns = 0, g_perfLabels = 0, g_perfSat = -1;
     DWORD g_perfLogAt = 0;
 
     struct Stopwatch
@@ -2588,10 +2590,10 @@ namespace
         const double game = g_stageMs[ST_TOWNS] + g_stageMs[ST_CHARS] + g_stageMs[ST_LABELS] + g_stageMs[ST_UPLOAD];
         char note[400];
         sprintf_s(note, "BestMinimap: render %.1f/s; game thread %.2f ms avg (towns %.2f [%d], characters %.2f [%d], "
-                        "labels %.2f [%d], upload %.2f); drawing thread %.2f ms",
+                        "labels %.2f [%d], upload %.2f); drawing thread %.2f ms; satellite areas in view: %d",
                   n * 1000.0 / (now - g_perfLogAt), game / n, g_stageMs[ST_TOWNS] / n, g_perfTowns,
                   g_stageMs[ST_CHARS] / n, g_perfDots, g_stageMs[ST_LABELS] / n, g_perfLabels,
-                  g_stageMs[ST_UPLOAD] / n, g_stageMs[ST_DRAW] / n);
+                  g_stageMs[ST_UPLOAD] / n, g_stageMs[ST_DRAW] / n, g_perfSat);
         DebugLog(note);
         g_perfRenders = 0;
         for (int i = 0; i < ST_COUNT; ++i)
@@ -2641,6 +2643,7 @@ namespace
         bool sat;
         double w0x, w0z, wdxx, wdxz, wdyx, wdyz;
         unsigned dayWeight;     // 0..256: доля дневного снимка
+        int satTiles;           // поток: участков спутника в кадре
         std::vector<long long> fresh;   // плитки, снятые заново, - перечитать
         double drawMs;          // сколько рисовал поток
     };
@@ -2732,10 +2735,10 @@ namespace
 
     // Какие плитки в кадре и какой их уровень нужен (на пиксель миникарты -
     // примерно пиксель плитки). false - спутника в кадре нет.
-    bool BuildGrid(const Job& j, SatGrid& grid)
+    int BuildGrid(const Job& j, SatGrid& grid)
     {
         if (!j.sat)
-            return false;
+            return 0;
         double minX = j.w0x, maxX = j.w0x, minZ = j.w0z, maxZ = j.w0z;
         const double cx[3] = { j.w0x + j.wdxx * j.w, j.w0x + j.wdyx * j.h, j.w0x + j.wdxx * j.w + j.wdyx * j.h };
         const double cz[3] = { j.w0z + j.wdxz * j.w, j.w0z + j.wdyz * j.h, j.w0z + j.wdxz * j.w + j.wdyz * j.h };
@@ -2751,8 +2754,8 @@ namespace
         grid.tz0 = static_cast<int>(std::floor(minZ / t));
         grid.nx = static_cast<int>(std::floor(maxX / t)) - grid.tx0 + 1;
         grid.nz = static_cast<int>(std::floor(maxZ / t)) - grid.tz0 + 1;
-        if (grid.nx <= 0 || grid.nz <= 0 || grid.nx * grid.nz > 1024)
-            return false;
+        if (grid.nx <= 0 || grid.nz <= 0 || grid.nx * grid.nz > 4096)
+            return 0;
         const double metresPerPixel = Hi(1e-3, std::sqrt(j.wdxx * j.wdxx + j.wdxz * j.wdxz));
         const int want = static_cast<int>(t / metresPerPixel);
         Satellite::Level none;
@@ -2760,7 +2763,7 @@ namespace
         none.px = NULL;
         grid.day.assign(grid.nx * grid.nz, none);
         grid.night.assign(grid.nx * grid.nz, none);
-        bool any = false;
+        int any = 0;
         for (int z = 0; z < grid.nz; ++z)
             for (int x = 0; x < grid.nx; ++x)
             {
@@ -2776,7 +2779,7 @@ namespace
                     if (!wantNight)
                         hasNight = Satellite::TileLevel(grid.tx0 + x, grid.tz0 + z, Satellite::NIGHT, want, grid.night[i]);
                 }
-                any = any || hasDay || hasNight;
+                any += hasDay || hasNight ? 1 : 0;
             }
         return any;
     }
@@ -2784,10 +2787,11 @@ namespace
     // Картинка карты под вид v. Точка картинки линейна по x строки,
     // поэтому идём шагом в фиксированной точке 16.16, а смесь 4 соседей -
     // целыми, по два канала за раз. Где есть снимок спутника - он.
-    void DrawBackground(const Job& j)
+    void DrawBackground(Job& j)
     {
         SatGrid grid;
-        const bool sat = BuildGrid(j, grid);
+        j.satTiles = BuildGrid(j, grid);
+        const bool sat = j.satTiles > 0;
         const double tile = Satellite::kTileMetres;
         const View& v = j.v;
         const int w = j.w, h = j.h;
@@ -2961,6 +2965,7 @@ namespace
         Stopwatch watch;
         const Job& j = g_job;
         g_stageMs[ST_DRAW] += j.drawMs;
+        g_perfSat = j.sat ? j.satTiles : -1;
         // Миникарту за это время переделали (размер, форма) - кадр устарел.
         if (j.w > 0 && j.w == g_viewW && j.h == g_viewH && j.shape == g_shape && g_tex != NULL &&
             j.w <= g_texW && j.h <= g_texH)
@@ -3099,6 +3104,7 @@ namespace
         // Спутник: точка мира у пикселя миникарты - обратным путём от
         // картинки карты; она линейна по пикселю - хватает начала и шагов.
         job.sat = g_satellite && g_range <= g_satMaxRange;
+        job.satTiles = 0;
         Satellite::TakeFresh(job.fresh);
         if (job.sat)
         {
@@ -3808,7 +3814,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     lightLabels[0] = Tr("By the time of day");
     lightLabels[1] = Tr("Always day");
     api->choice(api, kSec, "SatelliteLighting", Tr("Lighting"), Tr("By the time of day - night shots at night (with the lamps), day shots by day, mixed at dawn and dusk."), "time", lightValues, lightLabels, 2, 0);
-    api->integer(api, kSec, "SatelliteMaxRange", Tr("Satellite up to range, m"), Tr("When the minimap shows wider than this, it is static: from that far the shots are too small to see."), 8000, 0, 150000, 0);
+    api->integer(api, kSec, "SatelliteRange", Tr("Satellite up to range, m"), Tr("When the minimap shows wider than this, it is static: from that far the shots are too small to see."), 30000, 0, 150000, 0);
     api->hotkey(api, kSec, "SatelliteShotKey", Tr("Satellite shot key"), Tr("Takes the area under the minimap centre at once, whatever the hour: day or night shot by the time of day."), "CTRL+SHIFT+Y", 0);
 
     api->section(api, Tr("Who is shown"));
