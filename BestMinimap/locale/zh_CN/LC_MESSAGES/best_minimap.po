@@ -452,8 +452,8 @@ msgstr "静态 - 游戏地图图片。卫星动态 - 游戏时拍摄的真实世
 msgid "Take satellite shots"
 msgstr "拍摄卫星图"
 
-msgid "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
-msgstr "游戏时小地图会拍摄镜头周围的世界: 白天8点到17点, 夜间22点到4点(游戏时间)。每次拍摄会有几帧世界被绘制两次。"
+msgid "While you play, the minimap takes shots of the world around the camera: by day from 9 to 16 and by night from 22 to 4 game hours. Near areas first, in the chosen quality, then far ones up to 4 km quickly, without buildings, retaken when the camera comes closer. Each shot is a few frames with the world drawn twice."
+msgstr "游戏时小地图会拍摄镜头周围的世界: 白天9点到16点, 夜间22点到4点(游戏时间)。先以所选质量拍摄附近区域, 再快速拍摄4公里内的远处区域(不含建筑), 镜头靠近时会重拍。每次拍摄会有几帧世界被绘制两次。"
 
 msgid "Render quality"
 msgstr "渲染质量"

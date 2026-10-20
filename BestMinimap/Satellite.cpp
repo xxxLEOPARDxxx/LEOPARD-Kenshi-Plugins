@@ -25,14 +25,19 @@
 // растёт с качеством. Камера - с узким углом (12 градусов) высоко над
 // землёй: почти ортогональная, на холмах шов между плитками - метры.
 //
-// ДЕНЬ И НОЧЬ. У плитки два варианта: дневной (снимаем с 8 до 17 игровых
+// БЛИЖНИЕ И ДАЛЬНИЕ. Постройки и мелочь игра рисует только около камеры
+// (до ~1,5 км). Ближние плитки снимаем в выбранном качестве, дальние (до
+// 4 км) - быстро, в 1024, с пометкой: подойдёт камера - переснимем.
+//
+// ДЕНЬ И НОЧЬ. У плитки два варианта: дневной (снимаем с 9 до 16 игровых
 // часов) и ночной (с 22 до 4, с огнями фонарей). Миникарта берёт по времени
 // суток, на рассвете и закате смешивает.
 //
 // ХРАНЕНИЕ. Файл на плитку и вариант в папке satellite мода: сжатие DXT1
 // (как у текстур игры - полбайта на пиксель) и уменьшенные копии до 4x4 -
-// миникарта читает с диска только нужный под масштаб размер. Запись -
-// через временный файл: поток рисования не прочтёт недописанное.
+// миникарта читает с диска только нужный под масштаб размер. Сжатие и
+// запись - в своём потоке (см. «Сжатие снимков»), запись - через временный
+// файл: поток рисования не прочтёт недописанное.
 //
 // ПАМЯТЬ ПОТОКА РИСОВАНИЯ. Прочитанные уровни плиток - в кэше до 192 МБ, по
 // давности использования; отданное в текущем кадре не выбрасывается.
@@ -43,6 +48,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <deque>
 #include <map>
 #include <string>
 #include <vector>
@@ -193,10 +199,14 @@ namespace
     // Файл плитки
     // ---------------------------------------------------------------
     //
-    // «BMS1», качество, число уровней, размеры уровней (int каждый), затем
-    // блоки DXT1 уровней подряд, строками блоков.
+    // «BMS2», качество, флаги, число уровней, размеры уровней (int каждый),
+    // затем блоки DXT1 уровней подряд, строками блоков. «BMS1» (первая
+    // версия) - то же без флагов.
 
-    const int kShot = 1024;             // снимок за раз, пикселей
+    const int kShot = 1024;             // снимок за раз, пикселей в дело
+    const int kMargin = 64;             // и поля вокруг - для подгонки яркости к соседям
+    const int kFrame = kShot + 2 * kMargin;
+    enum { FLAG_FAR = 1 };              // дальний: снят издалека, без построек - переснять вблизи
     const int kMinLevel = 4;            // самый мелкий уровень плитки
     std::string g_folder;               // папка плиток (с «\» в конце)
 
@@ -222,22 +232,30 @@ namespace
     struct Header
     {
         int quality;
+        int flags;
         std::vector<int> sizes;
         std::vector<long> offsets;
+        Header() : quality(0), flags(0) {}
     };
 
     bool ReadHeader(FILE* f, Header& h)
     {
         char magic[4];
         int levels = 0;
-        if (fread(magic, 1, 4, f) != 4 || memcmp(magic, "BMS1", 4) != 0 || fread(&h.quality, 4, 1, f) != 1 ||
+        h.flags = 0;
+        if (fread(magic, 1, 4, f) != 4)
+            return false;
+        const bool v2 = memcmp(magic, "BMS2", 4) == 0;
+        if (!v2 && memcmp(magic, "BMS1", 4) != 0)
+            return false;
+        if (fread(&h.quality, 4, 1, f) != 1 || (v2 && fread(&h.flags, 4, 1, f) != 1) ||
             fread(&levels, 4, 1, f) != 1 || levels <= 0 || levels > 16)
             return false;
         h.sizes.resize(levels);
         if (fread(&h.sizes[0], 4, levels, f) != static_cast<size_t>(levels))
             return false;
         h.offsets.resize(levels);
-        long at = 12 + 4 * levels;
+        long at = (v2 ? 16 : 12) + 4 * levels;
         for (int i = 0; i < levels; ++i)
         {
             if (h.sizes[i] < kMinLevel || h.sizes[i] > 8192 || h.sizes[i] % 4 != 0)
@@ -253,7 +271,14 @@ namespace
     // Поток игры: какие плитки есть
     // ---------------------------------------------------------------
 
-    std::map<long long, int> g_stored;      // ключ -> качество
+    struct Stored
+    {
+        int quality;
+        bool distant;
+        Stored() : quality(0), distant(false) {}
+        Stored(int q, bool f) : quality(q), distant(f) {}
+    };
+    std::map<long long, Stored> g_stored;   // что снято
     std::vector<long long> g_fresh;         // снятые, ещё не отданные потоку рисования
     bool g_capture = true;
     int g_quality = 1024;
@@ -289,7 +314,7 @@ namespace
                 continue;
             Header hd;
             if (ReadHeader(f, hd))
-                g_stored[key] = hd.quality;
+                g_stored[key] = Stored(hd.quality, (hd.flags & FLAG_FAR) != 0);
             fclose(f);
         } while (FindNextFileA(h, &fd));
         FindClose(h);
@@ -322,7 +347,7 @@ namespace
         }
     };
 
-    const float kFov = 12.0f;           // угол обзора камеры при съёмке, градусов
+    const float kFov = 12.0f;           // угол, под которым с высоты съёмки видна сторона снимка, градусов
     const int kSettleFirst = 8;         // кадров до первого снимка плитки: свет, адаптация яркости
     const int kSettleNext = 2;          // и между снимками мозаики
 
@@ -346,14 +371,15 @@ namespace
         int shot;                       // который снимаем
         int wait;                       // кадров до чтения
         float groundY;                  // высота земли в центре плитки (мир)
-        std::vector<int> sizes;         // уровни плитки
-        std::vector<std::vector<unsigned char> > blocks;
+        bool distant;                       // дальний (см. FLAG_FAR)
         DWORD started;
         Job() : active(false), tx(0), tz(0), variant(Satellite::DAY), quality(0), n(1), shot(0), wait(0),
-                groundY(0), started(0) {}
+                groundY(0), distant(false), started(0) {}
     };
     Job g_job;
     DWORD g_nextPlan = 0;
+    LONG g_gen = 0;                     // номер съёмки: после загрузки сейва старое не нужно
+    bool g_encoding = false;            // поток сжатия ещё дописывает прошлую плитку
 
     // ---- камера игры: наверх и обратно ----
     struct CameraState
@@ -401,7 +427,9 @@ namespace
         }
         cam->setPosition(position);
         cam->setOrientation(orientation);
-        cam->setFOVy(Ogre::Degree(kFov));
+        // Кадр - со стороной побольше: поля kMargin вокруг снимка.
+        const float frame = side * kFrame / kShot;
+        cam->setFOVy(Ogre::Radian(2.0f * std::atan(frame * 0.5f / height)));
         cam->setAspectRatio(1.0f);
         // Глубина - только вокруг земли: так её точности хватает и с
         // десятка километров.
@@ -550,7 +578,6 @@ namespace
         RestoreCamera();
         RestoreGui();
         g_job.active = false;
-        g_job.blocks.clear();
     }
 
     void DropWorkspace()
@@ -582,7 +609,7 @@ namespace
         if (g_target.isNull())
             g_target = Ogre::TextureManager::getSingleton().createManual(
                 "BestMinimap_Satellite", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                Ogre::TEX_TYPE_2D, kShot, kShot, 1, 0, Ogre::PF_A8R8G8B8, Ogre::TU_RENDERTARGET);
+                Ogre::TEX_TYPE_2D, kFrame, kFrame, 1, 0, Ogre::PF_A8R8G8B8, Ogre::TU_RENDERTARGET);
         if (g_workspace == NULL)
         {
             const Ogre::CompositorWorkspaceDef* const def = WorkspaceAccess::Def(r->workspace);
@@ -605,46 +632,222 @@ namespace
         return true;
     }
 
-    bool Begin(int tx, int tz, Satellite::Variant v)
+    // ---------------------------------------------------------------
+    // Сжатие снимков - свой поток
+    // ---------------------------------------------------------------
+    //
+    // DXT1 для снимка 1024x1024 с уменьшенными копиями - миллисекунды; при
+    // качестве 8192 их 64 на плитку, и в потоке игры это была просадка FPS
+    // (20.10.2026). Поток игры теперь только читает снимок из видеокарты и
+    // отдаёт сюда; здесь - подгонка яркости, сжатие и запись файла.
+    //
+    // ЯРКОСТЬ. Игра подстраивает экспозицию под кадр: снимок светлого песка
+    // выходит темнее, тёмных скал - светлее, и плитки шли лоскутами. Поэтому
+    // у снимка поля kMargin: они видят края уже снятых соседей (слева и
+    // сверху в той же плитке, по краям - соседние плитки с диска), и
+    // снимок умножается на отношение их яркостей.
+
+    struct Msg
     {
-        g_job = Job();
-        g_job.tx = tx;
-        g_job.tz = tz;
-        g_job.variant = v;
-        g_job.quality = g_quality;
-        g_job.n = g_quality / kShot;
-        // Высота земли - в центре плитки; нет её там (край мира) - у камеры.
-        const float cx = (tx + 0.5f) * Satellite::kTileMetres, cz = (tz + 0.5f) * Satellite::kTileMetres;
-        const float ground = UtilityT::getTerrainHeight(cx, cz);
-        g_job.groundY = (ground == ground && ground > -100000.0f && ground < 100000.0f) ? ground : 0.0f;
-        for (int size = g_quality, shot = kShot; shot >= kMinLevel; size /= 2, shot /= 2)
-        {
-            g_job.sizes.push_back(size);
-            g_job.blocks.push_back(std::vector<unsigned char>(BlocksBytes(size)));
-        }
-        g_job.wait = kSettleFirst;
-        g_job.started = GetTickCount();
-        g_job.active = true;
-        if (!StartShooting())
-        {
-            g_job.active = false;
-            g_job.blocks.clear();
-            return false;
-        }
-        return true;
+        enum Kind { BEGIN, SHOT, END };
+        Kind kind;
+        LONG gen;
+        int tx, tz, quality, n, shot;
+        Satellite::Variant variant;
+        bool distant;
+        DWORD started;
+        std::vector<unsigned> px;       // снимок с полями, kFrame x kFrame
+    };
+
+    struct Result
+    {
+        LONG gen;
+        int tx, tz, quality;
+        Satellite::Variant variant;
+        bool distant, ok;
+        DWORD ms;
+        float minGain, maxGain;
+    };
+
+    CRITICAL_SECTION g_encLock;
+    HANDLE g_encWake = NULL;
+    std::deque<Msg*> g_encQueue;
+    std::vector<Result> g_encDone;
+    volatile LONG g_encGen = 0;         // какой номер съёмки ещё нужен
+
+    // Состояние потока сжатия.
+    struct Neighbour
+    {
+        bool tried, ok;
+        int size;
+        std::vector<unsigned> px;
+    };
+    struct EncTile
+    {
+        bool active;
+        LONG gen;
+        int tx, tz, quality, n;
+        Satellite::Variant variant;
+        bool distant;
+        DWORD started;
+        std::vector<int> sizes;
+        std::vector<std::vector<unsigned char> > blocks;
+        Neighbour nb[4];                // слева, справа, сверху, снизу
+        float minGain, maxGain;
+    };
+    EncTile g_enc;
+
+    inline int Luma(unsigned c)
+    {
+        return static_cast<int>(((c >> 16) & 255) + 2 * ((c >> 8) & 255) + (c & 255));
     }
 
-    // Снимок мозаики - во все уровни плитки: уровень 0 - как есть, дальше -
-    // уменьшение вдвое (среднее 2x2), пока снимок не 4x4.
-    void StoreShot(std::vector<unsigned>& px)
+    double MeanLuma(const unsigned* px, int stride, int x0, int y0, int w, int h)
     {
-        const int sx = g_job.shot % g_job.n, sz = g_job.shot / g_job.n;
-        int side = kShot;
-        for (size_t level = 0; level < g_job.sizes.size() && side >= 4; ++level)
+        if (w <= 0 || h <= 0)
+            return 0.0;
+        double sum = 0.0;
+        for (int y = y0; y < y0 + h; ++y)
+            for (int x = x0; x < x0 + w; ++x)
+                sum += Luma(px[static_cast<size_t>(y) * stride + x]);
+        return sum / (static_cast<double>(w) * h);
+    }
+
+    // Средняя яркость куска уровня 0 текущей плитки (уже сжатого): x0, y0,
+    // w, h кратны 4.
+    double MeanLumaBlocks(int x0, int y0, int w, int h)
+    {
+        const int size = g_enc.sizes[0], bw = size / 4;
+        const unsigned char* const blocks = &g_enc.blocks[0][0];
+        unsigned tile[16];
+        double sum = 0.0;
+        for (int by = y0 / 4; by < (y0 + h) / 4; ++by)
+            for (int bx = x0 / 4; bx < (x0 + w) / 4; ++bx)
+            {
+                DecodeBlock(blocks + (static_cast<size_t>(by) * bw + bx) * 8, tile, 4);
+                for (int k = 0; k < 16; ++k)
+                    sum += Luma(tile[k]);
+            }
+        return sum / (static_cast<double>(w) * h);
+    }
+
+    // Соседняя плитка с диска (тот же вариант): уровень не больше 1024.
+    Neighbour& LoadNeighbour(int side)
+    {
+        Neighbour& nb = g_enc.nb[side];
+        if (nb.tried)
+            return nb;
+        nb.tried = true;
+        nb.ok = false;
+        static const int dx[4] = { -1, 1, 0, 0 }, dz[4] = { 0, 0, -1, 1 };
+        FILE* f = NULL;
+        if (fopen_s(&f, TileFile(g_enc.tx + dx[side], g_enc.tz + dz[side], g_enc.variant).c_str(), "rb") != 0 || f == NULL)
+            return nb;
+        Header h;
+        if (ReadHeader(f, h))
         {
-            const int tileBlocks = g_job.sizes[level] / 4;
+            int level = static_cast<int>(h.sizes.size()) - 1;
+            for (size_t i = 0; i < h.sizes.size(); ++i)
+                if (h.sizes[i] <= 1024)
+                {
+                    level = static_cast<int>(i);
+                    break;
+                }
+            nb.size = h.sizes[level];
+            std::vector<unsigned char> blocks(BlocksBytes(nb.size));
+            if (fseek(f, h.offsets[level], SEEK_SET) == 0 && fread(&blocks[0], 1, blocks.size(), f) == blocks.size())
+            {
+                nb.px.resize(static_cast<size_t>(nb.size) * nb.size);
+                const int bw = nb.size / 4;
+                for (int by = 0; by < bw; ++by)
+                    for (int bx = 0; bx < bw; ++bx)
+                        DecodeBlock(&blocks[(static_cast<size_t>(by) * bw + bx) * 8],
+                                    &nb.px[static_cast<size_t>(by * 4) * nb.size + bx * 4], nb.size);
+                nb.ok = true;
+            }
+        }
+        fclose(f);
+        return nb;
+    }
+
+    // Множитель яркости снимка shot (кадр p с полями) по уже снятым соседям.
+    float GainFor(int shot, const std::vector<unsigned>& p)
+    {
+        const int n = g_enc.n, sx = shot % n, sz = shot / n;
+        const int X0 = sx * kShot, Z0 = sz * kShot;
+        const unsigned* const P = &p[0];
+        double ref = 0.0, our = 0.0;
+        // Сосед и наши поля над ним; совсем тёмное (край мира) - не в счёт.
+        struct Pair { double r, o; };
+        Pair pairs[6];
+        int count = 0;
+        if (sx > 0)
+        {
+            pairs[count].r = MeanLumaBlocks(X0 - kMargin, Z0, kMargin, kShot);
+            pairs[count++].o = MeanLuma(P, kFrame, 0, kMargin, kMargin, kShot);
+        }
+        if (sz > 0)
+        {
+            pairs[count].r = MeanLumaBlocks(X0, Z0 - kMargin, kShot, kMargin);
+            pairs[count++].o = MeanLuma(P, kFrame, kMargin, 0, kShot, kMargin);
+        }
+        // Соседние плитки: полоса той же ширины в метрах, в их пикселях.
+        const bool edge[4] = { sx == 0, sx == n - 1, sz == 0, sz == n - 1 };
+        for (int side = 0; side < 4; ++side)
+        {
+            if (!edge[side])
+                continue;
+            Neighbour& nb = LoadNeighbour(side);
+            if (!nb.ok)
+                continue;
+            const int S = nb.size;
+            const int w = Hi(1, kMargin * S / (kShot * n));
+            const int a = (side < 2 ? sz : sx) * S / n, len = Hi(1, S / n);
+            if (side == 0)
+            {
+                pairs[count].r = MeanLuma(&nb.px[0], S, S - w, a, w, len);
+                pairs[count++].o = MeanLuma(P, kFrame, 0, kMargin, kMargin, kShot);
+            }
+            else if (side == 1)
+            {
+                pairs[count].r = MeanLuma(&nb.px[0], S, 0, a, w, len);
+                pairs[count++].o = MeanLuma(P, kFrame, kMargin + kShot, kMargin, kMargin, kShot);
+            }
+            else if (side == 2)
+            {
+                pairs[count].r = MeanLuma(&nb.px[0], S, a, S - w, len, w);
+                pairs[count++].o = MeanLuma(P, kFrame, kMargin, 0, kShot, kMargin);
+            }
+            else
+            {
+                pairs[count].r = MeanLuma(&nb.px[0], S, a, 0, len, w);
+                pairs[count++].o = MeanLuma(P, kFrame, kMargin, kMargin + kShot, kShot, kMargin);
+            }
+        }
+        for (int i = 0; i < count; ++i)
+            if (pairs[i].o >= 8.0 && pairs[i].r >= 8.0)
+            {
+                ref += pairs[i].r;
+                our += pairs[i].o;
+            }
+        if (our <= 0.0)
+            return 1.0f;
+        const double g = ref / our;
+        return static_cast<float>(g < 0.6 ? 0.6 : (g > 1.6 ? 1.6 : g));
+    }
+
+    // Снимок мозаики (середина кадра, уже с подогнанной яркостью) - во все
+    // уровни плитки: уровень 0 - как есть, дальше - уменьшение вдвое
+    // (среднее 2x2), пока снимок не 4x4.
+    void StoreShot(int shot, std::vector<unsigned>& px)
+    {
+        const int sx = shot % g_enc.n, sz = shot / g_enc.n;
+        int side = kShot;
+        for (size_t level = 0; level < g_enc.sizes.size() && side >= 4; ++level)
+        {
+            const int tileBlocks = g_enc.sizes[level] / 4;
             const int shotBlocks = side / 4;
-            unsigned char* const out = &g_job.blocks[level][0];
+            unsigned char* const out = &g_enc.blocks[level][0];
             for (int by = 0; by < shotBlocks; ++by)
                 for (int bx = 0; bx < shotBlocks; ++bx)
                 {
@@ -666,68 +869,308 @@ namespace
         }
     }
 
+    // Файл - через временный: поток рисования не прочтёт недописанное. Он
+    // же может держать старый файл открытым - тогда пробуем ещё раз.
     bool WriteTile()
     {
-        const Satellite::Variant v = g_job.variant;
-        const std::string file = TileFile(g_job.tx, g_job.tz, v);
+        const std::string file = TileFile(g_enc.tx, g_enc.tz, g_enc.variant);
         const std::string temp = file + ".tmp";
         FILE* f = NULL;
         if (fopen_s(&f, temp.c_str(), "wb") != 0 || f == NULL)
             return false;
-        const int levels = static_cast<int>(g_job.sizes.size());
-        bool ok = fwrite("BMS1", 1, 4, f) == 4 && fwrite(&g_job.quality, 4, 1, f) == 1 && fwrite(&levels, 4, 1, f) == 1 &&
-                  fwrite(&g_job.sizes[0], 4, levels, f) == static_cast<size_t>(levels);
+        const int levels = static_cast<int>(g_enc.sizes.size());
+        const int flags = g_enc.distant ? FLAG_FAR : 0;
+        bool ok = fwrite("BMS2", 1, 4, f) == 4 && fwrite(&g_enc.quality, 4, 1, f) == 1 && fwrite(&flags, 4, 1, f) == 1 &&
+                  fwrite(&levels, 4, 1, f) == 1 && fwrite(&g_enc.sizes[0], 4, levels, f) == static_cast<size_t>(levels);
         for (int i = 0; ok && i < levels; ++i)
-            ok = fwrite(&g_job.blocks[i][0], 1, g_job.blocks[i].size(), f) == g_job.blocks[i].size();
+            ok = fwrite(&g_enc.blocks[i][0], 1, g_enc.blocks[i].size(), f) == g_enc.blocks[i].size();
         fclose(f);
-        if (!ok || !MoveFileExA(temp.c_str(), file.c_str(), MOVEFILE_REPLACE_EXISTING))
+        bool moved = false;
+        for (int attempt = 0; ok && !moved && attempt < 20; ++attempt)
         {
+            moved = MoveFileExA(temp.c_str(), file.c_str(), MOVEFILE_REPLACE_EXISTING) != 0;
+            if (!moved)
+                Sleep(10);
+        }
+        if (!moved)
             DeleteFileA(temp.c_str());
+        return moved;
+    }
+
+    void Handle(Msg* m)
+    {
+        if (m->gen != g_encGen)
+            return;                     // съёмка из прошлой игры
+        if (m->kind == Msg::BEGIN)
+        {
+            g_enc = EncTile();
+            g_enc.active = true;
+            g_enc.gen = m->gen;
+            g_enc.tx = m->tx;
+            g_enc.tz = m->tz;
+            g_enc.variant = m->variant;
+            g_enc.quality = m->quality;
+            g_enc.n = m->n;
+            g_enc.distant = m->distant;
+            g_enc.started = m->started;
+            g_enc.minGain = 10.0f;
+            g_enc.maxGain = 0.0f;
+            for (int i = 0; i < 4; ++i)
+                g_enc.nb[i].tried = g_enc.nb[i].ok = false;
+            for (int size = m->quality, shot = kShot; shot >= kMinLevel; size /= 2, shot /= 2)
+            {
+                g_enc.sizes.push_back(size);
+                g_enc.blocks.push_back(std::vector<unsigned char>(BlocksBytes(size)));
+            }
+            return;
+        }
+        if (m->kind == Msg::END && !g_enc.active)
+        {
+            // Плитку бросили (не хватило памяти) - поток игры ждёт ответа.
+            Result res;
+            res.gen = m->gen;
+            res.tx = m->tx;
+            res.tz = m->tz;
+            res.quality = m->quality;
+            res.variant = m->variant;
+            res.distant = m->distant;
+            res.ok = false;
+            res.ms = GetTickCount() - m->started;
+            res.minGain = res.maxGain = 1.0f;
+            EnterCriticalSection(&g_encLock);
+            g_encDone.push_back(res);
+            LeaveCriticalSection(&g_encLock);
+            return;
+        }
+        if (!g_enc.active || g_enc.gen != m->gen)
+            return;
+        if (m->kind == Msg::SHOT)
+        {
+            const float gain = GainFor(m->shot, m->px);
+            g_enc.minGain = Lo(g_enc.minGain, gain);
+            g_enc.maxGain = Hi(g_enc.maxGain, gain);
+            const unsigned k = static_cast<unsigned>(gain * 256.0f + 0.5f);
+            // Середина кадра, с подогнанной яркостью, - подряд.
+            std::vector<unsigned> mid(static_cast<size_t>(kShot) * kShot);
+            for (int y = 0; y < kShot; ++y)
+            {
+                const unsigned* const src = &m->px[static_cast<size_t>(y + kMargin) * kFrame + kMargin];
+                unsigned* const dst = &mid[static_cast<size_t>(y) * kShot];
+                for (int x = 0; x < kShot; ++x)
+                {
+                    const unsigned c = src[x];
+                    const unsigned r = Lo(255u, (((c >> 16) & 255) * k) >> 8);
+                    const unsigned g = Lo(255u, (((c >> 8) & 255) * k) >> 8);
+                    const unsigned b = Lo(255u, ((c & 255) * k) >> 8);
+                    dst[x] = 0xFF000000u | (r << 16) | (g << 8) | b;
+                }
+            }
+            StoreShot(m->shot, mid);
+            return;
+        }
+        // END
+        Result res;
+        res.gen = g_enc.gen;
+        res.tx = g_enc.tx;
+        res.tz = g_enc.tz;
+        res.quality = g_enc.quality;
+        res.variant = g_enc.variant;
+        res.distant = g_enc.distant;
+        res.ok = WriteTile();
+        res.ms = GetTickCount() - g_enc.started;
+        res.minGain = g_enc.minGain;
+        res.maxGain = g_enc.maxGain;
+        g_enc = EncTile();
+        EnterCriticalSection(&g_encLock);
+        g_encDone.push_back(res);
+        LeaveCriticalSection(&g_encLock);
+    }
+
+    DWORD WINAPI EncoderThread(LPVOID)
+    {
+        for (;;)
+        {
+            WaitForSingleObject(g_encWake, INFINITE);
+            for (;;)
+            {
+                Msg* m = NULL;
+                EnterCriticalSection(&g_encLock);
+                if (!g_encQueue.empty())
+                {
+                    m = g_encQueue.front();
+                    g_encQueue.pop_front();
+                }
+                LeaveCriticalSection(&g_encLock);
+                if (m == NULL)
+                    break;
+                try
+                {
+                    Handle(m);
+                }
+                catch (...)
+                {
+                    g_enc = EncTile();          // нет памяти - плитку бросаем
+                }
+                delete m;
+            }
+        }
+    }
+
+    bool g_encReady = false;
+
+    bool StartEncoder()
+    {
+        if (g_encReady)
+            return true;
+        InitializeCriticalSection(&g_encLock);
+        g_encWake = CreateEventA(NULL, FALSE, FALSE, NULL);
+        HANDLE const thread = g_encWake == NULL ? NULL : CreateThread(NULL, 0, &EncoderThread, NULL, 0, NULL);
+        if (thread == NULL)
+        {
+            Log("could not start the compression thread - no satellite shots");
             return false;
         }
-        const long long key = Satellite::Key(g_job.tx, g_job.tz, v);
-        g_stored[key] = g_job.quality;
-        g_fresh.push_back(key);
+        CloseHandle(thread);
+        g_encReady = true;
         return true;
+    }
+
+    void Post(Msg* m)
+    {
+        EnterCriticalSection(&g_encLock);
+        g_encQueue.push_back(m);
+        LeaveCriticalSection(&g_encLock);
+        SetEvent(g_encWake);
+    }
+
+    bool Begin(int tx, int tz, Satellite::Variant v, bool distant)
+    {
+        if (!StartEncoder())
+            return false;
+        g_job = Job();
+        g_job.tx = tx;
+        g_job.tz = tz;
+        g_job.variant = v;
+        g_job.distant = distant;
+        // Дальнее - быстро, в 1024: его всё равно переснимут вблизи.
+        g_job.quality = distant ? kShot : g_quality;
+        g_job.n = g_job.quality / kShot;
+        // Высота земли - в центре плитки; нет её там (край мира) - 0.
+        const float cx = (tx + 0.5f) * Satellite::kTileMetres, cz = (tz + 0.5f) * Satellite::kTileMetres;
+        const float ground = UtilityT::getTerrainHeight(cx, cz);
+        g_job.groundY = (ground == ground && ground > -100000.0f && ground < 100000.0f) ? ground : 0.0f;
+        g_job.wait = kSettleFirst;
+        g_job.started = GetTickCount();
+        g_job.active = true;
+        if (!StartShooting())
+        {
+            g_job.active = false;
+            return false;
+        }
+        Msg* const m = new Msg();
+        m->kind = Msg::BEGIN;
+        m->gen = g_gen;
+        m->tx = tx;
+        m->tz = tz;
+        m->quality = g_job.quality;
+        m->n = g_job.n;
+        m->shot = 0;
+        m->variant = v;
+        m->distant = distant;
+        m->started = g_job.started;
+        Post(m);
+        return true;
+    }
+
+    // Готовое из потока сжатия - в список снятого.
+    void CollectDone()
+    {
+        if (!g_encReady)
+            return;
+        std::vector<Result> done;
+        EnterCriticalSection(&g_encLock);
+        done.swap(g_encDone);
+        LeaveCriticalSection(&g_encLock);
+        for (size_t i = 0; i < done.size(); ++i)
+        {
+            const Result& r = done[i];
+            if (r.gen != g_gen)
+                continue;
+            g_encoding = false;
+            char note[220];
+            sprintf_s(note, "tile %d %d (%s, %d px%s) %s in %u ms, brightness x%.2f-%.2f", r.tx, r.tz,
+                      r.variant == Satellite::DAY ? "day" : "night", r.quality, r.distant ? ", far" : "",
+                      r.ok ? "taken" : "could not be saved", r.ms, r.minGain, r.maxGain);
+            Log(note);
+            if (!r.ok)
+                continue;
+            const long long key = Satellite::Key(r.tx, r.tz, r.variant);
+            g_stored[key] = Stored(r.quality, r.distant);
+            g_fresh.push_back(key);
+        }
     }
 
     // Какой вариант снимать в это время суток (VARIANT_COUNT - никакой:
     // сумерки, свет меняется).
     Satellite::Variant VariantAt(double hour)
     {
-        if (hour >= 8.0 && hour < 17.0)
+        if (hour >= 9.0 && hour < 16.0)
             return Satellite::DAY;
         if (hour >= 22.0 || hour < 4.0)
             return Satellite::NIGHT;
         return Satellite::VARIANT_COUNT;
     }
 
-    // Следующая плитка: ближайшая к центру камеры из 3x3 вокруг (центр
-    // плитки - не дальше 1,4 км: дальше игра держит мир не целиком), у
-    // которой этого варианта нет или он хуже нынешнего качества.
-    bool PickTile(const Ogre::Vector3& c, Satellite::Variant v, int& outX, int& outZ)
+    // Следующая плитка. Сначала ближние (центр плитки не дальше 1,4 км от
+    // центра камеры: там игра держит мир целиком) - которых нет, они
+    // дальние или хуже нынешнего качества. Нет таких - дальние (до 4 км,
+    // только рельеф): их снимаем быстро, в 1024, и переснимем вблизи.
+    bool PickTile(const Ogre::Vector3& c, Satellite::Variant v, int& outX, int& outZ, bool& distant)
     {
+        const float nearR = 1400.0f, farR = 4100.0f;
         const int cx = static_cast<int>(std::floor(c.x / Satellite::kTileMetres));
         const int cz = static_cast<int>(std::floor(c.z / Satellite::kTileMetres));
-        float best = 1400.0f * 1400.0f;
-        bool found = false;
-        for (int dz = -1; dz <= 1; ++dz)
-            for (int dx = -1; dx <= 1; ++dx)
+        float bestNear = nearR * nearR, bestFar = farR * farR;
+        bool foundNear = false, foundFar = false;
+        int nx = 0, nz = 0, fx = 0, fz = 0;
+        for (int dz = -5; dz <= 5; ++dz)
+            for (int dx = -5; dx <= 5; ++dx)
             {
                 const int tx = cx + dx, tz = cz + dz;
                 const float mx = (tx + 0.5f) * Satellite::kTileMetres - c.x, mz = (tz + 0.5f) * Satellite::kTileMetres - c.z;
                 const float d2 = mx * mx + mz * mz;
-                if (d2 >= best)
-                    continue;
-                std::map<long long, int>::const_iterator it = g_stored.find(Satellite::Key(tx, tz, v));
-                if (it != g_stored.end() && it->second >= g_quality)
-                    continue;
-                best = d2;
-                outX = tx;
-                outZ = tz;
-                found = true;
+                std::map<long long, Stored>::const_iterator it = g_stored.find(Satellite::Key(tx, tz, v));
+                const bool have = it != g_stored.end();
+                if (d2 < bestNear && (!have || it->second.distant || it->second.quality < g_quality))
+                {
+                    bestNear = d2;
+                    nx = tx;
+                    nz = tz;
+                    foundNear = true;
+                }
+                else if (d2 < bestFar && !have)
+                {
+                    bestFar = d2;
+                    fx = tx;
+                    fz = tz;
+                    foundFar = true;
+                }
             }
-        return found;
+        if (foundNear)
+        {
+            outX = nx;
+            outZ = nz;
+            distant = false;
+            return true;
+        }
+        if (foundFar)
+        {
+            outX = fx;
+            outZ = fz;
+            distant = true;
+            return true;
+        }
+        return false;
     }
 
     void Fail(const std::string& why)
@@ -843,7 +1286,7 @@ namespace Satellite
     int StoredCount(Variant v)
     {
         int n = 0;
-        for (std::map<long long, int>::const_iterator it = g_stored.begin(); it != g_stored.end(); ++it)
+        for (std::map<long long, Stored>::const_iterator it = g_stored.begin(); it != g_stored.end(); ++it)
             n += (it->first & 3) == v ? 1 : 0;
         return n;
     }
@@ -862,18 +1305,20 @@ namespace Satellite
     void Tick(const Ogre::Vector3& cameraCentre, double hourOfDay, bool allowed)
     {
         const DWORD now = GetTickCount();
+        CollectDone();
         if (!g_job.active)
         {
-            if (!allowed || !g_capture || now < g_nextPlan)
+            if (!allowed || !g_capture || g_encoding || now < g_nextPlan)
                 return;
-            g_nextPlan = now + 1000;
+            g_nextPlan = now + 500;
             const Variant v = VariantAt(hourOfDay);
             int tx = 0, tz = 0;
-            if (v == VARIANT_COUNT || !PickTile(cameraCentre, v, tx, tz))
+            bool distant = false;
+            if (v == VARIANT_COUNT || !PickTile(cameraCentre, v, tx, tz, distant))
                 return;
             try
             {
-                Begin(tx, tz, v);
+                Begin(tx, tz, v, distant);
             }
             catch (const Ogre::Exception& e)
             {
@@ -887,25 +1332,46 @@ namespace Satellite
         }
         if (--g_job.wait > 0)
             return;
+        // Поток сжатия не успевает - ждём: очередь снимков по 5 МБ не копим.
+        EnterCriticalSection(&g_encLock);
+        const size_t queued = g_encQueue.size();
+        LeaveCriticalSection(&g_encLock);
+        if (queued >= 3)
+        {
+            g_job.wait = 1;
+            return;
+        }
         try
         {
-            std::vector<unsigned> px(static_cast<size_t>(kShot) * kShot);
-            Ogre::PixelBox box(kShot, kShot, 1, Ogre::PF_A8R8G8B8, &px[0]);
+            // Поток игры - только чтение снимка; остальное - поток сжатия.
+            Msg* const m = new Msg();
+            m->kind = Msg::SHOT;
+            m->gen = g_gen;
+            m->shot = g_job.shot;
+            m->px.resize(static_cast<size_t>(kFrame) * kFrame);
+            Ogre::PixelBox box(kFrame, kFrame, 1, Ogre::PF_A8R8G8B8, &m->px[0]);
             g_target->getBuffer()->blitToMemory(box);
-            StoreShot(px);
+            Post(m);
             if (++g_job.shot < g_job.n * g_job.n)
             {
                 g_job.wait = kSettleNext;
                 return;
             }
-            const bool ok = WriteTile();
-            char note[200];
-            sprintf_s(note, "tile %d %d (%s, %d px) %s in %u ms", g_job.tx, g_job.tz,
-                      g_job.variant == DAY ? "day" : "night", g_job.quality, ok ? "taken" : "could not be saved",
-                      GetTickCount() - g_job.started);
-            Log(note);
+            Msg* const end = new Msg();
+            end->kind = Msg::END;
+            end->gen = g_gen;
+            end->tx = g_job.tx;
+            end->tz = g_job.tz;
+            end->quality = g_job.quality;
+            end->n = g_job.n;
+            end->shot = 0;
+            end->variant = g_job.variant;
+            end->distant = g_job.distant;
+            end->started = g_job.started;
+            Post(end);
+            g_encoding = true;
             StopShooting();
-            g_nextPlan = GetTickCount() + 2000;     // передышка между плитками
+            g_nextPlan = GetTickCount() + 500;      // передышка между плитками
         }
         catch (const Ogre::Exception& e)
         {
@@ -919,14 +1385,14 @@ namespace Satellite
 
     void CaptureNow(const Ogre::Vector3& centre, double hourOfDay)
     {
-        if (g_job.active)
+        if (g_job.active || g_encoding)
             return;
         const Variant v = hourOfDay >= 6.0 && hourOfDay < 19.0 ? DAY : NIGHT;
         const int tx = static_cast<int>(std::floor(centre.x / kTileMetres));
         const int tz = static_cast<int>(std::floor(centre.z / kTileMetres));
         try
         {
-            Begin(tx, tz, v);
+            Begin(tx, tz, v, false);
         }
         catch (const Ogre::Exception& e)
         {
@@ -940,6 +1406,9 @@ namespace Satellite
 
     void Reset()
     {
+        // Начатое потоком сжатия - не нужно: новый номер съёмки.
+        g_gen = InterlockedIncrement(&g_encGen);
+        g_encoding = false;
         try
         {
             DropWorkspace();
