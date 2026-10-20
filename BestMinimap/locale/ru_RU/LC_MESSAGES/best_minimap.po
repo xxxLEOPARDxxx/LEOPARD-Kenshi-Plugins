@@ -437,17 +437,17 @@ msgstr "Заметка"
 msgid "Satellite view"
 msgstr "Вид со спутника"
 
-msgid "Satellite where taken"
-msgstr "Спутник, где снят"
+msgid "Dynamic from satellite"
+msgstr "Динамичная со спутника"
 
-msgid "Game map picture"
-msgstr "Картинка карты игры"
+msgid "Static"
+msgstr "Статичная"
 
-msgid "Minimap background"
-msgstr "Фон миникарты"
+msgid "Minimap render"
+msgstr "Рендер миникарты"
 
-msgid "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
-msgstr "Спутник - снимки мира сверху там, где они сняты; в остальных местах - картинка карты."
+msgid "Static - the picture of the game map. Dynamic from satellite - real shots of the world from above, as the game draws it, taken while you play; where there are none yet - the map picture."
+msgstr "Статичная - картинка карты игры. Динамичная со спутника - настоящие снимки мира сверху, как его рисует игра, снятые, пока вы играете; где их ещё нет - картинка карты."
 
 msgid "Take satellite shots"
 msgstr "Снимать спутник"
@@ -455,11 +455,11 @@ msgstr "Снимать спутник"
 msgid "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
 msgstr "Пока вы играете, миникарта снимает мир вокруг камеры: днём с 8 до 17 и ночью с 22 до 4 игровых часов. Каждый снимок - несколько кадров, в которые мир рисуется дважды."
 
-msgid "Satellite quality"
-msgstr "Качество спутника"
+msgid "Render quality"
+msgstr "Качество рендера"
 
-msgid "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
-msgstr "Пикселей на плитку 1024 м. Больше 1024 плитка снимается мозаикой: 2048 - 4 снимка, 4096 - 16, 8192 - 64. На диске на плитку и вариант примерно 0,7, 2,8, 11 и 45 МБ. Плитки худшего качества переснимаются."
+msgid "Detail of the satellite render: pixels per 1024 m of the world. Above 1024 an area is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64 (longer, but no more video memory). On disk per area and lighting about 0.7, 2.8, 11 and 45 MB. Areas taken at a lower quality are taken again."
+msgstr "Подробность рендера со спутника: пикселей на 1024 м мира. Больше 1024 участок снимается мозаикой: 2048 - 4 снимка, 4096 - 16, 8192 - 64 (дольше, но видеопамяти не больше). На диске на участок и освещение примерно 0,7, 2,8, 11 и 45 МБ. Участки, снятые в худшем качестве, переснимаются."
 
 msgid "By the time of day"
 msgstr "По времени суток"
@@ -476,11 +476,11 @@ msgstr "По времени суток - ночью ночные снимки (�
 msgid "Satellite up to range, m"
 msgstr "Спутник до обзора, м"
 
-msgid "Wider than this - the map picture."
-msgstr "Обзор шире - картинка карты."
+msgid "When the minimap shows wider than this, it is static: from that far the shots are too small to see."
+msgstr "Когда обзор миникарты шире этого, она статичная: с такого отдаления снимков не разглядеть."
 
 msgid "Satellite shot key"
 msgstr "Клавиша снимка спутника"
 
-msgid "Takes the tile under the minimap centre at once, whatever the hour."
-msgstr "Снимает плитку под центром миникарты сразу, в любое время суток."
+msgid "Takes the area under the minimap centre at once, whatever the hour: day or night shot by the time of day."
+msgstr "Снимает участок под центром миникарты сразу, в любое время: дневной или ночной снимок - по времени суток."

@@ -3797,19 +3797,19 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Satellite view"));
     static const char* const backValues[] = { "satellite", "map" };
     static const char* backLabels[2];
-    backLabels[0] = Tr("Satellite where taken");
-    backLabels[1] = Tr("Game map picture");
-    api->choice(api, kSec, "Background", Tr("Minimap background"), Tr("Satellite - shots of the world from above where they are taken; elsewhere - the map picture."), "satellite", backValues, backLabels, 2, 0);
+    backLabels[0] = Tr("Dynamic from satellite");
+    backLabels[1] = Tr("Static");
+    api->choice(api, kSec, "Background", Tr("Minimap render"), Tr("Static - the picture of the game map. Dynamic from satellite - real shots of the world from above, as the game draws it, taken while you play; where there are none yet - the map picture."), "satellite", backValues, backLabels, 2, 0);
     api->toggle(api, kSec, "SatelliteCapture", Tr("Take satellite shots"), Tr("While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."), 1, 0);
     static const char* const qualityValues[] = { "1024", "2048", "4096", "8192" };
-    api->choice(api, kSec, "SatelliteQuality", Tr("Satellite quality"), Tr("Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."), "1024", qualityValues, qualityValues, 4, 0);
+    api->choice(api, kSec, "SatelliteQuality", Tr("Render quality"), Tr("Detail of the satellite render: pixels per 1024 m of the world. Above 1024 an area is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64 (longer, but no more video memory). On disk per area and lighting about 0.7, 2.8, 11 and 45 MB. Areas taken at a lower quality are taken again."), "1024", qualityValues, qualityValues, 4, 0);
     static const char* const lightValues[] = { "time", "day" };
     static const char* lightLabels[2];
     lightLabels[0] = Tr("By the time of day");
     lightLabels[1] = Tr("Always day");
     api->choice(api, kSec, "SatelliteLighting", Tr("Lighting"), Tr("By the time of day - night shots at night (with the lamps), day shots by day, mixed at dawn and dusk."), "time", lightValues, lightLabels, 2, 0);
-    api->integer(api, kSec, "SatelliteMaxRange", Tr("Satellite up to range, m"), Tr("Wider than this - the map picture."), 8000, 0, 150000, 0);
-    api->hotkey(api, kSec, "SatelliteShotKey", Tr("Satellite shot key"), Tr("Takes the tile under the minimap centre at once, whatever the hour."), "CTRL+SHIFT+Y", 0);
+    api->integer(api, kSec, "SatelliteMaxRange", Tr("Satellite up to range, m"), Tr("When the minimap shows wider than this, it is static: from that far the shots are too small to see."), 8000, 0, 150000, 0);
+    api->hotkey(api, kSec, "SatelliteShotKey", Tr("Satellite shot key"), Tr("Takes the area under the minimap centre at once, whatever the hour: day or night shot by the time of day."), "CTRL+SHIFT+Y", 0);
 
     api->section(api, Tr("Who is shown"));
     static const char* const catLabels[CAT_COUNT] = { "Your squad", "Allies", "Neutrals", "Enemies", "Animals" };

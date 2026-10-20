@@ -437,17 +437,17 @@ msgstr "笔记"
 msgid "Satellite view"
 msgstr "卫星视图"
 
-msgid "Satellite where taken"
-msgstr "已拍摄处显示卫星"
+msgid "Dynamic from satellite"
+msgstr "卫星动态"
 
-msgid "Game map picture"
-msgstr "游戏地图图片"
+msgid "Static"
+msgstr "静态"
 
-msgid "Minimap background"
-msgstr "小地图背景"
+msgid "Minimap render"
+msgstr "小地图渲染"
 
-msgid "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
-msgstr "卫星 - 已拍摄处显示世界俯视图; 其余地方显示地图图片。"
+msgid "Static - the picture of the game map. Dynamic from satellite - real shots of the world from above, as the game draws it, taken while you play; where there are none yet - the map picture."
+msgstr "静态 - 游戏地图图片。卫星动态 - 游戏时拍摄的真实世界俯视图, 与游戏画面一致; 尚未拍摄处显示地图图片。"
 
 msgid "Take satellite shots"
 msgstr "拍摄卫星图"
@@ -455,11 +455,11 @@ msgstr "拍摄卫星图"
 msgid "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
 msgstr "游戏时小地图会拍摄镜头周围的世界: 白天8点到17点, 夜间22点到4点(游戏时间)。每次拍摄会有几帧世界被绘制两次。"
 
-msgid "Satellite quality"
-msgstr "卫星图质量"
+msgid "Render quality"
+msgstr "渲染质量"
 
-msgid "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
-msgstr "每块1024米图块的像素数。高于1024时图块分多次拼接拍摄: 2048 - 4次, 4096 - 16次, 8192 - 64次。每块每种光照在磁盘上约0.7、2.8、11和45 MB。低质量图块会重新拍摄。"
+msgid "Detail of the satellite render: pixels per 1024 m of the world. Above 1024 an area is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64 (longer, but no more video memory). On disk per area and lighting about 0.7, 2.8, 11 and 45 MB. Areas taken at a lower quality are taken again."
+msgstr "卫星渲染的细节: 每1024米世界的像素数。高于1024时区域分多次拼接拍摄: 2048 - 4次, 4096 - 16次, 8192 - 64次(更慢, 但不增加显存)。每个区域每种光照在磁盘上约0.7、2.8、11和45 MB。以较低质量拍摄的区域会重新拍摄。"
 
 msgid "By the time of day"
 msgstr "按昼夜时间"
@@ -476,11 +476,11 @@ msgstr "按昼夜时间 - 夜间显示夜景(带灯光), 白天显示白天图�
 msgid "Satellite up to range, m"
 msgstr "卫星图最大视野, 米"
 
-msgid "Wider than this - the map picture."
-msgstr "视野更大时显示地图图片。"
+msgid "When the minimap shows wider than this, it is static: from that far the shots are too small to see."
+msgstr "小地图视野大于此值时使用静态地图: 这么远时卫星图太小看不清。"
 
 msgid "Satellite shot key"
 msgstr "卫星拍摄键"
 
-msgid "Takes the tile under the minimap centre at once, whatever the hour."
-msgstr "立即拍摄小地图中心下方的图块, 不论时间。"
+msgid "Takes the area under the minimap centre at once, whatever the hour: day or night shot by the time of day."
+msgstr "立即拍摄小地图中心下方的区域, 不论时间: 按昼夜时间拍摄白天或夜景。"

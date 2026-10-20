@@ -437,17 +437,17 @@ msgstr "Note"
 msgid "Satellite view"
 msgstr "Satellite view"
 
-msgid "Satellite where taken"
-msgstr "Satellite where taken"
+msgid "Dynamic from satellite"
+msgstr "Dynamic from satellite"
 
-msgid "Game map picture"
-msgstr "Game map picture"
+msgid "Static"
+msgstr "Static"
 
-msgid "Minimap background"
-msgstr "Minimap background"
+msgid "Minimap render"
+msgstr "Minimap render"
 
-msgid "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
-msgstr "Satellite - shots of the world from above where they are taken; elsewhere - the map picture."
+msgid "Static - the picture of the game map. Dynamic from satellite - real shots of the world from above, as the game draws it, taken while you play; where there are none yet - the map picture."
+msgstr "Static - the picture of the game map. Dynamic from satellite - real shots of the world from above, as the game draws it, taken while you play; where there are none yet - the map picture."
 
 msgid "Take satellite shots"
 msgstr "Take satellite shots"
@@ -455,11 +455,11 @@ msgstr "Take satellite shots"
 msgid "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
 msgstr "While you play, the minimap takes shots of the world around the camera: by day from 8 to 17 and by night from 22 to 4 game hours. Each shot is a few frames with the world drawn twice."
 
-msgid "Satellite quality"
-msgstr "Satellite quality"
+msgid "Render quality"
+msgstr "Render quality"
 
-msgid "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
-msgstr "Pixels per 1024 m tile. Above 1024 a tile is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64. On disk per tile and variant about 0.7, 2.8, 11 and 45 MB. Tiles of a lower quality are taken again."
+msgid "Detail of the satellite render: pixels per 1024 m of the world. Above 1024 an area is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64 (longer, but no more video memory). On disk per area and lighting about 0.7, 2.8, 11 and 45 MB. Areas taken at a lower quality are taken again."
+msgstr "Detail of the satellite render: pixels per 1024 m of the world. Above 1024 an area is taken as a mosaic: 2048 - 4 shots, 4096 - 16, 8192 - 64 (longer, but no more video memory). On disk per area and lighting about 0.7, 2.8, 11 and 45 MB. Areas taken at a lower quality are taken again."
 
 msgid "By the time of day"
 msgstr "By the time of day"
@@ -476,11 +476,11 @@ msgstr "By the time of day - night shots at night (with the lamps), day shots by
 msgid "Satellite up to range, m"
 msgstr "Satellite up to range, m"
 
-msgid "Wider than this - the map picture."
-msgstr "Wider than this - the map picture."
+msgid "When the minimap shows wider than this, it is static: from that far the shots are too small to see."
+msgstr "When the minimap shows wider than this, it is static: from that far the shots are too small to see."
 
 msgid "Satellite shot key"
 msgstr "Satellite shot key"
 
-msgid "Takes the tile under the minimap centre at once, whatever the hour."
-msgstr "Takes the tile under the minimap centre at once, whatever the hour."
+msgid "Takes the area under the minimap centre at once, whatever the hour: day or night shot by the time of day."
+msgstr "Takes the area under the minimap centre at once, whatever the hour: day or night shot by the time of day."
