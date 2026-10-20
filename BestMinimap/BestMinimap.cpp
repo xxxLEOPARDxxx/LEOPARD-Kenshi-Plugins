@@ -216,6 +216,7 @@ namespace
     bool g_townRadius = true;           // круг радиуса поселения
     bool g_townGameIcons = true;        // значки как на большой карте игры
     int g_townIconSize = 22;            // их высота, пикселей
+    std::string g_townFont;             // шрифт названий поселений (пусто - как у прочих подписей)
     unsigned g_townColour = 0xFFF0E6C8u;
     bool g_rightClickMove = true;       // ПКМ по миникарте - идти туда
     bool g_showBounty = true;           // кольцо и сумма награды за голову
@@ -347,6 +348,14 @@ namespace
         g_townRadius = ReadBool(ini, "TownRadius", true);
         g_townGameIcons = ReadText(ini, "TownIcons", "game") != "diamond";
         g_townIconSize = ReadInt(ini, "TownIconSize", 22, 10, 64);
+        {
+            // Размер названий - готовыми шрифтами игры: они чёткие, а
+            // растянутый шрифт расплывается.
+            const std::string size = ReadText(ini, "TownNameSize", "normal");
+            g_townFont = size == "small" ? "Kenshi_StandardFont_Small" :
+                         size == "medium" ? "Kenshi_StandardFont_Medium" :
+                         size == "large" ? "Kenshi_StandardFont_Large" : "";
+        }
         g_rightClickMove = ReadBool(ini, "RightClickMove", true);
         g_showBounty = ReadBool(ini, "ShowBounty", true);
         ReadColour(ini, "BountyColour", "#F2C230", unused, g_bountyColour);
@@ -1796,7 +1805,11 @@ namespace
         }
     }
 
-    void PlaceLabel(const std::string& text, float x, float y, unsigned colour)
+    // Подпись: по умолчанию по центру над точкой x, y (низ подписи - y);
+    // rightOf - слева от неё x, по высоте по центру y. font - шрифт (пусто -
+    // шрифт оформления).
+    void PlaceLabel(const std::string& text, float x, float y, unsigned colour, const std::string& font = std::string(),
+                    bool rightOf = false)
     {
         if (text.empty() || g_labelsUsed >= kLabelPool)
             return;
@@ -1806,7 +1819,14 @@ namespace
         MyGUI::TextBox* const box = LabelBox(g_labelsUsed);
         if (box == NULL)
             return;
-        std::map<std::string, MyGUI::IntSize>::const_iterator known = g_textSizes.find(text);
+        // Шрифт: свой у подписи или тот, с которым виджет создан.
+        if (box->getUserString("bm_font0").empty())
+            box->setUserString("bm_font0", box->getFontName());
+        const std::string& wantFont = font.empty() ? box->getUserString("bm_font0") : font;
+        if (box->getFontName() != wantFont)
+            box->setFontName(wantFont);
+        const std::string sizeKey = wantFont + "|" + text;
+        std::map<std::string, MyGUI::IntSize>::const_iterator known = g_textSizes.find(sizeKey);
         MyGUI::IntSize ts;
         if (known != g_textSizes.end())
             ts = known->second;
@@ -1816,19 +1836,21 @@ namespace
             ts = box->getTextSize();
             if (g_textSizes.size() > 1024)
                 g_textSizes.clear();
-            g_textSizes[text] = ts;
+            g_textSizes[sizeKey] = ts;
         }
         const int pad = GamePad();
-        int left = pad + static_cast<int>(x) - ts.width / 2;
-        int top = pad + static_cast<int>(y) - ts.height;
+        int left = pad + static_cast<int>(x) - (rightOf ? 0 : ts.width / 2);
+        int top = pad + static_cast<int>(y) - (rightOf ? ts.height / 2 : ts.height);
         left = Clamp(left, pad, Hi(pad, pad + g_viewW - ts.width));
         top = Clamp(top, pad, Hi(pad, pad + g_viewH - ts.height));
         const MyGUI::IntCoord rc(left, top, ts.width + 2, ts.height);
         for (size_t i = 0; i < g_labelRects.size(); ++i)
         {
             const MyGUI::IntCoord& o = g_labelRects[i];
+            // По высоте строки шрифта есть пустые поля - касание в 4
+            // пикселя за наложение не считаем.
             if (rc.left < o.left + o.width && o.left < rc.left + rc.width &&
-                rc.top < o.top + o.height - 2 && o.top < rc.top + rc.height - 2)
+                rc.top < o.top + o.height - 4 && o.top < rc.top + rc.height - 4)
                 return;
         }
         g_labelRects.push_back(rc);
@@ -2806,6 +2828,25 @@ namespace
         // --- подписи (виджеты MyGUI поверх картинки) ---
         // Поселения - пока обзор не шире TownNamesRange: на всей карте их
         // сотни, и подписи слились бы в кашу.
+        // Налезающая подпись не ставится, поэтому порядок - по важности:
+        // награды (раньше их съедали названия отрядов над теми же
+        // бандитами), поселения, отряды, имена.
+        std::vector<float> dotX(g_dots.size()), dotY(g_dots.size());
+        for (size_t i = 0; i < g_dots.size(); ++i)
+        {
+            double u, vv;
+            g_map.apply(g_dots[i].pos.x, g_dots[i].pos.z, u, vv);
+            ToScreen(v, u, vv, dotX[i], dotY[i]);
+        }
+        const float labelR = g_dot * 0.5f + 2.0f;
+        if (g_showBounty)
+            for (size_t i = 0; i < g_dots.size(); ++i)
+                if (g_dots[i].bounty > 0)
+                {
+                    char text[32];
+                    sprintf_s(text, "%d c", g_dots[i].bounty);
+                    PlaceLabel(text, dotX[i] + labelR + 4.0f, dotY[i] + 2.0f, g_bountyColour, std::string(), true);
+                }
         if (g_showTowns && g_townNames && g_range <= g_townNamesRange)
             for (size_t i = 0; i < g_towns.size(); ++i)
             {
@@ -2813,29 +2854,22 @@ namespace
                 g_map.apply(g_towns[i].pos.x, g_towns[i].pos.z, u, vv);
                 float x, y;
                 ToScreen(v, u, vv, x, y);
-                PlaceLabel(g_towns[i].name, x, y - 5.0f, g_towns[i].colour);
+                // Над значком: у значка игры - его половина высоты.
+                const float above = g_towns[i].icon != NULL ? g_towns[i].icon->h * 0.5f + 1.0f : 5.0f;
+                PlaceLabel(g_towns[i].name, x, y - above, g_towns[i].colour, g_townFont);
             }
         for (size_t i = 0; i < g_dots.size(); ++i)
         {
             const Dot& d = g_dots[i];
-            double u, vv;
-            g_map.apply(d.pos.x, d.pos.z, u, vv);
-            float x, y;
-            ToScreen(v, u, vv, x, y);
-            const float r = g_dot * 0.5f + 2.0f;
             // Подпись отряда - над его лидером.
             const bool squadOk = g_squadLabels == 2 || (g_squadLabels == 1 && d.cat != CAT_SQUAD);
             if (squadOk && d.leader && d.platoon != NULL && !d.dead)
-                PlaceLabel(d.platoon->getName(), x, y - r, g_squadLabelColour);
-            if (g_showBounty && d.bounty > 0)
-            {
-                char text[32];
-                sprintf_s(text, "%d c", d.bounty);
-                PlaceLabel(text, x + 18.0f, y + 8.0f, g_bountyColour);
-            }
-            if (g_charNames && !d.dead)
-                PlaceLabel(d.name, x, y + r + 14.0f, d.colour);
+                PlaceLabel(d.platoon->getName(), dotX[i], dotY[i] - labelR, g_squadLabelColour);
         }
+        if (g_charNames)
+            for (size_t i = 0; i < g_dots.size(); ++i)
+                if (!g_dots[i].dead)
+                    PlaceLabel(g_dots[i].name, dotX[i], dotY[i] + labelR + 14.0f, g_dots[i].colour);
         HideUnusedLabels();
 
         // Подсказка: ближайшее к мыши поселение или персонаж.
@@ -3257,6 +3291,13 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     iconLabels[1] = Tr("Diamonds");
     api->choice(api, kSec, "TownIcons", Tr("Town icons"), Tr("As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."), "game", iconValues, iconLabels, 2, 0);
     api->integer(api, kSec, "TownIconSize", Tr("Town icon size, px"), NULL, 22, 10, 64, 0);
+    static const char* const nameSizeValues[] = { "small", "normal", "medium", "large" };
+    static const char* nameSizeLabels[4];
+    nameSizeLabels[0] = Tr("Small");
+    nameSizeLabels[1] = Tr("Normal");
+    nameSizeLabels[2] = Tr("Medium");
+    nameSizeLabels[3] = Tr("Large");
+    api->choice(api, kSec, "TownNameSize", Tr("Town name size"), Tr("Normal - like the other labels. The game's own fonts: they stay sharp."), "normal", nameSizeValues, nameSizeLabels, 4, 0);
     api->colour(api, kSec, "TownColour", Tr("Town colour"), Tr("auto - by the relations of the town's faction to yours: red hostile, green ally."), "auto", 0);
     api->toggle(api, kSec, "MapMarkers", Tr("Map-markers markers"), Tr("Markers of the Map-markers mod, from the current save."), 1, 0);
     api->toggle(api, kSec, "WantedMarkers", Tr("WantedMap targets"), Tr("Targets of the WantedMap mod, as of the last look at the big map."), 1, 0);
