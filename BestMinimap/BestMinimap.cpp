@@ -1396,13 +1396,18 @@ namespace
         return true;
     }
 
+    void HideTooltip();
+
     void Show(bool on)
     {
         if (MyGUI::Widget* const root = g_rootRef.get())
             root->setVisible(on);
         g_hidden = !on;
         if (!on)
+        {
             g_dragging = false;
+            HideTooltip();
+        }
     }
 
 
@@ -1848,21 +1853,29 @@ namespace
     }
 
     // ---- подсказка при наведении ----
-    WidgetRef g_tipRef;
+    // Отдельное окошко в слое подсказок (поверх всего, не обрезается краем
+    // миникарты): фон - панель игры, текст - над курсором, чтобы курсор его
+    // не закрывал; сверху места нет - под курсором.
+    WidgetRef g_tipRef;         // фон
+    WidgetRef g_tipTextRef;     // текст
 
-    void ShowTooltip(const std::string& text, float x, float y)
+    void ShowTooltip(const std::string& text)
     {
-        MyGUI::Widget* const root = g_rootRef.get();
-        if (root == NULL)
-            return;
-        MyGUI::TextBox* box = g_tipRef.get() ? g_tipRef.get()->castType<MyGUI::TextBox>(false) : NULL;
-        if (box == NULL)
+        MyGUI::Widget* back = g_tipRef.get();
+        MyGUI::TextBox* box = g_tipTextRef.get() ? g_tipTextRef.get()->castType<MyGUI::TextBox>(false) : NULL;
+        if (back == NULL || box == NULL)
         {
-            box = root->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
-                MyGUI::IntCoord(0, 0, 300, 40), MyGUI::Align::Default, "");
+            if (back != NULL)
+                MyGUI::Gui::getInstance().destroyWidget(back);
+            back = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>("Kenshi_FloatingPanelSkin",
+                MyGUI::IntCoord(0, 0, 300, 40), MyGUI::Align::Default, "ToolTip");
+            back->setNeedMouseFocus(false);
+            box = back->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
+                MyGUI::IntCoord(8, 5, 284, 30), MyGUI::Align::Default, "");
             box->setNeedMouseFocus(false);
             box->setTextShadow(true);
-            g_tipRef.set(box);
+            g_tipRef.set(back);
+            g_tipTextRef.set(box);
         }
         if (box->getUserString("bm_text") != text)
         {
@@ -1870,14 +1883,17 @@ namespace
             box->setCaption(MyGUI::UString(text));
         }
         const MyGUI::IntSize ts = box->getTextSize();
-        const int pad = GamePad();
-        int left = pad + static_cast<int>(x) + 12, top = pad + static_cast<int>(y) + 10;
-        if (left + ts.width > pad + g_viewW)
-            left = pad + static_cast<int>(x) - 12 - ts.width;
-        if (top + ts.height > pad + g_viewH)
-            top = pad + static_cast<int>(y) - 10 - ts.height;
-        box->setCoord(Hi(0, left), Hi(0, top), ts.width + 2, ts.height);
-        box->setVisible(true);
+        const int w = ts.width + 18, h = ts.height + 10;
+        const MyGUI::IntPoint m = MyGUI::InputManager::getInstance().getMousePosition();
+        const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
+        int left = m.left - w / 2, top = m.top - h - 14;
+        if (top < 0)
+            top = m.top + 30;
+        left = Clamp(left, 0, Hi(0, view.width - w));
+        top = Clamp(top, 0, Hi(0, view.height - h));
+        box->setCoord(9, 5, ts.width + 2, ts.height);
+        back->setCoord(left, top, w, h);
+        back->setVisible(true);
     }
 
     void HideTooltip()
@@ -1886,9 +1902,9 @@ namespace
             w->setVisible(false);
     }
 
-    // ---- поселения: с меток большой карты ----
-    // Список берём у самой карты (mapMarkersTowns): там ровно то, что игра
-    // отмечает на большой карте, с модами. Открыто ли - isDiscovered.
+    // ---- поселения и прочие места большой карты ----
+    // Список - у игры (shou->townList, см. CollectTowns); открыто ли -
+    // isDiscovered.
     struct TownInfo
     {
         Ogre::Vector3 pos;
@@ -2061,12 +2077,30 @@ namespace
     std::map<TownBase*, MapScreen::MapMarkerTown*> g_markerByTown;
     std::map<std::string, MapScreen::MapMarkerTown*> g_markerByName;
 
+    // Метки (и значки) большая карта строит при первом открытии. Не
+    // открывали - просим её построить их сами, один раз на карту:
+    // refreshTowns игры (защищённый - вызываем через наследника).
+    struct MapScreenAccess : public MapScreen
+    {
+        static void RefreshTowns(MapScreen* map) { (map->*(&MapScreenAccess::refreshTowns))(); }
+    };
+    MapScreen* g_markersBuiltFor = NULL;
+
     void IndexMarkers(MapScreen* map)
     {
         g_markerByTown.clear();
         g_markerByName.clear();
         if (map == NULL || !g_townGameIcons)
             return;
+        if (map->mapMarkersTowns.empty() && g_markersBuiltFor != map)
+        {
+            g_markersBuiltFor = map;
+            MapScreenAccess::RefreshTowns(map);
+            char note[120];
+            sprintf_s(note, "BestMinimap: asked the big map to build its town markers: %u",
+                      static_cast<unsigned>(map->mapMarkersTowns.size()));
+            DebugLog(note);
+        }
         typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
         const Towns& towns = map->mapMarkersTowns;
         for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
@@ -2156,22 +2190,28 @@ namespace
                     if (seen.insert(t).second)
                         AddTown(t, player, center, reach);
         }
-        static bool logged = false;
-        if (g_debug && !logged)
+        // В журнал - когда что-то из этого меняется (а не каждую секунду).
+        static unsigned lastIcons = ~0u, lastMarkers = ~0u, lastMatched = ~0u;
+        if (g_debug)
         {
-            logged = true;
             unsigned withIcon = 0;
             for (size_t i = 0; i < g_towns.size(); ++i)
                 withIcon += g_towns[i].icon != NULL ? 1 : 0;
-            char note[300];
-            sprintf_s(note, "BestMinimap: %u towns and nests known to the game, %u near the view (%u with a map icon); "
-                            "big map markers %u, matched by reference %u",
-                      static_cast<unsigned>(seen.size()), static_cast<unsigned>(g_towns.size()), withIcon,
-                      map == NULL ? 0u : static_cast<unsigned>(map->mapMarkersTowns.size()),
-                      static_cast<unsigned>(g_markerByTown.size()));
-            DebugLog(note);
-            if (withIcon == 0 && !g_towns.empty())
-                logged = false;     // ещё раз, когда значки появятся (после первого открытия карты)
+            const unsigned markers = map == NULL ? 0u : static_cast<unsigned>(map->mapMarkersTowns.size());
+            const unsigned matched = static_cast<unsigned>(g_markerByTown.size());
+            if ((withIcon > 0) != (lastIcons > 0 && lastIcons != ~0u) || lastIcons == ~0u ||
+                markers != lastMarkers || matched != lastMatched)
+            {
+                char note[300];
+                sprintf_s(note, "BestMinimap: %u towns and nests known to the game, %u near the view (%u with a map icon); "
+                                "big map markers %u, matched by reference %u",
+                          static_cast<unsigned>(seen.size()), static_cast<unsigned>(g_towns.size()), withIcon,
+                          markers, matched);
+                DebugLog(note);
+            }
+            lastIcons = withIcon;
+            lastMarkers = markers;
+            lastMatched = matched;
         }
     }
 
@@ -2846,7 +2886,7 @@ namespace
                     }
                     if (!text.empty())
                     {
-                        ShowTooltip(text, mx, my);
+                        ShowTooltip(text);
                         tip = true;
                     }
                 }
