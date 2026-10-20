@@ -2,26 +2,39 @@
 //
 // КАК. Игра рисует мир через набор компоновщиков Ogre 2.0
 // (CompositorWorkspace): тени, отложенное освещение, туман, постобработка.
-// Свой «спутник» - это тот же набор, но со своей камерой (сверху,
-// ортогональная проекция, север вверху) и своей текстурой вместо окна. Набор
+// Свой «спутник» - это тот же набор, но со своей камерой (высоко над
+// местом, взглядом вниз, север вверху) и своей текстурой вместо окна. Набор
 // игры берём по имени у её же рабочего набора (Renderer::workspace), так что
-// картинка - ровно как в игре, с модами на графику.
+// картинка - как в игре, с модами на графику.
 //
-// ПРОБА. Пока это опыт: по клавише (SatelliteShotKey) - три снимка с
-// высот 400, 1500 и 5000 м, по одному на кадр с паузой (освещению с
-// адаптацией яркости нужно несколько кадров), в папку мода картинками BMP.
-// По ним видно, что игра рисует сверху: дальность прорисовки, туман, свет.
-// Пока набор включён, игра рисует мир дважды - это несколько десятков
-// кадров с просадкой, и только по клавише.
+// Камера - перспективная, с узким углом обзора с большой высоты: почти
+// ортогональная. Настоящая ортогональная не годится: первая проба
+// (20.10.2026) дала чёрный мир - освещение игры восстанавливает положение
+// точек по глубине в расчёте на перспективу.
+//
+// Интерфейс MyGUI рисуется в любую цель рендера, и на первой пробе он был на
+// снимке. Поэтому на кадр, который читаем, корневые окна интерфейса
+// прячутся и потом получают прежнюю видимость (мигнёт на один кадр).
+//
+// ПРОБА. Пока это опыт: по клавише (SatelliteShotKey) - три снимка одного
+// квадрата с углами обзора 60, 20 и 8 градусов (чем уже угол, тем выше
+// камера), в папку мода картинками BMP. По ним видно, что игра рисует
+// сверху и с какой высоты ещё рисует постройки. Пока набор включён, игра
+// рисует мир дважды - несколько десятков кадров с просадкой, только по
+// клавише.
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include <cmath>
 #include <cstdio>
 #include <string>
 #include <vector>
 
 #include <Debug.h>
+
+#include <mygui/MyGUI_Gui.h>
+#include <mygui/MyGUI_Widget.h>
 
 #include <OgreRoot.h>
 #include <OgreCamera.h>
@@ -68,12 +81,15 @@ namespace
     Ogre::Camera* g_camera = NULL;
     Ogre::CompositorWorkspace* g_workspace = NULL;
 
-    std::vector<float> g_heights;       // высоты снимков, ещё не сделанных
+    std::vector<float> g_fovs;          // углы обзора снимков, ещё не сделанных
     Ogre::Vector3 g_center;             // мировые координаты
     float g_size = 0.0f;
     std::string g_folder;
     int g_wait = 0;
     DWORD g_started = 0;
+
+    // Спрятанные на кадр снимка окна интерфейса.
+    std::vector<MyGUI::Widget*> g_hiddenGui;
 
     Renderer* GameRenderer()
     {
@@ -83,6 +99,41 @@ namespace
     void Log(const std::string& text)
     {
         DebugLog("BestMinimap: satellite: " + text);
+    }
+
+    void HideGui()
+    {
+        g_hiddenGui.clear();
+        MyGUI::EnumeratorWidgetPtr roots = MyGUI::Gui::getInstance().getEnumerator();
+        while (roots.next())
+        {
+            MyGUI::Widget* const w = roots.current();
+            if (w != NULL && w->getVisible())
+            {
+                w->setVisible(false);
+                g_hiddenGui.push_back(w);
+            }
+        }
+    }
+
+    // Вернуть видимость. Окна за этот кадр могли удалить - возвращаем только
+    // тем, кто ещё среди корневых.
+    void RestoreGui()
+    {
+        if (g_hiddenGui.empty())
+            return;
+        MyGUI::EnumeratorWidgetPtr roots = MyGUI::Gui::getInstance().getEnumerator();
+        while (roots.next())
+        {
+            MyGUI::Widget* const w = roots.current();
+            for (size_t i = 0; i < g_hiddenGui.size(); ++i)
+                if (g_hiddenGui[i] == w)
+                {
+                    w->setVisible(true);
+                    break;
+                }
+        }
+        g_hiddenGui.clear();
     }
 
     void StopWorkspace()
@@ -123,23 +174,26 @@ namespace
         return true;
     }
 
-    // Камеру - над центром снимка на высоте height, взглядом вниз, север
-    // (-Z мира: на картинке карты он вверху) - вверху снимка.
-    void AimCamera(float height)
+    // Камеру - над центром снимка, взглядом вниз, север (-Z мира: на
+    // картинке карты он вверху) - вверху снимка. Высота - такая, чтобы при
+    // угле fov квадрат g_size на уровне центра влез ровно в кадр.
+    void AimCamera(float fov)
     {
         Renderer* const r = GameRenderer();
+        const float height = g_size * 0.5f / std::tan(fov * 0.5f * 3.14159265f / 180.0f);
         // Сцена может быть сдвинута относительно мира (чтобы числа были
         // мелкими у камеры): мировая точка в сцене - минус этот сдвиг.
         const Ogre::Vector3 origin = r->getSceneRelativeOrigin();
         const Ogre::Vector3 scene = g_center - origin;
+        g_camera->setFOVy(Ogre::Degree(fov));
         g_camera->setPosition(scene.x, scene.y + height, scene.z);
-        g_camera->setNearClipDistance(1.0f);
-        g_camera->setFarClipDistance(height + 20000.0f);
-        char note[300];
-        const Ogre::Vector3 main = r->camera != NULL ? r->camera->getDerivedPosition() : Ogre::Vector3::ZERO;
-        sprintf_s(note, "shot from %.0f m: world centre %.0f %.0f %.0f, scene origin %.0f %.0f %.0f, "
-                        "game camera at %.0f %.0f %.0f (scene)",
-                  height, g_center.x, g_center.y, g_center.z, origin.x, origin.y, origin.z, main.x, main.y, main.z);
+        // Глубина - только вокруг земли: так её точности хватает и с
+        // десятка километров.
+        g_camera->setNearClipDistance(height > 4005.0f ? height - 4000.0f : 5.0f);
+        g_camera->setFarClipDistance(height + 4000.0f);
+        char note[200];
+        sprintf_s(note, "shot with %.0f deg from %.0f m above the centre (world %.0f %.0f %.0f, scene origin %.0f %.0f %.0f)",
+                  fov, height, g_center.x, g_center.y, g_center.z, origin.x, origin.y, origin.z);
         Log(note);
     }
 
@@ -171,10 +225,9 @@ namespace
             // Камера смотрит по -Z; поворот на -90 градусов вокруг X - взгляд
             // вниз (-Y), а «верх» снимка - -Z, север.
             g_camera->setOrientation(Ogre::Quaternion(Ogre::Degree(-90.0f), Ogre::Vector3::UNIT_X));
-            g_camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
             g_camera->setAspectRatio(1.0f);
         }
-        g_camera->setOrthoWindow(g_size, g_size);
+        g_camera->setProjectionType(Ogre::PT_PERSPECTIVE);
         Ogre::RenderTarget* const rt = g_target->getBuffer()->getRenderTarget();
         g_workspace = r->root->getCompositorManager2()->addWorkspace(r->scene, rt, g_camera, defName, true, 0);
         char note[160];
@@ -184,7 +237,7 @@ namespace
         return g_workspace != NULL;
     }
 
-    void SaveShot(float height)
+    void SaveShot(float fov)
     {
         std::vector<unsigned char> pixels(static_cast<size_t>(kSide) * kSide * 4, 0);
         Ogre::PixelBox box(kSide, kSide, 1, Ogre::PF_A8R8G8B8, &pixels[0]);
@@ -193,9 +246,17 @@ namespace
         for (size_t i = 3; i < pixels.size(); i += 4)
             pixels[i] = 255;
         char name[64];
-        sprintf_s(name, "satellite_probe_%dm.bmp", static_cast<int>(height));
+        sprintf_s(name, "satellite_probe_fov%d.bmp", static_cast<int>(fov));
         const std::string file = g_folder + name;
         Log(std::string(SaveBmp(file, pixels, kSide, kSide) ? "saved " : "could not save ") + file);
+    }
+
+    void Fail(const std::string& why)
+    {
+        Log("failed: " + why);
+        g_fovs.clear();
+        RestoreGui();
+        StopWorkspace();
     }
 }
 
@@ -203,10 +264,11 @@ namespace Satellite
 {
     void RequestProbe(const Ogre::Vector3& centerWorld, float sizeMetres, const std::string& folder)
     {
-        if (!g_heights.empty())
+        if (!g_fovs.empty())
             return;                 // ещё снимаем прошлый
         g_center = centerWorld;
-        g_size = sizeMetres;
+        // Квадрат - не больше 2 км: проба подробности, а не всей карты.
+        g_size = sizeMetres < 2000.0f ? sizeMetres : 2000.0f;
         g_folder = folder;
         g_started = GetTickCount();
         try
@@ -216,64 +278,67 @@ namespace Satellite
                 StopWorkspace();
                 return;
             }
-            g_heights.push_back(5000.0f);
-            g_heights.push_back(1500.0f);
-            g_heights.push_back(400.0f);
-            AimCamera(g_heights.back());
+            g_fovs.push_back(8.0f);
+            g_fovs.push_back(20.0f);
+            g_fovs.push_back(60.0f);
+            AimCamera(g_fovs.back());
             g_wait = kSettleFrames;
         }
         catch (const Ogre::Exception& e)
         {
-            Log("failed: " + e.getFullDescription());
-            g_heights.clear();
-            StopWorkspace();
+            Fail(e.getFullDescription());
         }
         catch (...)
         {
-            Log("failed with an unknown error");
-            g_heights.clear();
-            StopWorkspace();
+            Fail("unknown error");
         }
     }
 
     void Tick()
     {
-        if (g_heights.empty() || g_workspace == NULL)
+        if (g_fovs.empty() || g_workspace == NULL)
             return;
-        if (--g_wait > 0)
-            return;
+        --g_wait;
         try
         {
-            SaveShot(g_heights.back());
-            g_heights.pop_back();
-            if (!g_heights.empty())
+            // Последний кадр перед чтением - без интерфейса.
+            if (g_wait == 1)
             {
-                AimCamera(g_heights.back());
+                HideGui();
+                return;
+            }
+            if (g_wait > 0)
+                return;
+            SaveShot(g_fovs.back());
+            RestoreGui();
+            g_fovs.pop_back();
+            if (!g_fovs.empty())
+            {
+                AimCamera(g_fovs.back());
                 g_wait = kSettleFrames;
                 return;
             }
             char note[96];
             sprintf_s(note, "done in %u ms", GetTickCount() - g_started);
             Log(note);
+            StopWorkspace();
         }
         catch (const Ogre::Exception& e)
         {
-            Log("failed: " + e.getFullDescription());
-            g_heights.clear();
+            Fail(e.getFullDescription());
         }
         catch (...)
         {
-            Log("failed with an unknown error");
-            g_heights.clear();
+            Fail("unknown error");
         }
-        StopWorkspace();
     }
 
     void Reset()
     {
-        g_heights.clear();
+        g_fovs.clear();
         try
         {
+            RestoreGui();           // только тем окнам, что ещё есть
             StopWorkspace();
         }
         catch (...)
