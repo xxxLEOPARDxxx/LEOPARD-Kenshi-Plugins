@@ -62,8 +62,23 @@ msgstr "Панель видна, только пока зажата эта кл�
 msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
 msgstr "У своей постройки, за которой никто не закреплён: панель с надписью никто. Выключено - панели нет. У чужих построек никто не пишется никогда."
 
-msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
-msgstr "Подробности в RE_Kenshi_log.txt: у каждой выделенной постройки - куда смотрят работы всех персонажей и кого нашли."
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."
+msgstr "Подробности в RE_Kenshi_log.txt: у каждой выделенной постройки - куда смотрят работы всех персонажей и кого нашли; по клавише свободных - почему каждый персонаж свободен или нет."
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "Панель видна, только пока зажата эта клавиша. Щёлкните и нажмите клавишу; Backspace - без клавиши, панель видна всегда."
+
+msgid "Free characters"
+msgstr "Свободные персонажи"
+
+msgid "Select free characters"
+msgstr "Выделить свободных"
+
+msgid "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
+msgstr "Выделяет всех ваших персонажей, кто ничем не занят и ни к чему не приписан: список работ пуст, приказов нет, не в бою, в сознании. Щёлкнуть и нажать клавишу; Backspace - без клавиши."
+
+msgid "Nobody is free"
+msgstr "Свободных нет"
+
+msgid "Free characters selected: "
+msgstr "Выделено свободных: "

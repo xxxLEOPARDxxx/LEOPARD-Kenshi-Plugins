@@ -62,8 +62,23 @@ msgstr "The panel is shown only while this key is held. always - the panel is al
 msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
 msgstr "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
 
-msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
-msgstr "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."
+msgstr "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
+
+msgid "Free characters"
+msgstr "Free characters"
+
+msgid "Select free characters"
+msgstr "Select free characters"
+
+msgid "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
+msgstr "Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."
+
+msgid "Nobody is free"
+msgstr "Nobody is free"
+
+msgid "Free characters selected: "
+msgstr "Free characters selected: "

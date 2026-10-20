@@ -33,6 +33,12 @@
 // пятеро. И на всякий случай добавляем всех, кто у постройки прямо сейчас
 // (UseableStuff::currentOperators): эти работают здесь в любом случае.
 //
+// СВОБОДНЫЕ. По клавише SelectIdleKey (CTRL+SHIFT+I) выделяются все
+// свои персонажи, кто ничем не занят и ни к чему не приписан: список работ
+// пуст, приказов игрока нет (идти, бить, следовать...), не в бою, в
+// сознании, не в клетке. Животные - нет. Сверху экрана на 2 с - сколько
+// выделено (или что свободных нет: иначе нажатие выглядело бы сломанным).
+//
 // ИСТОРИЯ. Первая версия дописывала строки в саму нижнюю панель
 // (setLine). Не годится: getGUIData зовётся для каждой из пяти её частей
 // - строки дублировались, - и для подсказки без scrollView, где новая
@@ -56,6 +62,7 @@
 #include <mygui/MyGUI_TextBox.h>
 #include <mygui/MyGUI_Window.h>
 #include <mygui/MyGUI_RenderManager.h>
+#include <mygui/MyGUI_InputManager.h>
 #include <WidgetRef.h>
 
 #include <kenshi/Globals.h>
@@ -63,6 +70,7 @@
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/Character.h>
 #include <kenshi/Tasker.h>
+#include <kenshi/AI/AITaskSystem.h>
 #include <kenshi/RootObjectBase.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/gui/ForgottenGUI.h>
@@ -103,6 +111,7 @@ namespace
     bool g_showNobody = true;
     bool g_debug = false;
     HoldKey::Key g_holdKey;    // ALT; vk 0 - показывать всегда (см. HoldKey.h)
+    HoldKey::Key g_idleKey;    // выделить свободных; vk 0 - нет клавиши
 
 
     std::string IniFileName()
@@ -150,6 +159,11 @@ namespace
         GetPrivateProfileStringA(section, "HoldKey", "ALT", key, sizeof(key),
                                  ini.c_str());
         g_holdKey = HoldKey::Parse(key);   // любая клавиша, «NONE» - всегда
+
+        char idle[32] = {};
+        GetPrivateProfileStringA(section, "SelectIdleKey", "CTRL+SHIFT+I", idle,
+                                 sizeof(idle), ini.c_str());
+        g_idleKey = HoldKey::Parse(idle);  // «NONE» - vk 0, без клавиши
     }
 
 
@@ -811,6 +825,121 @@ namespace
 
 
     // ---------------------------------------------------------------
+    // Свободные персонажи
+    // ---------------------------------------------------------------
+
+    // Ничем не занят и ни к чему не приписан.
+    bool IsIdle(Character* c)
+    {
+        if (c->isDead() || c->isUnconcious() || c->isAnimal() != NULL)
+            return false;
+        if (c->inSomething == IN_PRISON)
+            return false;
+        if (c->getPermajobCount() > 0)
+            return false;              // есть работы в списке
+        if (c->isInCombatMode(true, true))
+            return false;
+        OrdersReceiver* const orders = c->getOrdersReciever();
+        return orders == NULL || !orders->hasPlayerOrders();
+    }
+
+
+    // Надпись сверху экрана: сколько выделено.
+    MyGUI::Widget* g_notice = NULL;
+    MyGUI::TextBox* g_noticeText = NULL;
+    DWORD g_noticeUntil = 0;
+
+    void ShowNotice(const std::string& text)
+    {
+        EnsureColours();
+        if (g_notice == NULL)
+        {
+            g_notice = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
+                "Kenshi_FloatingPanelSkin", MyGUI::IntCoord(0, 0, 100, 40),
+                MyGUI::Align::Default, "ToolTip", "AssignedWorkers_Notice");
+            g_notice->setNeedMouseFocus(false);
+            g_notice->setNeedKeyFocus(false);
+            g_noticeText = g_notice->createWidget<MyGUI::TextBox>(
+                "Kenshi_TextboxStandardText", MyGUI::IntCoord(0, 0, 10, 10),
+                MyGUI::Align::Default, "");
+            g_noticeText->setNeedMouseFocus(false);
+            g_noticeText->setNeedKeyFocus(false);
+            g_noticeText->setTextAlign(MyGUI::Align::Center);
+        }
+        g_noticeText->setTextColour(g_label);
+        g_noticeText->setCaption(text);
+        const MyGUI::IntSize size = g_noticeText->getTextSize();
+        const int w = size.width + kPadX * 2, h = size.height + kPadY * 2;
+        const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
+        g_notice->setCoord((view.width - w) / 2, view.height / 8, w, h);
+        g_noticeText->setCoord(kPadX, kPadY, size.width, size.height);
+        g_notice->setVisible(true);
+        g_noticeUntil = GetTickCount() + 2000;
+    }
+
+
+    void SelectIdle()
+    {
+        if (ou == NULL || ou->player == NULL)
+            return;
+        PlayerInterface* const player = ou->player;
+        const lektor<Character*>& squad = player->playerCharacters;
+
+        std::vector<Character*> idle;
+        for (uint32_t i = 0; i < squad.size(); ++i)
+        {
+            Character* const c = squad[i];
+            if (c == NULL)
+                continue;
+            const bool isFree = IsIdle(c);
+            if (isFree)
+                idle.push_back(c);
+            if (g_debug)
+            {
+                OrdersReceiver* const orders = c->getOrdersReciever();
+                char note[160];
+                sprintf_s(note, " - jobs %d, player orders %d, combat %d, goal %d%s",
+                          c->getPermajobCount(),
+                          orders != NULL && orders->hasPlayerOrders() ? 1 : 0,
+                          c->isInCombatMode(true, true) ? 1 : 0,
+                          orders != NULL ? static_cast<int>(orders->getCurrentGoal().key()) : -1,
+                          isFree ? " - FREE" : "");
+                DebugLog("AssignedWorkers: " + c->getName() + note);
+            }
+        }
+
+        if (idle.empty())
+        {
+            ShowNotice(Tr("Nobody is free"));
+            return;
+        }
+        // Первый - вместо прежнего выделения, остальные - добавляются.
+        for (size_t i = 0; i < idle.size(); ++i)
+            player->selectObject(idle[i], i > 0);
+        char count[16];
+        sprintf_s(count, "%u", static_cast<unsigned>(idle.size()));
+        ShowNotice(std::string(Tr("Free characters selected: ")) + count);
+    }
+
+
+    bool g_idleWasDown = false;
+
+    void PollIdleKey()
+    {
+        if (g_notice != NULL && g_notice->getVisible() && GetTickCount() > g_noticeUntil)
+            g_notice->setVisible(false);
+        if (g_idleKey.vk == 0)
+            return;
+        // Печатает игрок в поле - клавиши не наши.
+        const bool typing = MyGUI::InputManager::getInstance().getKeyFocusWidget() != NULL;
+        const bool down = !typing && HoldKey::Held(g_idleKey);
+        if (down && !g_idleWasDown)
+            SelectIdle();
+        g_idleWasDown = down;
+    }
+
+
+    // ---------------------------------------------------------------
     // Перехват
     // ---------------------------------------------------------------
 
@@ -855,6 +984,7 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
         g_origGuiUpdate(thisptr);
+        PollIdleKey();
         Update();
     }
 }
@@ -872,8 +1002,10 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "AssignedWorkers", "Enabled", Tr("Enabled"), Tr("Who of the squad is assigned to the selected building - a panel next to its window."), 1, MCM_RESTART);
     api->hotkey(api, "AssignedWorkers", "HoldKey", Tr("Show while held"), Tr("The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."), "ALT", 0);
     api->toggle(api, "AssignedWorkers", "ShowNobody", Tr("Show when nobody is assigned"), Tr("At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."), 1, 0);
+    api->section(api, Tr("Free characters"));
+    api->hotkey(api, "AssignedWorkers", "SelectIdleKey", Tr("Select free characters"), Tr("Selects all your characters who are not busy and not assigned to anything: no jobs in their list, no orders, not fighting, conscious. Click and press a key; Backspace - no key."), "CTRL+SHIFT+I", 0);
     api->section(api, Tr("Diagnostics"));
-    api->toggle(api, "AssignedWorkers", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."), 0, 0);
+    api->toggle(api, "AssignedWorkers", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."), 0, 0);
 }
 
 
