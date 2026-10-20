@@ -398,20 +398,8 @@ msgstr "As on the game map - the icons of the big map, from the game's interface
 msgid "Town icon size, px"
 msgstr "Town icon size, px"
 
-msgid "Small"
-msgstr "Small"
+msgid "Town name size, px"
+msgstr "Town name size, px"
 
-msgid "Normal"
-msgstr "Normal"
-
-msgid "Medium"
-msgstr "Medium"
-
-msgid "Large"
-msgstr "Large"
-
-msgid "Town name size"
-msgstr "Town name size"
-
-msgid "Normal - like the other labels. The game's own fonts: they stay sharp."
-msgstr "Normal - like the other labels. The game's own fonts: they stay sharp."
+msgid "0 - like the other labels."
+msgstr "0 - like the other labels."

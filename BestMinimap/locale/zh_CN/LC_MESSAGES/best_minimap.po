@@ -398,20 +398,8 @@ msgstr "与游戏地图相同 - 使用大地图的图标, 来自游戏界面和�
 msgid "Town icon size, px"
 msgstr "城镇图标大小, 像素"
 
-msgid "Small"
-msgstr "小"
+msgid "Town name size, px"
+msgstr "城镇名称大小, 像素"
 
-msgid "Normal"
-msgstr "普通"
-
-msgid "Medium"
-msgstr "中"
-
-msgid "Large"
-msgstr "大"
-
-msgid "Town name size"
-msgstr "城镇名称大小"
-
-msgid "Normal - like the other labels. The game's own fonts: they stay sharp."
-msgstr "普通 - 与其他标签相同。使用游戏自带字体: 保持清晰。"
+msgid "0 - like the other labels."
+msgstr "0 - 与其他标签相同。"

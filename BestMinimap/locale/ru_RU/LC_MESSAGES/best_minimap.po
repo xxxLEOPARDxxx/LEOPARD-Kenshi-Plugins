@@ -398,20 +398,8 @@ msgstr "Как на карте игры - значки большой карты
 msgid "Town icon size, px"
 msgstr "Размер значков поселений, пикс."
 
-msgid "Small"
-msgstr "Мелкий"
+msgid "Town name size, px"
+msgstr "Размер названий поселений, пикс."
 
-msgid "Normal"
-msgstr "Обычный"
-
-msgid "Medium"
-msgstr "Средний"
-
-msgid "Large"
-msgstr "Крупный"
-
-msgid "Town name size"
-msgstr "Размер названий поселений"
-
-msgid "Normal - like the other labels. The game's own fonts: they stay sharp."
-msgstr "Обычный - как прочие подписи. Шрифты самой игры: они остаются чёткими."
+msgid "0 - like the other labels."
+msgstr "0 - как прочие подписи."

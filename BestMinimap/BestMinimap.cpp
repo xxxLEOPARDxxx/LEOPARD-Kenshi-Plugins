@@ -216,7 +216,7 @@ namespace
     bool g_townRadius = true;           // круг радиуса поселения
     bool g_townGameIcons = true;        // значки как на большой карте игры
     int g_townIconSize = 22;            // их высота, пикселей
-    std::string g_townFont;             // шрифт названий поселений (пусто - как у прочих подписей)
+    int g_townFontSize = 0;             // высота названий поселений, пикс. (0 - как прочие подписи)
     unsigned g_townColour = 0xFFF0E6C8u;
     bool g_rightClickMove = true;       // ПКМ по миникарте - идти туда
     bool g_showBounty = true;           // кольцо и сумма награды за голову
@@ -348,14 +348,7 @@ namespace
         g_townRadius = ReadBool(ini, "TownRadius", true);
         g_townGameIcons = ReadText(ini, "TownIcons", "game") != "diamond";
         g_townIconSize = ReadInt(ini, "TownIconSize", 22, 10, 64);
-        {
-            // Размер названий - готовыми шрифтами игры: они чёткие, а
-            // растянутый шрифт расплывается.
-            const std::string size = ReadText(ini, "TownNameSize", "normal");
-            g_townFont = size == "small" ? "Kenshi_StandardFont_Small" :
-                         size == "medium" ? "Kenshi_StandardFont_Medium" :
-                         size == "large" ? "Kenshi_StandardFont_Large" : "";
-        }
+        g_townFontSize = ReadInt(ini, "TownNameSize", 0, 0, 40);
         g_rightClickMove = ReadBool(ini, "RightClickMove", true);
         g_showBounty = ReadBool(ini, "ShowBounty", true);
         ReadColour(ini, "BountyColour", "#F2C230", unused, g_bountyColour);
@@ -781,9 +774,10 @@ namespace
         // «Как видит наш персонаж» (getPercievedBounty) почти всегда 0:
         // игра отдаёт её, только когда наш персонаж разыскиваемого узнал
         // (20.10.2026).
+        // Так же берёт её и Vital-Sense для своего «$».
         int bounty = 0;
         if (g_showBounty && cat != CAT_SQUAD)
-            bounty = c->crimes.getTotalBounty();
+            bounty = Hi(0, c->crimes.getTotalBounty());
         CatCache& e = g_catCache[c];
         e.bounty = bounty;
         e.cat = cat;
@@ -860,6 +854,20 @@ namespace
             d.platoon = c->getPlatoon();
             d.leader = d.platoon != NULL && d.platoon->squadleader == c;
             dots.push_back(d);
+        }
+        if (g_debug)
+        {
+            static int lastWanted = -1;
+            int wanted = 0;
+            for (size_t i = 0; i < dots.size(); ++i)
+                wanted += dots[i].bounty > 0 ? 1 : 0;
+            if (wanted != lastWanted)
+            {
+                lastWanted = wanted;
+                char note[96];
+                sprintf_s(note, "BestMinimap: %d characters with a bounty in range", wanted);
+                DebugLog(note);
+            }
         }
     }
 
@@ -1834,8 +1842,34 @@ namespace
     // Подпись: по умолчанию по центру над точкой x, y (низ подписи - y);
     // rightOf - слева от неё x, по высоте по центру y. font - шрифт (пусто -
     // шрифт оформления).
-    void PlaceLabel(const std::string& text, float x, float y, unsigned colour, const std::string& font = std::string(),
-                    bool rightOf = false)
+    // Шрифт игры под высоту px: самый мелкий не ниже её - его и ужимаем до
+    // px (уменьшенный остаётся чётким, растянутый расплылся бы). Выше
+    // самого крупного - крупный, растянутый.
+    std::string FontFor(int px)
+    {
+        static int lastPx = -1;
+        static std::string lastFont;
+        if (px == lastPx)
+            return lastFont;
+        static const char* const fonts[] = { "Kenshi_StandardFont_Small", "Kenshi_StandardFont_MediumSmall",
+                                             "Kenshi_StandardFont_Medium", "Kenshi_StandardFont_Large",
+                                             "Kenshi_PaintedTextFont_Large" };
+        std::string pick;
+        for (size_t i = 0; i < sizeof(fonts) / sizeof(fonts[0]); ++i)
+        {
+            MyGUI::IFont* const f = MyGUI::FontManager::getInstance().getByName(fonts[i]);
+            if (f == NULL)
+                continue;
+            pick = fonts[i];
+            if (f->getDefaultHeight() >= px)
+                break;
+        }
+        lastPx = px;
+        lastFont = pick;
+        return pick;
+    }
+
+    void PlaceLabel(const std::string& text, float x, float y, unsigned colour, int fontPx = 0, bool rightOf = false)
     {
         if (text.empty() || g_labelsUsed >= kLabelPool)
             return;
@@ -1845,13 +1879,23 @@ namespace
         MyGUI::TextBox* const box = LabelBox(g_labelsUsed);
         if (box == NULL)
             return;
-        // Шрифт: свой у подписи или тот, с которым виджет создан.
+        // Шрифт: под высоту fontPx или тот, с которым виджет создан.
         if (box->getUserString("bm_font0").empty())
+        {
             box->setUserString("bm_font0", box->getFontName());
-        const std::string& wantFont = font.empty() ? box->getUserString("bm_font0") : font;
-        if (box->getFontName() != wantFont)
+            char h[16];
+            sprintf_s(h, "%d", box->getFontHeight());
+            box->setUserString("bm_height0", h);
+        }
+        const std::string wantFont = fontPx > 0 ? FontFor(fontPx) : box->getUserString("bm_font0");
+        const int wantHeight = fontPx > 0 ? fontPx : atoi(box->getUserString("bm_height0").c_str());
+        if (!wantFont.empty() && box->getFontName() != wantFont)
             box->setFontName(wantFont);
-        const std::string sizeKey = wantFont + "|" + text;
+        if (wantHeight > 0 && box->getFontHeight() != wantHeight)
+            box->setFontHeight(wantHeight);
+        char heightText[16];
+        sprintf_s(heightText, "%d|", wantHeight);
+        const std::string sizeKey = heightText + wantFont + "|" + text;
         std::map<std::string, MyGUI::IntSize>::const_iterator known = g_textSizes.find(sizeKey);
         MyGUI::IntSize ts;
         if (known != g_textSizes.end())
@@ -2871,7 +2915,7 @@ namespace
                 {
                     char text[32];
                     sprintf_s(text, "%d c", g_dots[i].bounty);
-                    PlaceLabel(text, dotX[i] + labelR + 4.0f, dotY[i] + 2.0f, g_bountyColour, std::string(), true);
+                    PlaceLabel(text, dotX[i] + labelR + 4.0f, dotY[i] + 2.0f, g_bountyColour, 0, true);
                 }
         if (g_showTowns && g_townNames && g_range <= g_townNamesRange)
             for (size_t i = 0; i < g_towns.size(); ++i)
@@ -2882,7 +2926,7 @@ namespace
                 ToScreen(v, u, vv, x, y);
                 // Над значком: у значка игры - его половина высоты.
                 const float above = g_towns[i].icon != NULL ? g_towns[i].icon->h * 0.5f + 1.0f : 5.0f;
-                PlaceLabel(g_towns[i].name, x, y - above, g_towns[i].colour, g_townFont);
+                PlaceLabel(g_towns[i].name, x, y - above, g_towns[i].colour, g_townFontSize);
             }
         for (size_t i = 0; i < g_dots.size(); ++i)
         {
@@ -3317,13 +3361,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     iconLabels[1] = Tr("Diamonds");
     api->choice(api, kSec, "TownIcons", Tr("Town icons"), Tr("As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."), "game", iconValues, iconLabels, 2, 0);
     api->integer(api, kSec, "TownIconSize", Tr("Town icon size, px"), NULL, 22, 10, 64, 0);
-    static const char* const nameSizeValues[] = { "small", "normal", "medium", "large" };
-    static const char* nameSizeLabels[4];
-    nameSizeLabels[0] = Tr("Small");
-    nameSizeLabels[1] = Tr("Normal");
-    nameSizeLabels[2] = Tr("Medium");
-    nameSizeLabels[3] = Tr("Large");
-    api->choice(api, kSec, "TownNameSize", Tr("Town name size"), Tr("Normal - like the other labels. The game's own fonts: they stay sharp."), "normal", nameSizeValues, nameSizeLabels, 4, 0);
+    api->integer(api, kSec, "TownNameSize", Tr("Town name size, px"), Tr("0 - like the other labels."), 0, 0, 40, 0);
     api->colour(api, kSec, "TownColour", Tr("Town colour"), Tr("auto - by the relations of the town's faction to yours: red hostile, green ally."), "auto", 0);
     api->toggle(api, kSec, "MapMarkers", Tr("Map-markers markers"), Tr("Markers of the Map-markers mod, from the current save."), 1, 0);
     api->toggle(api, kSec, "WantedMarkers", Tr("WantedMap targets"), Tr("Targets of the WantedMap mod, as of the last look at the big map."), 1, 0);
