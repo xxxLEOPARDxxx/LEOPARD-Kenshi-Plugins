@@ -62,8 +62,35 @@ msgstr "Панель видна, только пока зажата эта кл�
 msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
 msgstr "У своей постройки, за которой никто не закреплён: панель с надписью никто. Выключено - панели нет. У чужих построек никто не пишется никогда."
 
-msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
-msgstr "Подробности в RE_Kenshi_log.txt: у каждой выделенной постройки - куда смотрят работы всех персонажей и кого нашли."
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."
+msgstr "Подробности в RE_Kenshi_log.txt: у каждой выделенной постройки - куда смотрят работы всех персонажей и кого нашли; по клавише свободных - почему каждый персонаж свободен или нет."
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "Панель видна, только пока зажата эта клавиша. Щёлкните и нажмите клавишу; Backspace - без клавиши, панель видна всегда."
+
+msgid "Free characters"
+msgstr "Свободные персонажи"
+
+msgid "Select free characters"
+msgstr "Выделить свободных"
+
+msgid "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
+msgstr "Выделяет всех ваших персонажей без цели (в окне персонажа «Нет цели»), в сознании, не в клетке. Каких именно - две строки ниже. Щёлкнуть и нажать клавишу; Backspace - без клавиши."
+
+msgid "Nobody is free"
+msgstr "Свободных нет"
+
+msgid "Free characters selected: "
+msgstr "Выделено свободных: "
+
+msgid "Not assigned"
+msgstr "Не приписанные"
+
+msgid "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
+msgstr "Выделять персонажей без цели, не приписанных к постройке (станку, машине...). «Медик», «Роботехника» и подобные работы приписью не считаются."
+
+msgid "Assigned"
+msgstr "Приписанные"
+
+msgid "Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."
+msgstr "Выделять персонажей без цели, хотя они приписаны к постройке (станку, машине...): ей нечего делать или место занято."

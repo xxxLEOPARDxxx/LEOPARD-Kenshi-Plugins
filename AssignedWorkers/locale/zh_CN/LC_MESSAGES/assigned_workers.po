@@ -62,8 +62,35 @@ msgstr "仅在按住此键时显示面板。始终 - 面板一直显示。"
 msgid "At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."
 msgstr "自己的建筑无人指派时：显示写有无人的面板。关闭 - 不显示面板。他人的建筑从不显示无人。"
 
-msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found."
-msgstr "在 RE_Kenshi_log.txt 中记录：每个所选建筑上，每个角色的工作指向哪里以及找到了谁。"
+msgid "Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."
+msgstr "在 RE_Kenshi_log.txt 中记录：每个所选建筑上，每个角色的工作指向哪里以及找到了谁；按空闲角色键时，每个角色为何空闲或不空闲。"
 
 msgid "The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."
 msgstr "仅在按住此键时显示面板。点击后按下一个键；Backspace - 不设键，面板始终显示。"
+
+msgid "Free characters"
+msgstr "空闲角色"
+
+msgid "Select free characters"
+msgstr "选中空闲角色"
+
+msgid "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
+msgstr "选中你所有没有目标的角色(角色窗口显示"无目标"), 意识清醒, 不在笼中。具体选哪些 - 见下面两行。点击后按下一个键; Backspace - 不设键。"
+
+msgid "Nobody is free"
+msgstr "没有空闲角色"
+
+msgid "Free characters selected: "
+msgstr "已选中空闲角色: "
+
+msgid "Not assigned"
+msgstr "未分配"
+
+msgid "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
+msgstr "选中没有目标且未分配到建筑(工作台、机器等)的角色。医生、机器人技术等工作不算分配。"
+
+msgid "Assigned"
+msgstr "已分配"
+
+msgid "Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."
+msgstr "选中没有目标但已分配到建筑(工作台、机器等)的角色: 建筑无事可做或位置已被占用。"
