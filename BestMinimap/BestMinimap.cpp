@@ -53,6 +53,7 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -88,10 +89,12 @@
 #include <mygui/common/itembox/BaseItemBox.h>
 #include <kenshi/gui/ManagementScreen.h>
 #include <kenshi/gui/ForgottenGUI.h>
+#include <kenshi/gui/MainBarGUI.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 #include <kenshi/Platoon.h>
 #include <kenshi/Town.h>
+#include <kenshi/SharedKing.h>
 #include <kenshi/Faction.h>
 #include <kenshi/FactionRelations.h>
 #include <kenshi/util/UtilityT.h>
@@ -1363,6 +1366,11 @@ namespace
     // Рисование
     // ---------------------------------------------------------------
 
+    float InsideShape(float fx, float fy, int w, int h, float inset);
+
+    struct FrameCov { unsigned index; float alpha; };
+    std::vector<FrameCov> g_frameCov;
+
     // Маска формы с мягким краем (1 пиксель сглаживания).
     void BuildMask(int w, int h)
     {
@@ -1391,6 +1399,23 @@ namespace
                 }
                 g_mask[static_cast<size_t>(y) * w + x] =
                     static_cast<unsigned char>(Clamp(inside, 0.0f, 1.0f) * 255.0f + 0.5f);
+            }
+        // Рамка-линия: где и насколько её рисовать - тоже один раз, а не
+        // InsideShape в каждом пикселе каждой перерисовки.
+        g_frameCov.clear();
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x)
+            {
+                const size_t i = static_cast<size_t>(y) * w + x;
+                if (g_mask[i] == 0)
+                    continue;
+                const float inner = InsideShape(x + 0.5f, y + 0.5f, w, h, 2.0f);
+                if (inner >= 1.0f)
+                    continue;
+                FrameCov c;
+                c.index = static_cast<unsigned>(i);
+                c.alpha = (1.0f - inner) * (g_mask[i] / 255.0f);
+                g_frameCov.push_back(c);
             }
         g_dirtyMask = false;
     }
@@ -1429,15 +1454,29 @@ namespace
         const int w = g_viewW, h = g_viewH;
         const int x0 = Hi(0, static_cast<int>(cx - r - 2)), x1 = Lo(w - 1, static_cast<int>(cx + r + 2));
         const int y0 = Hi(0, static_cast<int>(cy - r - 2)), y1 = Lo(h - 1, static_cast<int>(cy + r + 2));
+        // Корень - только на краю: внутри (без сглаживания) и снаружи
+        // хватает квадрата расстояния.
+        const float out2 = (r + 0.5f) * (r + 0.5f);
+        const float solid = Hi(0.0f, r - 1.5f), solid2 = solid * solid;
+        const bool opaque = alpha >= 1.0f;
+        const unsigned fillA = (fill & 0x00FFFFFFu) | 0xFF000000u;
         for (int y = y0; y <= y1; ++y)
             for (int x = x0; x <= x1; ++x)
             {
                 const float fx = x + 0.5f - cx, fy = y + 0.5f - cy;
-                const float d = std::sqrt(fx * fx + fy * fy);
+                const float d2 = fx * fx + fy * fy;
+                if (d2 >= out2)
+                    continue;
+                const size_t i = static_cast<size_t>(y) * w + x;
+                if (opaque && d2 < solid2 && g_mask[i] == 255)
+                {
+                    g_buf[i] = fillA;
+                    continue;
+                }
+                const float d = std::sqrt(d2);
                 const float cover = Clamp(r + 0.5f - d, 0.0f, 1.0f);
                 if (cover <= 0.0f)
                     continue;
-                const size_t i = static_cast<size_t>(y) * w + x;
                 const float clip = g_mask[i] / 255.0f;
                 const float inner = Clamp(r - 1.0f + 0.5f - d, 0.0f, 1.0f);
                 unsigned c = Blend(g_buf[i], outline, cover * clip * alpha);
@@ -1853,38 +1892,69 @@ namespace
         return std::string(Tr("neutral")) + num;
     }
 
+    void AddTown(TownBase* t, Faction* player, const Ogre::Vector3& center, float reach)
+    {
+        if (!t->isDiscovered() && !g_showUndiscovered)
+            return;
+        TownInfo info;
+        info.pos = t->getPosition();
+        info.radius = t->getRadius();
+        const float dx = info.pos.x - center.x, dz = info.pos.z - center.z;
+        const float lim = reach + info.radius;
+        if (dx * dx + dz * dz > lim * lim)
+            return;
+        info.name = t->getKnownName();
+        Faction* const f = t->getFaction();
+        unsigned relColour = g_townColour;
+        const std::string rel = RelationText(f, player, relColour);
+        info.colour = g_townAutoColour ? relColour : g_townColour;
+        info.tip = info.name;
+        if (f != NULL)
+            info.tip += "\n" + f->getName() + (rel.empty() ? std::string() : " - " + rel);
+        g_towns.push_back(info);
+    }
+
+    // Все поселения и гнёзда мира - из списка игры (shou->townList): метки
+    // большой карты (MapScreen::mapMarkersTowns) заполняются не всегда, и
+    // по ним выходило 0 поселений (20.10.2026). Метки карты - запасной путь.
     void CollectTowns(MapScreen* map, const Ogre::Vector3& center, float reach)
     {
         g_towns.clear();
-        if (!g_showTowns || map == NULL)
+        if (!g_showTowns)
             return;
         Faction* const player = ou->player->getFaction();
-        typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
-        const Towns& towns = map->mapMarkersTowns;
-        for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
+        std::set<TownBase*> seen;
+        if (shou != NULL && shou->townList != NULL)
         {
-            TownBase* const t = it->first.getTown();
-            if (t == NULL)
-                continue;
-            const bool discovered = t->isDiscovered();
-            if (!discovered && !g_showUndiscovered)
-                continue;
-            TownInfo info;
-            info.pos = t->getPosition();
-            info.radius = t->getRadius();
-            const float dx = info.pos.x - center.x, dz = info.pos.z - center.z;
-            const float lim = reach + info.radius;
-            if (dx * dx + dz * dz > lim * lim)
-                continue;
-            info.name = t->getKnownName();
-            Faction* const f = t->getFaction();
-            unsigned relColour = g_townColour;
-            const std::string rel = RelationText(f, player, relColour);
-            info.colour = g_townAutoColour ? relColour : g_townColour;
-            info.tip = info.name;
-            if (f != NULL)
-                info.tip += "\n" + f->getName() + (rel.empty() ? std::string() : " - " + rel);
-            g_towns.push_back(info);
+            const lektor<RootObject*>* const lists[2] = { &shou->townList->things, &shou->townList->nests };
+            for (int l = 0; l < 2; ++l)
+                for (uint32_t i = 0; i < lists[l]->size(); ++i)
+                {
+                    RootObject* const o = (*lists[l])[i];
+                    if (o == NULL)
+                        continue;
+                    TownBase* const t = static_cast<TownBase*>(o);
+                    if (seen.insert(t).second)
+                        AddTown(t, player, center, reach);
+                }
+        }
+        if (seen.empty() && map != NULL)
+        {
+            typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
+            const Towns& towns = map->mapMarkersTowns;
+            for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
+                if (TownBase* const t = it->first.getTown())
+                    if (seen.insert(t).second)
+                        AddTown(t, player, center, reach);
+        }
+        static bool logged = false;
+        if (g_debug && !logged)
+        {
+            logged = true;
+            char note[160];
+            sprintf_s(note, "BestMinimap: %u towns and nests known to the game, %u near the view",
+                      static_cast<unsigned>(seen.size()), static_cast<unsigned>(g_towns.size()));
+            DebugLog(note);
         }
     }
 
@@ -2013,35 +2083,47 @@ namespace
         const int lw = level == 0 ? v.sw : g_src.mips[level - 1].w;
         const int lh = level == 0 ? v.sh : g_src.mips[level - 1].h;
         const double lk = 1.0 / (1 << level);
+        // Точка картинки линейна по x строки, поэтому идём шагом, в
+        // фиксированной точке 16.16, а смесь 4 соседей - целыми, по два
+        // канала за раз. Раньше - double и float на каждый пиксель: 3 мс на
+        // перерисовку при миникарте 500 пикселей (20.10.2026).
+        unsigned alphaOf[256];
+        for (int m = 0; m < 256; ++m)
+            alphaOf[m] = static_cast<unsigned>(m * alpha + 0.5f) << 24;
+        const unsigned backRgb = back & 0x00FFFFFFu;
+        const double kx = v.scale * lk * 65536.0;
+        const long long stepX = static_cast<long long>(v.c * kx), stepY = static_cast<long long>(v.s * kx);
+        const long long maxX = static_cast<long long>(lw - 1) << 16, maxY = static_cast<long long>(lh - 1) << 16;
+        const bool sample = haveSrc && lpx != NULL;
         for (int y = 0; y < h; ++y)
         {
             const double dy = (y + 0.5 - v.cy) * v.scale;
-            for (int x = 0; x < w; ++x)
+            const double dx0 = (0.5 - v.cx) * v.scale;
+            long long fx = static_cast<long long>(((v.su + v.c * dx0 - v.s * dy) * lk - 0.5) * 65536.0);
+            long long fy = static_cast<long long>(((v.sv + v.s * dx0 + v.c * dy) * lk - 0.5) * 65536.0);
+            const unsigned char* const mrow = &g_mask[static_cast<size_t>(y) * w];
+            unsigned* const brow = &g_buf[static_cast<size_t>(y) * w];
+            for (int x = 0; x < w; ++x, fx += stepX, fy += stepY)
             {
-                const size_t i = static_cast<size_t>(y) * w + x;
-                const int m = g_mask[i];
+                const unsigned m = mrow[x];
                 if (m == 0)
                     continue;
-                unsigned c = back;
-                if (haveSrc)
+                unsigned c = backRgb;
+                if (sample && fx >= 0 && fy >= 0 && fx < maxX && fy < maxY)
                 {
-                    const double dx = (x + 0.5 - v.cx) * v.scale;
-                    const double sx = (v.su + v.c * dx - v.s * dy) * lk - 0.5;
-                    const double sy = (v.sv + v.s * dx + v.c * dy) * lk - 0.5;
-                    if (lpx != NULL && sx >= 0 && sy >= 0 && sx < lw - 1 && sy < lh - 1)
-                    {
-                        const int ix = static_cast<int>(sx), iy = static_cast<int>(sy);
-                        const float tx = static_cast<float>(sx - ix), ty = static_cast<float>(sy - iy);
-                        const unsigned* const row = &lpx[static_cast<size_t>(iy) * lw + ix];
-                        const unsigned p00 = row[0], p10 = row[1], p01 = row[lw], p11 = row[lw + 1];
-                        const float w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty), w01 = (1 - tx) * ty, w11 = tx * ty;
-                        const int r = static_cast<int>(ChR(p00) * w00 + ChR(p10) * w10 + ChR(p01) * w01 + ChR(p11) * w11 + 0.5f);
-                        const int g = static_cast<int>(ChG(p00) * w00 + ChG(p10) * w10 + ChG(p01) * w01 + ChG(p11) * w11 + 0.5f);
-                        const int b = static_cast<int>(ChB(p00) * w00 + ChB(p10) * w10 + ChB(p01) * w01 + ChB(p11) * w11 + 0.5f);
-                        c = Pack(r, g, b, 255);
-                    }
+                    const int ix = static_cast<int>(fx >> 16), iy = static_cast<int>(fy >> 16);
+                    const unsigned tx = static_cast<unsigned>(fx >> 8) & 0xFFu, ty = static_cast<unsigned>(fy >> 8) & 0xFFu;
+                    const unsigned* const p = &lpx[static_cast<size_t>(iy) * lw + ix];
+                    const unsigned p00 = p[0], p10 = p[1], p01 = p[lw], p11 = p[lw + 1];
+                    // Веса в сумме ровно 256.
+                    const unsigned w11 = (tx * ty) >> 8, w10 = tx - w11, w01 = ty - w11, w00 = 256 - tx - ty + w11;
+                    const unsigned rb = ((p00 & 0x00FF00FFu) * w00 + (p10 & 0x00FF00FFu) * w10 +
+                                         (p01 & 0x00FF00FFu) * w01 + (p11 & 0x00FF00FFu) * w11) >> 8;
+                    const unsigned g = ((p00 & 0x0000FF00u) * w00 + (p10 & 0x0000FF00u) * w10 +
+                                        (p01 & 0x0000FF00u) * w01 + (p11 & 0x0000FF00u) * w11) >> 8;
+                    c = (rb & 0x00FF00FFu) | (g & 0x0000FF00u);
                 }
-                g_buf[i] = (c & 0x00FFFFFFu) | (static_cast<unsigned>(m * alpha + 0.5f) << 24);
+                brow[x] = c | alphaOf[m];
             }
         }
 
@@ -2217,19 +2299,12 @@ namespace
                 fc = FromColour(GameTheme::Colour("Main", "#AFA68B"));
             if (flash)
                 fc = Blend(fc | 0xFF000000u, g_alertColour, 0.35f + 0.65f * pulse);
-            for (int y = 0; y < h; ++y)
-                for (int x = 0; x < w; ++x)
-                {
-                    const size_t i = static_cast<size_t>(y) * w + x;
-                    if (g_mask[i] == 0)
-                        continue;
-                    const float inner = InsideShape(x + 0.5f, y + 0.5f, w, h, 2.0f);
-                    if (inner >= 1.0f)
-                        continue;
-                    const float a = (1.0f - inner) * (g_mask[i] / 255.0f);
-                    g_buf[i] = Blend(g_buf[i], fc, a);
-                    g_buf[i] = (g_buf[i] & 0x00FFFFFFu) | (static_cast<unsigned>(g_mask[i]) << 24);
-                }
+            for (size_t k = 0; k < g_frameCov.size(); ++k)
+            {
+                const unsigned i = g_frameCov[k].index;
+                const unsigned c = Blend(g_buf[i], fc, g_frameCov[k].alpha);
+                g_buf[i] = (c & 0x00FFFFFFu) | (static_cast<unsigned>(g_mask[i]) << 24);
+            }
         }
 
         watch.lap(ST_FRAME);
@@ -2513,6 +2588,17 @@ namespace
         return map->mainWidget != NULL && map->mainWidget->getInheritedVisible();
     }
 
+    // Спрятан ли интерфейс игры (F7). Как в LiveXpBars: признаков два -
+    // флаг ForgottenGUI::visible и видимость главной панели, - какой из них
+    // переключает F7, по заголовкам не видно. Спрятан любой - прячемся.
+    bool GameGuiHidden()
+    {
+        if (gui == NULL)
+            return false;
+        MyGUI::Widget* const bar = gui->mainbar != NULL ? gui->mainbar->mMainWidget : NULL;
+        return !gui->visible || (bar != NULL && !bar->getVisible());
+    }
+
     void Tick()
     {
         const DWORD now = GetTickCount();
@@ -2532,6 +2618,8 @@ namespace
             return Hide("the game has no map screen yet");
         if (BigMapOpen(map))
             return Hide("the big map is open");
+        if (GameGuiHidden())
+            return Hide("the game interface is hidden (F7)");
 
         const std::string texture = map->mapImage->_getTextureName();
         if (texture != g_src.texture && texture != g_srcFailed)
