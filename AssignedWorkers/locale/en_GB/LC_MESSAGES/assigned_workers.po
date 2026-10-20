@@ -83,14 +83,14 @@ msgstr "Nobody is free"
 msgid "Free characters selected: "
 msgstr "Free characters selected: "
 
-msgid "Without jobs"
-msgstr "Without jobs"
+msgid "Not assigned"
+msgstr "Not assigned"
 
-msgid "Select characters with no goal and an empty job list - not assigned to anything."
-msgstr "Select characters with no goal and an empty job list - not assigned to anything."
+msgid "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
+msgstr "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
 
-msgid "With jobs"
-msgstr "With jobs"
+msgid "Assigned"
+msgstr "Assigned"
 
-msgid "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
-msgstr "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
+msgid "Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."
+msgstr "Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."

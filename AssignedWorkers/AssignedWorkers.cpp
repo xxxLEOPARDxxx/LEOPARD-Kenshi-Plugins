@@ -35,10 +35,14 @@
 //
 // СВОБОДНЫЕ. По клавише SelectIdleKey (CTRL+SHIFT+I) выделяются все
 // свои персонажи без цели - в окне персонажа «Цель: Нет цели» (текущая
-// цель OrdersReceiver пуста), в сознании, не в клетке; животные - нет.
-// Две галочки: без работ в списке (SelectIdleNoJobs) и с работами, но
-// всё равно без цели (SelectIdleWithJobs) - например, машина занята или
-// нечего делать. Сверху экрана на 2 с - сколько выделено (или что
+// цель OrdersReceiver пуста) и без текущего действия, в сознании, не в
+// клетке; животные - нет.
+// Две галочки: не приписанные (SelectIdleNoJobs) и приписанные, но всё
+// равно без цели (SelectIdleWithJobs) - например, машина занята или
+// нечего делать. Приписан - есть постоянная работа у конкретной постройки
+// (станок, машина: IsFixedTarget); «Медик», «Роботехника», «Найти и
+// спасти» - не приписка (вторая версия считала любую работу и
+// не-приписанным не находила никого). Сверху экрана на 2 с - сколько выделено (или что
 // свободных нет: иначе нажатие выглядело бы сломанным).
 //
 // Первая версия считала свободным того, у кого нет приказов игрока и кто
@@ -76,6 +80,7 @@
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/Character.h>
 #include <kenshi/Tasker.h>
+#include <kenshi/AI/AI.h>
 #include <kenshi/AI/AITaskSystem.h>
 #include <kenshi/RootObjectBase.h>
 #include <kenshi/util/hand.h>
@@ -851,17 +856,53 @@ namespace
     }
 
 
-    // Без цели; с работами или без - по настройкам.
+    // Приписан к постройке: есть работа у конкретной (станок, машина).
+    bool IsAssigned(Character* c)
+    {
+        const int count = c->getPermajobCount();
+        for (int slot = 0; slot < count; ++slot)
+        {
+            const Tasker* const job = c->getPermajobData(slot);
+            if (job != NULL && IsFixedTarget(job))
+                return true;
+        }
+        return false;
+    }
+
+
+    // Действие, которое персонаж выполняет прямо сейчас; NULL_TASK - никакого.
+    TaskType ActionOf(Character* c)
+    {
+        AI* const ai = c->getAI();
+        if (ai == NULL || ai->taskSystemAI == NULL)
+            return NULL_TASK;
+        const Tasker* const task = ai->taskSystemAI->actions.getFirstTask();
+        return task != NULL ? task->key() : NULL_TASK;
+    }
+
+
+    // Что игра пишет в «Цель:» окна персонажа - для журнала.
+    std::string GoalText(Character* c)
+    {
+        AI* const ai = c->getAI();
+        return ai != NULL && ai->taskSystemAI != NULL ? ai->taskSystemAI->getCurrentGoalString()
+                                                     : std::string("?");
+    }
+
+
+    // Без цели; приписан или нет - по настройкам.
     bool IsIdle(Character* c)
     {
         if (c->isDead() || c->isUnconcious() || c->isAnimal() != NULL)
             return false;
         if (c->inSomething == IN_PRISON)
             return false;
-        const TaskType goal = GoalOf(c);
-        if (goal != NULL_TASK && goal != IDLE)
+        // Ни цели, ни действия: с одной целью вторая версия выделяла с
+        // галочкой «приписанные» вообще всех, работающих тоже.
+        const TaskType goal = GoalOf(c), action = ActionOf(c);
+        if ((goal != NULL_TASK && goal != IDLE) || (action != NULL_TASK && action != IDLE))
             return false;
-        return c->getPermajobCount() > 0 ? g_idleWithJobs : g_idleNoJobs;
+        return IsAssigned(c) ? g_idleWithJobs : g_idleNoJobs;
     }
 
 
@@ -918,14 +959,22 @@ namespace
             if (g_debug)
             {
                 char note[160];
-                sprintf_s(note, " - goal %d, jobs %d, unconscious %d, caged %d%s",
-                          static_cast<int>(GoalOf(c)), c->getPermajobCount(),
+                sprintf_s(note, " - goal %d, action %d, jobs %d, assigned %d, unconscious %d, caged %d%s",
+                          static_cast<int>(GoalOf(c)), static_cast<int>(ActionOf(c)),
+                          c->getPermajobCount(), IsAssigned(c) ? 1 : 0,
                           c->isUnconcious() ? 1 : 0, c->inSomething == IN_PRISON ? 1 : 0,
                           isFree ? " - FREE" : "");
-                DebugLog("AssignedWorkers: " + c->getName() + note);
+                DebugLog("AssignedWorkers: " + c->getName() + note + ", goal text '" + GoalText(c) + "'");
             }
         }
 
+        if (g_debug)
+        {
+            char sum[96];
+            sprintf_s(sum, "AssignedWorkers: free %u of %u", static_cast<unsigned>(idle.size()),
+                      static_cast<unsigned>(squad.size()));
+            DebugLog(sum);
+        }
         if (idle.empty())
         {
             ShowNotice(Tr("Nobody is free"));
@@ -1022,8 +1071,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "AssignedWorkers", "ShowNobody", Tr("Show when nobody is assigned"), Tr("At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."), 1, 0);
     api->section(api, Tr("Free characters"));
     api->hotkey(api, "AssignedWorkers", "SelectIdleKey", Tr("Select free characters"), Tr("Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."), "CTRL+SHIFT+I", 0);
-    api->toggle(api, "AssignedWorkers", "SelectIdleNoJobs", Tr("Without jobs"), Tr("Select characters with no goal and an empty job list - not assigned to anything."), 1, 0);
-    api->toggle(api, "AssignedWorkers", "SelectIdleWithJobs", Tr("With jobs"), Tr("Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."), 0, 0);
+    api->toggle(api, "AssignedWorkers", "SelectIdleNoJobs", Tr("Not assigned"), Tr("Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."), 1, 0);
+    api->toggle(api, "AssignedWorkers", "SelectIdleWithJobs", Tr("Assigned"), Tr("Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."), 0, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "AssignedWorkers", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for each selected building, where every character's jobs point and who was found; on the free characters key, why each character is or is not free."), 0, 0);
 }

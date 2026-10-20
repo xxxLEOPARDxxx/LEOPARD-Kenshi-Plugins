@@ -83,14 +83,14 @@ msgstr "没有空闲角色"
 msgid "Free characters selected: "
 msgstr "已选中空闲角色: "
 
-msgid "Without jobs"
-msgstr "无工作"
+msgid "Not assigned"
+msgstr "未分配"
 
-msgid "Select characters with no goal and an empty job list - not assigned to anything."
-msgstr "选中没有目标且工作列表为空的角色 - 未分配任何工作。"
+msgid "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
+msgstr "选中没有目标且未分配到建筑(工作台、机器等)的角色。医生、机器人技术等工作不算分配。"
 
-msgid "With jobs"
-msgstr "有工作"
+msgid "Assigned"
+msgstr "已分配"
 
-msgid "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
-msgstr "选中没有目标但工作列表中有工作的角色(分配到机器、工作台等): 工作无事可做或位置已被占用。"
+msgid "Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."
+msgstr "选中没有目标但已分配到建筑(工作台、机器等)的角色: 建筑无事可做或位置已被占用。"

@@ -83,14 +83,14 @@ msgstr "Свободных нет"
 msgid "Free characters selected: "
 msgstr "Выделено свободных: "
 
-msgid "Without jobs"
-msgstr "Без работ"
+msgid "Not assigned"
+msgstr "Не приписанные"
 
-msgid "Select characters with no goal and an empty job list - not assigned to anything."
-msgstr "Выделять персонажей без цели с пустым списком работ - ни к чему не приписанных."
+msgid "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
+msgstr "Выделять персонажей без цели, не приписанных к постройке (станку, машине...). «Медик», «Роботехника» и подобные работы приписью не считаются."
 
-msgid "With jobs"
-msgstr "С работами"
+msgid "Assigned"
+msgstr "Приписанные"
 
-msgid "Select characters with no goal even though they have jobs in their list (assigned to a machine, a bench...): the job has nothing to do or is taken."
-msgstr "Выделять персонажей без цели, хотя в их списке есть работы (приписаны к машине, станку...): работе нечего делать или место занято."
+msgid "Select characters with no goal even though they are assigned to a building (a bench, a machine...): it has nothing to do or the place is taken."
+msgstr "Выделять персонажей без цели, хотя они приписаны к постройке (станку, машине...): ей нечего делать или место занято."
