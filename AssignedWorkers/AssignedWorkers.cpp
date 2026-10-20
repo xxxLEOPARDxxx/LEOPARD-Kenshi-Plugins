@@ -123,8 +123,8 @@ namespace
     bool g_debug = false;
     HoldKey::Key g_holdKey;    // ALT; vk 0 - показывать всегда (см. HoldKey.h)
     HoldKey::Key g_idleKey;    // выделить свободных; vk 0 - нет клавиши
-    bool g_idleNoJobs = true;      // выделять без цели и без работ
-    bool g_idleWithJobs = false;   // выделять без цели, но с работами
+    bool g_idleNoJobs = true;      // выделять не приписанных к постройке
+    bool g_idleWithJobs = false;   // выделять приписанных, но без цели
 
 
     std::string IniFileName()
@@ -897,8 +897,9 @@ namespace
             return false;
         if (c->inSomething == IN_PRISON)
             return false;
-        // Ни цели, ни действия: с одной целью вторая версия выделяла с
-        // галочкой «приписанные» вообще всех, работающих тоже.
+        // Ни цели, ни действия. Цель 0 - ровно «Нет цели» окна персонажа
+        // (журнал 20.10.2026); действие - на случай, когда цель уже
+        // снята, а персонаж ещё доделывает начатое.
         const TaskType goal = GoalOf(c), action = ActionOf(c);
         if ((goal != NULL_TASK && goal != IDLE) || (action != NULL_TASK && action != IDLE))
             return false;
@@ -906,36 +907,41 @@ namespace
     }
 
 
-    // Надпись сверху экрана: сколько выделено.
-    MyGUI::Widget* g_notice = NULL;
-    MyGUI::TextBox* g_noticeText = NULL;
+    // Надпись сверху экрана: сколько выделено. Через WidgetRef: удалит
+    // игра виджет при смене интерфейса - создадим заново, а не обратимся к
+    // удалённому.
+    WidgetRef* g_noticeRef = new WidgetRef();      // не удаляется: см. WidgetRef.h
+    MyGUI::TextBox* g_noticeText = NULL;           // дочерний, живёт с надписью
     DWORD g_noticeUntil = 0;
 
     void ShowNotice(const std::string& text)
     {
         EnsureColours();
-        if (g_notice == NULL)
+        MyGUI::Widget* notice = g_noticeRef->get();
+        if (notice == NULL)
         {
-            g_notice = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
+            MyGUI::Widget* const created = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
                 "Kenshi_FloatingPanelSkin", MyGUI::IntCoord(0, 0, 100, 40),
                 MyGUI::Align::Default, "ToolTip", "AssignedWorkers_Notice");
-            g_notice->setNeedMouseFocus(false);
-            g_notice->setNeedKeyFocus(false);
-            g_noticeText = g_notice->createWidget<MyGUI::TextBox>(
+            created->setNeedMouseFocus(false);
+            created->setNeedKeyFocus(false);
+            g_noticeText = created->createWidget<MyGUI::TextBox>(
                 "Kenshi_TextboxStandardText", MyGUI::IntCoord(0, 0, 10, 10),
                 MyGUI::Align::Default, "");
             g_noticeText->setNeedMouseFocus(false);
             g_noticeText->setNeedKeyFocus(false);
             g_noticeText->setTextAlign(MyGUI::Align::Center);
+            g_noticeRef->set(created);
+            notice = created;
         }
         g_noticeText->setTextColour(g_label);
         g_noticeText->setCaption(text);
         const MyGUI::IntSize size = g_noticeText->getTextSize();
         const int w = size.width + kPadX * 2, h = size.height + kPadY * 2;
         const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
-        g_notice->setCoord((view.width - w) / 2, view.height / 8, w, h);
+        notice->setCoord((view.width - w) / 2, view.height / 8, w, h);
         g_noticeText->setCoord(kPadX, kPadY, size.width, size.height);
-        g_notice->setVisible(true);
+        notice->setVisible(true);
         g_noticeUntil = GetTickCount() + 2000;
     }
 
@@ -993,13 +999,16 @@ namespace
 
     void PollIdleKey()
     {
-        if (g_notice != NULL && g_notice->getVisible() && GetTickCount() > g_noticeUntil)
-            g_notice->setVisible(false);
+        MyGUI::Widget* const notice = g_noticeRef->get();
+        if (notice != NULL && notice->getVisible() &&
+            static_cast<LONG>(GetTickCount() - g_noticeUntil) > 0)
+            notice->setVisible(false);
         if (g_idleKey.vk == 0 || (!g_idleNoJobs && !g_idleWithJobs))
             return;
-        // Печатает игрок в поле - клавиши не наши.
-        const bool typing = MyGUI::InputManager::getInstance().getKeyFocusWidget() != NULL;
-        const bool down = !typing && HoldKey::Held(g_idleKey);
+        // Печатает игрок в поле - клавиши не наши (спрашиваем, только
+        // когда клавиша нажата: кадр без нажатия ничего не стоит).
+        const bool down = HoldKey::Held(g_idleKey) &&
+                          MyGUI::InputManager::getInstance().getKeyFocusWidget() == NULL;
         if (down && !g_idleWasDown)
             SelectIdle();
         g_idleWasDown = down;
