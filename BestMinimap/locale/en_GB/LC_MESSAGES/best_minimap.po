@@ -403,3 +403,33 @@ msgstr "Town name size, px"
 
 msgid "0 - like the other labels."
 msgstr "0 - like the other labels."
+
+msgid "Danger"
+msgstr "Danger"
+
+msgid "Stash"
+msgstr "Stash"
+
+msgid "Ruin"
+msgstr "Ruin"
+
+msgid "Mine / Resource"
+msgstr "Mine / Resource"
+
+msgid "Base / Outpost"
+msgstr "Base / Outpost"
+
+msgid "Trader / Shop"
+msgstr "Trader / Shop"
+
+msgid "Safe Spot / Bed / Recovery"
+msgstr "Safe Spot / Bed / Recovery"
+
+msgid "Quest"
+msgstr "Quest"
+
+msgid "Todo"
+msgstr "Todo"
+
+msgid "Note"
+msgstr "Note"

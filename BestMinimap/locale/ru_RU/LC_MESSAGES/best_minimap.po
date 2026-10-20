@@ -403,3 +403,33 @@ msgstr "Размер названий поселений, пикс."
 
 msgid "0 - like the other labels."
 msgstr "0 - как прочие подписи."
+
+msgid "Danger"
+msgstr "Опасность"
+
+msgid "Stash"
+msgstr "Тайник"
+
+msgid "Ruin"
+msgstr "Руины"
+
+msgid "Mine / Resource"
+msgstr "Шахта / ресурсы"
+
+msgid "Base / Outpost"
+msgstr "База / форпост"
+
+msgid "Trader / Shop"
+msgstr "Торговец / лавка"
+
+msgid "Safe Spot / Bed / Recovery"
+msgstr "Укрытие / кровать / лечение"
+
+msgid "Quest"
+msgstr "Задание"
+
+msgid "Todo"
+msgstr "Сделать"
+
+msgid "Note"
+msgstr "Заметка"

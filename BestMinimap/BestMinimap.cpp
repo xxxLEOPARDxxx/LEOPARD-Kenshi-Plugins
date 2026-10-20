@@ -882,6 +882,7 @@ namespace
         bool world;             // true - x/z ниже, а не u/v
         double x, z;
         unsigned colour;
+        std::string tip;        // подсказка при наведении
     };
 
     std::vector<Pin> g_mapPins;
@@ -906,18 +907,125 @@ namespace
         return FromColour(MyGUI::Colour(0.18f, 0.78f, 0.20f));
     }
 
-    // Разбор без библиотеки JSON: формат пишет сам Map-markers, он простой -
-    // массив объектов с полями x, y, type.
-    bool ReadNumber(const std::string& s, size_t from, size_t to, const char* key, double& out)
+    // Название типа метки Map-markers - для подсказки.
+    const char* MarkerTypeName(const std::string& type)
     {
-        const size_t k = s.find(key, from);
-        if (k == std::string::npos || k >= to)
-            return false;
-        const size_t colon = s.find(':', k);
-        if (colon == std::string::npos || colon >= to)
-            return false;
-        out = atof(s.c_str() + colon + 1);
-        return true;
+        if (type == "danger") return Tr("Danger");
+        if (type == "stash") return Tr("Stash");
+        if (type == "ruin") return Tr("Ruin");
+        if (type == "mine") return Tr("Mine / Resource");
+        if (type == "base") return Tr("Base / Outpost");
+        if (type == "trader") return Tr("Trader / Shop");
+        if (type == "safe_spot") return Tr("Safe Spot / Bed / Recovery");
+        if (type == "quest") return Tr("Quest");
+        if (type == "todo") return Tr("Todo");
+        return Tr("Note");
+    }
+
+    // Разбор без библиотеки JSON: формат пишет сам Map-markers, он простой -
+    // массив объектов с полями id, x, y, type, label. Строки - с
+    // экранированием \" \\ \n \r \t (как пишет его JsonEscapeString), поэтому
+    // скобки и кавычки внутри текста заметки разбору не мешают.
+
+    // Конец строки JSON, начатой кавычкой в from (позиция закрывающей).
+    size_t JsonStringEnd(const std::string& s, size_t from)
+    {
+        for (size_t i = from + 1; i < s.size(); ++i)
+        {
+            if (s[i] == '\\')
+                ++i;
+            else if (s[i] == '"')
+                return i;
+        }
+        return std::string::npos;
+    }
+
+    // Объект { ... } с позиции open: позиция его закрывающей скобки.
+    size_t JsonObjectEnd(const std::string& s, size_t open)
+    {
+        int depth = 0;
+        for (size_t i = open; i < s.size(); ++i)
+        {
+            if (s[i] == '"')
+            {
+                i = JsonStringEnd(s, i);
+                if (i == std::string::npos)
+                    return i;
+            }
+            else if (s[i] == '{')
+                ++depth;
+            else if (s[i] == '}' && --depth == 0)
+                return i;
+        }
+        return std::string::npos;
+    }
+
+    // Значение поля key в объекте obj: число или строка (без кавычек,
+    // раскрытая).
+    bool JsonField(const std::string& obj, const char* key, std::string& out, bool& isString)
+    {
+        const std::string quoted = std::string("\"") + key + "\"";
+        size_t at = 0;
+        while ((at = obj.find('"', at)) != std::string::npos)
+        {
+            const size_t end = JsonStringEnd(obj, at);
+            if (end == std::string::npos)
+                return false;
+            const bool match = obj.compare(at, end - at + 1, quoted) == 0;
+            size_t p = end + 1;
+            while (p < obj.size() && (obj[p] == ' ' || obj[p] == '\t' || obj[p] == '\r' || obj[p] == '\n'))
+                ++p;
+            if (p >= obj.size() || obj[p] != ':')
+            {
+                at = end + 1;       // это было значение, а не имя поля
+                continue;
+            }
+            ++p;
+            while (p < obj.size() && (obj[p] == ' ' || obj[p] == '\t' || obj[p] == '\r' || obj[p] == '\n'))
+                ++p;
+            if (p >= obj.size())
+                return false;
+            if (obj[p] == '"')
+            {
+                const size_t close = JsonStringEnd(obj, p);
+                if (close == std::string::npos)
+                    return false;
+                if (match)
+                {
+                    out.clear();
+                    for (size_t i = p + 1; i < close; ++i)
+                    {
+                        if (obj[i] != '\\' || i + 1 >= close)
+                        {
+                            out += obj[i];
+                            continue;
+                        }
+                        const char e = obj[++i];
+                        if (e == 'n')
+                            out += '\n';
+                        else if (e == 't')
+                            out += ' ';
+                        else if (e != 'r')
+                            out += e;       // \" и \\ - сам знак
+                    }
+                    isString = true;
+                    return true;
+                }
+                at = close + 1;
+                continue;
+            }
+            size_t q = p;
+            while (q < obj.size() && obj[q] != ',' && obj[q] != '}')
+                ++q;
+            if (match)
+            {
+                out = obj.substr(p, q - p);
+                isString = false;
+                return true;
+            }
+            at = q;
+        }
+        return false;
     }
 
     void ParseMapMarkers(const std::string& s)
@@ -931,24 +1039,26 @@ namespace
             const size_t open = s.find('{', at);
             if (open == std::string::npos)
                 break;
-            const size_t close = s.find('}', open);
+            const size_t close = JsonObjectEnd(s, open);
             if (close == std::string::npos)
                 break;
-            Pin p;
-            p.world = false;
-            p.x = p.z = 0;
-            if (ReadNumber(s, open, close, "\"x\"", p.u) && ReadNumber(s, open, close, "\"y\"", p.v))
+            const std::string obj = s.substr(open, close - open + 1);
+            std::string x, y, type, label;
+            bool str = false;
+            if (JsonField(obj, "x", x, str) && JsonField(obj, "y", y, str))
             {
-                std::string type = "note";
-                const size_t t = s.find("\"type\"", open);
-                if (t != std::string::npos && t < close)
-                {
-                    const size_t q1 = s.find('"', s.find(':', t));
-                    const size_t q2 = q1 == std::string::npos ? q1 : s.find('"', q1 + 1);
-                    if (q2 != std::string::npos && q2 < close)
-                        type = s.substr(q1 + 1, q2 - q1 - 1);
-                }
+                Pin p;
+                p.world = false;
+                p.x = p.z = 0;
+                p.u = atof(x.c_str());
+                p.v = atof(y.c_str());
+                if (!JsonField(obj, "type", type, str) || !str)
+                    type = "note";
                 p.colour = MarkerTypeColour(type);
+                if (!JsonField(obj, "label", label, str) || !str)
+                    label.clear();
+                p.tip = label.empty() ? std::string(MarkerTypeName(type))
+                                      : label + "\n" + MarkerTypeName(type);
                 g_mapPins.push_back(p);
             }
             at = close + 1;
@@ -1023,6 +1133,8 @@ namespace
             p.z = buf[i].z;
             p.u = p.v = 0;
             p.colour = FromColour(MyGUI::Colour(buf[i].r, buf[i].g, buf[i].b));
+            buf[i].label[sizeof(buf[i].label) - 1] = 0;
+            p.tip = buf[i].label;
             g_wantedPins.push_back(p);
         }
     }
@@ -1339,6 +1451,7 @@ namespace
     {
         const int w = ViewWidth(), h = ViewHeight(), pad = GamePad();
         MyGUI::Widget* root = g_rootRef.get();
+        const bool created = root == NULL;
         if (root == NULL)
         {
             ClampPosition(w + 2 * pad, h + 2 * pad);
@@ -1390,9 +1503,8 @@ namespace
             // стоит справа - растёт влево, снизу - вверх. Раньше всегда рос
             // вправо-вниз от левого верхнего угла, и миникарта в правом углу
             // уезжала (20.10.2026).
-            static bool sized = false;
             const int wasLeft = g_left, wasTop = g_top;
-            if (sized && g_placed)
+            if (!created && g_placed)
             {
                 const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
                 const int oldW = root->getWidth(), oldH = root->getHeight();
@@ -1401,7 +1513,6 @@ namespace
                 if (g_top + oldH / 2 > view.height / 2)
                     g_top += oldH - (h + 2 * pad);
             }
-            sized = true;
             ClampPosition(w + 2 * pad, h + 2 * pad);
             // Новое место - в ini: иначе перечитка настроек (MCM) вернула бы
             // старое.
@@ -2314,6 +2425,10 @@ namespace
 
     std::vector<Dot> g_dots;
 
+    // Метки на экране этой перерисовки - для подсказки при наведении.
+    struct ScreenTip { float x, y; const std::string* text; };
+    std::vector<ScreenTip> g_pinTips;
+
     // Поселения стоят на месте: список - раз в секунду, или сразу, если
     // сменился обзор или центр ушёл на четверть обзора.
     DWORD g_townsAt = 0;
@@ -2747,6 +2862,7 @@ namespace
         watch.lap(ST_TOWNS);
 
         // --- метки Map-markers и WantedMap ---
+        g_pinTips.clear();
         const float pinR = Hi(2.5f, g_dot * 0.7f);
         for (int list = 0; list < 2; ++list)
         {
@@ -2762,6 +2878,11 @@ namespace
                 ToScreen(v, u, vv, x, y);
                 if (!PlacePin(x, y, frameW + pinR + 1.0f))
                     continue;
+                if (!pins[i].tip.empty())
+                {
+                    ScreenTip t = { x, y, &pins[i].tip };
+                    g_pinTips.push_back(t);
+                }
                 // Цель WantedMap - ромбом не рисуем, а двойным кольцом: так её
                 // не спутать с персонажем и с меткой игрока.
                 if (list == 1)
@@ -2965,6 +3086,18 @@ namespace
                         {
                             best = d2;
                             text = g_towns[i].tip;
+                        }
+                    }
+                    // Метки Map-markers и WantedMap - там, где нарисованы
+                    // (у края - тоже).
+                    for (size_t i = 0; i < g_pinTips.size(); ++i)
+                    {
+                        const float x = g_pinTips[i].x, y = g_pinTips[i].y;
+                        const float d2 = (x - mx) * (x - mx) + (y - my) * (y - my);
+                        if (d2 < best && d2 < 64.0f)
+                        {
+                            best = d2;
+                            text = *g_pinTips[i].text;
                         }
                     }
                     for (size_t i = 0; i < g_dots.size(); ++i)

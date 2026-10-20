@@ -403,3 +403,33 @@ msgstr "城镇名称大小, 像素"
 
 msgid "0 - like the other labels."
 msgstr "0 - 与其他标签相同。"
+
+msgid "Danger"
+msgstr "危险"
+
+msgid "Stash"
+msgstr "藏匿处"
+
+msgid "Ruin"
+msgstr "废墟"
+
+msgid "Mine / Resource"
+msgstr "矿场 / 资源"
+
+msgid "Base / Outpost"
+msgstr "基地 / 前哨"
+
+msgid "Trader / Shop"
+msgstr "商人 / 商店"
+
+msgid "Safe Spot / Bed / Recovery"
+msgstr "安全点 / 床 / 恢复"
+
+msgid "Quest"
+msgstr "任务"
+
+msgid "Todo"
+msgstr "待办"
+
+msgid "Note"
+msgstr "笔记"
