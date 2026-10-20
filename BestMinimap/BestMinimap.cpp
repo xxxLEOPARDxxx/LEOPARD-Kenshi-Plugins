@@ -10,9 +10,10 @@
 // карты вокруг центра камеры, с поворотом, маской формы (круг, квадрат,
 // прямоугольник), рамкой и точками. Шейдеры и render-to-texture Ogre не
 // нужны, поэтому нет зависимости от того, как рендер игры собран (DX11,
-// OpenGL), - текстуру MyGUI сам отдаёт в нужный рендер. Работы на кадр
-// немного: 220x220 = 48 тыс. точек с билинейной выборкой, и не каждый кадр,
-// а UpdateFps раз в секунду.
+// OpenGL), - текстуру MyGUI сам отдаёт в нужный рендер. Перерисовка -
+// UpdateFps раз в секунду; пиксели считает отдельный поток (см. «Поток
+// рисования»), в потоке игры - только сбор данных, подписи и запись готовой
+// картинки в текстуру.
 //
 // КАРТА В ПАМЯТИ. Картинку карты один раз читаем с диска через Ogre::Image
 // (тот же файл, что грузит игра). Если файл не читается - копию с видеокарты
@@ -272,14 +273,37 @@ namespace
         colour = c;
     }
 
+    // Запись в ini - не сразу, а через полторы секунды тишины: каждая
+    // WritePrivateProfileString - это запись файла на диск в потоке игры, а
+    // зум и размер с клавиш при удержании повторяются 8 раз в секунду.
+    std::map<std::string, int> g_pendingWrites;
+    DWORD g_pendingAt = 0;
+
     void WriteInt(const char* key, int value)
     {
-        const std::string ini = IniPath();
-        if (ini.empty())
+        g_pendingWrites[key] = value;
+        g_pendingAt = GetTickCount();
+    }
+
+    void FlushWrites()
+    {
+        if (g_pendingWrites.empty())
             return;
-        char text[32];
-        sprintf_s(text, "%d", value);
-        WritePrivateProfileStringA(kSec, key, text, ini.c_str());
+        const std::string ini = IniPath();
+        if (!ini.empty())
+            for (std::map<std::string, int>::const_iterator it = g_pendingWrites.begin(); it != g_pendingWrites.end(); ++it)
+            {
+                char text[32];
+                sprintf_s(text, "%d", it->second);
+                WritePrivateProfileStringA(kSec, it->first.c_str(), text, ini.c_str());
+            }
+        g_pendingWrites.clear();
+    }
+
+    void FlushWritesIfQuiet(DWORD now)
+    {
+        if (!g_pendingWrites.empty() && now - g_pendingAt >= 1500)
+            FlushWrites();
     }
 
     void Invalidate();
@@ -287,6 +311,8 @@ namespace
     // Зовётся при запуске и из MCM после изменения настройки.
     void __cdecl LoadSettings()
     {
+        // Отложенное - сначала на диск, иначе перечитали бы старое.
+        FlushWrites();
         const std::string ini = IniPath();
         if (ini.empty())
             return;
@@ -736,14 +762,14 @@ namespace
         ActivePlatoon* platoon;
         bool leader;            // лидер своего отряда - на нём подпись
         int bounty;             // награда за голову, 0 - нет
-        std::string name;
+        const std::string* name;    // из кэша персонажа (g_catCache) - не копия
     };
 
     // Категория персонажа считается не каждый кадр: isEnemy/isAlly не
     // бесплатны, а отношения меняются редко. Кэш на секунду.
-    struct CatCache { int cat; int bounty; unsigned colour; std::string name; DWORD at; };
+    struct CatCache { int cat; int bounty; unsigned colour; std::string name; DWORD at; DWORD seen; };
     std::map<Character*, CatCache> g_catCache;
-    DWORD g_catCacheCleared = 0;
+    DWORD g_catCacheSwept = 0;
 
     Character* ReferenceCharacter()
     {
@@ -759,6 +785,8 @@ namespace
     {
         std::map<Character*, CatCache>::iterator it = g_catCache.find(c);
         const DWORD life = 1000 + static_cast<DWORD>((reinterpret_cast<size_t>(c) >> 4) % 500);
+        if (it != g_catCache.end())
+            it->second.seen = now;
         if (it != g_catCache.end() && now - it->second.at < life)
             return it->second;
         int cat = CAT_NEUTRAL;
@@ -779,10 +807,15 @@ namespace
         if (g_showBounty && cat != CAT_SQUAD)
             bounty = Hi(0, c->crimes.getTotalBounty());
         CatCache& e = g_catCache[c];
+        e.seen = now;
         e.bounty = bounty;
         e.cat = cat;
-        e.colour = FromColour(MapScreen::getMarkerColor(c));
-        e.name = (g_tooltips || g_charNames) ? c->getName() : std::string();
+        // Цвет игры - только для категорий с цветом «auto».
+        e.colour = g_colourAuto[cat] ? FromColour(MapScreen::getMarkerColor(c)) : g_colour[cat];
+        if (g_tooltips || g_charNames)
+            e.name = c->getName();
+        else
+            e.name.clear();
         e.at = now;
         return e;
     }
@@ -812,11 +845,23 @@ namespace
     void CollectDots(std::vector<Dot>& dots, const Ogre::Vector3& center, float reach, DWORD now)
     {
         dots.clear();
-        if (now - g_catCacheCleared > 30000)
+        // Персонажи приходят и уходят - не копим: раз в 10 с выбрасываем
+        // тех, кого 10 с не было рядом. Раньше кэш раз в 30 с очищался
+        // целиком, и следующая перерисовка пересчитывала всех разом.
+        if (now - g_catCacheSwept > 10000)
         {
-            g_catCache.clear();         // персонажи приходят и уходят - не копим
-            g_catCacheCleared = now;
+            g_catCacheSwept = now;
+            for (std::map<Character*, CatCache>::iterator it = g_catCache.begin(); it != g_catCache.end();)
+            {
+                if (now - it->second.seen > 10000)
+                    g_catCache.erase(it++);
+                else
+                    ++it;
+            }
         }
+        // Отряд персонажа - для подписей отрядов и подсказки; не нужны -
+        // не спрашиваем.
+        const bool wantPlatoon = g_squadLabels != 0 || g_tooltips;
         Character* const ref = ReferenceCharacter();
         SelectedCharacters(g_selected);
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
@@ -844,14 +889,18 @@ namespace
             d.colour = g_colourAuto[cat] ? info.colour : g_colour[cat];
             d.cat = cat;
             d.bounty = info.bounty;
-            d.name = info.name;
-            // Вперёд у персонажа - ось +Z его ориентации (FacingFlip=1 -
-            // если на деле наоборот).
-            const Ogre::Vector3 f = c->getOrientation() * Ogre::Vector3::UNIT_Z;
-            const float fl = std::sqrt(f.x * f.x + f.z * f.z);
-            d.fx = fl > 1e-4f ? f.x / fl * (g_facingFlip ? -1.0f : 1.0f) : 0.0f;
-            d.fz = fl > 1e-4f ? f.z / fl * (g_facingFlip ? -1.0f : 1.0f) : 0.0f;
-            d.platoon = c->getPlatoon();
+            d.name = &info.name;
+            d.fx = d.fz = 0.0f;
+            if (g_showFacing && !dead)
+            {
+                // Вперёд у персонажа - ось +Z его ориентации (FacingFlip=1 -
+                // если на деле наоборот).
+                const Ogre::Vector3 f = c->getOrientation() * Ogre::Vector3::UNIT_Z;
+                const float fl = std::sqrt(f.x * f.x + f.z * f.z);
+                d.fx = fl > 1e-4f ? f.x / fl * (g_facingFlip ? -1.0f : 1.0f) : 0.0f;
+                d.fz = fl > 1e-4f ? f.z / fl * (g_facingFlip ? -1.0f : 1.0f) : 0.0f;
+            }
+            d.platoon = wantPlatoon ? c->getPlatoon() : NULL;
             d.leader = d.platoon != NULL && d.platoon->squadleader == c;
             dots.push_back(d);
         }
@@ -1159,6 +1208,8 @@ namespace
         DWORD last;
     };
 
+    bool g_hidden = true;               // миникарта сейчас скрыта (см. Show)
+
     std::map<Character*, Alert> g_alerts;
     DWORD g_alertScan = 0;
     DWORD g_lastMessage = 0;
@@ -1172,6 +1223,9 @@ namespace
             g_alertNames.clear();
             return;
         }
+        // Миникарта скрыта, а сообщения выключены - тревогу никто не увидит.
+        if (!g_alertMessage && g_hidden)
+            return;
         if (now - g_alertScan < 250)
             return;
         g_alertScan = now;
@@ -1277,7 +1331,7 @@ namespace
     WidgetRef g_imageRef;           // картинка с нашей текстурой
     MyGUI::ITexture* g_tex = NULL;
     std::string g_texName;
-    int g_texW = 0, g_texH = 0;     // размер текстуры (ширина кратна 64)
+    int g_texW = 0, g_texH = 0;     // размер текстуры (степень двойки от 256)
     int g_viewW = 0, g_viewH = 0;   // видимая часть = размер карты на экране
     int g_texSerial = 0;
     // Рисует отдельный поток (см. «Поток рисования»): буфер, маска и их
@@ -1290,31 +1344,31 @@ namespace
     bool g_dirtyMask = true;
     DWORD g_lastRender = 0;
     DWORD g_lastWorldFrame = 0;
-    bool g_hidden = true;
 
     int ViewWidth() { return g_size; }
     // Прямоугольник - всегда 16:10, как экран: ширина - Size, высота из неё.
     int ViewHeight() { return g_shape == SHAPE_RECT ? (g_size * 10 + 8) / 16 : g_size; }
     int GamePad() { return g_frame == FRAME_GAME && g_shape != SHAPE_CIRCLE ? 8 : 0; }
 
+    std::vector<Dot> g_dots;
+    DWORD g_townsAt = 0;
+
     void Invalidate()
     {
         g_dirtyMask = true;
         g_lastRender = 0;
+        // Цвета, имена, награды в кэше персонажей и поселения - по старым
+        // настройкам: пересобрать сразу.
+        g_dots.clear();
+        g_catCache.clear();
+        g_townsAt = 0;
     }
 
-    // Одна текстура на всё время игры - 1024x1024, больше самой большой
-    // миникарты (kSizeMax). Видна только её часть размером с миникарту
-    // (setImageCoord), рисуем тоже только в неё.
+    // Видна только часть текстуры размером с миникарту (setImageInfo), рисуем
+    // тоже только в неё. Ширина - степень двойки от 256: строка - не меньше
+    // 1 КБ, и шаг строки у видеокарты совпадает с нашим (MyGUI отдаёт
+    // указатель без шага строки).
     //
-    // Первая версия пересоздавала текстуру под каждый размер, и после первой
-    // же смены размера или формы миникарта пропадала (20.10.2026): картинка
-    // MyGUI не переживала подмену текстуры. Одна неизменная текстура это
-    // снимает, а 4 МБ видеопамяти - не цена.
-    //
-    // Ширина кратна 64 пикселям: строка - ровно 4 КБ, шаг строки у
-    // видеокарты совпадает с нашим (MyGUI отдаёт указатель без шага строки).
-
     // Текстура - степень двойки не меньше миникарты (от 256): чем меньше,
     // тем дешевле её запись каждую перерисовку. Растёт при увеличении
     // миникарты; прежняя удаляется кадром позже, когда картинка уже
@@ -1463,6 +1517,7 @@ namespace
             root->eventMouseDrag += MyGUI::newDelegate(&OnDragged);
             root->eventMouseButtonReleased += MyGUI::newDelegate(&OnReleased);
             root->eventMouseWheel += MyGUI::newDelegate(&OnWheel);
+            root->setNeedMouseFocus(true);
             g_backRef.reset();
             g_imageRef.reset();
             g_dirtyMask = true;
@@ -1525,7 +1580,6 @@ namespace
             if (back != NULL)
                 back->setSize(w + 2 * pad, h + 2 * pad);
         }
-        root->setNeedMouseFocus(true);
 
         if (!EnsureTexture(w, h))
             return false;
@@ -1554,6 +1608,9 @@ namespace
 
     void Show(bool on)
     {
+        // Скрыто - и так скрыто: Hide зовётся каждый кадр, пока причина есть.
+        if (!on && g_hidden)
+            return;
         if (MyGUI::Widget* const root = g_rootRef.get())
             root->setVisible(on);
         g_hidden = !on;
@@ -2288,13 +2345,20 @@ namespace
         static void RefreshTowns(MapScreen* map) { (map->*(&MapScreenAccess::refreshTowns))(); }
     };
     MapScreen* g_markersBuiltFor = NULL;
+    size_t g_markersIndexed = 0;        // сколько меток было при последнем разборе
+    DWORD g_markersIndexedAt = 0;
 
-    void IndexMarkers(MapScreen* map)
+    // Разбор меток карты - когда их число сменилось, и не чаще раза в 10 с
+    // без этого: раньше - каждую секунду, с копией подписи каждой метки.
+    void IndexMarkers(MapScreen* map, DWORD now)
     {
-        g_markerByTown.clear();
-        g_markerByName.clear();
         if (map == NULL || !g_townGameIcons)
+        {
+            g_markerByTown.clear();
+            g_markerByName.clear();
+            g_markersIndexed = 0;
             return;
+        }
         if (map->mapMarkersTowns.empty() && g_markersBuiltFor != map)
         {
             g_markersBuiltFor = map;
@@ -2304,6 +2368,13 @@ namespace
                       static_cast<unsigned>(map->mapMarkersTowns.size()));
             DebugLog(note);
         }
+        if (map->mapMarkersTowns.size() == g_markersIndexed && now - g_markersIndexedAt < 10000 &&
+            g_markersIndexedAt != 0)
+            return;
+        g_markersIndexed = map->mapMarkersTowns.size();
+        g_markersIndexedAt = now;
+        g_markerByTown.clear();
+        g_markerByName.clear();
         typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
         const Towns& towns = map->mapMarkersTowns;
         for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
@@ -2321,10 +2392,21 @@ namespace
         }
     }
 
-    void AddTown(TownBase* t, Faction* player, const Ogre::Vector3& center, float reach)
+    // Что у поселения меняется редко (имя, значок) - на 10 с; отношения -
+    // каждый раз (война начинается сразу).
+    struct TownStatic
     {
-        if (!t->isDiscovered())
-            return;
+        std::string name;
+        const Icon* icon;
+        bool iconTried;
+        int iconSize;           // под какой TownIconSize подбирали
+        DWORD at;
+        TownStatic() : icon(NULL), iconTried(false), iconSize(0), at(0) {}
+    };
+    std::map<TownBase*, TownStatic> g_townStatic;
+
+    void AddTown(TownBase* t, Faction* player, const Ogre::Vector3& center, float reach, DWORD now)
+    {
         TownInfo info;
         info.icon = NULL;
         info.pos = t->getPosition();
@@ -2333,7 +2415,18 @@ namespace
         const float lim = reach + info.radius;
         if (dx * dx + dz * dz > lim * lim)
             return;
-        info.name = t->getKnownName();
+        if (!t->isDiscovered())
+            return;
+        TownStatic& st = g_townStatic[t];
+        if (st.at == 0 || now - st.at > 10000 || st.iconSize != g_townIconSize)
+        {
+            st.at = now;
+            st.name = t->getKnownName();
+            st.icon = NULL;
+            st.iconTried = false;
+            st.iconSize = g_townIconSize;
+        }
+        info.name = st.name;
         Faction* const f = t->getFaction();
         unsigned relColour = g_townColour;
         const std::string rel = RelationText(f, player, relColour);
@@ -2341,8 +2434,9 @@ namespace
         info.tip = info.name;
         if (f != NULL)
             info.tip += "\n" + f->getName() + (rel.empty() ? std::string() : " - " + rel);
-        if (g_townGameIcons)
+        if (g_townGameIcons && !st.iconTried && !g_markerByTown.empty())
         {
+            st.iconTried = true;
             std::map<TownBase*, MapScreen::MapMarkerTown*>::const_iterator m = g_markerByTown.find(t);
             MapScreen::MapMarkerTown* marker = m != g_markerByTown.end() ? m->second : NULL;
             if (marker == NULL)
@@ -2354,21 +2448,22 @@ namespace
             MyGUI::IntCoord coord;
             int texW = 0, texH = 0;
             if (marker != NULL && IconOf(marker->image, texture, coord, texW, texH))
-                info.icon = IconFor(texture, coord, texW, texH, MyGUI::Colour::White, g_townIconSize);
+                st.icon = IconFor(texture, coord, texW, texH, MyGUI::Colour::White, g_townIconSize);
         }
+        info.icon = g_townGameIcons ? st.icon : NULL;
         g_towns.push_back(info);
     }
 
     // Все поселения и гнёзда мира - из списка игры (shou->townList): метки
     // большой карты (MapScreen::mapMarkersTowns) заполняются не всегда, и
     // по ним выходило 0 поселений (20.10.2026). Метки карты - запасной путь.
-    void CollectTowns(MapScreen* map, const Ogre::Vector3& center, float reach)
+    void CollectTowns(MapScreen* map, const Ogre::Vector3& center, float reach, DWORD now)
     {
         g_towns.clear();
         if (!g_showTowns)
             return;
         Faction* const player = ou->player->getFaction();
-        IndexMarkers(map);
+        IndexMarkers(map, now);
         std::set<TownBase*> seen;
         if (shou != NULL && shou->townList != NULL)
         {
@@ -2381,7 +2476,7 @@ namespace
                         continue;
                     TownBase* const t = static_cast<TownBase*>(o);
                     if (seen.insert(t).second)
-                        AddTown(t, player, center, reach);
+                        AddTown(t, player, center, reach, now);
                 }
         }
         if (seen.empty() && map != NULL)
@@ -2391,7 +2486,7 @@ namespace
             for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
                 if (TownBase* const t = it->first.getTown())
                     if (seen.insert(t).second)
-                        AddTown(t, player, center, reach);
+                        AddTown(t, player, center, reach, now);
         }
         // В журнал - когда что-то из этого меняется (а не каждую секунду).
         static unsigned lastIcons = ~0u, lastMarkers = ~0u, lastMatched = ~0u;
@@ -2423,15 +2518,12 @@ namespace
     DWORD g_moveAt = 0;
     const DWORD kMoveFlagMs = 3000;
 
-    std::vector<Dot> g_dots;
-
     // Метки на экране этой перерисовки - для подсказки при наведении.
     struct ScreenTip { float x, y; const std::string* text; };
     std::vector<ScreenTip> g_pinTips;
 
     // Поселения стоят на месте: список - раз в секунду, или сразу, если
-    // сменился обзор или центр ушёл на четверть обзора.
-    DWORD g_townsAt = 0;
+    // сменился обзор или центр ушёл на четверть обзора (g_townsAt - выше).
     double g_townsRange = -1.0;
     Ogre::Vector3 g_townsCenter;
 
@@ -2834,7 +2926,7 @@ namespace
             g_townsAt = now;
             g_townsRange = g_range;
             g_townsCenter = center;
-            CollectTowns(GetMapScreen(), center, static_cast<float>(g_range * 2.1));
+            CollectTowns(GetMapScreen(), center, static_cast<float>(g_range * 2.1), now);
         }
         for (size_t i = 0; i < g_towns.size(); ++i)
         {
@@ -3022,7 +3114,9 @@ namespace
         // Налезающая подпись не ставится, поэтому порядок - по важности:
         // награды (раньше их съедали названия отрядов над теми же
         // бандитами), поселения, отряды, имена.
-        std::vector<float> dotX(g_dots.size()), dotY(g_dots.size());
+        static std::vector<float> dotX, dotY;      // без выделения памяти каждую перерисовку
+        dotX.resize(g_dots.size());
+        dotY.resize(g_dots.size());
         for (size_t i = 0; i < g_dots.size(); ++i)
         {
             double u, vv;
@@ -3060,7 +3154,7 @@ namespace
         if (g_charNames)
             for (size_t i = 0; i < g_dots.size(); ++i)
                 if (!g_dots[i].dead)
-                    PlaceLabel(g_dots[i].name, dotX[i], dotY[i] + labelR + 14.0f, g_dots[i].colour);
+                    PlaceLabel(*g_dots[i].name, dotX[i], dotY[i] + labelR + 14.0f, g_dots[i].colour);
         HideUnusedLabels();
 
         // Подсказка: ближайшее к мыши поселение или персонаж.
@@ -3110,7 +3204,7 @@ namespace
                         if (d2 < best && d2 < 49.0f)
                         {
                             best = d2;
-                            text = g_dots[i].name;
+                            text = *g_dots[i].name;
                             if (g_dots[i].platoon != NULL && !g_dots[i].platoon->getName().empty())
                                 text += "\n" + g_dots[i].platoon->getName();
                             if (g_dots[i].bounty > 0)
@@ -3315,6 +3409,7 @@ namespace
     void Tick()
     {
         const DWORD now = GetTickCount();
+        FlushWritesIfQuiet(now);
         if (!g_enabled)
             return Hide("disabled (Enabled=0)");
         if (ou == NULL || ou->player == NULL)
@@ -3334,7 +3429,7 @@ namespace
         if (GameGuiHidden())
             return Hide("the game interface is hidden (F7)");
 
-        const std::string texture = map->mapImage->_getTextureName();
+        const std::string& texture = map->mapImage->_getTextureName();
         if (texture != g_src.texture && texture != g_srcFailed)
         {
             // Картинку карты читает поток рисования - меняем, только когда
@@ -3411,8 +3506,23 @@ namespace
         if (!g_hidden && GetTickCount() - g_lastWorldFrame > 300)
         {
             Hide("the game loop stopped (main menu or loading)");
+            FlushWrites();
+            // Другой сейв - другие персонажи, поселения и метки большой
+            // карты: всё, что держит их указатели, - забыть. Иначе после
+            // загрузки значки поселений брались бы из уже удалённых меток.
             g_map = Affine();
+            g_dots.clear();
             g_catCache.clear();
+            g_alerts.clear();
+            g_alertNames.clear();
+            g_towns.clear();
+            g_townStatic.clear();
+            g_markerByTown.clear();
+            g_markerByName.clear();
+            g_markersBuiltFor = NULL;
+            g_markersIndexed = 0;
+            g_markersIndexedAt = 0;
+            g_townsAt = 0;
             g_mapPinsFile.clear();
         }
     }
