@@ -400,7 +400,7 @@ namespace
         g_keyZoomOut = HoldKey::Parse(ReadText(ini, "KeyZoomOut", "-"));
         g_keyBigger = HoldKey::Parse(ReadText(ini, "KeyBigger", "CTRL+="));
         g_keySmaller = HoldKey::Parse(ReadText(ini, "KeySmaller", "CTRL+-"));
-        g_keySatProbe = HoldKey::Parse(ReadText(ini, "SatelliteProbeKey", "CTRL+SHIFT+F9"));
+        g_keySatProbe = HoldKey::Parse(ReadText(ini, "SatelliteShotKey", "CTRL+SHIFT+Y"));
 
         g_maxSource = ReadInt(ini, "MaxSourceSize", 4096, 512, 8192);
         g_swapRB = ReadBool(ini, "SwapRedBlue", false);
