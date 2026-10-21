@@ -1841,7 +1841,7 @@ namespace
                         // Место под клетки - пустыми строками (ключ - пробелы,
                         // своей длины у каждой: ключи строк на странице
                         // уникальны; сброс берёт settings.size() + 2).
-                        for (int k = 0; k < kPaletteLines; ++k)
+                        for (int gapLine = 0; gapLine < kPaletteLines; ++gapLine)
                         {
                             DataPanelLine* const gap = g_panel->setLineTextEditable(
                                 std::string(m->settings.size() + 3 + (spacerKeys++), ' '), "", CAT, true, false,
