@@ -439,3 +439,9 @@ msgstr "Camera arrow colour"
 
 msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
 msgstr "The white arrow is hard to see on light sand - pick a brighter or darker one."
+
+msgid "Middle click - camera there"
+msgstr "Middle click - camera there"
+
+msgid "Middle click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
+msgstr "Middle click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."

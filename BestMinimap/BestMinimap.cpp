@@ -221,6 +221,7 @@ namespace
     int g_townFontSize = 0;             // высота названий поселений, пикс. (0 - как прочие подписи)
     unsigned g_townColour = 0xFFF0E6C8u;
     bool g_rightClickMove = true;       // ПКМ по миникарте - идти туда
+    bool g_middleClickCamera = true;    // СКМ по миникарте - камера туда
     bool g_showBounty = true;           // кольцо и сумма награды за голову
     unsigned g_bountyColour = 0xFFF2C230u;
     bool g_tooltips = true;             // подсказка при наведении мыши
@@ -381,6 +382,7 @@ namespace
         g_townIconSize = ReadInt(ini, "TownIconSize", 22, 10, 64);
         g_townFontSize = ReadInt(ini, "TownNameSize", 0, 0, 40);
         g_rightClickMove = ReadBool(ini, "RightClickMove", true);
+        g_middleClickCamera = ReadBool(ini, "MiddleClickCamera", true);
         g_showBounty = ReadBool(ini, "ShowBounty", true);
         ReadColour(ini, "BountyColour", "#F2C230", unused, g_bountyColour);
         g_tooltips = ReadBool(ini, "Tooltips", true);
@@ -1453,12 +1455,18 @@ namespace
     MyGUI::IntPoint g_dragMouse, g_dragOrigin;
 
     void MoveSelectedTo();          // ниже, после Render: нужен последний вид
+    void CameraTo();
 
     void OnPressed(MyGUI::Widget*, int, int, MyGUI::MouseButton button)
     {
         if (button == MyGUI::MouseButton::Right)
         {
             MoveSelectedTo();
+            return;
+        }
+        if (button == MyGUI::MouseButton::Middle)
+        {
+            CameraTo();
             return;
         }
         if (button != MyGUI::MouseButton::Left || g_locked)
@@ -3252,13 +3260,14 @@ namespace
     // преобразованием: mapCoordsToWorld игры принимает целые пиксели большой
     // карты, а на её мелком масштабе пиксель - это больше сотни метров.
     // Высота - по земле (UtilityT::getTerrainHeight), если там она есть.
-    void MoveSelectedTo()
+    // Точка мира под мышью на миникарте; false - вида ещё нет.
+    bool MouseWorldPoint(Ogre::Vector3& pos)
     {
-        if (!g_rightClickMove || !g_haveView || !g_map.ok || ou == NULL || ou->player == NULL)
-            return;
+        if (!g_haveView || !g_map.ok || ou == NULL || ou->player == NULL)
+            return false;
         MyGUI::Widget* const img = g_imageRef.get();
         if (img == NULL)
-            return;
+            return false;
         const MyGUI::IntPoint m = MyGUI::InputManager::getInstance().getMousePosition();
         const MyGUI::IntPoint a = img->getAbsolutePosition();
         const View& v = g_lastView;
@@ -3269,14 +3278,21 @@ namespace
         const Affine& f = g_map;
         const double det = f.au * f.bv - f.bu * f.av;
         if (std::fabs(det) < 1e-18)
-            return;
-        Ogre::Vector3 pos;
+            return false;
         pos.x = static_cast<float>((f.bv * (u - f.cu) - f.bu * (vv - f.cv)) / det);
         pos.z = static_cast<float>((-f.av * (u - f.cu) + f.au * (vv - f.cv)) / det);
         pos.y = ou->getCameraCenter().y;
         const float ground = UtilityT::getTerrainHeight(pos.x, pos.z);
         if (ground == ground && ground > -100000.0f && ground < 100000.0f)
             pos.y = ground;
+        return true;
+    }
+
+    void MoveSelectedTo()
+    {
+        Ogre::Vector3 pos;
+        if (!g_rightClickMove || !MouseWorldPoint(pos))
+            return;
         ou->player->playerMove(pos, NULL);
         g_movePos = pos;
         g_moveAt = GetTickCount();
@@ -3285,6 +3301,59 @@ namespace
         {
             char note[128];
             sprintf_s(note, "BestMinimap: move order to %.0f %.0f %.0f", pos.x, pos.y, pos.z);
+            DebugLog(note);
+        }
+    }
+
+    // СКМ по миникарте (21.10.2026, просьба пользователя) - камера в точку
+    // под мышью, если до неё дотягивается: игра держит камеру не дальше
+    // предела от своих персонажей (CameraRange, тот же, что линия на
+    // миникарте). Дальше - камеру не трогаем: игра всё равно вернула бы её
+    // к краю. Предел ещё не известен (0) или свободная камера - без
+    // проверки. Камера, следящая за персонажем, перестаёт следить - иначе
+    // она тут же вернулась бы к нему.
+    void CameraTo()
+    {
+        Ogre::Vector3 pos;
+        if (!g_middleClickCamera || !MouseWorldPoint(pos))
+            return;
+        CameraClass* const cam = ou->player->camera;
+        if (cam == NULL)
+            return;
+        const float range = CameraRange();
+        if (!cam->isFreeCameraMode() && range >= 20.0f)
+        {
+            const lektor<Character*>& mine = ou->player->playerCharacters;
+            float best = -1.0f;
+            for (uint32_t i = 0; i < mine.size(); ++i)
+            {
+                Character* const ch = mine[i];
+                if (ch == NULL || ch->isDead())
+                    continue;
+                const Ogre::Vector3 p = ch->getPosition();
+                const float d = std::sqrt((p.x - pos.x) * (p.x - pos.x) + (p.z - pos.z) * (p.z - pos.z));
+                if (best < 0.0f || d < best)
+                    best = d;
+            }
+            if (best > range)
+            {
+                if (g_debug)
+                {
+                    char note[128];
+                    sprintf_s(note, "BestMinimap: camera spot %.0f m from own people, range %.0f - not moved", best, range);
+                    DebugLog(note);
+                }
+                return;
+            }
+        }
+        if (!cam->getFollowObject().isNull())
+            cam->stopFollowing();
+        cam->teleport(pos);
+        g_lastRender = 0;
+        if (g_debug)
+        {
+            char note[128];
+            sprintf_s(note, "BestMinimap: camera to %.0f %.0f %.0f", pos.x, pos.y, pos.z);
             DebugLog(note);
         }
     }
@@ -3586,6 +3655,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowView", Tr("Camera direction"), Tr("A small arrow in the centre."), 1, 0);
     api->colour(api, kSec, "ViewColour", Tr("Camera arrow colour"), Tr("The white arrow is hard to see on light sand - pick a brighter or darker one."), "#F0EAD8", 0);
     api->toggle(api, kSec, "RightClickMove", Tr("Right click - go there"), Tr("Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."), 1, 0);
+    api->toggle(api, kSec, "MiddleClickCamera", Tr("Middle click - camera there"), Tr("Middle click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."), 1, 0);
     api->toggle(api, kSec, "Tooltips", Tr("Tooltips"), Tr("Hover a town or a character on the minimap: name, faction and relations, squad, bounty."), 1, 0);
 
     api->section(api, Tr("Who is shown"));

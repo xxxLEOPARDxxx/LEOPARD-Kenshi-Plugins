@@ -439,3 +439,9 @@ msgstr "镜头箭头颜色"
 
 msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
 msgstr "白色箭头在浅色沙地上不易看清 - 可选更亮或更暗的颜色。"
+
+msgid "Middle click - camera there"
+msgstr "中键 - 镜头移过去"
+
+msgid "Middle click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
+msgstr "在小地图上按中键，把镜头移到该点——前提是镜头能离你的角色那么远（镜头范围线）。更远则无反应。"
