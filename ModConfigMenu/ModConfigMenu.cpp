@@ -971,8 +971,14 @@ namespace
         // Строка цвета: кнопка Hex/Палитра, кнопка «Палитра»/«Скрыть»,
         // образец текущего цвета, клетки палитры (arg - номер цвета, -1 -
         // слово по умолчанию: auto, skin...).
-        OWN_COLOUR_MODE = 2, OWN_COLOUR_OPEN = 3, OWN_COLOUR_SWATCH = 4, OWN_COLOUR_CELL = 5
+        OWN_COLOUR_MODE = 2, OWN_COLOUR_OPEN = 3, OWN_COLOUR_SWATCH = 4, OWN_COLOUR_CELL = 5,
+        // Пустая строка под палитрой: место под клетки (21.10.2026).
+        // addSpace игры давал пустоты в несколько строк - разные на разных
+        // страницах; строка-текст игры ровно той же высоты, что строка
+        // настройки, а клетки и так ставятся с шагом в её высоту.
+        OWN_SPACER = 6
     };
+    bool IsColourPart(int what) { return what >= OWN_COLOUR_MODE && what <= OWN_COLOUR_CELL; }
     struct OwnButton
     {
         DataPanelLine* line;
@@ -1106,7 +1112,7 @@ namespace
     void PlaceOwnButton(size_t index)
     {
         OwnButton& b = g_ownButtons[index];
-        if (b.what >= OWN_COLOUR_MODE)
+        if (IsColourPart(b.what))
         {
             PlaceColourPart(index);
             return;
@@ -1124,12 +1130,14 @@ namespace
             field->setVisible(false);
         // У строки сброса подписи нет, а поле подписи в ванильном скине -
         // светлая плашка: слева от кнопки висело пустое поле (11.10.2026).
-        if (b.what == OWN_RESET)
+        if (b.what == OWN_RESET || b.what == OWN_SPACER)
         {
             MyGUI::Widget* const name = t->getNameBox();
             if (name != NULL && name->getVisible())
                 name->setVisible(false);
         }
+        if (b.what == OWN_SPACER)
+            return;                         // только место: ни поля, ни кнопки
         MyGUI::Widget* const row = field->getParent();
         MyGUI::Widget* button = b.ref->get();
         if (button != NULL && button->getParent() != row)
@@ -1730,6 +1738,7 @@ namespace
         }
 
         bool first = true;
+        int spacerKeys = 0;             // пустые строки под палитрами - каждой свой ключ
         for (size_t k = 0; k < m->settings.size(); ++k)
         {
             Setting* const s = m->settings[k];
@@ -1829,7 +1838,17 @@ namespace
                     AddOwnButton(l, s, OWN_COLOUR_SWATCH);
                     if (s->colourOpen && !s->colourHex)
                     {
-                        g_panel->addSpace(CAT, static_cast<float>(kPaletteLines));
+                        // Место под клетки - пустыми строками (ключ - пробелы,
+                        // своей длины у каждой: ключи строк на странице
+                        // уникальны; сброс берёт settings.size() + 2).
+                        for (int k = 0; k < kPaletteLines; ++k)
+                        {
+                            DataPanelLine* const gap = g_panel->setLineTextEditable(
+                                std::string(m->settings.size() + 3 + (spacerKeys++), ' '), "", CAT, true, false,
+                                MyGUI::Align::Left, 0.95f);
+                            if (gap != NULL)
+                                AddOwnButton(gap, NULL, OWN_SPACER);
+                        }
                         if (DefaultIsWord(s))
                             AddOwnButton(l, s, OWN_COLOUR_CELL, -1);
                         for (int c = 0; c < kPaletteCount; ++c)
@@ -1963,7 +1982,7 @@ namespace
             return;
         }
         Setting* const s = b.s;
-        if (b.what >= OWN_COLOUR_MODE)
+        if (IsColourPart(b.what))
         {
             if (b.what == OWN_COLOUR_SWATCH)
                 return;

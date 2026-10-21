@@ -3488,6 +3488,76 @@ namespace
     }
 
 
+    // ---------------------------------------------------------------
+    // Журнал «Диалоги» на тёмном интерфейсе (21.10.2026)
+    //
+    // Игра пишет реплики NPC в журнал вкладки «Диалоги» (MessagesTextBox)
+    // с цветом, зашитым в код: «#000000» (строка рядом с MessagesTextBox в
+    // kenshi_x64.exe), реплики игрока - цветом темы DialogueTextOption. На
+    // ванильном пергаменте чёрный читается, на тёмном интерфейсе
+    // (Dark UI и подобные - палитра из мода) реплики NPC не видны. Здесь
+    // чёрный тег в тексте журнала заменяется светлым, только при палитре
+    // из мода на интерфейс. Текст перебирается, лишь когда он изменился
+    // (длина), не каждый кадр; прокрутка сохраняется.
+    // ---------------------------------------------------------------
+
+    WidgetRef* g_messagesRef = new WidgetRef();     // не удаляется: см. WidgetRef.h
+    size_t g_messagesLength = static_cast<size_t>(-1);
+
+    void FixDialogueLog()
+    {
+        if (!GameTheme::PaletteFromMod())
+            return;
+        ManagementScreen* const screen = ManagementScreen::getSingleton();
+        if (screen == NULL || !screen->getVisible())
+            return;
+        MyGUI::Widget* widget = g_messagesRef->get();
+        if (widget == NULL)
+        {
+            widget = screen->getWidget("MessagesTextBox");
+            if (widget == NULL)
+                return;
+            g_messagesRef->set(widget);
+            g_messagesLength = static_cast<size_t>(-1);
+        }
+        MyGUI::EditBox* const box = widget->castType<MyGUI::EditBox>(false);
+        if (box == NULL || !box->getInheritedVisible())
+            return;
+        const MyGUI::UString& caption = box->getCaption();
+        if (caption.size() == g_messagesLength)
+            return;
+        std::string text = caption.asUTF8();
+        bool changed = false;
+        for (std::string::size_type at = text.find("#000000"); at != std::string::npos;
+             at = text.find("#000000", at + 7))
+        {
+            // «##000000» - экранированная решётка и текст, не тег.
+            if (at > 0 && text[at - 1] == '#')
+                continue;
+            text.replace(at, 7, "#a0a0a0");
+            changed = true;
+        }
+        if (changed)
+        {
+            const size_t scroll = box->getVScrollPosition();
+            box->setCaption(MyGUI::UString(text));
+            box->setVScrollPosition(scroll);
+        }
+        g_messagesLength = box->getCaption().size();
+    }
+
+    void SafeFixDialogueLog()
+    {
+        __try
+        {
+            FixDialogueLog();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            g_messagesRef->reset();
+        }
+    }
+
     void (*g_origGuiUpdate)(ForgottenGUI* thisptr) = NULL;
 
     void GuiUpdate_hook(ForgottenGUI* thisptr)
@@ -3502,6 +3572,7 @@ namespace
             SafeCraftHover();
             SafeTickIconJob();
             SafeCentreTraderMoney();
+            SafeFixDialogueLog();
         }
     }
 }
