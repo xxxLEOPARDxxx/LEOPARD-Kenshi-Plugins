@@ -51,6 +51,7 @@
 #define NOMINMAX
 #include <Windows.h>
 #include <IniDefaults.h>
+#include <WantedMapApi.h>
 
 #include <cstdio>
 #include <cstring>
@@ -1575,6 +1576,41 @@ namespace
 
         DrawMarkers(self);
     }
+}
+
+
+// Метки для других плагинов - см. shared/WantedMapApi.h. Сейчас их берёт
+// BestMinimap. Отдаём то же, что нарисовано на большой карте: позиция -
+// по живому объекту, если он ещё есть, иначе запомненная; объект пропал -
+// метку пропускаем, как DrawMarkers.
+extern "C" __declspec(dllexport) int __cdecl WantedMap_GetMarkers(WantedMap_Marker* out, int max)
+{
+    if (out == NULL || max <= 0 || !g_enabled)
+        return 0;
+    int n = 0;
+    for (size_t i = 0; i < g_markers.size() && n < max; ++i)
+    {
+        const Marker& m = g_markers[i];
+        Ogre::Vector3 pos = m.pos;
+        if (!m.fixed)
+        {
+            RootObjectBase* const obj = m.object.getRootObjectBase();
+            if (obj == NULL)
+                continue;
+            pos = obj->getPosition();
+        }
+        WantedMap_Marker& o = out[n++];
+        o.x = pos.x;
+        o.y = pos.y;
+        o.z = pos.z;
+        const MyGUI::Colour c = ColourOf(m);
+        o.r = c.red;
+        o.g = c.green;
+        o.b = c.blue;
+        o.accuracy = static_cast<int>(m.accuracy);
+        strncpy_s(o.label, sizeof(o.label), LabelText(m).c_str(), _TRUNCATE);
+    }
+    return n;
 }
 
 

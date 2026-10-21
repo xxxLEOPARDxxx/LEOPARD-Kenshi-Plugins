@@ -1,0 +1,441 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BestMinimap\n"
+"Language: en_GB\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps). Only the map: the markers stay opaque."
+msgstr "1-10 (10% steps). Only the map: the markers stay opaque."
+
+msgid "A bigger map picture is scaled down in memory to this size."
+msgstr "A bigger map picture is scaled down in memory to this size."
+
+msgid "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+msgstr "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+
+msgid "A small arrow in the centre."
+msgstr "A small arrow in the centre."
+
+msgid "Allies"
+msgstr "Allies"
+
+msgid "Animals"
+msgstr "Animals"
+
+msgid "Background"
+msgstr "Background"
+
+msgid "Bigger key"
+msgstr "Bigger key"
+
+msgid "Camera direction"
+msgstr "Camera direction"
+
+msgid "Centre on the selected"
+msgstr "Centre on the selected"
+
+msgid "Circle"
+msgstr "Circle"
+
+msgid "Colour where the map picture ends."
+msgstr "Colour where the map picture ends."
+
+msgid "Colours"
+msgstr "Colours"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+msgstr "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+
+msgid "Dimmed."
+msgstr "Dimmed."
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Enemies"
+msgstr "Enemies"
+
+msgid "Frame"
+msgstr "Frame"
+
+msgid "Frame colour"
+msgstr "Frame colour"
+
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+msgstr "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+
+msgid "Game panel"
+msgstr "Game panel"
+
+msgid "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+msgstr "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+
+msgid "General"
+msgstr "General"
+
+msgid "If the colours of the minimap look wrong (blue sand)."
+msgstr "If the colours of the minimap look wrong (blue sand)."
+
+msgid "In RE_Kenshi_log.txt."
+msgstr "In RE_Kenshi_log.txt."
+
+msgid "Line"
+msgstr "Line"
+
+msgid "Lock position"
+msgstr "Lock position"
+
+msgid "Look"
+msgstr "Look"
+
+msgid "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+msgstr "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+
+msgid "Makes the minimap itself bigger on the screen."
+msgstr "Makes the minimap itself bigger on the screen."
+
+msgid "Map"
+msgstr "Map"
+
+msgid "Map picture limit, px"
+msgstr "Map picture limit, px"
+
+msgid "Map-markers markers"
+msgstr "Map-markers markers"
+
+msgid "Marker size, px"
+msgstr "Marker size, px"
+
+msgid "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+msgstr "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+
+msgid "Markers of the Map-markers mod, from the current save."
+msgstr "Markers of the Map-markers mod, from the current save."
+
+msgid "Neutrals"
+msgstr "Neutrals"
+
+msgid "None"
+msgstr "None"
+
+msgid "Off - drag the minimap with the left mouse button."
+msgstr "Off - drag the minimap with the left mouse button."
+
+msgid "Off - no minimap at all."
+msgstr "Off - no minimap at all."
+
+msgid "Off - north is always up."
+msgstr "Off - north is always up."
+
+msgid "Off - on the centre of the camera."
+msgstr "Off - on the centre of the camera."
+
+msgid "Opacity"
+msgstr "Opacity"
+
+msgid "Pin to the edge"
+msgstr "Pin to the edge"
+
+msgid "Range, m"
+msgstr "Range, m"
+
+msgid "Rectangle"
+msgstr "Rectangle"
+
+msgid "Rotate with the camera"
+msgstr "Rotate with the camera"
+
+msgid "Shape"
+msgstr "Shape"
+
+msgid "Show / hide key"
+msgstr "Show / hide key"
+
+msgid "Shown"
+msgstr "Shown"
+
+msgid "Shows or hides the minimap."
+msgstr "Shows or hides the minimap."
+
+msgid "Size, px"
+msgstr "Size, px"
+
+msgid "Smaller key"
+msgstr "Smaller key"
+
+msgid "Square"
+msgstr "Square"
+
+msgid "Swap red and blue"
+msgstr "Swap red and blue"
+
+msgid "Targets of the WantedMap mod, as of the last look at the big map."
+msgstr "Targets of the WantedMap mod, as of the last look at the big map."
+
+msgid "The dead"
+msgstr "The dead"
+
+msgid "The same switch as the show / hide key."
+msgstr "The same switch as the show / hide key."
+
+msgid "Updates per second"
+msgstr "Updates per second"
+
+msgid "WantedMap targets"
+msgstr "WantedMap targets"
+
+msgid "Who is shown"
+msgstr "Who is shown"
+
+msgid "Your squad"
+msgstr "Your squad"
+
+msgid "Zoom in key"
+msgstr "Zoom in key"
+
+msgid "Zoom out key"
+msgstr "Zoom out key"
+
+msgid "auto - from the palette of the game (and of interface mods)."
+msgstr "auto - from the palette of the game (and of interface mods)."
+
+msgid "auto - the colour the game gives this character on the big map."
+msgstr "auto - the colour the game gives this character on the big map."
+
+msgid "Your squad colour"
+msgstr "Your squad colour"
+
+msgid "Allies colour"
+msgstr "Allies colour"
+
+msgid "Neutrals colour"
+msgstr "Neutrals colour"
+
+msgid "Enemies colour"
+msgstr "Enemies colour"
+
+msgid "Animals colour"
+msgstr "Animals colour"
+
+msgid "The rectangle is 16:10, its width is the Size."
+msgstr "The rectangle is 16:10, its width is the Size."
+
+msgid "Attack alert"
+msgstr "Attack alert"
+
+msgid "Alert when your people are attacked"
+msgstr "Alert when your people are attacked"
+
+msgid "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+msgstr "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+
+msgid "Alert colour"
+msgstr "Alert colour"
+
+msgid "Alert lasts, s"
+msgstr "Alert lasts, s"
+
+msgid "How long the ring stays after the last attack."
+msgstr "How long the ring stays after the last attack."
+
+msgid "Message in the game"
+msgstr "Message in the game"
+
+msgid "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+msgstr "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+
+msgid "Flash the frame"
+msgstr "Flash the frame"
+
+msgid "While someone is attacked the frame of the minimap blinks in the alert colour."
+msgstr "While someone is attacked the frame of the minimap blinks in the alert colour."
+
+msgid "Camera range"
+msgstr "Camera range"
+
+msgid "Show how far the camera can go"
+msgstr "Show how far the camera can go"
+
+msgid "A thin line around your characters: the camera cannot be moved farther."
+msgstr "A thin line around your characters: the camera cannot be moved farther."
+
+msgid "Camera range, m"
+msgstr "Camera range, m"
+
+msgid "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+msgstr "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+
+msgid "Camera line colour"
+msgstr "Camera line colour"
+
+msgid "Under attack: "
+msgstr "Under attack: "
+
+msgid "A gold ring and the sum on characters with a price on their head."
+msgstr "A gold ring and the sum on characters with a price on their head."
+
+msgid "A name under every dot. Many dots - many names."
+msgstr "A name under every dot. Many dots - many names."
+
+msgid "A small nose on each dot: where the character looks."
+msgstr "A small nose on each dot: where the character looks."
+
+msgid "A thin white circle: how far the town reaches."
+msgstr "A thin white circle: how far the town reaches."
+
+msgid "All squads"
+msgstr "All squads"
+
+msgid "Bounties"
+msgstr "Bounties"
+
+msgid "Bounty colour"
+msgstr "Bounty colour"
+
+msgid "Camera line style"
+msgstr "Camera line style"
+
+msgid "Character names"
+msgstr "Character names"
+
+msgid "Dotted"
+msgstr "Dotted"
+
+msgid "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+msgstr "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+
+msgid "Facing"
+msgstr "Facing"
+
+msgid "Flip the facing"
+msgstr "Flip the facing"
+
+msgid "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+msgstr "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+
+msgid "If the noses point backwards."
+msgstr "If the noses point backwards."
+
+msgid "Names up to range, m"
+msgstr "Names up to range, m"
+
+msgid "Other squads"
+msgstr "Other squads"
+
+msgid "Right click - go there"
+msgstr "Right click - go there"
+
+msgid "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+msgstr "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+
+msgid "Solid"
+msgstr "Solid"
+
+msgid "Squad name colour"
+msgstr "Squad name colour"
+
+msgid "Squad names"
+msgstr "Squad names"
+
+msgid "The name of a squad over its leader."
+msgstr "The name of a squad over its leader."
+
+msgid "Tooltips"
+msgstr "Tooltips"
+
+msgid "Town colour"
+msgstr "Town colour"
+
+msgid "Town names"
+msgstr "Town names"
+
+msgid "Town names are shown while the range is not wider than this: on the whole map they would merge."
+msgstr "Town names are shown while the range is not wider than this: on the whole map they would merge."
+
+msgid "Town radius"
+msgstr "Town radius"
+
+msgid "Towns"
+msgstr "Towns"
+
+msgid "Towns and places"
+msgstr "Towns and places"
+
+msgid "ally"
+msgstr "ally"
+
+msgid "auto - by the relations of the town's faction to yours: red hostile, green ally."
+msgstr "auto - by the relations of the town's faction to yours: red hostile, green ally."
+
+msgid "hostile"
+msgstr "hostile"
+
+msgid "neutral"
+msgstr "neutral"
+
+msgid "your faction"
+msgstr "your faction"
+
+msgid "Town icons"
+msgstr "Town icons"
+
+msgid "As on the game map"
+msgstr "As on the game map"
+
+msgid "Diamonds"
+msgstr "Diamonds"
+
+msgid "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+msgstr "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+
+msgid "Town icon size, px"
+msgstr "Town icon size, px"
+
+msgid "Town name size, px"
+msgstr "Town name size, px"
+
+msgid "0 - like the other labels."
+msgstr "0 - like the other labels."
+
+msgid "Danger"
+msgstr "Danger"
+
+msgid "Stash"
+msgstr "Stash"
+
+msgid "Ruin"
+msgstr "Ruin"
+
+msgid "Mine / Resource"
+msgstr "Mine / Resource"
+
+msgid "Base / Outpost"
+msgstr "Base / Outpost"
+
+msgid "Trader / Shop"
+msgstr "Trader / Shop"
+
+msgid "Safe Spot / Bed / Recovery"
+msgstr "Safe Spot / Bed / Recovery"
+
+msgid "Quest"
+msgstr "Quest"
+
+msgid "Todo"
+msgstr "Todo"
+
+msgid "Note"
+msgstr "Note"
+
+msgid "Camera arrow colour"
+msgstr "Camera arrow colour"
+
+msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
+msgstr "The white arrow is hard to see on light sand - pick a brighter or darker one."

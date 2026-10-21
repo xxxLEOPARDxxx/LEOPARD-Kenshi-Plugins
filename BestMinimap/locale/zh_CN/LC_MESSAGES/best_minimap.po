@@ -1,0 +1,441 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BestMinimap\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps). Only the map: the markers stay opaque."
+msgstr "1-10（每级 10%）。只影响地图：标记始终不透明。"
+
+msgid "A bigger map picture is scaled down in memory to this size."
+msgstr "更大的地图图片会在内存中缩小到此尺寸。"
+
+msgid "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+msgstr "屏幕角落的小地图：游戏的地图图片、附近的角色、Map-markers 和 WantedMap 的标记。"
+
+msgid "A small arrow in the centre."
+msgstr "中心的小箭头。"
+
+msgid "Allies"
+msgstr "盟友"
+
+msgid "Animals"
+msgstr "动物"
+
+msgid "Background"
+msgstr "背景"
+
+msgid "Bigger key"
+msgstr "放大小地图按键"
+
+msgid "Camera direction"
+msgstr "镜头方向"
+
+msgid "Centre on the selected"
+msgstr "以选中角色为中心"
+
+msgid "Circle"
+msgstr "圆形"
+
+msgid "Colour where the map picture ends."
+msgstr "地图图片之外区域的颜色。"
+
+msgid "Colours"
+msgstr "颜色"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+msgstr "圆形的直径、正方形的边长、矩形的宽度。在小地图上按住 CTRL 滚动滚轮也可调整。"
+
+msgid "Dimmed."
+msgstr "暗淡显示。"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Enemies"
+msgstr "敌人"
+
+msgid "Frame"
+msgstr "边框"
+
+msgid "Frame colour"
+msgstr "边框颜色"
+
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+msgstr "从中心到边缘的距离。在小地图上滚动滚轮或使用缩放按键也可调整。游戏地图图片每像素约 70 米，因此低于约 1500 米时会变模糊。"
+
+msgid "Game panel"
+msgstr "游戏面板"
+
+msgid "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+msgstr "游戏面板 - 使用游戏自带面板（及界面模组）的外观；圆形则使用游戏配色的线条。"
+
+msgid "General"
+msgstr "常规"
+
+msgid "If the colours of the minimap look wrong (blue sand)."
+msgstr "如果小地图颜色不对（沙子变成蓝色）。"
+
+msgid "In RE_Kenshi_log.txt."
+msgstr "写入 RE_Kenshi_log.txt。"
+
+msgid "Line"
+msgstr "线条"
+
+msgid "Lock position"
+msgstr "锁定位置"
+
+msgid "Look"
+msgstr "外观"
+
+msgid "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+msgstr "整个小地图每秒重绘的次数: 地图、点、名称、镜头箭头。越高镜头移动时越流畅, 处理器负担稍大; 不影响游戏帧率。"
+
+msgid "Makes the minimap itself bigger on the screen."
+msgstr "让小地图本身在屏幕上变大。"
+
+msgid "Map"
+msgstr "地图"
+
+msgid "Map picture limit, px"
+msgstr "地图图片上限（像素）"
+
+msgid "Map-markers markers"
+msgstr "Map-markers 标记"
+
+msgid "Marker size, px"
+msgstr "标记大小（像素）"
+
+msgid "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+msgstr "超出范围的 Map-markers 和 WantedMap 标记停留在边缘，指示方向。"
+
+msgid "Markers of the Map-markers mod, from the current save."
+msgstr "来自当前存档的 Map-markers 模组标记。"
+
+msgid "Neutrals"
+msgstr "中立"
+
+msgid "None"
+msgstr "无"
+
+msgid "Off - drag the minimap with the left mouse button."
+msgstr "关闭时可用鼠标左键拖动小地图。"
+
+msgid "Off - no minimap at all."
+msgstr "关闭时完全不显示小地图。"
+
+msgid "Off - north is always up."
+msgstr "关闭时北方始终朝上。"
+
+msgid "Off - on the centre of the camera."
+msgstr "关闭时以镜头中心为中心。"
+
+msgid "Opacity"
+msgstr "不透明度"
+
+msgid "Pin to the edge"
+msgstr "固定在边缘"
+
+msgid "Range, m"
+msgstr "范围（米）"
+
+msgid "Rectangle"
+msgstr "矩形"
+
+msgid "Rotate with the camera"
+msgstr "随镜头旋转"
+
+msgid "Shape"
+msgstr "形状"
+
+msgid "Show / hide key"
+msgstr "显示 / 隐藏按键"
+
+msgid "Shown"
+msgstr "已显示"
+
+msgid "Shows or hides the minimap."
+msgstr "显示或隐藏小地图。"
+
+msgid "Size, px"
+msgstr "大小（像素）"
+
+msgid "Smaller key"
+msgstr "缩小小地图按键"
+
+msgid "Square"
+msgstr "正方形"
+
+msgid "Swap red and blue"
+msgstr "交换红色和蓝色"
+
+msgid "Targets of the WantedMap mod, as of the last look at the big map."
+msgstr "WantedMap 模组的目标，以最后一次查看大地图时为准。"
+
+msgid "The dead"
+msgstr "死者"
+
+msgid "The same switch as the show / hide key."
+msgstr "与显示 / 隐藏按键相同的开关。"
+
+msgid "Updates per second"
+msgstr "每秒刷新次数"
+
+msgid "WantedMap targets"
+msgstr "WantedMap 目标"
+
+msgid "Who is shown"
+msgstr "显示对象"
+
+msgid "Your squad"
+msgstr "你的小队"
+
+msgid "Zoom in key"
+msgstr "拉近按键"
+
+msgid "Zoom out key"
+msgstr "拉远按键"
+
+msgid "auto - from the palette of the game (and of interface mods)."
+msgstr "auto - 使用游戏（及界面模组）的配色。"
+
+msgid "auto - the colour the game gives this character on the big map."
+msgstr "auto - 使用游戏在大地图上标记该角色的颜色。"
+
+msgid "Your squad colour"
+msgstr "你的小队颜色"
+
+msgid "Allies colour"
+msgstr "盟友颜色"
+
+msgid "Neutrals colour"
+msgstr "中立颜色"
+
+msgid "Enemies colour"
+msgstr "敌人颜色"
+
+msgid "Animals colour"
+msgstr "动物颜色"
+
+msgid "The rectangle is 16:10, its width is the Size."
+msgstr "矩形为 16:10，宽度即“大小”。"
+
+msgid "Attack alert"
+msgstr "遇袭警报"
+
+msgid "Alert when your people are attacked"
+msgstr "己方遇袭时警报"
+
+msgid "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+msgstr "己方角色遇袭时，小地图上该位置出现脉动圆环；超出范围时显示在边缘并指示方向。"
+
+msgid "Alert colour"
+msgstr "警报颜色"
+
+msgid "Alert lasts, s"
+msgstr "警报持续（秒）"
+
+msgid "How long the ring stays after the last attack."
+msgstr "最后一次攻击后圆环保留的时间。"
+
+msgid "Message in the game"
+msgstr "游戏内消息"
+
+msgid "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+msgstr "在游戏消息栏显示“遭受攻击：”及名字，最多每 3 秒一次。"
+
+msgid "Flash the frame"
+msgstr "边框闪烁"
+
+msgid "While someone is attacked the frame of the minimap blinks in the alert colour."
+msgstr "有人遇袭时，小地图边框以警报颜色闪烁。"
+
+msgid "Camera range"
+msgstr "镜头范围"
+
+msgid "Show how far the camera can go"
+msgstr "显示镜头可移动的范围"
+
+msgid "A thin line around your characters: the camera cannot be moved farther."
+msgstr "你的角色周围的细线：镜头无法移出此范围。"
+
+msgid "Camera range, m"
+msgstr "镜头范围（米）"
+
+msgid "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+msgstr "0 - 自动获取：将镜头从你的角色处移到最远一次，线条就会采用该距离。"
+
+msgid "Camera line colour"
+msgstr "镜头线颜色"
+
+msgid "Under attack: "
+msgstr "遭受攻击："
+
+msgid "A gold ring and the sum on characters with a price on their head."
+msgstr "悬赏角色显示金色圆环和金额。"
+
+msgid "A name under every dot. Many dots - many names."
+msgstr "每个点下显示名字。点多则名字多。"
+
+msgid "A small nose on each dot: where the character looks."
+msgstr "每个点上的小尖角：角色面朝的方向。"
+
+msgid "A thin white circle: how far the town reaches."
+msgstr "细白圈：城镇的范围。"
+
+msgid "All squads"
+msgstr "所有小队"
+
+msgid "Bounties"
+msgstr "悬赏"
+
+msgid "Bounty colour"
+msgstr "悬赏颜色"
+
+msgid "Camera line style"
+msgstr "镜头线样式"
+
+msgid "Character names"
+msgstr "角色名字"
+
+msgid "Dotted"
+msgstr "虚线"
+
+msgid "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+msgstr "大地图上标记的一切：城镇、前哨、营地、巢穴、遗迹 - 按游戏所知显示。"
+
+msgid "Facing"
+msgstr "朝向"
+
+msgid "Flip the facing"
+msgstr "反转朝向"
+
+msgid "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+msgstr "将鼠标悬停在小地图上的城镇或角色上：名字、派系与关系、小队、悬赏。"
+
+msgid "If the noses point backwards."
+msgstr "如果尖角朝向反了。"
+
+msgid "Names up to range, m"
+msgstr "名称显示的最大范围（米）"
+
+msgid "Other squads"
+msgstr "其他小队"
+
+msgid "Right click - go there"
+msgstr "右键 - 前往该处"
+
+msgid "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+msgstr "在小地图上右键，选中的角色会前往该位置，与右键点击地面相同。"
+
+msgid "Solid"
+msgstr "实线"
+
+msgid "Squad name colour"
+msgstr "小队名称颜色"
+
+msgid "Squad names"
+msgstr "小队名称"
+
+msgid "The name of a squad over its leader."
+msgstr "小队名称显示在队长上方。"
+
+msgid "Tooltips"
+msgstr "提示"
+
+msgid "Town colour"
+msgstr "城镇颜色"
+
+msgid "Town names"
+msgstr "城镇名称"
+
+msgid "Town names are shown while the range is not wider than this: on the whole map they would merge."
+msgstr "范围不超过此值时显示城镇名称：在整张地图上它们会挤成一团。"
+
+msgid "Town radius"
+msgstr "城镇范围"
+
+msgid "Towns"
+msgstr "城镇"
+
+msgid "Towns and places"
+msgstr "城镇与地点"
+
+msgid "ally"
+msgstr "盟友"
+
+msgid "auto - by the relations of the town's faction to yours: red hostile, green ally."
+msgstr "auto - 按城镇派系与你的关系着色：红色敌对，绿色盟友。"
+
+msgid "hostile"
+msgstr "敌对"
+
+msgid "neutral"
+msgstr "中立"
+
+msgid "your faction"
+msgstr "你的派系"
+
+msgid "Town icons"
+msgstr "城镇图标"
+
+msgid "As on the game map"
+msgstr "与游戏地图相同"
+
+msgid "Diamonds"
+msgstr "菱形"
+
+msgid "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+msgstr "与游戏地图相同 - 使用大地图的图标, 来自游戏界面和界面模组。大地图没有图标的地点显示为菱形。"
+
+msgid "Town icon size, px"
+msgstr "城镇图标大小, 像素"
+
+msgid "Town name size, px"
+msgstr "城镇名称大小, 像素"
+
+msgid "0 - like the other labels."
+msgstr "0 - 与其他标签相同。"
+
+msgid "Danger"
+msgstr "危险"
+
+msgid "Stash"
+msgstr "藏匿处"
+
+msgid "Ruin"
+msgstr "废墟"
+
+msgid "Mine / Resource"
+msgstr "矿场 / 资源"
+
+msgid "Base / Outpost"
+msgstr "基地 / 前哨"
+
+msgid "Trader / Shop"
+msgstr "商人 / 商店"
+
+msgid "Safe Spot / Bed / Recovery"
+msgstr "安全点 / 床 / 恢复"
+
+msgid "Quest"
+msgstr "任务"
+
+msgid "Todo"
+msgstr "待办"
+
+msgid "Note"
+msgstr "笔记"
+
+msgid "Camera arrow colour"
+msgstr "镜头箭头颜色"
+
+msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
+msgstr "白色箭头在浅色沙地上不易看清 - 可选更亮或更暗的颜色。"

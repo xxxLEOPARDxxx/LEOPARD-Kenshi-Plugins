@@ -5,6 +5,7 @@
 
 | Плагин | Что делает |
 |---|---|
+| BestMinimap | миникарта: карта игры (и модов на карту), персонажи рядом, метки Map-markers и WantedMap |
 | AssignedWorkers | кто из отряда закреплён за постройкой - панель у её окна; клавиша «выделить свободных» |
 | BuildModeGizmo | стрелочки для перемещения своей недостроенной постройки |
 | UITweaks | доработки частей интерфейса, которые игра строит в коде |
@@ -32,7 +33,7 @@ Visual C++ 2010 (VC10) + Windows SDK 7.1, KenshiLib 0.2.1, boost 1.60.
 ```
 
 `shared/` - общие заголовки: Localization.h (перевод через .po), WidgetRef.h,
-HoldKey.h, GameTheme.h, ModConfigMenu.h (API вкладки MCM).
+HoldKey.h, GameTheme.h, ModConfigMenu.h (API вкладки MCM), WantedMapApi.h (метки WantedMap для других плагинов).
 
 Перевод - `<Плагин>/locale/<язык>/LC_MESSAGES/*.po`; в DLL только английский.
 

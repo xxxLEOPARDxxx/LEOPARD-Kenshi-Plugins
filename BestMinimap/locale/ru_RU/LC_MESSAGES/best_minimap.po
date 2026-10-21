@@ -1,0 +1,441 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BestMinimap\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "1-10 (10% steps). Only the map: the markers stay opaque."
+msgstr "1-10 (шаг 10%). Только карта: метки остаются непрозрачными."
+
+msgid "A bigger map picture is scaled down in memory to this size."
+msgstr "Картинка карты больше этого размера уменьшается в памяти до него."
+
+msgid "A minimap in the corner of the screen: the game's map picture, characters nearby, Map-markers and WantedMap markers."
+msgstr "Миникарта в углу экрана: картинка карты игры, персонажи рядом, метки Map-markers и WantedMap."
+
+msgid "A small arrow in the centre."
+msgstr "Маленькая стрелка в центре."
+
+msgid "Allies"
+msgstr "Союзники"
+
+msgid "Animals"
+msgstr "Животные"
+
+msgid "Background"
+msgstr "Фон"
+
+msgid "Bigger key"
+msgstr "Клавиша \"больше\""
+
+msgid "Camera direction"
+msgstr "Направление камеры"
+
+msgid "Centre on the selected"
+msgstr "Центр - на выделенных"
+
+msgid "Circle"
+msgstr "Круг"
+
+msgid "Colour where the map picture ends."
+msgstr "Цвет там, где картинка карты кончается."
+
+msgid "Colours"
+msgstr "Цвета"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Diameter of the circle, side of the square, width of the rectangle. CTRL+wheel over the minimap changes it too."
+msgstr "Диаметр круга, сторона квадрата, ширина прямоугольника. Меняется и колесом с CTRL над миникартой."
+
+msgid "Dimmed."
+msgstr "Блёкло."
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Enemies"
+msgstr "Враги"
+
+msgid "Frame"
+msgstr "Рамка"
+
+msgid "Frame colour"
+msgstr "Цвет рамки"
+
+msgid "From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."
+msgstr "От центра до края. Меняется и колесом над миникартой, и клавишами масштаба. В картинке карты игры около 70 м на пиксель, поэтому ближе примерно 1500 м она расплывается."
+
+msgid "Game panel"
+msgstr "Панель игры"
+
+msgid "Game panel - the skin of the game's own panels (and of interface mods); the circle gets a line in the colour of the game palette."
+msgstr "Панель игры - оформление родных панелей игры (и модов на интерфейс); у круга - линия цвета палитры игры."
+
+msgid "General"
+msgstr "Общее"
+
+msgid "If the colours of the minimap look wrong (blue sand)."
+msgstr "Если цвета миникарты не те (синий песок)."
+
+msgid "In RE_Kenshi_log.txt."
+msgstr "В RE_Kenshi_log.txt."
+
+msgid "Line"
+msgstr "Линия"
+
+msgid "Lock position"
+msgstr "Закрепить на месте"
+
+msgid "Look"
+msgstr "Вид"
+
+msgid "How often the whole minimap is redrawn: the map, dots, names, the camera arrow. Higher - smoother when the camera moves, a little more work for the processor; the game FPS does not depend on it."
+msgstr "Как часто перерисовывается вся миникарта: карта, точки, подписи, стрелка камеры. Больше - плавнее при движении камеры и чуть больше работы процессору; на FPS игры не влияет."
+
+msgid "Makes the minimap itself bigger on the screen."
+msgstr "Делает саму миникарту больше на экране."
+
+msgid "Map"
+msgstr "Карта"
+
+msgid "Map picture limit, px"
+msgstr "Предел картинки карты, пикс."
+
+msgid "Map-markers markers"
+msgstr "Метки Map-markers"
+
+msgid "Marker size, px"
+msgstr "Размер точки, пикс."
+
+msgid "Markers of Map-markers and WantedMap that are out of range stay at the edge, pointing the way."
+msgstr "Метки Map-markers и WantedMap за пределами миникарты остаются у края и показывают направление."
+
+msgid "Markers of the Map-markers mod, from the current save."
+msgstr "Метки мода Map-markers из текущего сохранения."
+
+msgid "Neutrals"
+msgstr "Нейтралы"
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Off - drag the minimap with the left mouse button."
+msgstr "Выключено - миникарту можно тащить левой кнопкой мыши."
+
+msgid "Off - no minimap at all."
+msgstr "Выключено - миникарты нет вовсе."
+
+msgid "Off - north is always up."
+msgstr "Выключено - север всегда сверху."
+
+msgid "Off - on the centre of the camera."
+msgstr "Выключено - на центре камеры."
+
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+msgid "Pin to the edge"
+msgstr "Прижимать к краю"
+
+msgid "Range, m"
+msgstr "Обзор, м"
+
+msgid "Rectangle"
+msgstr "Прямоугольник"
+
+msgid "Rotate with the camera"
+msgstr "Поворачивать за камерой"
+
+msgid "Shape"
+msgstr "Форма"
+
+msgid "Show / hide key"
+msgstr "Клавиша \"показать / скрыть\""
+
+msgid "Shown"
+msgstr "Показана"
+
+msgid "Shows or hides the minimap."
+msgstr "Показывает или прячет миникарту."
+
+msgid "Size, px"
+msgstr "Размер, пикс."
+
+msgid "Smaller key"
+msgstr "Клавиша \"меньше\""
+
+msgid "Square"
+msgstr "Квадрат"
+
+msgid "Swap red and blue"
+msgstr "Поменять красный и синий"
+
+msgid "Targets of the WantedMap mod, as of the last look at the big map."
+msgstr "Цели мода WantedMap - на момент последнего взгляда на большую карту."
+
+msgid "The dead"
+msgstr "Мёртвые"
+
+msgid "The same switch as the show / hide key."
+msgstr "Тот же переключатель, что и клавиша \"показать / скрыть\"."
+
+msgid "Updates per second"
+msgstr "Обновлений в секунду"
+
+msgid "WantedMap targets"
+msgstr "Цели WantedMap"
+
+msgid "Who is shown"
+msgstr "Кого показывать"
+
+msgid "Your squad"
+msgstr "Ваш отряд"
+
+msgid "Zoom in key"
+msgstr "Клавиша \"приблизить\""
+
+msgid "Zoom out key"
+msgstr "Клавиша \"отдалить\""
+
+msgid "auto - from the palette of the game (and of interface mods)."
+msgstr "auto - из палитры игры (и модов на интерфейс)."
+
+msgid "auto - the colour the game gives this character on the big map."
+msgstr "auto - цвет, которым игра отмечает этого персонажа на большой карте."
+
+msgid "Your squad colour"
+msgstr "Цвет вашего отряда"
+
+msgid "Allies colour"
+msgstr "Цвет союзников"
+
+msgid "Neutrals colour"
+msgstr "Цвет нейтралов"
+
+msgid "Enemies colour"
+msgstr "Цвет врагов"
+
+msgid "Animals colour"
+msgstr "Цвет животных"
+
+msgid "The rectangle is 16:10, its width is the Size."
+msgstr "Прямоугольник - 16:10, его ширина - это \"Размер\"."
+
+msgid "Attack alert"
+msgstr "Тревога"
+
+msgid "Alert when your people are attacked"
+msgstr "Тревога, когда атакуют ваших"
+
+msgid "A pulsing ring on the minimap where a character of your faction is attacked; out of range - at the edge, pointing the way."
+msgstr "Пульсирующее кольцо на миникарте там, где атакуют персонажа вашей фракции; за пределами обзора - у края, в его сторону."
+
+msgid "Alert colour"
+msgstr "Цвет тревоги"
+
+msgid "Alert lasts, s"
+msgstr "Тревога держится, с"
+
+msgid "How long the ring stays after the last attack."
+msgstr "Сколько кольцо держится после последней атаки."
+
+msgid "Message in the game"
+msgstr "Сообщение в игре"
+
+msgid "Under attack: and the names - in the game's message line, at most once in 3 seconds."
+msgstr "\"Под атакой:\" и имена - в строке сообщений игры, не чаще раза в 3 секунды."
+
+msgid "Flash the frame"
+msgstr "Мигать рамкой"
+
+msgid "While someone is attacked the frame of the minimap blinks in the alert colour."
+msgstr "Пока кого-то атакуют, рамка миникарты мигает цветом тревоги."
+
+msgid "Camera range"
+msgstr "Дальность камеры"
+
+msgid "Show how far the camera can go"
+msgstr "Показывать, докуда долетает камера"
+
+msgid "A thin line around your characters: the camera cannot be moved farther."
+msgstr "Тонкая линия вокруг ваших персонажей: дальше неё камеру не отвести."
+
+msgid "Camera range, m"
+msgstr "Дальность камеры, м"
+
+msgid "0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."
+msgstr "0 - узнаётся само: один раз отведите камеру от своих до упора, и линия встанет на это расстояние."
+
+msgid "Camera line colour"
+msgstr "Цвет линии камеры"
+
+msgid "Under attack: "
+msgstr "Под атакой: "
+
+msgid "A gold ring and the sum on characters with a price on their head."
+msgstr "Золотое кольцо и сумма у персонажей, за голову которых назначена награда."
+
+msgid "A name under every dot. Many dots - many names."
+msgstr "Имя под каждой точкой. Много точек - много имён."
+
+msgid "A small nose on each dot: where the character looks."
+msgstr "Маленький носик у каждой точки: куда смотрит персонаж."
+
+msgid "A thin white circle: how far the town reaches."
+msgstr "Тонкий белый круг: докуда простирается поселение."
+
+msgid "All squads"
+msgstr "Все отряды"
+
+msgid "Bounties"
+msgstr "Награды за голову"
+
+msgid "Bounty colour"
+msgstr "Цвет награды"
+
+msgid "Camera line style"
+msgstr "Вид линии камеры"
+
+msgid "Character names"
+msgstr "Имена персонажей"
+
+msgid "Dotted"
+msgstr "Пунктир"
+
+msgid "Everything the big map marks: towns, outposts, camps, nests, ruins - as the game knows them."
+msgstr "Всё, что отмечает большая карта: города, заставы, лагеря, гнёзда, руины - как их знает игра."
+
+msgid "Facing"
+msgstr "Направление взгляда"
+
+msgid "Flip the facing"
+msgstr "Перевернуть направление"
+
+msgid "Hover a town or a character on the minimap: name, faction and relations, squad, bounty."
+msgstr "Наведите мышь на поселение или персонажа на миникарте: имя, фракция и отношения, отряд, награда."
+
+msgid "If the noses point backwards."
+msgstr "Если носики смотрят назад."
+
+msgid "Names up to range, m"
+msgstr "Названия до обзора, м"
+
+msgid "Other squads"
+msgstr "Чужие отряды"
+
+msgid "Right click - go there"
+msgstr "ПКМ - идти туда"
+
+msgid "Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."
+msgstr "ПКМ по миникарте отправляет выделенных персонажей в эту точку, как ПКМ по земле."
+
+msgid "Solid"
+msgstr "Сплошная"
+
+msgid "Squad name colour"
+msgstr "Цвет названий отрядов"
+
+msgid "Squad names"
+msgstr "Названия отрядов"
+
+msgid "The name of a squad over its leader."
+msgstr "Название отряда над его лидером."
+
+msgid "Tooltips"
+msgstr "Подсказки"
+
+msgid "Town colour"
+msgstr "Цвет поселений"
+
+msgid "Town names"
+msgstr "Названия поселений"
+
+msgid "Town names are shown while the range is not wider than this: on the whole map they would merge."
+msgstr "Названия поселений видны, пока обзор не шире этого: на всей карте они слились бы."
+
+msgid "Town radius"
+msgstr "Радиус поселений"
+
+msgid "Towns"
+msgstr "Поселения"
+
+msgid "Towns and places"
+msgstr "Поселения и места"
+
+msgid "ally"
+msgstr "союзник"
+
+msgid "auto - by the relations of the town's faction to yours: red hostile, green ally."
+msgstr "auto - по отношениям фракции поселения к вашей: красное - враги, зелёное - союзники."
+
+msgid "hostile"
+msgstr "враги"
+
+msgid "neutral"
+msgstr "нейтрально"
+
+msgid "your faction"
+msgstr "ваша фракция"
+
+msgid "Town icons"
+msgstr "Значки поселений"
+
+msgid "As on the game map"
+msgstr "Как на карте игры"
+
+msgid "Diamonds"
+msgstr "Ромбы"
+
+msgid "As on the game map - the icons of the big map, from the game's interface and interface mods. Places the big map has no icon for get a diamond."
+msgstr "Как на карте игры - значки большой карты, из интерфейса игры и модов на интерфейс. Местам, для которых у большой карты значка нет, - ромб."
+
+msgid "Town icon size, px"
+msgstr "Размер значков поселений, пикс."
+
+msgid "Town name size, px"
+msgstr "Размер названий поселений, пикс."
+
+msgid "0 - like the other labels."
+msgstr "0 - как прочие подписи."
+
+msgid "Danger"
+msgstr "Опасность"
+
+msgid "Stash"
+msgstr "Тайник"
+
+msgid "Ruin"
+msgstr "Руины"
+
+msgid "Mine / Resource"
+msgstr "Шахта / ресурсы"
+
+msgid "Base / Outpost"
+msgstr "База / форпост"
+
+msgid "Trader / Shop"
+msgstr "Торговец / лавка"
+
+msgid "Safe Spot / Bed / Recovery"
+msgstr "Укрытие / кровать / лечение"
+
+msgid "Quest"
+msgstr "Задание"
+
+msgid "Todo"
+msgstr "Сделать"
+
+msgid "Note"
+msgstr "Заметка"
+
+msgid "Camera arrow colour"
+msgstr "Цвет стрелки камеры"
+
+msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
+msgstr "Белую стрелку плохо видно на светлом песке - выберите поярче или потемнее."
