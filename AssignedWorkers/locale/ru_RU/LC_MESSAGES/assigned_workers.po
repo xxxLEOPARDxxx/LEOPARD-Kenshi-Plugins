@@ -75,7 +75,7 @@ msgid "Select free characters"
 msgstr "Выделить свободных"
 
 msgid "Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."
-msgstr "Выделяет всех ваших персонажей без цели (в окне персонажа «Нет цели»), в сознании, не в клетке. Каких именно - две строки ниже. Щёлкнуть и нажать клавишу; Backspace - без клавиши."
+msgstr "Выделяет всех ваших персонажей без цели (в окне персонажа \"Нет цели\"), в сознании, не в клетке. Каких именно - две строки ниже. Щёлкнуть и нажать клавишу; Backspace - без клавиши."
 
 msgid "Nobody is free"
 msgstr "Свободных нет"
@@ -87,7 +87,7 @@ msgid "Not assigned"
 msgstr "Не приписанные"
 
 msgid "Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."
-msgstr "Выделять персонажей без цели, не приписанных к постройке (станку, машине...). «Медик», «Роботехника» и подобные работы приписью не считаются."
+msgstr "Выделять персонажей без цели, не приписанных к постройке (станку, машине...). \"Медик\", \"Роботехника\" и подобные работы приписью не считаются."
 
 msgid "Assigned"
 msgstr "Приписанные"
