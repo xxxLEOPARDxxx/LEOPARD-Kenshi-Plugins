@@ -440,8 +440,8 @@ msgstr "Цвет стрелки камеры"
 msgid "The white arrow is hard to see on light sand - pick a brighter or darker one."
 msgstr "Белую стрелку плохо видно на светлом песке - выберите поярче или потемнее."
 
-msgid "Middle click - camera there"
-msgstr "СКМ - камера туда"
+msgid "Double click - camera there"
+msgstr "Двойной щелчок - камера туда"
 
-msgid "Middle click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
-msgstr "СКМ по миникарте переносит камеру в эту точку, если камера может отойти так далеко от ваших персонажей (линия предела камеры). Дальше - ничего не происходит."
+msgid "A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
+msgstr "Двойной щелчок ЛКМ по миникарте переносит камеру в эту точку, если камера может отойти так далеко от ваших персонажей (линия предела камеры). Дальше - ничего не происходит."

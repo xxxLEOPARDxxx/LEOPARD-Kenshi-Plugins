@@ -221,7 +221,7 @@ namespace
     int g_townFontSize = 0;             // высота названий поселений, пикс. (0 - как прочие подписи)
     unsigned g_townColour = 0xFFF0E6C8u;
     bool g_rightClickMove = true;       // ПКМ по миникарте - идти туда
-    bool g_middleClickCamera = true;    // СКМ по миникарте - камера туда
+    bool g_dblClickCamera = true;       // двойной щелчок по миникарте - камера туда
     bool g_showBounty = true;           // кольцо и сумма награды за голову
     unsigned g_bountyColour = 0xFFF2C230u;
     bool g_tooltips = true;             // подсказка при наведении мыши
@@ -382,7 +382,7 @@ namespace
         g_townIconSize = ReadInt(ini, "TownIconSize", 22, 10, 64);
         g_townFontSize = ReadInt(ini, "TownNameSize", 0, 0, 40);
         g_rightClickMove = ReadBool(ini, "RightClickMove", true);
-        g_middleClickCamera = ReadBool(ini, "MiddleClickCamera", true);
+        g_dblClickCamera = ReadBool(ini, "DoubleClickCamera", true);
         g_showBounty = ReadBool(ini, "ShowBounty", true);
         ReadColour(ini, "BountyColour", "#F2C230", unused, g_bountyColour);
         g_tooltips = ReadBool(ini, "Tooltips", true);
@@ -1464,16 +1464,19 @@ namespace
             MoveSelectedTo();
             return;
         }
-        if (button == MyGUI::MouseButton::Middle)
-        {
-            CameraTo();
-            return;
-        }
         if (button != MyGUI::MouseButton::Left || g_locked)
             return;
         g_dragging = true;
         g_dragMouse = MyGUI::InputManager::getInstance().getMousePosition();
         g_dragOrigin = MyGUI::IntPoint(g_left, g_top);
+    }
+
+    // Двойной щелчок ЛКМ - камера туда. Сначала была СКМ, но её игра
+    // забирает себе (поворот камеры), до миникарты она не доходит
+    // (21.10.2026, проверено пользователем).
+    void OnDoubleClick(MyGUI::Widget*)
+    {
+        CameraTo();
     }
 
     void OnDragged(MyGUI::Widget*, int, int, MyGUI::MouseButton)
@@ -1537,6 +1540,7 @@ namespace
             root->eventMouseDrag += MyGUI::newDelegate(&OnDragged);
             root->eventMouseButtonReleased += MyGUI::newDelegate(&OnReleased);
             root->eventMouseWheel += MyGUI::newDelegate(&OnWheel);
+            root->eventMouseButtonDoubleClick += MyGUI::newDelegate(&OnDoubleClick);
             root->setNeedMouseFocus(true);
             g_backRef.reset();
             g_imageRef.reset();
@@ -3305,7 +3309,7 @@ namespace
         }
     }
 
-    // СКМ по миникарте (21.10.2026, просьба пользователя) - камера в точку
+    // Двойной щелчок по миникарте (21.10.2026, просьба пользователя) - камера в точку
     // под мышью, если до неё дотягивается: игра держит камеру не дальше
     // предела от своих персонажей (CameraRange, тот же, что линия на
     // миникарте). Дальше - камеру не трогаем: игра всё равно вернула бы её
@@ -3315,7 +3319,7 @@ namespace
     void CameraTo()
     {
         Ogre::Vector3 pos;
-        if (!g_middleClickCamera || !MouseWorldPoint(pos))
+        if (!g_dblClickCamera || !MouseWorldPoint(pos))
             return;
         CameraClass* const cam = ou->player->camera;
         if (cam == NULL)
@@ -3655,7 +3659,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowView", Tr("Camera direction"), Tr("A small arrow in the centre."), 1, 0);
     api->colour(api, kSec, "ViewColour", Tr("Camera arrow colour"), Tr("The white arrow is hard to see on light sand - pick a brighter or darker one."), "#F0EAD8", 0);
     api->toggle(api, kSec, "RightClickMove", Tr("Right click - go there"), Tr("Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."), 1, 0);
-    api->toggle(api, kSec, "MiddleClickCamera", Tr("Middle click - camera there"), Tr("Middle click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."), 1, 0);
+    api->toggle(api, kSec, "DoubleClickCamera", Tr("Double click - camera there"), Tr("A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."), 1, 0);
     api->toggle(api, kSec, "Tooltips", Tr("Tooltips"), Tr("Hover a town or a character on the minimap: name, faction and relations, squad, bounty."), 1, 0);
 
     api->section(api, Tr("Who is shown"));
