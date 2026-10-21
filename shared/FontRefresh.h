@@ -26,6 +26,7 @@
 #include <kenshi/gui/ForgottenGUI.h>
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_ISubWidgetText.h>
+#include <mygui/MyGUI_EditText.h>
 #include <mygui/MyGUI_TextBox.h>
 #include <mygui/MyGUI_Widget.h>
 
@@ -33,6 +34,31 @@
 
 namespace FontRefresh
 {
+    // Does the text part have a font at all. getFontName() of a text part
+    // without one reads the name through a null font: the access violation
+    // was caught (SafeRebindOne), but KEO logs every such exception as a
+    // "crash" (Asur, 21.10.2026: ModConfigMenu.dll+0x14E34, read at 0x18,
+    // on every options opening). Now the font pointer is checked first and
+    // there is no exception. EditText (and SimpleText, derived from it) is
+    // MyGUI's text part; mFont is protected - read through a derived type.
+    struct EditTextFont : MyGUI::EditText
+    {
+        static MyGUI::IFont* Of(MyGUI::EditText* text)
+        {
+            return text->*(&EditTextFont::mFont);
+        }
+    };
+
+    // 1 - has a font, 0 - none, -1 - unknown kind of text part.
+    inline int HasFont(MyGUI::ISubWidgetText* text)
+    {
+        if (text == NULL)
+            return 0;
+        if (!text->isType<MyGUI::EditText>())
+            return -1;
+        return EditTextFont::Of(static_cast<MyGUI::EditText*>(text)) != NULL ? 1 : 0;
+    }
+
     // One widget. A TextBox (and EditBox, Button...) goes through its own
     // setFontName; any other widget whose skin has a text part (a plain
     // Widget with a caption) is handled on that text part directly - a
@@ -44,6 +70,9 @@ namespace FontRefresh
     inline void RebindOne(MyGUI::Widget* widget, int& stage)
     {
         stage = 1;
+        MyGUI::ISubWidgetText* const text = widget->getSubWidgetText();
+        if (HasFont(text) == 0)
+            return;                 // no font - no texture to go stale
         MyGUI::TextBox* const box = widget->castType<MyGUI::TextBox>(false);
         if (box != NULL)
         {
@@ -58,7 +87,6 @@ namespace FontRefresh
             }
             return;
         }
-        MyGUI::ISubWidgetText* const text = widget->getSubWidgetText();
         if (text == NULL)
             return;
         const std::string font = text->getFontName();
