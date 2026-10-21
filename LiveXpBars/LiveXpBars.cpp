@@ -1102,6 +1102,17 @@ namespace
     }
 
 
+    // setCoord у MyGUI помечает слой на пересборку, даже если место то же
+    // (22.10.2026: панель и подложка ставились каждый кадр - слой Window
+    // пересобирался каждый кадр). Ставим, только когда изменилось.
+    void SetCoordIfChanged(MyGUI::Widget* w, int left, int top, int width, int height)
+    {
+        const MyGUI::IntCoord c(left, top, width, height);
+        if (w->getCoord() != c)
+            w->setCoord(c);
+    }
+
+
     void PlaceRow(Row& row, int index, int leftOffset, int topOffset)
     {
         const int top = topOffset + index * (kRowHeight + g_rowGap);
@@ -1441,7 +1452,7 @@ namespace
         if (g_setup)
         {
             g_hint->setCaption(Tr("Drag to place. SHIFT+B when done."));
-            g_hint->setCoord(pad.left, pad.top, g_width, kRowHeight);
+            SetCoordIfChanged(g_hint, pad.left, pad.top, g_width, kRowHeight);
         }
 
         const int rows = g_setup ? kSetupRows : index;
@@ -1451,7 +1462,7 @@ namespace
         const int width = pad.left + g_width + pad.right;
 
         ClampPosition(height);
-        g_panel->setCoord(g_left - pad.left, g_top - pad.top, width,
+        SetCoordIfChanged(g_panel, g_left - pad.left, g_top - pad.top, width,
                           height > 0 ? height : kRowHeight);
         // F7 прячет интерфейс игры - и нас вместе с ним (HideWithGUI).
         // Настройку места не прячем: её включили руками.
@@ -1465,7 +1476,7 @@ namespace
             g_backdrop->setVisible(shown);
             if (shown)
             {
-                g_backdrop->setCoord(0, 0, width, height);
+                SetCoordIfChanged(g_backdrop, 0, 0, width, height);
                 g_backdrop->setAlpha(g_backgroundOpacity * brightest);
             }
         }

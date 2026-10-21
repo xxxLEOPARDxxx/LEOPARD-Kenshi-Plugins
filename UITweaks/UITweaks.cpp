@@ -158,6 +158,7 @@ namespace
     bool g_craftIcon = true;         // иконка вещи у мыши в списке рецептов
     bool g_traderMoneyCentre = true; // деньги торговца по центру окна (Dark UI)
     bool g_randomName = true;        // кнопка случайного имени в редакторе персонажа
+    bool g_skipSameMoves = true;     // не пересобирать слой, если виджет «сдвинули» на то же место
     // Клавиша иконки (09.10.2026, просьба тестеров; задержку убрали):
     // иконка - пока зажата; NONE - просто по наведению.
     HoldKey::Key g_craftIconKey;
@@ -288,6 +289,7 @@ namespace
         fputs("CraftIconKey=ALT\n", f);
         fputs("TraderMoneyCentre=1\n", f);
         fputs("RandomName=1\n", f);
+        fputs("SkipSameMoves=1\n", f);
         fputs("Debug=0\n", f);
 
         fclose(f);
@@ -336,6 +338,8 @@ namespace
             GetPrivateProfileIntA("Tweaks", "TraderMoneyCentre", 1, ini.c_str()) != 0;
         g_randomName =
             GetPrivateProfileIntA("Tweaks", "RandomName", 1, ini.c_str()) != 0;
+        g_skipSameMoves =
+            GetPrivateProfileIntA("Tweaks", "SkipSameMoves", 1, ini.c_str()) != 0;
         {
             char key[64] = {};
             GetPrivateProfileStringA("Tweaks", "CraftIconKey", "ALT", key, sizeof(key), ini.c_str());
@@ -3216,6 +3220,52 @@ namespace
             ErrorLog(std::string("UITweaks: could not hook ") + name);
     }
 
+    // ---- Сдвиг на то же место (22.10.2026)
+    //
+    // Замер (LayerProbe): игра каждый кадр зовёт Widget::setPosition для
+    // каждой подписи над персонажами - ~150 раз за кадр, и почти всегда с
+    // теми же координатами. MyGUI равенство не проверяет: setPosition
+    // помечает слой Back на пересборку, и все подписи пересобираются каждый
+    // кадр (80 пачек, ~4000 вершин). Пропускаем вызов, когда место то же:
+    // вид виджета от такого вызова не меняется (обрезку по родителю
+    // пересчитывает сам родитель, когда меняется он).
+    //
+    // ВНИМАНИЕ: setPosition(IntPoint) - виртуальная, впервые объявлена в
+    // ICroppedRectangle, и this в ней - ICroppedRectangle* (Widget+8), а не
+    // Widget*. Первая сборка 22.10 читала место со сдвигом в 8 байт: подписи
+    // всё равно пересобирались, а изредка совпавший мусор пропускал нужный
+    // сдвиг - пропадали портреты во вкладке «Отряды».
+    typedef void (*SetPositionPointFn)(MyGUI::ICroppedRectangle*, const MyGUI::IntPoint&);
+    typedef void (*SetPositionXYFn)(MyGUI::Widget*, int, int);
+    SetPositionPointFn g_origSetPositionPoint = NULL;
+    SetPositionXYFn g_origSetPositionXY = NULL;
+
+    void SetPositionPoint_hook(MyGUI::ICroppedRectangle* self, const MyGUI::IntPoint& point)
+    {
+        if (g_skipSameMoves && self->getPosition() == point)
+            return;
+        g_origSetPositionPoint(self, point);
+    }
+
+    void SetPositionXY_hook(MyGUI::Widget* self, int left, int top)
+    {
+        if (g_skipSameMoves && self->getPosition() == MyGUI::IntPoint(left, top))
+            return;
+        g_origSetPositionXY(self, left, top);
+    }
+
+    // экспорт MyGUIEngine - переходник jmp (инкрементальная сборка); хук -
+    // на саму функцию
+    void HookMyGui(const char* name, void* hook, void** orig)
+    {
+        HMODULE const lib = GetModuleHandleA("MyGUIEngine_x64.dll");
+        unsigned char* p = lib != NULL ? reinterpret_cast<unsigned char*>(GetProcAddress(lib, name)) : NULL;
+        if (p != NULL && p[0] == 0xE9)
+            p = p + 5 + *reinterpret_cast<int*>(p + 1);
+        if (p == NULL || KenshiLib::SUCCESS != KenshiLib::AddHook(p, hook, orig))
+            ErrorLog(std::string("UITweaks: could not hook ") + name);
+    }
+
     MyGUI::TextBox* FindTraderMoney(MyGUI::Widget* widget, int depth)
     {
         if (widget == NULL || depth > 5 || !widget->getVisible())
@@ -3611,6 +3661,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "Tweaks", "TraderMoneyCentre", Tr("Money at the centre"), Tr("The trader's money at the centre of the trader window. Only when the money plate is as wide as the window (Dark UI); the vanilla window stays as it is."), 1, 0);
     api->section(api, Tr("Character editor"));
     api->toggle(api, "Tweaks", "RandomName", Tr("Random name button"), Tr("A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."), 1, MCM_RESTART);
+    api->section(api, Tr("Performance"));
+    api->toggle(api, "Tweaks", "SkipSameMoves", Tr("Skip moves to the same place"), Tr("The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }
@@ -3699,6 +3751,13 @@ __declspec(dllexport) void startPlugin()
                  reinterpret_cast<void*>(&PlayerMove_hook), reinterpret_cast<void**>(&g_origPlayerMove));
     HookByExport("?_NV_playerMoveOrderDefault@Character@@QEAAXPEAVBuilding@@PEAVRootObject@@AEBVVector3@Ogre@@@Z",
                  reinterpret_cast<void*>(&CharMoveOrder_hook), reinterpret_cast<void**>(&g_origCharMoveOrder));
+
+    // Сдвиг виджета на то же место - не пересобирать слой. Хук стоит
+    // всегда, выключатель (SkipSameMoves) читается на ходу.
+    HookMyGui("?setPosition@Widget@MyGUI@@UEAAXAEBU?$TPoint@H@types@2@@Z",
+              reinterpret_cast<void*>(&SetPositionPoint_hook), reinterpret_cast<void**>(&g_origSetPositionPoint));
+    HookMyGui("?setPosition@Widget@MyGUI@@QEAAXHH@Z",
+              reinterpret_cast<void*>(&SetPositionXY_hook), reinterpret_cast<void**>(&g_origSetPositionXY));
 
     // Иконка вещи у мыши во вкладке «Ремесло» - нужно знать её станок.
     if (KenshiLib::SUCCESS !=

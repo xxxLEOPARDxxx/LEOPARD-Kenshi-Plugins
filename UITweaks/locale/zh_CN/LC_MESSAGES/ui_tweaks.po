@@ -162,3 +162,12 @@ msgstr "随机名字按钮"
 
 msgid "A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."
 msgstr "角色编辑器（新游戏、招募、手术）中名字旁的按钮：从游戏的名字列表中随机取名，按角色性别区分男女。替换这些列表的模组同样生效。"
+
+msgid "Performance"
+msgstr "性能"
+
+msgid "Skip moves to the same place"
+msgstr "跳过原地移动"
+
+msgid "The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."
+msgstr "游戏每帧都会移动角色头顶的名字，几乎总是移到原位，界面每次都要全部重绘。跳过这类移动，显示界面时帧数更高。"
