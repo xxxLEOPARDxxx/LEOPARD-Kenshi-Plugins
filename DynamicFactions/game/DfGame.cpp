@@ -22,7 +22,6 @@
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 
-#include "game/DfRecruit.h"
 
 const char* const kDfFactionRecord = "1-DynamicFactions.mod";
 const char* const kDfSquadRecord = "2-DynamicFactions.mod";
@@ -259,45 +258,6 @@ namespace
         return true;
     }
 
-    // Загруженный взвод фракции - туда встаёт новичок.
-    ActivePlatoon* LoadedPlatoon(Faction* f)
-    {
-        const lektor<Platoon*>& all = f->activePlatoons;
-        for (uint32_t i = 0; i < all.size(); ++i)
-        {
-            Platoon* const p = all.stuff[i];
-            if (p == NULL || p->isDead)
-                continue;
-            ActivePlatoon* const ap = p->getActivePlatoon();
-            if (ap != NULL)
-                return ap;
-        }
-        return NULL;
-    }
-
-    // Как нанял бы игрок: самый дешёвый из сидящих в баре Хаба
-    // (DfFindBarRecruit) по своей цене из диалога переходит во взвод
-    // фракции; его реплики найма запираются - перенанять его игрок не
-    // сможет. Нет никого или дороже, чем решило ядро, - найма нет.
-    bool Recruit(Faction* f, TownBase* hub, int budget)
-    {
-        if (hub == NULL)
-            return false;
-        Ownerships* const o = f->factionOwnerships;
-        ActivePlatoon* const ap = LoadedPlatoon(f);
-        if (o == NULL || ap == NULL)
-            return false;
-        Character* c = NULL;
-        int price = -1;
-        if (!DfFindBarRecruit(hub, f, c, price) || price > budget || o->money < price)
-            return false;
-        c->setFaction(f, ap);
-        DfLockRecruitLines(c);
-        if (c->getPlatoon() != ap)
-            ErrorLog("DynamicFactions: a recruit changed faction but is not in the faction's squad");
-        return Spend(f, price);
-    }
-
     bool Execute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)
     {
         if (f == NULL)
@@ -310,7 +270,7 @@ namespace
             f->factionOwnerships->addMoney(a.amount);
             return true;
         case DF_RECRUIT:
-            return Recruit(f, hub, a.amount);
+            return false;               // найм - походом в бар (game/DfHire)
         case DF_RESEARCH:
             return a.amount > 0 && Spend(f, a.amount * r.techPointCost);
         case DF_EXTINCT:

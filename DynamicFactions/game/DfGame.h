@@ -33,9 +33,8 @@ bool DfTakeSnapshot(Faction* f, DfSnapshot& out);
 // стартовые деньги. false - отряд не создан.
 bool DfFound(Faction* f, TownBase* hub, int members, int money, float statLevel);
 
-// Выполнить решение ядра. DF_INCOME - деньги фракции; DF_RECRUIT - нанять
-// из бара Хаба, как нанял бы игрок (взвод фракции загружен, нанимаемый
-// есть - иначе не выполнено); DF_RESEARCH -
+// Выполнить решение ядра. DF_INCOME - деньги фракции; DF_RECRUIT - не
+// здесь: поход в бар (game/DfHire.h); DF_RESEARCH -
 // плата за очки; DF_EXTINCT - ничего. Деньги проверяются заново прямо перед
 // вычитанием: не хватает - действие не выполняется (бюджет не уходит в минус).
 // false - не выполнено, в учёт не идёт.

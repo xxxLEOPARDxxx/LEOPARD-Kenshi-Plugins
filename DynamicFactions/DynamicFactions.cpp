@@ -43,6 +43,7 @@
 #include "core/DfNames.h"
 #include "core/DfState.h"
 #include "game/DfGame.h"
+#include "game/DfHire.h"
 #include "game/DfRecruit.h"
 #include "ui/DfWindow.h"
 
@@ -121,6 +122,7 @@ namespace
     struct Runtime
     {
         double zeroSince;                   // с какого часа численность 0 (-1 - не 0)
+        DfHireTask hire;                    // поход в бар за рекрутом
         Runtime() : zeroSince(-1.0) {}
     };
 
@@ -132,6 +134,8 @@ namespace
 
     void SetStates(std::vector<DfFactionState>& states, const char* why)
     {
+        for (size_t i = 0; i < g_runtime.size(); ++i)
+            DfHireCancel(g_runtime[i].hire);
         g_states.swap(states);
         g_runtime.assign(g_states.size(), Runtime());
         if (g_debug)
@@ -291,10 +295,16 @@ namespace
         else
             rt.zeroSince = -1.0;
 
-        // Кого можно нанять в баре дома и почём - для решения ядра.
+        // Кого можно нанять в баре дома и почём - для решения ядра. Идёт
+        // поход за рекрутом - нового не начинаем, его цена отложена.
         TownBase* const hub = snap.homeLoaded ? DfFindHub() : NULL;
         Character* recruit = NULL;
-        if (hub == NULL || !DfFindBarRecruit(hub, f, recruit, snap.recruitPrice))
+        if (rt.hire.busy())
+        {
+            snap.recruitPrice = -1;
+            snap.money -= rt.hire.price;
+        }
+        else if (hub == NULL || !DfFindBarRecruit(hub, f, recruit, snap.recruitPrice))
             snap.recruitPrice = -1;
 
         const DfRules rules = DfPhase1Rules();
@@ -302,6 +312,17 @@ namespace
         std::vector<DfAction> done;
         for (size_t i = 0; i < acts.size(); ++i)
         {
+            if (acts[i].type == DF_RECRUIT)
+            {
+                if (DfHireStart(rt.hire, f, hub, acts[i].amount))
+                {
+                    char line[256];
+                    sprintf_s(line, sizeof(line), "DynamicFactions: %s sends someone to a bar of the Hub to hire a recruit for %d",
+                              Quote(s.name).c_str(), rt.hire.price);
+                    DebugLog(line);
+                }
+                continue;
+            }
             if (DfExecute(f, hub, acts[i], rules))
                 done.push_back(acts[i]);
             else if (g_debug)
@@ -313,14 +334,8 @@ namespace
             }
         }
         DfApplyBookkeeping(s, done, hour, rules);
-        for (size_t i = 0; i < done.size(); ++i)
-            if (done[i].type == DF_RECRUIT)
-            {
-                char line[256];
-                sprintf_s(line, sizeof(line), "DynamicFactions: %s hired someone in a bar of the Hub for %d",
-                          Quote(s.name).c_str(), done[i].amount);
-                DebugLog(line);
-            }
+        if (s.extinct)
+            DfHireCancel(rt.hire);
 
         if (s.extinct)
             DebugLog("DynamicFactions: " + Quote(s.name) + " is extinct - all members are dead");
@@ -378,6 +393,31 @@ namespace
         g_keyWas = down;
     }
 
+    // Поход за рекрутом - каждую секунду, не только на часовом ходе.
+    void StepHire(DfFactionState& s, Runtime& rt, double hour)
+    {
+        if (!rt.hire.busy())
+            return;
+        Faction* const f = DfBindFaction(s.recordId);
+        const DfHireResult r = f != NULL ? DfHireStep(rt.hire, f, s.name) : DF_HIRE_FAILED;
+        if (r == DF_HIRE_RUNNING)
+            return;
+        char line[256];
+        if (r == DF_HIRE_DONE)
+        {
+            DfAddEvent(s, hour, "recruit");
+            sprintf_s(line, sizeof(line), "DynamicFactions: %s hired a recruit in a bar of the Hub for %d",
+                      Quote(s.name).c_str(), rt.hire.price);
+        }
+        else
+        {
+            DfHireCancel(rt.hire);
+            sprintf_s(line, sizeof(line), "DynamicFactions: %s - the hire fell through: %s",
+                      Quote(s.name).c_str(), rt.hire.why.c_str());
+        }
+        DebugLog(line);
+    }
+
     void Tick()
     {
         if (!g_ready || ou == NULL || ou->player == NULL)
@@ -394,7 +434,10 @@ namespace
         if (hour < 0.0)
             return;
         for (size_t i = 0; i < g_states.size(); ++i)
+        {
             TickFaction(g_states[i], g_runtime[i], hour);
+            StepHire(g_states[i], g_runtime[i], hour);
+        }
     }
 
 

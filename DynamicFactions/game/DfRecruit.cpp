@@ -4,6 +4,7 @@
 #include <Windows.h>
 
 #include <map>
+#include <set>
 #include <string>
 
 #include <Debug.h>
@@ -30,7 +31,13 @@ namespace
 {
     // ---- обход диалога: перенесено из RecruitMarkers.cpp один в один,
     // кроме проверки условий - она за собеседника-игрока, у фракции его нет.
-    // Добавлено: цена (DA_TAKE_MONEY на пути) и запирание найденных реплик.
+    // Добавлено: цена и запирание реплик найма.
+    //
+    // Цена (23.10): реплика найма сама снимает деньги (DA_TAKE_MONEY 3000 у
+    // «Hire me Outlaw 700»), но в том же дереве бывают бесплатные ветки для
+    // особого характера («I'll join YOU for free!» по тегу личности). Условия
+    // мы не смотрим, поэтому цена - наибольшее списание среди ВСЕХ реплик
+    // найма: обычная цена, как у игрока без особых обстоятельств.
 
     const int kNodeLimit = 4000;        // реплик за один обход диалога
     const int kDepthLimit = 40;
@@ -40,8 +47,9 @@ namespace
         Dialogue* dialogue;
         GameData* me;                   // данные самого персонажа
         int nodes;
-        int price;                      // цена найденного пути
-        bool lock;                      // запирать все реплики найма, а не искать первую
+        int price;                      // наибольшая цена среди найденных реплик найма
+        bool all;                       // обойти все реплики найма, а не до первой
+        bool lock;                      // запирать найденные реплики найма
         int locked;
     };
 
@@ -100,16 +108,18 @@ namespace
             const int price = taken > pathPrice ? taken : pathPrice;
             if (IsJoinLine(line))
             {
-                if (!s.lock)
-                {
+                if (price > s.price)
                     s.price = price;
-                    return true;
+                if (s.lock)
+                {
+                    s.dialogue->setLineLocked(line, true);
+                    ++s.locked;
                 }
-                s.dialogue->setLineLocked(line, true);
-                ++s.locked;
+                if (!s.all)
+                    return true;
                 continue;
             }
-            if (FindJoin(s, line->children, depth + 1, false, price) && !s.lock)
+            if (FindJoin(s, line->children, depth + 1, false, price) && !s.all)
                 return true;
         }
         return false;
@@ -137,9 +147,11 @@ namespace
         s.me = c->data;
         s.nodes = 0;
         s.price = -1;
+        s.all = true;
         s.lock = false;
         s.locked = 0;
-        return FindJoin(s, TalkToMe(dialogue), 0, true, 0) ? s.price : -1;
+        FindJoin(s, TalkToMe(dialogue), 0, true, 0);
+        return s.price;
     }
 
     // Уникальный - по флагу «unique» шаблона (RecruitMarkers: isUnique() врёт).
@@ -156,6 +168,34 @@ namespace
         return it != d->bdata.end() && it->second;
     }
 
+    // Обычные рекруты бара - персонажи, которых игра сама сажает в бары
+    // города: шаблоны из «choosefrom list» его отрядов «bar squads» (у Хаба -
+    // «Recruits list outlaw town generic»: Sword for hire 700/800, hire medic,
+    // Skeleton recruit...). Стражники, наёмники гильдии и уникальные из
+    // модов на бары сюда не попадают (23.10: нанимали стражника).
+    void BarRecruitTemplates(TownBase* town, std::set<GameData*>& out)
+    {
+        out.clear();
+        GameData* const td = town->data;
+        if (td == NULL)
+            return;
+        const Ogre::vector<GameDataReference>::type* const squads = td->getReferenceListIfExists("bar squads");
+        if (squads == NULL)
+            return;
+        for (size_t i = 0; i < squads->size(); ++i)
+        {
+            GameData* const sq = (*squads)[i].getPtr(&ou->gamedata);
+            if (sq == NULL)
+                continue;
+            const Ogre::vector<GameDataReference>::type* const list = sq->getReferenceListIfExists("choosefrom list");
+            if (list == NULL)
+                continue;
+            for (size_t k = 0; k < list->size(); ++k)
+                if (GameData* const ch = (*list)[k].getPtr(&ou->gamedata))
+                    out.insert(ch);
+        }
+    }
+
     bool InABar(Character* c)
     {
         Building* const b = c->isIndoors().getBuilding();
@@ -163,9 +203,11 @@ namespace
     }
 
     // -1 - не кандидат, иначе цена.
-    int Candidate(Character* c, TownBase* town, Faction* ours)
+    int Candidate(Character* c, TownBase* town, Faction* ours, const std::set<GameData*>& generic)
     {
         if (c->isDead() || c->isUnconcious() || c->isPlayerCharacter() || c->isAnimal() != NULL)
+            return -1;
+        if (generic.find(c->data) == generic.end())
             return -1;
         if (c->getFaction() == ours || c->getCurrentTownLocation() != town || !InABar(c))
             return -1;
@@ -180,13 +222,17 @@ namespace
         price = -1;
         if (ou == NULL || town == NULL)
             return false;
+        std::set<GameData*> generic;
+        BarRecruitTemplates(town, generic);
+        if (generic.empty())
+            return false;
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
         for (ogre_unordered_set<Character*>::type::const_iterator it = all.begin(); it != all.end(); ++it)
         {
             Character* const c = *it;
             if (c == NULL)
                 continue;
-            const int p = Candidate(c, town, ours);
+            const int p = Candidate(c, town, ours, generic);
             if (p >= 0 && (who == NULL || p < price))
             {
                 who = c;
@@ -206,6 +252,7 @@ namespace
         s.me = c->data;
         s.nodes = 0;
         s.price = -1;
+        s.all = true;
         s.lock = true;
         s.locked = 0;
         FindJoin(s, TalkToMe(dialogue), 0, true, 0);

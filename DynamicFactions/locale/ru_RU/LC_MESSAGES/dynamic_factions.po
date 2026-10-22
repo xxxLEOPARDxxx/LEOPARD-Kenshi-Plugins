@@ -119,3 +119,18 @@ msgstr "Ожидание игры..."
 
 msgid "No dynamic factions in this game yet."
 msgstr "В этой игре пока нет динамических фракций."
+
+msgid "Looking for work? %s could use another pair of hands."
+msgstr "Ищешь работу? Мы - %s, нам нужны люди."
+
+msgid "Depends. What does it pay?"
+msgstr "Смотря сколько платят."
+
+msgid "Food, a roof and a share of the loot."
+msgstr "Еда, крыша над головой и доля в добыче."
+
+msgid "%d cats now, food and a roof later."
+msgstr "%d кат сразу, еда и крыша потом."
+
+msgid "Deal. Lead the way."
+msgstr "Идёт. Веди."

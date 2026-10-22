@@ -407,6 +407,18 @@ static void test_brain_level_up_carries()
     CHECK(s.techLevel == 2 && s.techPoints == 4);
 }
 
+// Решение о найме - только начало похода в бар; событие «recruit» пишет
+// адаптер, когда человек и правда перешёл во фракцию.
+static void test_brain_recruit_decision_no_event()
+{
+    DfFactionState s = Founded(10.0);
+    DfAction a;
+    a.type = DF_RECRUIT;
+    a.amount = 1500;
+    DfApplyBookkeeping(s, std::vector<DfAction>(1, a), 11.0);
+    CHECK(s.events.empty());
+}
+
 static void test_brain_max_tech_stops()
 {
     DfFactionState s = Founded(10.0);
@@ -453,6 +465,7 @@ int main()
     test_brain_tick_advances_whole_hours();
     test_brain_level_up_carries();
     test_brain_max_tech_stops();
+    test_brain_recruit_decision_no_event();
     std::printf("%d checks, %d failed\n", g_checks, g_failed);
     return g_failed;
 }

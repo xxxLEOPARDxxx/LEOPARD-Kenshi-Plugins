@@ -119,3 +119,18 @@ msgstr "等待游戏..."
 
 msgid "No dynamic factions in this game yet."
 msgstr "本局游戏中还没有动态派系。"
+
+msgid "Looking for work? %s could use another pair of hands."
+msgstr "在找活干吗？%s 正缺人手。"
+
+msgid "Depends. What does it pay?"
+msgstr "那得看给多少钱。"
+
+msgid "Food, a roof and a share of the loot."
+msgstr "管饭、有住处，还能分战利品。"
+
+msgid "%d cats now, food and a roof later."
+msgstr "现在给 %d 卡特，之后管饭管住。"
+
+msgid "Deal. Lead the way."
+msgstr "成交。带路吧。"

@@ -119,3 +119,18 @@ msgstr "Waiting for the game..."
 
 msgid "No dynamic factions in this game yet."
 msgstr "No dynamic factions in this game yet."
+
+msgid "Looking for work? %s could use another pair of hands."
+msgstr "Looking for work? %s could use another pair of hands."
+
+msgid "Depends. What does it pay?"
+msgstr "Depends. What does it pay?"
+
+msgid "Food, a roof and a share of the loot."
+msgstr "Food, a roof and a share of the loot."
+
+msgid "%d cats now, food and a roof later."
+msgstr "%d cats now, food and a roof later."
+
+msgid "Deal. Lead the way."
+msgstr "Deal. Lead the way."

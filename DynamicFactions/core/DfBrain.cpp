@@ -105,8 +105,7 @@ void DfApplyBookkeeping(DfFactionState& s, const std::vector<DfAction>& done, do
             DfAddEvent(s, hour, "extinct");
             break;
         case DF_RECRUIT:
-            DfAddEvent(s, hour, "recruit");
-            break;
+            break;              // событие - когда человек и правда перешёл (адаптер)
         case DF_RESEARCH:
             if (s.techLevel >= r.maxTech)
                 break;
