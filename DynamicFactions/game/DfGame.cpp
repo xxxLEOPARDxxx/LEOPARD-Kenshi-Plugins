@@ -7,6 +7,7 @@
 
 #include <Debug.h>
 
+#include <kenshi/CharStats.h>
 #include <kenshi/Character.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Faction.h>
@@ -21,10 +22,12 @@
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 
+#include "game/DfRecruit.h"
+
 const char* const kDfFactionRecord = "1-DynamicFactions.mod";
 const char* const kDfSquadRecord = "2-DynamicFactions.mod";
 const char* const kDfHubRecord = "18919-Newwworld.mod";
-const char* const kDfRecruitRecord = "2205-gamedata.base";
+const char* const kDfFounderRecord = "2205-gamedata.base";
 
 namespace
 {
@@ -98,7 +101,9 @@ namespace
     {
         if (ou == NULL)
             return -1.0;
-        return ou->getTimeFromStamp_inGameHours(ou->getTimeStamp());
+        // getTimeFromStamp_inGameHours(stamp) - сколько прошло С stamp, не
+        // текущее время (первая проверка 22.10: час не наступал никогда).
+        return ou->getTimeStamp_inGameHours().getTotalHours();
     }
 
     double SafeGameHour()
@@ -115,13 +120,49 @@ namespace
         }
     }
 
+    // ---- численность ----
+
+    Character* AsLivingCharacter(RootObject* o)
+    {
+        if (o == NULL)
+            return NULL;
+        Character* const c = o->getHandle().getCharacter();
+        return c != NULL && !c->isDead() ? c : NULL;
+    }
+
+    // Живые члены фракции по её взводам: у загруженного - персонажи взвода,
+    // у незагруженного - его счётчик. countPopulation(NULL) сразу после
+    // основания отдал 10 при 4 созданных (22.10) - не годится.
+    int CountMembers(Faction* f)
+    {
+        int n = 0;
+        const lektor<Platoon*>* const lists[2] = { &f->activePlatoons, &f->unloadedPlatoons };
+        for (int l = 0; l < 2; ++l)
+            for (uint32_t i = 0; i < lists[l]->size(); ++i)
+            {
+                Platoon* const p = lists[l]->stuff[i];
+                if (p == NULL || p->isDead)
+                    continue;
+                ActivePlatoon* const ap = l == 0 ? p->getActivePlatoon() : NULL;
+                if (ap == NULL)
+                {
+                    n += p->_characterCountCurrent;
+                    continue;
+                }
+                for (uint32_t k = 0; k < ap->things.size(); ++k)
+                    if (AsLivingCharacter(ap->things.stuff[k]) != NULL)
+                        ++n;
+            }
+        return n;
+    }
+
     // ---- снимок ----
 
     bool TakeSnapshot(Faction* f, DfSnapshot& out)
     {
         if (f == NULL)
             return false;
-        out.members = f->countPopulation(NULL);
+        out.members = CountMembers(f);
         out.money = f->factionOwnerships != NULL ? f->factionOwnerships->money : 0;
         out.hour = GameHour();
         out.homeLoaded = FindHub() != NULL;
@@ -144,28 +185,59 @@ namespace
 
     // ---- основание ----
 
-    bool Found(Faction* f, TownBase* hub, int members, int money)
+    // Все навыки персонажа = level (сложность в MCM).
+    void SetAllStats(Character* c, float level)
+    {
+        CharStats* const st = c->getStats();
+        if (st == NULL)
+            return;
+        for (int s = STAT_NONE + 1; s < STAT_END; ++s)
+            st->getStatRef(static_cast<StatsEnumerated>(s)) = level;
+    }
+
+    // Отряд по шаблону - только главный: число бойцов шаблона игра умножает
+    // своим размером отрядов (22.10: вышло 10 вместо 4). Остальных добираем
+    // поштучно тем же персонажем.
+    bool Found(Faction* f, TownBase* hub, int members, int money, float statLevel)
     {
         if (f == NULL || hub == NULL || ou == NULL || ou->theFactory == NULL)
             return false;
         GameData* const squad = ou->gamedata.getData(kDfSquadRecord);
-        if (squad == NULL)
+        GameData* const tmpl = ou->gamedata.getData(kDfFounderRecord);
+        if (squad == NULL || tmpl == NULL)
             return false;
+        const Ogre::Vector3 pos = hub->getPosition();
         Platoon* const p = ou->theFactory->createRandomSquad(
-            f, hub->getPosition(), hub, members, NULL, squad, NULL, NULL, NULL,
+            f, pos, hub, 1, NULL, squad, NULL, NULL, NULL,
             true, hand(), NULL, 1.0f, SQ_RESIDENT, false);
         if (p == NULL)
             return false;
+        ActivePlatoon* const ap = p->getActivePlatoon();
+        if (ap != NULL)
+        {
+            for (int tries = 0; tries < members && static_cast<int>(ap->things.size()) < members; ++tries)
+            {
+                RootObject* const root = ou->theFactory->createRandomCharacter(f, pos, ap, tmpl, NULL, 0.0f);
+                Character* const c = root != NULL ? root->getHandle().getCharacter() : NULL;
+                if (c == NULL)
+                    continue;
+                c->setFaction(f, ap);
+                c->setRagdollNavmeshSafePos();
+            }
+            for (uint32_t k = 0; k < ap->things.size(); ++k)
+                if (Character* const c = AsLivingCharacter(ap->things.stuff[k]))
+                    SetAllStats(c, statLevel);
+        }
         if (f->factionOwnerships != NULL)
             f->factionOwnerships->addMoney(money);
         return true;
     }
 
-    bool SafeFound(Faction* f, TownBase* hub, int members, int money)
+    bool SafeFound(Faction* f, TownBase* hub, int members, int money, float statLevel)
     {
         __try
         {
-            return Found(f, hub, members, money);
+            return Found(f, hub, members, money, statLevel);
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
@@ -203,26 +275,22 @@ namespace
         return NULL;
     }
 
+    // Как нанял бы игрок: кто-то из сидящих в барах Хаба (DfFindBarRecruit)
+    // переходит во взвод фракции. Нет никого - найма нет, деньги целы.
     bool Recruit(Faction* f, TownBase* hub, int cost)
     {
-        if (hub == NULL || ou == NULL || ou->theFactory == NULL)
+        if (hub == NULL)
             return false;
         Ownerships* const o = f->factionOwnerships;
         if (o == NULL || o->money < cost)
             return false;
         ActivePlatoon* const ap = LoadedPlatoon(f);
-        GameData* const tmpl = ou->gamedata.getData(kDfRecruitRecord);
-        if (ap == NULL || tmpl == NULL)
+        if (ap == NULL)
             return false;
-        RootObject* const root = ou->theFactory->createRandomCharacter(f, hub->getPosition(), ap, tmpl, NULL, 0.0f);
-        if (root == NULL)
+        Character* const c = DfFindBarRecruit(hub, f);
+        if (c == NULL)
             return false;
-        Character* const c = root->getHandle().getCharacter();
-        if (c != NULL)
-        {
-            c->setFaction(f, ap);
-            c->setRagdollNavmeshSafePos();
-        }
+        c->setFaction(f, ap);
         return Spend(f, cost);
     }
 
@@ -328,9 +396,9 @@ bool DfTakeSnapshot(Faction* f, DfSnapshot& out)
     return SafeTakeSnapshot(f, out);
 }
 
-bool DfFound(Faction* f, TownBase* hub, int members, int money)
+bool DfFound(Faction* f, TownBase* hub, int members, int money, float statLevel)
 {
-    return SafeFound(f, hub, members, money);
+    return SafeFound(f, hub, members, money, statLevel);
 }
 
 bool DfExecute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)

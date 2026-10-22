@@ -15,6 +15,24 @@ msgstr "Включено"
 msgid "The whole mod."
 msgstr "Весь мод."
 
+msgid "Easy - skills 10"
+msgstr "Лёгкая - навыки 10"
+
+msgid "Medium - skills 30"
+msgstr "Средняя - навыки 30"
+
+msgid "Hard - skills 50"
+msgstr "Сложная - навыки 50"
+
+msgid "Very hard - skills 70"
+msgstr "Очень сложная - навыки 70"
+
+msgid "Difficulty"
+msgstr "Сложность"
+
+msgid "Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."
+msgstr "Навыки основателей новой фракции: все навыки с самого начала на этом уровне. Действует на фракции, основанные после изменения."
+
 msgid "Faction window key"
 msgstr "Клавиша окна фракций"
 
@@ -36,8 +54,8 @@ msgstr "День %d, %02d:00"
 msgid "Founded in the Hub"
 msgstr "Основана в Хабе"
 
-msgid "Recruited a new member"
-msgstr "Наняла нового человека"
+msgid "Hired someone from a bar"
+msgstr "Наняла человека в баре"
 
 msgid "All members are dead - the faction is extinct"
 msgstr "Все члены погибли - фракции больше нет"

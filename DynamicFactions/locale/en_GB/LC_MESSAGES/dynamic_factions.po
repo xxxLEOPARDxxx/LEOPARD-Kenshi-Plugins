@@ -15,6 +15,24 @@ msgstr "Enabled"
 msgid "The whole mod."
 msgstr "The whole mod."
 
+msgid "Easy - skills 10"
+msgstr "Easy - skills 10"
+
+msgid "Medium - skills 30"
+msgstr "Medium - skills 30"
+
+msgid "Hard - skills 50"
+msgstr "Hard - skills 50"
+
+msgid "Very hard - skills 70"
+msgstr "Very hard - skills 70"
+
+msgid "Difficulty"
+msgstr "Difficulty"
+
+msgid "Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."
+msgstr "Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."
+
 msgid "Faction window key"
 msgstr "Faction window key"
 
@@ -36,8 +54,8 @@ msgstr "Day %d, %02d:00"
 msgid "Founded in the Hub"
 msgstr "Founded in the Hub"
 
-msgid "Recruited a new member"
-msgstr "Recruited a new member"
+msgid "Hired someone from a bar"
+msgstr "Hired someone from a bar"
 
 msgid "All members are dead - the faction is extinct"
 msgstr "All members are dead - the faction is extinct"

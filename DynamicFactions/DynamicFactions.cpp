@@ -56,6 +56,12 @@ namespace
     bool g_enabled = true;
     bool g_debug = false;
     HoldKey::Key g_windowKey;
+    float g_startStats = 30.0f;             // навыки основателей - по сложности
+
+    // Сложность: что в ini и какие навыки у основателей.
+    const char* const kDifficultyKeys[] = { "easy", "medium", "hard", "veryhard" };
+    const float kDifficultyStats[] = { 10.0f, 30.0f, 50.0f, 70.0f };
+    const int kDifficultyCount = 4;
 
     std::string IniFileName()
     {
@@ -85,6 +91,12 @@ namespace
         char key[64] = {};
         GetPrivateProfileStringA(section, "WindowKey", "CTRL+F10", key, sizeof(key), ini.c_str());
         g_windowKey = HoldKey::Parse(key);
+        char difficulty[32] = {};
+        GetPrivateProfileStringA(section, "Difficulty", "medium", difficulty, sizeof(difficulty), ini.c_str());
+        g_startStats = kDifficultyStats[1];
+        for (int i = 0; i < kDifficultyCount; ++i)
+            if (_stricmp(difficulty, kDifficultyKeys[i]) == 0)
+                g_startStats = kDifficultyStats[i];
     }
 
 
@@ -213,7 +225,7 @@ namespace
             return;
         const DfRules rules = DfPhase1Rules();
         DfApplyName(f, s.name);
-        if (!DfFound(f, hub, rules.startMembers, rules.startMoney))
+        if (!DfFound(f, hub, rules.startMembers, rules.startMoney, g_startStats))
             return;
         std::vector<DfAction> done(1);
         done[0].type = DF_FOUND;
@@ -222,7 +234,8 @@ namespace
         DfSnapshot snap;
         const int members = DfTakeSnapshot(f, snap) ? snap.members : -1;
         char line[256];
-        sprintf_s(line, sizeof(line), "DynamicFactions: founded %s in the Hub, %d members", Quote(s.name).c_str(), members);
+        sprintf_s(line, sizeof(line), "DynamicFactions: founded %s in the Hub, %d members, skills %.0f",
+                  Quote(s.name).c_str(), members, g_startStats);
         DebugLog(line);
     }
 
@@ -279,7 +292,7 @@ namespace
         DfApplyBookkeeping(s, done, hour, rules);
         for (size_t i = 0; i < done.size(); ++i)
             if (done[i].type == DF_RECRUIT)
-                DebugLog("DynamicFactions: " + Quote(s.name) + " recruited a new member");
+                DebugLog("DynamicFactions: " + Quote(s.name) + " recruited someone from a bar of the Hub");
 
         if (s.extinct)
             DebugLog("DynamicFactions: " + Quote(s.name) + " is extinct - all members are dead");
@@ -439,6 +452,14 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
         api->info(api, Tr("Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."));
     api->section(api, Tr("General"));
     api->toggle(api, "DynamicFactions", "Enabled", Tr("Enabled"), Tr("The whole mod."), 1, MCM_RESTART);
+    static const char* labels[kDifficultyCount] = {};
+    labels[0] = Tr("Easy - skills 10");
+    labels[1] = Tr("Medium - skills 30");
+    labels[2] = Tr("Hard - skills 50");
+    labels[3] = Tr("Very hard - skills 70");
+    api->choice(api, "DynamicFactions", "Difficulty", Tr("Difficulty"),
+                Tr("Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."),
+                "medium", kDifficultyKeys, labels, kDifficultyCount, 0);
     api->hotkey(api, "DynamicFactions", "WindowKey", Tr("Faction window key"),
                 Tr("Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."), "CTRL+F10", 0);
     api->section(api, Tr("Diagnostics"));

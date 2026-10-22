@@ -15,6 +15,24 @@ msgstr "启用"
 msgid "The whole mod."
 msgstr "整个模组。"
 
+msgid "Easy - skills 10"
+msgstr "简单 - 技能 10"
+
+msgid "Medium - skills 30"
+msgstr "中等 - 技能 30"
+
+msgid "Hard - skills 50"
+msgstr "困难 - 技能 50"
+
+msgid "Very hard - skills 70"
+msgstr "非常困难 - 技能 70"
+
+msgid "Difficulty"
+msgstr "难度"
+
+msgid "Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."
+msgstr "新派系创始成员的技能：所有技能从该等级开始。对更改后成立的派系生效。"
+
 msgid "Faction window key"
 msgstr "派系窗口按键"
 
@@ -36,8 +54,8 @@ msgstr "第 %d 天 %02d:00"
 msgid "Founded in the Hub"
 msgstr "在中心城成立"
 
-msgid "Recruited a new member"
-msgstr "招募了一名新成员"
+msgid "Hired someone from a bar"
+msgstr "在酒吧雇佣了一人"
 
 msgid "All members are dead - the faction is extinct"
 msgstr "所有成员已死亡 - 派系已覆灭"

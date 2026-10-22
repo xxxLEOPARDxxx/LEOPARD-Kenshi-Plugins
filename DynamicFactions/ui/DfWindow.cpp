@@ -86,7 +86,7 @@ namespace
         if (key == "found")
             return Tr("Founded in the Hub");
         if (key == "recruit")
-            return Tr("Recruited a new member");
+            return Tr("Hired someone from a bar");
         if (key == "extinct")
             return Tr("All members are dead - the faction is extinct");
         int level = 0;
