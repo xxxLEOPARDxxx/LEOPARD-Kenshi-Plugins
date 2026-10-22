@@ -250,11 +250,24 @@ namespace
 
         const DfRules rules = DfPhase1Rules();
         const std::vector<DfAction> acts = DfDecide(s, snap, rules);
+        TownBase* const hub = snap.homeLoaded ? DfFindHub() : NULL;
         std::vector<DfAction> done;
         for (size_t i = 0; i < acts.size(); ++i)
-            if (acts[i].type == DF_EXTINCT)
+        {
+            if (DfExecute(f, hub, acts[i], rules))
                 done.push_back(acts[i]);
+            else if (g_debug)
+            {
+                char line[128];
+                sprintf_s(line, sizeof(line), "DynamicFactions: action %d (%d) not carried out",
+                          static_cast<int>(acts[i].type), acts[i].amount);
+                DebugLog(line);
+            }
+        }
         DfApplyBookkeeping(s, done, hour, rules);
+        for (size_t i = 0; i < done.size(); ++i)
+            if (done[i].type == DF_RECRUIT)
+                DebugLog("DynamicFactions: " + Quote(s.name) + " recruited a new member");
 
         if (s.extinct)
             DebugLog("DynamicFactions: " + Quote(s.name) + " is extinct - all members are dead");

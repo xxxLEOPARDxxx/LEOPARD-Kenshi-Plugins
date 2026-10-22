@@ -15,6 +15,7 @@ class TownBase;
 extern const char* const kDfFactionRecord;      // FACTION, копия Nameless
 extern const char* const kDfSquadRecord;        // SQUAD_TEMPLATE, копия Drifter squad
 extern const char* const kDfHubRecord;          // Хаб
+extern const char* const kDfRecruitRecord;      // CHARACTER «Drifter» - кого нанимают
 
 // Фракция игры по записи FACTION; NULL - записи нет (мод не включён).
 Faction* DfBindFaction(const std::string& recordId);
@@ -30,6 +31,13 @@ bool DfTakeSnapshot(Faction* f, DfSnapshot& out);
 
 // Стартовый отряд в Хабе и стартовые деньги. false - отряд не создан.
 bool DfFound(Faction* f, TownBase* hub, int members, int money);
+
+// Выполнить решение ядра. DF_INCOME - деньги фракции; DF_RECRUIT - новый
+// человек во взвод фракции у Хаба (взвод должен быть загружен); DF_RESEARCH -
+// плата за очки; DF_EXTINCT - ничего. Деньги проверяются заново прямо перед
+// вычитанием: не хватает - действие не выполняется (бюджет не уходит в минус).
+// false - не выполнено, в учёт не идёт.
+bool DfExecute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r);
 
 // Имя фракции в игре = name (ставится только при расхождении).
 void DfApplyName(Faction* f, const std::string& name);

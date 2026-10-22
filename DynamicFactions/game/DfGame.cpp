@@ -7,6 +7,7 @@
 
 #include <Debug.h>
 
+#include <kenshi/Character.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Faction.h>
 #include <kenshi/GameData.h>
@@ -23,6 +24,7 @@
 const char* const kDfFactionRecord = "1-DynamicFactions.mod";
 const char* const kDfSquadRecord = "2-DynamicFactions.mod";
 const char* const kDfHubRecord = "18919-Newwworld.mod";
+const char* const kDfRecruitRecord = "2205-gamedata.base";
 
 namespace
 {
@@ -173,6 +175,94 @@ namespace
         }
     }
 
+    // ---- действия ----
+
+    // Списать деньги, только если их хватает.
+    bool Spend(Faction* f, int cost)
+    {
+        Ownerships* const o = f->factionOwnerships;
+        if (o == NULL || cost < 0 || o->money < cost)
+            return false;
+        o->setMoney(o->money - cost);
+        return true;
+    }
+
+    // Загруженный взвод фракции - туда встаёт новичок.
+    ActivePlatoon* LoadedPlatoon(Faction* f)
+    {
+        const lektor<Platoon*>& all = f->activePlatoons;
+        for (uint32_t i = 0; i < all.size(); ++i)
+        {
+            Platoon* const p = all.stuff[i];
+            if (p == NULL || p->isDead)
+                continue;
+            ActivePlatoon* const ap = p->getActivePlatoon();
+            if (ap != NULL)
+                return ap;
+        }
+        return NULL;
+    }
+
+    bool Recruit(Faction* f, TownBase* hub, int cost)
+    {
+        if (hub == NULL || ou == NULL || ou->theFactory == NULL)
+            return false;
+        Ownerships* const o = f->factionOwnerships;
+        if (o == NULL || o->money < cost)
+            return false;
+        ActivePlatoon* const ap = LoadedPlatoon(f);
+        GameData* const tmpl = ou->gamedata.getData(kDfRecruitRecord);
+        if (ap == NULL || tmpl == NULL)
+            return false;
+        RootObject* const root = ou->theFactory->createRandomCharacter(f, hub->getPosition(), ap, tmpl, NULL, 0.0f);
+        if (root == NULL)
+            return false;
+        Character* const c = root->getHandle().getCharacter();
+        if (c != NULL)
+        {
+            c->setFaction(f, ap);
+            c->setRagdollNavmeshSafePos();
+        }
+        return Spend(f, cost);
+    }
+
+    bool Execute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)
+    {
+        if (f == NULL)
+            return false;
+        switch (a.type)
+        {
+        case DF_INCOME:
+            if (f->factionOwnerships == NULL || a.amount < 0)
+                return false;
+            f->factionOwnerships->addMoney(a.amount);
+            return true;
+        case DF_RECRUIT:
+            return Recruit(f, hub, a.amount);
+        case DF_RESEARCH:
+            return a.amount > 0 && Spend(f, a.amount * r.techPointCost);
+        case DF_EXTINCT:
+            return true;
+        case DF_FOUND:
+            return false;               // основание - DfFound
+        }
+        return false;
+    }
+
+    bool SafeExecute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)
+    {
+        __try
+        {
+            return Execute(f, hub, a, r);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static volatile LONG told = 0;
+            TellOnce(told, "DynamicFactions: carrying out a decision failed once - it is skipped");
+            return false;
+        }
+    }
+
     // ---- имя ----
 
     void ApplyName(Faction* f, const std::string& name)
@@ -241,6 +331,11 @@ bool DfTakeSnapshot(Faction* f, DfSnapshot& out)
 bool DfFound(Faction* f, TownBase* hub, int members, int money)
 {
     return SafeFound(f, hub, members, money);
+}
+
+bool DfExecute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)
+{
+    return SafeExecute(f, hub, a, r);
 }
 
 void DfApplyName(Faction* f, const std::string& name)
