@@ -35,7 +35,7 @@ function ModDir($modFolder) {
     return $null
 }
 
-function BuildPlugin($srcDir, $name, $modFolder, [switch]$FromVcxproj) {
+function BuildPlugin($srcDir, $name, $modFolder, [switch]$FromVcxproj, [string[]]$SubDirs = @()) {
     $dll = "$ROOT\build\$name\$name.dll"
     # Успех определяем по самому файлу: обновилась ли DLL. Ловить вывод
     # build.ps1 нельзя - он печатает через Write-Host, прямо в консоль,
@@ -48,6 +48,8 @@ function BuildPlugin($srcDir, $name, $modFolder, [switch]$FromVcxproj) {
     # без этого любой плагин собирался как проект с .vcxproj.
     if ($FromVcxproj) {
         & "$ROOT\build.ps1" -SrcDir $srcDir -Name $name -FromVcxproj
+    } elseif ($SubDirs.Count -gt 0) {
+        & "$ROOT\build.ps1" -SrcDir $srcDir -Name $name -SubDirs $SubDirs
     } else {
         & "$ROOT\build.ps1" -SrcDir $srcDir -Name $name
     }
@@ -290,6 +292,14 @@ if (Test-Path $aiMod) {
     Copy-Item "$ROOT\ours\AIFixed\AIFixed.ini" "$aiMod\AIFixed.defaults.ini" -Force
 }
 
+BuildPlugin "$ROOT\ours\DynamicFactions"          "DynamicFactions"   "DynamicFactions" -SubDirs core,game,ui
+$dfMod = "$KENSHI\mods\DynamicFactions"
+if (Test-Path $dfMod) {
+    Copy-Item "$ROOT\ours\DynamicFactions\README.txt" $dfMod -Force -ErrorAction SilentlyContinue
+    Copy-Item "$ROOT\ours\DynamicFactions\locale" $dfMod -Recurse -Force -ErrorAction SilentlyContinue
+    Copy-Item "$ROOT\ours\DynamicFactions\DynamicFactions.ini" "$dfMod\DynamicFactions.defaults.ini" -Force -ErrorAction SilentlyContinue
+}
+
 BuildPlugin "$ROOT\ours\QuickStartSelect"         "QuickStartSelect"  "QuickStartSelect"
 $qsMod = "$KENSHI\mods\QuickStartSelect"
 if (Test-Path $qsMod) {
@@ -372,7 +382,7 @@ Step "Контроль: в собранных DLL не должно быть к�
 # каком виде, весь перевод живёт в .po.
 # Formations в списке нет намеренно: он не линкует KenshiLib, а значит не
 # может спросить у игры язык, и его русский лежит прямо в бинарнике.
-foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers", "BestMinimap", "AIFixed")) {
+foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers", "BestMinimap", "AIFixed", "DynamicFactions")) {
     $dll = Get-ChildItem "$KENSHI\mods\$m" -Filter *.dll -ErrorAction SilentlyContinue |
            Where-Object { $_.Name -notlike "*.orig" } | Select-Object -First 1
     if (-not $dll) { continue }
