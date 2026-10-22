@@ -35,3 +35,14 @@ msgstr "Подробный журнал"
 msgid "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
 msgstr "Подробности в RE_Kenshi_log.txt: для кого искали ремкровать и какая выбрана."
 
+msgid "Self-repair when worn"
+msgstr "Саморемонт при износе"
+
+msgid "A skeleton, or someone with prosthetics, whose part wear goes above the threshold goes to the nearest free powered repair bed by himself, stays until fully repaired and then goes back to work. Not in combat, not while carrying someone."
+msgstr "Скелет или живой с протезами, у кого износ части выше порога, сам идёт на ближайшую свободную ремкровать с питанием, лежит до полной починки и возвращается к работе. Не в бою и не когда несёт кого-то."
+
+msgid "Wear threshold"
+msgstr "Порог износа"
+
+msgid "Wear of any robotic part above which the character goes to repair himself."
+msgstr "Износ любой робот-части, выше которого персонаж идёт чиниться."

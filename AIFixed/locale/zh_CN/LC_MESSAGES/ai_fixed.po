@@ -35,3 +35,14 @@ msgstr "详细日志"
 msgid "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
 msgstr "在 RE_Kenshi_log.txt 中记录：为谁寻找修理床，以及选了哪一张。"
 
+msgid "Self-repair when worn"
+msgstr "磨损时自行修理"
+
+msgid "A skeleton, or someone with prosthetics, whose part wear goes above the threshold goes to the nearest free powered repair bed by himself, stays until fully repaired and then goes back to work. Not in combat, not while carrying someone."
+msgstr "部件磨损超过阈值的骷髅或装有义肢的角色会自行前往最近的空闲且通电的修理床，修好后回去工作。战斗中或背着人时不会。"
+
+msgid "Wear threshold"
+msgstr "磨损阈值"
+
+msgid "Wear of any robotic part above which the character goes to repair himself."
+msgstr "任一机械部件的磨损超过此值时，角色会去修理。"

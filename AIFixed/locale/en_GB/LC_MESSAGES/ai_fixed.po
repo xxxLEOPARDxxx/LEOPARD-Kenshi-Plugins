@@ -35,3 +35,14 @@ msgstr "Detailed log"
 msgid "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
 msgstr "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
 
+msgid "Self-repair when worn"
+msgstr "Self-repair when worn"
+
+msgid "A skeleton, or someone with prosthetics, whose part wear goes above the threshold goes to the nearest free powered repair bed by himself, stays until fully repaired and then goes back to work. Not in combat, not while carrying someone."
+msgstr "A skeleton, or someone with prosthetics, whose part wear goes above the threshold goes to the nearest free powered repair bed by himself, stays until fully repaired and then goes back to work. Not in combat, not while carrying someone."
+
+msgid "Wear threshold"
+msgstr "Wear threshold"
+
+msgid "Wear of any robotic part above which the character goes to repair himself."
+msgstr "Wear of any robotic part above which the character goes to repair himself."

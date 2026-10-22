@@ -48,6 +48,10 @@
 #include <kenshi/Character.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Faction.h>
+#include <kenshi/Globals.h>
+#include <kenshi/GameWorld.h>
+#include <kenshi/PlayerInterface.h>
+#include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/MedicalSystem.h>
 #include <kenshi/FactionRelations.h>
 #include <kenshi/RaceData.h>
@@ -73,6 +77,8 @@ namespace
 
     bool g_enabled = true;
     bool g_skeletonBeds = true;
+    bool g_selfRepair = true;
+    int g_selfRepairWear = 50;      // износ части, с которого идти чиниться (0-100)
     bool g_debug = false;
 
 
@@ -114,6 +120,14 @@ namespace
             GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_skeletonBeds =
             GetPrivateProfileIntA(section, "SkeletonRepairBeds", 1, ini.c_str()) != 0;
+        g_selfRepair =
+            GetPrivateProfileIntA(section, "SelfRepair", 1, ini.c_str()) != 0;
+        g_selfRepairWear =
+            GetPrivateProfileIntA(section, "SelfRepairWear", 50, ini.c_str());
+        if (g_selfRepairWear < 0)
+            g_selfRepairWear = 0;
+        if (g_selfRepairWear > 100)
+            g_selfRepairWear = 100;
         g_debug =
             GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
     }
@@ -165,8 +179,26 @@ namespace
     }
 
 
+    // Скорость починки ремкровати - как её считает medicalUpdate:
+    // getProductionMult() * calculateEfficiencyMult() её UseableStuff.
+    // calculateEfficiencyMult в заголовке protected - зовём по таблице
+    // (vtable +0x368), как зовёт сама игра.
+    float EfficiencyOf(UseableStuff* u)
+    {
+        typedef float (*Fn)(UseableStuff*);
+        return (*reinterpret_cast<Fn*>(*reinterpret_cast<char**>(u) + 0x368))(u);
+    }
+
+    float RepairRate(Building* bed)
+    {
+        UseableStuff* const useable = bed->getUseableStuff();
+        return useable != NULL ? bed->getProductionMult() * EfficiencyOf(useable) : 0.0f;
+    }
+
+
     // Свободная ремкровать рядом, теми же отсевами, что у игры для кроватей
-    // отряда игрока. NULL - такой нет.
+    // отряда игрока, и только та, что чинит (есть питание). NULL - такой нет.
+    // me - кто ищет: несущий раненого или сам скелет (саморемонт).
     Building* FindRepairBed(AI* ai, Character* me)
     {
         lektor<Building*>& machines = Machines();
@@ -194,6 +226,10 @@ namespace
 
             // Свободное место - как спрашивает игра, от имени несущего.
             if (!static_cast<UseableStuff*>(bed)->isFreeSlot(me->handle))
+                continue;
+
+            // Без питания ремкровать не чинит - на неё незачем.
+            if (!(RepairRate(bed) > 0.0f))
                 continue;
 
             Faction* const bedFaction = bed->getFaction();
@@ -352,23 +388,6 @@ namespace
     }
 
 
-    // Скорость починки ремкровати - как её считает medicalUpdate:
-    // getProductionMult() * calculateEfficiencyMult() её UseableStuff.
-    // calculateEfficiencyMult в заголовке protected - зовём по таблице
-    // (vtable +0x368), как зовёт сама игра.
-    float EfficiencyOf(UseableStuff* u)
-    {
-        typedef float (*Fn)(UseableStuff*);
-        return (*reinterpret_cast<Fn*>(*reinterpret_cast<char**>(u) + 0x368))(u);
-    }
-
-    float RepairRate(Building* bed)
-    {
-        UseableStuff* const useable = bed->getUseableStuff();
-        return useable != NULL ? bed->getProductionMult() * EfficiencyOf(useable) : 0.0f;
-    }
-
-
     // Порог и прибавка - те же, что в коде игры (scoreGetOutOfBedOnceFullyHealed).
     const float HEALED_ABOVE = 0.9f;
     const float HEALED_BONUS = 1.0f;
@@ -426,6 +445,186 @@ namespace
         if (!g_skeletonBeds || self == NULL)
             return score;
         return SafeStayUntilRepaired(self, score);
+    }
+
+
+    // ---------------------------------------------------------------
+    // 2. Саморемонт при износе (22.10.2026, просьба игроков)
+    //
+    // Скелет или живой с протезами, у кого износ какой-нибудь робот-части
+    // выше порога (SelfRepairWear, 0-100, по умолчанию 50), сам идёт на
+    // ближайшую свободную ремкровать с питанием - тот же приказ «лечь в
+    // кровать», что даёт игрок (USE_BED_ORDER), прежние приказы
+    // сбрасываются, постоянные работы остаются. Лежит до полной починки
+    // (правка 1б), потом наш приказ снимается - и он встаёт к своим делам.
+    //
+    // Не трогаем: тех, кто в бою, без сознания, лежит, несёт кого-то или
+    // кого несут, уже в кровати или тюрьме. Игрок отменил приказ -
+    // повторяем не чаще раза в 20 с и не больше 3 раз, пока износ не
+    // опустится ниже порога.
+    //
+    // Раз в 3 с из обновления интерфейса - оттуда игра отдаёт приказы игрока.
+    // ---------------------------------------------------------------
+
+    const DWORD SELF_REPAIR_SCAN_MS = 3000;
+    const DWORD SELF_REPAIR_RETRY_MS = 20000;
+    const int SELF_REPAIR_TRIES = 3;
+
+    struct SelfRepairState
+    {
+        DWORD ordered;      // когда отдали приказ, 0 - ещё не отдавали
+        int tries;          // сколько раз отдавали
+        bool sent;          // в кровати по нашему приказу
+    };
+
+    // Ключ - указатель только для поиска: разыменовываем лишь персонажей из
+    // живого списка игрока, записи об остальных выбрасываются каждый проход.
+    std::map<Character*, SelfRepairState> g_selfRepairState;
+
+
+    float WorstWear(MedicalSystem* med, bool robotRace)
+    {
+        float worst = 0.0f;
+        const lektor<MedicalSystem::HealthPartStatus*>& parts = med->anatomy;
+        for (uint32_t i = 0; i < parts.size(); ++i)
+        {
+            const MedicalSystem::HealthPartStatus* const p = parts[i];
+            if (p != NULL && IsRoboticPart(p, robotRace) && !p->isDead() && p->wearDamage > worst)
+                worst = p->wearDamage;
+        }
+        return worst;
+    }
+
+
+    void NoteSelfRepair(Character* c, const std::string& what)
+    {
+        if (g_debug)
+            DebugLog("AIFixed: self-repair " + c->displayName + " - " + what);
+    }
+
+
+    // Один персонаж. false - запись о нём больше не нужна.
+    bool SelfRepairOne(Character* c, SelfRepairState& state, DWORD now)
+    {
+        MedicalSystem* const med = c->getMedical();
+        OrdersReceiver* const orders = c->getOrdersReciever();
+        if (med == NULL || orders == NULL)
+            return false;
+
+        const bool robotRace = IsRobot(c);
+        if (!HasRoboticParts(med, robotRace))
+            return false;
+
+        if (c->inSomething == IN_BED)
+        {
+            // Лёг по нашему приказу и починился - приказ снимаем, встаёт сам.
+            if (state.sent && RoboticPartsRepaired(med, robotRace))
+            {
+                if (orders->hasGoal(USE_BED_ORDER))
+                    orders->removeGoal(USE_BED_ORDER);
+                NoteSelfRepair(c, "repaired, the bed order is lifted");
+                return false;
+            }
+            return true;
+        }
+
+        // state.sent не сбрасываем, пока идёт к кровати: дойдёт, починится -
+        // приказ снимем. Запись живёт, пока износ выше порога.
+        if (c->inSomething != IN_NOTHING || c->isDead() || c->isUnconcious() || c->isDown() ||
+            c->isCarryingSomething || c->isBeingCarried() || c->isInCombatMode(true, true))
+            return state.ordered != 0;
+
+        const float worst = WorstWear(med, robotRace);
+        if (!(worst > static_cast<float>(g_selfRepairWear)))
+            return false;               // износ в норме - всё забываем
+
+        if (orders->hasGoal(USE_BED_ORDER) || orders->hasGoal(USE_BED))
+            return true;                // уже идёт к кровати
+
+        if (state.tries >= SELF_REPAIR_TRIES ||
+            (state.ordered != 0 && now - state.ordered < SELF_REPAIR_RETRY_MS))
+            return true;
+
+        AI* const ai = c->getAI();
+        Building* const bed = ai != NULL ? FindRepairBed(ai, c) : NULL;
+        if (bed == NULL)
+        {
+            NoteSelfRepair(c, "worn, but no free repair bed with power nearby");
+            return true;
+        }
+
+        orders->addOrder(USE_BED_ORDER, bed->handle, bed->getPosition(), true, false);
+        state.ordered = now;
+        ++state.tries;
+        state.sent = true;
+
+        char line[96];
+        _snprintf_s(line, _TRUNCATE, "worst wear %.1f, try %d", worst, state.tries);
+        NoteSelfRepair(c, "sent to " + bed->displayName + ", " + line);
+        return true;
+    }
+
+
+    // Под защитой: не совпала раскладка или персонаж умер на полпути -
+    // пропускаем его в этом проходе. Объектов с деструкторами здесь нет.
+    bool SafeSelfRepairOne(Character* c, SelfRepairState& state, DWORD now)
+    {
+        __try
+        {
+            return SelfRepairOne(c, state, now);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static LONG told = 0;
+            if (InterlockedExchange(&told, 1) == 0)
+                ErrorLog("AIFixed: self-repair check failed once - that character was skipped");
+            return false;
+        }
+    }
+
+
+    void SelfRepairScan()
+    {
+        if (ou == NULL || ou->player == NULL)
+            return;
+
+        const lektor<Character*>& squad = ou->player->playerCharacters;
+        const DWORD now = GetTickCount();
+        std::map<Character*, SelfRepairState> kept;
+
+        for (uint32_t i = 0; i < squad.size(); ++i)
+        {
+            Character* const c = squad[i];
+            if (c == NULL)
+                continue;
+
+            SelfRepairState state = { 0, 0, false };
+            std::map<Character*, SelfRepairState>::const_iterator old = g_selfRepairState.find(c);
+            if (old != g_selfRepairState.end())
+                state = old->second;
+
+            if (SafeSelfRepairOne(c, state, now))
+                kept[c] = state;
+        }
+
+        g_selfRepairState.swap(kept);
+    }
+
+
+    void (*g_origGuiUpdate)(ForgottenGUI*) = NULL;
+    DWORD g_lastSelfRepairScan = 0;
+
+    void GuiUpdate_hook(ForgottenGUI* self)
+    {
+        g_origGuiUpdate(self);
+
+        if (!g_selfRepair)
+            return;
+        const DWORD now = GetTickCount();
+        if (now - g_lastSelfRepairScan < SELF_REPAIR_SCAN_MS)
+            return;
+        g_lastSelfRepairScan = now;
+        SelfRepairScan();
     }
 
 
@@ -672,6 +871,10 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Fixes"));
     api->toggle(api, "AIFixed", "SkeletonRepairBeds", Tr("Skeletons to repair beds"),
                 Tr("A wounded skeleton is carried to a free skeleton repair bed instead of an ordinary bed. No free repair bed nearby - an ordinary bed, as in the game."), 1, 0);
+    api->toggle(api, "AIFixed", "SelfRepair", Tr("Self-repair when worn"),
+                Tr("A skeleton, or someone with prosthetics, whose part wear goes above the threshold goes to the nearest free powered repair bed by himself, stays until fully repaired and then goes back to work. Not in combat, not while carrying someone."), 1, 0);
+    api->integer(api, "AIFixed", "SelfRepairWear", Tr("Wear threshold"),
+                 Tr("Wear of any robotic part above which the character goes to repair himself."), 50, 0, 100, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."), 0, 0);
 }
@@ -703,6 +906,15 @@ __declspec(dllexport) void startPlugin()
                            &g_origGetOutHealed))
     {
         ErrorLog("AIFixed: could not hook the get-out-of-bed check, skeletons leave repair beds at once");
+    }
+
+    // Саморемонт - из обновления интерфейса; выключатель читается на ходу.
+    if (KenshiLib::SUCCESS !=
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
+                           GuiUpdate_hook,
+                           &g_origGuiUpdate))
+    {
+        ErrorLog("AIFixed: could not hook the interface update, no self-repair");
     }
 
     // Диагностика - только при подробном журнале на старте.
