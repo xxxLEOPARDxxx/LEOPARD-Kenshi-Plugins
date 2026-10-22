@@ -39,6 +39,7 @@
 #include <IniDefaults.h>
 
 #include <cstdio>
+#include <map>
 #include <string>
 
 #include <Debug.h>
@@ -213,9 +214,28 @@ namespace
     }
 
 
+    // Журнал - одна строка на смену: игра переспрашивает кровать каждые
+    // ~0.3 с, а лежащих каждые ~0.2 с заново «укладывает» в ту же кровать.
+    // Ключи - только для сравнения, не разыменовываются. Только при Debug.
+    CRITICAL_SECTION g_noteLock;
+    typedef std::map<Character*, const void*> NotedMap;
+    NotedMap g_notedSearch;     // какую кровать нашли
+    NotedMap g_notedBed;        // в какой кровати лежит
+
+    bool Changed(NotedMap& noted, Character* c, const void* what)
+    {
+        EnterCriticalSection(&g_noteLock);
+        NotedMap::iterator it = noted.find(c);
+        const bool changed = it == noted.end() || it->second != what;
+        noted[c] = what;
+        LeaveCriticalSection(&g_noteLock);
+        return changed;
+    }
+
+
     void Note(Character* patient, Building* bed, bool justAsking)
     {
-        if (!g_debug)
+        if (!g_debug || !Changed(g_notedSearch, patient, bed))
             return;
 
         char line[512];
@@ -361,7 +381,7 @@ namespace
 
     void NoteBed(Character* self, bool on, UseableStuff* bed, const void* from)
     {
-        if (!IsRobot(self))
+        if (!IsRobot(self) || !Changed(g_notedBed, self, on ? static_cast<const void*>(bed) : NULL))
             return;
         char line[128];
         _snprintf_s(line, _TRUNCATE, "%s, function %d", on ? "on" : "off",
@@ -453,6 +473,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 
 __declspec(dllexport) void startPlugin()
 {
+    InitializeCriticalSection(&g_noteLock);
     LoadSettings();
 
     if (!g_enabled)
