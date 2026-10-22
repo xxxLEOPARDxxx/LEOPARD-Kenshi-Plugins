@@ -260,7 +260,7 @@ namespace
         g_stats.list.clear();
         if (generic.empty())
             return false;
-        const Ogre::Vector3 near = town->getPosition();
+        const Ogre::Vector3 centre = town->getPosition();
         float bestDistance = 0.0f;
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
         for (ogre_unordered_set<Character*>::type::const_iterator it = all.begin(); it != all.end(); ++it)
@@ -271,7 +271,7 @@ namespace
             const int p = Candidate(c, town, ours, generic);
             if (p < 0)
                 continue;
-            const float d = c->getPosition().distance(near);
+            const float d = c->getPosition().distance(centre);
             if (who == NULL || p < price || (p == price && d < bestDistance))
             {
                 who = c;
