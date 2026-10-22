@@ -33,6 +33,12 @@ msgstr "难度"
 msgid "Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."
 msgstr "新派系创始成员的技能：所有技能从该等级开始。对更改后成立的派系生效。"
 
+msgid "Start money"
+msgstr "初始资金"
+
+msgid "Money of a new faction when it is founded. Recruits in the Hub ask 3000-6000; until stage 2 the faction only earns 15 per member an hour. Applies to factions founded after the change."
+msgstr "新派系成立时的资金。中心城的新兵要价 3000-6000；在第 2 阶段之前，派系每名成员每小时只赚 15。对更改后成立的派系生效。"
+
 msgid "Faction window key"
 msgstr "派系窗口按键"
 
@@ -90,8 +96,8 @@ msgstr "成员：%d / %d"
 msgid "Money: %d"
 msgstr "资金：%d"
 
-msgid "Kept for hiring: up to %d"
-msgstr "留作招募：最多 %d"
+msgid "Cheapest recruit in town: %d (needs %d)"
+msgstr "城中最便宜的新兵：%d（需要 %d）"
 
 msgid "Hiring:"
 msgstr "招募："

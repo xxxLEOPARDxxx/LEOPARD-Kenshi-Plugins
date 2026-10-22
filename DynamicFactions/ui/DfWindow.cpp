@@ -121,8 +121,9 @@ namespace
         {
             t += Format(Tr("Members: %d of %d"), snap.members, r.maxMembers) + "\n";
             t += Format(Tr("Money: %d"), snap.money) + "\n";
-            if (snap.members < r.maxMembers)
-                t += Format(Tr("Kept for hiring: up to %d"), kDfReserve + kDfHireFund) + "\n";
+            if (snap.members < r.maxMembers && snap.recruitPrice >= 0)
+                t += Format(Tr("Cheapest recruit in town: %d (needs %d)"), snap.recruitPrice,
+                            snap.recruitPrice + kDfReserve) + "\n";
         }
         if (!hire.empty())
             t += std::string(Tr("Hiring:")) + " " + hire + "\n";

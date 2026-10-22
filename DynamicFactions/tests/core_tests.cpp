@@ -333,6 +333,25 @@ static void test_brain_hire_fund_kept()
     CHECK(res >= 0 && full[res].amount == 5);       // 30 человек - фонд не нужен
 }
 
+// Рекрут виден, но денег мало - копим на него, на технику ни очка (23.10:
+// рекруты по 6000, у фракции 5000, и то, что сверх, уходило в технику).
+static void test_brain_saving_for_visible_recruit()
+{
+    DfFactionState s = Founded(10.0);
+    DfSnapshot snap = Snap(4, 6500, 11.0, true);
+    snap.recruitPrice = 6000;
+    const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
+    CHECK(FindAction(acts, DF_RECRUIT) < 0);
+    CHECK(FindAction(acts, DF_RESEARCH) < 0);
+    snap.money = 20000;
+    const std::vector<DfAction> rich = DfDecide(s, snap, DfPhase1Rules());
+    const int rec = FindAction(rich, DF_RECRUIT);
+    const int res = FindAction(rich, DF_RESEARCH);
+    CHECK(rec >= 0 && rich[rec].amount == 6000);
+    // 20060 - 6000 - 1000 - 4000 фонда на следующего = 9060 -> потолок 5
+    CHECK(res >= 0 && rich[res].amount == 5);
+}
+
 static void test_brain_recruit_too_expensive()
 {
     DfFactionState s = Founded(10.0);
@@ -468,6 +487,7 @@ int main()
     test_brain_no_one_in_bar();
     test_brain_hire_fund_kept();
     test_brain_recruit_too_expensive();
+    test_brain_saving_for_visible_recruit();
     test_brain_free_recruit();
     test_brain_no_recruit_at_max();
     test_brain_no_recruit_when_home_unloaded();

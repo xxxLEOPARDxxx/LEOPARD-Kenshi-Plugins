@@ -33,6 +33,12 @@ msgstr "Сложность"
 msgid "Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."
 msgstr "Навыки основателей новой фракции: все навыки с самого начала на этом уровне. Действует на фракции, основанные после изменения."
 
+msgid "Start money"
+msgstr "Стартовые деньги"
+
+msgid "Money of a new faction when it is founded. Recruits in the Hub ask 3000-6000; until stage 2 the faction only earns 15 per member an hour. Applies to factions founded after the change."
+msgstr "Деньги новой фракции при основании. Рекруты в Хабе просят 3000-6000; до этапа 2 фракция зарабатывает только 15 в час на человека. Действует на фракции, основанные после изменения."
+
 msgid "Faction window key"
 msgstr "Клавиша окна фракций"
 
@@ -90,8 +96,8 @@ msgstr "Численность: %d из %d"
 msgid "Money: %d"
 msgstr "Деньги: %d"
 
-msgid "Kept for hiring: up to %d"
-msgstr "Отложено на найм: до %d"
+msgid "Cheapest recruit in town: %d (needs %d)"
+msgstr "Самый дешёвый рекрут в городе: %d (нужно %d)"
 
 msgid "Hiring:"
 msgstr "Найм:"

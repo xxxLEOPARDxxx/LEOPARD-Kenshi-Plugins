@@ -69,16 +69,23 @@ std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, 
 
     // Найм - как у игрока: кто сидит в баре и сколько просит (его диалог),
     // адаптер узнаёт заранее (snap.recruitPrice).
+    bool recruited = false;
     if (snap.homeLoaded && snap.recruitPrice >= 0 && snap.members < r.maxMembers &&
         money >= snap.recruitPrice + kDfReserve)
     {
         acts.push_back(Make(DF_RECRUIT, snap.recruitPrice));
         money -= snap.recruitPrice;
+        recruited = true;
     }
 
     // На технику - только сверх запаса и, пока людей меньше предела, сверх
-    // фонда найма (23.10: всё уходило в технику, платить рекруту было нечем).
-    const int keep = kDfReserve + (snap.members < r.maxMembers ? kDfHireFund : 0);
+    // денег на найм: рекрут виден, но не по карману - копим на его цену;
+    // не виден или уже нанят в этот час - держим фонд на следующего (23.10:
+    // всё уходило в технику, рекрут за 6000 оставался недоступен).
+    int fund = 0;
+    if (snap.members < r.maxMembers)
+        fund = (snap.recruitPrice >= 0 && !recruited) ? snap.recruitPrice : kDfHireFund;
+    const int keep = kDfReserve + fund;
     if (s.techLevel < r.maxTech && r.techPointCost > 0 && money > keep)
     {
         int points = (money - keep) / r.techPointCost;

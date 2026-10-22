@@ -60,6 +60,7 @@ namespace
     bool g_debug = false;
     HoldKey::Key g_windowKey;
     float g_startStats = 30.0f;             // навыки основателей - по сложности
+    int g_startMoney = 5000;                // деньги фракции при основании
 
     // Сложность: что в ini и какие навыки у основателей.
     const char* const kDifficultyKeys[] = { "easy", "medium", "hard", "veryhard" };
@@ -92,6 +93,9 @@ namespace
         g_enabled = GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
         DfHireSetDebug(g_debug);
+        g_startMoney = GetPrivateProfileIntA(section, "StartMoney", 5000, ini.c_str());
+        if (g_startMoney < 0)
+            g_startMoney = 0;
         char key[64] = {};
         GetPrivateProfileStringA(section, "WindowKey", "CTRL+F10", key, sizeof(key), ini.c_str());
         g_windowKey = HoldKey::Parse(key);
@@ -124,7 +128,8 @@ namespace
     {
         double zeroSince;                   // с какого часа численность 0 (-1 - не 0)
         DfHireTask hire;                    // поход в бар за рекрутом
-        Runtime() : zeroSince(-1.0) {}
+        int lastPrice;                      // самый дешёвый рекрут на последнем ходе (для окна)
+        Runtime() : zeroSince(-1.0), lastPrice(-1) {}
     };
 
     std::vector<DfFactionState> g_states;
@@ -233,7 +238,8 @@ namespace
         TownBase* const hub = DfFindHub();
         if (hub == NULL || f == NULL)
             return;
-        const DfRules rules = DfPhase1Rules();
+        DfRules rules = DfPhase1Rules();
+        rules.startMoney = g_startMoney;
         DfSnapshot before;
         if (!DfTakeSnapshot(f, before))
             return;
@@ -307,6 +313,7 @@ namespace
         }
         else if (hub == NULL || !DfFindBarRecruit(hub, f, recruit, snap.recruitPrice))
             snap.recruitPrice = -1;
+        rt.lastPrice = snap.recruitPrice;
         if (g_debug && hub != NULL && !rt.hire.busy())
         {
             const DfRecruitSearchStats& st = DfLastRecruitSearch();
@@ -366,7 +373,7 @@ namespace
         {
             snaps[i].members = -1;
             snaps[i].money = 0;
-            snaps[i].recruitPrice = -1;
+            snaps[i].recruitPrice = i < g_runtime.size() && !g_runtime[i].hire.busy() ? g_runtime[i].lastPrice : -1;
             Faction* const f = g_states[i].founded ? DfBindFaction(g_states[i].recordId) : NULL;
             if (f != NULL && !DfTakeSnapshot(f, snaps[i]))
                 snaps[i].members = -1;
@@ -588,6 +595,9 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->choice(api, "DynamicFactions", "Difficulty", Tr("Difficulty"),
                 Tr("Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."),
                 "medium", kDifficultyKeys, labels, kDifficultyCount, 0);
+    api->integer(api, "DynamicFactions", "StartMoney", Tr("Start money"),
+                 Tr("Money of a new faction when it is founded. Recruits in the Hub ask 3000-6000; until stage 2 the faction only earns 15 per member an hour. Applies to factions founded after the change."),
+                 5000, 0, 100000, 0);
     api->hotkey(api, "DynamicFactions", "WindowKey", Tr("Faction window key"),
                 Tr("Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."), "CTRL+F10", 0);
     api->section(api, Tr("Diagnostics"));
