@@ -35,6 +35,7 @@
 #include <ModConfigMenu.h>
 
 #include <Windows.h>
+#include <intrin.h>
 #include <IniDefaults.h>
 
 #include <cstdio>
@@ -50,12 +51,16 @@
 #include <kenshi/RaceData.h>
 #include <kenshi/AI/AI.h>
 #include <kenshi/AI/Blackboard.h>
+#include <kenshi/AI/AITaskSystem.h>
+#include <kenshi/Tasker.h>
 #include <kenshi/Building/Building.h>
 #include <kenshi/Building/UseableStuff.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
+
+#pragma intrinsic(_ReturnAddress)
 
 
 namespace
@@ -266,6 +271,154 @@ namespace
     }
 
 
+    // ---------------------------------------------------------------
+    // Диагностика укладывания скелетов (22.10.2026; только при Debug=1 на
+    // старте игры - иначе эти хуки не ставятся вовсе)
+    //
+    // Первая проверка: скелетов стали носить к ремкроватям, но клали рядом.
+    // Действие укладывания (PUT_SOMEONE_IN_BED) и оценка «положить в
+    // кровать» тип кровати не смотрят - чтобы не гадать, пишем, кто кого
+    // роняет и откуда, кого кладут в кровать, какая задача сорвалась.
+    // ---------------------------------------------------------------
+
+    std::string Where(const void* a)
+    {
+        HMODULE m = NULL;
+        char name[MAX_PATH] = "?";
+        if (a != NULL &&
+            GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               static_cast<LPCSTR>(a), &m) && m != NULL)
+        {
+            GetModuleFileNameA(m, name, sizeof(name));
+            const char* slash = strrchr(name, 0x5C);
+            char buf[MAX_PATH + 32];
+            _snprintf_s(buf, _TRUNCATE, "%s+0x%llX", slash != NULL ? slash + 1 : name,
+                        static_cast<unsigned long long>(static_cast<const char*>(a) - reinterpret_cast<char*>(m)));
+            return buf;
+        }
+        return "?";
+    }
+
+
+    std::string TasksOf(Character* c)
+    {
+        char buf[96] = "goal ? action ?";
+        AI* const ai = c->getAI();
+        OrdersReceiver* const orders = c->getOrdersReciever();
+        const int goal = orders != NULL ? static_cast<int>(orders->getCurrentGoal().key()) : -1;
+        int action = -1;
+        if (ai != NULL && ai->taskSystemAI != NULL)
+        {
+            Tasker* const task = ai->taskSystemAI->actions.getFirstTask();
+            if (task != NULL)
+                action = static_cast<int>(task->key());
+        }
+        _snprintf_s(buf, _TRUNCATE, "goal 0x%X action 0x%X", goal, action);
+        return buf;
+    }
+
+
+    Character* CarriedRobot(Character* carrier)
+    {
+        if (carrier == NULL || !carrier->isCarryingSomething)
+            return NULL;
+        Character* const carried = carrier->getCarryingObject().getCharacter();
+        return carried != NULL && IsRobot(carried) ? carried : NULL;
+    }
+
+
+    void (*g_origDrop)(Character*, bool, bool) = NULL;
+
+    void NoteDrop(Character* self, bool ragdoll, bool removeOnly, const void* from)
+    {
+        Character* const carried = CarriedRobot(self);
+        if (carried == NULL)
+            return;
+        DebugLog("AIFixed: " + self->displayName + " drops skeleton " + carried->displayName +
+                 (ragdoll ? " (ragdoll)" : "") + (removeOnly ? " (remove only)" : "") +
+                 ", " + TasksOf(self) + ", from " + Where(from));
+    }
+
+    void SafeNoteDrop(Character* self, bool ragdoll, bool removeOnly, const void* from)
+    {
+        __try
+        {
+            NoteDrop(self, ragdoll, removeOnly, from);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
+    void Drop_hook(Character* self, bool ragdoll, bool removeOnly)
+    {
+        SafeNoteDrop(self, ragdoll, removeOnly, _ReturnAddress());
+        g_origDrop(self, ragdoll, removeOnly);
+    }
+
+
+    void (*g_origSetBedMode)(Character*, bool, UseableStuff*) = NULL;
+
+    void NoteBed(Character* self, bool on, UseableStuff* bed, const void* from)
+    {
+        if (!IsRobot(self))
+            return;
+        char line[128];
+        _snprintf_s(line, _TRUNCATE, "%s, function %d", on ? "on" : "off",
+                    bed != NULL ? static_cast<int>(bed->getSpecialFunction()) : -1);
+        DebugLog("AIFixed: bed mode for skeleton " + self->displayName + ": " +
+                 (bed != NULL ? bed->displayName : std::string("no bed")) + " " + line +
+                 ", from " + Where(from));
+    }
+
+    void SafeNoteBed(Character* self, bool on, UseableStuff* bed, const void* from)
+    {
+        __try
+        {
+            NoteBed(self, on, bed, from);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
+    void SetBedMode_hook(Character* self, bool on, UseableStuff* bed)
+    {
+        SafeNoteBed(self, on, bed, _ReturnAddress());
+        g_origSetBedMode(self, on, bed);
+    }
+
+
+    void (*g_origTaskImpossible)(AITaskSytem*) = NULL;
+
+    void NoteImpossible(AITaskSytem* tasks, const void* from)
+    {
+        Character* const me = tasks->me;
+        Character* const carried = CarriedRobot(me);
+        if (carried == NULL)
+            return;
+        DebugLog("AIFixed: " + me->displayName + " carrying skeleton " + carried->displayName +
+                 ": task impossible, " + TasksOf(me) + ", from " + Where(from));
+    }
+
+    void SafeNoteImpossible(AITaskSytem* tasks, const void* from)
+    {
+        __try
+        {
+            NoteImpossible(tasks, from);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
+    void TaskImpossible_hook(AITaskSytem* self)
+    {
+        SafeNoteImpossible(self, _ReturnAddress());
+        g_origTaskImpossible(self);
+    }
+
+
     float (*g_origFindOwnedFreeBed)(AI*, const hand&, hand&, bool) = NULL;
 
     float FindOwnedFreeBed_hook(AI* self, const hand& in, hand& out, bool justAsking)
@@ -315,6 +468,20 @@ __declspec(dllexport) void startPlugin()
                            &g_origFindOwnedFreeBed))
     {
         ErrorLog("AIFixed: could not hook the bed search, skeletons keep going to ordinary beds");
+    }
+
+    // Диагностика - только при подробном журнале на старте.
+    if (g_debug)
+    {
+        if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::dropCarriedObject),
+                                                     Drop_hook, &g_origDrop) ||
+            KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::setBedMode),
+                                                     SetBedMode_hook, &g_origSetBedMode) ||
+            KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&AITaskSytem::taskImpossible),
+                                                     TaskImpossible_hook, &g_origTaskImpossible))
+            ErrorLog("AIFixed: some diagnostic hooks failed - the log will be incomplete");
+        else
+            DebugLog("AIFixed: diagnostics on (drops, bed mode, impossible tasks of skeleton carriers)");
     }
 
     DebugLog("AIFixed: installed");
