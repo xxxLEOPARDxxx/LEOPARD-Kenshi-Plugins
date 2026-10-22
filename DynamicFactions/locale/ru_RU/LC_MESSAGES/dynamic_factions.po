@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru_RU\n"
+
+msgid "Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."
+msgstr "Фракции, которые живут сами: в Хабе появляется новая фракция со своим названием, зарабатывает, нанимает людей и растёт в технике. Когда все её члены погибли - её больше нет."
+
+msgid "General"
+msgstr "Общие"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "The whole mod."
+msgstr "Весь мод."
+
+msgid "Faction window key"
+msgstr "Клавиша окна фракций"
+
+msgid "Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."
+msgstr "Открывает и закрывает окно с состоянием фракций. Щёлкните и нажмите клавишу; Backspace - без клавиши."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt: every hourly tick of a faction, saving and loading."
+msgstr "Подробности в RE_Kenshi_log.txt: каждый часовой ход фракции, сохранение и загрузка."
+
+msgid "Day %d, %02d:00"
+msgstr "День %d, %02d:00"
+
+msgid "Founded in the Hub"
+msgstr "Основана в Хабе"
+
+msgid "Recruited a new member"
+msgstr "Наняла нового человека"
+
+msgid "All members are dead - the faction is extinct"
+msgstr "Все члены погибли - фракции больше нет"
+
+msgid "Reached tech level %d"
+msgstr "Достигла уровня техники %d"
+
+msgid "human"
+msgstr "люди"
+
+msgid "shek"
+msgstr "шеки"
+
+msgid "skeleton"
+msgstr "скелеты"
+
+msgid "hive"
+msgstr "улей"
+
+msgid "Race:"
+msgstr "Раса:"
+
+msgid "Not founded yet - waits until the Hub is loaded"
+msgstr "Ещё не основана - ждёт, пока загрузится Хаб"
+
+msgid "Founded:"
+msgstr "Основана:"
+
+msgid "Members: %d of %d"
+msgstr "Численность: %d из %d"
+
+msgid "Money: %d"
+msgstr "Деньги: %d"
+
+msgid "Tech: level %d (maximum)"
+msgstr "Техника: уровень %d (предел)"
+
+msgid "Tech: level %d, %d of %d points"
+msgstr "Техника: уровень %d, очков %d из %d"
+
+msgid "Status:"
+msgstr "Состояние:"
+
+msgid "extinct"
+msgstr "вымерла"
+
+msgid "active"
+msgstr "действует"
+
+msgid "waiting"
+msgstr "ждёт"
+
+msgid "Recent events:"
+msgstr "Последние события:"
+
+msgid "Dynamic Factions"
+msgstr "Динамические фракции"
+
+msgid "Waiting for the game..."
+msgstr "Ожидание игры..."
+
+msgid "No dynamic factions in this game yet."
+msgstr "В этой игре пока нет динамических фракций."

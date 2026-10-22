@@ -13,8 +13,13 @@
 // loadGame. Деньги и люди - у игры (они в её сохранении).
 
 #define WIN32_LEAN_AND_MEAN
+#define KLOC_DOMAIN "dynamic_factions"
+#include <Localization.h>
+#include <ModConfigMenu.h>
+
 #include <Windows.h>
 #include <IniDefaults.h>
+#include <HoldKey.h>
 
 #include <cstdio>
 #include <fstream>
@@ -31,10 +36,13 @@
 #include <kenshi/SaveManager.h>
 #include <kenshi/gui/ForgottenGUI.h>
 
+#include <mygui/MyGUI_InputManager.h>
+
 #include "core/DfBrain.h"
 #include "core/DfNames.h"
 #include "core/DfState.h"
 #include "game/DfGame.h"
+#include "ui/DfWindow.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -47,6 +55,7 @@ namespace
 
     bool g_enabled = true;
     bool g_debug = false;
+    HoldKey::Key g_windowKey;
 
     std::string IniFileName()
     {
@@ -73,6 +82,9 @@ namespace
         const char* const section = "DynamicFactions";
         g_enabled = GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
+        char key[64] = {};
+        GetPrivateProfileStringA(section, "WindowKey", "CTRL+F10", key, sizeof(key), ini.c_str());
+        g_windowKey = HoldKey::Parse(key);
     }
 
 
@@ -280,6 +292,50 @@ namespace
         }
     }
 
+    // Окно: живые числа каждого состояния (не только на часовом тике).
+    void UpdateWindow()
+    {
+        std::vector<DfSnapshot> snaps(g_states.size());
+        for (size_t i = 0; i < g_states.size(); ++i)
+        {
+            snaps[i].members = -1;
+            snaps[i].money = 0;
+            Faction* const f = g_states[i].founded ? DfBindFaction(g_states[i].recordId) : NULL;
+            if (f != NULL && !DfTakeSnapshot(f, snaps[i]))
+                snaps[i].members = -1;
+        }
+        DfWindowUpdate(g_states, snaps, DfPhase1Rules());
+    }
+
+    // Хоткей - ровно эта комбинация: CTRL+F10 не срабатывает на CTRL+SHIFT+F10.
+    bool Exact(const HoldKey::Key& k)
+    {
+        if (k.vk == 0 || !HoldKey::Held(k))
+            return false;
+        if (!k.ctrl && k.vk != VK_CONTROL && HoldKey::Down(VK_CONTROL))
+            return false;
+        if (!k.shift && k.vk != VK_SHIFT && HoldKey::Down(VK_SHIFT))
+            return false;
+        if (!k.alt && k.vk != VK_MENU && HoldKey::Down(VK_MENU))
+            return false;
+        return true;
+    }
+
+    bool g_keyWas = false;
+
+    void PollKey()
+    {
+        // Печатает игрок в поле - клавиша не наша.
+        const bool typing = MyGUI::InputManager::getInstance().getKeyFocusWidget() != NULL;
+        const bool down = !typing && Exact(g_windowKey);
+        if (down && !g_keyWas)
+        {
+            DfWindowToggle();
+            g_lastTick = 0;                 // окно сразу с числами
+        }
+        g_keyWas = down;
+    }
+
     void Tick()
     {
         if (!g_ready || ou == NULL || ou->player == NULL)
@@ -314,11 +370,17 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
+        if (ou == NULL || ou->player == NULL)
+            return;
+        PollKey();
+        DfWindowFrame();
         const DWORD now = GetTickCount();
         if (now - g_lastTick < kTickMs)
             return;
         g_lastTick = now;
         Tick();
+        if (DfWindowIsOpen())
+            UpdateWindow();
     }
 
     int SaveGame_hook(SaveManager* self, const std::string& location, const std::string& name)
@@ -365,6 +427,23 @@ namespace
         g_needFresh = true;
         MarkReady();
     }
+}
+
+
+// Страница в ModConfigMenu (вкладка MCM в настройках игры), если он есть.
+extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
+{
+    static const std::string ini = IniPath();
+    api->beginMod(api, "DynamicFactions", "Dynamic Factions", ini.c_str(), &LoadSettings);
+    if (api->version >= 2)
+        api->info(api, Tr("Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."));
+    api->section(api, Tr("General"));
+    api->toggle(api, "DynamicFactions", "Enabled", Tr("Enabled"), Tr("The whole mod."), 1, MCM_RESTART);
+    api->hotkey(api, "DynamicFactions", "WindowKey", Tr("Faction window key"),
+                Tr("Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."), "CTRL+F10", 0);
+    api->section(api, Tr("Diagnostics"));
+    api->toggle(api, "DynamicFactions", "Debug", Tr("Detailed log"),
+                Tr("Details in RE_Kenshi_log.txt: every hourly tick of a faction, saving and loading."), 0, 0);
 }
 
 

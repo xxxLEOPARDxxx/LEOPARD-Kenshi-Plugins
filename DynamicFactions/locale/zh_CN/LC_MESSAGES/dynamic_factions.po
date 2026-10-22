@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+
+msgid "Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."
+msgstr "自主运作的派系：一个拥有独特名称的新派系会出现在中心城，赚钱、招募成员并提升科技。当其所有成员死亡时，它便会消失。"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "The whole mod."
+msgstr "整个模组。"
+
+msgid "Faction window key"
+msgstr "派系窗口按键"
+
+msgid "Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."
+msgstr "打开或关闭显示派系状态的窗口。点击后按下按键；Backspace - 不设按键。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt: every hourly tick of a faction, saving and loading."
+msgstr "在 RE_Kenshi_log.txt 中记录详情：派系每小时的行动、存档与读档。"
+
+msgid "Day %d, %02d:00"
+msgstr "第 %d 天 %02d:00"
+
+msgid "Founded in the Hub"
+msgstr "在中心城成立"
+
+msgid "Recruited a new member"
+msgstr "招募了一名新成员"
+
+msgid "All members are dead - the faction is extinct"
+msgstr "所有成员已死亡 - 派系已覆灭"
+
+msgid "Reached tech level %d"
+msgstr "科技达到 %d 级"
+
+msgid "human"
+msgstr "人类"
+
+msgid "shek"
+msgstr "沙克"
+
+msgid "skeleton"
+msgstr "骷髅"
+
+msgid "hive"
+msgstr "蜂巢"
+
+msgid "Race:"
+msgstr "种族："
+
+msgid "Not founded yet - waits until the Hub is loaded"
+msgstr "尚未成立 - 等待中心城加载"
+
+msgid "Founded:"
+msgstr "成立于："
+
+msgid "Members: %d of %d"
+msgstr "成员：%d / %d"
+
+msgid "Money: %d"
+msgstr "资金：%d"
+
+msgid "Tech: level %d (maximum)"
+msgstr "科技：%d 级（上限）"
+
+msgid "Tech: level %d, %d of %d points"
+msgstr "科技：%d 级，%d / %d 点"
+
+msgid "Status:"
+msgstr "状态："
+
+msgid "extinct"
+msgstr "已覆灭"
+
+msgid "active"
+msgstr "活跃"
+
+msgid "waiting"
+msgstr "等待中"
+
+msgid "Recent events:"
+msgstr "最近事件："
+
+msgid "Dynamic Factions"
+msgstr "动态派系"
+
+msgid "Waiting for the game..."
+msgstr "等待游戏..."
+
+msgid "No dynamic factions in this game yet."
+msgstr "本局游戏中还没有动态派系。"

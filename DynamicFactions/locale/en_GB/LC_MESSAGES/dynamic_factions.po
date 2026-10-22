@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en_GB\n"
+
+msgid "Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."
+msgstr "Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."
+
+msgid "General"
+msgstr "General"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "The whole mod."
+msgstr "The whole mod."
+
+msgid "Faction window key"
+msgstr "Faction window key"
+
+msgid "Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."
+msgstr "Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: every hourly tick of a faction, saving and loading."
+msgstr "Details in RE_Kenshi_log.txt: every hourly tick of a faction, saving and loading."
+
+msgid "Day %d, %02d:00"
+msgstr "Day %d, %02d:00"
+
+msgid "Founded in the Hub"
+msgstr "Founded in the Hub"
+
+msgid "Recruited a new member"
+msgstr "Recruited a new member"
+
+msgid "All members are dead - the faction is extinct"
+msgstr "All members are dead - the faction is extinct"
+
+msgid "Reached tech level %d"
+msgstr "Reached tech level %d"
+
+msgid "human"
+msgstr "human"
+
+msgid "shek"
+msgstr "shek"
+
+msgid "skeleton"
+msgstr "skeleton"
+
+msgid "hive"
+msgstr "hive"
+
+msgid "Race:"
+msgstr "Race:"
+
+msgid "Not founded yet - waits until the Hub is loaded"
+msgstr "Not founded yet - waits until the Hub is loaded"
+
+msgid "Founded:"
+msgstr "Founded:"
+
+msgid "Members: %d of %d"
+msgstr "Members: %d of %d"
+
+msgid "Money: %d"
+msgstr "Money: %d"
+
+msgid "Tech: level %d (maximum)"
+msgstr "Tech: level %d (maximum)"
+
+msgid "Tech: level %d, %d of %d points"
+msgstr "Tech: level %d, %d of %d points"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "extinct"
+msgstr "extinct"
+
+msgid "active"
+msgstr "active"
+
+msgid "waiting"
+msgstr "waiting"
+
+msgid "Recent events:"
+msgstr "Recent events:"
+
+msgid "Dynamic Factions"
+msgstr "Dynamic Factions"
+
+msgid "Waiting for the game..."
+msgstr "Waiting for the game..."
+
+msgid "No dynamic factions in this game yet."
+msgstr "No dynamic factions in this game yet."
