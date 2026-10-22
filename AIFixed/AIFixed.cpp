@@ -303,40 +303,80 @@ namespace
     // (race->robot или протез) пропускается, и у скелета restedState всегда
     // 1.0 - «вылечен» сразу.
     //
-    // Правка: для скелета, лежащего в ремкровати, та же мера по его частям -
-    // (плоть - оглушение) / (макс. здоровье * возраст * множитель - износ),
-    // меньшая по телу, как игра считает её для живых. Пока она не выше 0.9,
-    // прибавку «вылечен» убираем; починился - встаёт, как задумано игрой.
+    // Правка: кто лежит в ремкровати (скелет или живой с протезами), пока его
+    // робот-части не починены полностью (износ снят, прочность до полного
+    // максимума - ремкровать чинит и то и другое), прибавку «вылечен» не
+    // получает. Первая сборка 22.10 мерила как игра у живых (> 0.9 от
+    // максимума за вычетом износа) - вставали недочиненными. Кровать без
+    // питания не чинит - тогда решает игра, как раньше.
     // ---------------------------------------------------------------
 
-    float RobotRested(MedicalSystem* med)
+    // Часть - робот: у скелета все части, у живого - протезы.
+    bool IsRoboticPart(const MedicalSystem::HealthPartStatus* p, bool robotRace)
     {
-        float rested = 1.0f;
+        return robotRace || p->robotLimb != NULL;
+    }
+
+
+    // Починены ли все робот-части: износ снят, прочность - до полного
+    // максимума (ремкровать чинит и то и другое - HealthPartStatus::update,
+    // ветка robotWear). Потерянные части (isDead) кровать не вернёт - их не
+    // ждём. Допуски - полединицы, чтобы не ждать дробей.
+    bool RoboticPartsRepaired(MedicalSystem* med, bool robotRace)
+    {
         const lektor<MedicalSystem::HealthPartStatus*>& parts = med->anatomy;
         for (uint32_t i = 0; i < parts.size(); ++i)
         {
             const MedicalSystem::HealthPartStatus* const p = parts[i];
-            if (p == NULL)
+            if (p == NULL || !IsRoboticPart(p, robotRace) || p->isDead())
                 continue;
-            const float max = p->_maxHealth * p->age * p->HPMult - p->wearDamage;
-            if (max <= 0.0f)
+            const float full = p->_maxHealth * p->age * p->HPMult;
+            if (full <= 0.0f)
                 continue;
-            const float part = (p->flesh - p->fleshStun) / max;
-            if (part < rested)
-                rested = part;
+            if (p->wearDamage > 0.5f || p->flesh - p->fleshStun < full - 0.5f)
+                return false;
         }
-        return rested;
+        return true;
     }
 
 
-    // Пороги - те же, что в коде игры (scoreGetOutOfBedOnceFullyHealed).
+    bool HasRoboticParts(MedicalSystem* med, bool robotRace)
+    {
+        if (robotRace)
+            return true;
+        const lektor<MedicalSystem::HealthPartStatus*>& parts = med->anatomy;
+        for (uint32_t i = 0; i < parts.size(); ++i)
+            if (parts[i] != NULL && parts[i]->robotLimb != NULL)
+                return true;
+        return false;
+    }
+
+
+    // Скорость починки ремкровати - как её считает medicalUpdate:
+    // getProductionMult() * calculateEfficiencyMult() её UseableStuff.
+    // calculateEfficiencyMult в заголовке protected - зовём по таблице
+    // (vtable +0x368), как зовёт сама игра.
+    float EfficiencyOf(UseableStuff* u)
+    {
+        typedef float (*Fn)(UseableStuff*);
+        return (*reinterpret_cast<Fn*>(*reinterpret_cast<char**>(u) + 0x368))(u);
+    }
+
+    float RepairRate(Building* bed)
+    {
+        UseableStuff* const useable = bed->getUseableStuff();
+        return useable != NULL ? bed->getProductionMult() * EfficiencyOf(useable) : 0.0f;
+    }
+
+
+    // Порог и прибавка - те же, что в коде игры (scoreGetOutOfBedOnceFullyHealed).
     const float HEALED_ABOVE = 0.9f;
     const float HEALED_BONUS = 1.0f;
 
     float StayUntilRepaired(AI* ai, float score)
     {
         Character* const me = ai->me;
-        if (me == NULL || me->inSomething != IN_BED || !IsRobot(me))
+        if (me == NULL || me->inSomething != IN_BED)
             return score;
 
         Building* const bed = me->inWhat.getBuilding();
@@ -347,7 +387,15 @@ namespace
         if (med == NULL || !(med->restedState > HEALED_ABOVE))
             return score;           // прибавки «вылечен» игра не давала
 
-        if (RobotRested(med) > HEALED_ABOVE)
+        const bool robotRace = IsRobot(me);
+        if (!HasRoboticParts(med, robotRace))
+            return score;           // чинить в ремкровати нечего
+
+        // Кровать не чинит (нет питания) - решает игра, иначе лежать вечно.
+        if (!(RepairRate(bed) > 0.0f))
+            return score;
+
+        if (RoboticPartsRepaired(med, robotRace))
             return score;           // починился - пусть встаёт
 
         return score - HEALED_BONUS;
@@ -537,18 +585,11 @@ namespace
     // UseableStuff. Раз в 5 с на скелета игрока в кровати пишем эти значения.
     std::map<Character*, DWORD> g_lastSnap;
 
-    float EfficiencyOf(UseableStuff* u)
-    {
-        // calculateEfficiencyMult в заголовке protected - зовём по таблице,
-        // как зовёт сама игра (vtable +0x368).
-        typedef float (*Fn)(UseableStuff*);
-        return (*reinterpret_cast<Fn*>(*reinterpret_cast<char**>(u) + 0x368))(u);
-    }
-
     void Snap(MedicalSystem* med)
     {
         Character* const c = med->me;
-        if (c == NULL || c->inSomething != IN_BED || !c->isPlayerCharacter() || !IsRobot(c))
+        if (c == NULL || c->inSomething != IN_BED || !c->isPlayerCharacter() ||
+            !HasRoboticParts(med, IsRobot(c)))
             return;
 
         const DWORD now = GetTickCount();
@@ -563,9 +604,17 @@ namespace
 
         Building* const bed = c->inWhat.getBuilding();
         UseableStuff* const useable = bed != NULL ? bed->getUseableStuff() : NULL;
-        char line[384];
+        float worstWear = 0.0f;
+        for (uint32_t i = 0; i < med->anatomy.size(); ++i)
+        {
+            const MedicalSystem::HealthPartStatus* const p = med->anatomy[i];
+            if (p != NULL && IsRoboticPart(p, IsRobot(c)) && p->wearDamage > worstWear)
+                worstWear = p->wearDamage;
+        }
+        char line[448];
         _snprintf_s(line, _TRUNCATE,
-                    "function %d, production %.3f, efficiency %.3f, power %d, distance %.1f, down %d, unconscious %d",
+                    "repaired %d, worst wear %.1f, rested %.2f, function %d, production %.3f, efficiency %.3f, power %d, distance %.1f, down %d, unconscious %d",
+                    RoboticPartsRepaired(med, IsRobot(c)) ? 1 : 0, worstWear, med->restedState,
                     bed != NULL ? static_cast<int>(bed->getSpecialFunction()) : -1,
                     bed != NULL ? bed->getProductionMult() : -1.0f,
                     useable != NULL ? EfficiencyOf(useable) : -1.0f,
