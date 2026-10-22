@@ -312,7 +312,7 @@ namespace
             const DfRecruitSearchStats& st = DfLastRecruitSearch();
             char line[256];
             sprintf_s(line, sizeof(line), "DynamicFactions: bar recruits - %d templates, %d such people in town, "
-                      "%d in a bar, %d can be hired; cheapest %d: ",
+                      "%d of them in a bar, %d can be hired; cheapest %d: ",
                       st.templates, st.generic, st.inBar, st.recruitable, snap.recruitPrice);
             DebugLog(line + st.list);
         }

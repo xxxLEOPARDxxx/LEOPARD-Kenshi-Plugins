@@ -229,9 +229,10 @@ namespace
         if (c->getFaction() == ours || c->getCurrentTownLocation() != town)
             return -1;
         ++g_stats.generic;
-        if (!InABar(c) || TemplateUnique(c))
+        if (TemplateUnique(c))
             return -1;
-        ++g_stats.inBar;
+        if (InABar(c))
+            ++g_stats.inBar;
         const int price = RecruitPrice(c);
         if (price < 0)
             return -1;
@@ -239,7 +240,8 @@ namespace
         if (g_stats.recruitable <= 8)
         {
             char buf[96];
-            sprintf_s(buf, sizeof(buf), "%s %d%s; ", c->getName().c_str(), price, Skipped(c) ? " (skipped)" : "");
+            sprintf_s(buf, sizeof(buf), "%s %d%s%s; ", c->getName().c_str(), price, InABar(c) ? "" : " (street)",
+                      Skipped(c) ? " (skipped)" : "");
             g_stats.list += buf;
         }
         return Skipped(c) ? -1 : price;
@@ -258,6 +260,8 @@ namespace
         g_stats.list.clear();
         if (generic.empty())
             return false;
+        const Ogre::Vector3 near = town->getPosition();
+        float bestDistance = 0.0f;
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
         for (ogre_unordered_set<Character*>::type::const_iterator it = all.begin(); it != all.end(); ++it)
         {
@@ -265,10 +269,14 @@ namespace
             if (c == NULL)
                 continue;
             const int p = Candidate(c, town, ours, generic);
-            if (p >= 0 && (who == NULL || p < price))
+            if (p < 0)
+                continue;
+            const float d = c->getPosition().distance(near);
+            if (who == NULL || p < price || (p == price && d < bestDistance))
             {
                 who = c;
                 price = p;
+                bestDistance = d;
             }
         }
         return who != NULL;
