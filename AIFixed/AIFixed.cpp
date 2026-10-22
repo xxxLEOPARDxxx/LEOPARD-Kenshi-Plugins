@@ -496,6 +496,8 @@ namespace
         Building* bed;      // куда отправили - только для сравнения и брони,
                             // живая ли она, проверяем по списку игры
         int noted;          // что последним писали в журнал (повторы не пишем)
+        DWORD getUpAt;      // когда велели встать после починки
+        int getUpTries;
     };
 
     enum { NOTED_NONE, NOTED_NO_BED, NOTED_SENT, NOTED_HEADING, NOTED_NOT_GOING };
@@ -572,13 +574,25 @@ namespace
 
         if (c->inSomething == IN_BED)
         {
-            // Лёг по нашему приказу и починился - приказ снимаем, встаёт сам.
+            // Лёг по нашему приказу и починился - поднимаем. Снять приказ
+            // мало (22.10.2026: лежали дальше - у лёгшего по приказу нет
+            // цели «встать, когда вылечился», она есть у принесённых).
+            // Приказ «встать с кровати» (GET_OUT_OF_BED) вместо нашего;
+            // всё ещё лежит через 5 с - ещё раз, не больше трёх.
             if (state.sent && RoboticPartsRepaired(med, robotRace))
             {
-                if (orders->hasGoal(USE_BED_ORDER))
-                    orders->removeGoal(USE_BED_ORDER);
-                NoteSelfRepair(c, "repaired, the bed order is lifted");
-                return false;
+                if (state.getUpTries >= SELF_REPAIR_TRIES)
+                    return false;
+                if (state.getUpAt != 0 && now - state.getUpAt < SELF_REPAIR_GRACE_MS)
+                    return true;
+                orders->addOrder(GET_OUT_OF_BED, c->handle, c->getPosition(), true, false);
+                state.getUpAt = now;
+                ++state.getUpTries;
+                char line[64];
+                _snprintf_s(line, _TRUNCATE, "repaired, get up (try %d, goal 0x%X)", state.getUpTries,
+                            static_cast<int>(orders->getCurrentGoal().key()));
+                NoteSelfRepair(c, line);
+                return true;
             }
             return true;
         }
@@ -722,7 +736,7 @@ namespace
             if (c == NULL)
                 continue;
 
-            SelfRepairState state = { 0, 0, 0, false, NULL, NOTED_NONE };
+            SelfRepairState state = { 0, 0, 0, false, NULL, NOTED_NONE, 0, 0 };
             std::map<Character*, SelfRepairState>::const_iterator old = g_selfRepairState.find(c);
             if (old != g_selfRepairState.end())
                 state = old->second;
