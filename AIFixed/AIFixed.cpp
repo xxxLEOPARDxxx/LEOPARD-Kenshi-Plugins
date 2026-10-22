@@ -48,6 +48,7 @@
 #include <kenshi/Character.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Faction.h>
+#include <kenshi/MedicalSystem.h>
 #include <kenshi/FactionRelations.h>
 #include <kenshi/RaceData.h>
 #include <kenshi/AI/AI.h>
@@ -292,6 +293,95 @@ namespace
 
 
     // ---------------------------------------------------------------
+    // 1б. Скелет встаёт с ремкровати сразу, не починившись
+    //
+    // Проверка 22.10.2026: уложенный в ремкровать скелет (и RLBS, и робо-
+    // робот) тут же встаёт. Задача «встать, когда вылечился»
+    // (AI::scoreGetOutOfBedOnceFullyHealed) прибавляет 1.0 к оценке «встать»,
+    // когда MedicalSystem::restedState > 0.9. А restedState игра считает в
+    // precalculateFirstAidNeedScore только по живым частям: часть робота
+    // (race->robot или протез) пропускается, и у скелета restedState всегда
+    // 1.0 - «вылечен» сразу.
+    //
+    // Правка: для скелета, лежащего в ремкровати, та же мера по его частям -
+    // (плоть - оглушение) / (макс. здоровье * возраст * множитель - износ),
+    // меньшая по телу, как игра считает её для живых. Пока она не выше 0.9,
+    // прибавку «вылечен» убираем; починился - встаёт, как задумано игрой.
+    // ---------------------------------------------------------------
+
+    float RobotRested(MedicalSystem* med)
+    {
+        float rested = 1.0f;
+        const lektor<MedicalSystem::HealthPartStatus*>& parts = med->anatomy;
+        for (uint32_t i = 0; i < parts.size(); ++i)
+        {
+            const MedicalSystem::HealthPartStatus* const p = parts[i];
+            if (p == NULL)
+                continue;
+            const float max = p->_maxHealth * p->age * p->HPMult - p->wearDamage;
+            if (max <= 0.0f)
+                continue;
+            const float part = (p->flesh - p->fleshStun) / max;
+            if (part < rested)
+                rested = part;
+        }
+        return rested;
+    }
+
+
+    // Пороги - те же, что в коде игры (scoreGetOutOfBedOnceFullyHealed).
+    const float HEALED_ABOVE = 0.9f;
+    const float HEALED_BONUS = 1.0f;
+
+    float StayUntilRepaired(AI* ai, float score)
+    {
+        Character* const me = ai->me;
+        if (me == NULL || me->inSomething != IN_BED || !IsRobot(me))
+            return score;
+
+        Building* const bed = me->inWhat.getBuilding();
+        if (bed == NULL || bed->getSpecialFunction() != BF_SKELETON_BED)
+            return score;
+
+        MedicalSystem* const med = ai->medical;
+        if (med == NULL || !(med->restedState > HEALED_ABOVE))
+            return score;           // прибавки «вылечен» игра не давала
+
+        if (RobotRested(med) > HEALED_ABOVE)
+            return score;           // починился - пусть встаёт
+
+        return score - HEALED_BONUS;
+    }
+
+
+    float SafeStayUntilRepaired(AI* ai, float score)
+    {
+        __try
+        {
+            return StayUntilRepaired(ai, score);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static LONG told = 0;
+            if (InterlockedExchange(&told, 1) == 0)
+                ErrorLog("AIFixed: repair bed stay check failed once - the game's choice is kept");
+            return score;
+        }
+    }
+
+
+    float (*g_origGetOutHealed)(AI*, const hand&, const Ogre::Vector3&) = NULL;
+
+    float GetOutHealed_hook(AI* self, const hand& subject, const Ogre::Vector3& v)
+    {
+        const float score = g_origGetOutHealed(self, subject, v);
+        if (!g_skeletonBeds || self == NULL)
+            return score;
+        return SafeStayUntilRepaired(self, score);
+    }
+
+
+    // ---------------------------------------------------------------
     // Диагностика укладывания скелетов (22.10.2026; только при Debug=1 на
     // старте игры - иначе эти хуки не ставятся вовсе)
     //
@@ -439,6 +529,73 @@ namespace
     }
 
 
+    // Снимок починки в ремкровати (22.10.2026, тоже только при Debug=1):
+    // робо-робот, уложенный кем-то в ремкровать, лежал на полу и не чинился.
+    // MedicalSystem::medicalUpdate чинит в ремкровати, если персонаж «в
+    // кровати» (inSomething = IN_BED), inWhat - ремкровать, а множитель
+    // починки = getProductionMult() кровати * calculateEfficiencyMult() её
+    // UseableStuff. Раз в 5 с на скелета игрока в кровати пишем эти значения.
+    std::map<Character*, DWORD> g_lastSnap;
+
+    float EfficiencyOf(UseableStuff* u)
+    {
+        // calculateEfficiencyMult в заголовке protected - зовём по таблице,
+        // как зовёт сама игра (vtable +0x368).
+        typedef float (*Fn)(UseableStuff*);
+        return (*reinterpret_cast<Fn*>(*reinterpret_cast<char**>(u) + 0x368))(u);
+    }
+
+    void Snap(MedicalSystem* med)
+    {
+        Character* const c = med->me;
+        if (c == NULL || c->inSomething != IN_BED || !c->isPlayerCharacter() || !IsRobot(c))
+            return;
+
+        const DWORD now = GetTickCount();
+        EnterCriticalSection(&g_noteLock);
+        DWORD& last = g_lastSnap[c];
+        const bool due = now - last >= 5000;
+        if (due)
+            last = now;
+        LeaveCriticalSection(&g_noteLock);
+        if (!due)
+            return;
+
+        Building* const bed = c->inWhat.getBuilding();
+        UseableStuff* const useable = bed != NULL ? bed->getUseableStuff() : NULL;
+        char line[384];
+        _snprintf_s(line, _TRUNCATE,
+                    "function %d, production %.3f, efficiency %.3f, power %d, distance %.1f, down %d, unconscious %d",
+                    bed != NULL ? static_cast<int>(bed->getSpecialFunction()) : -1,
+                    bed != NULL ? bed->getProductionMult() : -1.0f,
+                    useable != NULL ? EfficiencyOf(useable) : -1.0f,
+                    useable != NULL ? (useable->hasPower() ? 1 : 0) : -1,
+                    bed != NULL ? (bed->getPosition() - c->getPosition()).length() : -1.0f,
+                    c->isDown() ? 1 : 0, c->isUnconcious() ? 1 : 0);
+        DebugLog("AIFixed: in bed " + c->displayName + ": " +
+                 (bed != NULL ? bed->displayName : std::string("?")) + ", " + line);
+    }
+
+    void SafeSnap(MedicalSystem* med)
+    {
+        __try
+        {
+            Snap(med);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+
+    void (*g_origMedical)(MedicalSystem*, float) = NULL;
+
+    void Medical_hook(MedicalSystem* self, float frameTime)
+    {
+        g_origMedical(self, frameTime);
+        SafeSnap(self);
+    }
+
+
     float (*g_origFindOwnedFreeBed)(AI*, const hand&, hand&, bool) = NULL;
 
     float FindOwnedFreeBed_hook(AI* self, const hand& in, hand& out, bool justAsking)
@@ -491,6 +648,14 @@ __declspec(dllexport) void startPlugin()
         ErrorLog("AIFixed: could not hook the bed search, skeletons keep going to ordinary beds");
     }
 
+    if (KenshiLib::SUCCESS !=
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&AI::_NV_scoreGetOutOfBedOnceFullyHealed),
+                           GetOutHealed_hook,
+                           &g_origGetOutHealed))
+    {
+        ErrorLog("AIFixed: could not hook the get-out-of-bed check, skeletons leave repair beds at once");
+    }
+
     // Диагностика - только при подробном журнале на старте.
     if (g_debug)
     {
@@ -499,7 +664,9 @@ __declspec(dllexport) void startPlugin()
             KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::setBedMode),
                                                      SetBedMode_hook, &g_origSetBedMode) ||
             KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&AITaskSytem::taskImpossible),
-                                                     TaskImpossible_hook, &g_origTaskImpossible))
+                                                     TaskImpossible_hook, &g_origTaskImpossible) ||
+            KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&MedicalSystem::medicalUpdate),
+                                                     Medical_hook, &g_origMedical))
             ErrorLog("AIFixed: some diagnostic hooks failed - the log will be incomplete");
         else
             DebugLog("AIFixed: diagnostics on (drops, bed mode, impossible tasks of skeleton carriers)");
