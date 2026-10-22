@@ -2,6 +2,8 @@
 // Найм «как у игрока»: те же люди, что сидят в барах и кого игрок нанял бы
 // разговором, по той же цене. Бары игра пополняет сама, со временем.
 
+#include <string>
+
 class Character;
 class Faction;
 class TownBase;
@@ -21,8 +23,12 @@ struct DfRecruitSearchStats
     int generic;                // живых персонажей с такими шаблонами в городе
     int inBar;                  // из них стоят в баре
     int recruitable;            // из них с открытой репликой найма
+    std::string list;           // «имя цена; ...» нанимаемых (до 8)
 };
 const DfRecruitSearchStats& DfLastRecruitSearch();
+
+// Не предлагать этого рекрута ms миллисекунд (не дошли до него).
+void DfRecruitSkip(Character* c, unsigned long ms);
 
 // Запереть у нанятого реплики «вступить в отряд»: перенанять его у фракции
 // разговором игрок уже не сможет. Под SEH.

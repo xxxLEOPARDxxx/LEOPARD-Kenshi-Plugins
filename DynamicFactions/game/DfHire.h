@@ -6,6 +6,9 @@
 //
 // Шаги, раз в секунду из тика плагина:
 //   GO   - посланник идёт к рекруту (приказ «следовать», повтор раз в 5 с);
+//          15 с не приближается - прямой путь к его точке (setDestination,
+//          раз в 3 с; 23.10 «следовать» встал в 40 м); ещё 15 с - рекрут
+//          недостижим, его не предлагать 10 минут;
 //   TALK - рядом (< 5 м) или перестал приближаться (< 10 м и 8 с без
 //          продвижения - рекрут за столом, ближе не подойти): четыре
 //          реплики по очереди, по 3 с;
@@ -45,11 +48,12 @@ struct DfHireTask
     unsigned long startedMs;
     unsigned long phaseMs;      // когда сказана последняя реплика / отдан приказ
     int line;                   // сколько реплик сказано
+    bool direct;                // идёт напрямую к точке, не «следовать»
     float closest;              // ближе всего подходил
     unsigned long closerMs;     // когда последний раз подошёл ближе
     std::string why;            // почему сорвалось - для журнала
 
-    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), line(0), closest(0.0f), closerMs(0) {}
+    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), line(0), direct(false), closest(0.0f), closerMs(0) {}
     bool busy() const { return phase != DF_HIRE_IDLE; }
 };
 

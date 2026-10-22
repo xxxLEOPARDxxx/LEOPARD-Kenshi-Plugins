@@ -31,6 +31,9 @@ namespace
     const DWORD kOrderEveryMs = 5000;       // повтор приказа «следовать»
     const DWORD kLineMs = 3000;             // реплика держится над головой
     const DWORD kGiveUpMs = 240000;         // не дошёл за 4 минуты - срыв
+    const DWORD kNoProgressMs = 15000;      // столько не приближается - другой способ / отказ
+    const DWORD kDirectEveryMs = 3000;
+    const DWORD kSkipMs = 600000;           // недостижимого рекрута - 10 минут не предлагать
     const int kLines = 4;
 
     bool g_hireDebug = false;
@@ -96,7 +99,10 @@ namespace
                           static_cast<int>(orders->getCurrentGoal().key()));
                 DebugLog(line);
             }
-            orders->addOrder(FOLLOW_PLAYER_ORDER, recruit->getHandle(), recruit->getPosition(), true, false);
+            if (t.direct)
+                envoy->setDestination(recruit->getPosition(), false);
+            else
+                orders->addOrder(FOLLOW_PLAYER_ORDER, recruit->getHandle(), recruit->getPosition(), true, false);
         }
         else if (g_hireDebug)
             DebugLog("DynamicFactions: hire - the envoy takes no orders");
@@ -141,7 +147,17 @@ namespace
         t.line = 0;
         t.closest = envoy->getPosition().distance(recruit->getPosition());
         t.closerMs = now;
+        t.direct = false;
         t.why.clear();
+        if (g_hireDebug)
+        {
+            const Ogre::Vector3 e = envoy->getPosition();
+            const Ogre::Vector3 r = recruit->getPosition();
+            char line[320];
+            sprintf_s(line, sizeof(line), "DynamicFactions: hire - envoy %s (%.0f %.0f %.0f) to %s (%.0f %.0f %.0f), price %d",
+                      envoy->getName().c_str(), e.x, e.y, e.z, recruit->getName().c_str(), r.x, r.y, r.z, price);
+            DebugLog(line);
+        }
         Order(t, envoy, recruit, now);
         return true;
     }
@@ -204,9 +220,24 @@ namespace
                 t.phaseMs = now - kLineMs;          // первая реплика - сразу
                 return DF_HIRE_RUNNING;
             }
+            if (now - t.closerMs >= kNoProgressMs)
+            {
+                if (t.direct)
+                {
+                    DfRecruitSkip(recruit, kSkipMs);
+                    char why[96];
+                    sprintf_s(why, sizeof(why), "cannot reach the recruit (stuck %.0f m away)", d);
+                    t.why = why;
+                    return Fail(t, envoy, "cannot reach the recruit");
+                }
+                t.direct = true;                    // «следовать» не ведёт - напрямую
+                t.closerMs = now;
+                Order(t, envoy, recruit, now);
+                return DF_HIRE_RUNNING;
+            }
             if (now - t.startedMs >= kGiveUpMs)
                 return Fail(t, envoy, "the envoy did not reach the recruit in 4 minutes");
-            if (now - t.phaseMs >= kOrderEveryMs)
+            if (now - t.phaseMs >= (t.direct ? kDirectEveryMs : kOrderEveryMs))
                 Order(t, envoy, recruit, now);
             return DF_HIRE_RUNNING;
         }

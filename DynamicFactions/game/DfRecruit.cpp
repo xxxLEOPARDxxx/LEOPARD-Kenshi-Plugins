@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 
+#include <cstdio>
 #include <map>
 #include <set>
 #include <string>
@@ -203,6 +204,20 @@ namespace
     }
 
     DfRecruitSearchStats g_stats;
+    std::map<Character*, DWORD> g_skipUntil;    // недостижимые - до какого GetTickCount
+
+    bool Skipped(Character* c)
+    {
+        std::map<Character*, DWORD>::iterator it = g_skipUntil.find(c);
+        if (it == g_skipUntil.end())
+            return false;
+        if (static_cast<LONG>(GetTickCount() - it->second) >= 0)
+        {
+            g_skipUntil.erase(it);
+            return false;
+        }
+        return true;
+    }
 
     // -1 - не кандидат, иначе цена.
     int Candidate(Character* c, TownBase* town, Faction* ours, const std::set<GameData*>& generic)
@@ -218,9 +233,16 @@ namespace
             return -1;
         ++g_stats.inBar;
         const int price = RecruitPrice(c);
-        if (price >= 0)
-            ++g_stats.recruitable;
-        return price;
+        if (price < 0)
+            return -1;
+        ++g_stats.recruitable;
+        if (g_stats.recruitable <= 8)
+        {
+            char buf[96];
+            sprintf_s(buf, sizeof(buf), "%s %d%s; ", c->getName().c_str(), price, Skipped(c) ? " (skipped)" : "");
+            g_stats.list += buf;
+        }
+        return Skipped(c) ? -1 : price;
     }
 
     bool Find(TownBase* town, Faction* ours, Character*& who, int& price)
@@ -233,6 +255,7 @@ namespace
         BarRecruitTemplates(town, generic);
         g_stats.templates = static_cast<int>(generic.size());
         g_stats.generic = g_stats.inBar = g_stats.recruitable = 0;
+        g_stats.list.clear();
         if (generic.empty())
             return false;
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
@@ -283,6 +306,12 @@ bool DfFindBarRecruit(TownBase* town, Faction* ours, Character*& who, int& price
         price = -1;
         return false;
     }
+}
+
+void DfRecruitSkip(Character* c, unsigned long ms)
+{
+    if (c != NULL)
+        g_skipUntil[c] = GetTickCount() + ms;
 }
 
 const DfRecruitSearchStats& DfLastRecruitSearch()
