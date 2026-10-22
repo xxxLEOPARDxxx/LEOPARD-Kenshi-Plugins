@@ -15,6 +15,10 @@
 //     вообще есть в диалоге;
 //   * разговор не для другого конкретного персонажа (isCharacter).
 //
+// ТОРГОВЦЫ (22.10.2026). Свой значок - стопка монет, свой цвет. Торговец -
+// по проверке самой игры, Character::isATrader(), диалог не разбираем. Если
+// торговца можно и нанять - оба значка рядом.
+//
 // НАГРУЗКА. Кандидаты (живые, не наши, в пределах MaxDistance от центра
 // камеры) - раз в 0,75 с из списка обновляемых персонажей игры. Обход
 // диалога - не больше двух персонажей за кадр, результат хранится 10 с.
@@ -83,6 +87,8 @@ namespace
     bool g_showGeneric = true;
     bool g_showAnimals = true;
     bool g_checkConditions = true;
+    bool g_showTraders = true;
+    MyGUI::Colour g_traderColour(0.5f, 0.88f, 1.0f);
     MyGUI::Colour g_uniqueColour(1.0f, 0.957f, 0.6f);
     MyGUI::Colour g_genericColour(1.0f, 0.745f, 0.4f);
     int g_iconSize = 40;
@@ -158,6 +164,8 @@ namespace
         g_showUnique = ReadBool(ini, "ShowUnique", true);
         g_showGeneric = ReadBool(ini, "ShowGeneric", true);
         g_showAnimals = ReadBool(ini, "ShowAnimals", true);
+        g_showTraders = ReadBool(ini, "ShowTraders", true);
+        g_traderColour = ReadColour(ini, "TraderColour", MyGUI::Colour(0.5f, 0.88f, 1.0f));
         const bool conditions = ReadBool(ini, "CheckConditions", true);
         if (conditions != g_checkConditions)
             ForgetCache();              // другое правило - пересчитать всех
@@ -348,6 +356,8 @@ namespace
     {
         hand who;
         bool unique;
+        bool recruit;                   // значок найма
+        bool trader;                    // значок торговца
         float distance;
         int bone;
     };
@@ -380,16 +390,18 @@ namespace
         return it != d->bdata.end() && it->second;
     }
 
-    bool SafeFilter(Character* c, const Ogre::Vector3& camera, bool& unique, float& distance)
+    // recruitKind - проверять ли найм (по настройкам «кого»); trader - торговец.
+    bool SafeFilter(Character* c, const Ogre::Vector3& camera, bool& unique, bool& recruitKind, bool& trader,
+                    float& distance)
     {
         __try
         {
             if (c->isDead() || c->isPlayerCharacter())
                 return false;
-            if (c->isAnimal() != NULL && !g_showAnimals)
-                return false;
             unique = TemplateUnique(c);
-            if (unique ? !g_showUnique : !g_showGeneric)
+            recruitKind = (c->isAnimal() == NULL || g_showAnimals) && (unique ? g_showUnique : g_showGeneric);
+            trader = g_showTraders && c->isATrader();
+            if (!recruitKind && !trader)
                 return false;
             const Ogre::Vector3 p = c->getPosition();
             distance = p.distance(camera);
@@ -412,26 +424,30 @@ namespace
         for (ogre_unordered_set<Character*>::type::const_iterator it = all.begin(); it != all.end(); ++it)
         {
             Character* const c = *it;
-            bool unique = false;
+            bool unique = false, recruitKind = false, trader = false;
             float distance = 0.0f;
-            if (c == NULL || !SafeFilter(c, camera, unique, distance))
+            if (c == NULL || !SafeFilter(c, camera, unique, recruitKind, trader, distance))
                 continue;
             const hand& h = c->handle;
             std::map<unsigned long long, CacheEntry>::iterator e = g_cache.find(Key(h));
-            if (e == g_cache.end() || now - e->second.stamp >= kCacheMs)
+            // диалог - только тем, кого по настройкам проверяем на найм
+            if (recruitKind && (e == g_cache.end() || now - e->second.stamp >= kCacheMs))
                 g_queue.push_back(h);
+            const bool recruit = recruitKind && e != g_cache.end() && e->second.recruitable;
             if (e != g_cache.end())
-            {
                 e->second.seen = now;
-                if (e->second.recruitable)
-                {
-                    Marker m;
-                    m.who = h;
-                    m.unique = unique;
-                    m.distance = distance;
-                    m.bone = e->second.bone;
-                    g_markers.push_back(m);
-                }
+            if (recruit || trader)
+            {
+                Marker m;
+                m.who = h;
+                m.unique = unique;
+                m.recruit = recruit;
+                m.trader = trader;
+                m.distance = distance;
+                // кость головы - из кэша (торговец без проверки найма в нём
+                // может не быть: найдём при отрисовке)
+                m.bone = e != g_cache.end() ? e->second.bone : -2;
+                g_markers.push_back(m);
             }
         }
         std::sort(g_markers.begin(), g_markers.end(), ByDistance);
@@ -522,6 +538,8 @@ namespace
 
     WidgetRef g_icons[kPoolMax];
     int g_shown = 0;                    // сколько первых значков видимы
+    WidgetRef g_coins[kPoolMax];        // значки торговцев - свой пул, своя текстура
+    int g_coinsShown = 0;
 
     const std::string& IconTexture()
     {
@@ -546,6 +564,65 @@ namespace
         if (texture.empty())
             ErrorLog("RecruitMarkers: gui/gfx/recruitmarkers_icon.png not found");
         return texture;
+    }
+
+    const std::string& CoinTexture()
+    {
+        static std::string texture;
+        static bool tried = false;
+        if (tried)
+            return texture;
+        tried = true;
+        const char* const names[] = { "gui/gfx/recruitmarkers_trader.png", "gui\\gfx\\recruitmarkers_trader.png",
+                                      "recruitmarkers_trader.png" };
+        for (size_t i = 0; i < sizeof(names) / sizeof(names[0]) && texture.empty(); ++i)
+        {
+            try
+            {
+                if (Ogre::ResourceGroupManager::getSingleton().resourceExistsInAnyGroup(names[i]))
+                    texture = names[i];
+            }
+            catch (...)
+            {
+            }
+        }
+        if (texture.empty())
+            ErrorLog("RecruitMarkers: gui/gfx/recruitmarkers_trader.png not found");
+        return texture;
+    }
+
+    MyGUI::ImageBox* MakeImage(WidgetRef& ref, const char* prefix, int i, const std::string& texture)
+    {
+        MyGUI::Gui* const gui = MyGUI::Gui::getInstancePtr();
+        if (gui == NULL)
+            return NULL;
+        char name[48];
+        sprintf_s(name, "%s%d", prefix, i);
+        MyGUI::ImageBox* image = NULL;
+        try
+        {
+            image = gui->createWidget<MyGUI::ImageBox>("ImageBox", MyGUI::IntCoord(0, 0, g_iconSize, g_iconSize),
+                                                       MyGUI::Align::Default, "Back", name);
+        }
+        catch (...)
+        {
+            image = NULL;
+        }
+        if (image == NULL)
+            return NULL;
+        image->setNeedMouseFocus(false);
+        image->setNeedKeyFocus(false);
+        image->setImageTexture(texture);
+        image->setVisible(false);
+        ref.set(image);
+        return image;
+    }
+
+    MyGUI::ImageBox* Coin(int i)
+    {
+        if (MyGUI::Widget* const w = g_coins[i].get())
+            return static_cast<MyGUI::ImageBox*>(w);
+        return MakeImage(g_coins[i], "RecruitMarkers_Coin_", i, CoinTexture());
     }
 
     MyGUI::ImageBox* Icon(int i)
@@ -586,7 +663,20 @@ namespace
             g_shown = from;
     }
 
-    void HideAll() { HideFrom(0); }
+    void HideCoinsFrom(int from)
+    {
+        for (int i = from; i < g_coinsShown; ++i)
+            if (MyGUI::Widget* const w = g_coins[i].get())
+                w->setVisible(false);
+        if (from < g_coinsShown)
+            g_coinsShown = from;
+    }
+
+    void HideAll()
+    {
+        HideFrom(0);
+        HideCoinsFrom(0);
+    }
 
     // Точка значка - как у LtEast (снято с его DLL, 16.10.2026): кость
     // «Bip01 Head», «Head» или «head», если она правдоподобна (не дальше 12
@@ -668,6 +758,30 @@ namespace
         float alpha;
     };
     IconState g_iconState[kPoolMax];
+    IconState g_coinState[kPoolMax];
+
+    // Значок на место, цвет, прозрачность - только то, что изменилось.
+    void Place(MyGUI::ImageBox* icon, IconState& st, bool created, const MyGUI::IntCoord& coord,
+               const MyGUI::Colour& colour, float alpha)
+    {
+        if (created || st.coord != coord)
+        {
+            icon->setCoord(coord);
+            st.coord = coord;
+        }
+        if (created || st.colour != colour)
+        {
+            icon->setColour(colour);
+            st.colour = colour;
+        }
+        if (created || st.alpha != alpha)
+        {
+            icon->setAlpha(alpha);
+            st.alpha = alpha;
+        }
+        if (!icon->getVisible())
+            icon->setVisible(true);
+    }
 
     void Draw(DWORD now)
     {
@@ -681,7 +795,8 @@ namespace
         const MyGUI::IntSize view = render->getViewSize();
         const float pulse = 0.5f + 0.5f * static_cast<float>(sin((now % 1600) / 1600.0 * 6.2831853));
         int drawn = 0;
-        for (size_t i = 0; i < g_markers.size() && drawn < g_maxMarkers; ++i)
+        int coins = 0;
+        for (size_t i = 0; i < g_markers.size() && drawn + coins < g_maxMarkers; ++i)
         {
             Marker& marker = g_markers[i];
             Character* const c = marker.who.getCharacter();
@@ -701,44 +816,47 @@ namespace
             // облачко реплики из атласа игры, 38x36; низом на точке, зазор 4 - как у LtEast
             const int width = g_iconSize;
             const int height = g_iconSize * 36 / 38;
-            const int left = static_cast<int>(x) - width / 2;
+            // оба значка - рядом: найм слева, монета справа
+            const bool both = marker.recruit && marker.trader;
+            const int centre = static_cast<int>(x);
             const int top = static_cast<int>(y) - height - 4;
-            if (left + width < 0 || top + height < 0 || left > view.width || top > view.height)
+            const int recruitLeft = both ? centre - width - 2 : centre - width / 2;
+            const int coinLeft = both ? centre + 2 : centre - width / 2;
+            if (recruitLeft + 2 * width + 4 < 0 || top + height < 0 || recruitLeft > view.width || top > view.height)
                 continue;
-            const bool created = g_icons[drawn].get() == NULL;
-            MyGUI::ImageBox* const icon = Icon(drawn);
-            if (icon == NULL)
-                break;
-            IconState& st = g_iconState[drawn];
-            const MyGUI::IntCoord coord(left, top, width, height);
-            const bool unique = marker.unique;
-            const MyGUI::Colour& colour = unique ? g_uniqueColour : g_genericColour;
-            float alpha = g_alpha;
-            if (unique && g_pulseUnique)
-                alpha *= 0.55f + 0.45f * pulse;
-            if (created || st.coord != coord)
+            if (marker.recruit)
             {
-                icon->setCoord(coord);
-                st.coord = coord;
+                const bool created = g_icons[drawn].get() == NULL;
+                MyGUI::ImageBox* const icon = Icon(drawn);
+                if (icon == NULL)
+                    break;
+                const bool unique = marker.unique;
+                float alpha = g_alpha;
+                if (unique && g_pulseUnique)
+                    alpha *= 0.55f + 0.45f * pulse;
+                Place(icon, g_iconState[drawn], created, MyGUI::IntCoord(recruitLeft, top, width, height),
+                      unique ? g_uniqueColour : g_genericColour, alpha);
+                ++drawn;
             }
-            if (created || st.colour != colour)
+            if (marker.trader)
             {
-                icon->setColour(colour);
-                st.colour = colour;
+                const bool created = g_coins[coins].get() == NULL;
+                MyGUI::ImageBox* const coin = Coin(coins);
+                if (coin == NULL)
+                    break;
+                Place(coin, g_coinState[coins], created, MyGUI::IntCoord(coinLeft, top, width, height),
+                      g_traderColour, g_alpha);
+                ++coins;
             }
-            if (created || st.alpha != alpha)
-            {
-                icon->setAlpha(alpha);
-                st.alpha = alpha;
-            }
-            if (!icon->getVisible())
-                icon->setVisible(true);
-            ++drawn;
         }
         if (drawn > g_shown)
             g_shown = drawn;
         HideFrom(drawn);
         g_shown = drawn;
+        if (coins > g_coinsShown)
+            g_coinsShown = coins;
+        HideCoinsFrom(coins);
+        g_coinsShown = coins;
     }
 
     // ---------------------------------------------------------------
@@ -790,7 +908,7 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
-        if (g_shown > 0 && GetTickCount() - g_lastWorldFrame > 300)
+        if ((g_shown > 0 || g_coinsShown > 0) && GetTickCount() - g_lastWorldFrame > 300)
         {
             HideAll();
             ForgetCache();              // другой сейв - другие персонажи
@@ -807,7 +925,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     static const std::string ini = IniPath();
     api->beginMod(api, "RecruitMarkers", "Recruit Markers", ini.c_str(), &LoadSettings);
     if (api->version >= 2)
-        api->info(api, Tr("A marker over the heads of characters you can recruit."));
+        api->info(api, Tr("A marker over the heads of characters you can recruit, and over traders."));
     api->section(api, Tr("General"));
     api->toggle(api, kSec, "Enabled", Tr("Enabled"), Tr("Markers over characters you can recruit."), 1, 0);
     api->hotkey(api, kSec, "HoldKey", Tr("Show key"), Tr("The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."), "ALT", 0);
@@ -815,10 +933,12 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowUnique", Tr("Unique characters"), Tr("Named characters who can join you."), 1, 0);
     api->toggle(api, kSec, "ShowGeneric", Tr("Ordinary recruits"), Tr("Bar recruits, drifters and other ordinary characters who can join you."), 1, 0);
     api->toggle(api, kSec, "ShowAnimals", Tr("Animals"), Tr("Animals that can join you."), 1, 0);
+    api->toggle(api, kSec, "ShowTraders", Tr("Traders"), Tr("A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."), 1, 0);
     api->toggle(api, kSec, "CheckConditions", Tr("Only if recruitable right now"), Tr("Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."), 1, 0);
     api->section(api, Tr("Look"));
     api->colour(api, kSec, "UniqueColour", Tr("Unique colour"), Tr("Marker colour of unique characters, #RRGGBB."), "#fff499", 0);
     api->colour(api, kSec, "GenericColour", Tr("Ordinary colour"), Tr("Marker colour of ordinary recruits and animals, #RRGGBB."), "#ffbe66", 0);
+    api->colour(api, kSec, "TraderColour", Tr("Trader colour"), Tr("Colour of the coin marker over traders, #RRGGBB."), "#80e0ff", 0);
     api->integer(api, kSec, "IconSize", Tr("Marker size"), Tr("Width in pixels."), 40, 12, 96, 0);
     api->integer(api, kSec, "Opacity", Tr("Opacity"), Tr("1-10 (10% steps)."), 8, 1, 10, 0);
     api->toggle(api, kSec, "PulseUnique", Tr("Pulse on unique"), Tr("The markers of unique characters gently pulse."), 1, 0);

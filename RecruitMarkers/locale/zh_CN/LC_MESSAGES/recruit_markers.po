@@ -109,3 +109,18 @@ msgstr "独特颜色"
 
 msgid "Who"
 msgstr "标记对象"
+
+msgid "A marker over the heads of characters you can recruit, and over traders."
+msgstr "在可招募的角色和商人头顶显示标记。"
+
+msgid "Traders"
+msgstr "商人"
+
+msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+msgstr "在与你交易的人头顶显示一摞硬币。也能招募的商人会同时显示两个标记。"
+
+msgid "Trader colour"
+msgstr "商人颜色"
+
+msgid "Colour of the coin marker over traders, #RRGGBB."
+msgstr "商人头顶硬币标记的颜色，#RRGGBB。"

@@ -109,3 +109,18 @@ msgstr "Цвет уникальных"
 
 msgid "Who"
 msgstr "Кого отмечать"
+
+msgid "A marker over the heads of characters you can recruit, and over traders."
+msgstr "Значок над теми, кого можно нанять, и над торговцами."
+
+msgid "Traders"
+msgstr "Торговцы"
+
+msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+msgstr "Стопка монет над теми, кто с вами торгует. Если торговца можно и нанять - оба значка рядом."
+
+msgid "Trader colour"
+msgstr "Цвет торговцев"
+
+msgid "Colour of the coin marker over traders, #RRGGBB."
+msgstr "Цвет монет над торговцами, #RRGGBB."

@@ -109,3 +109,18 @@ msgstr "Unique colour"
 
 msgid "Who"
 msgstr "Who"
+
+msgid "A marker over the heads of characters you can recruit, and over traders."
+msgstr "A marker over the heads of characters you can recruit, and over traders."
+
+msgid "Traders"
+msgstr "Traders"
+
+msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+msgstr "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+
+msgid "Trader colour"
+msgstr "Trader colour"
+
+msgid "Colour of the coin marker over traders, #RRGGBB."
+msgstr "Colour of the coin marker over traders, #RRGGBB."
