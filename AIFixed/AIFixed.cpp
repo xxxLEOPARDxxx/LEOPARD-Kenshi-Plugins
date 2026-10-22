@@ -478,6 +478,7 @@ namespace
     struct SelfRepairState
     {
         DWORD ordered;      // когда отдали приказ, 0 - ещё не отдавали
+        DWORD lastOrder;    // когда отдали последний (и при смене кровати)
         int tries;          // сколько раз отдавали
         bool sent;          // идёт к кровати или лежит по нашему приказу
         Building* bed;      // куда отправили - только для сравнения и брони,
@@ -485,7 +486,10 @@ namespace
         int noted;          // что последним писали в журнал (повторы не пишем)
     };
 
-    enum { NOTED_NONE, NOTED_NO_BED, NOTED_SENT };
+    enum { NOTED_NONE, NOTED_NO_BED, NOTED_SENT, NOTED_HEADING, NOTED_NOT_GOING };
+
+    // Сколько ждём, пока приказ дойдёт до ИИ и персонаж пойдёт.
+    const DWORD SELF_REPAIR_GRACE_MS = 5000;
 
     // Брони саморемонта: кровать -> кто на неё отправлен и ещё идёт. Без неё
     // за один проход все отправлялись на одну кровать (22.10.2026): пока
@@ -581,20 +585,51 @@ namespace
         if (ai == NULL)
             return true;
 
-        // Идёт по нашему приказу. Кровать ещё свободна - держим бронь; её
-        // заняли раньше - другая свободная, попыткой это не считается.
+        // Идёт ли к кровати - по текущей цели, как её видит игра (приказ
+        // игрока лежит не в списке целей, hasGoal его не видел: 22.10.2026
+        // отправленные числились «идущими», держали брони и стояли).
+        const int goal = static_cast<int>(orders->getCurrentGoal().key());
+        const bool heading = goal == USE_BED_ORDER || goal == USE_BED;
+
         bool retarget = false;
-        if (state.sent && orders->hasGoal(USE_BED_ORDER))
+        if (state.sent)
         {
-            Building* const target = LiveRepairBed(ai, state.bed);
-            if (target != NULL && static_cast<UseableStuff*>(target)->isFreeSlot(c->handle))
+            if (heading)
             {
-                g_reserved[target] = c;
-                return true;
+                // Кровать ещё свободна - держим бронь; её заняли раньше -
+                // другая свободная, попыткой это не считается.
+                Building* const target = LiveRepairBed(ai, state.bed);
+                if (target != NULL && static_cast<UseableStuff*>(target)->isFreeSlot(c->handle))
+                {
+                    g_reserved[target] = c;
+                    if (state.noted != NOTED_HEADING)
+                        NoteSelfRepair(c, "heading to " + target->displayName);
+                    state.noted = NOTED_HEADING;
+                    return true;
+                }
+                retarget = true;
             }
-            retarget = true;
+            else if (now - state.lastOrder < SELF_REPAIR_GRACE_MS)
+                return true;            // приказ ещё не дошёл - бронь держим
+            else
+            {
+                // Не пошёл (игрок отменил или игра не приняла) - бронь
+                // отдаём другим, повтор - по обычным правилам.
+                std::map<Building*, Character*>::iterator own = g_reserved.find(state.bed);
+                if (own != g_reserved.end() && own->second == c)
+                    g_reserved.erase(own);
+                if (state.noted != NOTED_NOT_GOING)
+                {
+                    char why[48];
+                    _snprintf_s(why, _TRUNCATE, "did not go, goal 0x%X", goal);
+                    NoteSelfRepair(c, why);
+                }
+                state.noted = NOTED_NOT_GOING;
+                state.sent = false;
+                state.bed = NULL;
+            }
         }
-        else if (orders->hasGoal(USE_BED_ORDER) || orders->hasGoal(USE_BED))
+        else if (heading)
             return true;                // идёт по приказу игрока - не мешаем
 
         if (!retarget && (state.tries >= SELF_REPAIR_TRIES ||
@@ -616,6 +651,7 @@ namespace
         state.bed = bed;
         state.sent = true;
         state.noted = NOTED_SENT;
+        state.lastOrder = now;
         if (!retarget)
         {
             state.ordered = now;
@@ -670,7 +706,7 @@ namespace
             if (c == NULL)
                 continue;
 
-            SelfRepairState state = { 0, 0, false, NULL, NOTED_NONE };
+            SelfRepairState state = { 0, 0, 0, false, NULL, NOTED_NONE };
             std::map<Character*, SelfRepairState>::const_iterator old = g_selfRepairState.find(c);
             if (old != g_selfRepairState.end())
                 state = old->second;
