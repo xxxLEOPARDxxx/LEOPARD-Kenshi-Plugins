@@ -40,6 +40,7 @@
 
 #include <cstdio>
 #include <map>
+#include <set>
 #include <string>
 
 #include <Debug.h>
@@ -199,7 +200,7 @@ namespace
     // Свободная ремкровать рядом, теми же отсевами, что у игры для кроватей
     // отряда игрока, и только та, что чинит (есть питание). NULL - такой нет.
     // me - кто ищет: несущий раненого или сам скелет (саморемонт).
-    Building* FindRepairBed(AI* ai, Character* me)
+    Building* FindRepairBed(AI* ai, Character* me, const std::set<Building*>* reserved)
     {
         lektor<Building*>& machines = Machines();
         ai->getAllLocalMachines(machines, 1u << BF_SKELETON_BED);
@@ -218,6 +219,10 @@ namespace
         {
             Building* const bed = machines[i];
             if (bed == NULL || bed->getSpecialFunction() != BF_SKELETON_BED)
+                continue;
+
+            // На неё уже отправлен кто-то из наших (саморемонт).
+            if (reserved != NULL && reserved->find(bed) != reserved->end())
                 continue;
 
             // Туда уже несут кого-то другого.
@@ -299,7 +304,7 @@ namespace
                 return false;
         }
 
-        Building* const bed = FindRepairBed(ai, ai->me);
+        Building* const bed = FindRepairBed(ai, ai->me, NULL);
         Note(patient, bed, justAsking);
         if (bed == NULL)
             return false;
@@ -474,8 +479,27 @@ namespace
     {
         DWORD ordered;      // когда отдали приказ, 0 - ещё не отдавали
         int tries;          // сколько раз отдавали
-        bool sent;          // в кровати по нашему приказу
+        bool sent;          // идёт к кровати или лежит по нашему приказу
+        Building* bed;      // куда отправили - только для сравнения и брони,
+                            // живая ли она, проверяем по списку игры
+        int noted;          // что последним писали в журнал (повторы не пишем)
     };
+
+    enum { NOTED_NONE, NOTED_NO_BED, NOTED_SENT };
+
+    // Брони саморемонта: кровать -> кто на неё отправлен и ещё идёт. Без неё
+    // за один проход все отправлялись на одну кровать (22.10.2026): пока
+    // никто не дошёл, она для всех «свободна».
+    std::map<Building*, Character*> g_reserved;
+
+    std::set<Building*> ReservedByOthers(Character* c)
+    {
+        std::set<Building*> out;
+        for (std::map<Building*, Character*>::const_iterator it = g_reserved.begin(); it != g_reserved.end(); ++it)
+            if (it->second != c)
+                out.insert(it->first);
+        return out;
+    }
 
     // Ключ - указатель только для поиска: разыменовываем лишь персонажей из
     // живого списка игрока, записи об остальных выбрасываются каждый проход.
@@ -493,6 +517,21 @@ namespace
                 worst = p->wearDamage;
         }
         return worst;
+    }
+
+
+    // Кровать из записи - только если игра её всё ещё видит рядом: по
+    // сохранённому указателю не обращаемся, пока не нашли его в живом списке.
+    Building* LiveRepairBed(AI* ai, Building* stored)
+    {
+        if (stored == NULL)
+            return NULL;
+        lektor<Building*>& machines = Machines();
+        ai->getAllLocalMachines(machines, 1u << BF_SKELETON_BED);
+        for (uint32_t i = 0; i < machines.size(); ++i)
+            if (machines[i] == stored)
+                return stored;
+        return NULL;
     }
 
 
@@ -538,29 +577,55 @@ namespace
         if (!(worst > static_cast<float>(g_selfRepairWear)))
             return false;               // износ в норме - всё забываем
 
-        if (orders->hasGoal(USE_BED_ORDER) || orders->hasGoal(USE_BED))
-            return true;                // уже идёт к кровати
-
-        if (state.tries >= SELF_REPAIR_TRIES ||
-            (state.ordered != 0 && now - state.ordered < SELF_REPAIR_RETRY_MS))
+        AI* const ai = c->getAI();
+        if (ai == NULL)
             return true;
 
-        AI* const ai = c->getAI();
-        Building* const bed = ai != NULL ? FindRepairBed(ai, c) : NULL;
+        // Идёт по нашему приказу. Кровать ещё свободна - держим бронь; её
+        // заняли раньше - другая свободная, попыткой это не считается.
+        bool retarget = false;
+        if (state.sent && orders->hasGoal(USE_BED_ORDER))
+        {
+            Building* const target = LiveRepairBed(ai, state.bed);
+            if (target != NULL && static_cast<UseableStuff*>(target)->isFreeSlot(c->handle))
+            {
+                g_reserved[target] = c;
+                return true;
+            }
+            retarget = true;
+        }
+        else if (orders->hasGoal(USE_BED_ORDER) || orders->hasGoal(USE_BED))
+            return true;                // идёт по приказу игрока - не мешаем
+
+        if (!retarget && (state.tries >= SELF_REPAIR_TRIES ||
+                          (state.ordered != 0 && now - state.ordered < SELF_REPAIR_RETRY_MS)))
+            return true;
+
+        const std::set<Building*> reserved = ReservedByOthers(c);
+        Building* const bed = FindRepairBed(ai, c, &reserved);
         if (bed == NULL)
         {
-            NoteSelfRepair(c, "worn, but no free repair bed with power nearby");
+            if (state.noted != NOTED_NO_BED)
+                NoteSelfRepair(c, "worn, but no free repair bed with power nearby");
+            state.noted = NOTED_NO_BED;
             return true;
         }
 
         orders->addOrder(USE_BED_ORDER, bed->handle, bed->getPosition(), true, false);
-        state.ordered = now;
-        ++state.tries;
+        g_reserved[bed] = c;
+        state.bed = bed;
         state.sent = true;
+        state.noted = NOTED_SENT;
+        if (!retarget)
+        {
+            state.ordered = now;
+            ++state.tries;
+        }
 
         char line[96];
         _snprintf_s(line, _TRUNCATE, "worst wear %.1f, try %d", worst, state.tries);
-        NoteSelfRepair(c, "sent to " + bed->displayName + ", " + line);
+        NoteSelfRepair(c, std::string(retarget ? "bed taken, sent to another: " : "sent to ") +
+                           bed->displayName + ", " + line);
         return true;
     }
 
@@ -592,13 +657,20 @@ namespace
         const DWORD now = GetTickCount();
         std::map<Character*, SelfRepairState> kept;
 
+        // Брони прошлого прохода: кто ещё идёт - подтвердит свою заново.
+        g_reserved.clear();
+        for (std::map<Character*, SelfRepairState>::const_iterator it = g_selfRepairState.begin();
+             it != g_selfRepairState.end(); ++it)
+            if (it->second.sent && it->second.bed != NULL)
+                g_reserved[it->second.bed] = it->first;
+
         for (uint32_t i = 0; i < squad.size(); ++i)
         {
             Character* const c = squad[i];
             if (c == NULL)
                 continue;
 
-            SelfRepairState state = { 0, 0, false };
+            SelfRepairState state = { 0, 0, false, NULL, NOTED_NONE };
             std::map<Character*, SelfRepairState>::const_iterator old = g_selfRepairState.find(c);
             if (old != g_selfRepairState.end())
                 state = old->second;
