@@ -275,23 +275,27 @@ namespace
         return NULL;
     }
 
-    // Как нанял бы игрок: кто-то из сидящих в барах Хаба (DfFindBarRecruit)
-    // переходит во взвод фракции. Нет никого - найма нет, деньги целы.
-    bool Recruit(Faction* f, TownBase* hub, int cost)
+    // Как нанял бы игрок: самый дешёвый из сидящих в баре Хаба
+    // (DfFindBarRecruit) по своей цене из диалога переходит во взвод
+    // фракции; его реплики найма запираются - перенанять его игрок не
+    // сможет. Нет никого или дороже, чем решило ядро, - найма нет.
+    bool Recruit(Faction* f, TownBase* hub, int budget)
     {
         if (hub == NULL)
             return false;
         Ownerships* const o = f->factionOwnerships;
-        if (o == NULL || o->money < cost)
-            return false;
         ActivePlatoon* const ap = LoadedPlatoon(f);
-        if (ap == NULL)
+        if (o == NULL || ap == NULL)
             return false;
-        Character* const c = DfFindBarRecruit(hub, f);
-        if (c == NULL)
+        Character* c = NULL;
+        int price = -1;
+        if (!DfFindBarRecruit(hub, f, c, price) || price > budget || o->money < price)
             return false;
         c->setFaction(f, ap);
-        return Spend(f, cost);
+        DfLockRecruitLines(c);
+        if (c->getPlatoon() != ap)
+            ErrorLog("DynamicFactions: a recruit changed faction but is not in the faction's squad");
+        return Spend(f, price);
     }
 
     bool Execute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)
@@ -415,14 +419,4 @@ void DfGameFactionNames(std::vector<std::string>& out)
 {
     out.clear();
     SafeFactionNames(out);
-}
-
-std::string DfStatePath(const std::string& location, const std::string& name)
-{
-    if (name.empty())
-        return std::string();
-    std::string dir = location;
-    if (!dir.empty() && dir[dir.size() - 1] != '\\' && dir[dir.size() - 1] != '/')
-        dir += '\\';
-    return dir + name + "\\dynamicfactions.txt";
 }

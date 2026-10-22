@@ -83,6 +83,73 @@ static void test_names_exhausted_get_numeral()
     CHECK(n.find(" II") != std::string::npos);
 }
 
+static const char* const kDictText =
+    "# test\n"
+    "[human]\n"
+    "noun=Jackals|p\n"
+    "noun=Hand|f\n"
+    "adj=Iron|Irona|Irono|Ironi\n"
+    "[shek]\n"
+    "noun=Horn|m\n"
+    "adj=Red|Reda|Redo|Redi\n";
+
+static void test_dict_parse()
+{
+    DfNameDict d;
+    CHECK(DfParseNameDict(kDictText, d));
+    CHECK(d.size() == 2);
+    CHECK(d["human"].nouns.size() == 2 && d["human"].adj.size() == 1);
+    CHECK(d["human"].nouns[1].gender == 1);
+    CHECK(d["shek"].adj[0].forms[2] == "Redo");
+}
+
+static void test_dict_bad_line_rejected()
+{
+    DfNameDict d;
+    CHECK(!DfParseNameDict("[human]\nnoun=Jackals|x\n", d));
+    CHECK(!DfParseNameDict("[human]\nadj=One|Two\n", d));
+    CHECK(!DfParseNameDict("noun=Jackals|p\n", d));
+}
+
+static void test_dict_agreement()
+{
+    DfNameDict d;
+    DfParseNameDict(kDictText, d);
+    const std::vector<std::string> none;
+    std::vector<std::string> seen;
+    for (unsigned seed = 0; seed < 50; ++seed)
+        seen.push_back(DfMakeNameFrom(d, "human", seed, none));
+    bool plural = false, feminine = false;
+    for (size_t i = 0; i < seen.size(); ++i)
+    {
+        plural = plural || seen[i] == "Ironi Jackals";
+        feminine = feminine || seen[i] == "Irona Hand";
+        CHECK(seen[i] == "Ironi Jackals" || seen[i] == "Irona Hand");
+    }
+    CHECK(plural && feminine);
+}
+
+static void test_dict_fallbacks()
+{
+    DfNameDict d;
+    DfParseNameDict(kDictText, d);
+    const std::vector<std::string> none;
+    CHECK(DfMakeNameFrom(d, "hive", 2, none) == DfMakeNameFrom(d, "human", 2, none));
+    DfNameDict empty;
+    CHECK(DfMakeNameFrom(empty, "human", 2, none) == DfMakeName("human", 2, none));
+}
+
+static void test_dict_taken_numeral()
+{
+    DfNameDict d;
+    DfParseNameDict(kDictText, d);
+    std::vector<std::string> taken;
+    taken.push_back("Ironi Jackals");
+    taken.push_back("Irona Hand");
+    const std::string n = DfMakeNameFrom(d, "human", 0, taken);
+    CHECK(n.find(" II") != std::string::npos);
+}
+
 static DfFactionState MakeState(const std::string& id, const std::string& name)
 {
     DfFactionState s;
@@ -188,6 +255,7 @@ static DfSnapshot Snap(int members, int money, double hour, bool homeLoaded)
     snap.money = money;
     snap.hour = hour;
     snap.homeLoaded = homeLoaded;
+    snap.recruitPrice = -1;
     return snap;
 }
 
@@ -232,27 +300,63 @@ static void test_brain_income_no_money_no_recruit()
 static void test_brain_recruit_then_research()
 {
     DfFactionState s = Founded(10.0);
-    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 3000, 11.0, true), DfPhase1Rules());
+    DfSnapshot snap = Snap(4, 3000, 11.0, true);
+    snap.recruitPrice = 1500;
+    const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
     const int inc = FindAction(acts, DF_INCOME);
     const int rec = FindAction(acts, DF_RECRUIT);
     const int res = FindAction(acts, DF_RESEARCH);
     CHECK(inc >= 0 && acts[inc].amount == 60);
     CHECK(rec >= 0 && acts[rec].amount == 1500);
+    // 3060 - 1500 - 1000 запаса = 560 -> 2 очка
     CHECK(res >= 0 && acts[res].amount == 2);
     CHECK(rec < res);
+}
+
+static void test_brain_no_one_in_bar()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 3000, 11.0, true), DfPhase1Rules());
+    const int res = FindAction(acts, DF_RESEARCH);
+    CHECK(FindAction(acts, DF_RECRUIT) < 0);
+    CHECK(res >= 0 && acts[res].amount == 5);
+}
+
+static void test_brain_recruit_too_expensive()
+{
+    DfFactionState s = Founded(10.0);
+    DfSnapshot snap = Snap(4, 3000, 11.0, true);
+    snap.recruitPrice = 6000;
+    CHECK(FindAction(DfDecide(s, snap, DfPhase1Rules()), DF_RECRUIT) < 0);
+}
+
+static void test_brain_free_recruit()
+{
+    DfFactionState s = Founded(10.0);
+    DfSnapshot snap = Snap(4, 0, 11.0, true);
+    snap.recruitPrice = 0;
+    CHECK(FindAction(DfDecide(s, snap, DfPhase1Rules()), DF_RECRUIT) < 0);     // запас 1000 не набран
+    snap.money = 2000;
+    const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
+    const int rec = FindAction(acts, DF_RECRUIT);
+    CHECK(rec >= 0 && acts[rec].amount == 0);
 }
 
 static void test_brain_no_recruit_at_max()
 {
     DfFactionState s = Founded(10.0);
-    const std::vector<DfAction> acts = DfDecide(s, Snap(30, 100000, 11.0, true), DfPhase1Rules());
+    DfSnapshot snap = Snap(30, 100000, 11.0, true);
+    snap.recruitPrice = 100;
+    const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
     CHECK(FindAction(acts, DF_RECRUIT) < 0);
 }
 
 static void test_brain_no_recruit_when_home_unloaded()
 {
     DfFactionState s = Founded(10.0);
-    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 100000, 11.0, false), DfPhase1Rules());
+    DfSnapshot snap = Snap(4, 100000, 11.0, false);
+    snap.recruitPrice = 100;
+    const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
     CHECK(FindAction(acts, DF_RECRUIT) < 0);
     CHECK(FindAction(acts, DF_INCOME) >= 0);
 }
@@ -324,6 +428,11 @@ int main()
     test_names_all_races_ascii();
     test_names_unknown_race_is_human();
     test_names_exhausted_get_numeral();
+    test_dict_parse();
+    test_dict_bad_line_rejected();
+    test_dict_agreement();
+    test_dict_fallbacks();
+    test_dict_taken_numeral();
     test_state_roundtrip();
     test_state_events_capped();
     test_state_garbage_rejected();
@@ -333,6 +442,9 @@ int main()
     test_brain_extinct();
     test_brain_income_no_money_no_recruit();
     test_brain_recruit_then_research();
+    test_brain_no_one_in_bar();
+    test_brain_recruit_too_expensive();
+    test_brain_free_recruit();
     test_brain_no_recruit_at_max();
     test_brain_no_recruit_when_home_unloaded();
     test_brain_hours_capped();

@@ -33,6 +33,7 @@
 #include <kenshi/Faction.h>
 #include <kenshi/GameWorld.h>
 #include <kenshi/Globals.h>
+#include <kenshi/SaveFileSystem.h>
 #include <kenshi/SaveManager.h>
 #include <kenshi/gui/ForgottenGUI.h>
 
@@ -42,6 +43,7 @@
 #include "core/DfNames.h"
 #include "core/DfState.h"
 #include "game/DfGame.h"
+#include "game/DfRecruit.h"
 #include "ui/DfWindow.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
@@ -102,10 +104,19 @@ namespace
 
     // ---------------------------------------------------------------
     // Состояние текущей игры
+    //
+    // Файл dynamicfactions.txt - внутри сохранения, через SaveFileSystem
+    // (рецепт Formations.save, 17.10.2026): saveGame пишет в его временную
+    // папку writeFile(имя) ДО оригинала, loadGame читает readFile(имя) после.
+    // Писать в папку сейва после SaveManager::saveGame нельзя: сохранение
+    // собирается во временной папке и копируется потом (22.10: «could not
+    // write»). newGame - новая игра: состояния нет. Пустое состояние на
+    // первом тике = новая фракция (или принятие уже живущей - Found).
     // ---------------------------------------------------------------
 
     const DWORD kTickMs = 1000;             // проверка «прошёл ли час» - раз в секунду
     const DWORD kGraceMs = 10000;           // после загрузки мир дозагружается
+    const char* const kStateFile = "dynamicfactions.txt";
 
     struct Runtime
     {
@@ -115,37 +126,29 @@ namespace
 
     std::vector<DfFactionState> g_states;
     std::vector<Runtime> g_runtime;
-    bool g_ready = false;                   // состояние этой игры загружено
-    bool g_needFresh = false;               // новая игра - фракцию заводим на первом тике
+    bool g_ready = false;                   // мир этой игры поднят
     DWORD g_readyAt = 0;
     DWORD g_lastTick = 0;
 
-    void Reset(const char* why)
+    void SetStates(std::vector<DfFactionState>& states, const char* why)
     {
-        g_states.clear();
-        g_runtime.clear();
-        g_ready = false;
-        g_needFresh = false;
+        g_states.swap(states);
+        g_runtime.assign(g_states.size(), Runtime());
         if (g_debug)
-            DebugLog(std::string("DynamicFactions: state cleared (") + why + ")");
+        {
+            char line[128];
+            sprintf_s(line, sizeof(line), "DynamicFactions: %d faction state(s) (%s)",
+                      static_cast<int>(g_states.size()), why);
+            DebugLog(line);
+        }
     }
 
-    void MarkReady()
+    void MarkReady(const char* why)
     {
-        g_runtime.assign(g_states.size(), Runtime());
         g_ready = true;
         g_readyAt = GetTickCount();
-    }
-
-    DfFactionState FreshFaction()
-    {
-        std::vector<std::string> taken;
-        DfGameFactionNames(taken);
-        DfFactionState s;
-        s.recordId = kDfFactionRecord;
-        s.race = "human";
-        s.name = DfMakeName(s.race, GetTickCount(), taken);
-        return s;
+        if (g_debug)
+            DebugLog(std::string("DynamicFactions: world ready (") + why + ")");
     }
 
     std::string Quote(const std::string& s)
@@ -164,72 +167,87 @@ namespace
         return true;
     }
 
-    // Во временный файл, потом подмена: оборванная запись не портит прежний.
     bool WriteFile(const std::string& path, const std::string& text)
     {
-        const std::string tmp = path + ".tmp";
-        {
-            std::ofstream f(tmp.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
-            if (!f)
-                return false;
-            f.write(text.data(), static_cast<std::streamsize>(text.size()));
-            if (!f)
-                return false;
-        }
-        return MoveFileExA(tmp.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING) != 0;
+        std::ofstream f(path.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+        if (!f)
+            return false;
+        f.write(text.data(), static_cast<std::streamsize>(text.size()));
+        return !f.fail();
     }
 
-    void LoadStateFor(const std::string& location, const std::string& name)
+    // Словарь названий на языке игры: locale/<язык>/LC_MESSAGES/
+    // dynamic_factions_names.txt. Нет файла - английские названия.
+    const DfNameDict& NameDict()
     {
-        const std::string path = DfStatePath(location, name);
-        std::string text;
-        std::vector<DfFactionState> loaded;
-        if (!path.empty() && ReadFile(path, text))
+        static bool loaded = false;
+        static DfNameDict dict;
+        if (loaded)
+            return dict;
+        loaded = true;
+        KLoc::EnsureLoaded();
+        const std::string base = KLoc::FindLocaleBase();
+        std::vector<std::string> ids;
+        KLoc::AddCandidates(ids, KLoc::LoadedLocaleId());
+        for (size_t i = 0; i < ids.size() && !base.empty(); ++i)
         {
-            if (DfDeserialize(text, loaded) && !loaded.empty())
-            {
-                g_states.swap(loaded);
-                for (size_t i = 0; i < g_states.size(); ++i)
-                    DebugLog("DynamicFactions: restored " + Quote(g_states[i].name) +
-                             (g_states[i].extinct ? " (extinct)" : g_states[i].founded ? "" : " (not founded yet)"));
-                MarkReady();
-                return;
-            }
-            ErrorLog("DynamicFactions: " + path + " is damaged - a new faction is started");
+            const std::string path = KLoc::Join(KLoc::Join(base, ids[i]), "LC_MESSAGES\\dynamic_factions_names.txt");
+            std::string text;
+            if (!ReadFile(path, text))
+                continue;
+            if (DfParseNameDict(text, dict))
+                DebugLog("DynamicFactions: faction names from " + path);
+            else
+                ErrorLog("DynamicFactions: " + path + " has a bad line - English names");
+            break;
         }
-        g_states.assign(1, FreshFaction());
-        DebugLog("DynamicFactions: no saved state - new faction " + Quote(g_states[0].name) + " waits for the Hub");
-        MarkReady();
+        return dict;
     }
 
-    void SaveStateTo(const std::string& location, const std::string& name)
+    DfFactionState FreshFaction()
     {
-        if (!g_ready)
-            return;
-        const std::string path = DfStatePath(location, name);
-        if (path.empty() || !WriteFile(path, DfSerialize(g_states)))
-            ErrorLog("DynamicFactions: could not write " + path);
-        else if (g_debug)
-            DebugLog("DynamicFactions: state written to " + path);
+        std::vector<std::string> taken;
+        DfGameFactionNames(taken);
+        DfFactionState s;
+        s.recordId = kDfFactionRecord;
+        s.race = "human";
+        s.name = DfMakeNameFrom(NameDict(), s.race, GetTickCount(), taken);
+        return s;
     }
-
 
     // ---------------------------------------------------------------
     // Тик: раз в секунду смотрим, не прошёл ли игровой час
     // ---------------------------------------------------------------
 
+    // Основание. Если у записи фракции в игре уже есть живые люди (сейв
+    // без нашего файла, другой плагин и т.п.) - фракция принимается как
+    // есть, без нового отряда и денег: 22.10 после загрузки сейва без файла
+    // получился второй отряд.
     void Found(DfFactionState& s, Faction* f, double hour)
     {
         TownBase* const hub = DfFindHub();
         if (hub == NULL || f == NULL)
             return;
         const DfRules rules = DfPhase1Rules();
-        DfApplyName(f, s.name);
-        if (!DfFound(f, hub, rules.startMembers, rules.startMoney, g_startStats))
+        DfSnapshot before;
+        if (!DfTakeSnapshot(f, before))
             return;
         std::vector<DfAction> done(1);
         done[0].type = DF_FOUND;
         done[0].amount = rules.startMoney;
+        if (before.members > 0)
+        {
+            DfApplyBookkeeping(s, done, hour, rules);
+            DfApplyName(f, s.name);
+            char line[256];
+            sprintf_s(line, sizeof(line), "DynamicFactions: %s took over the faction already in the game, %d members",
+                      Quote(s.name).c_str(), before.members);
+            DebugLog(line);
+            return;
+        }
+        DfApplyName(f, s.name);
+        if (!DfFound(f, hub, rules.startMembers, rules.startMoney, g_startStats))
+            return;
         DfApplyBookkeeping(s, done, hour, rules);
         DfSnapshot snap;
         const int members = DfTakeSnapshot(f, snap) ? snap.members : -1;
@@ -273,9 +291,14 @@ namespace
         else
             rt.zeroSince = -1.0;
 
+        // Кого можно нанять в баре дома и почём - для решения ядра.
+        TownBase* const hub = snap.homeLoaded ? DfFindHub() : NULL;
+        Character* recruit = NULL;
+        if (hub == NULL || !DfFindBarRecruit(hub, f, recruit, snap.recruitPrice))
+            snap.recruitPrice = -1;
+
         const DfRules rules = DfPhase1Rules();
         const std::vector<DfAction> acts = DfDecide(s, snap, rules);
-        TownBase* const hub = snap.homeLoaded ? DfFindHub() : NULL;
         std::vector<DfAction> done;
         for (size_t i = 0; i < acts.size(); ++i)
         {
@@ -292,7 +315,12 @@ namespace
         DfApplyBookkeeping(s, done, hour, rules);
         for (size_t i = 0; i < done.size(); ++i)
             if (done[i].type == DF_RECRUIT)
-                DebugLog("DynamicFactions: " + Quote(s.name) + " recruited someone from a bar of the Hub");
+            {
+                char line[256];
+                sprintf_s(line, sizeof(line), "DynamicFactions: %s hired someone in a bar of the Hub for %d",
+                          Quote(s.name).c_str(), done[i].amount);
+                DebugLog(line);
+            }
 
         if (s.extinct)
             DebugLog("DynamicFactions: " + Quote(s.name) + " is extinct - all members are dead");
@@ -313,6 +341,7 @@ namespace
         {
             snaps[i].members = -1;
             snaps[i].money = 0;
+            snaps[i].recruitPrice = -1;
             Faction* const f = g_states[i].founded ? DfBindFaction(g_states[i].recordId) : NULL;
             if (f != NULL && !DfTakeSnapshot(f, snaps[i]))
                 snaps[i].members = -1;
@@ -355,12 +384,11 @@ namespace
             return;
         if (GetTickCount() - g_readyAt < kGraceMs)
             return;
-        if (g_needFresh)
+        if (g_states.empty())
         {
-            g_needFresh = false;
-            g_states.assign(1, FreshFaction());
-            g_runtime.assign(1, Runtime());
-            DebugLog("DynamicFactions: new game - new faction " + Quote(g_states[0].name) + " waits for the Hub");
+            std::vector<DfFactionState> fresh(1, FreshFaction());
+            SetStates(fresh, "new faction");
+            DebugLog("DynamicFactions: new faction " + Quote(g_states[0].name) + " waits for the Hub");
         }
         const double hour = DfGameHour();
         if (hour < 0.0)
@@ -375,7 +403,9 @@ namespace
     // ---------------------------------------------------------------
 
     void (*g_origGuiUpdate)(ForgottenGUI*) = NULL;
-    int (*g_origSaveGame)(SaveManager*, const std::string&, const std::string&) = NULL;
+    bool (*g_origSfsSave)(SaveFileSystem*, const std::string&) = NULL;
+    void (*g_origSfsLoad)(SaveFileSystem*, const std::string&) = NULL;
+    void (*g_origSfsNew)(SaveFileSystem*) = NULL;
     int (*g_origLoadGame)(SaveManager*, const std::string&, const std::string&) = NULL;
     void (*g_origResetGame)(GameWorld*) = NULL;
     void (*g_origInitNewWorld)(GameWorld*, GameDataManager*) = NULL;
@@ -396,49 +426,91 @@ namespace
             UpdateWindow();
     }
 
-    int SaveGame_hook(SaveManager* self, const std::string& location, const std::string& name)
+    void WriteState(SaveFileSystem* sfs)
     {
-        const int result = g_origSaveGame(self, location, name);
-        if (g_debug)
-        {
-            char line[64];
-            sprintf_s(line, sizeof(line), " (result %d)", result);
-            DebugLog("DynamicFactions: saveGame " + location + " | " + name + line);
-        }
-        SaveStateTo(location, name);
-        return result;
+        if (!g_ready)
+            return;
+        const std::string path = sfs->writeFile(kStateFile);
+        if (path.empty() || !WriteFile(path, DfSerialize(g_states)))
+            ErrorLog("DynamicFactions: could not write the faction state (" + path + ")");
+        else if (g_debug)
+            DebugLog("DynamicFactions: state written to " + path);
     }
 
+    void ReadState(SaveFileSystem* sfs)
+    {
+        std::vector<DfFactionState> loaded;
+        if (!sfs->fileExists(kStateFile))
+        {
+            SetStates(loaded, "this save has no faction state");
+            return;
+        }
+        const std::string path = sfs->readFile(kStateFile);
+        std::string text;
+        if (!ReadFile(path, text) || !DfDeserialize(text, loaded))
+        {
+            ErrorLog("DynamicFactions: " + path + " is damaged - the faction is taken over from the game");
+            loaded.clear();
+        }
+        SetStates(loaded, "loaded");
+        for (size_t i = 0; i < g_states.size(); ++i)
+            DebugLog("DynamicFactions: restored " + Quote(g_states[i].name) +
+                     (g_states[i].extinct ? " (extinct)" : g_states[i].founded ? "" : " (not founded yet)"));
+    }
+
+    bool SfsSave_hook(SaveFileSystem* self, const std::string& path)
+    {
+        __try
+        {
+            WriteState(self);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+        return g_origSfsSave(self, path);
+    }
+
+    void SfsLoad_hook(SaveFileSystem* self, const std::string& path)
+    {
+        g_origSfsLoad(self, path);
+        __try
+        {
+            ReadState(self);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            ErrorLog("DynamicFactions: reading the faction state failed - the faction is taken over from the game");
+        }
+    }
+
+    void SfsNew_hook(SaveFileSystem* self)
+    {
+        g_origSfsNew(self);
+        std::vector<DfFactionState> none;
+        SetStates(none, "new game");
+    }
+
+    // Мир поднят: после загрузки сейва и после создания мира новой игры.
     int LoadGame_hook(SaveManager* self, const std::string& location, const std::string& name)
     {
-        Reset("loading a save");
+        g_ready = false;
         const int result = g_origLoadGame(self, location, name);
-        if (g_debug)
-        {
-            char line[64];
-            sprintf_s(line, sizeof(line), " (result %d)", result);
-            DebugLog("DynamicFactions: loadGame " + location + " | " + name + line);
-        }
-        LoadStateFor(location, name);
+        MarkReady("save loaded");
         return result;
     }
 
     void ResetGame_hook(GameWorld* self)
     {
-        Reset("world reset");
+        g_ready = false;
+        if (g_debug)
+            DebugLog("DynamicFactions: world reset");
         g_origResetGame(self);
     }
 
-    // Новая игра. Загрузка сейва, если тоже идёт сюда, после себя всё равно
-    // читает файл в LoadGame_hook - он и победит.
     void InitNewWorld_hook(GameWorld* self, GameDataManager* data)
     {
         g_origInitNewWorld(self, data);
-        if (g_debug)
-            DebugLog("DynamicFactions: new game world initialised");
-        g_states.clear();
-        g_needFresh = true;
-        MarkReady();
+        MarkReady("world initialised");
     }
 }
 
@@ -477,8 +549,12 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveManager::saveGame),
-                                                 SaveGame_hook, &g_origSaveGame) ||
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::saveGame),
+                                                 SfsSave_hook, &g_origSfsSave) ||
+        KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),
+                                                 SfsLoad_hook, &g_origSfsLoad) ||
+        KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),
+                                                 SfsNew_hook, &g_origSfsNew) ||
         KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveManager::loadGame),
                                                  LoadGame_hook, &g_origLoadGame) ||
         KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&GameWorld::resetGame),

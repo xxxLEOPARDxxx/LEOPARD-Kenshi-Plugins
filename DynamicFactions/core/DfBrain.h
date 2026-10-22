@@ -12,6 +12,7 @@ struct DfSnapshot
     int money;
     double hour;
     bool homeLoaded;
+    int recruitPrice;           // цена нанимаемого в баре дома; < 0 - нанять некого
 };
 
 enum DfActionType

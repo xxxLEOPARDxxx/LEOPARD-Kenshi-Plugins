@@ -46,6 +46,3 @@ void DfApplyName(Faction* f, const std::string& name);
 
 // Названия всех фракций игры - чтобы новое имя не совпало.
 void DfGameFactionNames(std::vector<std::string>& out);
-
-// Файл состояния в папке сохранения: <location>\<name>\dynamicfactions.txt.
-std::string DfStatePath(const std::string& location, const std::string& name);

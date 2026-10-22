@@ -67,10 +67,13 @@ std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, 
     acts.push_back(Make(DF_INCOME, income));
     int money = snap.money + income;
 
-    if (snap.homeLoaded && snap.members < r.maxMembers && money >= r.recruitCost + kDfReserve)
+    // Найм - как у игрока: кто сидит в баре и сколько просит (его диалог),
+    // адаптер узнаёт заранее (snap.recruitPrice).
+    if (snap.homeLoaded && snap.recruitPrice >= 0 && snap.members < r.maxMembers &&
+        money >= snap.recruitPrice + kDfReserve)
     {
-        acts.push_back(Make(DF_RECRUIT, r.recruitCost));
-        money -= r.recruitCost;
+        acts.push_back(Make(DF_RECRUIT, snap.recruitPrice));
+        money -= snap.recruitPrice;
     }
 
     if (s.techLevel < r.maxTech && r.techPointCost > 0 && money > kDfReserve)
