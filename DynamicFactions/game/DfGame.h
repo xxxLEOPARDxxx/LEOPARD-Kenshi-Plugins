@@ -15,7 +15,7 @@ class TownBase;
 extern const char* const kDfFactionRecord;      // FACTION, копия Nameless
 extern const char* const kDfSquadRecord;        // SQUAD_TEMPLATE, копия Drifter squad
 extern const char* const kDfHubRecord;          // Хаб
-extern const char* const kDfFounderRecord;      // CHARACTER «Drifter» - основатели
+extern const char* const kDfFounderRecord;      // CHARACTER: «Drifter» без вещей и денег
 
 // Фракция игры по записи FACTION; NULL - записи нет (мод не включён).
 Faction* DfBindFaction(const std::string& recordId);

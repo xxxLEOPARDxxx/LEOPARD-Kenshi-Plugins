@@ -27,7 +27,7 @@
 const char* const kDfFactionRecord = "1-DynamicFactions.mod";
 const char* const kDfSquadRecord = "2-DynamicFactions.mod";
 const char* const kDfHubRecord = "18919-Newwworld.mod";
-const char* const kDfFounderRecord = "2205-gamedata.base";
+const char* const kDfFounderRecord = "3-DynamicFactions.mod";
 
 namespace
 {
