@@ -28,7 +28,8 @@ namespace
     const float kNearDistance = 10.0f;      // рядом, но ближе не подойти (стол, стойка)
     const DWORD kStuckMs = 8000;            // столько не приближался - говорим отсюда
     const float kLostDistance = 12.0f;      // во время разговора ушли дальше - снова идти
-    const DWORD kOrderEveryMs = 1000;       // повтор приказа идти (ИИ отряда его перебивает)
+    const DWORD kOrderEveryMs = 1000;       // как часто смотреть, не повторить ли приказ
+    const float kRetargetDistance = 2.0f;   // рекрут отошёл от точки приказа - новый приказ
     const float kMovedDistance = 1.5f;      // сдвинулся - не стоит
     const DWORD kLineMs = 3000;             // реплика держится над головой
     const DWORD kGiveUpMs = 240000;         // не дошёл за 4 минуты - срыв
@@ -104,8 +105,19 @@ namespace
                 DebugLog(line);
             }
         }
-        envoy->setDestination(recruit->getPosition(), false);
+        t.target = recruit->getPosition();
+        envoy->setDestination(t.target, false);
         t.phaseMs = now;
+    }
+
+    // Повторять приказ, только если он устарел: рекрут ушёл от точки или
+    // посланник занят другим (дёрганье на месте от приказа каждую секунду).
+    bool OrderStale(const DfHireTask& t, Character* envoy, Character* recruit)
+    {
+        if (recruit->getPosition().distance(t.target) > kRetargetDistance)
+            return true;
+        OrdersReceiver* const orders = envoy->getOrdersReciever();
+        return orders != NULL && orders->getCurrentGoal().key() != MOVE_ON_FREE_WILL;
     }
 
     std::string Line(const DfHireTask& t, const std::string& factionName)
@@ -239,7 +251,7 @@ namespace
                 DfRecruitSkip(recruit, kSkipMs);
                 return Fail(t, envoy, "the envoy did not reach the recruit in 4 minutes");
             }
-            if (now - t.phaseMs >= kOrderEveryMs)
+            if (now - t.phaseMs >= kOrderEveryMs && OrderStale(t, envoy, recruit))
                 Order(t, envoy, recruit, now);
             return DF_HIRE_RUNNING;
         }

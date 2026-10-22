@@ -6,9 +6,9 @@
 //
 // Шаги, раз в секунду из тика плагина:
 //   GO   - посланник идёт к текущей точке рекрута (Character::
-//          setDestination каждую секунду: ИИ отряда NPC перебивает приказы -
-//          «следовать» сбрасывал через 15 с, «прогулка» уводила в магазин,
-//          goal SHOPPING, 23.10). Рекрут бродит - догоняем. Сам посланник
+//          setDestination; повтор, если рекрут отошёл от точки приказа > 2 м
+//          или цель посланника уже не «идти»; пакет ИИ фракции - только
+//          реакции, перебивать некому). Рекрут бродит - догоняем. Сам посланник
 //          15 с стоит на месте (сдвиг < 1,5 м) - недостижим, рекрута 10
 //          минут не предлагать;
 //   TALK - рядом (< 5 м) или стоит рядом (< 10 м и 8 с не подходит
@@ -52,13 +52,14 @@ struct DfHireTask
     unsigned long startedMs;
     unsigned long phaseMs;      // когда сказана последняя реплика / отдан приказ
     int line;                   // сколько реплик сказано
+    Ogre::Vector3 target;       // куда послан последним приказом
     Ogre::Vector3 lastPos;      // где посланник был, когда последний раз сдвинулся
     unsigned long movedMs;      // когда последний раз сдвинулся
     float closest;              // ближе всего подходил
     unsigned long closerMs;     // когда последний раз подошёл ближе
     std::string why;            // почему сорвалось - для журнала
 
-    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), line(0), lastPos(0.0f, 0.0f, 0.0f), movedMs(0), closest(0.0f), closerMs(0) {}
+    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), line(0), target(0.0f, 0.0f, 0.0f), lastPos(0.0f, 0.0f, 0.0f), movedMs(0), closest(0.0f), closerMs(0) {}
     bool busy() const { return phase != DF_HIRE_IDLE; }
 };
 
