@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8
+"
+"Language: zh_CN
+"
+
+msgid "Small fixes of the game's AI. Each one only touches the case it fixes."
+msgstr "游戏 AI 的小修正。每项只处理它要修复的情况。"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "All fixes of this mod."
+msgstr "本模组的全部修正。"
+
+msgid "Fixes"
+msgstr "修正"
+
+msgid "Skeletons to repair beds"
+msgstr "骷髅送往修理床"
+
+msgid "A wounded skeleton is carried to a free skeleton repair bed instead of an ordinary bed. No free repair bed nearby - an ordinary bed, as in the game."
+msgstr "受伤的骷髅会被送到空闲的骷髅修理床，而不是普通床。附近没有空闲修理床时，按游戏原样送到普通床。"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
+msgstr "在 RE_Kenshi_log.txt 中记录：为谁寻找修理床，以及选了哪一张。"
+

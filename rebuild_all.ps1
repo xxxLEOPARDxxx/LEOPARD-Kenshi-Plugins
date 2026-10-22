@@ -282,6 +282,14 @@ if (Test-Path $psMod) {
     Copy-Item "$ROOT\ours\PatientSelfAid\PatientSelfAid.ini" "$psMod\PatientSelfAid.defaults.ini" -Force
 }
 
+BuildPlugin "$ROOT\ours\AIFixed"                  "AIFixed"           "AIFixed"
+$aiMod = "$KENSHI\mods\AIFixed"
+if (Test-Path $aiMod) {
+    Copy-Item "$ROOT\ours\AIFixed\README.txt" $aiMod -Force
+    Copy-Item "$ROOT\ours\AIFixed\locale" $aiMod -Recurse -Force
+    Copy-Item "$ROOT\ours\AIFixed\AIFixed.ini" "$aiMod\AIFixed.defaults.ini" -Force
+}
+
 BuildPlugin "$ROOT\ours\QuickStartSelect"         "QuickStartSelect"  "QuickStartSelect"
 $qsMod = "$KENSHI\mods\QuickStartSelect"
 if (Test-Path $qsMod) {
@@ -364,7 +372,7 @@ Step "Контроль: в собранных DLL не должно быть к�
 # каком виде, весь перевод живёт в .po.
 # Formations в списке нет намеренно: он не линкует KenshiLib, а значит не
 # может спросить у игры язык, и его русский лежит прямо в бинарнике.
-foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers", "BestMinimap")) {
+foreach ($m in @("Character Inspector", "BetterLooting", "StatColours", "BuildModeGizmo", "KillCounter", "LiveXpBars", "PatientSelfAid", "GearCompare", "XP_Overhaul", "UITweaks", "AssignedWorkers", "RangedDamageXp", "WantedMap", "ModConfigMenu", "Container-Highlight", "Character-Highlight", "Vital-Sense", "Vital-Read", "Job-B-Gone", "Organize-the-Trader", "Organize-the-Inventory", "Organize-the-Crafting-Stations", "Auto-Pause-on-Load", "Loot-Scoot-Execute", "Wall-B-Gone", "Hidden-Faction-Relations", "Map-markers", "BestMinimap", "AIFixed")) {
     $dll = Get-ChildItem "$KENSHI\mods\$m" -Filter *.dll -ErrorAction SilentlyContinue |
            Where-Object { $_.Name -notlike "*.orig" } | Select-Object -First 1
     if (-not $dll) { continue }

@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8
+"
+"Language: en_GB
+"
+
+msgid "Small fixes of the game's AI. Each one only touches the case it fixes."
+msgstr "Small fixes of the game's AI. Each one only touches the case it fixes."
+
+msgid "General"
+msgstr "General"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "All fixes of this mod."
+msgstr "All fixes of this mod."
+
+msgid "Fixes"
+msgstr "Fixes"
+
+msgid "Skeletons to repair beds"
+msgstr "Skeletons to repair beds"
+
+msgid "A wounded skeleton is carried to a free skeleton repair bed instead of an ordinary bed. No free repair bed nearby - an ordinary bed, as in the game."
+msgstr "A wounded skeleton is carried to a free skeleton repair bed instead of an ordinary bed. No free repair bed nearby - an ordinary bed, as in the game."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
+msgstr "Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."
+
