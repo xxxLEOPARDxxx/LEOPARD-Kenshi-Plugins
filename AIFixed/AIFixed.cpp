@@ -62,6 +62,7 @@
 #include <kenshi/Tasker.h>
 #include <kenshi/Building/Building.h>
 #include <kenshi/Building/UseableStuff.h>
+#include <kenshi/Town.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 
@@ -202,6 +203,14 @@ namespace
     // me - кто ищет: несущий раненого или сам скелет (саморемонт).
     Building* FindRepairBed(AI* ai, Character* me, const std::set<Building*>* reserved)
     {
+        // Только в своей базе: «местные» постройки игрока - это все его
+        // постройки на карте (22.10.2026: отряд с другого края карты
+        // бронировал ремкровати базы). Персонаж и кровать - в черте одного
+        // поселения, как у автосброса ресурсов на склады базы.
+        TownBase* const town = me->getCurrentTownLocation();
+        if (town == NULL)
+            return NULL;
+
         lektor<Building*>& machines = Machines();
         ai->getAllLocalMachines(machines, 1u << BF_SKELETON_BED);
         if (machines.size() == 0)
@@ -219,6 +228,9 @@ namespace
         {
             Building* const bed = machines[i];
             if (bed == NULL || bed->getSpecialFunction() != BF_SKELETON_BED)
+                continue;
+
+            if (bed->getTown() != town)
                 continue;
 
             // На неё уже отправлен кто-то из наших (саморемонт).
@@ -641,7 +653,11 @@ namespace
         if (bed == NULL)
         {
             if (state.noted != NOTED_NO_BED)
-                NoteSelfRepair(c, "worn, but no free repair bed with power nearby");
+            {
+                TownBase* const town = c->getCurrentTownLocation();
+                NoteSelfRepair(c, town == NULL ? std::string("worn, but not in a base")
+                                               : "worn, but no free repair bed with power in " + town->displayName);
+            }
             state.noted = NOTED_NO_BED;
             return true;
         }
