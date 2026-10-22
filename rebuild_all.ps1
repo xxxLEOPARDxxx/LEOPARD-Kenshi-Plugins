@@ -296,6 +296,7 @@ BuildPlugin "$ROOT\ours\DynamicFactions"          "DynamicFactions"   "DynamicFa
 $dfMod = "$KENSHI\mods\DynamicFactions"
 if (Test-Path $dfMod) {
     Copy-Item "$ROOT\ours\DynamicFactions\README.txt" $dfMod -Force -ErrorAction SilentlyContinue
+    Copy-Item "$ROOT\ours\DynamicFactions\DynamicFactions.mod" $dfMod -Force -ErrorAction SilentlyContinue
     Copy-Item "$ROOT\ours\DynamicFactions\locale" $dfMod -Recurse -Force -ErrorAction SilentlyContinue
     Copy-Item "$ROOT\ours\DynamicFactions\DynamicFactions.ini" "$dfMod\DynamicFactions.defaults.ini" -Force -ErrorAction SilentlyContinue
 }
