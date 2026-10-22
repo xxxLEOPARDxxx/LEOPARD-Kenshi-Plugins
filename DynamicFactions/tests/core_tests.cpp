@@ -6,6 +6,7 @@
 
 #include "core/DfNames.h"
 #include "core/DfState.h"
+#include "core/DfBrain.h"
 
 static int g_failed = 0;
 static int g_checks = 0;
@@ -160,6 +161,161 @@ static void test_state_empty_ok()
     CHECK(out.empty());
 }
 
+static int FindAction(const std::vector<DfAction>& acts, DfActionType type)
+{
+    for (size_t i = 0; i < acts.size(); ++i)
+        if (acts[i].type == type)
+            return static_cast<int>(i);
+    return -1;
+}
+
+static DfFactionState Founded(double lastTick)
+{
+    DfFactionState s;
+    s.recordId = "df-faction-human-1";
+    s.name = "Iron Jackals";
+    s.race = "human";
+    s.founded = true;
+    s.foundedHour = lastTick;
+    s.lastTickHour = lastTick;
+    return s;
+}
+
+static DfSnapshot Snap(int members, int money, double hour, bool homeLoaded)
+{
+    DfSnapshot snap;
+    snap.members = members;
+    snap.money = money;
+    snap.hour = hour;
+    snap.homeLoaded = homeLoaded;
+    return snap;
+}
+
+static void test_brain_rules_values()
+{
+    const DfRules r = DfPhase1Rules();
+    CHECK(r.startMembers == 4 && r.startMoney == 5000 && r.recruitCost == 1500 && r.maxMembers == 30);
+    CHECK(r.incomePerMemberHour == 15 && r.techPointCost == 200 && r.maxTech == 10);
+}
+
+static void test_brain_found_only_when_home_loaded()
+{
+    DfFactionState s;
+    s.recordId = "df-faction-human-1";
+    CHECK(DfDecide(s, Snap(0, 0, 10.0, false), DfPhase1Rules()).empty());
+    const std::vector<DfAction> acts = DfDecide(s, Snap(0, 0, 10.0, true), DfPhase1Rules());
+    CHECK(acts.size() == 1 && acts[0].type == DF_FOUND);
+    DfApplyBookkeeping(s, acts, 10.0);
+    CHECK(s.founded && s.foundedHour == 10.0 && s.lastTickHour == 10.0);
+}
+
+static void test_brain_extinct()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(0, 500, 11.0, true), DfPhase1Rules());
+    CHECK(acts.size() == 1 && acts[0].type == DF_EXTINCT);
+    DfApplyBookkeeping(s, acts, 11.0);
+    CHECK(s.extinct);
+    CHECK(DfDecide(s, Snap(4, 5000, 12.0, true), DfPhase1Rules()).empty());
+}
+
+static void test_brain_income_no_money_no_recruit()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 0, 12.0, true), DfPhase1Rules());
+    const int inc = FindAction(acts, DF_INCOME);
+    CHECK(inc >= 0 && acts[inc].amount == 120);
+    CHECK(FindAction(acts, DF_RECRUIT) < 0);
+    CHECK(FindAction(acts, DF_RESEARCH) < 0);
+}
+
+static void test_brain_recruit_then_research()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 3000, 11.0, true), DfPhase1Rules());
+    const int inc = FindAction(acts, DF_INCOME);
+    const int rec = FindAction(acts, DF_RECRUIT);
+    const int res = FindAction(acts, DF_RESEARCH);
+    CHECK(inc >= 0 && acts[inc].amount == 60);
+    CHECK(rec >= 0 && acts[rec].amount == 1500);
+    CHECK(res >= 0 && acts[res].amount == 2);
+    CHECK(rec < res);
+}
+
+static void test_brain_no_recruit_at_max()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(30, 100000, 11.0, true), DfPhase1Rules());
+    CHECK(FindAction(acts, DF_RECRUIT) < 0);
+}
+
+static void test_brain_no_recruit_when_home_unloaded()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 100000, 11.0, false), DfPhase1Rules());
+    CHECK(FindAction(acts, DF_RECRUIT) < 0);
+    CHECK(FindAction(acts, DF_INCOME) >= 0);
+}
+
+static void test_brain_hours_capped()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(1, 0, 60.0, true), DfPhase1Rules());
+    const int inc = FindAction(acts, DF_INCOME);
+    CHECK(inc >= 0 && acts[inc].amount == 24 * 15);
+}
+
+static void test_brain_research_capped_per_tick()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(30, 100000, 11.0, true), DfPhase1Rules());
+    const int res = FindAction(acts, DF_RESEARCH);
+    CHECK(res >= 0 && acts[res].amount == 5);
+}
+
+static void test_brain_less_than_hour_nothing()
+{
+    DfFactionState s = Founded(10.0);
+    CHECK(DfDecide(s, Snap(4, 100000, 10.9, true), DfPhase1Rules()).empty());
+    CHECK(DfDecide(s, Snap(4, 100000, 5.0, true), DfPhase1Rules()).empty());
+}
+
+static void test_brain_tick_advances_whole_hours()
+{
+    DfFactionState s = Founded(10.0);
+    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 0, 12.5, true), DfPhase1Rules());
+    DfApplyBookkeeping(s, acts, 12.5);
+    CHECK(s.lastTickHour == 12.0);
+}
+
+static void test_brain_level_up_carries()
+{
+    DfFactionState s = Founded(10.0);
+    s.techPoints = 99;
+    DfAction a;
+    a.type = DF_RESEARCH;
+    a.amount = 1;
+    DfApplyBookkeeping(s, std::vector<DfAction>(1, a), 11.0);
+    CHECK(s.techLevel == 1 && s.techPoints == 0);
+    s.techPoints = 199;
+    a.amount = 5;
+    DfApplyBookkeeping(s, std::vector<DfAction>(1, a), 12.0);
+    CHECK(s.techLevel == 2 && s.techPoints == 4);
+}
+
+static void test_brain_max_tech_stops()
+{
+    DfFactionState s = Founded(10.0);
+    s.techLevel = 10;
+    s.techPoints = 0;
+    DfAction a;
+    a.type = DF_RESEARCH;
+    a.amount = 3;
+    DfApplyBookkeeping(s, std::vector<DfAction>(1, a), 11.0);
+    CHECK(s.techLevel == 10 && s.techPoints == 0);
+    CHECK(FindAction(DfDecide(s, Snap(30, 100000, 12.0, true), DfPhase1Rules()), DF_RESEARCH) < 0);
+}
+
 int main()
 {
     test_harness_runs();
@@ -172,6 +328,19 @@ int main()
     test_state_events_capped();
     test_state_garbage_rejected();
     test_state_empty_ok();
+    test_brain_rules_values();
+    test_brain_found_only_when_home_loaded();
+    test_brain_extinct();
+    test_brain_income_no_money_no_recruit();
+    test_brain_recruit_then_research();
+    test_brain_no_recruit_at_max();
+    test_brain_no_recruit_when_home_unloaded();
+    test_brain_hours_capped();
+    test_brain_research_capped_per_tick();
+    test_brain_less_than_hour_nothing();
+    test_brain_tick_advances_whole_hours();
+    test_brain_level_up_carries();
+    test_brain_max_tech_stops();
     std::printf("%d checks, %d failed\n", g_checks, g_failed);
     return g_failed;
 }
