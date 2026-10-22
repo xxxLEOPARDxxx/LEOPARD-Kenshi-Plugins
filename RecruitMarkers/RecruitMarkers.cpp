@@ -16,8 +16,11 @@
 //   * разговор не для другого конкретного персонажа (isCharacter).
 //
 // ТОРГОВЦЫ (22.10.2026). Свой значок - стопка монет, свой цвет. Торговец -
-// по проверке самой игры, Character::isATrader(), диалог не разбираем. Если
-// торговца можно и нанять - оба значка рядом.
+// по флагу «is trader» шаблона персонажа («торговец: с магазином или большим
+// рюкзаком и списком товаров» - fcs.def), диалог не разбираем. Не
+// Character::isATrader(): та отвечает «да» и всему «торговому отряду»
+// лавки или каравана, с охраной (первая сборка: монеты почти над всеми).
+// Если торговца можно и нанять - оба значка рядом.
 //
 // НАГРУЗКА. Кандидаты (живые, не наши, в пределах MaxDistance от центра
 // камеры) - раз в 0,75 с из списка обновляемых персонажей игры. Обход
@@ -377,8 +380,9 @@ namespace
     // игры). Character::isUnique() для этого не годится: у двух наёмников
     // из одного шаблона он отвечал по-разному (15.10.2026).
     const std::string g_uniqueKey("unique");
+    const std::string g_traderKey("is trader");
 
-    bool TemplateUnique(Character* c)
+    bool TemplateFlag(Character* c, const std::string& key)
     {
         GameData* const d = c->data;
         if (d == NULL)
@@ -386,9 +390,11 @@ namespace
         boost::unordered::unordered_map<std::string, bool, boost::hash<std::string>, std::equal_to<std::string>,
                                          Ogre::STLAllocator<std::pair<std::string const, bool>,
                                                             Ogre::GeneralAllocPolicy> >::const_iterator it =
-            d->bdata.find(g_uniqueKey);
+            d->bdata.find(key);
         return it != d->bdata.end() && it->second;
     }
+
+    bool TemplateUnique(Character* c) { return TemplateFlag(c, g_uniqueKey); }
 
     // recruitKind - проверять ли найм (по настройкам «кого»); trader - торговец.
     bool SafeFilter(Character* c, const Ogre::Vector3& camera, bool& unique, bool& recruitKind, bool& trader,
@@ -400,7 +406,7 @@ namespace
                 return false;
             unique = TemplateUnique(c);
             recruitKind = (c->isAnimal() == NULL || g_showAnimals) && (unique ? g_showUnique : g_showGeneric);
-            trader = g_showTraders && c->isATrader();
+            trader = g_showTraders && TemplateFlag(c, g_traderKey);
             if (!recruitKind && !trader)
                 return false;
             const Ogre::Vector3 p = c->getPosition();
