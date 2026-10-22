@@ -108,7 +108,8 @@ namespace
         return race;
     }
 
-    std::string Describe(const DfFactionState& s, const DfSnapshot& snap, const DfRules& r)
+    std::string Describe(const DfFactionState& s, const DfSnapshot& snap, const std::string& hire,
+                         const DfRules& r)
     {
         std::string t = s.name + "\n";
         t += std::string(Tr("Race:")) + " " + RaceText(s.race) + "\n";
@@ -120,7 +121,11 @@ namespace
         {
             t += Format(Tr("Members: %d of %d"), snap.members, r.maxMembers) + "\n";
             t += Format(Tr("Money: %d"), snap.money) + "\n";
+            if (snap.members < r.maxMembers)
+                t += Format(Tr("Kept for hiring: up to %d"), kDfReserve + kDfHireFund) + "\n";
         }
+        if (!hire.empty())
+            t += std::string(Tr("Hiring:")) + " " + hire + "\n";
         if (s.techLevel >= r.maxTech)
             t += Format(Tr("Tech: level %d (maximum)"), s.techLevel) + "\n";
         else
@@ -197,7 +202,7 @@ bool DfWindowIsOpen()
 }
 
 void DfWindowUpdate(const std::vector<DfFactionState>& states, const std::vector<DfSnapshot>& snaps,
-                    const DfRules& rules)
+                    const std::vector<std::string>& hires, const DfRules& rules)
 {
     if (Win() == NULL || g_text == NULL)
         return;
@@ -206,7 +211,7 @@ void DfWindowUpdate(const std::vector<DfFactionState>& states, const std::vector
     {
         if (i > 0)
             text += "\n";
-        text += Describe(states[i], snaps[i], rules);
+        text += Describe(states[i], snaps[i], i < hires.size() ? hires[i] : std::string(), rules);
     }
     if (states.empty())
         text = Tr("No dynamic factions in this game yet.");

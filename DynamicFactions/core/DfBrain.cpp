@@ -76,9 +76,12 @@ std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, 
         money -= snap.recruitPrice;
     }
 
-    if (s.techLevel < r.maxTech && r.techPointCost > 0 && money > kDfReserve)
+    // На технику - только сверх запаса и, пока людей меньше предела, сверх
+    // фонда найма (23.10: всё уходило в технику, платить рекруту было нечем).
+    const int keep = kDfReserve + (snap.members < r.maxMembers ? kDfHireFund : 0);
+    if (s.techLevel < r.maxTech && r.techPointCost > 0 && money > keep)
     {
-        int points = (money - kDfReserve) / r.techPointCost;
+        int points = (money - keep) / r.techPointCost;
         if (points > kDfMaxResearchPerTick)
             points = kDfMaxResearchPerTick;
         if (points > 0)

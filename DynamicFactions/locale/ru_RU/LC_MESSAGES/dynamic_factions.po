@@ -90,6 +90,12 @@ msgstr "Численность: %d из %d"
 msgid "Money: %d"
 msgstr "Деньги: %d"
 
+msgid "Kept for hiring: up to %d"
+msgstr "Отложено на найм: до %d"
+
+msgid "Hiring:"
+msgstr "Найм:"
+
 msgid "Tech: level %d (maximum)"
 msgstr "Техника: уровень %d (предел)"
 
@@ -134,3 +140,9 @@ msgstr "%d кат сразу, еда и крыша потом."
 
 msgid "Deal. Lead the way."
 msgstr "Идёт. Веди."
+
+msgid "going to a recruit in the bar (%d)"
+msgstr "идёт к рекруту в бар (%d)"
+
+msgid "talking to a recruit (%d)"
+msgstr "говорит с рекрутом (%d)"

@@ -91,6 +91,7 @@ namespace
         const char* const section = "DynamicFactions";
         g_enabled = GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
+        DfHireSetDebug(g_debug);
         char key[64] = {};
         GetPrivateProfileStringA(section, "WindowKey", "CTRL+F10", key, sizeof(key), ini.c_str());
         g_windowKey = HoldKey::Parse(key);
@@ -306,6 +307,15 @@ namespace
         }
         else if (hub == NULL || !DfFindBarRecruit(hub, f, recruit, snap.recruitPrice))
             snap.recruitPrice = -1;
+        if (g_debug && hub != NULL && !rt.hire.busy())
+        {
+            const DfRecruitSearchStats& st = DfLastRecruitSearch();
+            char line[256];
+            sprintf_s(line, sizeof(line), "DynamicFactions: bar recruits - %d templates, %d such people in town, "
+                      "%d in a bar, %d can be hired; cheapest %d",
+                      st.templates, st.generic, st.inBar, st.recruitable, snap.recruitPrice);
+            DebugLog(line);
+        }
 
         const DfRules rules = DfPhase1Rules();
         const std::vector<DfAction> acts = DfDecide(s, snap, rules);
@@ -361,7 +371,10 @@ namespace
             if (f != NULL && !DfTakeSnapshot(f, snaps[i]))
                 snaps[i].members = -1;
         }
-        DfWindowUpdate(g_states, snaps, DfPhase1Rules());
+        std::vector<std::string> hires(g_states.size());
+        for (size_t i = 0; i < g_states.size() && i < g_runtime.size(); ++i)
+            hires[i] = DfHireStatus(g_runtime[i].hire);
+        DfWindowUpdate(g_states, snaps, hires, DfPhase1Rules());
     }
 
     // Хоткей - ровно эта комбинация: CTRL+F10 не срабатывает на CTRL+SHIFT+F10.

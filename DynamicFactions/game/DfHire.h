@@ -6,7 +6,9 @@
 //
 // Шаги, раз в секунду из тика плагина:
 //   GO   - посланник идёт к рекруту (приказ «следовать», повтор раз в 5 с);
-//   TALK - рядом (< 3 м): четыре реплики по очереди, по 3 с;
+//   TALK - рядом (< 5 м) или перестал приближаться (< 10 м и 8 с без
+//          продвижения - рекрут за столом, ближе не подойти): четыре
+//          реплики по очереди, по 3 с;
 //   JOIN - деньги ещё есть: рекрут во взвод фракции, реплики найма
 //          заперты, деньги списаны.
 // Срыв (кто-то погиб, без сознания, ушёл в другую фракцию, не дошли за
@@ -43,9 +45,11 @@ struct DfHireTask
     unsigned long startedMs;
     unsigned long phaseMs;      // когда сказана последняя реплика / отдан приказ
     int line;                   // сколько реплик сказано
+    float closest;              // ближе всего подходил
+    unsigned long closerMs;     // когда последний раз подошёл ближе
     std::string why;            // почему сорвалось - для журнала
 
-    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), line(0) {}
+    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), line(0), closest(0.0f), closerMs(0) {}
     bool busy() const { return phase != DF_HIRE_IDLE; }
 };
 
@@ -59,3 +63,9 @@ DfHireResult DfHireStep(DfHireTask& t, Faction* f, const std::string& factionNam
 
 // Бросить (загрузка, вымирание): снять приказ посланнику.
 void DfHireCancel(DfHireTask& t);
+
+// Подробный журнал похода (расстояние, цель посланника раз в 5 с).
+void DfHireSetDebug(bool on);
+
+// Для окна: что сейчас с наймом (пусто - не идёт), уже переведено.
+std::string DfHireStatus(const DfHireTask& t);

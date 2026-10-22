@@ -90,6 +90,12 @@ msgstr "Members: %d of %d"
 msgid "Money: %d"
 msgstr "Money: %d"
 
+msgid "Kept for hiring: up to %d"
+msgstr "Kept for hiring: up to %d"
+
+msgid "Hiring:"
+msgstr "Hiring:"
+
 msgid "Tech: level %d (maximum)"
 msgstr "Tech: level %d (maximum)"
 
@@ -134,3 +140,9 @@ msgstr "%d cats now, food and a roof later."
 
 msgid "Deal. Lead the way."
 msgstr "Deal. Lead the way."
+
+msgid "going to a recruit in the bar (%d)"
+msgstr "going to a recruit in the bar (%d)"
+
+msgid "talking to a recruit (%d)"
+msgstr "talking to a recruit (%d)"

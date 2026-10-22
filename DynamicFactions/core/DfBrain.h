@@ -42,6 +42,7 @@ struct DfRules
 };
 
 const int kDfReserve = 1000;            // неприкосновенный запас денег
+const int kDfHireFund = 4000;           // пока людей меньше предела - на найм, не на технику
 const int kDfMaxResearchPerTick = 5;
 const int kDfMaxTickHours = 24;
 

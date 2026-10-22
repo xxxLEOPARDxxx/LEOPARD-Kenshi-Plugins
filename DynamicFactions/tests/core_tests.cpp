@@ -300,7 +300,7 @@ static void test_brain_income_no_money_no_recruit()
 static void test_brain_recruit_then_research()
 {
     DfFactionState s = Founded(10.0);
-    DfSnapshot snap = Snap(4, 3000, 11.0, true);
+    DfSnapshot snap = Snap(4, 7000, 11.0, true);
     snap.recruitPrice = 1500;
     const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
     const int inc = FindAction(acts, DF_INCOME);
@@ -308,7 +308,7 @@ static void test_brain_recruit_then_research()
     const int res = FindAction(acts, DF_RESEARCH);
     CHECK(inc >= 0 && acts[inc].amount == 60);
     CHECK(rec >= 0 && acts[rec].amount == 1500);
-    // 3060 - 1500 - 1000 запаса = 560 -> 2 очка
+    // 7060 - 1500 - 1000 запаса - 4000 фонда найма = 560 -> 2 очка
     CHECK(res >= 0 && acts[res].amount == 2);
     CHECK(rec < res);
 }
@@ -316,10 +316,21 @@ static void test_brain_recruit_then_research()
 static void test_brain_no_one_in_bar()
 {
     DfFactionState s = Founded(10.0);
-    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 3000, 11.0, true), DfPhase1Rules());
+    const std::vector<DfAction> acts = DfDecide(s, Snap(4, 10000, 11.0, true), DfPhase1Rules());
     const int res = FindAction(acts, DF_RESEARCH);
     CHECK(FindAction(acts, DF_RECRUIT) < 0);
     CHECK(res >= 0 && acts[res].amount == 5);
+}
+
+// Пока людей меньше предела, на технику идёт только то, что сверх запаса и
+// фонда найма (23.10: все деньги уходили в технику, нанять было не на что).
+static void test_brain_hire_fund_kept()
+{
+    DfFactionState s = Founded(10.0);
+    CHECK(FindAction(DfDecide(s, Snap(4, 4900, 11.0, true), DfPhase1Rules()), DF_RESEARCH) < 0);
+    const std::vector<DfAction> full = DfDecide(s, Snap(30, 4900, 11.0, true), DfPhase1Rules());
+    const int res = FindAction(full, DF_RESEARCH);
+    CHECK(res >= 0 && full[res].amount == 5);       // 30 человек - фонд не нужен
 }
 
 static void test_brain_recruit_too_expensive()
@@ -455,6 +466,7 @@ int main()
     test_brain_income_no_money_no_recruit();
     test_brain_recruit_then_research();
     test_brain_no_one_in_bar();
+    test_brain_hire_fund_kept();
     test_brain_recruit_too_expensive();
     test_brain_free_recruit();
     test_brain_no_recruit_at_max();

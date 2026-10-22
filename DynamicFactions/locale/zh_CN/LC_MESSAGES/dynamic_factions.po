@@ -90,6 +90,12 @@ msgstr "成员：%d / %d"
 msgid "Money: %d"
 msgstr "资金：%d"
 
+msgid "Kept for hiring: up to %d"
+msgstr "留作招募：最多 %d"
+
+msgid "Hiring:"
+msgstr "招募："
+
 msgid "Tech: level %d (maximum)"
 msgstr "科技：%d 级（上限）"
 
@@ -134,3 +140,9 @@ msgstr "现在给 %d 卡特，之后管饭管住。"
 
 msgid "Deal. Lead the way."
 msgstr "成交。带路吧。"
+
+msgid "going to a recruit in the bar (%d)"
+msgstr "正前往酒吧找新兵（%d）"
+
+msgid "talking to a recruit (%d)"
+msgstr "正在与新兵交谈（%d）"

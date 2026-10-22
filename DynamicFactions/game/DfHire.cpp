@@ -24,12 +24,16 @@
 
 namespace
 {
-    const float kTalkDistance = 3.0f;       // подошёл - разговор
-    const float kLostDistance = 6.0f;       // во время разговора ушли дальше - снова идти
+    const float kTalkDistance = 5.0f;       // подошёл - разговор
+    const float kNearDistance = 10.0f;      // рядом, но ближе не подойти (стол, стойка)
+    const DWORD kStuckMs = 8000;            // столько не приближался - говорим отсюда
+    const float kLostDistance = 12.0f;      // во время разговора ушли дальше - снова идти
     const DWORD kOrderEveryMs = 5000;       // повтор приказа «следовать»
     const DWORD kLineMs = 3000;             // реплика держится над головой
     const DWORD kGiveUpMs = 240000;         // не дошёл за 4 минуты - срыв
     const int kLines = 4;
+
+    bool g_hireDebug = false;
 
     void TellOnce(volatile LONG& told, const char* what)
     {
@@ -83,7 +87,19 @@ namespace
     {
         OrdersReceiver* const orders = envoy->getOrdersReciever();
         if (orders != NULL)
+        {
+            if (g_hireDebug)
+            {
+                char line[160];
+                sprintf_s(line, sizeof(line), "DynamicFactions: hire - envoy %.1f m from the recruit, goal 0x%X",
+                          envoy->getPosition().distance(recruit->getPosition()),
+                          static_cast<int>(orders->getCurrentGoal().key()));
+                DebugLog(line);
+            }
             orders->addOrder(FOLLOW_PLAYER_ORDER, recruit->getHandle(), recruit->getPosition(), true, false);
+        }
+        else if (g_hireDebug)
+            DebugLog("DynamicFactions: hire - the envoy takes no orders");
         t.phaseMs = now;
     }
 
@@ -123,6 +139,8 @@ namespace
         t.price = price;
         t.startedMs = now;
         t.line = 0;
+        t.closest = envoy->getPosition().distance(recruit->getPosition());
+        t.closerMs = now;
         t.why.clear();
         Order(t, envoy, recruit, now);
         return true;
@@ -172,7 +190,13 @@ namespace
         const float d = envoy->getPosition().distance(recruit->getPosition());
         if (t.phase == DF_HIRE_GO)
         {
-            if (d <= kTalkDistance)
+            if (d < t.closest - 0.5f)
+            {
+                t.closest = d;
+                t.closerMs = now;
+            }
+            const bool stuckNear = d <= kNearDistance && now - t.closerMs >= kStuckMs;
+            if (d <= kTalkDistance || stuckNear)
             {
                 ClearOrder(envoy);
                 t.phase = DF_HIRE_TALK;
@@ -191,6 +215,8 @@ namespace
         if (d > kLostDistance)
         {
             t.phase = DF_HIRE_GO;
+            t.closest = d;
+            t.closerMs = now;
             Order(t, envoy, recruit, now);
             return DF_HIRE_RUNNING;
         }
@@ -238,6 +264,27 @@ DfHireResult DfHireStep(DfHireTask& t, Faction* f, const std::string& factionNam
         TellOnce(told, "DynamicFactions: a hire step failed once - the hire is dropped");
         t.phase = DF_HIRE_IDLE;
         return DF_HIRE_FAILED;
+    }
+}
+
+void DfHireSetDebug(bool on)
+{
+    g_hireDebug = on;
+}
+
+std::string DfHireStatus(const DfHireTask& t)
+{
+    char buf[128];
+    switch (t.phase)
+    {
+    case DF_HIRE_GO:
+        sprintf_s(buf, sizeof(buf), Tr("going to a recruit in the bar (%d)"), t.price);
+        return buf;
+    case DF_HIRE_TALK:
+        sprintf_s(buf, sizeof(buf), Tr("talking to a recruit (%d)"), t.price);
+        return buf;
+    default:
+        return std::string();
     }
 }
 

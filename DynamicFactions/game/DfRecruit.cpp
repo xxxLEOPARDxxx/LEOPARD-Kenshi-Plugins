@@ -202,6 +202,8 @@ namespace
         return b != NULL && b->getBuildingDesignation() == BD_BAR;
     }
 
+    DfRecruitSearchStats g_stats;
+
     // -1 - не кандидат, иначе цена.
     int Candidate(Character* c, TownBase* town, Faction* ours, const std::set<GameData*>& generic)
     {
@@ -209,11 +211,16 @@ namespace
             return -1;
         if (generic.find(c->data) == generic.end())
             return -1;
-        if (c->getFaction() == ours || c->getCurrentTownLocation() != town || !InABar(c))
+        if (c->getFaction() == ours || c->getCurrentTownLocation() != town)
             return -1;
-        if (TemplateUnique(c))
+        ++g_stats.generic;
+        if (!InABar(c) || TemplateUnique(c))
             return -1;
-        return RecruitPrice(c);
+        ++g_stats.inBar;
+        const int price = RecruitPrice(c);
+        if (price >= 0)
+            ++g_stats.recruitable;
+        return price;
     }
 
     bool Find(TownBase* town, Faction* ours, Character*& who, int& price)
@@ -224,6 +231,8 @@ namespace
             return false;
         std::set<GameData*> generic;
         BarRecruitTemplates(town, generic);
+        g_stats.templates = static_cast<int>(generic.size());
+        g_stats.generic = g_stats.inBar = g_stats.recruitable = 0;
         if (generic.empty())
             return false;
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
@@ -274,6 +283,11 @@ bool DfFindBarRecruit(TownBase* town, Faction* ours, Character*& who, int& price
         price = -1;
         return false;
     }
+}
+
+const DfRecruitSearchStats& DfLastRecruitSearch()
+{
+    return g_stats;
 }
 
 void DfLockRecruitLines(Character* c)

@@ -14,6 +14,16 @@ class TownBase;
 // найма (0 - бесплатно). false - нанять некого. Главный поток; под SEH.
 bool DfFindBarRecruit(TownBase* town, Faction* ours, Character*& who, int& price);
 
+// Сколько отсеялось на каждом шаге последнего поиска - для журнала.
+struct DfRecruitSearchStats
+{
+    int templates;              // шаблонов рекрутов у баров города
+    int generic;                // живых персонажей с такими шаблонами в городе
+    int inBar;                  // из них стоят в баре
+    int recruitable;            // из них с открытой репликой найма
+};
+const DfRecruitSearchStats& DfLastRecruitSearch();
+
 // Запереть у нанятого реплики «вступить в отряд»: перенанять его у фракции
 // разговором игрок уже не сможет. Под SEH.
 void DfLockRecruitLines(Character* c);
