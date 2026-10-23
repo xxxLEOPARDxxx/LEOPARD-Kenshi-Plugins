@@ -24,7 +24,8 @@
 
 namespace
 {
-    const float kTalkDistance = 5.0f;       // подошёл - разговор
+    const float kTalkDistance = 10.0f;      // подошёл - сразу разговор
+    const float kWaitDistance = 25.0f;      // ближе - рекрут ждёт на месте
     const float kNearDistance = 10.0f;      // рядом, но ближе не подойти (стол, стойка)
     const DWORD kStuckMs = 8000;            // столько не приближался - говорим отсюда
     const float kLostDistance = 12.0f;      // во время разговора ушли дальше - снова идти
@@ -216,6 +217,8 @@ namespace
             return Fail(t, envoy, "the envoy is fighting");
 
         const float d = envoy->getPosition().distance(recruit->getPosition());
+        if (d <= kWaitDistance)
+            recruit->setDestination(recruit->getPosition(), false);     // подожди
         if (t.phase == DF_HIRE_GO)
         {
             if (d < t.closest - 0.5f)
@@ -267,6 +270,7 @@ namespace
             Order(t, envoy, recruit, now);
             return DF_HIRE_RUNNING;
         }
+        envoy->setDestination(envoy->getPosition(), false);             // стоят, пока говорят
         if (now - t.phaseMs < kLineMs)
             return DF_HIRE_RUNNING;
         if (t.line >= kLines)

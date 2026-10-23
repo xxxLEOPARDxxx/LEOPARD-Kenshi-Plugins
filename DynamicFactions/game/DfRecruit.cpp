@@ -23,6 +23,7 @@
 #include <kenshi/Faction.h>
 #include <kenshi/GameData.h>
 #include <kenshi/GameWorld.h>
+#include <kenshi/Platoon.h>
 #include <kenshi/Globals.h>
 #include <kenshi/Town.h>
 #include <kenshi/util/hand.h>
@@ -30,8 +31,10 @@
 
 namespace
 {
-    // ---- обход диалога: перенесено из RecruitMarkers.cpp один в один,
-    // кроме проверки условий - она за собеседника-игрока, у фракции его нет.
+    // ---- обход диалога: перенесено из RecruitMarkers.cpp один в один;
+    // собеседник при проверке условий - член фракции, а не игрок (23.10: без
+    // условий нашлась бесплатная ветка «для особого характера» - наняли
+    // того, кого игроку нанять нельзя, без значка RecruitMarkers).
     // Добавлено: цена и запирание реплик найма.
     //
     // Цена (23.10): реплика найма сама снимает деньги (DA_TAKE_MONEY 3000 у
@@ -47,6 +50,7 @@ namespace
     {
         Dialogue* dialogue;
         GameData* me;                   // данные самого персонажа
+        Character* talker;              // собеседник - член фракции; NULL - условия не смотреть
         int nodes;
         int price;                      // наибольшая цена среди найденных реплик найма
         bool all;                       // обойти все реплики найма, а не до первой
@@ -88,6 +92,8 @@ namespace
         // Разговор для другого конкретного персонажа из общего пакета.
         if (root && s.me != NULL && line->hasSpecificCharacterRequirement() &&
             !line->isForSpecificCharacter(s.me))
+            return false;
+        if (s.talker != NULL && !line->checkConditions(s.dialogue, s.talker, false))
             return false;
         return true;
     }
@@ -138,7 +144,7 @@ namespace
     }
 
     // -1 - нанять нельзя, иначе цена.
-    int RecruitPrice(Character* c)
+    int RecruitPrice(Character* c, Character* talker)
     {
         Dialogue* const dialogue = c->dialogue;
         if (dialogue == NULL)
@@ -146,6 +152,7 @@ namespace
         ScanState s;
         s.dialogue = dialogue;
         s.me = c->data;
+        s.talker = talker;
         s.nodes = 0;
         s.price = -1;
         s.all = true;
@@ -197,6 +204,26 @@ namespace
         }
     }
 
+    Character* AnyMember(Faction* f)
+    {
+        const lektor<Platoon*>& all = f->activePlatoons;
+        for (uint32_t i = 0; i < all.size(); ++i)
+        {
+            Platoon* const p = all.stuff[i];
+            ActivePlatoon* const ap = p != NULL && !p->isDead ? p->getActivePlatoon() : NULL;
+            if (ap == NULL)
+                continue;
+            for (uint32_t k = 0; k < ap->things.size(); ++k)
+            {
+                RootObject* const o = ap->things.stuff[k];
+                Character* const c = o != NULL ? o->getHandle().getCharacter() : NULL;
+                if (c != NULL && !c->isDead())
+                    return c;
+            }
+        }
+        return NULL;
+    }
+
     bool InABar(Character* c)
     {
         Building* const b = c->isIndoors().getBuilding();
@@ -220,7 +247,8 @@ namespace
     }
 
     // -1 - не кандидат, иначе цена.
-    int Candidate(Character* c, TownBase* town, Faction* ours, const std::set<GameData*>& generic)
+    int Candidate(Character* c, TownBase* town, Faction* ours, Character* talker,
+                  const std::set<GameData*>& generic)
     {
         if (c->isDead() || c->isUnconcious() || c->isPlayerCharacter() || c->isAnimal() != NULL)
             return -1;
@@ -233,7 +261,7 @@ namespace
             return -1;
         if (InABar(c))
             ++g_stats.inBar;
-        const int price = RecruitPrice(c);
+        const int price = RecruitPrice(c, talker);
         if (price < 0)
             return -1;
         ++g_stats.recruitable;
@@ -253,6 +281,10 @@ namespace
         price = -1;
         if (ou == NULL || town == NULL)
             return false;
+        // Условия разговора - как для члена фракции (кто-нибудь живой).
+        Character* const talker = AnyMember(ours);
+        if (talker == NULL)
+            return false;
         std::set<GameData*> generic;
         BarRecruitTemplates(town, generic);
         g_stats.templates = static_cast<int>(generic.size());
@@ -268,7 +300,7 @@ namespace
             Character* const c = *it;
             if (c == NULL)
                 continue;
-            const int p = Candidate(c, town, ours, generic);
+            const int p = Candidate(c, town, ours, talker, generic);
             if (p < 0)
                 continue;
             const float d = c->getPosition().distance(centre);
@@ -290,6 +322,7 @@ namespace
         ScanState s;
         s.dialogue = dialogue;
         s.me = c->data;
+        s.talker = NULL;                // запирать все реплики найма, при любых условиях
         s.nodes = 0;
         s.price = -1;
         s.all = true;
