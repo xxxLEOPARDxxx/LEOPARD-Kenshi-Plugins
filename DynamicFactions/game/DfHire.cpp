@@ -24,12 +24,12 @@
 
 namespace
 {
-    const float kTalkDistance = 20.0f;      // разговор издалека
-    const float kWaitDistance = 30.0f;      // ближе - рекрут ждёт на месте
+    const float kTalkDistance = 100.0f;     // разговор издалека (23.10: «за бродячим часами бегал»)
+    const float kWaitDistance = 100.0f;     // ближе - рекрут ждёт на месте
     const float kNearDistance = 10.0f;      // рядом, но ближе не подойти (стол, стойка)
     const DWORD kStuckMs = 8000;            // столько не приближался - говорим отсюда
-    const float kLostDistance = 40.0f;      // во время разговора ушли дальше - снова догонять
-    const float kWalkTalkDistance = 15.0f;  // дальше - посланник подходит, говоря на ходу
+    const float kLostDistance = 150.0f;     // во время разговора ушли дальше - снова догонять
+    const float kWalkTalkDistance = 80.0f;  // дальше - посланник подходит, говоря на ходу
     const DWORD kOrderEveryMs = 1000;       // как часто смотреть, не повторить ли приказ
     const float kRetargetDistance = 2.0f;   // рекрут отошёл от точки приказа - новый приказ
     const float kMovedDistance = 1.5f;      // сдвинулся - не стоит
