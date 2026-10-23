@@ -9,6 +9,7 @@
 #include <string>
 
 #include <Debug.h>
+#include <core/Functions.h>
 
 // conversationsMain у Dialogue закрытый
 #define private public
@@ -35,7 +36,7 @@ namespace
     // собеседник при проверке условий - член фракции, а не игрок (23.10: без
     // условий нашлась бесплатная ветка «для особого характера» - наняли
     // того, кого игроку нанять нельзя, без значка RecruitMarkers).
-    // Добавлено: цена и запирание реплик найма.
+    // Добавлено: цена (наибольшее списание среди открытых реплик найма).
     //
     // Цена (23.10): реплика найма сама снимает деньги (DA_TAKE_MONEY 3000 у
     // «Hire me Outlaw 700»), но в том же дереве бывают бесплатные ветки для
@@ -54,8 +55,6 @@ namespace
         int nodes;
         int price;                      // наибольшая цена среди найденных реплик найма
         bool all;                       // обойти все реплики найма, а не до первой
-        bool lock;                      // запирать найденные реплики найма
-        int locked;
     };
 
     bool IsJoinLine(DialogLineData* line)
@@ -117,11 +116,6 @@ namespace
             {
                 if (price > s.price)
                     s.price = price;
-                if (s.lock)
-                {
-                    s.dialogue->setLineLocked(line, true);
-                    ++s.locked;
-                }
                 if (!s.all)
                     return true;
                 continue;
@@ -156,8 +150,6 @@ namespace
         s.nodes = 0;
         s.price = -1;
         s.all = true;
-        s.lock = false;
-        s.locked = 0;
         FindJoin(s, TalkToMe(dialogue), 0, true, 0);
         return s.price;
     }
@@ -314,22 +306,6 @@ namespace
         return who != NULL;
     }
 
-    void Lock(Character* c)
-    {
-        Dialogue* const dialogue = c->dialogue;
-        if (dialogue == NULL)
-            return;
-        ScanState s;
-        s.dialogue = dialogue;
-        s.me = c->data;
-        s.talker = NULL;                // запирать все реплики найма, при любых условиях
-        s.nodes = 0;
-        s.price = -1;
-        s.all = true;
-        s.lock = true;
-        s.locked = 0;
-        FindJoin(s, TalkToMe(dialogue), 0, true, 0);
-    }
 }
 
 bool DfFindBarRecruit(TownBase* town, Faction* ours, Character*& who, int& price)
@@ -360,17 +336,53 @@ const DfRecruitSearchStats& DfLastRecruitSearch()
     return g_stats;
 }
 
-void DfLockRecruitLines(Character* c)
+namespace
 {
-    __try
+    std::vector<Faction*> g_own;
+    bool (*g_origCheckConditions)(DialogLineData*, Dialogue*, Character*, bool) = NULL;
+
+    bool OwnersFactionIsOurs(Dialogue* d)
     {
-        if (c != NULL)
-            Lock(c);
+        if (d == NULL || g_own.empty())
+            return false;
+        Character* const owner = d->getCharacter();
+        if (owner == NULL)
+            return false;
+        Faction* const f = owner->getFaction();
+        for (size_t i = 0; i < g_own.size(); ++i)
+            if (g_own[i] == f)
+                return true;
+        return false;
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+
+    bool BlockHire(DialogLineData* line, Dialogue* d)
     {
-        static volatile LONG told = 0;
-        if (InterlockedExchange(&told, 1) == 0)
-            ErrorLog("DynamicFactions: locking the hire lines of a recruit failed once");
+        __try
+        {
+            return IsJoinLine(line) && OwnersFactionIsOurs(d);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
     }
+
+    bool CheckConditions_hook(DialogLineData* line, Dialogue* d, Character* target, bool isWordswap)
+    {
+        const bool ok = g_origCheckConditions(line, d, target, isWordswap);
+        if (!ok || g_own.empty() || line == NULL)
+            return ok;
+        return !BlockHire(line, d);
+    }
+}
+
+bool DfInstallHireBlock()
+{
+    return KenshiLib::SUCCESS == KenshiLib::AddHook(KenshiLib::GetRealAddress(&DialogLineData::checkConditions),
+                                                    CheckConditions_hook, &g_origCheckConditions);
+}
+
+void DfSetOwnFactions(const std::vector<Faction*>& factions)
+{
+    g_own = factions;
 }

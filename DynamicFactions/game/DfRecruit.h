@@ -3,6 +3,7 @@
 // разговором, по той же цене. Бары игра пополняет сама, со временем.
 
 #include <string>
+#include <vector>
 
 class Character;
 class Faction;
@@ -33,6 +34,12 @@ const DfRecruitSearchStats& DfLastRecruitSearch();
 // Не предлагать этого рекрута ms миллисекунд (не дошли до него).
 void DfRecruitSkip(Character* c, unsigned long ms);
 
-// Запереть у нанятого реплики «вступить в отряд»: перенанять его у фракции
-// разговором игрок уже не сможет. Под SEH.
-void DfLockRecruitLines(Character* c);
+// Перенанять члена динамической фракции разговором нельзя: хук на
+// DialogLineData::checkConditions - у реплики с действием «вступить в
+// отряд» условие ложно, если персонаж, чей это разговор, из наших фракций.
+// Остальные реплики и чужие персонажи - как в игре. (23.10: запирание
+// реплик через Dialogue::setLineLocked не держалось, игрок перенанимал.)
+bool DfInstallHireBlock();
+
+// Наши фракции игры - для блока найма. Главный поток.
+void DfSetOwnFactions(const std::vector<Faction*>& factions);

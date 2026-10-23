@@ -142,6 +142,7 @@ namespace
     {
         for (size_t i = 0; i < g_runtime.size(); ++i)
             DfHireCancel(g_runtime[i].hire);
+        DfSetOwnFactions(std::vector<Faction*>());
         g_states.swap(states);
         g_runtime.assign(g_states.size(), Runtime());
         if (g_debug)
@@ -453,6 +454,13 @@ namespace
         const double hour = DfGameHour();
         if (hour < 0.0)
             return;
+        // Наши фракции - для блока перенайма (DfInstallHireBlock).
+        std::vector<Faction*> own;
+        for (size_t i = 0; i < g_states.size(); ++i)
+            if (g_states[i].founded && !g_states[i].extinct)
+                if (Faction* const f = DfBindFaction(g_states[i].recordId))
+                    own.push_back(f);
+        DfSetOwnFactions(own);
         for (size_t i = 0; i < g_states.size(); ++i)
         {
             TickFaction(g_states[i], g_runtime[i], hour);
@@ -631,6 +639,9 @@ __declspec(dllexport) void startPlugin()
         ErrorLog("DynamicFactions: could not hook saving and loading - the mod stays off");
         return;
     }
+
+    if (!DfInstallHireBlock())
+        ErrorLog("DynamicFactions: could not hook dialogue conditions - the player can re-hire faction members");
 
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
                                                  GuiUpdate_hook, &g_origGuiUpdate))
