@@ -390,6 +390,45 @@ bool DfExecute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r)
     return SafeExecute(f, hub, a, r);
 }
 
+namespace
+{
+    void Members(Faction* f, std::vector<Character*>& out)
+    {
+        const lektor<Platoon*>& all = f->activePlatoons;
+        for (uint32_t i = 0; i < all.size(); ++i)
+        {
+            Platoon* const p = all.stuff[i];
+            ActivePlatoon* const ap = p != NULL && !p->isDead ? p->getActivePlatoon() : NULL;
+            if (ap == NULL)
+                continue;
+            for (uint32_t k = 0; k < ap->things.size(); ++k)
+                if (Character* const c = AsLivingCharacter(ap->things.stuff[k]))
+                    if (!c->isUnconcious())
+                        out.push_back(c);
+        }
+    }
+
+    void SafeMembers(Faction* f, std::vector<Character*>& out)
+    {
+        __try
+        {
+            Members(f, out);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static volatile LONG told = 0;
+            TellOnce(told, "DynamicFactions: listing faction members failed once");
+        }
+    }
+}
+
+void DfFactionMembers(Faction* f, std::vector<Character*>& out)
+{
+    out.clear();
+    if (f != NULL)
+        SafeMembers(f, out);
+}
+
 void DfApplyName(Faction* f, const std::string& name)
 {
     SafeApplyName(f, name);

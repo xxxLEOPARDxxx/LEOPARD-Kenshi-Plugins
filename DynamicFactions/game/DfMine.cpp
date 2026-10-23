@@ -1,0 +1,135 @@
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include "game/DfMine.h"
+
+#include <Windows.h>
+
+#include <Debug.h>
+
+#include <kenshi/AI/AITaskSystem.h>
+#include <kenshi/Building/Building.h>
+#include <kenshi/Building/UseableStuff.h>
+#include <kenshi/Character.h>
+#include <kenshi/Enums.h>
+#include <kenshi/GameData.h>
+#include <kenshi/GameWorld.h>
+#include <kenshi/Globals.h>
+#include <kenshi/Inventory.h>
+#include <kenshi/Town.h>
+#include <kenshi/ZoneManager.h>
+#include <kenshi/util/lektor.h>
+
+namespace
+{
+    const int kMaxObjects = 4096;
+
+    GameData* FirstRef(GameData* d, const char* list)
+    {
+        if (d == NULL || ou == NULL)
+            return NULL;
+        const Ogre::vector<GameDataReference>::type* const refs = d->getReferenceListIfExists(list);
+        if (refs == NULL)
+            return NULL;
+        for (size_t i = 0; i < refs->size(); ++i)
+            if (GameData* const p = (*refs)[i].getPtr(&ou->gamedata))
+                return p;
+        return NULL;
+    }
+
+    int IntField(GameData* d, const char* key)
+    {
+        if (d == NULL)
+            return 0;
+        boost::unordered::unordered_map<std::string, int, boost::hash<std::string>, std::equal_to<std::string>,
+                                         Ogre::STLAllocator<std::pair<std::string const, int>,
+                                                            Ogre::GeneralAllocPolicy> >::const_iterator it =
+            d->idata.find(key);
+        return it != d->idata.end() ? it->second : 0;
+    }
+
+    void Find(TownBase* town, float radius, Character* probe, std::vector<DfNode>& out)
+    {
+        out.clear();
+        if (ou == NULL || ou->zoneMgr == NULL || town == NULL)
+            return;
+        const Ogre::Vector3 centre = town->getPosition();
+        lektor<RootObject*> objs;
+        ou->zoneMgr->buildingGrid.getObjects(centre, radius, objs, kMaxObjects);
+        for (uint32_t i = 0; i < objs.size(); ++i)
+        {
+            RootObject* const o = objs.stuff[i];
+            if (o == NULL || o->getDataType() != BUILDING)
+                continue;
+            Building* const b = static_cast<Building*>(o);
+            const BuildingFunction bf = b->getSpecialFunction();
+            if (bf != BF_MINE && bf != BF_MINE_NATURAL)
+                continue;
+            DfNode n;
+            n.building = b->getHandle();
+            n.pos = b->getPosition();
+            n.function = static_cast<int>(bf);
+            n.item = FirstRef(FirstRef(b->data, "functionality"), "produces");
+            n.itemName = n.item != NULL ? n.item->name : std::string();
+            n.itemValue = IntField(n.item, "value");
+            n.distance = n.pos.distance(centre);
+            n.freeSlot = probe != NULL && static_cast<UseableStuff*>(b)->isFreeSlot(probe->getHandle());
+            out.push_back(n);
+        }
+    }
+}
+
+void DfFindNodes(TownBase* town, float radius, Character* probe, std::vector<DfNode>& out)
+{
+    __try
+    {
+        Find(town, radius, probe, out);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        static volatile LONG told = 0;
+        if (InterlockedExchange(&told, 1) == 0)
+            ErrorLog("DynamicFactions: looking for ore nodes failed once");
+    }
+}
+
+bool DfOrderMine(Character* c, const DfNode& node)
+{
+    __try
+    {
+        OrdersReceiver* const orders = c != NULL ? c->getOrdersReciever() : NULL;
+        if (orders == NULL)
+            return false;
+        orders->addOrder(OPERATE_MACHINERY, node.building, node.pos, true, false);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+int DfGoalOf(Character* c)
+{
+    __try
+    {
+        OrdersReceiver* const orders = c != NULL ? c->getOrdersReciever() : NULL;
+        return orders != NULL ? static_cast<int>(orders->getCurrentGoal().key()) : -1;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return -1;
+    }
+}
+
+int DfCountItem(Character* c, GameData* item)
+{
+    __try
+    {
+        Inventory* const inv = c != NULL ? c->getInventory() : NULL;
+        return inv != NULL && item != NULL ? inv->countItems(item) : 0;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return 0;
+    }
+}

@@ -8,6 +8,7 @@
 
 #include "core/DfBrain.h"
 
+class Character;
 class Faction;
 class TownBase;
 
@@ -39,6 +40,9 @@ bool DfFound(Faction* f, TownBase* hub, int members, int money, float statLevel)
 // вычитанием: не хватает - действие не выполняется (бюджет не уходит в минус).
 // false - не выполнено, в учёт не идёт.
 bool DfExecute(Faction* f, TownBase* hub, const DfAction& a, const DfRules& r);
+
+// Живые члены фракции в загруженных взводах (в сознании).
+void DfFactionMembers(Faction* f, std::vector<Character*>& out);
 
 // Имя фракции в игре = name (ставится только при расхождении).
 void DfApplyName(Faction* f, const std::string& name);

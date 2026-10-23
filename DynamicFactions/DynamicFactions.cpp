@@ -30,6 +30,7 @@
 #include <Debug.h>
 #include <core/Functions.h>
 
+#include <kenshi/Character.h>
 #include <kenshi/Faction.h>
 #include <kenshi/GameWorld.h>
 #include <kenshi/Globals.h>
@@ -44,6 +45,8 @@
 #include "core/DfState.h"
 #include "game/DfGame.h"
 #include "game/DfHire.h"
+#include "game/DfMine.h"
+#include "game/DfSell.h"
 #include "game/DfRecruit.h"
 #include "ui/DfWindow.h"
 
@@ -138,8 +141,12 @@ namespace
     DWORD g_readyAt = 0;
     DWORD g_lastTick = 0;
 
+    void ResetProbe();                      // разведка этапа 2а, ниже
+    void ReconLog(Faction* f, TownBase* hub, const Runtime& rt);
+
     void SetStates(std::vector<DfFactionState>& states, const char* why)
     {
+        ResetProbe();
         for (size_t i = 0; i < g_runtime.size(); ++i)
             DfHireCancel(g_runtime[i].hire);
         DfSetOwnFactions(std::vector<Faction*>());
@@ -317,6 +324,8 @@ namespace
         else if (hub == NULL || !DfFindBarRecruit(hub, f, recruit, snap.recruitPrice))
             snap.recruitPrice = -1;
         rt.lastPrice = snap.recruitPrice;
+        if (g_debug && hub != NULL)
+            ReconLog(f, hub, rt);
         if (g_debug && hub != NULL && !rt.hire.busy())
         {
             const DfRecruitSearchStats& st = DfLastRecruitSearch();
@@ -416,6 +425,109 @@ namespace
         g_keyWas = down;
     }
 
+    // ---------------------------------------------------------------
+    // Разведка этапа 2а (только Debug): жилы, торговцы, проба копания
+    // ---------------------------------------------------------------
+
+    const float kReconRadius = 600.0f;
+
+    struct Probe
+    {
+        bool done;                          // за эту игру проба уже была
+        hand who;
+        DfNode node;
+        DWORD startedMs;
+        DWORD loggedMs;
+        Probe() : done(false), startedMs(0), loggedMs(0) {}
+    } g_probe;
+
+    void ResetProbe()
+    {
+        g_probe = Probe();
+    }
+
+    Character* FreeMember(Faction* f, const DfHireTask& hire)
+    {
+        std::vector<Character*> all;
+        DfFactionMembers(f, all);
+        Character* const envoy = hire.busy() ? hire.envoy.getCharacter() : NULL;
+        for (size_t i = 0; i < all.size(); ++i)
+            if (all[i] != envoy)
+                return all[i];
+        return NULL;
+    }
+
+    void ReconLog(Faction* f, TownBase* hub, const Runtime& rt)
+    {
+        Character* const probe = FreeMember(f, rt.hire);
+        std::vector<DfNode> nodes;
+        DfFindNodes(hub, kReconRadius, probe, nodes);
+        char line[320];
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d ore nodes within %.0f m of the Hub",
+                  static_cast<int>(nodes.size()), kReconRadius);
+        DebugLog(line);
+        for (size_t i = 0; i < nodes.size() && i < 20; ++i)
+        {
+            sprintf_s(line, sizeof(line), "DynamicFactions: recon node %s value %d, %.0f m, function %d, free %d",
+                      nodes[i].itemName.c_str(), nodes[i].itemValue, nodes[i].distance, nodes[i].function,
+                      nodes[i].freeSlot ? 1 : 0);
+            DebugLog(line);
+        }
+        std::vector<DfTrader> traders;
+        DfFindTraders(hub, traders);
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d traders in the Hub", static_cast<int>(traders.size()));
+        DebugLog(line);
+        for (size_t i = 0; i < traders.size() && i < 20; ++i)
+        {
+            sprintf_s(line, sizeof(line), "DynamicFactions: recon trader %s money %d, %.0f m",
+                      traders[i].name.c_str(), traders[i].money, traders[i].distance);
+            DebugLog(line);
+        }
+
+        // Проба: один член фракции, ближайшая к центру жила с ценой и местом.
+        if (g_probe.done || probe == NULL)
+            return;
+        const DfNode* best = NULL;
+        for (size_t i = 0; i < nodes.size(); ++i)
+            if (nodes[i].itemValue > 0 && nodes[i].freeSlot && (best == NULL || nodes[i].distance < best->distance))
+                best = &nodes[i];
+        if (best == NULL)
+            return;
+        g_probe.done = true;
+        g_probe.who = probe->getHandle();
+        g_probe.node = *best;
+        g_probe.startedMs = GetTickCount();
+        const bool ordered = DfOrderMine(probe, *best);
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - %s ordered to mine %s (%.0f m): %s",
+                  probe->getName().c_str(), best->itemName.c_str(), best->distance, ordered ? "ok" : "no orders");
+        DebugLog(line);
+    }
+
+    // Раз в секунду, 5 минут: цель, расстояние до жилы, руда в инвентаре.
+    void ProbeStep()
+    {
+        if (!g_probe.done || g_probe.startedMs == 0)
+            return;
+        const DWORD now = GetTickCount();
+        if (now - g_probe.startedMs > 300000)
+        {
+            g_probe.startedMs = 0;
+            DebugLog("DynamicFactions: recon probe finished");
+            return;
+        }
+        if (now - g_probe.loggedMs < 5000)
+            return;
+        g_probe.loggedMs = now;
+        Character* const c = g_probe.who.getCharacter();
+        if (c == NULL)
+            return;
+        char line[256];
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - goal 0x%X, %.1f m from the node, %d %s in inventory",
+                  DfGoalOf(c), c->getPosition().distance(g_probe.node.pos), DfCountItem(c, g_probe.node.item),
+                  g_probe.node.itemName.c_str());
+        DebugLog(line);
+    }
+
     // Поход за рекрутом - каждую секунду, не только на часовом ходе.
     void StepHire(DfFactionState& s, Runtime& rt, double hour)
     {
@@ -475,6 +587,8 @@ namespace
             TickFaction(g_states[i], g_runtime[i], hour);
             StepHire(g_states[i], g_runtime[i], hour);
         }
+        if (g_debug)
+            ProbeStep();
     }
 
 
