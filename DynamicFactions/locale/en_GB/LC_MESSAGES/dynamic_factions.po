@@ -60,8 +60,8 @@ msgstr "Day %d, %02d:00"
 msgid "Founded in the Hub"
 msgstr "Founded in the Hub"
 
-msgid "Hired someone from a bar"
-msgstr "Hired someone from a bar"
+msgid "Hired a recruit in town"
+msgstr "Hired a recruit in town"
 
 msgid "All members are dead - the faction is extinct"
 msgstr "All members are dead - the faction is extinct"
@@ -147,8 +147,8 @@ msgstr "%d cats now, food and a roof later."
 msgid "Deal. Lead the way."
 msgstr "Deal. Lead the way."
 
-msgid "going to a recruit in the bar (%d)"
-msgstr "going to a recruit in the bar (%d)"
+msgid "going to a recruit (%d)"
+msgstr "going to a recruit (%d)"
 
 msgid "talking to a recruit (%d)"
 msgstr "talking to a recruit (%d)"

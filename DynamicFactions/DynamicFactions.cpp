@@ -335,7 +335,7 @@ namespace
                 if (DfHireStart(rt.hire, f, hub, acts[i].amount))
                 {
                     char line[256];
-                    sprintf_s(line, sizeof(line), "DynamicFactions: %s sends someone to a bar of the Hub to hire a recruit for %d",
+                    sprintf_s(line, sizeof(line), "DynamicFactions: %s sends someone to hire a recruit in the Hub for %d",
                               Quote(s.name).c_str(), rt.hire.price);
                     DebugLog(line);
                 }
@@ -427,7 +427,7 @@ namespace
         if (r == DF_HIRE_DONE)
         {
             DfAddEvent(s, hour, "recruit");
-            sprintf_s(line, sizeof(line), "DynamicFactions: %s hired a recruit in a bar of the Hub for %d",
+            sprintf_s(line, sizeof(line), "DynamicFactions: %s hired a recruit in the Hub for %d",
                       Quote(s.name).c_str(), rt.hire.price);
         }
         else

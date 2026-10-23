@@ -334,7 +334,7 @@ std::string DfHireStatus(const DfHireTask& t)
     switch (t.phase)
     {
     case DF_HIRE_GO:
-        sprintf_s(buf, sizeof(buf), Tr("going to a recruit in the bar (%d)"), t.price);
+        sprintf_s(buf, sizeof(buf), Tr("going to a recruit (%d)"), t.price);
         return buf;
     case DF_HIRE_TALK:
         sprintf_s(buf, sizeof(buf), Tr("talking to a recruit (%d)"), t.price);

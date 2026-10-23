@@ -60,8 +60,8 @@ msgstr "第 %d 天 %02d:00"
 msgid "Founded in the Hub"
 msgstr "在中心城成立"
 
-msgid "Hired someone from a bar"
-msgstr "在酒吧雇佣了一人"
+msgid "Hired a recruit in town"
+msgstr "在城里雇佣了一人"
 
 msgid "All members are dead - the faction is extinct"
 msgstr "所有成员已死亡 - 派系已覆灭"
@@ -147,8 +147,8 @@ msgstr "现在给 %d 卡特，之后管饭管住。"
 msgid "Deal. Lead the way."
 msgstr "成交。带路吧。"
 
-msgid "going to a recruit in the bar (%d)"
-msgstr "正前往酒吧找新兵（%d）"
+msgid "going to a recruit (%d)"
+msgstr "正前往新兵处（%d）"
 
 msgid "talking to a recruit (%d)"
 msgstr "正在与新兵交谈（%d）"
