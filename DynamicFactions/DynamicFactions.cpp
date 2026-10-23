@@ -608,9 +608,10 @@ namespace
             return;
         g_probe.loggedMs = now;
         char line[256];
-        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - goal 0x%X, %.1f m from the node, loaded %d, %d %s in inventory",
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - goal 0x%X, %.1f m from the node, loaded %d, %d %s in inventory, %d in the node",
                   DfGoalOf(c), c->getPosition().distance(g_probe.node.pos), isLoaded ? 1 : 0,
-                  DfCountItem(c, g_probe.node.item), g_probe.node.itemName.c_str());
+                  DfCountItem(c, g_probe.node.item), g_probe.node.itemName.c_str(),
+                  isLoaded ? DfCountInNode(loaded.building, g_probe.node.item) : -3);
         DebugLog(line);
     }
 

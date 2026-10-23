@@ -284,6 +284,20 @@ int DfGoalOf(Character* c)
     }
 }
 
+int DfCountInNode(const hand& node, GameData* item)
+{
+    __try
+    {
+        Building* const b = node.getBuilding();
+        Inventory* const inv = b != NULL ? b->getInventory() : NULL;
+        return inv != NULL && item != NULL ? inv->countItems(item) : -1;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return -2;
+    }
+}
+
 int DfCountItem(Character* c, GameData* item)
 {
     __try

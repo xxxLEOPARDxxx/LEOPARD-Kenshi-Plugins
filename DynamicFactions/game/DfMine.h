@@ -46,6 +46,9 @@ std::string DfDescribeArea(const Ogre::Vector3& from, float radius);
 // Руда этого предмета в инвентаре.
 int DfCountItem(Character* c, GameData* item);
 
+// Сколько этого предмета лежит в самой жиле (её инвентарь); -1 - у жилы нет инвентаря.
+int DfCountInNode(const hand& node, GameData* item);
+
 // Разведка: что игра сама предлагает этому персонажу для работы на добыче
 // (AI::findMineToWorkAt, как у шахтёров городов) - имя постройки, функция,
 // расстояние; пусто - ничего.
