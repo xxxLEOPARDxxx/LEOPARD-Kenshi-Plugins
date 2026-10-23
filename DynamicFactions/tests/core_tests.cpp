@@ -7,6 +7,7 @@
 #include "core/DfNames.h"
 #include "core/DfState.h"
 #include "core/DfBrain.h"
+#include "core/DfWork.h"
 
 static int g_failed = 0;
 static int g_checks = 0;
@@ -486,6 +487,170 @@ static void test_brain_max_tech_stops()
     CHECK(FindAction(DfDecide(s, Snap(30, 100000, 12.0, true), DfPhase1Rules()), DF_RESEARCH) < 0);
 }
 
+// ---- работа: выбор жилы и роли (этап 2а) ----
+
+static DfNodeOffer Offer(int value, float distance)
+{
+    DfNodeOffer o;
+    o.value = value;
+    o.distance = distance;
+    return o;
+}
+
+static void test_rank_value_beats_distance()
+{
+    std::vector<DfNodeOffer> nodes;
+    nodes.push_back(Offer(150, 100.0f));    // железо: 150 / 2 = 75
+    nodes.push_back(Offer(800, 400.0f));    // золото: 800 / 5 = 160
+    std::vector<int> order;
+    DfRankNodes(nodes, order);
+    CHECK(order.size() == 2 && order[0] == 1 && order[1] == 0);
+}
+
+static void test_rank_near_cheap_beats_far_rich()
+{
+    std::vector<DfNodeOffer> nodes;
+    nodes.push_back(Offer(800, 1500.0f));   // 800 / 16 = 50
+    nodes.push_back(Offer(150, 10.0f));     // 150 / 1.1 = 136
+    std::vector<int> order;
+    DfRankNodes(nodes, order);
+    CHECK(order.size() == 2 && order[0] == 1);
+}
+
+static void test_rank_skips_no_value()
+{
+    std::vector<DfNodeOffer> nodes;
+    nodes.push_back(Offer(0, 10.0f));
+    nodes.push_back(Offer(70, 50.0f));
+    std::vector<int> order;
+    DfRankNodes(nodes, order);
+    CHECK(order.size() == 1 && order[0] == 1);
+}
+
+static DfMember Member(int id, DfRole role, int node, int carried)
+{
+    DfMember m;
+    m.id = id;
+    m.able = true;
+    m.hiring = false;
+    m.carried = carried;
+    m.node = node;
+    m.role = role;
+    return m;
+}
+
+static DfNodeState Node(int value, float distance, int stored, int maxMiners)
+{
+    DfNodeState n;
+    n.value = value;
+    n.distance = distance;
+    n.stored = stored;
+    n.cap = 50;
+    n.maxMiners = maxMiners;
+    return n;
+}
+
+static int CountRole(const std::vector<DfMember>& ms, DfRole role, int node)
+{
+    int n = 0;
+    for (size_t i = 0; i < ms.size(); ++i)
+        if (ms[i].role == role && (node < 0 || ms[i].node == node))
+            ++n;
+    return n;
+}
+
+static void test_work_home_unloaded_all_idle()
+{
+    std::vector<DfMember> ms;
+    ms.push_back(Member(1, DF_ROLE_MINE, 0, 0));
+    ms.push_back(Member(2, DF_ROLE_IDLE, -1, 0));
+    ms[1].hiring = true;
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, false, true);
+    CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == -1);
+    CHECK(ms[1].role == DF_ROLE_HIRE);
+}
+
+static void test_work_hiring_kept()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_MINE, 0, 0));
+    ms[0].hiring = true;
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_HIRE);
+}
+
+static void test_work_miners_limit()
+{
+    std::vector<DfMember> ms;
+    for (int i = 0; i < 3; ++i)
+        ms.push_back(Member(i, DF_ROLE_IDLE, -1, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 2));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(CountRole(ms, DF_ROLE_MINE, 0) == 2);
+    CHECK(CountRole(ms, DF_ROLE_IDLE, -1) == 1);
+}
+
+static void test_work_haul_when_stored()
+{
+    std::vector<DfMember> ms;
+    for (int i = 0; i < 3; ++i)
+        ms.push_back(Member(i, DF_ROLE_MINE, 0, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, kDfHaulAt, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(CountRole(ms, DF_ROLE_HAUL, 0) == 1);
+    CHECK(CountRole(ms, DF_ROLE_MINE, 0) == 2);
+}
+
+static void test_work_no_trader_money_no_haul()
+{
+    std::vector<DfMember> ms;
+    for (int i = 0; i < 3; ++i)
+        ms.push_back(Member(i, DF_ROLE_MINE, 0, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 40, 3));
+    DfAssignRoles(ms, nodes, true, false);
+    CHECK(CountRole(ms, DF_ROLE_HAUL, -1) == 0);
+}
+
+static void test_work_hauler_keeps_load()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_HAUL, 0, 5));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, false);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0);
+}
+
+static void test_work_hauler_done_back_to_mine()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_HAUL, 0, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_MINE && ms[0].node == 0);
+}
+
+static void test_work_full_node_moves_miner()
+{
+    std::vector<DfMember> ms;
+    ms.push_back(Member(1, DF_ROLE_MINE, 0, 0));
+    ms.push_back(Member(2, DF_ROLE_MINE, 0, 0));
+    std::vector<DfNodeState> nodes;
+    nodes.push_back(Node(150, 100.0f, 50, 3));     // полна
+    nodes.push_back(Node(150, 300.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(CountRole(ms, DF_ROLE_HAUL, 0) == 1);
+    CHECK(CountRole(ms, DF_ROLE_MINE, 1) == 1);
+    CHECK(CountRole(ms, DF_ROLE_MINE, 0) == 0);
+}
+
+static void test_work_unable_idle()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_MINE, 0, 0));
+    ms[0].able = false;
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == -1);
+}
+
 int main()
 {
     test_harness_runs();
@@ -524,6 +689,18 @@ int main()
     test_brain_level_up_carries();
     test_brain_max_tech_stops();
     test_brain_recruit_decision_no_event();
+    test_rank_value_beats_distance();
+    test_rank_near_cheap_beats_far_rich();
+    test_rank_skips_no_value();
+    test_work_home_unloaded_all_idle();
+    test_work_hiring_kept();
+    test_work_miners_limit();
+    test_work_haul_when_stored();
+    test_work_no_trader_money_no_haul();
+    test_work_hauler_keeps_load();
+    test_work_hauler_done_back_to_mine();
+    test_work_full_node_moves_miner();
+    test_work_unable_idle();
     std::printf("%d checks, %d failed\n", g_checks, g_failed);
     return g_failed;
 }
