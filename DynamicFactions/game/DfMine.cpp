@@ -284,6 +284,60 @@ int DfGoalOf(Character* c)
     }
 }
 
+bool DfLoadedNodeAt(const Ogre::Vector3& pos, DfNode& out)
+{
+    std::vector<DfNode> here;
+    DfFindNodes(pos, 10.0f, NULL, here);
+    if (here.empty())
+        return false;
+    out = here[0];
+    return true;
+}
+
+namespace
+{
+    GameData* ItemBySid(const std::string& sid, int& value)
+    {
+        value = 0;
+        if (ou == NULL || sid.empty())
+            return NULL;
+        GameData* const d = ou->gamedata.getData(sid);
+        value = IntField(d, "value");
+        return d;
+    }
+
+    GameData* SafeItemBySid(const std::string& sid, int& value)
+    {
+        __try
+        {
+            return ItemBySid(sid, value);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            value = 0;
+            return NULL;
+        }
+    }
+}
+
+GameData* DfItemBySid(const std::string& sid, int& value)
+{
+    return SafeItemBySid(sid, value);
+}
+
+void DfClearOrders(Character* c)
+{
+    __try
+    {
+        OrdersReceiver* const orders = c != NULL ? c->getOrdersReciever() : NULL;
+        if (orders != NULL)
+            orders->clearOrders();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
 int DfCountInNode(const hand& node, GameData* item)
 {
     __try

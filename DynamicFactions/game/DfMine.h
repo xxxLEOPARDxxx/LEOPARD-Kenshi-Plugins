@@ -58,6 +58,15 @@ std::string DfGameMineFor(Character* c);
 // с функцией добычи (1, 27) - имя, функция, foliage, тип; до max штук.
 std::string DfListMinesNear(const Ogre::Vector3& from, float radius, int max);
 
+// Жила в этой точке сейчас загружена (в пределах 10 м)? Тогда она - в out.
+bool DfLoadedNodeAt(const Ogre::Vector3& pos, DfNode& out);
+
+// Предмет по stringID и его value (0 - нет такого или без цены).
+GameData* DfItemBySid(const std::string& sid, int& value);
+
+// Снять приказы персонажа (работа кончилась).
+void DfClearOrders(Character* c);
+
 // Приказ копать, как игрок: OrdersReceiver::addOrder(OPERATE_MACHINERY, жила).
 bool DfOrderMine(Character* c, const DfNode& node);
 

@@ -137,6 +137,30 @@ namespace
             return ParseInt(value, s.techLevel);
         else if (key == "techPoints")
             return ParseInt(value, s.techPoints);
+        else if (key == "node")
+        {
+            // x|y|z|stringID|stored
+            std::vector<std::string> parts;
+            size_t from = 0;
+            while (true)
+            {
+                const size_t bar = value.find('|', from);
+                parts.push_back(value.substr(from, bar == std::string::npos ? std::string::npos : bar - from));
+                if (bar == std::string::npos)
+                    break;
+                from = bar + 1;
+            }
+            double x = 0.0, y = 0.0, z = 0.0;
+            DfKnownNode n;
+            if (parts.size() != 5 || !ParseDouble(parts[0], x) || !ParseDouble(parts[1], y) ||
+                !ParseDouble(parts[2], z) || parts[3].empty() || !ParseInt(parts[4], n.stored))
+                return false;
+            n.x = static_cast<float>(x);
+            n.y = static_cast<float>(y);
+            n.z = static_cast<float>(z);
+            n.itemSid = parts[3];
+            s.nodes.push_back(n);
+        }
         else if (key == "event")
         {
             const size_t bar = value.find('|');
@@ -167,6 +191,12 @@ std::string DfSerialize(const std::vector<DfFactionState>& all)
         Line(out, "techPoints", Num(s.techPoints));
         for (size_t e = 0; e < s.events.size(); ++e)
             Line(out, "event", Num(s.events[e].hour) + "|" + Escape(s.events[e].text));
+        for (size_t k = 0; k < s.nodes.size(); ++k)
+        {
+            const DfKnownNode& n = s.nodes[k];
+            Line(out, "node", Num(static_cast<double>(n.x)) + "|" + Num(static_cast<double>(n.y)) + "|" +
+                              Num(static_cast<double>(n.z)) + "|" + Escape(n.itemSid) + "|" + Num(n.stored));
+        }
     }
     return out;
 }

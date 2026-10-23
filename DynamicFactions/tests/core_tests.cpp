@@ -199,6 +199,37 @@ static void test_state_roundtrip()
     CHECK(back[0].events.size() == 2 && back[0].events[1].hour == 14.0 && back[0].events[1].text == "recruit a=b");
 }
 
+// Запомненные жилы - в файле состояния, по сейвам (этап 2а).
+static void test_state_nodes_roundtrip()
+{
+    std::vector<DfFactionState> all(1, MakeState("df", "n"));
+    DfKnownNode a;
+    a.x = -53421.5f;
+    a.y = 908.0f;
+    a.z = 2493.25f;
+    a.itemSid = "1866-gamedata.base";
+    a.stored = 17;
+    all[0].nodes.push_back(a);
+    a.itemSid = "1540824-GenMod.mod";
+    a.stored = 0;
+    all[0].nodes.push_back(a);
+    std::vector<DfFactionState> back;
+    CHECK(DfDeserialize(DfSerialize(all), back));
+    CHECK(back.size() == 1 && back[0].nodes.size() == 2);
+    if (back.size() != 1 || back[0].nodes.size() != 2)
+        return;
+    CHECK(back[0].nodes[0].x == -53421.5f && back[0].nodes[0].z == 2493.25f);
+    CHECK(back[0].nodes[0].itemSid == "1866-gamedata.base" && back[0].nodes[0].stored == 17);
+    CHECK(back[0].nodes[1].itemSid == "1540824-GenMod.mod");
+}
+
+static void test_state_bad_node_rejected()
+{
+    std::vector<DfFactionState> out;
+    CHECK(!DfDeserialize("[faction 0]\nid=df\nnode=1|2|x|sid|3\n", out));
+    CHECK(out.empty());
+}
+
 static void test_state_events_capped()
 {
     DfFactionState s = MakeState("x", "y");
@@ -665,6 +696,8 @@ int main()
     test_dict_fallbacks();
     test_dict_taken_numeral();
     test_state_roundtrip();
+    test_state_nodes_roundtrip();
+    test_state_bad_node_rejected();
     test_state_events_capped();
     test_state_garbage_rejected();
     test_state_empty_ok();

@@ -326,6 +326,11 @@ void DfHireClock(bool paused)
     g_clockSeenAt = real;
 }
 
+unsigned long DfHireNow()
+{
+    return g_clockMs;
+}
+
 void DfHireSetDebug(bool on)
 {
     g_hireDebug = on;

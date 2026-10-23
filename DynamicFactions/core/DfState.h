@@ -11,6 +11,16 @@ struct DfEvent
     std::string text;           // английский ключ + числа, перевод при показе
 };
 
+// Жила, которую фракция видела (жилы видны, только пока загружен их
+// участок карты - запоминаем). stored - условный запас руды, накопанный,
+// пока жила не загружена (настоящий лежит в самой жиле).
+struct DfKnownNode
+{
+    float x, y, z;
+    std::string itemSid;        // stringID предмета, который даёт жила
+    int stored;
+};
+
 struct DfFactionState
 {
     std::string recordId;       // StringID записи FACTION из .mod
@@ -23,6 +33,7 @@ struct DfFactionState
     int techLevel;
     int techPoints;
     std::vector<DfEvent> events;    // не больше kDfMaxEvents, старые выбрасываются
+    std::vector<DfKnownNode> nodes; // запомненные жилы
 
     DfFactionState();
 };
