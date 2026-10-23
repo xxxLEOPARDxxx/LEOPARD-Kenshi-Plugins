@@ -28,7 +28,8 @@ namespace
     const float kWaitDistance = 25.0f;      // ближе - рекрут ждёт на месте
     const float kNearDistance = 10.0f;      // рядом, но ближе не подойти (стол, стойка)
     const DWORD kStuckMs = 8000;            // столько не приближался - говорим отсюда
-    const float kLostDistance = 12.0f;      // во время разговора ушли дальше - снова идти
+    const float kLostDistance = 40.0f;      // во время разговора ушли дальше - снова догонять
+    const float kWalkTalkDistance = 4.0f;   // дальше - посланник идёт рядом, не стоит
     const DWORD kOrderEveryMs = 1000;       // как часто смотреть, не повторить ли приказ
     const float kRetargetDistance = 2.0f;   // рекрут отошёл от точки приказа - новый приказ
     const float kMovedDistance = 1.5f;      // сдвинулся - не стоит
@@ -108,7 +109,7 @@ namespace
         }
         t.target = recruit->getPosition();
         envoy->setDestination(t.target, false);
-        t.phaseMs = now;
+        t.orderMs = now;
     }
 
     // Повторять приказ, только если он устарел: рекрут ушёл от точки или
@@ -237,8 +238,7 @@ namespace
             {
                 envoy->setDestination(envoy->getPosition(), false);     // встать
                 t.phase = DF_HIRE_TALK;
-                t.line = 0;
-                t.phaseMs = now - kLineMs;          // первая реплика - сразу
+                t.phaseMs = now - kLineMs;          // следующая реплика - сразу (начатый разговор продолжается)
                 return DF_HIRE_RUNNING;
             }
             if (now - t.movedMs >= kNoProgressMs)
@@ -254,7 +254,7 @@ namespace
                 DfRecruitSkip(recruit, kSkipMs);
                 return Fail(t, envoy, "the envoy did not reach the recruit in 4 minutes");
             }
-            if (now - t.phaseMs >= kOrderEveryMs && OrderStale(t, envoy, recruit))
+            if (now - t.orderMs >= kOrderEveryMs && OrderStale(t, envoy, recruit))
                 Order(t, envoy, recruit, now);
             return DF_HIRE_RUNNING;
         }
@@ -270,7 +270,13 @@ namespace
             Order(t, envoy, recruit, now);
             return DF_HIRE_RUNNING;
         }
-        envoy->setDestination(envoy->getPosition(), false);             // стоят, пока говорят
+        if (d > kWalkTalkDistance)
+        {
+            if (now - t.orderMs >= kOrderEveryMs && OrderStale(t, envoy, recruit))
+                Order(t, envoy, recruit, now);                          // идёт рядом, говорит на ходу
+        }
+        else
+            envoy->setDestination(envoy->getPosition(), false);         // рядом - стоит
         if (now - t.phaseMs < kLineMs)
             return DF_HIRE_RUNNING;
         if (t.line >= kLines)
