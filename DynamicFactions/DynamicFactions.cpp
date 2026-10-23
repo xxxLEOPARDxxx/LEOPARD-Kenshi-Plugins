@@ -471,6 +471,9 @@ namespace
         DebugLog(line);
         DebugLog("DynamicFactions: recon area 300 m - " + DfDescribeArea(from, 300.0f));
         DebugLog("DynamicFactions: recon area 1500 m - " + DfDescribeArea(from, kReconRadius));
+        const std::string gameMine = DfGameMineFor(probe);
+        DebugLog("DynamicFactions: recon - the game's own mine for " + probe->getName() + ": " +
+                 (gameMine.empty() ? std::string("none") : gameMine));
         std::vector<DfNode> nodes;
         DfFindNodes(from, kReconRadius, probe, nodes);
         sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d ore nodes within %.0f m of the faction",
@@ -511,6 +514,28 @@ namespace
         sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - %s ordered to mine %s (%.0f m): %s",
                   probe->getName().c_str(), best->itemName.c_str(), best->distance, ordered ? "ok" : "no orders");
         DebugLog(line);
+    }
+
+    // Камера: подвести к известной жиле - видно, видит ли её мод. Раз в 10 с,
+    // если камеру сдвинули больше чем на 30 м.
+    Ogre::Vector3 g_lastCam(0.0f, 0.0f, 0.0f);
+    DWORD g_lastCamLog = 0;
+
+    void CameraRecon()
+    {
+        const DWORD now = GetTickCount();
+        if (now - g_lastCamLog < 10000)
+            return;
+        const Ogre::Vector3 cam = ou->getCameraCenter();
+        if (cam.distance(g_lastCam) < 30.0f)
+            return;
+        g_lastCam = cam;
+        g_lastCamLog = now;
+        char line[200];
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon camera at (%.0f %.0f %.0f)", cam.x, cam.y, cam.z);
+        DebugLog(line);
+        DebugLog("DynamicFactions: recon camera 300 m - " + DfDescribeArea(cam, 300.0f));
+        DebugLog("DynamicFactions: recon camera mines within 300 m - " + DfListMinesNear(cam, 300.0f, 10));
     }
 
     // Раз в секунду, 5 минут: цель, расстояние до жилы, руда в инвентаре.
@@ -598,7 +623,10 @@ namespace
             StepHire(g_states[i], g_runtime[i], hour);
         }
         if (g_debug)
+        {
             ProbeStep();
+            CameraRecon();
+        }
     }
 
 

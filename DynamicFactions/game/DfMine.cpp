@@ -9,6 +9,7 @@
 
 #include <Debug.h>
 
+#include <kenshi/AI/AI.h>
 #include <kenshi/AI/AITaskSystem.h>
 #include <kenshi/Building/Building.h>
 #include <kenshi/Building/UseableStuff.h>
@@ -168,6 +169,90 @@ std::string DfDescribeArea(const Ogre::Vector3& from, float radius)
         r += buf;
     }
     return r;
+}
+
+namespace
+{
+    bool GameMine(Character* c, Building*& out, float& score)
+    {
+        out = NULL;
+        score = 0.0f;
+        AI* const ai = c != NULL ? c->getAI() : NULL;
+        if (ai == NULL)
+            return false;
+        hand target;
+        score = ai->findMineToWorkAt(hand(), target, true);
+        out = target.getBuilding();
+        return out != NULL;
+    }
+
+    bool SafeGameMine(Character* c, Building*& out, float& score)
+    {
+        __try
+        {
+            return GameMine(c, out, score);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            out = NULL;
+            return false;
+        }
+    }
+
+    void ListMines(const Ogre::Vector3& from, float radius, int max, std::string& r)
+    {
+        if (ou == NULL || ou->zoneMgr == NULL)
+            return;
+        lektor<RootObject*> objs;
+        ou->zoneMgr->buildingGrid.getObjects(from, radius, objs, kMaxObjects);
+        int shown = 0;
+        char buf[200];
+        for (uint32_t i = 0; i < objs.size() && shown < max; ++i)
+        {
+            RootObject* const o = objs.stuff[i];
+            if (o == NULL || !IsBuildingType(o->getDataType()))
+                continue;
+            Building* const b = static_cast<Building*>(o);
+            const int bf = static_cast<int>(b->getSpecialFunction());
+            if (bf != BF_MINE && bf != BF_MINE_NATURAL)
+                continue;
+            ++shown;
+            sprintf_s(buf, sizeof(buf), "%s (fn %d, foliage %d, type %d, %.0f m); ",
+                      b->data != NULL ? b->data->name.c_str() : "?", bf, BoolField(b->data, "is foliage") ? 1 : 0,
+                      static_cast<int>(o->getDataType()), b->getPosition().distance(from));
+            r += buf;
+        }
+    }
+
+    void SafeListMines(const Ogre::Vector3& from, float radius, int max, std::string& r)
+    {
+        __try
+        {
+            ListMines(from, radius, max, r);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+}
+
+std::string DfGameMineFor(Character* c)
+{
+    Building* b = NULL;
+    float score = 0.0f;
+    if (!SafeGameMine(c, b, score))
+        return std::string();
+    char buf[256];
+    sprintf_s(buf, sizeof(buf), "%s (fn %d, %.0f m, score %.2f)", b->data != NULL ? b->data->name.c_str() : "?",
+              static_cast<int>(b->getSpecialFunction()), b->getPosition().distance(c->getPosition()), score);
+    return buf;
+}
+
+std::string DfListMinesNear(const Ogre::Vector3& from, float radius, int max)
+{
+    std::string r;
+    SafeListMines(from, radius, max, r);
+    return r.empty() ? std::string("none") : r;
 }
 
 bool DfOrderMine(Character* c, const DfNode& node)

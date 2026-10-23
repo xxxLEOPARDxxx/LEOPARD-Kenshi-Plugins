@@ -46,6 +46,15 @@ std::string DfDescribeArea(const Ogre::Vector3& from, float radius);
 // Руда этого предмета в инвентаре.
 int DfCountItem(Character* c, GameData* item);
 
+// Разведка: что игра сама предлагает этому персонажу для работы на добыче
+// (AI::findMineToWorkAt, как у шахтёров городов) - имя постройки, функция,
+// расстояние; пусто - ничего.
+std::string DfGameMineFor(Character* c);
+
+// Разведка: постройки в радиусе от точки, имя которых (в данных) не пустое,
+// с функцией добычи (1, 27) - имя, функция, foliage, тип; до max штук.
+std::string DfListMinesNear(const Ogre::Vector3& from, float radius, int max);
+
 // Приказ копать, как игрок: OrdersReceiver::addOrder(OPERATE_MACHINERY, жила).
 bool DfOrderMine(Character* c, const DfNode& node);
 
