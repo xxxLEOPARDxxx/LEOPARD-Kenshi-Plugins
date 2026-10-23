@@ -35,6 +35,7 @@
 #include <kenshi/GameWorld.h>
 #include <kenshi/Globals.h>
 #include <kenshi/SaveFileSystem.h>
+#include <kenshi/Town.h>
 #include <kenshi/SaveManager.h>
 #include <kenshi/gui/ForgottenGUI.h>
 
@@ -429,7 +430,7 @@ namespace
     // Разведка этапа 2а (только Debug): жилы, торговцы, проба копания
     // ---------------------------------------------------------------
 
-    const float kReconRadius = 600.0f;
+    const float kReconRadius = 1500.0f;
 
     struct Probe
     {
@@ -460,10 +461,19 @@ namespace
     void ReconLog(Faction* f, TownBase* hub, const Runtime& rt)
     {
         Character* const probe = FreeMember(f, rt.hire);
-        std::vector<DfNode> nodes;
-        DfFindNodes(hub, kReconRadius, probe, nodes);
+        if (probe == NULL)
+            return;
+        const Ogre::Vector3 from = probe->getPosition();
+        const Ogre::Vector3 townPos = hub->getPosition();
         char line[320];
-        sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d ore nodes within %.0f m of the Hub",
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon - faction member at (%.0f %.0f %.0f), Hub point at (%.0f %.0f %.0f), %.0f m apart",
+                  from.x, from.y, from.z, townPos.x, townPos.y, townPos.z, from.distance(townPos));
+        DebugLog(line);
+        DebugLog("DynamicFactions: recon area 300 m - " + DfDescribeArea(from, 300.0f));
+        DebugLog("DynamicFactions: recon area 1500 m - " + DfDescribeArea(from, kReconRadius));
+        std::vector<DfNode> nodes;
+        DfFindNodes(from, kReconRadius, probe, nodes);
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d ore nodes within %.0f m of the faction",
                   static_cast<int>(nodes.size()), kReconRadius);
         DebugLog(line);
         for (size_t i = 0; i < nodes.size() && i < 20; ++i)
@@ -485,7 +495,7 @@ namespace
         }
 
         // Проба: один член фракции, ближайшая к центру жила с ценой и местом.
-        if (g_probe.done || probe == NULL)
+        if (g_probe.done)
             return;
         const DfNode* best = NULL;
         for (size_t i = 0; i < nodes.size(); ++i)

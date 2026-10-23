@@ -14,7 +14,9 @@ class Faction;
 class GameData;
 class TownBase;
 
-// Жила: постройка с функцией BF_MINE или BF_MINE_NATURAL. Что даёт - по
+// Жила: постройка с функцией BF_MINE_NATURAL или BF_MINE с «is foliage» в
+// данных (естественные залежи: железо, медь, камень, модовые из GenMod -
+// олово, уран, золото, серебро; без флага BF_MINE - фермы и колодцы). Что даёт - по
 // данным: запись постройки -> «functionality» -> «produces» -> предмет
 // (у меди «Copper Resource» -> «copper mine» -> предмет 42158). Ничего не
 // зашито - модовые жилы находятся так же.
@@ -30,9 +32,16 @@ struct DfNode
     bool freeSlot;              // есть место для члена фракции (UseableStuff::isFreeSlot)
 };
 
-// Жилы в радиусе от центра города (ZoneManager::getObjects). probe - член
+// Жилы в радиусе от точки (ZoneManager::buildingGrid). Точка - где люди
+// фракции: точка города (TownBase::getPosition) - не центр (разведка 23.10:
+// торговцы Хаба «в 2 км» от неё). Берутся и постройки-«растительность»
+// (FOLIAGE_BUILDING: у «Copper Resource» is foliage = 1). probe - член
 // фракции, для которого проверяется свободное место; NULL - не проверять.
-void DfFindNodes(TownBase* town, float radius, Character* probe, std::vector<DfNode>& out);
+void DfFindNodes(const Ogre::Vector3& from, float radius, Character* probe, std::vector<DfNode>& out);
+
+// Разведка: что вокруг точки - сколько объектов каждого типа (itemType) и
+// функций построек (BuildingFunction), строкой для журнала.
+std::string DfDescribeArea(const Ogre::Vector3& from, float radius);
 
 // Руда этого предмета в инвентаре.
 int DfCountItem(Character* c, GameData* item);

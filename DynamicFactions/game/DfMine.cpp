@@ -4,6 +4,9 @@
 
 #include <Windows.h>
 
+#include <cstdio>
+#include <map>
+
 #include <Debug.h>
 
 #include <kenshi/AI/AITaskSystem.h>
@@ -36,6 +39,17 @@ namespace
         return NULL;
     }
 
+    bool BoolField(GameData* d, const char* key)
+    {
+        if (d == NULL)
+            return false;
+        boost::unordered::unordered_map<std::string, bool, boost::hash<std::string>, std::equal_to<std::string>,
+                                         Ogre::STLAllocator<std::pair<std::string const, bool>,
+                                                            Ogre::GeneralAllocPolicy> >::const_iterator it =
+            d->bdata.find(key);
+        return it != d->bdata.end() && it->second;
+    }
+
     int IntField(GameData* d, const char* key)
     {
         if (d == NULL)
@@ -47,22 +61,31 @@ namespace
         return it != d->idata.end() ? it->second : 0;
     }
 
-    void Find(TownBase* town, float radius, Character* probe, std::vector<DfNode>& out)
+    bool IsBuildingType(itemType t)
+    {
+        return t == BUILDING || t == FOLIAGE_BUILDING;
+    }
+
+    void Find(const Ogre::Vector3& centre, float radius, Character* probe, std::vector<DfNode>& out)
     {
         out.clear();
-        if (ou == NULL || ou->zoneMgr == NULL || town == NULL)
+        if (ou == NULL || ou->zoneMgr == NULL)
             return;
-        const Ogre::Vector3 centre = town->getPosition();
         lektor<RootObject*> objs;
         ou->zoneMgr->buildingGrid.getObjects(centre, radius, objs, kMaxObjects);
         for (uint32_t i = 0; i < objs.size(); ++i)
         {
             RootObject* const o = objs.stuff[i];
-            if (o == NULL || o->getDataType() != BUILDING)
+            if (o == NULL || !IsBuildingType(o->getDataType()))
                 continue;
             Building* const b = static_cast<Building*>(o);
             const BuildingFunction bf = b->getSpecialFunction();
             if (bf != BF_MINE && bf != BF_MINE_NATURAL)
+                continue;
+            // Естественная жила - «is foliage» в данных постройки (железо, медь,
+            // камень, модовые олово/уран/золото/серебро); BF_MINE без него -
+            // фермы, колодцы, буры игрока и города.
+            if (bf == BF_MINE && !BoolField(b->data, "is foliage"))
                 continue;
             DfNode n;
             n.building = b->getHandle();
@@ -78,11 +101,11 @@ namespace
     }
 }
 
-void DfFindNodes(TownBase* town, float radius, Character* probe, std::vector<DfNode>& out)
+void DfFindNodes(const Ogre::Vector3& from, float radius, Character* probe, std::vector<DfNode>& out)
 {
     __try
     {
-        Find(town, radius, probe, out);
+        Find(from, radius, probe, out);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -90,6 +113,61 @@ void DfFindNodes(TownBase* town, float radius, Character* probe, std::vector<DfN
         if (InterlockedExchange(&told, 1) == 0)
             ErrorLog("DynamicFactions: looking for ore nodes failed once");
     }
+}
+
+namespace
+{
+    void Describe(const Ogre::Vector3& from, float radius, std::map<int, int>& types, std::map<int, int>& funcs)
+    {
+        if (ou == NULL || ou->zoneMgr == NULL)
+            return;
+        lektor<RootObject*> objs;
+        ou->zoneMgr->buildingGrid.getObjects(from, radius, objs, kMaxObjects);
+        for (uint32_t i = 0; i < objs.size(); ++i)
+        {
+            RootObject* const o = objs.stuff[i];
+            if (o == NULL)
+                continue;
+            const itemType t = o->getDataType();
+            ++types[static_cast<int>(t)];
+            if (IsBuildingType(t))
+                ++funcs[static_cast<int>(static_cast<Building*>(o)->getSpecialFunction())];
+        }
+    }
+
+    bool SafeDescribe(const Ogre::Vector3& from, float radius, std::map<int, int>& types, std::map<int, int>& funcs)
+    {
+        __try
+        {
+            Describe(from, radius, types, funcs);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+}
+
+std::string DfDescribeArea(const Ogre::Vector3& from, float radius)
+{
+    std::map<int, int> types, funcs;
+    if (!SafeDescribe(from, radius, types, funcs))
+        return "failed";
+    std::string r = "types:";
+    char buf[32];
+    for (std::map<int, int>::const_iterator it = types.begin(); it != types.end(); ++it)
+    {
+        sprintf_s(buf, sizeof(buf), " %d=%d", it->first, it->second);
+        r += buf;
+    }
+    r += "; building functions:";
+    for (std::map<int, int>::const_iterator it = funcs.begin(); it != funcs.end(); ++it)
+    {
+        sprintf_s(buf, sizeof(buf), " %d=%d", it->first, it->second);
+        r += buf;
+    }
+    return r;
 }
 
 bool DfOrderMine(Character* c, const DfNode& node)
