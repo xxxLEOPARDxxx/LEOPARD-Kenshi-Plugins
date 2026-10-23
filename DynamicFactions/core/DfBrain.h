@@ -49,6 +49,7 @@ const int kDfMaxTickHours = 24;
 DfRules DfPhase1Rules();
 
 // Тик - раз в целый игровой час с прошлого тика (пропущенное - не больше суток).
+// Вымирание (численность 0) - только при загруженном доме.
 std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, const DfRules& r);
 
 // done - действия, которые адаптер реально выполнил. Техника, события,

@@ -9,8 +9,8 @@
 // главного потока (ForgottenGUI::update), каждое обращение - под SEH.
 //
 // Своё состояние (имя, техника, журнал событий) - файл dynamicfactions.txt
-// в папке сохранения: пишется после SaveManager::saveGame, читается после
-// loadGame. Деньги и люди - у игры (они в её сохранении).
+// внутри сохранения через SaveFileSystem (writeFile при сохранении,
+// readFile при загрузке). Деньги и люди - у игры (они в её сохранении).
 
 #define WIN32_LEAN_AND_MEAN
 #define KLOC_DOMAIN "dynamic_factions"
@@ -283,10 +283,12 @@ namespace
             Found(s, f, hour);
             return;
         }
+        // Название - каждую секунду (дёшево, ставится только при расхождении):
+        // после загрузки не ждать игрового часа (ревью 23.10).
+        DfApplyName(f, s.name);
         if (hour - s.lastTickHour < 1.0)
             return;
 
-        DfApplyName(f, s.name);
         DfSnapshot snap;
         if (!DfTakeSnapshot(f, snap))
             return;
@@ -486,6 +488,7 @@ namespace
         g_origGuiUpdate(self);
         if (ou == NULL || ou->player == NULL)
             return;
+        DfHireClock(ou->isPaused());
         PollKey();
         DfWindowFrame();
         const DWORD now = GetTickCount();

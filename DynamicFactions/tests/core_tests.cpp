@@ -287,6 +287,17 @@ static void test_brain_extinct()
     CHECK(DfDecide(s, Snap(4, 5000, 12.0, true), DfPhase1Rules()).empty());
 }
 
+// Вымирание объявляется только при загруженном доме: вдали численность
+// держится на счётчиках незагруженных взводов - не доверяем ей вечную смерть
+// фракции (ревью 23.10); вернётся игрок - пересчёт по живым персонажам.
+static void test_brain_no_extinction_when_home_unloaded()
+{
+    DfFactionState s = Founded(10.0);
+    CHECK(DfDecide(s, Snap(0, 500, 11.0, false), DfPhase1Rules()).empty());
+    const std::vector<DfAction> acts = DfDecide(s, Snap(0, 500, 11.0, true), DfPhase1Rules());
+    CHECK(acts.size() == 1 && acts[0].type == DF_EXTINCT);
+}
+
 static void test_brain_income_no_money_no_recruit()
 {
     DfFactionState s = Founded(10.0);
@@ -482,6 +493,7 @@ int main()
     test_brain_rules_values();
     test_brain_found_only_when_home_loaded();
     test_brain_extinct();
+    test_brain_no_extinction_when_home_unloaded();
     test_brain_income_no_money_no_recruit();
     test_brain_recruit_then_research();
     test_brain_no_one_in_bar();

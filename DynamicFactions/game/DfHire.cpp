@@ -42,6 +42,10 @@ namespace
 
     bool g_hireDebug = false;
 
+    // Часы найма: идут вместе с реальным временем, но не на паузе игры.
+    DWORD g_clockMs = 0;
+    DWORD g_clockSeenAt = 0;
+
     void TellOnce(volatile LONG& told, const char* what)
     {
         if (InterlockedExchange(&told, 1) == 0)
@@ -151,7 +155,7 @@ namespace
         Character* const envoy = NearestMember(f, recruit->getPosition());
         if (envoy == NULL)
             return false;
-        const DWORD now = GetTickCount();
+        const DWORD now = g_clockMs;
         t.phase = DF_HIRE_GO;
         t.envoy = envoy->getHandle();
         t.recruit = recruit->getHandle();
@@ -206,7 +210,7 @@ namespace
     {
         Character* const envoy = t.envoy.getCharacter();
         Character* const recruit = t.recruit.getCharacter();
-        const DWORD now = GetTickCount();
+        const DWORD now = g_clockMs;
         if (!Able(envoy) || envoy->getFaction() != f)
             return Fail(t, envoy, "the envoy is down or gone");
         if (!Able(recruit))
@@ -321,6 +325,19 @@ DfHireResult DfHireStep(DfHireTask& t, Faction* f, const std::string& factionNam
         t.phase = DF_HIRE_IDLE;
         return DF_HIRE_FAILED;
     }
+}
+
+void DfHireClock(bool paused)
+{
+    const DWORD real = GetTickCount();
+    if (g_clockSeenAt != 0 && !paused)
+    {
+        DWORD dt = real - g_clockSeenAt;
+        if (dt > 1000)
+            dt = 1000;                      // долгий кадр (загрузка, сворачивание) - не больше секунды
+        g_clockMs += dt;
+    }
+    g_clockSeenAt = real;
 }
 
 void DfHireSetDebug(bool on)

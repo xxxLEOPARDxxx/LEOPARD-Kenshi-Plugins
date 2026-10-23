@@ -51,9 +51,12 @@ std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, 
             acts.push_back(Make(DF_FOUND, r.startMoney));
         return acts;
     }
+    // Вымирание - навсегда, поэтому только по живым персонажам загруженного
+    // дома; вдали численность - счётчики незагруженных взводов (ревью 23.10).
     if (snap.members <= 0)
     {
-        acts.push_back(Make(DF_EXTINCT, 0));
+        if (snap.homeLoaded)
+            acts.push_back(Make(DF_EXTINCT, 0));
         return acts;
     }
 
