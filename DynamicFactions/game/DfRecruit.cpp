@@ -341,6 +341,37 @@ namespace
     std::vector<Faction*> g_own;
     bool (*g_origCheckConditions)(DialogLineData*, Dialogue*, Character*, bool) = NULL;
 
+    // Есть ли найм в реплике или под ней. Реплики - данные игры, общие для
+    // всех; ответ запоминается до смены игры (DfSetOwnFactions с пустым).
+    std::map<DialogLineData*, bool> g_hireBelow;
+
+    bool HireBelow(DialogLineData* line, int depth, int& nodes)
+    {
+        if (line == NULL || depth > kDepthLimit || ++nodes > kNodeLimit)
+            return false;
+        if (IsJoinLine(line))
+            return true;
+        DialogChoiceList* const list = line->children;
+        if (list == NULL)
+            return false;
+        const lektor<DialogLineData*>& choices = list->conversationChoices;
+        for (uint32_t i = 0; i < choices.size(); ++i)
+            if (HireBelow(choices[i], depth + 1, nodes))
+                return true;
+        return false;
+    }
+
+    bool LeadsToHire(DialogLineData* line)
+    {
+        std::map<DialogLineData*, bool>::iterator it = g_hireBelow.find(line);
+        if (it != g_hireBelow.end())
+            return it->second;
+        int nodes = 0;
+        const bool yes = HireBelow(line, 0, nodes);
+        g_hireBelow[line] = yes;
+        return yes;
+    }
+
     bool OwnersFactionIsOurs(Dialogue* d)
     {
         if (d == NULL || g_own.empty())
@@ -359,7 +390,7 @@ namespace
     {
         __try
         {
-            return IsJoinLine(line) && OwnersFactionIsOurs(d);
+            return OwnersFactionIsOurs(d) && LeadsToHire(line);
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
@@ -385,4 +416,6 @@ bool DfInstallHireBlock()
 void DfSetOwnFactions(const std::vector<Faction*>& factions)
 {
     g_own = factions;
+    if (factions.empty())
+        g_hireBelow.clear();                // другая игра - реплики могли пересоздаться
 }
