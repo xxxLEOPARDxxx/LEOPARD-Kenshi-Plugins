@@ -430,7 +430,43 @@ namespace
     // Разведка этапа 2а (только Debug): жилы, торговцы, проба копания
     // ---------------------------------------------------------------
 
-    const float kReconRadius = 1500.0f;
+    const float kReconRadius = 3000.0f;
+
+    // Жилы видны, только пока загружен их участок карты (разведка 23.10:
+    // «Залежи меди» в 1,9 км от Хаба нашлись, когда туда подвели камеру).
+    // Увиденные запоминаются - на них и посылаем.
+    std::vector<DfNode> g_known;
+
+    void Remember(const std::vector<DfNode>& nodes)
+    {
+        for (size_t i = 0; i < nodes.size(); ++i)
+        {
+            if (nodes[i].itemValue <= 0)
+                continue;
+            bool seen = false;
+            for (size_t k = 0; k < g_known.size() && !seen; ++k)
+                seen = g_known[k].pos.distance(nodes[i].pos) < 5.0f;
+            if (!seen)
+            {
+                g_known.push_back(nodes[i]);
+                char line[256];
+                sprintf_s(line, sizeof(line), "DynamicFactions: recon - remembered %s (value %d) at (%.0f %.0f %.0f)",
+                          nodes[i].itemName.c_str(), nodes[i].itemValue, nodes[i].pos.x, nodes[i].pos.y, nodes[i].pos.z);
+                DebugLog(line);
+            }
+        }
+    }
+
+    // Жила в этой точке сейчас загружена? Тогда её постройка (handle) - в out.
+    bool LoadedNodeAt(const Ogre::Vector3& pos, DfNode& out)
+    {
+        std::vector<DfNode> here;
+        DfFindNodes(pos, 10.0f, NULL, here);
+        if (here.empty())
+            return false;
+        out = here[0];
+        return true;
+    }
 
     struct Probe
     {
@@ -439,12 +475,14 @@ namespace
         DfNode node;
         DWORD startedMs;
         DWORD loggedMs;
-        Probe() : done(false), startedMs(0), loggedMs(0) {}
+        bool ordered;                       // приказ копать уже отдан (жила была загружена)
+        Probe() : done(false), startedMs(0), loggedMs(0), ordered(false) {}
     } g_probe;
 
     void ResetProbe()
     {
         g_probe = Probe();
+        g_known.clear();
     }
 
     Character* FreeMember(Faction* f, const DfHireTask& hire)
@@ -476,8 +514,9 @@ namespace
                  (gameMine.empty() ? std::string("none") : gameMine));
         std::vector<DfNode> nodes;
         DfFindNodes(from, kReconRadius, probe, nodes);
-        sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d ore nodes within %.0f m of the faction",
-                  static_cast<int>(nodes.size()), kReconRadius);
+        Remember(nodes);
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon - %d ore nodes loaded within %.0f m of the faction, %d remembered",
+                  static_cast<int>(nodes.size()), kReconRadius, static_cast<int>(g_known.size()));
         DebugLog(line);
         for (size_t i = 0; i < nodes.size() && i < 20; ++i)
         {
@@ -497,22 +536,20 @@ namespace
             DebugLog(line);
         }
 
-        // Проба: один член фракции, ближайшая к центру жила с ценой и местом.
-        if (g_probe.done)
+        // Проба: один член фракции к ближайшей запомненной жиле.
+        if (g_probe.done || g_known.empty())
             return;
-        const DfNode* best = NULL;
-        for (size_t i = 0; i < nodes.size(); ++i)
-            if (nodes[i].itemValue > 0 && nodes[i].freeSlot && (best == NULL || nodes[i].distance < best->distance))
-                best = &nodes[i];
-        if (best == NULL)
-            return;
+        size_t best = 0;
+        for (size_t i = 1; i < g_known.size(); ++i)
+            if (g_known[i].pos.distance(from) < g_known[best].pos.distance(from))
+                best = i;
         g_probe.done = true;
         g_probe.who = probe->getHandle();
-        g_probe.node = *best;
+        g_probe.node = g_known[best];
         g_probe.startedMs = GetTickCount();
-        const bool ordered = DfOrderMine(probe, *best);
-        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - %s ordered to mine %s (%.0f m): %s",
-                  probe->getName().c_str(), best->itemName.c_str(), best->distance, ordered ? "ok" : "no orders");
+        g_probe.ordered = false;
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - %s goes to %s %.0f m away",
+                  probe->getName().c_str(), g_probe.node.itemName.c_str(), g_probe.node.pos.distance(from));
         DebugLog(line);
     }
 
@@ -536,30 +573,44 @@ namespace
         DebugLog(line);
         DebugLog("DynamicFactions: recon camera 300 m - " + DfDescribeArea(cam, 300.0f));
         DebugLog("DynamicFactions: recon camera mines within 300 m - " + DfListMinesNear(cam, 300.0f, 10));
+        std::vector<DfNode> nodes;
+        DfFindNodes(cam, 300.0f, NULL, nodes);
+        Remember(nodes);
     }
 
-    // Раз в секунду, 5 минут: цель, расстояние до жилы, руда в инвентаре.
+    // Раз в секунду, 8 минут: идёт к жиле; жила загружена - приказ копать;
+    // раз в 5 с в журнал - цель, расстояние, загружена ли, руда в инвентаре.
     void ProbeStep()
     {
         if (!g_probe.done || g_probe.startedMs == 0)
             return;
         const DWORD now = GetTickCount();
-        if (now - g_probe.startedMs > 300000)
+        if (now - g_probe.startedMs > 480000)
         {
             g_probe.startedMs = 0;
             DebugLog("DynamicFactions: recon probe finished");
             return;
         }
-        if (now - g_probe.loggedMs < 5000)
-            return;
-        g_probe.loggedMs = now;
         Character* const c = g_probe.who.getCharacter();
         if (c == NULL)
             return;
+        DfNode loaded;
+        const bool isLoaded = LoadedNodeAt(g_probe.node.pos, loaded);
+        if (isLoaded && !g_probe.ordered)
+        {
+            g_probe.ordered = DfOrderMine(c, loaded);
+            DebugLog(std::string("DynamicFactions: recon probe - the node is loaded, mining order ") +
+                     (g_probe.ordered ? "given" : "refused"));
+        }
+        else if (!g_probe.ordered && now - g_probe.loggedMs >= 5000)
+            c->setDestination(g_probe.node.pos, false);
+        if (now - g_probe.loggedMs < 5000)
+            return;
+        g_probe.loggedMs = now;
         char line[256];
-        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - goal 0x%X, %.1f m from the node, %d %s in inventory",
-                  DfGoalOf(c), c->getPosition().distance(g_probe.node.pos), DfCountItem(c, g_probe.node.item),
-                  g_probe.node.itemName.c_str());
+        sprintf_s(line, sizeof(line), "DynamicFactions: recon probe - goal 0x%X, %.1f m from the node, loaded %d, %d %s in inventory",
+                  DfGoalOf(c), c->getPosition().distance(g_probe.node.pos), isLoaded ? 1 : 0,
+                  DfCountItem(c, g_probe.node.item), g_probe.node.itemName.c_str());
         DebugLog(line);
     }
 
