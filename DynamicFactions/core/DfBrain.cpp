@@ -32,7 +32,6 @@ DfRules DfPhase1Rules()
     DfRules r;
     r.startMembers = 4;
     r.startMoney = 5000;
-    r.recruitCost = 1500;
     r.maxMembers = 30;
     r.incomePerMemberHour = 15;
     r.techPointCost = 200;

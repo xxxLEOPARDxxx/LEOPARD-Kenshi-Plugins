@@ -34,7 +34,6 @@ struct DfRules
 {
     int startMembers;
     int startMoney;
-    int recruitCost;
     int maxMembers;
     int incomePerMemberHour;
     int techPointCost;

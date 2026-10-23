@@ -63,21 +63,19 @@ struct DfHireTask
     Ogre::Vector3 target;       // куда послан последним приказом
     Ogre::Vector3 lastPos;      // где посланник был, когда последний раз сдвинулся
     unsigned long movedMs;      // когда последний раз сдвинулся
-    float closest;              // ближе всего подходил
-    unsigned long closerMs;     // когда последний раз подошёл ближе
     std::string why;            // почему сорвалось - для журнала
 
-    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), orderMs(0), line(0), target(0.0f, 0.0f, 0.0f), lastPos(0.0f, 0.0f, 0.0f), movedMs(0), closest(0.0f), closerMs(0) {}
+    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), orderMs(0), line(0), target(0.0f, 0.0f, 0.0f), lastPos(0.0f, 0.0f, 0.0f), movedMs(0) {}
     bool busy() const { return phase != DF_HIRE_IDLE; }
 };
 
 // Раз в кадр интерфейса: часы найма идут, только когда игра не на паузе.
 void DfHireClock(bool paused);
 
-// Начать: самый дешёвый рекрут бара города (DfFindBarRecruit) не дороже
-// maxPrice и ближайший к нему член фракции в загруженном взводе. false -
-// некого нанять или некого послать.
-bool DfHireStart(DfHireTask& t, Faction* f, TownBase* town, int maxPrice);
+// Начать: рекрут, уже найденный DfFindBarRecruit в этом же кадре (второго
+// поиска нет - ревью этапа 1), если цена не выше maxPrice, и ближайший к
+// нему член фракции в загруженном взводе. false - некого послать.
+bool DfHireStart(DfHireTask& t, Faction* f, TownBase* town, int maxPrice, Character* recruit, int price);
 
 // Шаг раз в секунду. factionName - для реплики посланника.
 DfHireResult DfHireStep(DfHireTask& t, Faction* f, const std::string& factionName);

@@ -262,7 +262,7 @@ static DfSnapshot Snap(int members, int money, double hour, bool homeLoaded)
 static void test_brain_rules_values()
 {
     const DfRules r = DfPhase1Rules();
-    CHECK(r.startMembers == 4 && r.startMoney == 5000 && r.recruitCost == 1500 && r.maxMembers == 30);
+    CHECK(r.startMembers == 4 && r.startMoney == 5000 && r.maxMembers == 30);
     CHECK(r.incomePerMemberHour == 15 && r.techPointCost == 200 && r.maxTech == 10);
 }
 
@@ -296,6 +296,19 @@ static void test_brain_no_extinction_when_home_unloaded()
     CHECK(DfDecide(s, Snap(0, 500, 11.0, false), DfPhase1Rules()).empty());
     const std::vector<DfAction> acts = DfDecide(s, Snap(0, 500, 11.0, true), DfPhase1Rules());
     CHECK(acts.size() == 1 && acts[0].type == DF_EXTINCT);
+}
+
+// Идёт поход за рекрутом - его цена отложена, в снимке денег может стать
+// меньше нуля: ни второго найма, ни техники (ревью этапа 1, #13).
+static void test_brain_negative_money_no_spend()
+{
+    DfFactionState s = Founded(10.0);
+    DfSnapshot snap = Snap(4, -500, 11.0, true);
+    snap.recruitPrice = 0;
+    const std::vector<DfAction> acts = DfDecide(s, snap, DfPhase1Rules());
+    CHECK(FindAction(acts, DF_RECRUIT) < 0);
+    CHECK(FindAction(acts, DF_RESEARCH) < 0);
+    CHECK(FindAction(acts, DF_INCOME) >= 0);
 }
 
 static void test_brain_income_no_money_no_recruit()
@@ -494,6 +507,7 @@ int main()
     test_brain_found_only_when_home_loaded();
     test_brain_extinct();
     test_brain_no_extinction_when_home_unloaded();
+    test_brain_negative_money_no_spend();
     test_brain_income_no_money_no_recruit();
     test_brain_recruit_then_research();
     test_brain_no_one_in_bar();

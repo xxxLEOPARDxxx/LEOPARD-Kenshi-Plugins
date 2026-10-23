@@ -334,7 +334,7 @@ namespace
         {
             if (acts[i].type == DF_RECRUIT)
             {
-                if (DfHireStart(rt.hire, f, hub, acts[i].amount))
+                if (DfHireStart(rt.hire, f, hub, acts[i].amount, recruit, snap.recruitPrice))
                 {
                     char line[256];
                     sprintf_s(line, sizeof(line), "DynamicFactions: %s sends someone to hire a recruit in the Hub for %d",
@@ -441,10 +441,24 @@ namespace
         DebugLog(line);
     }
 
+    // Наши фракции - для блока перенайма (DfInstallHireBlock): как только мир
+    // готов, без ожидания 10 с (ревью этапа 1: после загрузки было окно для
+    // перенайма).
+    void UpdateOwnFactions()
+    {
+        std::vector<Faction*> own;
+        for (size_t i = 0; i < g_states.size(); ++i)
+            if (g_states[i].founded && !g_states[i].extinct)
+                if (Faction* const f = DfBindFaction(g_states[i].recordId))
+                    own.push_back(f);
+        DfSetOwnFactions(own);
+    }
+
     void Tick()
     {
         if (!g_ready || ou == NULL || ou->player == NULL)
             return;
+        UpdateOwnFactions();
         if (GetTickCount() - g_readyAt < kGraceMs)
             return;
         if (g_states.empty())
@@ -456,13 +470,6 @@ namespace
         const double hour = DfGameHour();
         if (hour < 0.0)
             return;
-        // Наши фракции - для блока перенайма (DfInstallHireBlock).
-        std::vector<Faction*> own;
-        for (size_t i = 0; i < g_states.size(); ++i)
-            if (g_states[i].founded && !g_states[i].extinct)
-                if (Faction* const f = DfBindFaction(g_states[i].recordId))
-                    own.push_back(f);
-        DfSetOwnFactions(own);
         for (size_t i = 0; i < g_states.size(); ++i)
         {
             TickFaction(g_states[i], g_runtime[i], hour);
@@ -496,7 +503,7 @@ namespace
             return;
         g_lastTick = now;
         Tick();
-        if (DfWindowIsOpen())
+        if (g_ready && DfWindowIsOpen())
             UpdateWindow();
     }
 

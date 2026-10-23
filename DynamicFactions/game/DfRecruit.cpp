@@ -345,10 +345,14 @@ namespace
     // всех; ответ запоминается до смены игры (DfSetOwnFactions с пустым).
     std::map<DialogLineData*, bool> g_hireBelow;
 
+    // Дерево больше лимита - считаем, что найм там есть: лучше закрыть
+    // лишнюю реплику, чем оставить перенайм (ревью этапа 1).
     bool HireBelow(DialogLineData* line, int depth, int& nodes)
     {
-        if (line == NULL || depth > kDepthLimit || ++nodes > kNodeLimit)
+        if (line == NULL)
             return false;
+        if (depth > kDepthLimit || ++nodes > kNodeLimit)
+            return true;
         if (IsJoinLine(line))
             return true;
         DialogChoiceList* const list = line->children;
@@ -415,7 +419,12 @@ bool DfInstallHireBlock()
 
 void DfSetOwnFactions(const std::vector<Faction*>& factions)
 {
+    if (factions == g_own)
+        return;                             // каждую секунду - присваиваем только при изменении
     g_own = factions;
     if (factions.empty())
+    {
         g_hireBelow.clear();                // другая игра - реплики могли пересоздаться
+        g_skipUntil.clear();                // и персонажи по тем же адресам - другие
+    }
 }

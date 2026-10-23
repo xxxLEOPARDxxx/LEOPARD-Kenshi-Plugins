@@ -26,8 +26,6 @@ namespace
 {
     const float kTalkDistance = 100.0f;     // разговор издалека (23.10: «за бродячим часами бегал»)
     const float kWaitDistance = 100.0f;     // ближе - рекрут ждёт на месте
-    const float kNearDistance = 10.0f;      // рядом, но ближе не подойти (стол, стойка)
-    const DWORD kStuckMs = 8000;            // столько не приближался - говорим отсюда
     const float kLostDistance = 150.0f;     // во время разговора ушли дальше - снова догонять
     const float kWalkTalkDistance = 80.0f;  // дальше - посланник подходит, говоря на ходу
     const DWORD kOrderEveryMs = 1000;       // как часто смотреть, не повторить ли приказ
@@ -146,11 +144,9 @@ namespace
         }
     }
 
-    bool Start(DfHireTask& t, Faction* f, TownBase* town, int maxPrice)
+    bool Start(DfHireTask& t, Faction* f, int maxPrice, Character* recruit, int price)
     {
-        Character* recruit = NULL;
-        int price = -1;
-        if (!DfFindBarRecruit(town, f, recruit, price) || price > maxPrice)
+        if (recruit == NULL || price < 0 || price > maxPrice)
             return false;
         Character* const envoy = NearestMember(f, recruit->getPosition());
         if (envoy == NULL)
@@ -162,8 +158,6 @@ namespace
         t.price = price;
         t.startedMs = now;
         t.line = 0;
-        t.closest = envoy->getPosition().distance(recruit->getPosition());
-        t.closerMs = now;
         t.lastPos = envoy->getPosition();
         t.movedMs = now;
         t.why.clear();
@@ -190,8 +184,8 @@ namespace
             t.why = "not enough money any more";
             return false;
         }
+        o->setMoney(o->money - t.price);       // сначала оплата: сбой после неё не даёт человека даром
         recruit->setFaction(f, ap);
-        o->setMoney(o->money - t.price);
         if (recruit->getPlatoon() != ap)
             ErrorLog("DynamicFactions: a recruit changed faction but is not in the envoy's squad");
         return true;
@@ -225,19 +219,13 @@ namespace
             recruit->setDestination(recruit->getPosition(), false);     // подожди
         if (t.phase == DF_HIRE_GO)
         {
-            if (d < t.closest - 0.5f)
-            {
-                t.closest = d;
-                t.closerMs = now;
-            }
             const Ogre::Vector3 here = envoy->getPosition();
             if (here.distance(t.lastPos) > kMovedDistance)
             {
                 t.lastPos = here;
                 t.movedMs = now;
             }
-            const bool stuckNear = d <= kNearDistance && now - t.closerMs >= kStuckMs;
-            if (d <= kTalkDistance || stuckNear)
+            if (d <= kTalkDistance)
             {
                 envoy->setDestination(envoy->getPosition(), false);     // встать
                 t.phase = DF_HIRE_TALK;
@@ -266,8 +254,6 @@ namespace
         if (d > kLostDistance)
         {
             t.phase = DF_HIRE_GO;
-            t.closest = d;
-            t.closerMs = now;
             t.lastPos = envoy->getPosition();
             t.movedMs = now;
             Order(t, envoy, recruit, now);
@@ -295,11 +281,11 @@ namespace
     }
 }
 
-bool DfHireStart(DfHireTask& t, Faction* f, TownBase* town, int maxPrice)
+bool DfHireStart(DfHireTask& t, Faction* f, TownBase* town, int maxPrice, Character* recruit, int price)
 {
     __try
     {
-        return f != NULL && town != NULL && !t.busy() && Start(t, f, town, maxPrice);
+        return f != NULL && town != NULL && !t.busy() && Start(t, f, maxPrice, recruit, price);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {

@@ -194,6 +194,39 @@ namespace
             st->getStatRef(static_cast<StatsEnumerated>(s)) = level;
     }
 
+    void AddFounders(Faction* f, ActivePlatoon* ap, GameData* tmpl, const Ogre::Vector3& pos, int members,
+                     float statLevel)
+    {
+        if (ap == NULL)
+            return;
+        for (int tries = 0; tries < members && static_cast<int>(ap->things.size()) < members; ++tries)
+        {
+            RootObject* const root = ou->theFactory->createRandomCharacter(f, pos, ap, tmpl, NULL, 0.0f);
+            Character* const c = root != NULL ? root->getHandle().getCharacter() : NULL;
+            if (c == NULL)
+                continue;
+            c->setFaction(f, ap);
+            c->setRagdollNavmeshSafePos();
+        }
+        for (uint32_t k = 0; k < ap->things.size(); ++k)
+            if (Character* const c = AsLivingCharacter(ap->things.stuff[k]))
+                SetAllStats(c, statLevel);
+    }
+
+    void SafeAddFounders(Faction* f, ActivePlatoon* ap, GameData* tmpl, const Ogre::Vector3& pos, int members,
+                         float statLevel)
+    {
+        __try
+        {
+            AddFounders(f, ap, tmpl, pos, members, statLevel);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            static volatile LONG told = 0;
+            TellOnce(told, "DynamicFactions: adding founders failed once - the faction starts smaller");
+        }
+    }
+
     // Отряд по шаблону - только главный: число бойцов шаблона игра умножает
     // своим размером отрядов (22.10: вышло 10 вместо 4). Остальных добираем
     // поштучно тем же персонажем.
@@ -211,24 +244,11 @@ namespace
             true, hand(), NULL, 1.0f, SQ_RESIDENT, false);
         if (p == NULL)
             return false;
-        ActivePlatoon* const ap = p->getActivePlatoon();
-        if (ap != NULL)
-        {
-            for (int tries = 0; tries < members && static_cast<int>(ap->things.size()) < members; ++tries)
-            {
-                RootObject* const root = ou->theFactory->createRandomCharacter(f, pos, ap, tmpl, NULL, 0.0f);
-                Character* const c = root != NULL ? root->getHandle().getCharacter() : NULL;
-                if (c == NULL)
-                    continue;
-                c->setFaction(f, ap);
-                c->setRagdollNavmeshSafePos();
-            }
-            for (uint32_t k = 0; k < ap->things.size(); ++k)
-                if (Character* const c = AsLivingCharacter(ap->things.stuff[k]))
-                    SetAllStats(c, statLevel);
-        }
+        // Отряд есть - фракция основана: деньги сразу, до необязательных
+        // шагов (ревью этапа 1: сбой добора оставлял фракцию без денег).
         if (f->factionOwnerships != NULL)
             f->factionOwnerships->addMoney(money);
+        SafeAddFounders(f, p->getActivePlatoon(), tmpl, pos, members, statLevel);
         return true;
     }
 
