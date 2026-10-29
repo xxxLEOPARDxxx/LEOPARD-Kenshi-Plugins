@@ -34,6 +34,9 @@ msgstr "No mods with settings were found."
 msgid "Palette"
 msgstr "Palette"
 
+msgid "Press a key or mouse button... Backspace - none, Esc - cancel"
+msgstr "Press a key or mouse button... Backspace - none, Esc - cancel"
+
 msgid "Press a key... Backspace - none"
 msgstr "Press a key... Backspace - none"
 

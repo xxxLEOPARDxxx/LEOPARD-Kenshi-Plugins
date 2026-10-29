@@ -34,6 +34,9 @@ msgstr "未找到带有设置的模组。"
 msgid "Palette"
 msgstr "调色板"
 
+msgid "Press a key or mouse button... Backspace - none, Esc - cancel"
+msgstr "请按键盘按键或鼠标按钮... Backspace - 无，Esc - 取消"
+
 msgid "Press a key... Backspace - none"
 msgstr "请按一个键... Backspace - 无"
 

@@ -34,6 +34,9 @@ msgstr "Модов с настройками не найдено."
 msgid "Palette"
 msgstr "Палитра"
 
+msgid "Press a key or mouse button... Backspace - none, Esc - cancel"
+msgstr "Нажмите клавишу или кнопку мыши... Backspace - убрать, Esc - отмена"
+
 msgid "Press a key... Backspace - none"
 msgstr "Нажмите клавишу... Backspace - нет"
 

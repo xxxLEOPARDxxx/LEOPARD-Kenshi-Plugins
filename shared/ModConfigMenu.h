@@ -35,6 +35,7 @@
 
 // Флаги настройки
 #define MCM_RESTART 0x1u   // действует после перезапуска игры
+#define MCM_ALLOW_MOUSE 0x2u // hotkey/hotkeyFn opts in to mouse capture; legacy callbacks remain keyboard-only
 
 struct MCM_Api;
 typedef void (__cdecl *MCM_ApplyFn)();
@@ -46,7 +47,15 @@ typedef void (__cdecl *MCM_DescribeFn)(MCM_Api* api);
 // плагин пишет в err (размер errSize), MCM кладёт его в журнал и
 // перечитывает значение. Сигнатуры совпадают с Mod Hub (EMC_*Callback),
 // так что его функции подходят без обёрток.
-struct MCM_Key { int keycode; unsigned modifiers; };   // keycode - OIS::KeyCode, -1 - не задана
+// Keyboard: OIS::KeyCode, -1: unbound. Mouse buttons use reserved codes
+// outside the OIS range. Capture produces them only for MCM_ALLOW_MOUSE
+// bindings; callback clients must opt in and may reject unsupported codes.
+struct MCM_Key { int keycode; unsigned modifiers; };
+#define MCM_KEY_MOUSE_LEFT   0x1000
+#define MCM_KEY_MOUSE_RIGHT  0x1001
+#define MCM_KEY_MOUSE_MIDDLE 0x1002
+#define MCM_KEY_MOUSE_X1     0x1003
+#define MCM_KEY_MOUSE_X2     0x1004
 #define MCM_KEY_CTRL  0x1u
 #define MCM_KEY_SHIFT 0x2u
 #define MCM_KEY_ALT   0x4u

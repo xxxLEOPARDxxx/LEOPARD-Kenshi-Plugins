@@ -1,7 +1,7 @@
 #pragma once
 // Клавиша «показывать, пока зажата» - в том виде, как её записывает MCM
 // (захват нажатия, 07.10.2026): «ALT», «CTRL», «SHIFT», «F», «CTRL+B»,
-// «NUM5», «NONE» (= клавиши нет, показывать всегда).
+// «NUM5», «MMB», «CTRL+X1», «NONE» (= клавиши нет, показывать всегда).
 //
 // Раньше AssignedWorkers и GearCompare понимали только ALT/CTRL/SHIFT/NONE
 // и выбирались выпадающим списком MCM, а он в игре выбор не отдавал.
@@ -13,6 +13,7 @@
 #include <Windows.h>
 #include <cctype>
 #include <cstring>
+#include <cstdio>
 #include <string>
 
 namespace HoldKey
@@ -56,6 +57,8 @@ namespace HoldKey
             return VK_NUMPAD0 + (n[3] - '0');
         struct Named { const char* name; int vk; };
         static const Named named[] = {
+            { "LMB", VK_LBUTTON }, { "RMB", VK_RBUTTON }, { "MMB", VK_MBUTTON },
+            { "X1", VK_XBUTTON1 }, { "X2", VK_XBUTTON2 },
             { "ALT", VK_MENU }, { "CTRL", VK_CONTROL }, { "SHIFT", VK_SHIFT },
             { "LALT", VK_LMENU }, { "RALT", VK_RMENU }, { "LCTRL", VK_LCONTROL },
             { "RCTRL", VK_RCONTROL }, { "LSHIFT", VK_LSHIFT }, { "RSHIFT", VK_RSHIFT },
@@ -69,6 +72,44 @@ namespace HoldKey
             if (n == named[i].name)
                 return named[i].vk;
         return 0;
+    }
+
+    // Canonical names for one-time legacy scan-code migration. Held itself
+    // stores and checks only Key, with no per-frame string work.
+    inline std::string NameFromVk(int vk)
+    {
+        if ((vk >= 'A' && vk <= 'Z') || (vk >= '0' && vk <= '9'))
+            return std::string(1, static_cast<char>(vk));
+        char number[16];
+        if (vk >= VK_F1 && vk <= VK_F12) { sprintf_s(number, "F%d", vk - VK_F1 + 1); return number; }
+        if (vk >= VK_NUMPAD0 && vk <= VK_NUMPAD9) { sprintf_s(number, "NUM%d", vk - VK_NUMPAD0); return number; }
+        struct Named { int vk; const char* name; };
+        static const Named named[] = {
+            { VK_LBUTTON, "LMB" }, { VK_RBUTTON, "RMB" }, { VK_MBUTTON, "MMB" },
+            { VK_XBUTTON1, "X1" }, { VK_XBUTTON2, "X2" },
+            { VK_MENU, "ALT" }, { VK_LMENU, "LALT" }, { VK_RMENU, "RALT" },
+            { VK_CONTROL, "CTRL" }, { VK_LCONTROL, "LCTRL" }, { VK_RCONTROL, "RCTRL" },
+            { VK_SHIFT, "SHIFT" }, { VK_LSHIFT, "LSHIFT" }, { VK_RSHIFT, "RSHIFT" },
+            { VK_SPACE, "SPACE" }, { VK_TAB, "TAB" }, { VK_RETURN, "ENTER" },
+            { VK_INSERT, "INSERT" }, { VK_DELETE, "DELETE" }, { VK_HOME, "HOME" },
+            { VK_END, "END" }, { VK_PRIOR, "PAGEUP" }, { VK_NEXT, "PAGEDOWN" },
+            { VK_UP, "UP" }, { VK_DOWN, "DOWN" }, { VK_LEFT, "LEFT" }, { VK_RIGHT, "RIGHT" },
+            { VK_BACK, "BACKSPACE" }, { VK_ESCAPE, "ESC" }, { VK_OEM_3, "`" },
+            { VK_OEM_MINUS, "-" }, { VK_OEM_PLUS, "=" }, { VK_OEM_4, "[" }, { VK_OEM_6, "]" },
+            { VK_OEM_1, ";" }, { VK_OEM_7, "'" }, { VK_OEM_COMMA, "," }, { VK_OEM_PERIOD, "." },
+            { VK_OEM_2, "/" }, { VK_OEM_5, "\\" }
+        };
+        for (size_t i = 0; i < sizeof(named) / sizeof(named[0]); ++i)
+            if (vk == named[i].vk) return named[i].name;
+        return "NONE";
+    }
+
+    inline std::string Format(const Key& key)
+    {
+        const std::string name = NameFromVk(key.vk);
+        if (name == "NONE") return name;
+        return std::string(key.ctrl ? "CTRL+" : "") + (key.shift ? "SHIFT+" : "") +
+               (key.alt ? "ALT+" : "") + name;
     }
 
     // Пустое, «NONE» и непонятное - клавиши нет (показывать всегда), как

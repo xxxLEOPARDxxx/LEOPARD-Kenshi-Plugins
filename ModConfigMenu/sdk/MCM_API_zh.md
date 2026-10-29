@@ -252,3 +252,7 @@ ModConfigMenu: MyPlugin [MyPlugin] Radius=120
 
 如果你的插件不在列表中，请检查 `MCM_Describe` 是否以未修饰的名称导出：
 `dumpbin /exports MyPlugin.dll` 应该正好显示 `MCM_Describe`。
+
+## 鼠标快捷键（MCM v11）
+
+快捷键行通过 MCM_ALLOW_MOUSE 明确启用鼠标。支持 LMB、RMB、MMB、X1、X2 以及 CTRL/SHIFT/ALT 组合。回调鼠标代码为 MCM_KEY_MOUSE_LEFT 至 MCM_KEY_MOUSE_X2（0x1000..0x1004），不是 OIS 键盘代码。未设置标志的现有行仍只接受键盘。捕获会同时消耗按下和释放事件。API 结构仍为版本6，布局未改变。

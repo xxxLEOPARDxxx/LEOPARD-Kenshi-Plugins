@@ -286,3 +286,7 @@ ModConfigMenu: MyPlugin [MyPlugin] Radius=120
 Если плагина нет в списке, проверьте, что `MCM_Describe` экспортирован без
 декорирования: `dumpbin /exports MyPlugin.dll` должен показать ровно
 `MCM_Describe`.
+
+## Мышь в назначении клавиш (MCM v11)
+
+Строка hotkey разрешает мышь флагом MCM_ALLOW_MOUSE. Поддерживаются LMB, RMB, MMB, X1, X2 и сочетания CTRL/SHIFT/ALT. Коды callback: MCM_KEY_MOUSE_LEFT..MCM_KEY_MOUSE_X2 (0x1000..0x1004), это не клавиатурные коды OIS. Без флага строка остаётся клавиатурной. Захват поглощает нажатие и отпускание. Структура API версии6 не менялась.

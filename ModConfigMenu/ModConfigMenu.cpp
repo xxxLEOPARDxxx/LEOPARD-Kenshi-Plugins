@@ -557,6 +557,8 @@ namespace
     struct KeyName { int code; const char* name; };
     const KeyName kKeyNames[] = {
         // Одиночные модификаторы - первыми: их и печатаем.
+        { MCM_KEY_MOUSE_LEFT, "LMB" }, { MCM_KEY_MOUSE_RIGHT, "RMB" },
+        { MCM_KEY_MOUSE_MIDDLE, "MMB" }, { MCM_KEY_MOUSE_X1, "X1" }, { MCM_KEY_MOUSE_X2, "X2" },
         { OIS::KC_LMENU, "ALT" }, { OIS::KC_LCONTROL, "CTRL" }, { OIS::KC_LSHIFT, "SHIFT" },
         { OIS::KC_A, "A" }, { OIS::KC_B, "B" }, { OIS::KC_C, "C" }, { OIS::KC_D, "D" },
         { OIS::KC_E, "E" }, { OIS::KC_F, "F" }, { OIS::KC_G, "G" }, { OIS::KC_H, "H" },
@@ -712,6 +714,11 @@ namespace
             if (!ParseKey(v, &k))
             {
                 ErrorLog("ModConfigMenu: " + modId + " '" + s->label + "': not a key: " + v);
+                return false;
+            }
+            if (k.keycode >= MCM_KEY_MOUSE_LEFT && k.keycode <= MCM_KEY_MOUSE_X2 && !(s->flags & MCM_ALLOW_MOUSE))
+            {
+                ErrorLog("ModConfigMenu: mouse binding rejected for keyboard-only callback: " + s->label);
                 return false;
             }
             r = reinterpret_cast<MCM_SetKeyFn>(s->set)(s->ud, k, err, sizeof(err) - 1);
@@ -1198,7 +1205,9 @@ namespace
             if (value != NULL) b.captionValue = *value;
             if (b.what == OWN_RESET) b.captionText = Tr("Reset to defaults");
             else if (b.s->kind == K_ACTION) b.captionText = EscapeTags(b.s->label);
-            else if (capturing) b.captionText = Tr("Press a key... Backspace - none, click - cancel");
+            else if (capturing) b.captionText = Tr((b.s->flags & MCM_ALLOW_MOUSE)
+                ? "Press a key or mouse button... Backspace - none, Esc - cancel"
+                : "Press a key... Backspace - none, click - cancel");
             else b.captionText = ButtonCaption(b.s);
         }
         return b.captionText;
@@ -1532,16 +1541,77 @@ namespace
         }
     }
 
-    // Колесо над клетками палитры - прокрутка страницы (сами клетки колесо
-    // себе забирают).
-    void OnPanelWheel(MyGUI::Widget*, int rel)
+    // MyGUI dispatches the target's virtual onMouseWheel BEFORE its event
+    // delegates, and does not bubble the event to parents. A delegate on a
+    // setting slider is too late: the wheel already changed its value.
+    // Route at _riseMouseWheel instead, and only inside this live native host.
+    __declspec(thread) bool g_forwardingPanelWheel = false;
+    bool RoutePanelWheel(MyGUI::Widget* sender, int rel)
     {
+        if (g_forwardingPanelWheel) return false;
+        MyGUI::Widget* const root = g_panelRootRef->get();
+        if (sender == NULL || root == NULL || !root->getInheritedVisible())
+            return false;
         MyGUI::ScrollView* const view = PanelScroll(g_panel);
         if (view == NULL)
-            return;
-        MyGUI::IntPoint offset = view->getViewOffset();
-        offset.top += rel > 0 ? 40 : -40;
-        view->setViewOffset(offset);
+            return false;
+        unsigned depth = 0;
+        for (MyGUI::Widget* p = sender; p != NULL && depth < 128; p = p->getParent(), ++depth)
+        {
+            if (p == root)
+            {
+                if (rel != 0)
+                {
+                    g_scrollUntil = 0; // manual input wins over rebuild restoration
+                    // Let the game's panel update/clamp its own scrollbar and
+                    // thumb together, instead of moving only the canvas offset.
+                    // A native panel may redispatch to its own scrollbar.
+                    // Permit that original dispatch without routing recursively.
+                    struct Forwarding
+                    {
+                        Forwarding() { g_forwardingPanelWheel = true; }
+                        ~Forwarding() { g_forwardingPanelWheel = false; }
+                    } forwarding;
+                    g_panel->notifyMouseWheel(sender, rel);
+                }
+                return true;
+            }
+            MyGUI::ScrollView* const nested = p->castType<MyGUI::ScrollView>(false);
+            if (nested != NULL && nested != view)
+                return false; // independent embedded scroll area owns its wheel
+        }
+        return false; // other tabs, mod list and custom-area siblings pass through
+    }
+
+    void (*g_origWheelInput)(MyGUI::WidgetInput*, int) = NULL;
+    void WheelInput_hook(MyGUI::WidgetInput* self, int rel)
+    {
+        // WidgetInput is a secondary Widget base. The SDK downcast performs
+        // the adjustment (0x80 in this game build); never reinterpret as Widget*.
+        MyGUI::Widget* const widget = static_cast<MyGUI::Widget*>(self);
+        if (!RoutePanelWheel(widget, rel))
+            g_origWheelInput(self, rel);
+    }
+
+    bool InstallWheelRouting()
+    {
+        HMODULE const lib = GetModuleHandleA("MyGUIEngine_x64.dll");
+        unsigned char* target = lib != NULL ? reinterpret_cast<unsigned char*>(GetProcAddress(lib,
+            "?_riseMouseWheel@WidgetInput@MyGUI@@QEAAXH@Z")) : NULL;
+        for (unsigned i = 0; target != NULL && target[0] == 0xE9 && i < 4; ++i)
+            target += 5 + *reinterpret_cast<int*>(target + 1);
+        if (target != NULL && KenshiLib::AddHook(target, WheelInput_hook, &g_origWheelInput) == KenshiLib::SUCCESS)
+            return true;
+        ErrorLog("ModConfigMenu: cannot hook wheel dispatch; use the page scrollbar");
+        return false;
+    }
+
+    // Existing own-button delegates remain a fallback if hook installation
+    // fails. The pre-dispatch route consumes owned input before these run,
+    // so a wheel event can never scroll both paths.
+    void OnPanelWheel(MyGUI::Widget* sender, int rel)
+    {
+        RoutePanelWheel(sender, rel);
     }
 
     // ---- захват клавиши ----------------------------------------------
@@ -1575,43 +1645,107 @@ namespace
         return "ALT";
     }
 
+    unsigned g_capturedMouseDown = 0;
+    int g_capturedKeyDown = -1;
+    bool g_mouseCaptureReady = false;
+
+    bool CaptureActive()
+    {
+        MyGUI::Widget* const root = g_panelRootRef->get();
+        return g_capture != NULL && g_capture->line != NULL && root != NULL && root->getInheritedVisible();
+    }
+
+    unsigned CaptureModifiers()
+    {
+        unsigned modifiers = 0;
+        if (GetAsyncKeyState(VK_CONTROL) & 0x8000) modifiers |= MCM_KEY_CTRL;
+        if (GetAsyncKeyState(VK_SHIFT) & 0x8000) modifiers |= MCM_KEY_SHIFT;
+        if (GetAsyncKeyState(VK_MENU) & 0x8000) modifiers |= MCM_KEY_ALT;
+        return modifiers;
+    }
+
+    void BeginCapture(Setting* setting)
+    {
+        g_capture = g_capture == setting ? NULL : setting;
+        g_captureMod = 0;
+    }
+
+    bool (*g_origMousePress)(MyGUI::InputManager*, int, int, MyGUI::MouseButton) = NULL;
+    bool (*g_origMouseRelease)(MyGUI::InputManager*, int, int, MyGUI::MouseButton) = NULL;
+
+    bool MousePress_hook(MyGUI::InputManager* self, int x, int y, MyGUI::MouseButton button)
+    {
+        const int id = button.getValue();
+        if (g_mouseCaptureReady && id >= 0 && id < 5)
+        {
+            const unsigned mask = 1u << id;
+            if (g_capturedMouseDown & mask) return true; // duplicate before matching release
+            if (CaptureActive() && (g_capture->flags & MCM_ALLOW_MOUSE))
+            {
+                // The click that opens capture was already pressed before
+                // BeginCapture runs on click/release; it cannot bind itself.
+                g_capturedMouseDown |= mask;
+                MCM_Key key = { MCM_KEY_MOUSE_LEFT + id, CaptureModifiers() };
+                FinishCapture(FormatKey(key));
+                return true;
+            }
+        }
+        return g_origMousePress(self, x, y, button);
+    }
+
+    bool MouseRelease_hook(MyGUI::InputManager* self, int x, int y, MyGUI::MouseButton button)
+    {
+        const int id = button.getValue();
+        if (id >= 0 && id < 5 && (g_capturedMouseDown & (1u << id)))
+        {
+            g_capturedMouseDown &= ~(1u << id);
+            return true; // do not deliver a release whose press was consumed
+        }
+        return g_origMouseRelease(self, x, y, button);
+    }
+
+    void* MouseCaptureTarget(HMODULE module, const char* name)
+    {
+        unsigned char* target = module != NULL ? reinterpret_cast<unsigned char*>(GetProcAddress(module, name)) : NULL;
+        for (unsigned i = 0; target != NULL && target[0] == 0xE9 && i < 4; ++i)
+            target += 5 + *reinterpret_cast<int*>(target + 1);
+        return target;
+    }
+
+    void InstallMouseCapture()
+    {
+        HMODULE const module = GetModuleHandleA("MyGUIEngine_x64.dll");
+        void* press = MouseCaptureTarget(module, "?injectMousePress@InputManager@MyGUI@@QEAA_NHHUMouseButton@2@@Z");
+        void* release = MouseCaptureTarget(module, "?injectMouseRelease@InputManager@MyGUI@@QEAA_NHHUMouseButton@2@@Z");
+        const bool pressReady = press != NULL && KenshiLib::AddHook(press, MousePress_hook, &g_origMousePress) == KenshiLib::SUCCESS;
+        const bool releaseReady = release != NULL && KenshiLib::AddHook(release, MouseRelease_hook, &g_origMouseRelease) == KenshiLib::SUCCESS;
+        g_mouseCaptureReady = pressReady && releaseReady;
+        if (!g_mouseCaptureReady) ErrorLog("ModConfigMenu: cannot hook mouse capture; keyboard assignment remains available");
+    }
+
     void (*g_origKeyDown)(InputHandler*, OIS::KeyCode) = NULL;
     void (*g_origKeyUp)(InputHandler*, OIS::KeyCode) = NULL;
 
     void KeyDown_hook(InputHandler* self, OIS::KeyCode key)
     {
-        if (g_capture != NULL && g_capture->line != NULL)
+        if (g_capturedKeyDown == key) return; // OS repeat belongs to the captured press
+        if (CaptureActive())
         {
-            if (IsModifier(key))
-            {
-                g_captureMod = key;
-                return;
-            }
+            if (IsModifier(key)) { g_captureMod = key; return; }
             g_captureMod = 0;
+            g_capturedKeyDown = key;
             if (key == OIS::KC_ESCAPE)
             {
-                g_capture = NULL;           // отмена; окно не закрываем
+                g_capture = NULL;
                 PlaceOwnButtons();
                 return;
             }
-            if (key == OIS::KC_BACK)
-            {
-                FinishCapture("NONE");
-                return;
-            }
-            MCM_Key k;
-            k.keycode = key;
-            k.modifiers = 0;
-            if (GetAsyncKeyState(VK_CONTROL) & 0x8000) k.modifiers |= MCM_KEY_CTRL;
-            if (GetAsyncKeyState(VK_SHIFT) & 0x8000) k.modifiers |= MCM_KEY_SHIFT;
-            if (GetAsyncKeyState(VK_MENU) & 0x8000) k.modifiers |= MCM_KEY_ALT;
-            const std::string text = FormatKey(k);
-            if (text.find("KEY") == std::string::npos)   // клавиши без имени - мимо
-                FinishCapture(text);
+            if (key == OIS::KC_BACK) { FinishCapture("NONE"); return; }
+            MCM_Key binding = { key, CaptureModifiers() };
+            const std::string text = FormatKey(binding);
+            if (text.find("KEY") == std::string::npos) FinishCapture(text);
             return;
         }
-        // Esc/Enter в нашем поле закрывают окно: дописанное - сохранить,
-        // фокус - снять, пока поле живо (см. DropFocusInside).
         if ((key == OIS::KC_ESCAPE || key == OIS::KC_RETURN || key == OIS::KC_NUMPADENTER) && g_panel != NULL)
         {
             MyGUI::InputManager* const input = MyGUI::InputManager::getInstancePtr();
@@ -1626,7 +1760,8 @@ namespace
 
     void KeyUp_hook(InputHandler* self, OIS::KeyCode key)
     {
-        if (g_capture != NULL && g_captureMod != 0 && key == g_captureMod)
+        if (g_capturedKeyDown == key) { g_capturedKeyDown = -1; return; }
+        if (CaptureActive() && g_captureMod != 0 && key == g_captureMod)
         {
             FinishCapture(ModifierName(key));
             return;
@@ -2239,8 +2374,7 @@ namespace
         }
         else if (s->kind == K_HOTKEY)
         {
-            g_capture = (g_capture == s) ? NULL : s;    // повторный щелчок - отмена
-            g_captureMod = 0;
+            BeginCapture(s);
         }
         if (g_debug)
             DebugLog("ModConfigMenu: button '" + (s->label.empty() ? s->key : s->label) + "' clicked");
@@ -2891,6 +3025,9 @@ __declspec(dllexport) void startPlugin()
     // ini игрока - см. shared/IniDefaults.h (11.10.2026).
     const std::string ini = IniDefaults::Prepare(ModuleDir() + "ModConfigMenu.ini");
     g_debug = GetPrivateProfileIntA("ModConfigMenu", "Debug", 0, ini.c_str()) != 0;
+
+    InstallWheelRouting();
+    InstallMouseCapture();
 
     // Ownership release depends on this hook. Do not create native rows if
     // their real lifetime cannot be observed.
