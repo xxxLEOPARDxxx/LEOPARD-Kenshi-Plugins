@@ -1,9 +1,29 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: ModConfigMenu\n"
-"Language: en_GB\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+msgstr "Language: en_GB\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "* Takes effect after the game is restarted."
+msgstr "* Takes effect after the game is restarted."
+
+msgid "Current colour"
+msgstr "Current colour"
+
+msgid "Debug logging"
+msgstr "Debug logging"
+
+msgid "Default"
+msgstr "Default"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: which mods were found and what was written."
+msgstr "Details in RE_Kenshi_log.txt: which mods were found and what was written."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Hide"
+msgstr "Hide"
 
 msgid "Mods"
 msgstr "Mods"
@@ -11,17 +31,11 @@ msgstr "Mods"
 msgid "No mods with settings were found."
 msgstr "No mods with settings were found."
 
-msgid "* Takes effect after the game is restarted."
-msgstr "* Takes effect after the game is restarted."
-
-msgid "Reset to defaults"
-msgstr "Reset to defaults"
+msgid "Palette"
+msgstr "Palette"
 
 msgid "Press a key... Backspace - none"
 msgstr "Press a key... Backspace - none"
-
-msgid "none"
-msgstr "none"
 
 msgid "Press a key... Backspace - none, Esc - cancel"
 msgstr "Press a key... Backspace - none, Esc - cancel"
@@ -29,32 +43,17 @@ msgstr "Press a key... Backspace - none, Esc - cancel"
 msgid "Press a key... Backspace - none, click - cancel"
 msgstr "Press a key... Backspace - none, click - cancel"
 
-msgid "Palette"
-msgstr "Palette"
-
-msgid "Hide"
-msgstr "Hide"
-
-msgid "Current colour"
-msgstr "Current colour"
-
-msgid "Default"
-msgstr "Default"
-
-msgid "Switch between the palette and typing the colour code (#RRGGBB)"
-msgstr "Switch between the palette and typing the colour code (#RRGGBB)"
-
-msgid "Show or hide the colours to pick from"
-msgstr "Show or hide the colours to pick from"
+msgid "Reset to defaults"
+msgstr "Reset to defaults"
 
 msgid "Settings of the mods in this tab."
 msgstr "Settings of the mods in this tab."
 
-msgid "Diagnostics"
-msgstr "Diagnostics"
+msgid "Show or hide the colours to pick from"
+msgstr "Show or hide the colours to pick from"
 
-msgid "Detailed log"
-msgstr "Detailed log"
+msgid "Switch between the palette and typing the colour code (#RRGGBB)"
+msgstr "Switch between the palette and typing the colour code (#RRGGBB)"
 
-msgid "Details in RE_Kenshi_log.txt: which mods were found and what was written."
-msgstr "Details in RE_Kenshi_log.txt: which mods were found and what was written."
+msgid "none"
+msgstr "none"

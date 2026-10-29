@@ -123,6 +123,8 @@ namespace
         void* set;
         bool fnHasDef;              // API v5: значение по умолчанию в def
         bool dyn;                   // API v6: строка из rows - пересобирается при показе
+        DatapanelGUI* panelOwner;    // native rows can still hold &b / &f
+        bool retiring;              // no longer in the model; owner releases it
 
         // Выпадающий список: пункт, замеченный в самом списке в прошлом
         // кадре и ещё не принятый (см. PollChoiceCombo).
@@ -139,7 +141,7 @@ namespace
 
         Setting() : kind(K_TEXT), flags(0), fmin(0), fmax(1), decimals(0), b(false), f(0), i(0),
                     line(NULL), lastMoveMs(0), hasBaseline(false), touched(false), fn(false), ud(NULL), get(NULL),
-                    set(NULL), fnHasDef(false), dyn(false), comboSeen(-1), colourHex(false), colourOpen(false),
+                    set(NULL), fnHasDef(false), dyn(false), panelOwner(NULL), retiring(false), comboSeen(-1), colourHex(false), colourOpen(false),
                     colourHasBase(false) {}
     };
 
@@ -157,11 +159,21 @@ namespace
         // какой постоянной строкой блок стоит (их число на момент вызова rows).
         struct RowsBlock { MCM_RowsFn fn; void* ud; size_t at; };
         std::vector<RowsBlock> blocks;
-        // Строки прошлых показов не удаляем: на них может ещё смотреть
-        // захват клавиши или кнопка. Это десяток байт на строку за показ.
-        std::vector<Setting*> retired;
         ModEntry() : apply(NULL), attach(NULL), detach(NULL), areaUd(NULL), areaPercent(0) {}
     };
+
+    struct PanelBindings
+    {
+        std::vector<Setting*> settings;
+        WidgetRef* host;
+        WidgetRef* area;
+        bool destroyRequested;
+        bool destroying;
+        PanelBindings() : host(NULL), area(NULL), destroyRequested(false), destroying(false) {}
+    };
+    // An entry exists until the real native destructor has returned. This is
+    // also the quarantine for backing values of a deferred/failed destruction.
+    std::map<DatapanelGUI*, PanelBindings> g_panelBindings;
 
     std::vector<ModEntry*> g_mods;
     ModEntry* g_building = NULL;
@@ -986,6 +998,11 @@ namespace
         int what;
         int arg;
         WidgetRef* ref;
+        std::string captionText, captionValue;
+        int captionChoice;
+        bool captionReady, captionDirty, captionCapturing;
+        OwnButton() : line(NULL), s(NULL), what(0), arg(0), ref(NULL), captionChoice(-1),
+                      captionReady(false), captionDirty(false), captionCapturing(false) {}
     };
     std::vector<OwnButton> g_ownButtons;
     std::vector<WidgetRef*> g_freeRefs;     // WidgetRef не удаляется - в запас
@@ -1098,15 +1115,93 @@ namespace
         g_captureMod = 0;
     }
 
-    std::string OwnCaption(const OwnButton& b)
+    WidgetRef* KeepPanelWidget(MyGUI::Widget* widget)
     {
-        if (b.what == OWN_RESET)
-            return Tr("Reset to defaults");
-        if (b.s->kind == K_ACTION)
-            return EscapeTags(b.s->label);
-        if (g_capture == b.s)
-            return Tr("Press a key... Backspace - none, click - cancel");
-        return ButtonCaption(b.s);
+        if (widget == NULL) return NULL;
+        WidgetRef* ref;
+        if (g_freeRefs.empty()) ref = new WidgetRef();
+        else { ref = g_freeRefs.back(); g_freeRefs.pop_back(); }
+        ref->set(widget);
+        return ref;
+    }
+
+    void BindPanelSetting(DatapanelGUI* panel, Setting* setting)
+    {
+        if (setting->panelOwner == panel) return;
+        g_panelBindings[panel].settings.push_back(setting);
+        setting->panelOwner = panel;
+    }
+
+    // Called only after g_origDatapanelDtor: native callbacks and bool/float
+    // value pointers have stopped existing before any Setting is released.
+    void ReleasePanelBindings(DatapanelGUI* panel)
+    {
+        std::map<DatapanelGUI*, PanelBindings>::iterator found = g_panelBindings.find(panel);
+        if (found == g_panelBindings.end()) return;
+        PanelBindings& owner = found->second;
+        for (size_t i = 0; i < owner.settings.size(); ++i)
+        {
+            Setting* setting = owner.settings[i];
+            if (setting->panelOwner != panel) continue; // static row rebound to a new panel
+            setting->panelOwner = NULL;
+            setting->line = NULL;
+            if (setting->retiring) delete setting;
+        }
+        WidgetRef* refs[] = { owner.host, owner.area };
+        g_panelBindings.erase(found);
+        for (size_t i = 0; i < 2; ++i)
+        {
+            if (refs[i] == NULL) continue;
+            MyGUI::Widget* widget = refs[i]->get();
+            if (g_host == widget) g_host = NULL;
+            if (g_area == widget) g_area = NULL;
+            MyGUI::Gui* manager = MyGUI::Gui::getInstancePtr();
+            if (widget != NULL && manager != NULL) manager->destroyWidget(widget);
+            refs[i]->reset();
+            g_freeRefs.push_back(refs[i]);
+        }
+    }
+
+    bool SafeDestroyPanel(DatapanelGUI* panel)
+    {
+        __try { panel->show(false); }
+        __except (EXCEPTION_EXECUTE_HANDLER) {}
+        __try { gui->destroy(panel); return true; }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            ErrorLog("ModConfigMenu: native panel destruction failed; backing values retained");
+            return false;
+        }
+    }
+
+    bool RequestPanelDestroy(DatapanelGUI* panel)
+    {
+        if (panel == NULL || gui == NULL) return true;
+        PanelBindings& owner = g_panelBindings[panel];
+        if (owner.destroyRequested || owner.destroying) return true;
+        owner.destroyRequested = true;
+        return SafeDestroyPanel(panel); // do not touch owner: destructor may have erased it
+    }
+
+    const std::string& OwnCaption(OwnButton& b)
+    {
+        const bool capturing = b.s != NULL && g_capture == b.s;
+        const int choice = b.s != NULL && b.s->kind == K_CHOICE ? b.s->i : -1;
+        const std::string* value = b.s != NULL && b.s->kind == K_HOTKEY ? &b.s->committed : NULL;
+        if (!b.captionReady || capturing != b.captionCapturing || choice != b.captionChoice ||
+            (value != NULL && b.captionValue != *value))
+        {
+            b.captionReady = true;
+            b.captionDirty = true;
+            b.captionCapturing = capturing;
+            b.captionChoice = choice;
+            if (value != NULL) b.captionValue = *value;
+            if (b.what == OWN_RESET) b.captionText = Tr("Reset to defaults");
+            else if (b.s->kind == K_ACTION) b.captionText = EscapeTags(b.s->label);
+            else if (capturing) b.captionText = Tr("Press a key... Backspace - none, click - cancel");
+            else b.captionText = ButtonCaption(b.s);
+        }
+        return b.captionText;
     }
 
     void PlaceOwnButton(size_t index)
@@ -1146,6 +1241,7 @@ namespace
             button = NULL;
         }
         const MyGUI::IntCoord coord = field->getCoord();
+        const bool newButton = button == NULL;
         if (button == NULL)
         {
             MyGUI::Button* const created = MakeButton(row, coord, MyGUI::Align::Left | MyGUI::Align::Top);
@@ -1174,9 +1270,12 @@ namespace
             button->setCoord(coord);
         }
         MyGUI::Button* const asButton = button->castType<MyGUI::Button>(false);
-        const std::string caption = OwnCaption(b);
-        if (asButton != NULL && asButton->getCaption().asUTF8() != caption)
+        const std::string& caption = OwnCaption(b);
+        if (asButton != NULL && (newButton || b.captionDirty))
+        {
             asButton->setCaption(caption);
+            b.captionDirty = false;
+        }
     }
 
     void PlaceOwnButtons()
@@ -1599,13 +1698,35 @@ namespace
     {
         if (g_right == NULL || gui == NULL)
             return false;
-        DetachArea();
         DropFocusInside();
+        DetachArea();
+        // A failed page may have lost its current-panel pointer, but the
+        // registry still owns its native backing values and widget roots.
+        if (g_panel == NULL && !g_panelBindings.empty())
+        {
+            if (!RequestPanelDestroy(g_panelBindings.begin()->first)) return false;
+            if (!g_panelBindings.empty())
+            {
+                g_pendingShow = m;
+                g_hasPending = true;
+                return false; // no new allocations until the real destructor
+            }
+        }
         if (g_panel != NULL)
         {
-            g_panel->show(false);
-            gui->destroy(g_panel);
+            DatapanelGUI* old = g_panel;
+            if (!RequestPanelDestroy(old)) return false;
+            if (g_panelBindings.find(old) != g_panelBindings.end())
+            {
+                g_pendingShow = m;
+                g_hasPending = true;
+                return false;
+            }
             g_panel = NULL;
+            // A deferred native destructor still owns these roots. Their
+            // WidgetRefs keep deletion safe if the game removes them first.
+            g_host = NULL;
+            g_area = NULL;
             ClearTabPanelData();
         }
         MyGUI::Gui& mygui = MyGUI::Gui::getInstance();
@@ -1636,10 +1757,65 @@ namespace
             ErrorLog("ModConfigMenu: createDatapanel failed");
             return false;
         }
+        PanelBindings& bindings = g_panelBindings[g_panel];
+        bindings.host = KeepPanelWidget(g_host);
+        bindings.area = KeepPanelWidget(g_area);
         g_panelRootRef->set(g_host);   // своя подложка: детей панели игра пересоздаёт
         if (g_window != NULL && g_window->tabs != NULL && g_tab != NULL)
             g_window->tabs->setItemData(g_tab, g_panel);
         return true;
+    }
+
+    void AbortPage()
+    {
+        g_resetLine = NULL;
+        g_actionLines.clear();
+        ForgetOwnButtons();
+        DropFocusInside();
+        DetachArea();
+        std::vector<DatapanelGUI*> panels;
+        for (std::map<DatapanelGUI*, PanelBindings>::iterator it = g_panelBindings.begin();
+             it != g_panelBindings.end(); ++it) panels.push_back(it->first);
+        // Register a panel even if creation failed before its roots were kept.
+        if (g_panel != NULL && g_panelBindings.find(g_panel) == g_panelBindings.end())
+            panels.push_back(g_panel);
+        g_panel = NULL;
+        g_current = NULL;
+        g_hasPending = false;
+        g_pendingShow = NULL;
+        for (size_t i = 0; i < panels.size(); ++i) RequestPanelDestroy(panels[i]);
+        // Registered/deferred panels keep their roots in the registry. Roots
+        // of an unsuccessful createDatapanel have no native users.
+        bool hostOwned = false, areaOwned = false;
+        for (std::map<DatapanelGUI*, PanelBindings>::iterator it = g_panelBindings.begin();
+             it != g_panelBindings.end(); ++it)
+        {
+            hostOwned = hostOwned || (it->second.host != NULL && it->second.host->get() == g_host);
+            areaOwned = areaOwned || (it->second.area != NULL && it->second.area->get() == g_area);
+        }
+        MyGUI::Gui* manager = MyGUI::Gui::getInstancePtr();
+        if (manager != NULL && g_host != NULL && !hostOwned) manager->destroyWidget(g_host);
+        if (manager != NULL && g_area != NULL && !areaOwned) manager->destroyWidget(g_area);
+        g_host = NULL;
+        g_area = NULL;
+        ClearTabPanelData();
+    }
+
+    void AbortPageSafe()
+    {
+        __try { AbortPage(); }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            // Keep the registry: freeing its values after partial teardown
+            // would be unsafe. A later real native destructor can release it.
+            g_panel = NULL;
+            g_current = NULL;
+            g_hasPending = false;
+            g_pendingShow = NULL;
+            g_host = NULL;
+            g_area = NULL;
+            ErrorLog("ModConfigMenu: page cleanup failed; backing values retained");
+        }
     }
 
     // MyGUI принимает «#RRGGBB» в подписи за смену цвета; «##» - это «#».
@@ -1676,7 +1852,10 @@ namespace
         std::vector<Setting*> base;
         for (size_t k = 0; k < m->settings.size(); ++k)
             if (m->settings[k]->dyn)
-                m->retired.push_back(m->settings[k]);
+            {
+                if (m->settings[k]->panelOwner != NULL) m->settings[k]->retiring = true;
+                else delete m->settings[k];
+            }
             else
                 base.push_back(m->settings[k]);
         ModEntry* const saved = g_building;
@@ -1704,14 +1883,47 @@ namespace
         g_building = saved;
     }
 
+    bool IsDiagnostic(const Setting* s)
+    {
+        if (s == NULL || s->kind != K_TOGGLE) return false;
+        return !_stricmp(s->key.c_str(), "Debug") || !_stricmp(s->key.c_str(), "DebugLogging") ||
+               !_stricmp(s->key.c_str(), "debug_logging") || !_stricmp(s->key.c_str(), "verboseLog") ||
+               !_stricmp(s->key.c_str(), "LoggingEnabled") ||
+               (!_stricmp(s->section.c_str(), "Debug") &&
+                (!_stricmp(s->key.c_str(), "Log") || !_stricmp(s->key.c_str(), "Logging") ||
+                 !_stricmp(s->key.c_str(), "Enabled"))) ||
+               (!_stricmp(s->section.c_str(), "Logging") && !_stricmp(s->key.c_str(), "Enabled")) ||
+               !_stricmp(s->label.c_str(), "Detailed log") || !_stricmp(s->label.c_str(), "Debug logging") ||
+               !_stricmp(s->label.c_str(), "Logging enabled") ||
+               s->label == Tr("Detailed log") || s->label == Tr("Debug logging");
+    }
+    std::vector<Setting*> DisplayRows(ModEntry* m)
+    {
+        std::vector<Setting*> normal, diagnostic;
+        normal.reserve(m->settings.size());
+        for (size_t i=0; i<m->settings.size(); ++i)
+        {
+            Setting* s=m->settings[i];
+            if (IsDiagnostic(s)) { diagnostic.push_back(s); continue; }
+            if (s->kind == K_SECTION)
+            {
+                bool onlyDiagnostics=true;
+                for (size_t j=i+1;j<m->settings.size() && m->settings[j]->kind != K_SECTION;++j)
+                    if (!IsDiagnostic(m->settings[j])) { onlyDiagnostics=false; break; }
+                if (onlyDiagnostics) continue;
+            }
+            normal.push_back(s);
+        }
+        normal.insert(normal.end(), diagnostic.begin(), diagnostic.end());
+        return normal;
+    }
+
     void ShowMod(ModEntry* m)
     {
         // Недописанное на прежней странице (ползунок, текст) - сейчас,
         // пока её строки живы.
         if (g_current != NULL && g_panel != NULL)
             Poll(true);
-        RebuildRows(m);
-        g_current = m;
         g_resetLine = NULL;
         g_actionLines.clear();
         ForgetOwnButtons();
@@ -1726,6 +1938,10 @@ namespace
             }
         if (!RecreatePanel(m))
             return;
+        // RebuildRows either deletes unowned rows or quarantines backing
+        // values until the old panel's actual native destructor returns.
+        g_current = m;
+        RebuildRows(m);
 
         g_panel->setLineSpacing(24.0f);
         if (m == NULL)
@@ -1739,9 +1955,10 @@ namespace
 
         bool first = true;
         int spacerKeys = 0;             // пустые строки под палитрами - каждой свой ключ
-        for (size_t k = 0; k < m->settings.size(); ++k)
+        const std::vector<Setting*> display = DisplayRows(m);
+        for (size_t k = 0; k < display.size(); ++k)
         {
-            Setting* const s = m->settings[k];
+            Setting* const s = display[k];
             s->line = NULL;
             if (s->kind == K_SECTION)
             {
@@ -1758,6 +1975,7 @@ namespace
                 continue;
             }
             first = false;
+            BindPanelSetting(g_panel, s); // before native constructors can retain &b / &f
 
             if (s->kind == K_ACTION)
             {
@@ -1976,6 +2194,7 @@ namespace
         if (index >= g_ownButtons.size())
             return;
         const OwnButton b = g_ownButtons[index];
+        if (b.ref == NULL || b.ref->get() != sender) return; // stale widget/index from an old page
         if (b.what == OWN_RESET)
         {
             OnResetLine(NULL);
@@ -2245,7 +2464,10 @@ namespace
             g_panel = NULL;
             DropFocusInside();
         }
+        std::map<DatapanelGUI*, PanelBindings>::iterator binding = g_panelBindings.find(self);
+        if (binding != g_panelBindings.end()) binding->second.destroying = true;
         g_origDatapanelDtor(self);
+        ReleasePanelBindings(self);
     }
 
     void BuildTabSafe(OptionsWindow* self)
@@ -2257,9 +2479,7 @@ namespace
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
             ErrorLog("ModConfigMenu: building the Mods tab crashed; tab skipped");
-            g_panel = NULL;
-            g_current = NULL;
-            ClearTabPanelData();
+            AbortPageSafe();
         }
     }
 
@@ -2272,8 +2492,7 @@ namespace
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
             ErrorLog("ModConfigMenu: showing a mod page crashed");
-            g_panel = NULL;
-            g_current = NULL;
+            AbortPageSafe();
         }
     }
 
@@ -2673,6 +2892,14 @@ __declspec(dllexport) void startPlugin()
     const std::string ini = IniDefaults::Prepare(ModuleDir() + "ModConfigMenu.ini");
     g_debug = GetPrivateProfileIntA("ModConfigMenu", "Debug", 0, ini.c_str()) != 0;
 
+    // Ownership release depends on this hook. Do not create native rows if
+    // their real lifetime cannot be observed.
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&DatapanelGUI::_DESTRUCTOR), DatapanelDtor_hook, &g_origDatapanelDtor))
+    {
+        ErrorLog("ModConfigMenu: could not hook DatapanelGUI destructor, no Mods tab");
+        return;
+    }
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&OptionsWindow::create), Create_hook, &g_origCreate))
     {
@@ -2688,9 +2915,6 @@ __declspec(dllexport) void startPlugin()
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&InputHandler::keyUpEvent), KeyUp_hook, &g_origKeyUp))
         ErrorLog("ModConfigMenu: could not hook InputHandler::keyUpEvent");
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&DatapanelGUI::_DESTRUCTOR), DatapanelDtor_hook, &g_origDatapanelDtor))
-        ErrorLog("ModConfigMenu: could not hook DatapanelGUI destructor");
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&OptionsWindow::saveOptions), Save_hook, &g_origSave))
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::saveOptions");
