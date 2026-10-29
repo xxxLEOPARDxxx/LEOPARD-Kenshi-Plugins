@@ -1,0 +1,131 @@
+msgid ""
+msgstr "Language: ru_RU\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "Also add the character name and new skill level to the game's message log."
+msgstr "Также добавлять имя персонажа и новый уровень навыка в игровой журнал."
+
+msgid "Armour smith"
+msgstr "Ковка брони"
+
+msgid "Assassination"
+msgstr "Убийство"
+
+msgid "Athletics"
+msgstr "Атлетика"
+
+msgid "Blunt"
+msgstr "Дробящее оружие"
+
+msgid "Cooking"
+msgstr "Готовка"
+
+msgid "Copy to game log"
+msgstr "Дублировать в игровой журнал"
+
+msgid "Crossbow smith"
+msgstr "Изготовление арбалетов"
+
+msgid "Crossbows"
+msgstr "Арбалеты"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
+msgstr "В RE_Kenshi_log.txt: настройки, повышения навыков и сброс исходных уровней при загрузке."
+
+msgid "Dexterity"
+msgstr "Ловкость"
+
+msgid "Dodge"
+msgstr "Уворот"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Engineering"
+msgstr "Инженерия"
+
+msgid "Farming"
+msgstr "Фермерство"
+
+msgid "First aid"
+msgstr "Медицина"
+
+msgid "Hackers"
+msgstr "Тесаки"
+
+msgid "Heavy weapons"
+msgstr "Тяжёлое оружие"
+
+msgid "Katanas"
+msgstr "Катаны"
+
+msgid "Labouring"
+msgstr "Физический труд"
+
+msgid "Lockpicking"
+msgstr "Взлом"
+
+msgid "Martial arts"
+msgstr "Боевые искусства"
+
+msgid "Medic"
+msgstr "Медицина"
+
+msgid "Melee attack"
+msgstr "Атака"
+
+msgid "Melee defence"
+msgstr "Защита"
+
+msgid "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
+msgstr "Только сообщения о достигнутом целом уровне навыка над персонажами. Без полос опыта и дробных прибавок."
+
+msgid "Perception"
+msgstr "Восприятие"
+
+msgid "Polearms"
+msgstr "Древковое оружие"
+
+msgid "Precision shooting"
+msgstr "Точная стрельба"
+
+msgid "Robotics"
+msgstr "Робототехника"
+
+msgid "Sabres"
+msgstr "Сабли"
+
+msgid "Science"
+msgstr "Наука"
+
+msgid "Selected characters only"
+msgstr "Только выбранные персонажи"
+
+msgid "Show a message when a skill reaches a new whole level."
+msgstr "Показывать сообщение при достижении нового целого уровня навыка."
+
+msgid "Stealth"
+msgstr "Скрытность"
+
+msgid "Strength"
+msgstr "Сила"
+
+msgid "Swimming"
+msgstr "Плавание"
+
+msgid "Thievery"
+msgstr "Воровство"
+
+msgid "Toughness"
+msgstr "Стойкость"
+
+msgid "Track the whole player faction, but only announce gains for selected characters."
+msgstr "Следить за всей фракцией игрока, но сообщать о повышении навыков только выбранных персонажей."
+
+msgid "Turrets"
+msgstr "Турели"
+
+msgid "Weapon smith"
+msgstr "Ковка оружия"

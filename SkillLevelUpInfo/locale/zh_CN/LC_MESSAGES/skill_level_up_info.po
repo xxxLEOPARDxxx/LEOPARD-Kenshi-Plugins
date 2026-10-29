@@ -1,0 +1,131 @@
+msgid ""
+msgstr "Language: zh_CN\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "Also add the character name and new skill level to the game's message log."
+msgstr "同时将角色名称和新的技能等级添加到游戏消息日志。"
+
+msgid "Armour smith"
+msgstr "护甲锻造"
+
+msgid "Assassination"
+msgstr "暗杀"
+
+msgid "Athletics"
+msgstr "运动"
+
+msgid "Blunt"
+msgstr "钝器"
+
+msgid "Cooking"
+msgstr "烹饪"
+
+msgid "Copy to game log"
+msgstr "同时写入游戏日志"
+
+msgid "Crossbow smith"
+msgstr "弩制作"
+
+msgid "Crossbows"
+msgstr "弩"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
+msgstr "在 RE_Kenshi_log.txt 中记录设置、技能升级和读档后的基础等级重置。"
+
+msgid "Dexterity"
+msgstr "敏捷"
+
+msgid "Dodge"
+msgstr "闪避"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Engineering"
+msgstr "工程"
+
+msgid "Farming"
+msgstr "农业"
+
+msgid "First aid"
+msgstr "医疗"
+
+msgid "Hackers"
+msgstr "砍刀"
+
+msgid "Heavy weapons"
+msgstr "重武器"
+
+msgid "Katanas"
+msgstr "刀"
+
+msgid "Labouring"
+msgstr "劳动"
+
+msgid "Lockpicking"
+msgstr "开锁"
+
+msgid "Martial arts"
+msgstr "武术"
+
+msgid "Medic"
+msgstr "医疗"
+
+msgid "Melee attack"
+msgstr "近战攻击"
+
+msgid "Melee defence"
+msgstr "近战防御"
+
+msgid "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
+msgstr "仅在角色头顶显示技能提升到新整数等级的提示。不显示经验条或零碎经验增量。"
+
+msgid "Perception"
+msgstr "感知"
+
+msgid "Polearms"
+msgstr "长柄武器"
+
+msgid "Precision shooting"
+msgstr "射击精准"
+
+msgid "Robotics"
+msgstr "机器人学"
+
+msgid "Sabres"
+msgstr "军刀"
+
+msgid "Science"
+msgstr "科学"
+
+msgid "Selected characters only"
+msgstr "仅所选角色"
+
+msgid "Show a message when a skill reaches a new whole level."
+msgstr "技能达到新的整数等级时显示提示。"
+
+msgid "Stealth"
+msgstr "隐匿"
+
+msgid "Strength"
+msgstr "力量"
+
+msgid "Swimming"
+msgstr "游泳"
+
+msgid "Thievery"
+msgstr "盗窃"
+
+msgid "Toughness"
+msgstr "韧性"
+
+msgid "Track the whole player faction, but only announce gains for selected characters."
+msgstr "跟踪玩家所有角色，但仅提示所选角色的技能提升。"
+
+msgid "Turrets"
+msgstr "炮塔"
+
+msgid "Weapon smith"
+msgstr "武器锻造"

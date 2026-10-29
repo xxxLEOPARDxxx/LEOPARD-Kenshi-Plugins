@@ -1,0 +1,131 @@
+msgid ""
+msgstr "Language: en_GB\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "Also add the character name and new skill level to the game's message log."
+msgstr "Also add the character name and new skill level to the game's message log."
+
+msgid "Armour smith"
+msgstr "Armour smith"
+
+msgid "Assassination"
+msgstr "Assassination"
+
+msgid "Athletics"
+msgstr "Athletics"
+
+msgid "Blunt"
+msgstr "Blunt"
+
+msgid "Cooking"
+msgstr "Cooking"
+
+msgid "Copy to game log"
+msgstr "Copy to game log"
+
+msgid "Crossbow smith"
+msgstr "Crossbow smith"
+
+msgid "Crossbows"
+msgstr "Crossbows"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
+msgstr "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
+
+msgid "Dexterity"
+msgstr "Dexterity"
+
+msgid "Dodge"
+msgstr "Dodge"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Engineering"
+msgstr "Engineering"
+
+msgid "Farming"
+msgstr "Farming"
+
+msgid "First aid"
+msgstr "First aid"
+
+msgid "Hackers"
+msgstr "Hackers"
+
+msgid "Heavy weapons"
+msgstr "Heavy weapons"
+
+msgid "Katanas"
+msgstr "Katanas"
+
+msgid "Labouring"
+msgstr "Labouring"
+
+msgid "Lockpicking"
+msgstr "Lockpicking"
+
+msgid "Martial arts"
+msgstr "Martial arts"
+
+msgid "Medic"
+msgstr "Medic"
+
+msgid "Melee attack"
+msgstr "Melee attack"
+
+msgid "Melee defence"
+msgstr "Melee defence"
+
+msgid "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
+msgstr "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
+
+msgid "Perception"
+msgstr "Perception"
+
+msgid "Polearms"
+msgstr "Polearms"
+
+msgid "Precision shooting"
+msgstr "Precision shooting"
+
+msgid "Robotics"
+msgstr "Robotics"
+
+msgid "Sabres"
+msgstr "Sabres"
+
+msgid "Science"
+msgstr "Science"
+
+msgid "Selected characters only"
+msgstr "Selected characters only"
+
+msgid "Show a message when a skill reaches a new whole level."
+msgstr "Show a message when a skill reaches a new whole level."
+
+msgid "Stealth"
+msgstr "Stealth"
+
+msgid "Strength"
+msgstr "Strength"
+
+msgid "Swimming"
+msgstr "Swimming"
+
+msgid "Thievery"
+msgstr "Thievery"
+
+msgid "Toughness"
+msgstr "Toughness"
+
+msgid "Track the whole player faction, but only announce gains for selected characters."
+msgstr "Track the whole player faction, but only announce gains for selected characters."
+
+msgid "Turrets"
+msgstr "Turrets"
+
+msgid "Weapon smith"
+msgstr "Weapon smith"
