@@ -93,14 +93,14 @@
       "[b]Золотой текст с анимацией.[/b] Надпись поднимается над персонажем и плавно исчезает, сохраняя вид исходной механики xp_info.",
       "[b]Настройки в MCM.[/b] Можно ограничить сообщения выбранными персонажами и включить дублирование в игровой журнал.",
       "Меньше лишних сообщений: после загрузки и повторного включения текущие уровни принимаются за исходные; старые повышения не высыпаются на экран.",
-      "[b]Начало у головы.[/b] Точка появления берётся у головы персонажа с учётом его модели и позы, затем сохраняются подъём и плавное затухание."
+      "[b]Исправлена стартовая высота.[/b] Точка появления учитывает кость модели или запасной отступ; надпись поднимается и плавно затухает. Точное положение зависит от модели персонажа."
     ],
     "en": [
       "[b]Whole-level increases only.[/b] The skill name and new level appear above the character, without XP bars or notifications for every small gain.",
       "[b]Animated gold text.[/b] Messages rise above the character and fade smoothly, preserving the original xp_info presentation.",
       "[b]MCM settings.[/b] Limit messages to selected characters and optionally copy them to the game log.",
       "Less notification noise: after loading or re-enabling, current levels become the baseline instead of replaying old increases.",
-      "[b]Start at the head.[/b] The starting point follows the character's head for their model and pose, preserving upward movement and smooth fading."
+      "[b]Corrected starting height.[/b] The starting point uses a model bone or fallback offset, preserving upward movement and fading. Exact placement depends on the character model."
     ]
   },
   "MultiXPMining": {

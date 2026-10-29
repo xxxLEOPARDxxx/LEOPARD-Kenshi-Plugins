@@ -2,7 +2,7 @@ SKILL LEVEL UP INFO
 
 ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 1 (29–30.10.2026)
 
-  * Начало метки у головы: голова в координатах мира минус позиция
+  * Расчёт начала метки: кость головы в координатах мира минус позиция
     персонажа, плюс 0.4 по вертикали. Учитывается поза и размер модели;
     используются Bip01 Head, Head, head. Нет подходящей кости —
     безопасный запасной отступ 2.6. Поиск только при создании метки,
@@ -38,7 +38,7 @@ SKILL LEVEL UP INFO
 
 VERSION 1 CHANGES (29–30 OCTOBER 2026)
 
-  * Labels start at the head: headWorld minus characterPosition, plus
+  * Label placement uses headWorld minus characterPosition, plus
     0.4 world Y. Uses Bip01 Head / Head / head with pose/model validation
     and a bounded 2.6 fallback. At most three bone queries per new label;
     stable scans make none. Native character tracking remains in use.
@@ -121,3 +121,13 @@ from the running game, confirming that the offset is added in world space.
 Nineteen regressions cover tall/short/prone poses, translation, invalid
 or missing bones and no-event overhead. The game still owns rising, fade
 and label destruction; the plugin keeps no live label/bone cache.
+
+
+ВИЗУАЛЬНАЯ ПРОВЕРКА / VISUAL ACCEPTANCE (30.10.2026)
+
+В сборке пользователя новая надпись начинается примерно от торса,
+а не строго от головы. Пользователь принял текущий результат и попросил
+оставить его. Точное совпадение с головой для всех моделей не заявляется.
+In the user's mod list the label starts around the torso rather than
+exactly at the head. The user accepted this result and requested no
+further anchor changes. Exact head placement for every model is not claimed.
