@@ -224,6 +224,9 @@ SKIP_DIRS = set(["memory", "strings"])
 
 # One runtime catalog per language: prefer compiled MO when it exists.
 # PO-only upstream plugins retain PO until their loader is migrated.
+
+ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=None,version="1",tags=["Gameplay","RE_Kenshi"],lang=True,drop=[],en="Focused repair-bed AI fixes and optional automatic wear repair for skeletons and characters with prosthetics."))
+
 def runtime_file_allowed(mod, folder, name):
     rel = os.path.relpath(os.path.join(folder, name), mod_dir(mod)).replace(os.sep, "/")
     if mod == "KenshiRotate" and rel.startswith("lang/"):

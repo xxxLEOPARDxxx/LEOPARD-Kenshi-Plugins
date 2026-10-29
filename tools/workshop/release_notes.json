@@ -75,13 +75,15 @@
       "[b]«Всегда брать эти предметы».[/b] Список имён или ID позволяет забирать нужные вещи независимо от категории, цены и цены за вес. Вместимость и правила кражи сохраняются.",
       "[b]Защита хранилищ игрока.[/b] По умолчанию сбор больше не забирает вещи из собственных построек, даже если их инвентарь открыт. Раскладка ALT+INSERT продолжает работать.",
       "[b]Подбор отдельных вещей с земли.[/b] По желанию персонаж сам подходит к подходящим предметам и поднимает их. Настройка выключена по умолчанию.",
-      "[b]Длинный список без обрезания.[/b] Для полного редактирования списка обязательных предметов нужен Mod Config Menu версии 10 или новее."
+      "[b]Длинный список без обрезания.[/b] Для полного редактирования списка обязательных предметов нужен Mod Config Menu версии 10 или новее.",
+      "[b]Ближайшие вещи с земли первыми.[/b] Маршрут начинается у персонажа, затем выбирает ближайшую вещь к предыдущей цели. Цена за вес больше не отправляет его сначала к далёкой добыче."
     ],
     "en": [
       "[b]Required-item list.[/b] Always take items by name or ID regardless of category, value and value-per-weight filters. Capacity and theft rules still apply.",
       "[b]Protect player storage.[/b] Looting ignores your own building inventories by default, even when their window is open. ALT+INSERT deposit still works.",
       "[b]Pick up loose ground items.[/b] Optionally, the character walks to suitable items and picks them up. Disabled by default.",
-      "[b]Long lists without truncation.[/b] Mod Config Menu version 10 or newer is needed to edit the full required-item list."
+      "[b]Long lists without truncation.[/b] Mod Config Menu version 10 or newer is needed to edit the full required-item list.",
+      "[b]Nearest ground items first.[/b] The route starts with the item nearest the character, then chooses the nearest item to the previous target. Value per weight no longer sends the character to distant loot first."
     ]
   },
   "SkillLevelUpInfo": {
@@ -90,13 +92,15 @@
       "[b]Только повышение целого уровня.[/b] Над персонажем появляются название навыка и его новый уровень; полос опыта и сообщений о каждом приросте нет.",
       "[b]Золотой текст с анимацией.[/b] Надпись поднимается над персонажем и плавно исчезает, сохраняя вид исходной механики xp_info.",
       "[b]Настройки в MCM.[/b] Можно ограничить сообщения выбранными персонажами и включить дублирование в игровой журнал.",
-      "Меньше лишних сообщений: после загрузки и повторного включения текущие уровни принимаются за исходные; старые повышения не высыпаются на экран."
+      "Меньше лишних сообщений: после загрузки и повторного включения текущие уровни принимаются за исходные; старые повышения не высыпаются на экран.",
+      "[b]Начало у головы.[/b] Точка появления берётся у головы персонажа с учётом его модели и позы, затем сохраняются подъём и плавное затухание."
     ],
     "en": [
       "[b]Whole-level increases only.[/b] The skill name and new level appear above the character, without XP bars or notifications for every small gain.",
       "[b]Animated gold text.[/b] Messages rise above the character and fade smoothly, preserving the original xp_info presentation.",
       "[b]MCM settings.[/b] Limit messages to selected characters and optionally copy them to the game log.",
-      "Less notification noise: after loading or re-enabling, current levels become the baseline instead of replaying old increases."
+      "Less notification noise: after loading or re-enabling, current levels become the baseline instead of replaying old increases.",
+      "[b]Start at the head.[/b] The starting point follows the character's head for their model and pose, preserving upward movement and smooth fading."
     ]
   },
   "MultiXPMining": {
@@ -161,6 +165,23 @@
       "[b]Choose which rows to show.[/b] Show or hide each counter in MCM without a separate hotkey.",
       "[b]Three languages.[/b] Labels and settings are available in English, Russian and Chinese.",
       "Only changed values are refreshed, and records for removed characters no longer accumulate. Stat Colours compatibility is preserved."
+    ]
+  },
+  "AIFixed": {
+    "version": "1",
+    "ru": [
+      "[b]Скелетов несут на ремкровати.[/b] Если подходящая свободная ремкровать с питанием есть в том же поселении, спасатель предпочитает её обычной кровати.",
+      "[b]Оставаться до полной починки.[/b] В работающей ремкровати роботизированные части больше не считаются уже вылеченными только из-за отсутствия обычных ран.",
+      "[b]Самостоятельный ремонт износа.[/b] Персонажи игрока - скелеты и живые с протезами - могут сами идти чиниться после превышения заданного порога, по умолчанию 50.",
+      "[b]Раздельные настройки.[/b] Правки ремонта и самостоятельный поход можно включать отдельно; интерфейс переведён на русский, английский и китайский.",
+      "[b]Без старых назначений между мирами.[/b] Временные записи ремонта очищаются при загрузке и новой игре; повторное использование объектов не переносит прежние назначения."
+    ],
+    "en": [
+      "[b]Carry skeletons to repair beds.[/b] A suitable free powered repair bed in the same settlement is preferred over an ordinary bed when rescuing a skeleton.",
+      "[b]Stay until fully repaired.[/b] Robotic parts in a working repair bed are no longer treated as healed merely because there are no ordinary wounds.",
+      "[b]Automatic wear repair.[/b] Player skeletons and biological characters with prosthetics can seek repairs when wear exceeds a configurable threshold, 50 by default.",
+      "[b]Separate controls.[/b] Bed fixes and automatic repair trips can be enabled independently, with English, Russian and Chinese interface text.",
+      "[b]No old assignments between worlds.[/b] Temporary repair records are cleared on loading and new games; reused objects do not inherit old assignments."
     ]
   }
 }
