@@ -20,7 +20,7 @@ msgid "Cooking"
 msgstr "烹饪"
 
 msgid "Copy to game log"
-msgstr "同时写入游戏日志"
+msgstr "将升级消息写入游戏日志"
 
 msgid "Crossbow smith"
 msgstr "弩制作"

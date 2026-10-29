@@ -15,6 +15,7 @@
 #include <kenshi/gui/CharacterStatsWindow.h>
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/gui/ScreenLabel.h>
+#include "HeadAnchor.h"
 #include <map>
 #include <string>
 #include <sstream>
@@ -108,14 +109,14 @@ namespace
                             message << Name(j) << " " << next.levels[j];
                         }
                     const std::string text = message.str();
-                    // Match the installed xp_info: gold (1,.84,.35), medium,
-                    // RS_NORMAL, tracked offset (0,2,0). ScreenLabel owns the
-                    // upward motion, fade and destruction; Debug labels do not.
+                    // Keep xp_info's gold, size and native rise/fade. Start at
+                    // the actual head: trackingOffset is relative world space.
+                    // ScreenLabel owns movement, fade and destruction.
                     ScreenLabel* const label = gui->createScreenLabel(text,
                         MyGUI::Colour(1.0f, 0.84f, 0.35f), ScreenLabel::LS_MEDIUM, ScreenLabel::RS_NORMAL);
                     if (label != NULL)
                     {
-                        label->setTracking(h, Ogre::Vector3(0, 2, 0));
+                        label->setTracking(h, SkillHeadAnchor::TrackingOffset(c));
                     }
                     if (PluginDiagnostics::Enabled())
                         DebugLog("SkillLevelUpInfo: " + c->displayName + " -> " + text);

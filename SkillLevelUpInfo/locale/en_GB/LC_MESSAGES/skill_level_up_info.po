@@ -20,7 +20,7 @@ msgid "Cooking"
 msgstr "Cooking"
 
 msgid "Copy to game log"
-msgstr "Copy to game log"
+msgstr "Level-ups in game log"
 
 msgid "Crossbow smith"
 msgstr "Crossbow smith"

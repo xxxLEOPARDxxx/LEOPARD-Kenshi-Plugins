@@ -2,6 +2,12 @@ SKILL LEVEL UP INFO
 
 ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 1 (29–30.10.2026)
 
+  * Начало метки у головы: голова в координатах мира минус позиция
+    персонажа, плюс 0.4 по вертикали. Учитывается поза и размер модели;
+    используются Bip01 Head, Head, head. Нет подходящей кости —
+    безопасный запасной отступ 2.6. Поиск только при создании метки,
+    до трёх запросов; постоянные проходы не опрашивают кости.
+
   * Уведомления о целых уровнях навыков своих персонажей: «Сила 25»,
     без дробных прибавок опыта и полос. Проверяются 33 базовых навыка
     без бонусов экипировки. Несколько уровней за проход дают итоговый
@@ -31,6 +37,11 @@ SKILL LEVEL UP INFO
     исходные .po остаются в репозитории.
 
 VERSION 1 CHANGES (29–30 OCTOBER 2026)
+
+  * Labels start at the head: headWorld minus characterPosition, plus
+    0.4 world Y. Uses Bip01 Head / Head / head with pose/model validation
+    and a bounded 2.6 fallback. At most three bone queries per new label;
+    stable scans make none. Native character tracking remains in use.
 
   * Whole skill-level notifications for player characters, such as
     "Strength 25", without fractional XP messages or bars. The plugin
@@ -90,3 +101,23 @@ MCM -> Skill Level Up Info: включение, только выбранные 
 Ушедшие герои удаляются из кэша на ближайшем проходе; загрузка и новая
 игра сбрасывают исходные уровни. Первый проход после включения молчит.
 Подробный журнал — последняя настройка MCM, по умолчанию выключен.
+
+
+ДВА ВИДА ЗАПИСЕЙ / TWO DIFFERENT OUTPUTS
+
+«Повышения в журнале игры» (LogToGame) — необязательная копия имени героя
+и достигнутых уровней в обычных сообщениях игры. «Подробный журнал» (Debug)
+— техническая диагностика в RE_Kenshi_log.txt для поиска неисправностей.
+Оба по умолчанию выключены и независимы; для всплывающих надписей ни один
+не обязателен. Debug остаётся последним пунктом MCM.
+
+“Level-ups in game log” (LogToGame) optionally copies the character name
+and reached levels to the game's messages. “Detailed log” (Debug) writes
+technical diagnostics to RE_Kenshi_log.txt. Both are independent and off
+by default; neither is required for floating labels. Debug stays last.
+
+Head-anchor verification: native ScreenLabel setTracking/update were read
+from the running game, confirming that the offset is added in world space.
+Nineteen regressions cover tall/short/prone poses, translation, invalid
+or missing bones and no-event overhead. The game still owns rising, fade
+and label destruction; the plugin keeps no live label/bone cache.

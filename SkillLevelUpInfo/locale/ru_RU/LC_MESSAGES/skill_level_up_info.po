@@ -20,7 +20,7 @@ msgid "Cooking"
 msgstr "Готовка"
 
 msgid "Copy to game log"
-msgstr "Дублировать в игровой журнал"
+msgstr "Повышения в журнале игры"
 
 msgid "Crossbow smith"
 msgstr "Изготовление арбалетов"
