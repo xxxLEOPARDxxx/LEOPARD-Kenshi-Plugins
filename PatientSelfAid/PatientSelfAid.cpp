@@ -43,6 +43,7 @@
 #include <cstdio>
 #include <map>
 #include <string>
+#include <vector>
 
 #include <Debug.h>
 #include <core/Functions.h>
@@ -50,7 +51,9 @@
 #include <kenshi/Globals.h>
 #include <kenshi/GameWorld.h>
 #include <kenshi/PlayerInterface.h>
+#include <kenshi/SaveFileSystem.h>
 #include <kenshi/Character.h>
+#include <kenshi/MedicalSystem.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Tasker.h>
 #include <kenshi/AI/AI.h>
@@ -69,6 +72,9 @@ namespace
 
     bool g_enabled = true;
     bool g_debug = false;
+    volatile LONG g_loadGeneration = 0;
+    LONG g_seenGeneration = 0;
+    void ResetState();
 
     // Как часто смотреть на отряд. Чаще незачем: лечение длится секунды.
     const DWORD SCAN_MS = 500;
@@ -123,6 +129,7 @@ namespace
             GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_debug =
             GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
+        ResetState();
     }
 
 
@@ -221,14 +228,13 @@ namespace
     // Кого персонаж лечит сейчас, если лечит. Смотрим цель, а не действие:
     // пока лекарь идёт к пациенту, действие у него - ходьба, а цель уже
     // лечение.
-    Character* PatientOf(Character* medic)
+    Character* PatientOf(Character* medic, const TaskMatch* currentGoal)
     {
-        OrdersReceiver* const orders = medic->getOrdersReciever();
-        if (orders == NULL)
+        if (currentGoal == NULL)
             return NULL;
 
         // Лечение по приказу игрока: пациент прямо в цели.
-        const TaskMatch& goal = orders->getCurrentGoal();
+        const TaskMatch& goal = *currentGoal;
         if (IsTreating(goal.key()))
         {
             Character* const target = goal.subtarget.getCharacter();
@@ -258,17 +264,27 @@ namespace
         DWORD lastOrder;     // когда отдали приказ, 0 - ещё не отдавали
         int tries;           // сколько раз отдавали за это лечение
         std::string logged;  // последнее, что писали в журнал
+        bool live;
+
+        PatientState() : lastOrder(0), tries(0), live(false) {}
     };
 
-    // Ключ - указатель, но только для поиска: разыменовываем мы лишь
-    // персонажей из живого списка игрока, а записи о тех, кого в этом
-    // проходе не лечат, выбрасываются.
-    std::map<Character*, PatientState> g_patients;
+    // Serial-bearing handles prevent a recycled Character address inheriting
+    // another patient's retry count. Only this scan's live patients survive.
+    std::map<hand, PatientState> g_patients;
 
 
-    void Note(PatientState& state, Character* patient, const std::string& what)
+    void Note(PatientState& state, Character* patient, Character* medic,
+              TaskType goal, TaskType action, const char* reason,
+              TaskType order = NULL_TASK)
     {
-        if (!g_debug || state.logged == what)
+        if (!g_debug)
+            return;
+        std::string what = "treated by " + medic->displayName +
+            " (goal " + TaskText(goal) + ", action " + TaskText(action) + "): " + reason;
+        if (order != NULL_TASK)
+            what += TaskText(order) + " on self, try " + std::string(1, char('0' + state.tries));
+        if (state.logged == what)
             return;
 
         state.logged = what;
@@ -283,31 +299,54 @@ namespace
     }
 
 
+    // needsFirstAid_robot also applies the AI's target-selection rules. A
+    // biological patient with replacement limbs can be omitted there even
+    // while another character is repairing those limbs. The medical system
+    // already scores robot first aid independently of the patient's race.
+    // Keep ordinary injury treatment first; wear alone needs a repair bed.
+    bool NeedsRobotAid(Character* patient, AI* ai, const hand& self,
+                       const Ogre::Vector3& where)
+    {
+        if (ai->needsFirstAid_robot(self, where))
+            return true;
+        MedicalSystem* const med = patient->getMedical();
+        return med != NULL && med->hasRobotics() &&
+               med->scoreFirstAidNeed(true) > 0.0f;
+    }
+
+
     void Handle(Character* patient, Character* medic, PatientState& state)
     {
         const TaskType goal = GoalOf(patient);
         const TaskType action = ActionOf(patient);
 
-        const std::string status =
-            "treated by " + medic->displayName +
-            " (goal " + TaskText(goal) + ", action " + TaskText(action) + ")";
-
         if (patient->isDead() || patient->isUnconcious() || patient->isDown())
         {
-            Note(state, patient, status + ": down or unconscious, cannot help");
+            Note(state, patient, medic, goal, action, "down or unconscious, cannot help");
             return;
         }
 
         // Уже лечит себя, лечит кого-то ещё или занят другим - не мешаем.
         if (IsTreating(goal))
         {
-            Note(state, patient, status + ": already treating someone");
+            Note(state, patient, medic, goal, action, "already treating someone");
             return;
         }
 
         if (!IsWaiting(goal, action))
         {
-            Note(state, patient, status + ": busy with something else");
+            Note(state, patient, medic, goal, action, "busy with something else");
+            return;
+        }
+
+        // Failed orders are bounded before repeating medical/inventory queries.
+        const DWORD now = GetTickCount();
+        if (state.lastOrder != 0 && now - state.lastOrder < RETRY_MS)
+            return;
+        if (state.tries >= MAX_TRIES)
+        {
+            Note(state, patient, medic, goal, action,
+                 "the order does not stick, giving up for this treatment");
             return;
         }
 
@@ -322,30 +361,18 @@ namespace
         TaskType order = NULL_TASK;
         if (ai->needsFirstAid(self, where) && ai->haveFirstAidKit(self, where))
             order = FIRST_AID_ORDER;
-        else if (ai->needsFirstAid_robot(self, where) &&
+        else if (NeedsRobotAid(patient, ai, self, where) &&
                  ai->haveFirstAidKit_robot(self, where))
             order = FIRST_AID_ROBOT;
 
         if (order == NULL_TASK)
         {
-            Note(state, patient, status + ": no kit or nothing to treat");
-            return;
-        }
-
-        const DWORD now = GetTickCount();
-
-        if (state.lastOrder != 0 && now - state.lastOrder < RETRY_MS)
-            return;
-
-        if (state.tries >= MAX_TRIES)
-        {
-            Note(state, patient, status +
-                 ": the order does not stick, giving up for this treatment");
+            Note(state, patient, medic, goal, action, "no kit or nothing to treat");
             return;
         }
 
         if (state.tries > 0)
-            Note(state, patient, status + ": previous order did not stick");
+            Note(state, patient, medic, goal, action, "previous order did not stick");
 
         OrdersReceiver* const orders = patient->getOrdersReciever();
         if (orders == NULL)
@@ -357,171 +384,162 @@ namespace
         state.lastOrder = now;
         ++state.tries;
 
-        Note(state, patient, status + ": ordered " + TaskText(order) +
-             " on self, try " + std::string(1, char('0' + state.tries)));
+        Note(state, patient, medic, goal, action, "ordered ", order);
     }
 
 
-    // Ближайший к пациенту персонаж отряда, который сейчас лечит или
-    // чинит, - в пределах NEAR_UNITS. NULL - такого рядом нет.
-    Character* NearbyMedic(const lektor<Character*>& squad, Character* patient)
+    struct Observed
     {
-        const Ogre::Vector3 at = patient->getPosition();
-        const float limit = NEAR_UNITS * NEAR_UNITS;
+        Character* character;
+        Character* medic;
+        Character* target;
+        TaskType goal;
+        Ogre::Vector3 position;
+    };
+    std::vector<Observed> g_squad;
+    std::vector<unsigned> g_medics;
 
+    Character* NearbyMedic(const Observed& patient)
+    {
         Character* best = NULL;
-        float bestDistance = limit;
-
-        for (unsigned int i = 0; i < squad.size(); ++i)
+        float bestDistance = NEAR_UNITS * NEAR_UNITS;
+        for (size_t i = 0; i < g_medics.size(); ++i)
         {
-            Character* const other = squad[i];
-            if (other == NULL || other == patient)
-                continue;
-            if (!IsTreating(GoalOf(other)))
-                continue;
-
-            const float distance = (other->getPosition() - at).squaredLength();
+            const Observed& other = g_squad[g_medics[i]];
+            if (other.character == patient.character) continue;
+            const float distance = (other.position - patient.position).squaredLength();
             if (distance <= bestDistance)
             {
-                best = other;
+                best = other.character;
                 bestDistance = distance;
             }
         }
-
         return best;
     }
 
-
-    // Только для журнала. Персонаж стоит смирно, ему есть что лечить и
-    // есть чем, а лекаря мы не нашли - значит, лекарь занят задачей,
-    // которую плагин не узнаёт. Пишем цели всех остальных в отряде, чтобы
-    // по журналу было видно, какую. Один раз на смену набора целей.
-    std::map<Character*, std::string> g_unexplained;
-
-    void NoteUnexplainedWaits(const lektor<Character*>& squad,
-                              const std::map<Character*, Character*>& treated)
+    struct WaitState
     {
-        std::map<Character*, std::string> seen;
+        std::string goals;
+        bool live;
+        WaitState() : live(false) {}
+    };
+    std::map<hand, WaitState> g_unexplained;
 
-        for (unsigned int i = 0; i < squad.size(); ++i)
+    void NoteUnexplainedWaits()
+    {
+        for (std::map<hand, WaitState>::iterator i = g_unexplained.begin(); i != g_unexplained.end(); ++i)
+            i->second.live = false;
+        for (size_t i = 0; i < g_squad.size(); ++i)
         {
-            Character* const c = squad[i];
-            if (c == NULL || treated.find(c) != treated.end())
-                continue;
-            if (GoalOf(c) != STAND_STILL)
-                continue;
-            if (c->isDead() || c->isUnconcious() || c->isDown())
-                continue;
-
+            const Observed& observed = g_squad[i];
+            Character* const c = observed.character;
+            if (observed.medic != NULL || observed.goal != STAND_STILL) continue;
+            if (c->isDead() || c->isUnconcious() || c->isDown()) continue;
             AI* const ai = c->getAI();
-            if (ai == NULL)
-                continue;
-
+            if (ai == NULL) continue;
             const hand self = ai->getHandle();
-            const Ogre::Vector3 where = c->getPosition();
+            const Ogre::Vector3& where = observed.position;
             const bool needs =
                 (ai->needsFirstAid(self, where) && ai->haveFirstAidKit(self, where)) ||
-                (ai->needsFirstAid_robot(self, where) &&
-                 ai->haveFirstAidKit_robot(self, where));
-            if (!needs)
-                continue;
+                (NeedsRobotAid(c, ai, self, where) && ai->haveFirstAidKit_robot(self, where));
+            if (!needs) continue;
 
             std::string goals;
-            for (unsigned int j = 0; j < squad.size(); ++j)
+            for (size_t j = 0; j < g_squad.size(); ++j)
             {
-                Character* const other = squad[j];
-                if (other == NULL || other == c)
-                    continue;
-                const TaskType g = GoalOf(other);
-                if (g == NULL_TASK || g == IDLE)
-                    continue;
-                goals += " " + other->displayName + "=" + TaskText(g);
+                const Observed& other = g_squad[j];
+                if (other.character == c || other.goal == NULL_TASK || other.goal == IDLE) continue;
+                goals += " " + other.character->displayName + "=" + TaskText(other.goal);
             }
-
-            seen[c] = goals;
-
-            std::map<Character*, std::string>::iterator old = g_unexplained.find(c);
-            if (old != g_unexplained.end() && old->second == goals)
-                continue;
-
+            std::pair<std::map<hand, WaitState>::iterator, bool> entry =
+                g_unexplained.insert(std::make_pair(self, WaitState()));
+            WaitState& state = entry.first->second;
+            state.live = true;
+            if (!entry.second && state.goals == goals) continue;
+            state.goals.swap(goals);
             DebugLog("PatientSelfAid: " + c->displayName +
                      " stands still with a kit, but no medic was recognised;"
-                     " squad goals:" + goals);
+                     " squad goals:" + state.goals);
         }
-
-        g_unexplained.swap(seen);
+        for (std::map<hand, WaitState>::iterator i = g_unexplained.begin(); i != g_unexplained.end();)
+            if (!i->second.live) g_unexplained.erase(i++); else ++i;
     }
 
+    void ResetState()
+    {
+        g_patients.clear();
+        g_unexplained.clear();
+        std::vector<Observed>().swap(g_squad);
+        std::vector<unsigned>().swap(g_medics);
+    }
 
     void Scan()
     {
-        if (ou == NULL || ou->player == NULL)
-            return;
-
+        if (!g_enabled) return;
+        if (ou == NULL || ou->player == NULL) { ResetState(); return; }
         const lektor<Character*>& squad = ou->player->playerCharacters;
-
-        // Кого лечат в этом проходе и кто. Записи о прочих выбросим.
-        std::map<Character*, Character*> treated;
-
-        for (unsigned int i = 0; i < squad.size(); ++i)
+        // Reuse buffers while a roster is stable; release excessive old capacity
+        // after large roster shrinkage. Never create a local owning lektor.
+        g_squad.clear();
+        g_medics.clear();
+        if (g_squad.capacity() > 2 * squad.size() + 64)
+            std::vector<Observed>().swap(g_squad);
+        if (g_medics.capacity() > 2 * squad.size() + 64)
+            std::vector<unsigned>().swap(g_medics);
+        g_squad.reserve(squad.size());
+        g_medics.reserve(squad.size());
+        for (unsigned i = 0; i < squad.size(); ++i)
         {
-            Character* const medic = squad[i];
-            if (medic == NULL)
-                continue;
-
-            Character* const patient = PatientOf(medic);
-            if (patient == NULL || patient == medic ||
-                !patient->isPlayerCharacter())
-                continue;
-
-            treated[patient] = medic;
+            Character* const c = squad[i];
+            if (c == NULL) continue;
+            Observed observed;
+            observed.character = c;
+            observed.medic = NULL;
+            OrdersReceiver* const orders = c->getOrdersReciever();
+            const TaskMatch* const goal = orders != NULL ? &orders->getCurrentGoal() : NULL;
+            observed.goal = goal != NULL ? goal->key() : NULL_TASK;
+            observed.target = PatientOf(c, goal);
+            if (observed.goal == STAND_STILL || IsTreating(observed.goal))
+                observed.position = c->getPosition();
+            if (IsTreating(observed.goal))
+                g_medics.push_back(static_cast<unsigned>(g_squad.size()));
+            g_squad.push_back(observed);
         }
 
-        // Второй способ - по соседству. Работа «ремонт роботов» своего
-        // текущего пациента не держит ни в цели, ни в выполняемой задаче
-        // (по журналу 25.09: у лекарей JOB_REPAIR_ROBOT, а пациента нигде
-        // нет), и первый способ её не видит. Зато видно другое: пациент
-        // стоит смирно, а рядом с ним работает лекарь из отряда. Кто ещё
-        // может велеть стоять смирно - стража при досмотре, - тот не из
-        // отряда, и лечащего рядом тогда нет.
-        for (unsigned int i = 0; i < squad.size(); ++i)
+        // Explicit task target has priority, as before. Require membership in
+        // the current roster before reading the target or retaining its handle.
+        for (size_t i = 0; i < g_squad.size(); ++i)
         {
-            Character* const patient = squad[i];
-            if (patient == NULL || treated.find(patient) != treated.end())
-                continue;
-            if (GoalOf(patient) != STAND_STILL)
-                continue;
-
-            Character* const medic = NearbyMedic(squad, patient);
-            if (medic != NULL)
-                treated[patient] = medic;
+            Character* const medic = g_squad[i].character;
+            Character* const patient = g_squad[i].target;
+            if (patient == NULL || patient == medic) continue;
+            for (size_t j = 0; j < g_squad.size(); ++j)
+                if (g_squad[j].character == patient)
+                {
+                    g_squad[j].medic = medic;
+                    break;
+                }
         }
-
-        std::map<Character*, PatientState> kept;
-
-        for (std::map<Character*, Character*>::iterator it = treated.begin();
-             it != treated.end(); ++it)
+        for (size_t i = 0; i < g_squad.size(); ++i)
         {
-            std::map<Character*, PatientState>::iterator old =
-                g_patients.find(it->first);
-
-            PatientState state;
-            if (old != g_patients.end())
-                state = old->second;
-            else
-            {
-                state.lastOrder = 0;
-                state.tries = 0;
-            }
-
-            Handle(it->first, it->second, state);
-            kept[it->first] = state;
+            Observed& patient = g_squad[i];
+            if (patient.medic == NULL && patient.goal == STAND_STILL)
+                patient.medic = NearbyMedic(patient);
         }
-
-        g_patients.swap(kept);
-
-        if (g_debug)
-            NoteUnexplainedWaits(squad, treated);
+        for (std::map<hand, PatientState>::iterator i = g_patients.begin(); i != g_patients.end(); ++i)
+            i->second.live = false;
+        for (size_t i = 0; i < g_squad.size(); ++i)
+        {
+            const Observed& patient = g_squad[i];
+            if (patient.medic == NULL) continue;
+            const hand key(patient.character);
+            PatientState& state = g_patients[key];
+            state.live = true;
+            Handle(patient.character, patient.medic, state);
+        }
+        for (std::map<hand, PatientState>::iterator i = g_patients.begin(); i != g_patients.end();)
+            if (!i->second.live) g_patients.erase(i++); else ++i;
+        if (g_debug) NoteUnexplainedWaits();
     }
 
 
@@ -535,13 +553,36 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
         g_origGuiUpdate(thisptr);
+        if (!g_enabled) return;
 
         const DWORD now = GetTickCount();
         if (now - g_lastScan < SCAN_MS)
             return;
 
+        const LONG generation = InterlockedCompareExchange(&g_loadGeneration, 0, 0);
+        if (generation != g_seenGeneration)
+        {
+            ResetState();
+            g_seenGeneration = generation;
+            if (g_debug) DebugLog("PatientSelfAid: save load, treatment state reset");
+        }
         g_lastScan = now;
         Scan();
+    }
+
+    void (*g_origLoad)(Character*, GameSaveState*) = NULL;
+    void Load(Character* character, GameSaveState* state)
+    {
+        g_origLoad(character, state);
+        if (g_enabled && character != NULL && character->isPlayerCharacter())
+            InterlockedIncrement(&g_loadGeneration);
+    }
+
+    void (*g_origNewGame)(SaveFileSystem*) = NULL;
+    void NewGame(SaveFileSystem* self)
+    {
+        InterlockedIncrement(&g_loadGeneration);
+        g_origNewGame(self);
     }
 }
 
@@ -555,7 +596,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     if (api->version >= 2)
         api->info(api, Tr("A patient being treated keeps treating himself instead of lying idle."));
     api->section(api, Tr("Treatment"));
-    api->toggle(api, "PatientSelfAid", "Enabled", Tr("Enabled"), Tr("A patient being treated treats himself too."), 1, MCM_RESTART);
+    api->toggle(api, "PatientSelfAid", "Enabled", Tr("Enabled"), Tr("A patient being treated treats himself too."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "PatientSelfAid", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: who is treated, who treats, what the patient is doing and whether the order took. Written only when the state changes."), 0, 0);
 }
@@ -564,12 +605,6 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 __declspec(dllexport) void startPlugin()
 {
     LoadSettings();
-
-    if (!g_enabled)
-    {
-        DebugLog("PatientSelfAid: disabled in the ini");
-        return;
-    }
 
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
@@ -581,5 +616,11 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
-    DebugLog("PatientSelfAid: installed");
+    if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::_NV_loadFromSerialise),
+                          Load, &g_origLoad) != KenshiLib::SUCCESS)
+        ErrorLog("PatientSelfAid: cannot hook character load");
+    if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),
+                          NewGame, &g_origNewGame) != KenshiLib::SUCCESS)
+        ErrorLog("PatientSelfAid: cannot hook new game");
+    if (g_debug) DebugLog("PatientSelfAid: installed");
 }
