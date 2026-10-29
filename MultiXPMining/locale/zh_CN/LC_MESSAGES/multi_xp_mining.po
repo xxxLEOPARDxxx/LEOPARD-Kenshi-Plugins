@@ -1,0 +1,86 @@
+msgid ""
+msgstr "Language: zh_CN\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "Allow extra skill training at this source."
+msgstr "允许在此来源进行额外技能训练。"
+
+msgid "Cap multiplier"
+msgstr "上限倍率"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Details in RE_Kenshi_log.txt: loaded rules, active work sources, extra XP ticks and limits. Worker summaries are limited to one per five seconds."
+msgstr "在 RE_Kenshi_log.txt 中记录已加载的规则、工作来源、额外经验次数和上限。每名工人的摘要最多每五秒记录一次。"
+
+msgid "Dexterity XP"
+msgstr "敏捷经验"
+
+msgid "Dexterity limit"
+msgstr "敏捷上限"
+
+msgid "Enable skill caps"
+msgstr "启用技能上限"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Extra XP multiplier"
+msgstr "经验倍率"
+
+msgid "Extra raw skill ticks per Labouring tick. 0 disables this skill; 1 gives one extra tick. Racial and XP Overhaul modifiers still apply."
+msgstr "每次劳动经验触发时额外提供的技能经验次数。0 为禁用此技能，1 为每次额外提供一次。仍会应用种族和 XP Overhaul 的经验修正。"
+
+msgid "Extra skill experience for work sources listed in SourceData."
+msgstr "为 SourceData 中列出的工作来源提供额外技能经验。"
+
+msgid "Maximum base skill level from this source. Applies only when skill caps are enabled; normal game XP is unchanged."
+msgstr "此来源可训练到的最高基础技能等级。仅在启用技能上限时生效，不改变游戏原有的经验。"
+
+msgid "Mining sources are detected automatically. This writes other unconfigured work sources to UnknownSources.ini without granting them extra XP."
+msgstr "自动识别采矿来源。此设置仅将其他未配置的工作来源记录到 UnknownSources.ini，不为其提供额外经验。"
+
+msgid "Multiplies every source's skill limits."
+msgstr "统一调整所有来源的技能上限。"
+
+msgid "Multiplies the extra skill ticks of every configured source."
+msgstr "统一调整所有已配置来源的额外技能经验次数。"
+
+msgid "No matching sources"
+msgstr "未找到匹配的来源"
+
+msgid "Record other work sources"
+msgstr "记录其他工作来源"
+
+msgid "Reload SourceData INI files in filename order, preserving per-key overrides."
+msgstr "按文件名顺序重新读取 SourceData 中的 INI 文件，后面的文件逐项覆盖先前配置。"
+
+msgid "Reload source tables"
+msgstr "重新加载来源配置"
+
+msgid "Select a mining source from the list. Search filters the visible names."
+msgstr "点击列表选择采矿来源，搜索可筛选名称。"
+
+msgid "Selected source"
+msgstr "所选来源"
+
+msgid "Source enabled"
+msgstr "启用此来源"
+
+msgid "Stop the extra experience at each source's configured skill limit."
+msgstr "达到该来源设置的技能上限后停止提供额外经验。"
+
+msgid "Strength XP"
+msgstr "力量经验"
+
+msgid "Strength limit"
+msgstr "力量上限"
+
+msgid "Toughness XP"
+msgstr "韧性经验"
+
+msgid "Toughness limit"
+msgstr "韧性上限"
+
+msgid "Train Strength, Toughness and Dexterity through actual mining work. All loaded mining sources are detected automatically; source overrides keep priority."
+msgstr "通过实际采矿工作训练力量、韧性和敏捷。自动识别所有已加载的采矿来源，单独设置仍具有优先权。"

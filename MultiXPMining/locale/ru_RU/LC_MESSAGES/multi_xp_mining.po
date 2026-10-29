@@ -1,0 +1,86 @@
+msgid ""
+msgstr "Language: ru_RU\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "Allow extra skill training at this source."
+msgstr "Включить дополнительную прокачку у этого источника."
+
+msgid "Cap multiplier"
+msgstr "Множитель лимитов"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Details in RE_Kenshi_log.txt: loaded rules, active work sources, extra XP ticks and limits. Worker summaries are limited to one per five seconds."
+msgstr "В RE_Kenshi_log.txt: загруженные правила, рабочие источники, дополнительные тики и пределы. Сводка по рабочему не чаще раза в пять секунд."
+
+msgid "Dexterity XP"
+msgstr "Опыт ловкости"
+
+msgid "Dexterity limit"
+msgstr "Предел ловкости"
+
+msgid "Enable skill caps"
+msgstr "Ограничивать уровень навыков"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Extra XP multiplier"
+msgstr "Множитель опыта"
+
+msgid "Extra raw skill ticks per Labouring tick. 0 disables this skill; 1 gives one extra tick. Racial and XP Overhaul modifiers still apply."
+msgstr "Сырые тики навыка на тик труда. 0 - навык отключён, 1 - один дополнительный тик. Затем применяются расовые модификаторы и XP Overhaul."
+
+msgid "Extra skill experience for work sources listed in SourceData."
+msgstr "Дополнительный опыт за работу на источниках из таблиц SourceData."
+
+msgid "Maximum base skill level from this source. Applies only when skill caps are enabled; normal game XP is unchanged."
+msgstr "Предельный базовый уровень навыка у этого источника. Действует при включённых ограничениях, обычный опыт игры не меняется."
+
+msgid "Mining sources are detected automatically. This writes other unconfigured work sources to UnknownSources.ini without granting them extra XP."
+msgstr "Источники добычи определяются автоматически. Эта настройка записывает прочие ненастроенные рабочие места в UnknownSources.ini, не начисляя им дополнительный опыт."
+
+msgid "Multiplies every source's skill limits."
+msgstr "Умножает пределы навыков всех источников."
+
+msgid "Multiplies the extra skill ticks of every configured source."
+msgstr "Умножает дополнительные тики опыта у всех настроенных источников."
+
+msgid "No matching sources"
+msgstr "Источники не найдены"
+
+msgid "Record other work sources"
+msgstr "Запись прочих работ"
+
+msgid "Reload SourceData INI files in filename order, preserving per-key overrides."
+msgstr "Перечитать INI-файлы SourceData по имени. Поздние файлы переопределяют отдельные значения."
+
+msgid "Reload source tables"
+msgstr "Перечитать таблицы источников"
+
+msgid "Select a mining source from the list. Search filters the visible names."
+msgstr "Выберите источник; поиск фильтрует список."
+
+msgid "Selected source"
+msgstr "Выбранный источник"
+
+msgid "Source enabled"
+msgstr "Источник включён"
+
+msgid "Stop the extra experience at each source's configured skill limit."
+msgstr "Прекращать дополнительную прокачку при достижении предела навыка для этого источника."
+
+msgid "Strength XP"
+msgstr "Опыт силы"
+
+msgid "Strength limit"
+msgstr "Предел силы"
+
+msgid "Toughness XP"
+msgstr "Опыт стойкости"
+
+msgid "Toughness limit"
+msgstr "Предел стойкости"
+
+msgid "Train Strength, Toughness and Dexterity through actual mining work. All loaded mining sources are detected automatically; source overrides keep priority."
+msgstr "Прокачка силы, стойкости и ловкости за реальную добычу. Все загруженные источники добычи определяются автоматически; индивидуальные настройки имеют приоритет."

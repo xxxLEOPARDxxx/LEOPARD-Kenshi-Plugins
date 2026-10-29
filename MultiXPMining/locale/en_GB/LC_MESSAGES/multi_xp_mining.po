@@ -1,0 +1,86 @@
+msgid ""
+msgstr "Language: en_GB\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "Allow extra skill training at this source."
+msgstr "Allow extra skill training at this source."
+
+msgid "Cap multiplier"
+msgstr "Cap multiplier"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Details in RE_Kenshi_log.txt: loaded rules, active work sources, extra XP ticks and limits. Worker summaries are limited to one per five seconds."
+msgstr "Details in RE_Kenshi_log.txt: loaded rules, active work sources, extra XP ticks and limits. Worker summaries are limited to one per five seconds."
+
+msgid "Dexterity XP"
+msgstr "Dexterity XP"
+
+msgid "Dexterity limit"
+msgstr "Dexterity limit"
+
+msgid "Enable skill caps"
+msgstr "Enable skill caps"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Extra XP multiplier"
+msgstr "Extra XP multiplier"
+
+msgid "Extra raw skill ticks per Labouring tick. 0 disables this skill; 1 gives one extra tick. Racial and XP Overhaul modifiers still apply."
+msgstr "Extra raw skill ticks per Labouring tick. 0 disables this skill; 1 gives one extra tick. Racial and XP Overhaul modifiers still apply."
+
+msgid "Extra skill experience for work sources listed in SourceData."
+msgstr "Extra skill experience for work sources listed in SourceData."
+
+msgid "Maximum base skill level from this source. Applies only when skill caps are enabled; normal game XP is unchanged."
+msgstr "Maximum base skill level from this source. Applies only when skill caps are enabled; normal game XP is unchanged."
+
+msgid "Mining sources are detected automatically. This writes other unconfigured work sources to UnknownSources.ini without granting them extra XP."
+msgstr "Mining sources are detected automatically. This writes other unconfigured work sources to UnknownSources.ini without granting them extra XP."
+
+msgid "Multiplies every source's skill limits."
+msgstr "Multiplies every source's skill limits."
+
+msgid "Multiplies the extra skill ticks of every configured source."
+msgstr "Multiplies the extra skill ticks of every configured source."
+
+msgid "No matching sources"
+msgstr "No matching sources"
+
+msgid "Record other work sources"
+msgstr "Record other work sources"
+
+msgid "Reload SourceData INI files in filename order, preserving per-key overrides."
+msgstr "Reload SourceData INI files in filename order, preserving per-key overrides."
+
+msgid "Reload source tables"
+msgstr "Reload source tables"
+
+msgid "Select a mining source from the list. Search filters the visible names."
+msgstr "Select a mining source from the list. Search filters the visible names."
+
+msgid "Selected source"
+msgstr "Selected source"
+
+msgid "Source enabled"
+msgstr "Source enabled"
+
+msgid "Stop the extra experience at each source's configured skill limit."
+msgstr "Stop the extra experience at each source's configured skill limit."
+
+msgid "Strength XP"
+msgstr "Strength XP"
+
+msgid "Strength limit"
+msgstr "Strength limit"
+
+msgid "Toughness XP"
+msgstr "Toughness XP"
+
+msgid "Toughness limit"
+msgstr "Toughness limit"
+
+msgid "Train Strength, Toughness and Dexterity through actual mining work. All loaded mining sources are detected automatically; source overrides keep priority."
+msgstr "Train Strength, Toughness and Dexterity through actual mining work. All loaded mining sources are detected automatically; source overrides keep priority."
