@@ -646,7 +646,7 @@ namespace
     // Значение у плагина (API v3) - строкой, как оно было бы в ini.
     std::string ReadFn(const Setting* s)
     {
-        char buf[1024] = {};
+        char buf[8193] = {};
         switch (s->kind)
         {
         case K_TOGGLE:
@@ -732,7 +732,7 @@ namespace
     {
         if (s->fn)
             return ReadFn(s);
-        char buf[2048] = {};
+        char buf[8193] = {};
         GetPrivateProfileStringA(s->section.c_str(), s->key.c_str(), s->def.c_str(), buf,
                                  sizeof(buf), m->ini.c_str());
         // Хвостовой комментарий «; ...» и пробелы - не значение.
