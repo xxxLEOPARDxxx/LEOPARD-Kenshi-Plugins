@@ -1,6 +1,6 @@
 """Canonical local release preparation. Does not upload to Nexus or Steam."""
 from pathlib import Path
-import os,sys,subprocess,shutil
+import os,sys,subprocess,shutil,json
 HERE=Path(__file__).resolve().parent
 import build
 def main():
@@ -10,6 +10,11 @@ def main():
         mod=item['mod'];dst=build.mod_dir(mod);src=build.source_dir(mod)
         (HERE/'images'/mod).mkdir(parents=True,exist_ok=True)
         if not dst:raise RuntimeError('Installed runtime missing: '+mod)
+        if mod=='UITweaks':
+            plugins=json.loads((Path(dst)/'RE_Kenshi.json').read_text(encoding='utf-8-sig')).get('Plugins',[])
+            if any(Path(name).name.startswith(('LayerProbe','HookCount')) for name in plugins):
+                raise RuntimeError('Remove diagnostic loader before preparing public UITweaks package')
+
         if src:
             for name in ['README.txt','README.md','ORIGIN.md','LICENSE']:
                 p=Path(src)/name

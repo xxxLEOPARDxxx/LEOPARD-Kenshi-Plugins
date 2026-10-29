@@ -73,7 +73,7 @@ ITEMS = [
             "characters nearby, discovered towns, attack alerts, Map-markers and "
             "WantedMap marks, camera range; right click to send the selected, "
             "double click to move the camera."),
-    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="9",
+    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="10",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Fixes for interface parts the game builds in code, so no UI mod can "
             "touch them: taller queue rows, full-width queue bars, scrolling "
@@ -85,7 +85,7 @@ ITEMS = [
             "patient treats their own wounds with their own kit instead of "
             "standing idle (skeletons use a repair kit)."),
     # --- новые, 05.10.2026 (Nexus 2201-2205) ---
-    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="10",
+    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="11",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="An MCM tab in the game's Options window: settings of RE_Kenshi "
             "plugins right in the game, drawn with the game's own rows, applied "
