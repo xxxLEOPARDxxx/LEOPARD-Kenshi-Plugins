@@ -1,5 +1,68 @@
 AssignedWorkers — кто закреплён за постройкой
 
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 7 (29–30.10.2026)
+
+  * Красная молния показывает выключенные достроенные машины игрока.
+    Она появляется по той же клавише HoldKey, что панель работников
+    (ALT по умолчанию, NONE — всегда). Выбирать постройку и открывать её
+    инвентарь не нужно. Чужие и недостроенные машины не отмечаются.
+  * IncludeNoPower дополнительно отмечает включённые машины, которым
+    требуется электричество, но его нет. PowerWarnings и IncludeNoPower
+    по умолчанию включены; размер — 32 пикселя (12..96), дальность от
+    камеры — 150 м (20..5000), высота над основанием — 4 м (0..50).
+    Все эти параметры доступны на странице Assigned Workers в MCM.
+  * Проверяются только загруженные машины. Сканирование — раз в 0,5 с,
+    до 128 ближайших подходящих машин; значки на слое Back остаются под
+    окнами. Пул виджетов переиспользуется, одинаковые координаты и уже
+    установленная видимость повторно не задаются. В меню и на загрузке
+    значки скрываются, список целей очищается.
+  * Поиск окна выбранной постройки кэшируется на 0,5 с, в том числе
+    отсутствие подходящего окна: закрытые окна не заставляют каждый
+    кадр повторять полный поиск. Панель держит безопасную ссылку и
+    восстанавливается после пересоздания интерфейса. Неизменный список
+    работников, включая пустой, не заполняется заново. Отключение мода
+    скрывает панель, значки и уведомление о свободных героях.
+  * Enabled и остальные настройки применяются из MCM на ходу; прежнее
+    требование перезапуска для Enabled снято. Замена самой DLL, как
+    обычно, требует перезапуска игры.
+  * Подробный журнал — последняя настройка MCM, Debug=0 по умолчанию.
+    При включении он объясняет состав панели и выбор свободных героев,
+    а сводку питания пишет не чаще раза в 5 с. Ошибки пишутся независимо
+    от Debug. Личный AssignedWorkers.ini сохраняется при обновлении.
+  * Интерфейсные переводы: ru_RU, en_GB, zh_CN. В пакете используются
+    рабочие .mo; исходные .po остаются в репозитории.
+
+VERSION 7 CHANGES (29–30 OCTOBER 2026)
+
+  * Red lightning bolts identify completed player machines that have
+    been switched off. They use the workers panel's HoldKey (ALT by
+    default, NONE for always visible), without selecting a building or
+    opening its inventory. Foreign and unfinished machines are excluded.
+  * IncludeNoPower also marks enabled machines that need electricity
+    but have none. PowerWarnings and IncludeNoPower default to on.
+    Defaults are 32 px size (12..96), 150 m camera range (20..5000) and
+    4 m height above the machine origin (0..50). All are exposed in MCM
+    on the Assigned Workers page.
+  * Loaded machines are scanned every 0.5 s, retaining up to 128 nearest
+    matches. Back-layer markers stay below windows. Widgets are reused;
+    unchanged geometry and visibility are not submitted again. Markers
+    are hidden and targets cleared in menus and during loading.
+  * Building-window lookup is cached for 0.5 s, including missing-window
+    results, avoiding a full search every frame for closed windows.
+    A safe widget reference lets the panel recover after UI recreation.
+    Unchanged worker lists, including empty ones, are not refilled.
+    Disabling the plugin hides the panel, markers and idle notice.
+  * Enabled and all other MCM settings now apply during play. Replacing
+    the DLL still requires restarting the game.
+  * Detailed log is the last MCM setting and defaults to off (Debug=0).
+    It explains panel entries and idle-character selection; power-marker
+    summaries are limited to once per 5 s. Errors are logged regardless
+    of Debug. Updates preserve the player's AssignedWorkers.ini.
+  * UI translations cover ru_RU, en_GB and zh_CN. Releases contain .mo
+    catalogs; .po source catalogs remain in the repository.
+
+СПРАВОЧНИК И ИСТОРИЯ
+
 Требуется RE_Kenshi.
 
 
@@ -81,8 +144,7 @@ Backspace — без клавиши.
 Если установлен мод ModConfigMenu, все настройки есть прямо в игре:
 окно «Настройки», вкладка MCM, страница «Assigned Workers». У каждой строки
 подсказка внизу окна, изменения сразу пишутся в ini и применяются.
-После перезапуска игры действует только «Включено» —
-такие строки помечены звёздочкой (*).
+Все настройки, включая «Включено», применяются без перезапуска игры.
 
 ФАЙЛ НАСТРОЕК И ОБНОВЛЕНИЯ МОДА
 

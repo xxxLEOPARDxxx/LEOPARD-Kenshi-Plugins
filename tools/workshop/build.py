@@ -64,9 +64,7 @@ ITEMS = [
             "verdict - better, worse or mixed."),
     dict(mod="AssignedWorkers", title="Assigned Workers (QoL)", nexus=2191, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
-         en="Select a machine, ore deposit, storage, research bench or turret "
-            "and hold ALT to see which of your characters are assigned to it "
-            "and at what job priority."),
+         en='See who is assigned to a building, select idle characters and spot switched-off or unpowered player machines by red lightning markers.'),
     dict(mod="BestMinimap", title="Best Minimap (QoL)", nexus=2242, version="1",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="A minimap in the corner of the screen on the game's own map picture: "
@@ -75,21 +73,14 @@ ITEMS = [
             "double click to move the camera."),
     dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="10",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
-         en="Fixes for interface parts the game builds in code, so no UI mod can "
-            "touch them: taller queue rows, full-width queue bars, scrolling "
-            "descriptions, taller squad cells, a proper 'Next level' bar. "
-            "Works with any UI mod."),
+         en='Interface fixes for queues, descriptions, squad panels and tooltips, plus fewer redundant name-label and status-bar updates. Works with vanilla and modded interfaces.'),
     dict(mod="PatientSelfAid", title="Patient Self Aid (QoL)", nexus=2193, version="4",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
-         en="While one of your characters gives first aid to another, the "
-            "patient treats their own wounds with their own kit instead of "
-            "standing idle (skeletons use a repair kit)."),
+         en='Let a conscious patient help with their own treatment, including repair of robotic limbs on biological characters.'),
     # --- новые, 05.10.2026 (Nexus 2201-2205) ---
-    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="11",
+    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="10",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
-         en="An MCM tab in the game's Options window: settings of RE_Kenshi "
-            "plugins right in the game, drawn with the game's own rows, applied "
-            "at once. With an SDK for plugin authors."),
+         en='In-game settings for RE_Kenshi plugins, with tooltips, page scrolling and keyboard or mouse binding support.'),
     dict(mod="QuickStartSelect", title="Quick Start Select (QoL)", nexus=2201, version="6",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="The 'Choose your beginning' window as a list of all starts: two "
@@ -157,9 +148,7 @@ ITEMS = [
     # нашей выкладки на Nexus.
     dict(mod="BetterLooting", title="Better Looting (MCM fork) (QoL)", nexus=2218, version="4",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
-         en="Open the inventory and press Insert: the selected character collects the loot "
-            "around by your rules - value, value per kg, categories. A fork of XxAtreuSSxX's "
-            "mod with settings in Mod Config Menu."),
+         en='Rule-based looting, required-item lists, protected player storage, optional ground pickup and deposit to base storage.'),
     dict(mod="Map-markers", title="Map markers (MCM fork) (QoL)", nexus=2211, version="3",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Your own markers with labels on the world map, per save - a fork of Emkej8's "
@@ -203,12 +192,10 @@ ITEMS = [
             "Slinkysalmon03's Formations with settings in Mod Config Menu."),
     dict(mod="RecruitMarkers", title="Recruit Markers (QoL)", nexus=2232, version="3",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
-         en="A speech-bubble marker over the heads of characters you can recruit right now - "
-            "a replacement for LtEast's Recruitable NPC Highlighter with settings in Mod Config "
-            "Menu."),
+         en='Recruit bubbles, trader coins and gold squad-leader stars, with a shared show key and independent star size.'),
 ]
 
-ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Gold skill level-up text that rises above your characters and fades out, without XP bars or fractional gain messages.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': None, 'version': '1', 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory items with middle mouse or a keyboard shortcut. Rotation is preserved when saving, loading and splitting stacks.'}])
+ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Gold skill level-up text that rises above your characters and fades out, without XP bars or fractional gain messages.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': None, 'version': '1', 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': None, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
 
 SKIP = re.compile(r"(^_.*\.(info|img)$)|(\.bak$)|(\.pre[^.]*$)|(\.prelog$)|"
                   r"(\.bak-[^.]*$)|(\.log$)|(_runtime_table\.txt$)|"

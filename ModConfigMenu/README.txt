@@ -1,5 +1,93 @@
 ModConfigMenu (MCM) — настройки модов прямо в игре
 
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 10 (29–30.10.2026)
+
+  * Колесо над любой штатной строкой MCM прокручивает страницу: над
+    подписью, флажком, ползунком, полем и кнопкой. Случайного изменения
+    значения ползунка от колеса больше нет. Событие доходит до штатной
+    DatapanelGUI один раз, с её полосой прокрутки и ограничением краёв.
+  * Обработка ограничена открытой живой страницей MCM. Собственные
+    области плагинов (список источников MultiXPMining), соседние окна
+    и отдельные вложенные области прокрутки сохраняют управление.
+    Защита от рекурсии не даёт одному событию прокрутить страницу
+    дважды. Нет покадрового обхода дерева или повторного навешивания
+    обработчиков на каждый элемент при перестройках.
+  * Плагин может разрешить мышь в обычной строке назначения клавиши:
+    LMB/RMB/MMB/X1/X2, в том числе с Ctrl, Shift и Alt. Первый щелчок
+    только включает захват; назначается следующее нажатие. Esc отменяет,
+    Backspace снимает назначение. Повторы и отпускание захваченного
+    нажатия не передаются остальному интерфейсу.
+  * Для авторов: MCM_ALLOW_MOUSE=0x2 — явное согласие строки на мышь;
+    коды MCM_KEY_MOUSE_LEFT..MCM_KEY_MOUSE_X2 зарезервированы в диапазоне
+    0x1000..0x1004. Включайте флаг только если обработчик плагина умеет
+    эти коды. Без него прежние callbacks получают только клавиатуру,
+    щелчок во время захвата неподдерживаемую кнопку не назначит.
+    Структура и порядок полей API v6 не изменились. Приём мыши проходит
+    через штатный InputManager; SDK и руководства обновлены на 3 языках.
+  * В этот выпуск также входят: подробный журнал всегда последней настройкой
+    каждой страницы; порядок обычных настроек и динамических блоков
+    сохраняется. Для динамических строк api->rows больше не копится
+    память прошлых показов: она освобождается после завершения
+    удаления родной панели, когда callbacks и поля уже не используют
+    настройки, включая отложенные и аварийные пути удаления.
+  * Подписи собственных кнопок обновляются при реальном изменении,
+    а не собираются заново каждый кадр. Длинные текстовые настройки
+    читаются целиком до 8191 UTF-8 байта, включая списки правил
+    BetterLooting, без старых ограничений в 1023/2047 байт. Чтение —
+    при построении страницы и восстановлении отклонённого значения.
+  * Звёздочку и пояснение перезапуска добавляет MCM только для
+    MCM_RESTART. Живые переключатели не получают её автоматически.
+    Новые механизмы колеса и мыши не требуют отдельных настроек;
+    для загрузки новой DLL нужен обычный перезапуск игры.
+  * Собственная страница Mod Config Menu содержит подробный журнал:
+    Debug=0 по умолчанию, изменение действует сразу; ошибки пишутся
+    независимо от него. Личный ModConfigMenu.ini сохраняется.
+    Переводы ru_RU/en_GB/zh_CN; в выпуске .mo, .po — в исходниках.
+
+VERSION 10 CHANGES (29–30 OCTOBER 2026)
+
+  * The wheel scrolls the settings page over native MCM labels,
+    checkboxes, sliders, fields and buttons, without changing control
+    values. Each event reaches native DatapanelGUI once, retaining
+    its scrollbar and page bounds.
+  * Routing is limited to the open, live MCM page. Plugin-owned areas
+    such as MultiXPMining's source list, sibling windows and independent
+    nested scroll areas retain their own wheel handling. A recursion
+    guard prevents duplicate scrolling; no per-frame tree scan or
+    repeated per-control handler installation is needed.
+  * Plugins can opt into mouse buttons in regular hotkey rows:
+    LMB/RMB/MMB/X1/X2, with Ctrl, Shift and Alt modifiers. The initial
+    click only arms capture; the next press is assigned. Esc cancels,
+    Backspace clears. Repeats and release of the captured press are
+    suppressed from the rest of the interface.
+  * For authors: MCM_ALLOW_MOUSE=0x2 opts a row in. Reserved mouse codes
+    MCM_KEY_MOUSE_LEFT..MCM_KEY_MOUSE_X2 are 0x1000..0x1004. Set the flag
+    only when the consumer understands these codes. Existing callbacks
+    without it remain keyboard-only; mouse clicks during capture cannot
+    assign an unsupported button. API v6 structure and field order are
+    unchanged. Capture uses native InputManager; the SDK and its three
+    language guides were updated.
+  * Also included in this release: Detailed log is moved to the end of every page while
+    retaining normal API order and dynamic-block placement. Old
+    api->rows settings no longer accumulate between page visits;
+    memory is freed after the native panel has finished destruction,
+    including deferred and failure paths, when fields and callbacks
+    have stopped using it.
+  * Owned button captions update on actual changes instead of being
+    rebuilt every frame. Text settings, including BetterLooting lists,
+    read up to 8191 UTF-8 bytes without the former 1023/2047-byte
+    truncation. Reads occur on page construction or rejected-value
+    restoration, not every frame.
+  * MCM adds the restart star and explanation only for MCM_RESTART;
+    live toggles are not automatically marked. Wheel and mouse support
+    need no new settings. Restart the game to load the replacement DLL.
+  * The Mod Config Menu page exposes Detailed log, off by default
+    (Debug=0) and applied immediately. Errors are always logged.
+    Updates preserve ModConfigMenu.ini. UI translations cover
+    ru_RU/en_GB/zh_CN; releases contain .mo catalogs, .po stays in source.
+
+СПРАВОЧНИК И ИСТОРИЯ
+
 Требуется RE_Kenshi.
 
 
@@ -36,7 +124,7 @@ MCM. Слева — список модов, у которых есть наст
 ниже). Наши уже умеют: Live Xp Bars, Stat Colours, Gear Compare Alt,
 Assigned Workers, UI Tweaks, Patient Self Aid, Wanted Map, Build Mode
 Gizmo, Ranged Damage Xp, Quick Start Select, Item Markers, Recruit
-Markers; наши форки модов Emkej8: Auto-Pause on Load, Container
+Markers, Skill Level Up Info, Multi XP Mining; наши форки модов Emkej8: Auto-Pause on Load, Container
 Highlight, Hidden Faction Relations, Job B Gone, Loot Scoot Execute, Map
 markers, Organize the Crafting Stations, Organize the Trader, Vital
 Read, Vital Sense, Wall B Gone; и форки модов других авторов: Better

@@ -287,6 +287,6 @@ If your plugin is not in the list, check that `MCM_Describe` is exported
 undecorated: `dumpbin /exports MyPlugin.dll` must show exactly
 `MCM_Describe`.
 
-## Mouse-capable bindings (MCM v11)
+## Mouse-capable bindings (MCM v10)
 
 A hotkey row may opt in with MCM_ALLOW_MOUSE. LMB, RMB, MMB, X1 and X2 support CTRL/SHIFT/ALT combinations. Callback mouse codes are MCM_KEY_MOUSE_LEFT through MCM_KEY_MOUSE_X2 (0x1000..0x1004); these are not OIS keyboard codes. Existing rows without the flag remain keyboard-only. Press/release capture consumes both events. The API struct remains version6 and unchanged.

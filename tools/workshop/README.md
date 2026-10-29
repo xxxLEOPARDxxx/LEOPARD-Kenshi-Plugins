@@ -4,4 +4,12 @@ Versioned sources for the local release tools. Copy these files, preserving `des
 
 Run `prepare_release.py ModName ...` in that working folder. It refreshes README, Steam and Nexus descriptions, screenshot folders and CRC-verified ZIPs. Releases contain one runtime catalog per language; compiled-MO plugins ship MO only. Obsolete ZIPs for the same mod are removed only after the replacement succeeds.
 
-No tool here uploads anything. The user uploads Nexus first and supplies links; the corresponding Steam release follows afterwards. Maintain these tracked sources and synchronize the working copy when changing release behavior.
+Maintain full player descriptions in `desc/qol-20261029.json`: purpose, features, controls, settings and compatibility, with matching Russian and English detail. Keep the existing BBCode headings, lists and bold feature names. Forks credit the original author and link the original project before their changes. Technical implementation details belong in README; MCM's SDK section is the exception.
+
+Write both languages of each current version's changes in `release_notes.json`. Preparation places a visible version section in both descriptions and updates `changelog.json` while retaining older versions. The history is synchronized with its versioned copy. Every mod/fork README also describes current-version changes in English and Russian.
+
+`validate_descriptions.py ModName ...` checks full generated bodies, both languages and every version-note item in Steam/Nexus outputs, balanced BBCode, matching changelog and Steam byte limits. Preparation runs it before replacing ZIPs.
+
+Preparation and validation never upload. `steam_upload.py` is the existing publisher, now versioned here too: it sends the English description, then a separate Russian translation. Upload attaches one bilingual changelog to the first submission; the translation adds no duplicate note. Missing changelogs fail explicitly. Do not run the publisher during preparation. The user uploads Nexus first and supplies links; the corresponding Steam release follows afterwards. Maintain these tracked sources and synchronize the working copy when changing release behavior.
+
+One prepared release increments the published number once. Fixes before publication retain that number. MCM is published as9; all current changes belong to10. Its `published_version` baseline guards this rule. API v6 is independent of the product version.

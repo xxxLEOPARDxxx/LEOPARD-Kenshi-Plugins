@@ -3,9 +3,11 @@ from pathlib import Path
 import os,sys,subprocess,shutil,json
 HERE=Path(__file__).resolve().parent
 import build
+from release_metadata import sync_notes
 def main():
     only=set(sys.argv[1:]);items=[i for i in build.ITEMS if not only or i['mod'] in only]
     if only-{i['mod'] for i in items}:raise SystemExit('Unknown mod names: '+str(only-{i['mod'] for i in items}))
+    sync_notes(items)
     for item in items:
         mod=item['mod'];dst=build.mod_dir(mod);src=build.source_dir(mod)
         (HERE/'images'/mod).mkdir(parents=True,exist_ok=True)
@@ -25,7 +27,7 @@ def main():
             if not target.is_relative_to((HERE/mod).resolve()):raise RuntimeError('Unsafe generated-content path')
     names=[i['mod'] for i in items]
     env=dict(os.environ,PYTHONIOENCODING='utf-8')
-    for script in ['desc/make_desc.py','build.py','nexus_desc.py','nexus_pack.py']:
+    for script in ['desc/make_desc.py','build.py','nexus_desc.py','validate_descriptions.py','nexus_pack.py']:
         subprocess.run([sys.executable,str(HERE/script),*names],check=True,env=env)
     return 0
 if __name__=='__main__':sys.exit(main())

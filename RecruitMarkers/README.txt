@@ -1,5 +1,62 @@
 RECRUIT MARKERS (QoL)
 
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 3 (29–30.10.2026)
+
+  * Над фактическим лидером загруженного отряда появляется золотая
+    звезда. Используется лидер, назначенный самой игрой, а не первый
+    персонаж в списке. ShowLeaders включает звёзды, ShowPlayerLeaders
+    разрешает их и для своих отрядов, если у них назначен лидер.
+  * У звезды независимый размер LeaderSize: 20 пикселей по умолчанию,
+    диапазон 8..64. IconSize по-прежнему управляет только наймом и
+    торговцами. Квадратная звезда выровнена с ними по нижнему краю,
+    несколько значков одного героя располагаются рядом.
+  * Цвет звезды LeaderColour по умолчанию #ffda40. Общие HoldKey (ALT,
+    NONE — всегда), прозрачность, высота, дальность и лимит значков
+    действуют и на звёзды. В MCM доступны отдельные переключатели
+    лидеров, размер и цвет; настройки применяются без перезапуска.
+  * При переполнении отбираются ближайшие цели из всех загруженных
+    подходящих персонажей. Лимит считает отдельные значки найма,
+    торговца и лидера. Проверка диалогов ограничена двумя кандидатами
+    за проход с интервалом не менее 50 мс (до 40 диалогов/с), очередь —
+    до 256 целей, кэш — до 2048 с удалением давно исчезнувших целей.
+  * Виджеты переиспользуются и хранят безопасные ссылки. Координаты,
+    цвет и прозрачность меняются при отличии; кость головы кэшируется.
+    На загрузке и в меню значки скрываются, игровое состояние очищается.
+    Это ограничения работы плагина, а не обещание прироста FPS.
+  * Debug — последняя настройка MCM, выключен по умолчанию (Debug=0). Сводка
+    ограничена интервалом 10 с; ошибки пишутся независимо от Debug.
+    Личный INI сохраняется. Переводы ru_RU/en_GB/zh_CN; в выпуске .mo,
+    .po остаются в исходниках.
+
+VERSION 3 CHANGES (29–30 OCTOBER 2026)
+
+  * A gold star marks the actual game-assigned leader of a loaded
+    squad. ShowLeaders controls stars; ShowPlayerLeaders includes
+    player squads when the game has assigned a leader.
+  * LeaderSize is independent: 20 px by default, range 8..64. IconSize
+    still controls recruit and trader icons. The square star aligns
+    with their bottom edge; multiple icons for one character sit
+    beside each other.
+  * LeaderColour defaults to #ffda40. Stars share HoldKey (ALT, or NONE
+    for always visible), opacity, height, range and the total marker
+    budget. Leader toggles, size and colour are exposed in MCM; all
+    settings apply without restarting the game.
+  * Overflow keeps nearest targets from all eligible loaded characters.
+    Recruit, trader and leader icons each count toward the limit.
+    Dialogue scans process at most two candidates per pass, at least
+    50 ms apart (up to 40 dialogues/s); the queue holds up to 256 and
+    the cache up to 2048 entries, pruning long-absent targets.
+  * Widgets and safe references are reused. Geometry, colour and alpha
+    update only when changed; head-bone lookup is cached. Loading and
+    menus hide markers and clear session state. These are work limits,
+    not a claim of an FPS increase.
+  * Detailed log is last in MCM and off by default; summaries are limited
+    to once per 10 s. Errors are logged regardless of Debug. Updates
+    preserve the player's INI. UI translations: ru_RU/en_GB/zh_CN;
+    releases contain .mo catalogs, with .po sources in the repository.
+
+СПРАВОЧНИК И ИСТОРИЯ
+
 Значок над головой у тех, кого можно нанять. По умолчанию виден, пока
 зажат ALT (клавиша и «всегда» - в настройках).
 
@@ -58,7 +115,9 @@ ForgottenGUI::update (в главном меню и на загрузке зна
 НАСТРОЙКИ (RecruitMarkers.ini, секция [RecruitMarkers])
 
   Enabled, HoldKey (ALT / CTRL+B / ... / NONE - всегда), ShowUnique,
-  ShowGeneric, ShowAnimals, CheckConditions, UniqueColour, GenericColour
+  ShowGeneric, ShowAnimals, ShowTraders, TraderColour, ShowLeaders,
+  ShowPlayerLeaders, LeaderSize (8..64, по умолчанию 20), LeaderColour,
+  CheckConditions, UniqueColour, GenericColour
   (#RRGGBB), IconSize (12..96), Opacity (1..10), PulseUnique,
   HeightAboveHead (см), MaxDistance (м, 20..5000), MaxMarkers (8..128), Debug.
 
@@ -97,8 +156,10 @@ ForgottenGUI::update (в главном меню и на загрузке зна
 
 Золотая звезда над фактическим лидером загруженного отряда, назначенным
 игрой. Значки найма, торговца и лидера располагаются рядом.
-Используются общие клавиша, размер, прозрачность и дальность показа.
-MCM: "Squad leaders", "Include player leaders" и "Leader colour".
+Используются общие клавиша, прозрачность и дальность показа.
+Размер звезды отдельный — LeaderSize.
+MCM: "Squad leaders", "Include player leaders", "Leader star size"
+и "Leader colour".
 Лидеры игрока отмечаются, если игра назначила их отрядам лидера.
 
 Исправления по проверке 29.10.2026:

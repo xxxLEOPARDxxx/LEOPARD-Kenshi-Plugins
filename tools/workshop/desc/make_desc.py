@@ -1550,49 +1550,29 @@ With Mod Config Menu installed (optional): Options window → MCM tab → "Kensh
 
 
 
-# Prepared 29.10.2026, not published by this script.
-for _mod, _ru, _en in [
-    ("PatientSelfAid", "Также ремонтирует повреждённые протезы у биологических пациентов, если у пациента есть ремкомплект. Все настройки MCM действуют сразу.", "Also repairs damaged prosthetics on biological patients with their own repair kit. All MCM settings apply immediately."),
-    ("AssignedWorkers", "Красная молния над выключенными достроенными машинами игрока по той же клавише ALT. В MCM можно включить отметки нехватки питания и настроить размер, дальность и высоту значка.", "A red lightning bolt above switched-off completed player machines, using the same ALT key. MCM also offers missing-power warnings and icon size, range and height."),
-    ("RecruitMarkers", "Золотая звезда над лидерами отрядов. Общая клавиша и дальность со значками найма и торговцев; размер звезды настраивается отдельно (по умолчанию 20 пикселей). Показ лидеров игрока и цвет звезды - в MCM.", "A gold star above squad leaders, with the same show key and range as recruit and trader markers. Star size is independent (20 pixels by default). MCM controls player-leader visibility and star colour."),
-]:
-    _a, _b = T[_mod]
-    if _mod in ("PatientSelfAid", "AssignedWorkers"):
-        _a = _a.replace("«Включено» действует после перезапуска игры.", "перезапуск не нужен.")
-        _b = _b.replace('"Enabled" takes effect after a game restart.', 'no restart needed.')
-    T[_mod] = (_a.rstrip()+"\n\n"+_ru+"\n", _b.rstrip()+"\n\n"+_en+"\n")
-
-
-# Player descriptions maintained together for the current QoL release.
+# Current release descriptions and bilingual notes share one source.
 import json
-with io.open(os.path.join(HERE, "qol-20261029.json"), encoding="utf-8") as _qol_file:
-    for _mod, _pair in json.load(_qol_file).items():
-        T[_mod] = (_pair["ru"], _pair["en"])
-
-def unwrap(text):
-    """Склеить ручные переносы внутри абзацев (README -> одна строка на абзац).
-    Строки списков и с отступом не склеиваются."""
-    out = []
-    for line in text.split("\n"):
-        s = line.rstrip()
-        prev = out[-1] if out else ""
-        glue = (s and prev and not prev.startswith("[h2]") and not s.startswith(("[h2]", "  ", "* ", "- "))
-                and not prev.startswith(("  ", "* ", "- ")) and not re.match(r"^\d+\.", s))
-        if glue:
-            out[-1] = prev + " " + s.strip()
+with io.open(os.path.join(HERE, "qol-20261029.json"), encoding="utf-8") as f:
+    current = json.load(f)
+with io.open(os.path.join(build.HERE, "release_notes.json"), encoding="utf-8") as f:
+    release_notes = json.load(f)
+for mod, pair in current.items():
+    note = release_notes[mod]
+    item = next(it for it in build.ITEMS if it["mod"] == mod)
+    if note["version"] != item["version"]:
+        raise ValueError("Release notes do not match version: " + mod)
+    localized = []
+    for lang, heading in (("ru", "Что изменено в версии %s:"), ("en", "What's changed in version %s:")):
+        changes = "[b]" + heading % note["version"] + "[/b]\n[list]\n"
+        changes += "\n".join("[*]" + line for line in note[lang]) + "\n[/list]\n\n"
+        body = pair[lang]
+        if mod in {"BetterLooting", "Character Inspector", "KenshiRotate", "KillCounter"}:
+            credit, body = body.split("\n\n", 1)
+            body = credit + "\n\n" + changes + body
         else:
-            out.append(s)
-    return "\n".join(out)
-
-
-def mcm():
-    """ModConfigMenu - README целиком (с разделом для авторов), абзацами."""
-    base = os.path.join(build.HERE, "ModConfigMenu")
-    ru = io.open(os.path.join(base, "description_ru.txt"), encoding="utf-8").read()
-    en = io.open(os.path.join(base, "description_en.txt"), encoding="utf-8").read()
-    # шапку (Требуется RE_Kenshi, версия) build.py добавит сам
-    cut = lambda t: t[t.index("[h2]"):]
-    return unwrap(cut(ru)), unwrap(cut(en))
+            body = changes + body
+        localized.append(body)
+    T[mod] = tuple(localized)
 
 
 if __name__ == "__main__":
@@ -1601,6 +1581,5 @@ if __name__ == "__main__":
         if only and mod not in only:
             continue
         for lang, text in (("ru", ru), ("en", en)):
-            io.open(os.path.join(HERE, "%s.%s.txt" % (mod, lang)), "w", encoding="utf-8",
-                    newline="\n").write(text.strip() + "\n")
-        print("%-16s ru %5d  en %5d" % (mod, len(ru.encode("utf-8")), len(en.encode("utf-8"))))
+            io.open(os.path.join(HERE, "%s.%s.txt" % (mod, lang)), "w", encoding="utf-8", newline="\n").write(text.strip() + "\n")
+        print("%-16s ru %5d en %5d" % (mod, len(ru.encode("utf-8")), len(en.encode("utf-8"))))

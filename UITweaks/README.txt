@@ -1,5 +1,68 @@
 UI Tweaks — доработки интерфейса, которых не сделать разметкой
 
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 10 (30.10.2026)
+
+  * SkipSameMoves теперь пропускает и повторную установку относительного
+    размера обычного MyGUI::Widget, если штатное преобразование в
+    пиксели даёт прежний IntSize. Игра обновляла так шесть полос
+    состояния каждый кадр, заставляя MyGUI заново перестраивать
+    неизменный интерфейс. Прежняя оптимизация одинаковых координат
+    подписей над персонажами сохранена.
+  * Перевод долей в пиксели выполняет сама MyGUI: округление, размеры
+    родителя и видимой области не пересчитываются своей формулой.
+    Проверка ограничена точным виджетом текущего setRealSize и только
+    обычным Widget. Производные элементы и реальные изменения размера
+    проходят штатным путём.
+  * Явный setSize, в том числе обновление с тем же размером, сохраняет
+    обычные уведомления. Временный маркер потребляется до callbacks,
+    поэтому повторный вызов из обработчика не блокируется. Предыдущее
+    состояние восстанавливается при выходе, включая исключения.
+    Обрезка родителем и вложенные обновления не отключаются.
+  * Настройка MCM «Пропуск неизменной геометрии» использует прежний
+    ключ SkipSameMoves, по умолчанию включена и применяется на ходу.
+    Новой личной настройки или ручного переноса INI не требуется.
+    Enabled, ScrollDescription и RandomName по-прежнему требуют
+    перезапуска и отмечены MCM_RESTART; остальные строки применяются
+    сразу. Новая DLL загружается после перезапуска игры.
+  * Это ограничение лишних обновлений интерфейса, а не изменение
+    игровой симуляции. Диагностический пробник не входит в публичный
+    пакет. Число пересборок и вершин MyGUI не является числом вызовов
+    отрисовки GPU; README не обещает фиксированного прироста FPS.
+  * Подробный журнал — последняя настройка MCM, выключен по умолчанию
+    (Debug=0); ошибки пишутся всегда. Личный UITweaks.ini сохраняется.
+    Переводы ru_RU/en_GB/zh_CN; в пакете .mo, .po остаются в исходниках.
+
+VERSION 10 CHANGES (30 OCTOBER 2026)
+
+  * SkipSameMoves now also skips repeated relative sizing of plain
+    MyGUI::Widget objects when native conversion produces the same
+    integer pixel size. The game did this for six status bars every
+    frame, repeatedly rebuilding unchanged UI geometry. Existing
+    unchanged-position filtering for overhead labels remains active.
+  * MyGUI still performs relative-to-pixel conversion, retaining its
+    rounding and parent/view dimensions. The guard is limited to the
+    exact widget in the active setRealSize call and plain Widget type.
+    Derived controls and actual pixel-size changes take the native path.
+  * Explicit setSize refreshes, including same-size refreshes, retain
+    normal notifications. The temporary marker is consumed before
+    callbacks, so reentrant updates are preserved; previous state is
+    restored on exit, including exceptions. Parent clipping and nested
+    updates remain functional.
+  * MCM's "Skip unchanged UI geometry" uses the existing SkipSameMoves
+    key, defaults to on and applies immediately. There is no new personal
+    setting or manual INI migration. Enabled, ScrollDescription and
+    RandomName still require restart and are marked MCM_RESTART;
+    other settings apply live. Restart to load the replacement DLL.
+  * This reduces redundant UI updates without changing the simulation.
+    The diagnostic probe is excluded from public packages. MyGUI
+    rebuild/vertex counts are not GPU draw-call counts; no fixed FPS
+    improvement is promised.
+  * Detailed log is last in MCM and off by default (Debug=0); errors
+    are always logged. Updates preserve UITweaks.ini. UI translations:
+    ru_RU/en_GB/zh_CN; release .mo catalogs only, .po remains in source.
+
+СПРАВОЧНИК И ИСТОРИЯ
+
 Требуется RE_Kenshi.
 
 
@@ -118,8 +181,8 @@ UI Tweaks — доработки интерфейса, которых не сд�
 Если установлен мод ModConfigMenu, все настройки есть прямо в игре:
 окно «Настройки», вкладка MCM, страница «UI Tweaks». У каждой строки
 подсказка внизу окна, изменения сразу пишутся в ini и применяются.
-После перезапуска игры действуют только «Включено» и полоса прокрутки
-описаний — такие строки помечены звёздочкой (*).
+После перезапуска игры действуют «Включено», полоса прокрутки описаний
+и кнопка случайного имени — эти строки помечены звёздочкой (*).
 
 
 НАСТРОЙКИ
@@ -142,7 +205,7 @@ Dark UI. После обновления включите UI Tweaks в спис�
 ФАЙЛ НАСТРОЕК И ОБНОВЛЕНИЯ МОДА
 
 UITweaks.ini — ваши настройки: обновление мода его не трогает.
-В моде лежит DarkUiTweaks.defaults.ini — значения по умолчанию с пояснениями.
+В моде лежит UITweaks.defaults.ini — значения по умолчанию с пояснениями.
 Нет UITweaks.ini — плагин при запуске сделает его копией defaults.
 Появились в обновлении новые настройки — плагин допишет их в ваш файл
 со значениями по умолчанию, остальное оставит как было.

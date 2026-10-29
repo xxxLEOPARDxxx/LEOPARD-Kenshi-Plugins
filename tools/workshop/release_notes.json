@@ -1,0 +1,166 @@
+{
+  "RecruitMarkers": {
+    "version": "3",
+    "ru": [
+      "[b]Звёзды над лидерами отрядов.[/b] Лидеры отмечаются золотой звездой по той же клавише и на той же дальности, что рекруты и торговцы; можно отдельно скрыть лидеров игрока.",
+      "[b]Отдельный размер звезды.[/b] Настраивается независимо от значков найма и монет, по умолчанию 20 пикселей. Цвет тоже можно изменить.",
+      "[b]Меньше повторной работы.[/b] Проверки диалогов распределены по времени, а не повторяются для всех персонажей каждый кадр."
+    ],
+    "en": [
+      "[b]Stars above squad leaders.[/b] A gold star identifies leaders using the same show key and range as recruit and trader markers; player leaders can be hidden separately.",
+      "[b]Independent star size.[/b] Adjustable separately from recruit bubbles and coins, 20 pixels by default. Star colour is adjustable too.",
+      "[b]Less repeated work.[/b] Dialogue checks are spread over time instead of being repeated for every character every frame."
+    ]
+  },
+  "AssignedWorkers": {
+    "version": "7",
+    "ru": [
+      "[b]Красная молния над выключенными машинами.[/b] Значок показывает достроенные машины игрока, которые выключены, по общей клавише показа панели работников.",
+      "[b]Отметки нехватки питания.[/b] Можно также отмечать машины без необходимой энергии; размер, дальность и высота молнии настраиваются.",
+      "[b]Быстрее обновление панели.[/b] Убраны повторные поиски одних и тех же элементов интерфейса. Включение и настройки применяются сразу."
+    ],
+    "en": [
+      "[b]Red lightning above switched-off machines.[/b] Markers identify completed player machines that are switched off, using the worker panel's show key.",
+      "[b]Missing-power warnings.[/b] Machines lacking required power can also be marked; icon size, range and height are adjustable.",
+      "[b]Lighter panel updates.[/b] Repeated searches for the same interface elements have been removed. Enable and settings changes apply immediately."
+    ]
+  },
+  "PatientSelfAid": {
+    "version": "4",
+    "ru": [
+      "[b]Протезы у биологических персонажей.[/b] Пациент может чинить повреждённые роботизированные конечности своим ремкомплектом, пока другой персонаж оказывает ему помощь.",
+      "[b]Лечение и ремонт учитываются отдельно.[/b] Наличие протеза больше не исключает обычного персонажа из проверки ремонта. Для ран всё ещё нужна аптечка, для протезов - ремкомплект.",
+      "[b]Включение без перезапуска.[/b] Переключатель в MCM действует сразу; уже отданные приказы остаются под управлением игры."
+    ],
+    "en": [
+      "[b]Prosthetics on biological characters.[/b] A patient can repair damaged robotic limbs with their own repair kit while another character assists them.",
+      "[b]Healing and repairs are checked separately.[/b] A biological character is no longer excluded from repair checks. Wounds still require a first aid kit; prosthetics require a repair kit.",
+      "[b]No restart for the enable switch.[/b] MCM changes apply immediately; orders already issued remain under the game's control."
+    ]
+  },
+  "UITweaks": {
+    "version": "10",
+    "ru": [
+      "[b]Меньше лишних обновлений полос состояния.[/b] Неизменные размеры больше не заставляют интерфейс заново собирать их изображение каждый кадр.",
+      "[b]Настоящие изменения продолжают отображаться.[/b] Когда полоса меняет размер или её окно перестраивается, она обновляется обычным образом.",
+      "[b]Общая настройка производительности.[/b] Пропуск неизменной геометрии управляет и неподвижными подписями, и повторными размерами полос; переключается на ходу."
+    ],
+    "en": [
+      "[b]Fewer redundant status-bar updates.[/b] Unchanged sizes no longer force the interface to rebuild their geometry every frame.",
+      "[b]Real changes remain visible.[/b] Bars update normally when their size changes or their window is rebuilt.",
+      "[b]One performance setting.[/b] Skipping unchanged UI geometry covers both stationary name labels and repeated bar sizes, and can be toggled immediately."
+    ]
+  },
+  "ModConfigMenu": {
+    "version": "10",
+    "ru": [
+      "[b]Колесо над любой обычной строкой настроек.[/b] Страница прокручивается и над флажком, ползунком, полем ввода или кнопкой. Значение самой настройки от колеса не меняется.",
+      "[b]Клавиатура и мышь в одном назначении.[/b] Поддерживающие это плагины позволяют назначить кнопку мыши или клавишу, включая сочетания с CTRL, SHIFT и ALT.",
+      "[b]Независимая прокрутка списков.[/b] Собственные списки плагинов, в том числе источники Multi XP Mining, сохраняют своё управление.",
+      "[b]Длинные списки предметов.[/b] Текстовые настройки сохраняют полный список без прежнего обрезания, в том числе список обязательной добычи Better Looting.",
+      "[b]Повторные открытия страниц.[/b] Старые динамические строки больше не накапливаются, убраны лишние обновления неизменных подписей кнопок."
+    ],
+    "en": [
+      "[b]Wheel scrolling over ordinary settings rows.[/b] Pages scroll over checkboxes, sliders, input fields and buttons without changing the setting's value.",
+      "[b]Keyboard and mouse in one binding.[/b] Supporting plugins can assign a mouse button or key, including CTRL, SHIFT and ALT combinations.",
+      "[b]Independent list scrolling.[/b] Plugin-owned lists, including Multi XP Mining sources, retain their own controls.",
+      "[b]Long item lists.[/b] Text settings retain complete lists without the former truncation, including Better Looting's required-item list.",
+      "[b]Repeated page visits.[/b] Old dynamic rows no longer accumulate, and unchanged button captions no longer receive redundant updates."
+    ],
+    "published_version": "9"
+  },
+  "BetterLooting": {
+    "version": "4",
+    "ru": [
+      "[b]«Всегда брать эти предметы».[/b] Список имён или ID позволяет забирать нужные вещи независимо от категории, цены и цены за вес. Вместимость и правила кражи сохраняются.",
+      "[b]Защита хранилищ игрока.[/b] По умолчанию сбор больше не забирает вещи из собственных построек, даже если их инвентарь открыт. Раскладка ALT+INSERT продолжает работать.",
+      "[b]Подбор отдельных вещей с земли.[/b] По желанию персонаж сам подходит к подходящим предметам и поднимает их. Настройка выключена по умолчанию.",
+      "[b]Длинный список без обрезания.[/b] Для полного редактирования списка обязательных предметов нужен Mod Config Menu версии 10 или новее."
+    ],
+    "en": [
+      "[b]Required-item list.[/b] Always take items by name or ID regardless of category, value and value-per-weight filters. Capacity and theft rules still apply.",
+      "[b]Protect player storage.[/b] Looting ignores your own building inventories by default, even when their window is open. ALT+INSERT deposit still works.",
+      "[b]Pick up loose ground items.[/b] Optionally, the character walks to suitable items and picks them up. Disabled by default.",
+      "[b]Long lists without truncation.[/b] Mod Config Menu version 10 or newer is needed to edit the full required-item list."
+    ]
+  },
+  "SkillLevelUpInfo": {
+    "version": "1",
+    "ru": [
+      "[b]Только повышение целого уровня.[/b] Над персонажем появляются название навыка и его новый уровень; полос опыта и сообщений о каждом приросте нет.",
+      "[b]Золотой текст с анимацией.[/b] Надпись поднимается над персонажем и плавно исчезает, сохраняя вид исходной механики xp_info.",
+      "[b]Настройки в MCM.[/b] Можно ограничить сообщения выбранными персонажами и включить дублирование в игровой журнал.",
+      "Меньше лишних сообщений: после загрузки и повторного включения текущие уровни принимаются за исходные; старые повышения не высыпаются на экран."
+    ],
+    "en": [
+      "[b]Whole-level increases only.[/b] The skill name and new level appear above the character, without XP bars or notifications for every small gain.",
+      "[b]Animated gold text.[/b] Messages rise above the character and fade smoothly, preserving the original xp_info presentation.",
+      "[b]MCM settings.[/b] Limit messages to selected characters and optionally copy them to the game log.",
+      "Less notification noise: after loading or re-enabling, current levels become the baseline instead of replaying old increases."
+    ]
+  },
+  "MultiXPMining": {
+    "version": "1",
+    "ru": [
+      "[b]Источники из загруженной сборки.[/b] Добыча определяется по данным игры, включая добавленные модами жилы и шахты: олово, уголь и другие ресурсы не требуют списка названий вручную.",
+      "[b]Удобный выбор источника.[/b] Список с поиском по имени или ID, прокруткой и подсказками; над параметрами видны имя и ID выбранного источника.",
+      "[b]Отдельные опыт и пределы.[/b] Сила, стойкость и ловкость настраиваются для каждого источника, вместе с общими множителями.",
+      "[b]Личные изменения сохраняются.[/b] У новых автоматически найденных источников начальные значения могут совпадать, но правки каждого источника независимы.",
+      "Исправлен повторный выбор: параметры источника можно обновить повторным щелчком, если окно настроек перестраивалось во время первого выбора."
+    ],
+    "en": [
+      "[b]Sources from the loaded mod list.[/b] Mining is detected from game data, including modded veins and mines: tin, coal and other resources do not need a hand-written name list.",
+      "[b]A practical source picker.[/b] Search by name or ID, scroll and read tooltips; the selected source's name and ID appear above its settings.",
+      "[b]Separate XP and caps.[/b] Configure Strength, Toughness and Dexterity for each source, with shared multipliers.",
+      "[b]Personal changes survive updates.[/b] Newly detected sources can share initial defaults, while edits to each source remain independent.",
+      "Repeated selection retries the parameter refresh if the options window was being rebuilt when a source was first selected."
+    ]
+  },
+  "Character Inspector": {
+    "version": "1",
+    "ru": [
+      "[b]Открытие из инвентаря.[/b] Кнопка STATS открывает осмотр персонажа этого инвентаря; отдельная горячая клавиша не нужна.",
+      "[b]Покрытие и слои защиты.[/b] Выберите часть тела, чтобы увидеть, какая броня её прикрывает, защитные слои и сопротивления.",
+      "[b]Настройки перенесены в MCM.[/b] Включение и показ кнопки меняются прямо в игре; интерфейс переведён на русский, английский и китайский.",
+      "Убраны повторные поиски и перестановки кнопок; осмотр остаётся привязан к открытому инвентарю и безопасно закрывается при удалении персонажа."
+    ],
+    "en": [
+      "[b]Open from the inventory.[/b] The STATS button inspects the character whose inventory is open; no separate hotkey is needed.",
+      "[b]Coverage and protective layers.[/b] Select a body part to inspect its armour coverage, protective layers and resistances.",
+      "[b]Settings moved to MCM.[/b] Enable the plugin and its inventory button in game, with English, Russian and Chinese interface text.",
+      "Repeated button searches and layout changes are removed; inspection stays with its source inventory and closes safely when the character is removed."
+    ]
+  },
+  "KenshiRotate": {
+    "version": "1",
+    "ru": [
+      "[b]Одно универсальное назначение.[/b] По умолчанию - средняя кнопка мыши; можно выбрать клавишу или кнопку мыши с CTRL, SHIFT и ALT. Лишние отдельные назначения убраны.",
+      "[b]Повторный поворот без переоткрытия.[/b] Предметы поворачиваются несколько раз подряд в том же инвентаре или рюкзаке; набор текста не вызывает поворот.",
+      "[b]Прежнее назначение переносится.[/b] Используется первый включённый старый способ; уже выбранное новое сочетание имеет приоритет.",
+      "[b]Сохранения и стопки.[/b] Сохранена исходная механика сетки, повёрнутых изображений, стопок и сохранения поворота.",
+      "Убраны лишние обновления значков. Состояние очищается при удалении предмета или значка; ссылки на удалённые вещи не остаются."
+    ],
+    "en": [
+      "[b]One universal binding.[/b] Middle mouse by default; choose a keyboard key or mouse button with CTRL, SHIFT and ALT. Redundant separate bindings are removed.",
+      "[b]Repeat without reopening.[/b] Rotate items repeatedly in the same inventory or backpack; typing text does not rotate items.",
+      "[b]Legacy binding migration.[/b] The first active old binding is migrated; an existing new binding takes priority.",
+      "[b]Saves and stacks.[/b] The original grid, rotated icons, stack behavior and saved rotations are preserved.",
+      "Redundant icon updates are removed. State is cleared when an item or icon is destroyed, preventing stale references."
+    ]
+  },
+  "KillCounter": {
+    "version": "1",
+    "ru": [
+      "[b]Счётчики в окне характеристик.[/b] Убийства, оглушения и оторванные конечности отображаются отдельными строками.",
+      "[b]Выбор нужных строк.[/b] Каждый счётчик можно показать или скрыть в MCM, без отдельной горячей клавиши.",
+      "[b]Три языка.[/b] Подписи и настройки переведены на русский, английский и китайский.",
+      "Обновляются только изменившиеся значения; устранено накопление записей об удалённых персонажах. Совместная работа со Stat Colours сохранена."
+    ],
+    "en": [
+      "[b]Counters in the stats window.[/b] Kills, knockouts and severed limbs are shown as separate rows.",
+      "[b]Choose which rows to show.[/b] Show or hide each counter in MCM without a separate hotkey.",
+      "[b]Three languages.[/b] Labels and settings are available in English, Russian and Chinese.",
+      "Only changed values are refreshed, and records for removed characters no longer accumulate. Stat Colours compatibility is preserved."
+    ]
+  }
+}

@@ -1,5 +1,60 @@
 PatientSelfAid — пациент лечит себя сам, пока его лечат
 
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 4 (29–30.10.2026)
+
+  * Биологический персонаж с повреждёнными протезами теперь может
+    помогать ремонтировать себя своим ремкомплектом, пока его лечит
+    другой герой. Проверяется медицинская потребность роботизированных
+    частей, а не только правила выбора цели у ИИ скелетов.
+  * Обычная первая помощь сохраняет приоритет: если есть раны и аптечка,
+    сначала отдаётся приказ лечить раны; иначе — чинить роботизированные
+    части при наличии ремкомплекта. Один износ, для которого нужна
+    ремкровать, не запускает бесполезное самолечение.
+  * Условия сохранены: оба персонажа принадлежат игроку, пациент стоит
+    и ждёт лекаря, находится в сознании и на ногах. Занятые, дерущиеся,
+    уже лечащие себя или других пациенты не получают новый приказ.
+    Приказ отдаётся штатным способом; максимум три попытки за одно
+    непрерывное лечение, с паузой в две секунды между попытками.
+  * Проверка идёт раз в 0,5 с. Цели и позиции для поиска лекаря рядом
+    читаются один раз за проход и переиспользуются. Выключенный мод
+    сразу выходит из своего обновления, диагностические строки при
+    Debug=0 не строятся. Кэш использует дескрипторы с серийным номером,
+    удаляет завершённые лечения и сбрасывается при загрузке, новой игре,
+    смене настроек и отсутствии мира. Рабочие буферы переиспользуются,
+    лишняя ёмкость после сокращения отряда освобождается.
+  * Обе настройки MCM применяются сразу. Подробный журнал — последняя
+    строка, выключен по умолчанию (Debug=0); ошибки пишутся всегда.
+    Личный PatientSelfAid.ini обновление не заменяет.
+  * Переводы ru_RU/en_GB/zh_CN; в пакете .mo, исходные .po в репозитории.
+
+VERSION 4 CHANGES (29–30 OCTOBER 2026)
+
+  * Biological characters with damaged prosthetics can now use their
+    own repair kit to help repair themselves while another character
+    treats them. Robot first-aid need is checked through the medical
+    system as well as the AI's robot-target rules.
+  * Ordinary wounds take priority when first aid and a medkit are
+    available; otherwise damaged robotic parts can receive a repair
+    order if a repair kit is available. Wear that requires a repair bed
+    alone does not trigger a useless self-treatment order.
+  * Both characters must belong to the player. The patient must be
+    conscious, standing and waiting for the medic. Busy patients,
+    fighters and characters already treating themselves or others are
+    left alone. Native orders are limited to three attempts per
+    continuous treatment, with a two-second retry interval.
+  * The half-second scan reuses each pass's goals and positions.
+    Disabled updates exit immediately; Debug=0 does not build log text.
+    Treatment state uses serial-bearing handles, removes finished
+    treatments and resets on load, new game, settings changes or no
+    world. Buffers are reused and excess capacity is released when
+    the squad shrinks.
+  * Both MCM settings apply immediately. Detailed log is last and off
+    by default (Debug=0); errors are always logged. Updates preserve
+    PatientSelfAid.ini. UI translations: ru_RU/en_GB/zh_CN; releases
+    contain .mo catalogs, with .po sources kept in the repository.
+
+СПРАВОЧНИК И ИСТОРИЯ
+
 Требуется RE_Kenshi.
 
 
@@ -42,13 +97,16 @@ PatientSelfAid — пациент лечит себя сам, пока его л
 
 Раз в полсекунды плагин перебирает отряд игрока. Лекарь опознаётся по
 текущей цели (FIRST_AID_ORDER, FIRST_AID_ROBOT, JOB_MEDIC,
-JOB_REPAIR_ROBOT). Пациента он находит двумя способами:
+JOB_REPAIR_ROBOT). Пациента он находит по цели, выполняемой подзадаче
+или, как запасной вариант, по соседству:
 
   * по цели лекаря — так видно лечение по приказу;
+  * по текущей подзадаче медика или ремонта роботов — пациент лежит
+    в currentSubTarget выполняемой задачи;
   * по соседству — персонаж стоит смирно (STAND_STILL), а в пределах
-    6 метров работает лекарь из отряда. Так видно лечение по работе
-    медика или ремонта роботов: своего текущего пациента эти работы
-    нигде не держат. Приказ «лечить себя» отдаётся тем же вызовом, что и
+    6 метров работает лекарь из отряда. Это запасной путь, если цель и
+    текущая подзадача не дали пациента. Приказ «лечить себя» отдаётся
+тем же вызовом, что и
 клик игрока (OrdersReceiver::addOrder), и из того же места — из
 обновления интерфейса.
 
