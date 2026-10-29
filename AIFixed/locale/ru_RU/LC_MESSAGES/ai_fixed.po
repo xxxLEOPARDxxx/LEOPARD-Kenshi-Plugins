@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=UTF-8
-"
-"Language: ru_RU
-"
+"Project-Id-Version: AIFixed 1\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "Small fixes of the game's AI. Each one only touches the case it fixes."
 msgstr "Точечные правки ИИ игры. Каждая трогает только тот случай, который чинит."

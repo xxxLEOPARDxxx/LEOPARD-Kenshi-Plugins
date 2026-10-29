@@ -52,6 +52,7 @@
 #include <kenshi/Globals.h>
 #include <kenshi/GameWorld.h>
 #include <kenshi/PlayerInterface.h>
+#include <kenshi/SaveFileSystem.h>
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/MedicalSystem.h>
 #include <kenshi/FactionRelations.h>
@@ -82,6 +83,13 @@ namespace
     bool g_selfRepair = true;
     int g_selfRepairWear = 50;      // износ части, с которого идти чиниться (0-100)
     bool g_debug = false;
+
+    // Native load hooks only publish invalidation; GUI owns repair containers.
+    volatile LONG g_loadGeneration = 0;
+    volatile LONG g_worldActiveAt = 0, g_worldReadyGeneration = -1;
+    volatile LONG g_loading = 0;
+    LONG g_seenGeneration = -1;
+    bool g_lifecycleReady = false, g_sessionActive = false;
 
 
     std::string IniFileName()
@@ -154,6 +162,28 @@ namespace
     }
 
 
+    // Compare only the SDK's public identity fields, never vptr/padding or the
+    // game's undocumented hand ordering. Both object and container reuse matter.
+    struct HandIdentityLess
+    {
+        bool operator()(const hand& a, const hand& b) const
+        {
+            if (a.type != b.type) return a.type < b.type;
+            if (a.container != b.container) return a.container < b.container;
+            if (a.containerSerial != b.containerSerial) return a.containerSerial < b.containerSerial;
+            if (a.index != b.index) return a.index < b.index;
+            return a.serial < b.serial;
+        }
+    };
+
+    bool SameIdentity(const hand& a, const hand& b)
+    {
+        const HandIdentityLess less;
+        return !less(a, b) && !less(b, a);
+    }
+
+    typedef std::set<hand, HandIdentityLess> ReservedSet;
+
     bool IsRobot(Character* c)
     {
         RaceData* const race = c->getRace();
@@ -201,7 +231,7 @@ namespace
     // Свободная ремкровать рядом, теми же отсевами, что у игры для кроватей
     // отряда игрока, и только та, что чинит (есть питание). NULL - такой нет.
     // me - кто ищет: несущий раненого или сам скелет (саморемонт).
-    Building* FindRepairBed(AI* ai, Character* me, const std::set<Building*>* reserved)
+    Building* FindRepairBed(AI* ai, Character* me, const ReservedSet* reserved)
     {
         // Только в своей базе: «местные» постройки игрока - это все его
         // постройки на карте (22.10.2026: отряд с другого края карты
@@ -234,7 +264,7 @@ namespace
                 continue;
 
             // На неё уже отправлен кто-то из наших (саморемонт).
-            if (reserved != NULL && reserved->find(bed) != reserved->end())
+            if (reserved != NULL && reserved->find(hand(bed)) != reserved->end())
                 continue;
 
             // Туда уже несут кого-то другого.
@@ -275,6 +305,7 @@ namespace
     typedef std::map<Character*, const void*> NotedMap;
     NotedMap g_notedSearch;     // какую кровать нашли
     NotedMap g_notedBed;        // в какой кровати лежит
+    std::map<Character*, DWORD> g_lastSnap;
 
     bool Changed(NotedMap& noted, Character* c, const void* what)
     {
@@ -493,8 +524,7 @@ namespace
         DWORD lastOrder;    // когда отдали последний (и при смене кровати)
         int tries;          // сколько раз отдавали
         bool sent;          // идёт к кровати или лежит по нашему приказу
-        Building* bed;      // куда отправили - только для сравнения и брони,
-                            // живая ли она, проверяем по списку игры
+        hand bed;           // serial-bearing identity; resolve only via live list
         int noted;          // что последним писали в журнал (повторы не пишем)
         DWORD getUpAt;      // когда велели встать после починки
         int getUpTries;
@@ -508,20 +538,22 @@ namespace
     // Брони саморемонта: кровать -> кто на неё отправлен и ещё идёт. Без неё
     // за один проход все отправлялись на одну кровать (22.10.2026): пока
     // никто не дошёл, она для всех «свободна».
-    std::map<Building*, Character*> g_reserved;
+    typedef std::map<hand, hand, HandIdentityLess> ReservationMap;
+    ReservationMap g_reserved;
 
-    std::set<Building*> ReservedByOthers(Character* c)
+    ReservedSet ReservedByOthers(Character* c)
     {
-        std::set<Building*> out;
-        for (std::map<Building*, Character*>::const_iterator it = g_reserved.begin(); it != g_reserved.end(); ++it)
-            if (it->second != c)
+        ReservedSet out;
+        const hand who(c);
+        for (ReservationMap::const_iterator it = g_reserved.begin(); it != g_reserved.end(); ++it)
+            if (!SameIdentity(it->second, who))
                 out.insert(it->first);
         return out;
     }
 
-    // Ключ - указатель только для поиска: разыменовываем лишь персонажей из
-    // живого списка игрока, записи об остальных выбрасываются каждый проход.
-    std::map<Character*, SelfRepairState> g_selfRepairState;
+    // A recycled address must not inherit another character's attempts/order.
+    typedef std::map<hand, SelfRepairState, HandIdentityLess> RepairStateMap;
+    RepairStateMap g_selfRepairState;
 
 
     float WorstWear(MedicalSystem* med, bool robotRace)
@@ -540,15 +572,15 @@ namespace
 
     // Кровать из записи - только если игра её всё ещё видит рядом: по
     // сохранённому указателю не обращаемся, пока не нашли его в живом списке.
-    Building* LiveRepairBed(AI* ai, Building* stored)
+    Building* LiveRepairBed(AI* ai, const hand& stored)
     {
-        if (stored == NULL)
+        if (SameIdentity(stored, hand()))
             return NULL;
         lektor<Building*>& machines = Machines();
         ai->getAllLocalMachines(machines, 1u << BF_SKELETON_BED);
         for (uint32_t i = 0; i < machines.size(); ++i)
-            if (machines[i] == stored)
-                return stored;
+            if (machines[i] != NULL && SameIdentity(hand(machines[i]), stored))
+                return machines[i];
         return NULL;
     }
 
@@ -627,7 +659,7 @@ namespace
                 Building* const target = LiveRepairBed(ai, state.bed);
                 if (target != NULL && static_cast<UseableStuff*>(target)->isFreeSlot(c->handle))
                 {
-                    g_reserved[target] = c;
+                    g_reserved[hand(target)] = hand(c);
                     if (state.noted != NOTED_HEADING)
                         NoteSelfRepair(c, "heading to " + target->displayName);
                     state.noted = NOTED_HEADING;
@@ -641,8 +673,8 @@ namespace
             {
                 // Не пошёл (игрок отменил или игра не приняла) - бронь
                 // отдаём другим, повтор - по обычным правилам.
-                std::map<Building*, Character*>::iterator own = g_reserved.find(state.bed);
-                if (own != g_reserved.end() && own->second == c)
+                ReservationMap::iterator own = g_reserved.find(state.bed);
+                if (own != g_reserved.end() && SameIdentity(own->second, hand(c)))
                     g_reserved.erase(own);
                 if (state.noted != NOTED_NOT_GOING)
                 {
@@ -652,7 +684,7 @@ namespace
                 }
                 state.noted = NOTED_NOT_GOING;
                 state.sent = false;
-                state.bed = NULL;
+                state.bed = hand();
             }
         }
         else if (heading)
@@ -662,7 +694,7 @@ namespace
                           (state.ordered != 0 && now - state.ordered < SELF_REPAIR_RETRY_MS)))
             return true;
 
-        const std::set<Building*> reserved = ReservedByOthers(c);
+        const ReservedSet reserved = ReservedByOthers(c);
         Building* const bed = FindRepairBed(ai, c, &reserved);
         if (bed == NULL)
         {
@@ -677,8 +709,8 @@ namespace
         }
 
         orders->addOrder(USE_BED_ORDER, bed->handle, bed->getPosition(), true, false);
-        g_reserved[bed] = c;
-        state.bed = bed;
+        g_reserved[hand(bed)] = hand(c);
+        state.bed = hand(bed);
         state.sent = true;
         state.noted = NOTED_SENT;
         state.lastOrder = now;
@@ -721,13 +753,13 @@ namespace
 
         const lektor<Character*>& squad = ou->player->playerCharacters;
         const DWORD now = GetTickCount();
-        std::map<Character*, SelfRepairState> kept;
+        RepairStateMap kept;
 
         // Брони прошлого прохода: кто ещё идёт - подтвердит свою заново.
         g_reserved.clear();
-        for (std::map<Character*, SelfRepairState>::const_iterator it = g_selfRepairState.begin();
+        for (RepairStateMap::const_iterator it = g_selfRepairState.begin();
              it != g_selfRepairState.end(); ++it)
-            if (it->second.sent && it->second.bed != NULL)
+            if (it->second.sent && !SameIdentity(it->second.bed, hand()))
                 g_reserved[it->second.bed] = it->first;
 
         for (uint32_t i = 0; i < squad.size(); ++i)
@@ -736,13 +768,14 @@ namespace
             if (c == NULL)
                 continue;
 
-            SelfRepairState state = { 0, 0, 0, false, NULL, NOTED_NONE, 0, 0 };
-            std::map<Character*, SelfRepairState>::const_iterator old = g_selfRepairState.find(c);
+            SelfRepairState state = { 0, 0, 0, false, hand(), NOTED_NONE, 0, 0 };
+            const hand key(c);
+            RepairStateMap::const_iterator old = g_selfRepairState.find(key);
             if (old != g_selfRepairState.end())
                 state = old->second;
 
             if (SafeSelfRepairOne(c, state, now))
-                kept[c] = state;
+                kept[key] = state;
         }
 
         g_selfRepairState.swap(kept);
@@ -752,13 +785,119 @@ namespace
     void (*g_origGuiUpdate)(ForgottenGUI*) = NULL;
     DWORD g_lastSelfRepairScan = 0;
 
+    void InvalidateWorld()
+    {
+        InterlockedExchange(&g_worldActiveAt, 0);
+        InterlockedIncrement(&g_loadGeneration);
+    }
+
+    bool WorldActive(DWORD now)
+    {
+        const DWORD last = static_cast<DWORD>(InterlockedCompareExchange(&g_worldActiveAt, 0, 0));
+        return g_lifecycleReady && InterlockedCompareExchange(&g_loading, 0, 0) == 0 &&
+               last != 0 && now - last <= 300 &&
+               InterlockedCompareExchange(&g_worldReadyGeneration, 0, 0) ==
+               InterlockedCompareExchange(&g_loadGeneration, 0, 0);
+    }
+
+    void ResetSessionState()
+    {
+        // GUI-owned metadata only: never dereference a stored game object.
+        g_selfRepairState.clear();
+        g_reserved.clear();
+        g_lastSelfRepairScan = 0;
+        EnterCriticalSection(&g_noteLock);
+        g_notedSearch.clear();
+        g_notedBed.clear();
+        g_lastSnap.clear();
+        LeaveCriticalSection(&g_noteLock);
+    }
+
+    bool SelfRepairSessionReady(DWORD now)
+    {
+        const LONG generation = InterlockedCompareExchange(&g_loadGeneration, 0, 0);
+        if (generation != g_seenGeneration)
+        {
+            ResetSessionState();
+            g_seenGeneration = generation;
+            g_sessionActive = false;
+        }
+        if (ou == NULL)
+        {
+            if (g_sessionActive) ResetSessionState();
+            g_sessionActive = false;
+            return false;
+        }
+        // A slow frame or a paused loop is not a world teardown. Preserve our
+        // sent-order ownership/retry budget and merely skip access/commands.
+        if (!WorldActive(now)) return false;
+        // Player fields are read only after a fresh native-world heartbeat.
+        if (ou->player == NULL)
+        {
+            if (g_sessionActive) ResetSessionState();
+            g_sessionActive = false;
+            return false;
+        }
+        g_sessionActive = true;
+        return true;
+    }
+
+    void (*g_origWorld)(GameWorld*, float) = NULL;
+    void World_hook(GameWorld* self, float time)
+    {
+        const LONG generation = InterlockedCompareExchange(&g_loadGeneration, 0, 0);
+        g_origWorld(self, time);
+        if (self == ou && InterlockedCompareExchange(&g_loading, 0, 0) == 0 &&
+            generation == InterlockedCompareExchange(&g_loadGeneration, 0, 0))
+        {
+            InterlockedExchange(&g_worldReadyGeneration, generation);
+            InterlockedExchange(&g_worldActiveAt, static_cast<LONG>(GetTickCount()));
+        }
+    }
+
+    void (*g_origLoadGame)(SaveFileSystem*, const std::string&) = NULL;
+    void LoadGame_hook(SaveFileSystem* self, const std::string& name)
+    {
+        InterlockedIncrement(&g_loading);
+        InvalidateWorld();
+        __try { g_origLoadGame(self, name); }
+        __finally { InvalidateWorld(); InterlockedDecrement(&g_loading); }
+    }
+
+    void (*g_origNewGame)(SaveFileSystem*) = NULL;
+    void NewGame_hook(SaveFileSystem* self)
+    {
+        InterlockedIncrement(&g_loading);
+        InvalidateWorld();
+        __try { g_origNewGame(self); }
+        __finally { InvalidateWorld(); InterlockedDecrement(&g_loading); }
+    }
+
+    void (*g_origResetGame)(GameWorld*) = NULL;
+    void ResetGame_hook(GameWorld* self)
+    {
+        InterlockedIncrement(&g_loading);
+        InvalidateWorld();
+        __try { g_origResetGame(self); }
+        __finally { InvalidateWorld(); InterlockedDecrement(&g_loading); }
+    }
+
+    void (*g_origClearWorld)(GameWorld*) = NULL;
+    void ClearWorld_hook(GameWorld* self)
+    {
+        InterlockedIncrement(&g_loading);
+        InvalidateWorld();
+        __try { g_origClearWorld(self); }
+        __finally { InvalidateWorld(); InterlockedDecrement(&g_loading); }
+    }
+
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
 
-        if (!g_selfRepair)
-            return;
         const DWORD now = GetTickCount();
+        if (!SelfRepairSessionReady(now) || !g_selfRepair)
+            return;
         if (now - g_lastSelfRepairScan < SELF_REPAIR_SCAN_MS)
             return;
         g_lastSelfRepairScan = now;
@@ -847,7 +986,7 @@ namespace
 
     void Drop_hook(Character* self, bool ragdoll, bool removeOnly)
     {
-        SafeNoteDrop(self, ragdoll, removeOnly, _ReturnAddress());
+        if (g_debug) SafeNoteDrop(self, ragdoll, removeOnly, _ReturnAddress());
         g_origDrop(self, ragdoll, removeOnly);
     }
 
@@ -879,7 +1018,7 @@ namespace
 
     void SetBedMode_hook(Character* self, bool on, UseableStuff* bed)
     {
-        SafeNoteBed(self, on, bed, _ReturnAddress());
+        if (g_debug) SafeNoteBed(self, on, bed, _ReturnAddress());
         g_origSetBedMode(self, on, bed);
     }
 
@@ -909,7 +1048,7 @@ namespace
 
     void TaskImpossible_hook(AITaskSytem* self)
     {
-        SafeNoteImpossible(self, _ReturnAddress());
+        if (g_debug) SafeNoteImpossible(self, _ReturnAddress());
         g_origTaskImpossible(self);
     }
 
@@ -920,7 +1059,6 @@ namespace
     // кровати» (inSomething = IN_BED), inWhat - ремкровать, а множитель
     // починки = getProductionMult() кровати * calculateEfficiencyMult() её
     // UseableStuff. Раз в 5 с на скелета игрока в кровати пишем эти значения.
-    std::map<Character*, DWORD> g_lastSnap;
 
     void Snap(MedicalSystem* med)
     {
@@ -978,7 +1116,7 @@ namespace
     void Medical_hook(MedicalSystem* self, float frameTime)
     {
         g_origMedical(self, frameTime);
-        SafeSnap(self);
+        if (g_debug) SafeSnap(self);
     }
 
 
@@ -1014,7 +1152,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->integer(api, "AIFixed", "SelfRepairWear", Tr("Wear threshold"),
                  Tr("Wear of any robotic part above which the character goes to repair himself."), 50, 0, 100, 0);
     api->section(api, Tr("Diagnostics"));
-    api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."), 0, 0);
+    api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."), 0, MCM_RESTART);
 }
 
 
@@ -1028,6 +1166,25 @@ __declspec(dllexport) void startPlugin()
         DebugLog("AIFixed: disabled in the ini");
         return;
     }
+
+    const bool worldHook = KenshiLib::SUCCESS ==
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&GameWorld::_NV_mainLoop_GPUSensitiveStuff),
+                          World_hook, &g_origWorld);
+    const bool loadHook = KenshiLib::SUCCESS ==
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),
+                          LoadGame_hook, &g_origLoadGame);
+    const bool newHook = KenshiLib::SUCCESS ==
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),
+                          NewGame_hook, &g_origNewGame);
+    const bool resetHook = KenshiLib::SUCCESS ==
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&GameWorld::resetGame),
+                          ResetGame_hook, &g_origResetGame);
+    const bool clearHook = KenshiLib::SUCCESS ==
+        KenshiLib::AddHook(KenshiLib::GetRealAddress(&GameWorld::_clearAndDestroyGameWorldStuff),
+                          ClearWorld_hook, &g_origClearWorld);
+    g_lifecycleReady = worldHook && loadHook && newHook && resetHook && clearHook;
+    if (!g_lifecycleReady)
+        ErrorLog("AIFixed: lifecycle hooks incomplete, automatic self-repair disabled");
 
     // Хук стоит всегда, выключатель правки читается на ходу.
     if (KenshiLib::SUCCESS !=
