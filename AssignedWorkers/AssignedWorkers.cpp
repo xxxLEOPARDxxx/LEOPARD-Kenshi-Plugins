@@ -1,4 +1,4 @@
-// AssignedWorkers - кто из отряда закреплён за постройкой.
+﻿// AssignedWorkers - кто из отряда закреплён за постройкой.
 //
 // ЧТО НЕ ТАК В ИГРЕ
 //
@@ -108,6 +108,8 @@
 #define KLOC_DOMAIN "assigned_workers"
 #include <Localization.h>
 #include <ModConfigMenu.h>
+#include <PluginSettings.h>
+#include "PowerMarkers.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -119,6 +121,9 @@ namespace
     // ---------------------------------------------------------------
 
     bool g_enabled = true;
+    bool g_powerWarnings = true, g_includeNoPower = true;
+    int g_powerSize = 32;
+    float g_powerRange = 150, g_powerHeight = 4;
     bool g_showNobody = true;
     bool g_debug = false;
     HoldKey::Key g_holdKey;    // ALT; vk 0 - показывать всегда (см. HoldKey.h)
@@ -160,6 +165,11 @@ namespace
             return;
 
         const char* const section = "AssignedWorkers";
+        g_powerWarnings = PluginSettings::Bool(section, "PowerWarnings", true, ini);
+        g_includeNoPower = PluginSettings::Bool(section, "IncludeNoPower", true, ini);
+        g_powerSize = (int)PluginSettings::Number(section, "PowerIconSize", 32, 12, 96, ini);
+        g_powerRange = PluginSettings::Number(section, "PowerMarkerRange", 150, 20, 5000, ini);
+        g_powerHeight = PluginSettings::Number(section, "PowerMarkerHeight", 4, 0, 50, ini);
 
         g_enabled =
             GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
@@ -424,9 +434,8 @@ namespace
     {
         const DWORD now = GetTickCount();
         MyGUI::Widget* const known = g_windowRef->get();
-        if (known != NULL && g_windowFor == building && known->getInheritedVisible() &&
-            now - g_windowCheckedAt < 500)
-            return known;
+        if (g_windowFor == building && now - g_windowCheckedAt < 500)
+            return known != NULL && known->getInheritedVisible() ? known : NULL;
         g_windowCheckedAt = now;
         g_windowFor = building;
         MyGUI::Widget* const found = FindBuildingWindowNow(building);
@@ -484,6 +493,7 @@ namespace
     const int kPadY = 10;
     const int kGap = 18;
 
+    WidgetRef g_panelRef;
     MyGUI::Widget* g_panel = NULL;
     std::vector<MyGUI::TextBox*> g_cells;   // по две на строку
     int g_rowHeight = 20;
@@ -510,12 +520,15 @@ namespace
 
     void EnsurePanel()
     {
+        g_panel = g_panelRef.get();
         if (g_panel != NULL)
             return;
+        g_cells.clear();
 
         g_panel = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
             "Kenshi_FloatingPanelSkin", MyGUI::IntCoord(0, 0, 100, 100),
             MyGUI::Align::Default, "ToolTip", "AssignedWorkers_Panel");
+        g_panelRef.set(g_panel);
         g_panel->setNeedMouseFocus(false);
         g_panel->setNeedKeyFocus(false);
         g_panel->setVisible(false);
@@ -740,6 +753,7 @@ namespace
 
     void Hide()
     {
+        g_panel = g_panelRef.get();
         if (g_panel != NULL && g_panel->getVisible())
             g_panel->setVisible(false);
     }
@@ -762,7 +776,7 @@ namespace
 
     void Update()
     {
-        if (!HoldKeyDown())
+        if (!g_enabled || !PowerMarkers::WorldActive() || !HoldKeyDown())
         {
             Hide();
             return;
@@ -782,6 +796,7 @@ namespace
             return;
         }
 
+        if (g_panelRef.get() == NULL) { g_shownFor = NULL; g_shownKey.clear(); }
         EnsurePanel();
 
         const DWORD now = GetTickCount();
@@ -814,7 +829,7 @@ namespace
             for (size_t i = 0; i < workers.size(); ++i)
                 key += workers[i].name + "|" + WorkerValue(workers[i]) + "\n";
 
-            if (building != g_shownFor || key != g_shownKey || key.empty())
+            if (building != g_shownFor || key != g_shownKey)
             {
                 Fill(workers);
 
@@ -1029,6 +1044,7 @@ namespace
     void GuiData_hook(UseableStuff* self, DatapanelGUI* panel, int cat)
     {
         g_orig[N](self, panel, cat);
+        if (!g_enabled) return;
 
         // Подсказка под курсором - панель без scrollView; это не
         // выделенная постройка.
@@ -1060,8 +1076,16 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* thisptr)
     {
         g_origGuiUpdate(thisptr);
-        PollIdleKey();
+        if (g_enabled && PowerMarkers::WorldActive()) PollIdleKey();
+        else {
+            g_idleWasDown = false;
+            if (MyGUI::Widget* notice = g_noticeRef->get())
+                if (notice->getVisible()) notice->setVisible(false);
+            g_selected = NULL; SelectedHandle() = hand();
+        }
         Update();
+        PowerMarkers::Tick(g_enabled && g_powerWarnings && HoldKeyDown(),
+                           g_includeNoPower, g_powerSize, g_powerRange, g_powerHeight, g_debug);
     }
 }
 
@@ -1075,9 +1099,15 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     if (api->version >= 2)
         api->info(api, Tr("Shows who of the squad is assigned to the selected building."));
     api->section(api, Tr("Panel"));
-    api->toggle(api, "AssignedWorkers", "Enabled", Tr("Enabled"), Tr("Who of the squad is assigned to the selected building - a panel next to its window."), 1, MCM_RESTART);
+    api->toggle(api, "AssignedWorkers", "Enabled", Tr("Enabled"), Tr("Who of the squad is assigned to the selected building - a panel next to its window."), 1, 0);
     api->hotkey(api, "AssignedWorkers", "HoldKey", Tr("Show while held"), Tr("The panel is shown only while this key is held. Click and press a key; Backspace - no key, the panel is always shown."), "ALT", 0);
     api->toggle(api, "AssignedWorkers", "ShowNobody", Tr("Show when nobody is assigned"), Tr("At your own building nobody is assigned to: a panel saying nobody. Off - no panel at all. At other buildings nobody is never shown."), 1, 0);
+    api->section(api, Tr("Machine power markers"));
+    api->toggle(api, "AssignedWorkers", "PowerWarnings", Tr("Mark switched-off machines"), Tr("A red lightning bolt above completed machines owned by the player, using the same show key as the workers panel."), 1, 0);
+    api->toggle(api, "AssignedWorkers", "IncludeNoPower", Tr("Also mark missing electricity"), Tr("Also mark enabled machines that require electricity but have none."), 1, 0);
+    api->integer(api, "AssignedWorkers", "PowerIconSize", Tr("Power marker size"), Tr("Lightning bolt size in screen pixels."), 32, 12, 96, 0);
+    api->number(api, "AssignedWorkers", "PowerMarkerRange", Tr("Power marker range"), Tr("Only loaded player machines within this distance of the camera are scanned."), 150, 20, 5000, 0, 0);
+    api->number(api, "AssignedWorkers", "PowerMarkerHeight", Tr("Power marker height"), Tr("World-space height above the machine's origin."), 4, 0, 50, 1, 0);
     api->section(api, Tr("Free characters"));
     api->hotkey(api, "AssignedWorkers", "SelectIdleKey", Tr("Select free characters"), Tr("Selects all your characters with no goal (the character window says No goal), conscious, not caged. Which ones - the two rows below. Click and press a key; Backspace - no key."), "CTRL+SHIFT+I", 0);
     api->toggle(api, "AssignedWorkers", "SelectIdleNoJobs", Tr("Not assigned"), Tr("Select characters with no goal who are not assigned to a building (a bench, a machine...). Medic, Robotics and similar jobs do not count as an assignment."), 1, 0);
@@ -1091,11 +1121,7 @@ __declspec(dllexport) void startPlugin()
 {
     LoadSettings();
 
-    if (!g_enabled)
-    {
-        DebugLog("AssignedWorkers: disabled in the ini");
-        return;
-    }
+    PowerMarkers::Install();
 
     Install("UseableStuff::getGUIData",
             KenshiLib::GetRealAddress(&UseableStuff::_NV_getGUIData),
@@ -1128,5 +1154,5 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
-    DebugLog("AssignedWorkers: installed");
+    if (g_debug) DebugLog("AssignedWorkers: installed");
 }
