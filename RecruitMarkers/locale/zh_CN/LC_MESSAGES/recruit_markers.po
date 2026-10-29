@@ -1,21 +1,29 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: RecruitMarkers\n"
-"Language: zh_CN\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+msgstr "Language: zh_CN\nContent-Type: text/plain; charset=UTF-8\n"
 
 msgid "1-10 (10% steps)."
 msgstr "1-10（每级 10%）。"
 
+msgid "A marker over the heads of characters you can recruit, and over traders."
+msgstr "在可招募的角色和商人头顶显示标记。"
+
 msgid "A marker over the heads of characters you can recruit."
 msgstr "可招募角色头顶显示标记。"
 
-msgid "Animals that can join you."
-msgstr "可以加入你的动物。"
+msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+msgstr "在与你交易的人头顶显示一摞硬币。也能招募的商人会同时显示两个标记。"
+
+msgid "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
+msgstr "在已加载小队的实际队长头顶显示星星，与招募和商人标记共用显示按键。"
+
+msgid "Also mark leaders of player squads when the game has assigned one."
+msgstr "游戏已为玩家小队指定队长时，也显示队长标记。"
 
 msgid "Animals"
 msgstr "动物"
+
+msgid "Animals that can join you."
+msgstr "可以加入你的动物。"
 
 msgid "Bar recruits, drifters and other ordinary characters who can join you."
 msgstr "酒吧招募者、流浪者等可以加入你的普通角色。"
@@ -25,6 +33,12 @@ msgstr "距离镜头中心超过此距离的角色不显示标记。"
 
 msgid "Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."
 msgstr "像游戏一样检查对话条件：金钱、关系、囚禁等，以你最近的选中角色为准。关闭 - 显示所有对话中可以加入队伍的角色。"
+
+msgid "Colour of the coin marker over traders, #RRGGBB."
+msgstr "商人头顶硬币标记的颜色，#RRGGBB。"
+
+msgid "Colour of the leader star, #RRGGBB."
+msgstr "队长星星的颜色，格式为 #RRGGBB。"
 
 msgid "Detailed log"
 msgstr "详细日志"
@@ -50,8 +64,14 @@ msgstr "标记悬挂在头部骨骼上方的高度。"
 msgid "In RE_Kenshi_log.txt: who was found recruitable, and every 10 seconds how many are marked and checked."
 msgstr "写入 RE_Kenshi_log.txt：哪些角色可招募，并每 10 秒记录标记和检查的数量。"
 
-msgid "Width in pixels."
-msgstr "宽度，单位为像素。"
+msgid "Include player leaders"
+msgstr "包括玩家小队队长"
+
+msgid "Leader colour"
+msgstr "队长星星颜色"
+
+msgid "Leader star size"
+msgstr "队长星星大小"
 
 msgid "Look"
 msgstr "外观"
@@ -92,6 +112,12 @@ msgstr "独特角色闪烁"
 msgid "Show key"
 msgstr "显示按键"
 
+msgid "Squad leaders"
+msgstr "小队队长"
+
+msgid "Star size in pixels, independent of recruit and trader markers."
+msgstr "星星的大小，单位为像素，不影响招募和商人标记。"
+
 msgid "The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."
 msgstr "按住此键时显示标记。NONE（设置时按 Backspace）- 始终显示。"
 
@@ -100,6 +126,12 @@ msgstr "独特角色的标记会轻微闪烁。"
 
 msgid "The nearest ones are shown."
 msgstr "显示最近的角色。"
+
+msgid "Trader colour"
+msgstr "商人颜色"
+
+msgid "Traders"
+msgstr "商人"
 
 msgid "Unique characters"
 msgstr "独特角色"
@@ -110,17 +142,5 @@ msgstr "独特颜色"
 msgid "Who"
 msgstr "标记对象"
 
-msgid "A marker over the heads of characters you can recruit, and over traders."
-msgstr "在可招募的角色和商人头顶显示标记。"
-
-msgid "Traders"
-msgstr "商人"
-
-msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
-msgstr "在与你交易的人头顶显示一摞硬币。也能招募的商人会同时显示两个标记。"
-
-msgid "Trader colour"
-msgstr "商人颜色"
-
-msgid "Colour of the coin marker over traders, #RRGGBB."
-msgstr "商人头顶硬币标记的颜色，#RRGGBB。"
+msgid "Width in pixels."
+msgstr "宽度，单位为像素。"

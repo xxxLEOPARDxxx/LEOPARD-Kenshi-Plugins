@@ -1,21 +1,29 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: RecruitMarkers\n"
-"Language: ru_RU\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+msgstr "Language: ru_RU\nContent-Type: text/plain; charset=UTF-8\n"
 
 msgid "1-10 (10% steps)."
 msgstr "1-10 (шаг 10%)."
 
+msgid "A marker over the heads of characters you can recruit, and over traders."
+msgstr "Значок над теми, кого можно нанять, и над торговцами."
+
 msgid "A marker over the heads of characters you can recruit."
 msgstr "Значок над головой у тех, кого можно нанять."
 
-msgid "Animals that can join you."
-msgstr "Животные, которых можно взять в отряд."
+msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+msgstr "Стопка монет над теми, кто с вами торгует. Если торговца можно и нанять - оба значка рядом."
+
+msgid "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
+msgstr "Звезда над фактическим лидером загруженного отряда. Общая клавиша со значками найма и торговцев."
+
+msgid "Also mark leaders of player squads when the game has assigned one."
+msgstr "Также отмечать лидеров отрядов игрока, если игра их назначила."
 
 msgid "Animals"
 msgstr "Животные"
+
+msgid "Animals that can join you."
+msgstr "Животные, которых можно взять в отряд."
 
 msgid "Bar recruits, drifters and other ordinary characters who can join you."
 msgstr "Наёмники из баров, бродяги и другие обычные персонажи, которых можно нанять."
@@ -25,6 +33,12 @@ msgstr "Персонажи дальше этого расстояния от ц�
 
 msgid "Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."
 msgstr "Проверять условия диалога так же, как игра: деньги, отношения, плен и прочее - для ближайшего выделенного персонажа. Выключено - все, чей диалог вообще может закончиться вступлением в отряд."
+
+msgid "Colour of the coin marker over traders, #RRGGBB."
+msgstr "Цвет монет над торговцами, #RRGGBB."
+
+msgid "Colour of the leader star, #RRGGBB."
+msgstr "Цвет звезды лидера, #RRGGBB."
 
 msgid "Detailed log"
 msgstr "Подробный журнал"
@@ -50,8 +64,14 @@ msgstr "Насколько выше кости головы висит знач�
 msgid "In RE_Kenshi_log.txt: who was found recruitable, and every 10 seconds how many are marked and checked."
 msgstr "В RE_Kenshi_log.txt: кого признали нанимаемым и раз в 10 секунд - сколько отмечено и проверено."
 
-msgid "Width in pixels."
-msgstr "Ширина в пикселях."
+msgid "Include player leaders"
+msgstr "Также лидеры игрока"
+
+msgid "Leader colour"
+msgstr "Цвет звезды лидера"
+
+msgid "Leader star size"
+msgstr "Размер звезды лидера"
 
 msgid "Look"
 msgstr "Вид"
@@ -92,6 +112,12 @@ msgstr "Пульсация у уникальных"
 msgid "Show key"
 msgstr "Клавиша показа"
 
+msgid "Squad leaders"
+msgstr "Лидеры отрядов"
+
+msgid "Star size in pixels, independent of recruit and trader markers."
+msgstr "Размер звезды в пикселях, независимо от значков найма и торговли."
+
 msgid "The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."
 msgstr "Значки видны, пока зажата эта клавиша. NONE (Backspace при назначении) - видны всегда."
 
@@ -100,6 +126,12 @@ msgstr "Значки уникальных персонажей мягко пул
 
 msgid "The nearest ones are shown."
 msgstr "Показываются ближайшие."
+
+msgid "Trader colour"
+msgstr "Цвет торговцев"
+
+msgid "Traders"
+msgstr "Торговцы"
 
 msgid "Unique characters"
 msgstr "Уникальные персонажи"
@@ -110,17 +142,5 @@ msgstr "Цвет уникальных"
 msgid "Who"
 msgstr "Кого отмечать"
 
-msgid "A marker over the heads of characters you can recruit, and over traders."
-msgstr "Значок над теми, кого можно нанять, и над торговцами."
-
-msgid "Traders"
-msgstr "Торговцы"
-
-msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
-msgstr "Стопка монет над теми, кто с вами торгует. Если торговца можно и нанять - оба значка рядом."
-
-msgid "Trader colour"
-msgstr "Цвет торговцев"
-
-msgid "Colour of the coin marker over traders, #RRGGBB."
-msgstr "Цвет монет над торговцами, #RRGGBB."
+msgid "Width in pixels."
+msgstr "Ширина в пикселях."

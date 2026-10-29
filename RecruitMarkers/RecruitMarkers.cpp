@@ -1,4 +1,4 @@
-// RecruitMarkers - значок над головой у тех, кого можно нанять.
+﻿// RecruitMarkers - значок над головой у тех, кого можно нанять.
 //
 // Аналог LtEast's Recruitable NPC Highlighter, настройки - в MCM.
 //
@@ -24,9 +24,9 @@
 //
 // НАГРУЗКА. Кандидаты (живые, не наши, в пределах MaxDistance от центра
 // камеры) - раз в 0,75 с из списка обновляемых персонажей игры. Обход
-// диалога - не больше двух персонажей за кадр, результат хранится 10 с.
+// диалога - не больше двух персонажей за 50 мс, результат хранится 10 с.
 // Значки - пул ImageBox на слое Back (как имена над головами у игры),
-// ссылки - WidgetRef, без поиска по имени. Каждый кадр - только позиция
+// ссылки - единый bounded pool, без поиска по имени. Каждый кадр - только позиция
 // головы и проекция на экран.
 
 #define KLOC_DOMAIN "recruit_markers"
@@ -38,12 +38,13 @@
 #include <Windows.h>
 #include <IniDefaults.h>
 #include <HoldKey.h>
-#include <WidgetRef.h>
+#include "MarkerWidgetPool.h"
 
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <map>
+#include <list>
 #include <string>
 #include <vector>
 
@@ -69,6 +70,7 @@
 #include <kenshi/GameData.h>
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/Character.h>
+#include <kenshi/Platoon.h>
 #include <kenshi/Enums.h>
 #include <kenshi/RootObjectBase.h>
 #include <kenshi/gui/ForgottenGUI.h>
@@ -91,10 +93,13 @@ namespace
     bool g_showAnimals = true;
     bool g_checkConditions = true;
     bool g_showTraders = true;
+    bool g_showLeaders = true, g_playerLeaders = true;
+    MyGUI::Colour g_leaderColour(1.0f, 0.85f, 0.25f);
     MyGUI::Colour g_traderColour(0.5f, 0.88f, 1.0f);
     MyGUI::Colour g_uniqueColour(1.0f, 0.957f, 0.6f);
     MyGUI::Colour g_genericColour(1.0f, 0.745f, 0.4f);
     int g_iconSize = 40;
+    int g_leaderSize = 20;
     float g_alpha = 0.8f;
     bool g_pulseUnique = true;
     float g_headGap = 0.4f;             // метры над костью головы по вертикали мира (VerticalOffset у LtEast)
@@ -105,7 +110,10 @@ namespace
     const int kPoolMax = 128;
     const DWORD kCandidateMs = 750;
     const DWORD kCacheMs = 10000;
+    const size_t kQueueLimit = 256;
+    const size_t kCacheLimit = 2048;
     const DWORD kForgetMs = 60000;
+    const DWORD kScanIntervalMs = 50; // <= 40 dialogues/s, independent of FPS
     const int kScansPerFrame = 2;
     const int kNodeLimit = 4000;        // реплик за один обход диалога
     const int kDepthLimit = 40;
@@ -168,6 +176,9 @@ namespace
         g_showGeneric = ReadBool(ini, "ShowGeneric", true);
         g_showAnimals = ReadBool(ini, "ShowAnimals", true);
         g_showTraders = ReadBool(ini, "ShowTraders", true);
+        g_showLeaders = ReadBool(ini, "ShowLeaders", true);
+        g_playerLeaders = ReadBool(ini, "ShowPlayerLeaders", true);
+        g_leaderColour = ReadColour(ini, "LeaderColour", MyGUI::Colour(1.0f, 0.85f, 0.25f));
         g_traderColour = ReadColour(ini, "TraderColour", MyGUI::Colour(0.5f, 0.88f, 1.0f));
         const bool conditions = ReadBool(ini, "CheckConditions", true);
         if (conditions != g_checkConditions)
@@ -176,6 +187,7 @@ namespace
         g_uniqueColour = ReadColour(ini, "UniqueColour", MyGUI::Colour(1.0f, 0.957f, 0.6f));
         g_genericColour = ReadColour(ini, "GenericColour", MyGUI::Colour(1.0f, 0.745f, 0.4f));
         g_iconSize = ReadInt(ini, "IconSize", 40, 12, 96);
+        g_leaderSize = ReadInt(ini, "LeaderSize", 20, 8, 64);
         g_alpha = ReadInt(ini, "Opacity", 8, 1, 10) / 10.0f;
         g_pulseUnique = ReadBool(ini, "PulseUnique", true);
         g_headGap = ReadInt(ini, "HeightAboveHead", 40, 0, 300) / 100.0f;
@@ -349,11 +361,15 @@ namespace
     struct CacheEntry
     {
         bool recruitable;
+        bool checked;
         DWORD stamp;
         DWORD seen;
         int bone;
+        DWORD boneStamp;
+        std::list<unsigned long long>::iterator age;
     };
     std::map<unsigned long long, CacheEntry> g_cache;
+    std::list<unsigned long long> g_cacheAge;
 
     struct Marker
     {
@@ -361,6 +377,7 @@ namespace
         bool unique;
         bool recruit;                   // значок найма
         bool trader;                    // значок торговца
+        bool leader;                    // реальный лидер взвода
         float distance;
         int bone;
     };
@@ -368,12 +385,15 @@ namespace
     std::vector<hand> g_queue;          // кого проверить
     DWORD g_lastCandidates = 0;
     unsigned g_scanned = 0, g_scanFailures = 0;
+    DWORD g_lastScan = 0;
 
     void ForgetCache()
     {
         g_cache.clear();
+        g_cacheAge.clear();
         g_queue.clear();
         g_lastCandidates = 0;
+        g_lastScan = 0;
     }
 
     // Уникальный - по флагу «unique» шаблона персонажа (как в редакторе
@@ -397,21 +417,24 @@ namespace
     bool TemplateUnique(Character* c) { return TemplateFlag(c, g_uniqueKey); }
 
     // recruitKind - проверять ли найм (по настройкам «кого»); trader - торговец.
-    bool SafeFilter(Character* c, const Ogre::Vector3& camera, bool& unique, bool& recruitKind, bool& trader,
+    bool SafeFilter(Character* c, const Ogre::Vector3& camera, bool& unique, bool& recruitKind, bool& trader, bool& leader,
                     float& distance)
     {
         __try
         {
-            if (c->isDead() || c->isPlayerCharacter())
+            const Ogre::Vector3 p = c->getPosition();
+            distance = p.squaredDistance(camera);
+            if (distance > g_maxDistance * g_maxDistance || c->isDead())
                 return false;
             unique = TemplateUnique(c);
-            recruitKind = (c->isAnimal() == NULL || g_showAnimals) && (unique ? g_showUnique : g_showGeneric);
-            trader = g_showTraders && TemplateFlag(c, g_traderKey);
-            if (!recruitKind && !trader)
+            const bool player = c->isPlayerCharacter();
+            recruitKind = !player && (c->isAnimal() == NULL || g_showAnimals) && (unique ? g_showUnique : g_showGeneric);
+            trader = !player && g_showTraders && TemplateFlag(c, g_traderKey);
+            ActivePlatoon* const platoon = g_showLeaders ? c->getPlatoon() : NULL;
+            leader = g_showLeaders && (!player || g_playerLeaders) && platoon != NULL && platoon->squadleader == c;
+            if (!recruitKind && !trader && !leader)
                 return false;
-            const Ogre::Vector3 p = c->getPosition();
-            distance = p.distance(camera);
-            return distance <= g_maxDistance;
+            return true;
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
@@ -421,52 +444,73 @@ namespace
 
     bool ByDistance(const Marker& a, const Marker& b) { return a.distance < b.distance; }
 
+    std::map<unsigned long long, CacheEntry>::iterator CacheFor(const hand& h, DWORD now)
+    {
+        const unsigned long long key = Key(h);
+        std::map<unsigned long long, CacheEntry>::iterator e = g_cache.find(key);
+        if (e == g_cache.end()) {
+            if (g_cache.size() >= kCacheLimit) {
+                g_cache.erase(g_cacheAge.front()); g_cacheAge.pop_front();
+            }
+            CacheEntry fresh;
+            fresh.recruitable=false; fresh.checked=false; fresh.stamp=0; fresh.seen=now; fresh.bone=-2; fresh.boneStamp=now;
+            g_cacheAge.push_back(key); fresh.age=g_cacheAge.end(); --fresh.age;
+            e = g_cache.insert(std::make_pair(key, fresh)).first;
+        } else {
+            g_cacheAge.splice(g_cacheAge.end(), g_cacheAge, e->second.age);
+        }
+        e->second.seen = now;
+        return e;
+    }
+
+    void KeepNearest(std::vector<Marker>& entries, const Marker& m, size_t limit)
+    {
+        if (entries.size() == limit) {
+            if (m.distance >= entries.front().distance) return;
+            std::pop_heap(entries.begin(), entries.end(), ByDistance); entries.pop_back();
+        }
+        entries.push_back(m); std::push_heap(entries.begin(), entries.end(), ByDistance);
+    }
+
     void RefreshCandidates(DWORD now)
     {
-        g_markers.clear();
-        g_queue.clear();
+        g_markers.clear(); g_queue.clear();
+        static std::vector<Marker> pending;
+        pending.clear();
         const Ogre::Vector3 camera = ou->getCameraCenter();
         const ogre_unordered_set<Character*>::type& all = ou->getCharacterUpdateList();
         for (ogre_unordered_set<Character*>::type::const_iterator it = all.begin(); it != all.end(); ++it)
         {
             Character* const c = *it;
-            bool unique = false, recruitKind = false, trader = false;
+            bool unique = false, recruitKind = false, trader = false, leader = false;
             float distance = 0.0f;
-            if (c == NULL || !SafeFilter(c, camera, unique, recruitKind, trader, distance))
-                continue;
-            const hand& h = c->handle;
-            std::map<unsigned long long, CacheEntry>::iterator e = g_cache.find(Key(h));
-            // диалог - только тем, кого по настройкам проверяем на найм
-            if (recruitKind && (e == g_cache.end() || now - e->second.stamp >= kCacheMs))
-                g_queue.push_back(h);
-            const bool recruit = recruitKind && e != g_cache.end() && e->second.recruitable;
-            if (e != g_cache.end())
-                e->second.seen = now;
-            if (recruit || trader)
-            {
-                Marker m;
-                m.who = h;
-                m.unique = unique;
-                m.recruit = recruit;
-                m.trader = trader;
-                m.distance = distance;
-                // кость головы - из кэша (торговец без проверки найма в нём
-                // может не быть: найдём при отрисовке)
-                m.bone = e != g_cache.end() ? e->second.bone : -2;
-                g_markers.push_back(m);
-            }
+            if (c == NULL || !SafeFilter(c, camera, unique, recruitKind, trader, leader, distance)) continue;
+            const hand& h=c->handle;
+            std::map<unsigned long long, CacheEntry>::iterator e=g_cache.find(Key(h));
+            if (e != g_cache.end()) e->second.seen=now;
+            Marker m;
+            m.who=h; m.unique=unique; m.trader=trader; m.leader=leader; m.distance=distance;
+            m.bone=e != g_cache.end() ? e->second.bone : -2;
+            m.recruit=recruitKind && e != g_cache.end() && e->second.checked && e->second.recruitable;
+            // Visible leaders/traders are selected from ALL loaded characters.
+            if (m.recruit || trader || leader) KeepNearest(g_markers, m, g_maxMarkers);
+            if (recruitKind && (e == g_cache.end() || !e->second.checked || now-e->second.stamp >= kCacheMs))
+                KeepNearest(pending, m, kQueueLimit);
+        }
+        for (std::map<unsigned long long, CacheEntry>::iterator e=g_cache.begin(); e!=g_cache.end();) {
+            if (now-e->second.seen >= kForgetMs) {
+                g_cacheAge.erase(e->second.age); g_cache.erase(e++);
+            } else ++e;
         }
         std::sort(g_markers.begin(), g_markers.end(), ByDistance);
-        if (static_cast<int>(g_markers.size()) > g_maxMarkers)
-            g_markers.resize(g_maxMarkers);
-        // кого давно нет рядом - забываем
-        for (std::map<unsigned long long, CacheEntry>::iterator e = g_cache.begin(); e != g_cache.end();)
-        {
-            if (now - e->second.seen >= kForgetMs)
-                g_cache.erase(e++);
-            else
-                ++e;
+        for (size_t i=0; i<g_markers.size(); ++i) {
+            const hand& h=g_markers[i].who;
+            std::map<unsigned long long, CacheEntry>::iterator e=CacheFor(h, now);
+            g_markers[i].bone=now-e->second.boneStamp >= kCacheMs ? -2 : e->second.bone;
         }
+        std::sort(pending.begin(), pending.end(), ByDistance);
+        // Reverse order: queue.back() is the nearest unchecked character.
+        for (size_t n=pending.size(); n>0; --n) g_queue.push_back(pending[n-1].who);
     }
 
     Character* Talker(Character* npc)
@@ -495,8 +539,11 @@ namespace
     // Не больше двух персонажей и ~2 мс за кадр (первый - всегда).
     void ScanSome(DWORD now)
     {
-        LARGE_INTEGER freq, start, cur;
-        QueryPerformanceFrequency(&freq);
+        if (g_queue.empty() || (g_lastScan != 0 && now - g_lastScan < kScanIntervalMs)) return;
+        g_lastScan = now;
+        LARGE_INTEGER start, cur;
+        static LARGE_INTEGER freq = {0};
+        if (freq.QuadPart == 0) QueryPerformanceFrequency(&freq);
         QueryPerformanceCounter(&start);
         for (int n = 0; n < kScansPerFrame && !g_queue.empty(); ++n)
         {
@@ -516,21 +563,19 @@ namespace
             const int result = ScanDialogue(c, target, nodes);
             ++g_scanned;
             std::map<unsigned long long, CacheEntry>::iterator found = g_cache.find(Key(h));
-            if (found == g_cache.end())
-            {
-                CacheEntry fresh;
-                fresh.bone = -2;
-                found = g_cache.insert(std::make_pair(Key(h), fresh)).first;
-            }
+            found = CacheFor(h, now);
             CacheEntry& e = found->second;
+            e.checked = true;
             e.recruitable = result == 1;
             e.stamp = now;
             e.seen = now;
             if (result < 0)
             {
                 ++g_scanFailures;
-                if (g_scanFailures <= 5)
-                    ErrorLog("RecruitMarkers: a dialogue could not be read safely: " + c->getName());
+                char error[160];
+                sprintf_s(error, "RecruitMarkers: dialogue read failed for handle %u:%u (%u failures)",
+                          h.index, h.serial, g_scanFailures);
+                ErrorLog(error);
             }
             else if (g_debug && result == 1)
                 DebugLog(std::string("RecruitMarkers: recruitable ") + (TemplateUnique(c) ? "unique " : "generic ") +
@@ -542,10 +587,10 @@ namespace
     // Значки
     // ---------------------------------------------------------------
 
-    WidgetRef g_icons[kPoolMax];
+    MarkerWidgetPool<3 * kPoolMax> g_widgets;
     int g_shown = 0;                    // сколько первых значков видимы
-    WidgetRef g_coins[kPoolMax];        // значки торговцев - свой пул, своя текстура
     int g_coinsShown = 0;
+    int g_starsShown = 0;
 
     const std::string& IconTexture()
     {
@@ -597,7 +642,7 @@ namespace
         return texture;
     }
 
-    MyGUI::ImageBox* MakeImage(WidgetRef& ref, const char* prefix, int i, const std::string& texture)
+    MyGUI::ImageBox* MakeImage(int slot, const char* prefix, int i, const std::string& texture)
     {
         MyGUI::Gui* const gui = MyGUI::Gui::getInstancePtr();
         if (gui == NULL)
@@ -620,20 +665,31 @@ namespace
         image->setNeedKeyFocus(false);
         image->setImageTexture(texture);
         image->setVisible(false);
-        ref.set(image);
+        g_widgets.Set(slot, image);
         return image;
+    }
+
+    const std::string& StarTexture()
+    {
+        static const std::string name("recruitmarkers_leader.png");
+        return name;
+    }
+    MyGUI::ImageBox* Star(int i)
+    {
+        if (MyGUI::Widget* w = g_widgets.Get(2 * kPoolMax + i)) return static_cast<MyGUI::ImageBox*>(w);
+        return MakeImage(2 * kPoolMax + i, "RecruitMarkers_Leader_", i, StarTexture());
     }
 
     MyGUI::ImageBox* Coin(int i)
     {
-        if (MyGUI::Widget* const w = g_coins[i].get())
+        if (MyGUI::Widget* const w = g_widgets.Get(kPoolMax + i))
             return static_cast<MyGUI::ImageBox*>(w);
-        return MakeImage(g_coins[i], "RecruitMarkers_Coin_", i, CoinTexture());
+        return MakeImage(kPoolMax + i, "RecruitMarkers_Coin_", i, CoinTexture());
     }
 
     MyGUI::ImageBox* Icon(int i)
     {
-        if (MyGUI::Widget* const w = g_icons[i].get())
+        if (MyGUI::Widget* const w = g_widgets.Get(i))
             return static_cast<MyGUI::ImageBox*>(w);
         MyGUI::Gui* const gui = MyGUI::Gui::getInstancePtr();
         if (gui == NULL)
@@ -656,14 +712,14 @@ namespace
         image->setNeedKeyFocus(false);
         image->setImageTexture(IconTexture());
         image->setVisible(false);
-        g_icons[i].set(image);
+        g_widgets.Set(i, image);
         return image;
     }
 
     void HideFrom(int from)
     {
         for (int i = from; i < g_shown; ++i)
-            if (MyGUI::Widget* const w = g_icons[i].get())
+            if (MyGUI::Widget* const w = g_widgets.Get(i))
                 w->setVisible(false);
         if (from < g_shown)
             g_shown = from;
@@ -672,16 +728,24 @@ namespace
     void HideCoinsFrom(int from)
     {
         for (int i = from; i < g_coinsShown; ++i)
-            if (MyGUI::Widget* const w = g_coins[i].get())
+            if (MyGUI::Widget* const w = g_widgets.Get(kPoolMax + i))
                 w->setVisible(false);
         if (from < g_coinsShown)
             g_coinsShown = from;
+    }
+
+    void HideStarsFrom(int from)
+    {
+        for (int i = from; i < g_starsShown; ++i)
+            if (MyGUI::Widget* w = g_widgets.Get(2 * kPoolMax + i)) w->setVisible(false);
+        if (from < g_starsShown) g_starsShown = from;
     }
 
     void HideAll()
     {
         HideFrom(0);
         HideCoinsFrom(0);
+        HideStarsFrom(0);
     }
 
     // Точка значка - как у LtEast (снято с его DLL, 16.10.2026): кость
@@ -747,7 +811,8 @@ namespace
                     bone = i;
         }
         // кость вдруг пропала (смена модели) - позиция + 2,2, как у LtEast
-        if (bone < 0 || !TryBone(c, bone, base, out))
+        if (bone >= 0 && !TryBone(c, bone, base, out)) bone = -1;
+        if (bone < 0)
         {
             out = base;
             out.y += 2.2f;
@@ -765,6 +830,7 @@ namespace
     };
     IconState g_iconState[kPoolMax];
     IconState g_coinState[kPoolMax];
+    IconState g_starState[kPoolMax];
 
     // Значок на место, цвет, прозрачность - только то, что изменилось.
     void Place(MyGUI::ImageBox* icon, IconState& st, bool created, const MyGUI::IntCoord& coord,
@@ -801,8 +867,8 @@ namespace
         const MyGUI::IntSize view = render->getViewSize();
         const float pulse = 0.5f + 0.5f * static_cast<float>(sin((now % 1600) / 1600.0 * 6.2831853));
         int drawn = 0;
-        int coins = 0;
-        for (size_t i = 0; i < g_markers.size() && drawn + coins < g_maxMarkers; ++i)
+        int coins = 0, stars = 0;
+        for (size_t i = 0; i < g_markers.size() && drawn + coins + stars < g_maxMarkers; ++i)
         {
             Marker& marker = g_markers[i];
             Character* const c = marker.who.getCharacter();
@@ -813,8 +879,10 @@ namespace
             if (boneBefore != marker.bone)
             {
                 std::map<unsigned long long, CacheEntry>::iterator e = g_cache.find(Key(marker.who));
-                if (e != g_cache.end())
+                if (e != g_cache.end()) {
                     e->second.bone = marker.bone;
+                    e->second.boneStamp = now;
+                }
             }
             float x = 0.0f, y = 0.0f;
             if (!SafeProject(utility, head, x, y))
@@ -822,17 +890,24 @@ namespace
             // облачко реплики из атласа игры, 38x36; низом на точке, зазор 4 - как у LtEast
             const int width = g_iconSize;
             const int height = g_iconSize * 36 / 38;
-            // оба значка - рядом: найм слева, монета справа
-            const bool both = marker.recruit && marker.trader;
+            // Each icon has its own width. Stars are square and bottom-aligned.
+            const int count = (marker.recruit ? 1 : 0) + (marker.trader ? 1 : 0) + (marker.leader ? 1 : 0);
+            const int totalWidth = (marker.recruit ? width : 0) + (marker.trader ? width : 0) +
+                                   (marker.leader ? g_leaderSize : 0) + (count - 1) * 4;
             const int centre = static_cast<int>(x);
             const int top = static_cast<int>(y) - height - 4;
-            const int recruitLeft = both ? centre - width - 2 : centre - width / 2;
-            const int coinLeft = both ? centre + 2 : centre - width / 2;
-            if (recruitLeft + 2 * width + 4 < 0 || top + height < 0 || recruitLeft > view.width || top > view.height)
+            const int starTop = static_cast<int>(y) - g_leaderSize - 4;
+            const int first = centre - totalWidth / 2;
+            const int recruitLeft = first;
+            const int coinLeft = first + (marker.recruit ? width + 4 : 0);
+            const int starLeft = first + ((marker.recruit ? 1 : 0) + (marker.trader ? 1 : 0)) * (width + 4);
+            const int tallest = marker.leader && g_leaderSize > height ? g_leaderSize : height;
+            if (first + totalWidth < 0 || static_cast<int>(y) < 0 || first > view.width ||
+                static_cast<int>(y) - tallest - 4 > view.height)
                 continue;
             if (marker.recruit)
             {
-                const bool created = g_icons[drawn].get() == NULL;
+                const bool created = g_widgets.Get(drawn) == NULL;
                 MyGUI::ImageBox* const icon = Icon(drawn);
                 if (icon == NULL)
                     break;
@@ -844,9 +919,9 @@ namespace
                       unique ? g_uniqueColour : g_genericColour, alpha);
                 ++drawn;
             }
-            if (marker.trader)
+            if (marker.trader && drawn + coins + stars < g_maxMarkers)
             {
-                const bool created = g_coins[coins].get() == NULL;
+                const bool created = g_widgets.Get(kPoolMax + coins) == NULL;
                 MyGUI::ImageBox* const coin = Coin(coins);
                 if (coin == NULL)
                     break;
@@ -854,7 +929,18 @@ namespace
                       g_traderColour, g_alpha);
                 ++coins;
             }
+            if (marker.leader && drawn + coins + stars < g_maxMarkers)
+            {
+                const bool created = g_widgets.Get(2 * kPoolMax + stars) == NULL;
+                MyGUI::ImageBox* const star = Star(stars);
+                if (star == NULL) break;
+                Place(star, g_starState[stars], created, MyGUI::IntCoord(starLeft, starTop, g_leaderSize, g_leaderSize), g_leaderColour, g_alpha);
+                ++stars;
+            }
         }
+        if (stars > g_starsShown) g_starsShown = stars;
+        HideStarsFrom(stars);
+        g_starsShown = stars;
         if (drawn > g_shown)
             g_shown = drawn;
         HideFrom(drawn);
@@ -890,6 +976,7 @@ namespace
         if (!g_enabled || ou == NULL || ou->player == NULL || !HoldKey::Held(g_holdKey))
         {
             HideAll();
+            g_markers.clear(); g_queue.clear(); g_lastCandidates=0;
             return;
         }
         if (g_lastCandidates == 0 || now - g_lastCandidates >= kCandidateMs)
@@ -914,11 +1001,12 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
-        if ((g_shown > 0 || g_coinsShown > 0) && GetTickCount() - g_lastWorldFrame > 300)
+        if (g_lastWorldFrame != 0 && GetTickCount() - g_lastWorldFrame > 300)
         {
             HideAll();
             ForgetCache();              // другой сейв - другие персонажи
             g_markers.clear();
+            g_lastWorldFrame = 0;
         }
     }
 }
@@ -940,6 +1028,10 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowGeneric", Tr("Ordinary recruits"), Tr("Bar recruits, drifters and other ordinary characters who can join you."), 1, 0);
     api->toggle(api, kSec, "ShowAnimals", Tr("Animals"), Tr("Animals that can join you."), 1, 0);
     api->toggle(api, kSec, "ShowTraders", Tr("Traders"), Tr("A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."), 1, 0);
+    api->toggle(api, kSec, "ShowLeaders", Tr("Squad leaders"), Tr("A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."), 1, 0);
+    api->toggle(api, kSec, "ShowPlayerLeaders", Tr("Include player leaders"), Tr("Also mark leaders of player squads when the game has assigned one."), 1, 0);
+    api->integer(api, kSec, "LeaderSize", Tr("Leader star size"), Tr("Star size in pixels, independent of recruit and trader markers."), 20, 8, 64, 0);
+    api->colour(api, kSec, "LeaderColour", Tr("Leader colour"), Tr("Colour of the leader star, #RRGGBB."), "#ffda40", 0);
     api->toggle(api, kSec, "CheckConditions", Tr("Only if recruitable right now"), Tr("Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."), 1, 0);
     api->section(api, Tr("Look"));
     api->colour(api, kSec, "UniqueColour", Tr("Unique colour"), Tr("Marker colour of unique characters, #RRGGBB."), "#fff499", 0);
@@ -969,5 +1061,5 @@ __declspec(dllexport) void startPlugin()
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&ForgottenGUI::update), GuiUpdate_hook, &g_origGuiUpdate))
         ErrorLog("RecruitMarkers: could not hook the interface update - markers may stay in the main menu");
-    DebugLog("RecruitMarkers: installed");
+    if (g_debug) DebugLog("RecruitMarkers: installed");
 }

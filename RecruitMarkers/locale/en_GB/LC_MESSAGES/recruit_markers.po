@@ -1,21 +1,29 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: RecruitMarkers\n"
-"Language: en_GB\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+msgstr "Language: en_GB\nContent-Type: text/plain; charset=UTF-8\n"
 
 msgid "1-10 (10% steps)."
 msgstr "1-10 (10% steps)."
 
+msgid "A marker over the heads of characters you can recruit, and over traders."
+msgstr "A marker over the heads of characters you can recruit, and over traders."
+
 msgid "A marker over the heads of characters you can recruit."
 msgstr "A marker over the heads of characters you can recruit."
 
-msgid "Animals that can join you."
-msgstr "Animals that can join you."
+msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+msgstr "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
+
+msgid "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
+msgstr "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
+
+msgid "Also mark leaders of player squads when the game has assigned one."
+msgstr "Also mark leaders of player squads when the game has assigned one."
 
 msgid "Animals"
 msgstr "Animals"
+
+msgid "Animals that can join you."
+msgstr "Animals that can join you."
 
 msgid "Bar recruits, drifters and other ordinary characters who can join you."
 msgstr "Bar recruits, drifters and other ordinary characters who can join you."
@@ -25,6 +33,12 @@ msgstr "Characters farther than this from the centre of the camera are not marke
 
 msgid "Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."
 msgstr "Check the conditions of the dialogue as the game does: money, relations, imprisonment and so on, for your nearest selected character. Off - everyone whose dialogue can end with joining."
+
+msgid "Colour of the coin marker over traders, #RRGGBB."
+msgstr "Colour of the coin marker over traders, #RRGGBB."
+
+msgid "Colour of the leader star, #RRGGBB."
+msgstr "Colour of the leader star, #RRGGBB."
 
 msgid "Detailed log"
 msgstr "Detailed log"
@@ -50,8 +64,14 @@ msgstr "How high over the head bone the marker hangs."
 msgid "In RE_Kenshi_log.txt: who was found recruitable, and every 10 seconds how many are marked and checked."
 msgstr "In RE_Kenshi_log.txt: who was found recruitable, and every 10 seconds how many are marked and checked."
 
-msgid "Width in pixels."
-msgstr "Width in pixels."
+msgid "Include player leaders"
+msgstr "Include player leaders"
+
+msgid "Leader colour"
+msgstr "Leader colour"
+
+msgid "Leader star size"
+msgstr "Leader star size"
 
 msgid "Look"
 msgstr "Look"
@@ -92,6 +112,12 @@ msgstr "Pulse on unique"
 msgid "Show key"
 msgstr "Show key"
 
+msgid "Squad leaders"
+msgstr "Squad leaders"
+
+msgid "Star size in pixels, independent of recruit and trader markers."
+msgstr "Star size in pixels, independent of recruit and trader markers."
+
 msgid "The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."
 msgstr "The markers are shown while this key is held. NONE (Backspace when assigning) - always shown."
 
@@ -100,6 +126,12 @@ msgstr "The markers of unique characters gently pulse."
 
 msgid "The nearest ones are shown."
 msgstr "The nearest ones are shown."
+
+msgid "Trader colour"
+msgstr "Trader colour"
+
+msgid "Traders"
+msgstr "Traders"
 
 msgid "Unique characters"
 msgstr "Unique characters"
@@ -110,17 +142,5 @@ msgstr "Unique colour"
 msgid "Who"
 msgstr "Who"
 
-msgid "A marker over the heads of characters you can recruit, and over traders."
-msgstr "A marker over the heads of characters you can recruit, and over traders."
-
-msgid "Traders"
-msgstr "Traders"
-
-msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
-msgstr "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
-
-msgid "Trader colour"
-msgstr "Trader colour"
-
-msgid "Colour of the coin marker over traders, #RRGGBB."
-msgstr "Colour of the coin marker over traders, #RRGGBB."
+msgid "Width in pixels."
+msgstr "Width in pixels."
