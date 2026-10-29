@@ -1,4 +1,4 @@
-#define KLOC_DOMAIN "multi_xp_mining"
+﻿#define KLOC_DOMAIN "multi_xp_mining"
 #include <PluginSettings.h>
 #include <Localization.h>
 #include <ModConfigMenu.h>
@@ -6,6 +6,8 @@
 #include "MiningPicker.h"
 #include <map>
 #include <algorithm>
+#include <sstream>
+#include <PluginDiagnostics.h>
 
 namespace
 {
@@ -42,9 +44,18 @@ namespace
     {
         g_selected=MiningPicker::Selected();
         if(g_selected.empty()) { api->section(api,Tr("No matching sources"));return; }
-        api->section(api,Tr("Selected source"));
         MiningCore::Rule rule,defaults;
-        if (!MiningCore::ReadSource(g_selected,rule,&defaults)) return;
+        if (!MiningCore::ReadSource(g_selected,rule,&defaults)) {
+            ErrorLog("MultiXPMining: selected source is missing while building parameters ["+g_selected+"]"); return;
+        }
+        std::string heading=std::string(Tr("Selected source"))+": "+MiningPicker::SelectedName()+" ["+g_selected+"]";
+        std::string escaped;for(size_t n=0;n<heading.size();++n){escaped+=heading[n];if(heading[n]=='#')escaped+='#';}
+        api->section(api,escaped.c_str());
+        if(PluginDiagnostics::Enabled()) {
+            std::ostringstream note;note<<"MultiXPMining: source rows ["<<g_selected<<"] enabled="<<rule.enabled;
+            for(int skill=0;skill<3;++skill)note<<" "<<skill<<"="<<rule.mult[skill]<<"/"<<rule.cap[skill];
+            PluginDiagnostics::Write(note.str());
+        }
         api->toggleFn(api,Tr("Source enabled"),Tr("Allow extra skill training at this source."),GetEnabled,SetEnabled,FieldFor(g_selected,"Enabled",-1,false),0);
         Default(api,defaults.enabled ? 1.0f : 0.0f);
         const char* keys[]={"Strength","Toughness","Dexterity"};

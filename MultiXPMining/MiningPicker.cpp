@@ -1,8 +1,9 @@
-#define KLOC_DOMAIN "multi_xp_mining"
+﻿#define KLOC_DOMAIN "multi_xp_mining"
 #include <PluginSettings.h>
 #include <Localization.h>
 #include <ModConfigMenu.h>
 #include <WidgetRef.h>
+#include <PluginDiagnostics.h>
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Button.h>
 #include <mygui/MyGUI_EditBox.h>
@@ -24,7 +25,7 @@ namespace {
     std::vector<size_t> g_filtered;
     std::vector<MyGUI::Button*> g_entries;
     std::map<std::string,unsigned> g_duplicates;
-    std::string g_selected,g_filter;
+    std::string g_selected,g_selectedName,g_filter;
     size_t g_top=0;
 
     std::wstring Fold(const std::string& text) {
@@ -34,7 +35,13 @@ namespace {
     }
     bool NameLess(const MiningCore::SourceInfo& a,const MiningCore::SourceInfo& b) { return a.name==b.name ? a.sid<b.sid : a.name<b.name; }
     std::string Escape(const std::string& s) { std::string out;out.reserve(s.size());for(size_t i=0;i<s.size();++i){out+=s[i];if(s[i]=='#')out+='#';}return out; }
-    void Refresh() { HMODULE m=GetModuleHandleA("ModConfigMenu.dll");MCM_OpenPageFn fn=m?(MCM_OpenPageFn)GetProcAddress(m,"MCM_OpenPage"):NULL;if(fn)fn("MultiXPMining"); }
+    void Refresh() {
+        HMODULE m=GetModuleHandleA("ModConfigMenu.dll");
+        MCM_OpenPageFn fn=m?(MCM_OpenPageFn)GetProcAddress(m,"MCM_OpenPage"):NULL;
+        if(!fn) { ErrorLog("MultiXPMining: MCM_OpenPage unavailable; selected source parameters could not refresh"); return; }
+        if(PluginDiagnostics::Enabled()) PluginDiagnostics::Write("MultiXPMining: source refresh requested ["+g_selected+"] "+g_selectedName);
+        fn("MultiXPMining");
+    }
 
     // Run only on attach/filter/scroll. UTF-32 truncation never splits UTF-8,
     // and escaping after truncation cannot leave half a MyGUI colour escape.
@@ -86,8 +93,12 @@ namespace {
     void Select(MyGUI::Widget* widget) {
         if(!g_root.get() || std::find(g_entries.begin(),g_entries.end(),widget)==g_entries.end())return;
         const size_t i=(size_t)atoi(widget->getUserString("source_index").c_str());
-        if(i>=g_sources.size() || g_selected==g_sources[i].sid)return;
-        g_selected=g_sources[i].sid;Refresh();
+        if(i>=g_sources.size())return;
+        // MCM_OpenPage can defer or reject a request during options teardown.
+        // A repeated click must retry, even when this ID is already selected.
+        g_selected=g_sources[i].sid;g_selectedName=g_sources[i].name;
+        if(PluginDiagnostics::Enabled()) PluginDiagnostics::Write("MultiXPMining: source clicked ["+g_selected+"] "+g_selectedName);
+        Refresh();
     }
     void Filter() {
         const std::wstring filter=Fold(g_filter);g_filtered.clear();
@@ -103,9 +114,11 @@ namespace MiningPicker {
         if(g_selected.empty() || !MiningCore::ReadSource(g_selected,r)) {
             const std::vector<MiningCore::SourceInfo> all=MiningCore::Sources();
             g_selected=all.empty()?std::string():all[0].sid;
+            g_selectedName=all.empty()?std::string():all[0].name;
         }
         return g_selected;
     }
+    std::string SelectedName() { Selected();return g_selectedName; }
     void Detach(void*) {
         MyGUI::Widget* w=g_root.get();
         g_root.reset();g_search=NULL;g_bar=NULL;g_entries.clear();
@@ -118,12 +131,13 @@ namespace MiningPicker {
         const MyGUI::IntSize size=p->getSize();
         MyGUI::Widget* root=p->createWidget<MyGUI::Widget>("PanelEmpty",MyGUI::IntCoord(0,0,size.width,size.height),MyGUI::Align::Default);
         g_root.set(root);g_sources=MiningCore::Sources();std::sort(g_sources.begin(),g_sources.end(),NameLess);g_names.reserve(g_sources.size());
-        for(size_t i=0;i<g_sources.size();++i){g_names.push_back(Fold(g_sources[i].name+" "+g_sources[i].sid));++g_duplicates[g_sources[i].name];}
+        for(size_t i=0;i<g_sources.size();++i){g_names.push_back(Fold(g_sources[i].name+" "+g_sources[i].sid));++g_duplicates[g_sources[i].name];if(g_sources[i].sid==g_selected)g_selectedName=g_sources[i].name;}
         const MiningPickerLayout::Layout layout(size.width,size.height);
         MyGUI::TextBox* title=root->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(layout.left,12,layout.width,26),MyGUI::Align::Default);
         FitCaption(title,Tr("Select a mining source from the list. Search filters the visible names."));
         title->setNeedMouseFocus(false);
         g_search=root->createWidget<MyGUI::EditBox>("Kenshi_EditBox",MyGUI::IntCoord(layout.left,42,layout.width,32),MyGUI::Align::Default);
+        g_search->setTextAlign(MyGUI::Align::Left|MyGUI::Align::VCenter);
         g_search->setMaxTextLength(128);g_search->setOnlyText(g_filter);g_search->eventEditTextChange+=MyGUI::newDelegate(&Search);
         MyGUI::Widget* viewport=root->createWidget<MyGUI::Widget>("PanelEmpty",MyGUI::IntCoord(layout.left,82,layout.rowWidth,layout.listHeight),MyGUI::Align::Default);
         viewport->eventMouseWheel+=MyGUI::newDelegate(&Wheel);

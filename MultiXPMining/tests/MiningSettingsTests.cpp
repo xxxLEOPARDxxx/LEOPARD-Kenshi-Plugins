@@ -1,4 +1,4 @@
-#include <Windows.h>
+﻿#include <Windows.h>
 #include <ModConfigMenu.h>
 #include "MiningCore.h"
 #include "MiningPicker.h"
@@ -33,11 +33,12 @@ namespace MiningCore {
         return true;
     }
 }
-// The real picker owns a ScrollView. This runner tests MiningSettings.cpp's
+// The real picker owns pooled rows and a native scrollbar. This runner tests MiningSettings.cpp's
 // rows and callbacks, so supply only its selected ID and attach boundaries.
 namespace MiningPicker {
     std::string selected;
     std::string Selected(){return selected;}
+    std::string SelectedName(){return "Test source";}
     void Attach(void*,void*){}
     void Detach(void*){}
 }
@@ -80,6 +81,7 @@ int main(){
     for(int i=0;i<128;++i){char id[24];sprintf_s(id,"source%03d",i);Rule r;r.name="Ore";r.mult[0]=(float)i+2;rules[id]=r;}
     MiningPicker::selected="source000";Build();
     Check(customAreaRegistered,"picker custom area is registered without null function calls");
+    Check(Has("Selected source: Test source [source000]"),"selected source name and exact ID appear above parameters");
     Check(rows.size()==15,"128 sources still expose one compact source editor");
     Check(rows.back().label=="Detailed log","Debug remains the last setting");
     Row old=Find("Strength XP");Check(old.def=="0.25","default XP comes from source defaults");
@@ -91,6 +93,7 @@ int main(){
     MiningPicker::selected="source001";Build();
     Row current=Find("Strength XP");float value=0;current.getFloat(current.ud,&value);
     Check(value==3,"picker selection changes the displayed source");
+    Check(Has("Selected source: Test source [source001]"),"source context changes with the displayed callbacks");
     Check(old.setFloat(old.ud,7,NULL,0)==0,"pending old-row edit is accepted");
     Check(rules["source000"].mult[0]==7&&rules["source001"].mult[0]==3,"pending edit cannot modify newly selected source");
     Check(current.setFloat(current.ud,9,NULL,0)==0,"current row edit succeeds");
