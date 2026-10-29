@@ -171,3 +171,9 @@ msgstr "Не двигать на то же место"
 
 msgid "The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."
 msgstr "Игра каждый кадр двигает подписи над персонажами, почти всегда на то же место, и интерфейс каждый раз перерисовывает их все. Такие сдвиги пропускаются - больше кадров с интерфейсом."
+
+msgid "Skip unchanged UI geometry"
+msgstr "Пропуск неизменной геометрии"
+
+msgid "Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."
+msgstr "Пропускать повторное смещение имён и относительный размер обычных элементов интерфейса, если пиксели не изменились. Реальное изменение размера, особые элементы и явное обновление продолжают работать."

@@ -3240,6 +3240,40 @@ namespace
     SetPositionPointFn g_origSetPositionPoint = NULL;
     SetPositionXYFn g_origSetPositionXY = NULL;
 
+    // Health bars call setRealSize every frame. Native conversion is retained;
+    // only the resulting equal integer size of this exact plain Widget is
+    // skipped. Explicit same-size refreshes and derived controls pass through.
+    typedef void (*SetSizePointFn)(MyGUI::ICroppedRectangle*, const MyGUI::IntSize&);
+    typedef void (*SetRealSizeFn)(MyGUI::Widget*, const MyGUI::FloatSize&);
+    SetSizePointFn g_origSetSizePoint = NULL;
+    SetRealSizeFn g_origSetRealSize = NULL;
+    __declspec(thread) MyGUI::ICroppedRectangle* g_relativeSizeTarget = NULL;
+
+    void SetSizePoint_hook(MyGUI::ICroppedRectangle* self, const MyGUI::IntSize& size)
+    {
+        const bool relativeTarget = self == g_relativeSizeTarget;
+        // Consume before native callbacks: an explicit refresh requested by
+        // a changeCoord listener must retain its normal notification semantics.
+        if (relativeTarget)
+            g_relativeSizeTarget = NULL;
+        if (g_skipSameMoves && relativeTarget && self->getSize() == size)
+            return;
+        g_origSetSizePoint(self, size);
+    }
+
+    void SetRealSize_hook(MyGUI::Widget* self, const MyGUI::FloatSize& size)
+    {
+        if (!g_skipSameMoves || self->getTypeName() != MyGUI::Widget::getClassTypeName())
+        {
+            g_origSetRealSize(self, size);
+            return;
+        }
+        MyGUI::ICroppedRectangle* const previous = g_relativeSizeTarget;
+        g_relativeSizeTarget = static_cast<MyGUI::ICroppedRectangle*>(self);
+        __try { g_origSetRealSize(self, size); }
+        __finally { g_relativeSizeTarget = previous; }
+    }
+
     void SetPositionPoint_hook(MyGUI::ICroppedRectangle* self, const MyGUI::IntPoint& point)
     {
         if (g_skipSameMoves && self->getPosition() == point)
@@ -3662,7 +3696,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Character editor"));
     api->toggle(api, "Tweaks", "RandomName", Tr("Random name button"), Tr("A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."), 1, MCM_RESTART);
     api->section(api, Tr("Performance"));
-    api->toggle(api, "Tweaks", "SkipSameMoves", Tr("Skip moves to the same place"), Tr("The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."), 1, 0);
+    api->toggle(api, "Tweaks", "SkipSameMoves", Tr("Skip unchanged UI geometry"), Tr("Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }
@@ -3758,6 +3792,11 @@ __declspec(dllexport) void startPlugin()
               reinterpret_cast<void*>(&SetPositionPoint_hook), reinterpret_cast<void**>(&g_origSetPositionPoint));
     HookMyGui("?setPosition@Widget@MyGUI@@QEAAXHH@Z",
               reinterpret_cast<void*>(&SetPositionXY_hook), reinterpret_cast<void**>(&g_origSetPositionXY));
+
+    HookMyGui("?setSize@Widget@MyGUI@@UEAAXAEBU?$TSize@H@types@2@@Z",
+              reinterpret_cast<void*>(&SetSizePoint_hook), reinterpret_cast<void**>(&g_origSetSizePoint));
+    HookMyGui("?setRealSize@Widget@MyGUI@@QEAAXAEBU?$TSize@M@types@2@@Z",
+              reinterpret_cast<void*>(&SetRealSize_hook), reinterpret_cast<void**>(&g_origSetRealSize));
 
     // Иконка вещи у мыши во вкладке «Ремесло» - нужно знать её станок.
     if (KenshiLib::SUCCESS !=

@@ -171,3 +171,9 @@ msgstr "跳过原地移动"
 
 msgid "The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."
 msgstr "游戏每帧都会移动角色头顶的名字，几乎总是移到原位，界面每次都要全部重绘。跳过这类移动，显示界面时帧数更高。"
+
+msgid "Skip unchanged UI geometry"
+msgstr "跳过未变化的界面几何"
+
+msgid "Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."
+msgstr "跳过未变化的名称位置和普通界面控件的重复相对尺寸设置。实际像素尺寸变化、派生控件和显式刷新仍正常执行。"

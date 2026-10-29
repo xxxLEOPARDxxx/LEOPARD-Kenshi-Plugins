@@ -171,3 +171,9 @@ msgstr "Skip moves to the same place"
 
 msgid "The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."
 msgstr "The game moves the names above characters every frame, mostly to the same place, and the interface redraws all of them each time. Such moves are skipped - more frames with the interface shown."
+
+msgid "Skip unchanged UI geometry"
+msgstr "Skip unchanged UI geometry"
+
+msgid "Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."
+msgstr "Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."
