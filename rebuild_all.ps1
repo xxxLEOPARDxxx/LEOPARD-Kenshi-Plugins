@@ -73,14 +73,8 @@ Step "Правки поверх исходников авторов"
 # fix_hookid правит KenshiLib и здесь не нужен: он накатывается отдельно,
 # после make_kenshilib.ps1. См. README.
 $patches = @(
-    "feat_weather_resists",      # защита от среды в Character Inspector
-    "fix_ci_piececols",          # ширина колонок в строке брони
-    "feat_ci_lighttext",         # названия предметов светлым тоном заголовка
-    "feat_ci_theme",             # цвета надписей - из палитры игры
-    "feat_ci_localization",      # локализация Character Inspector
     "fix_bl_vc10",               # BetterLooting: приведение к тулсету v100
     "feat_bl_mygui",             # BetterLooting: окно настроек на интерфейс игры
-    "feat_kc_localization",      # KillCounter: перевод подписей, свой цвет убран
     "feat_xpo_slots",            # XP_Overhaul: адреса xp* из таблицы KenshiLib, без Mod Hub
     "fix_xpo_adjustlevel",       # XP_Overhaul: центральная функция из файла exe, без разгона
     "fix_xpo_carry",             # XP_Overhaul: остаток прибавки, не влезший во float
@@ -118,6 +112,16 @@ foreach ($p in $modPatches) {
 }
 
 Step "Компиляция каталогов перевода (.po -> .mo)"
+# Compile canonical source catalogs before copying their .po/.mo pairs.
+foreach ($qolSource in @("$ROOT\ours\PatientSelfAid", "$ROOT\ours\SkillLevelUpInfo",
+        "$ROOT\ours\MultiXPMining", "$ROOT\ours\AssignedWorkers", "$ROOT\ours\RecruitMarkers",
+        "$ROOT\forks\LEOPARD-Kenshi-Forks\CharacterInspector",
+        "$ROOT\forks\LEOPARD-Kenshi-Forks\KillCounter", "$ROOT\forks\LEOPARD-Kenshi-Forks\KenshiRotate")) {
+    if (Test-Path "$qolSource\locale") {
+        $qolCatalogs = @(Get-ChildItem "$qolSource\locale" -Filter *.po -File -Recurse | ForEach-Object { $_.FullName })
+        if ($qolCatalogs.Count) { & python "$ROOT\po2mo.py" @qolCatalogs }
+    }
+}
 # Код читает .mo, .po остаётся исходником для правки. Скрипт сам проверяет
 # каждый файл сторонним разбором и удаляет битый: неверный .mo не просто
 # не переводит, с ним Kenshi вообще не запускается.
@@ -125,7 +129,7 @@ python "$ROOT\po2mo.py"
 
 Step "Сборка"
 $F = "$ROOT\forks"
-BuildPlugin "$F\CharacterInspector-src\CharacterInspector\CharacterInspector\src" `
+BuildPlugin "$F\LEOPARD-Kenshi-Forks\CharacterInspector\src" `
             "CharacterInspector" "Character Inspector"
 BuildPlugin "$F\LEOPARD-Kenshi-Forks\BetterLooting\Source"         "BetterLooting"     "BetterLooting"
 # Свой плагин, не форк: живёт в ours\, а не в forks\.
@@ -150,7 +154,7 @@ if (Test-Path $bgMod) {
     # <Мод>.defaults.ini и дописывает новые ключи (11.10.2026).
     Copy-Item "$ROOT\ours\BuildModeGizmo\BuildModeGizmo.ini" "$bgMod\BuildModeGizmo.defaults.ini" -Force
 }
-BuildPlugin "$F\KillCounter-src"                  "KillCounter"       "KillCounter"
+BuildPlugin "$F\LEOPARD-Kenshi-Forks\KillCounter"                  "KillCounter"       "KillCounter"
 # Свой плагин: полосы опыта тех навыков, которые качаются прямо сейчас.
 # Мод XpBars (DougTownsend) им заменён и отключён в mods.cfg.
 BuildPlugin "$ROOT\ours\LiveXpBars"               "LiveXpBars"        "LiveXpBars"
@@ -374,6 +378,37 @@ if (-not $NoDeploy) {
             Copy-Item $loc $mod -Recurse -Force
         }
     }
+}
+
+
+# 29.10.2026: minimal level-up notifications, mining XP and MCM rotation fork.
+BuildPlugin "$ROOT\ours\SkillLevelUpInfo" "SkillLevelUpInfo" "SkillLevelUpInfo"
+BuildPlugin "$ROOT\ours\MultiXPMining" "MultiXPMining" "MultiXPMining"
+BuildPlugin "$F\LEOPARD-Kenshi-Forks\KenshiRotate\src" "KenshiRotate" "KenshiRotate"
+if (-not $NoDeploy) {
+    $qolSources = @{
+        "Character Inspector" = "$F\LEOPARD-Kenshi-Forks\CharacterInspector"
+        "KillCounter" = "$F\LEOPARD-Kenshi-Forks\KillCounter"
+        "KenshiRotate" = "$F\LEOPARD-Kenshi-Forks\KenshiRotate"
+        "SkillLevelUpInfo" = "$ROOT\ours\SkillLevelUpInfo"
+        "MultiXPMining" = "$ROOT\ours\MultiXPMining"
+    }
+    foreach ($modName in $qolSources.Keys) {
+        $src = $qolSources[$modName]
+        $dst = ModDir $modName
+        if (-not $dst) { continue }
+        $baseName = if ($modName -eq "Character Inspector") { "CharacterInspector" } else { $modName }
+        Copy-Item "$src\$baseName.ini" "$dst\$baseName.defaults.ini" -Force
+        foreach ($asset in @("locale", "gui", "README.txt", "README.md", "README.upstream.md", "LICENSE", "ORIGIN.md")) {
+            if (Test-Path "$src\$asset") { Copy-Item "$src\$asset" $dst -Recurse -Force }
+        }
+        if ($modName -eq "MultiXPMining") {
+            New-Item -ItemType Directory -Path "$dst\SourceData" -Force | Out-Null
+            Get-ChildItem "$src\SourceData" -File | Where-Object { $_.Name -ne "99_UserOverride.ini" } |
+                ForEach-Object { Copy-Item $_.FullName "$dst\SourceData" -Force }
+        }
+    }
+    Copy-Item "$ROOT\ours\AssignedWorkers\gui" "$KENSHI\mods\AssignedWorkers" -Recurse -Force
 }
 
 Step "Контроль: в собранных DLL не должно быть кириллицы"
