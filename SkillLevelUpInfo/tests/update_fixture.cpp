@@ -18,7 +18,7 @@ int main(){
  Reset();fakeNow=30000;Scan();c.stats.value+=.03f;Scan();DatapanelGUI panel;MyGUI::Widget viewport;viewport.coord.height=75;panel.Vanilla(10);panel.Vanilla(30);
  for(size_t i=0;i<panel.lines.size();++i)panel.lines[i]->w1->parent=panel.lines[i]->w2->parent=&viewport;
  Panel(&c.stats,&panel,0,false);
- check(g_slots.count==1,"nested75px viewport constrains capacity independently of300px outer window");
+ check(g_slots.count==2,"nested75px viewport bounds the reversible native reflow independently of300px outer window");
  if(g_slots.count){DataPanelLine_Progress*row=static_cast<DataPanelLine_Progress*>(panel.getLine(SlotKey(g_slots.count-1),0));
   check(row->progress->getBottom()<=viewport.getHeight(),"XP rows remain inside their actual parent viewport");}
  Reset();c.stats.value=1.5f;Scan();reusedCharacter=&c;g_origIncrease=ReplaceRegistration;Increase(c.stats.value,1,100);

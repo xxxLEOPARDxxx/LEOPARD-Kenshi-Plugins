@@ -3,14 +3,14 @@
 Never enumerates processes, injects code, invokes game functions or writes game
 memory/files. The only output is a local JSON artifact. ABI offsets measured
 by probe_layout.cpp with the production VC10/SDK headers. This version accepts
-only audited XP candidates, including visual-nudged06b90cf, with matching maps.
+only audited XP candidates, including native-UI-repairca0f3e41, with matching maps.
 """
 from pathlib import Path
 import argparse, ctypes, ctypes.wintypes as wt, datetime, hashlib, json
 import math, re, struct, sys, time
 
-EXPECTED_SHA = 'd06b90cf19149f160e9fcef28dde56dc1bd5e856b40d9a7388f2606df50ae7e2'
-APPROVED_SHAS = {EXPECTED_SHA,'1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43','df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
+EXPECTED_SHA = 'ca0f3e41a5f3bae2119885598ee464474df24e164e10df01493dea4dcc5df642'
+APPROVED_SHAS = {EXPECTED_SHA,'d06b90cf19149f160e9fcef28dde56dc1bd5e856b40d9a7388f2606df50ae7e2','1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43','df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
 BUILD = Path(r'D:\DEV\Kenshi\build\SkillLevelUpInfo')
 NAMES = ['Strength','Toughness','Dexterity','Perception','Katanas','Sabres',
  'Hackers','Heavy weapons','Blunt','Polearms','Melee attack','Melee defence',
@@ -70,6 +70,8 @@ def rendered_font(m,address):
    height=i(m,text+0xf0)
    if not 0<height<4096:return {'unrecognized_text_height':height}
    return {'widget':hex(current),'text':hex(text),'font_resource':hex(font),'face':string(m,font+8),'caption':caption(m,text+0x70),
+    'client_chain':[{'widget':hex(a),'coord':list(unpack(m,'<4i',a+0x20)),
+                     'absolute':list(unpack(m,'<2i',a+0x30))} for a in chain],
     'font_height':height,'region':list(unpack(m,'<4i',text+0x18)),
     'absolute':list(unpack(m,'<2i',text+0x28)),'text_view_size':list(unpack(m,'<2i',text+0x140)),
     'align':i(m,text+0xb4),'view_offset':list(unpack(m,'<2i',text+0x114)),
@@ -80,7 +82,7 @@ def rendered_font(m,address):
 def widget(m,address):
  if not address: return None
  coord=list(unpack(m,'<4i',address+0x20));parent=q(m,address+0x450)
- return {'address':hex(address),'coord':coord,'bottom':coord[1]+coord[3],
+ return {'address':hex(address),'coord':coord,'bottom':coord[1]+coord[3],'absolute':list(unpack(m,'<2i',address+0x30)),
          'parent':hex(parent),'visible':m.read(address+0x46c,1)[0] != 0,'rendered_font':rendered_font(m,address)}
 
 def skin_children(m,address):
@@ -94,6 +96,25 @@ def skin_children(m,address):
   if item:item['name']=string(m,child+0x428);result.append(item)
  return result
 
+def owned_labels(m,references,skins,types):
+ """VC10 helper-verified WidgetRef24/std::string40 arrays; at most5 slots."""
+ result=[]
+ for slot in range(5):
+  address=q(m,references+slot*24+8)
+  if address:result.append({'slot':slot,'skin':string(m,skins+slot*40),'native_type':string(m,types+slot*40),'widget':widget(m,address)})
+ return result
+
+def placement_cache(m,address):
+ """Production helper verified Entry56, array24, count3608; no calls."""
+ count=i(m,address+3608)
+ if not 0<=count<=64:raise ValueError('native placement cache count budget exceeded')
+ result={'parent':hex(q(m,address+8)),'count':count,'writes_total':unpack(m,'<I',address+3612)[0],'entries':[]}
+ for index in range(count):
+  entry=address+24+index*56;w=q(m,entry+8)
+  result['entries'].append({'widget':hex(w),'original':list(unpack(m,'<4i',entry+24)),
+   'applied':list(unpack(m,'<4i',entry+40)),'current':list(unpack(m,'<4i',w+0x20)) if w else None})
+ return result
+
 def panel(m,address):
  result={'address':hex(address),'root':widget(m,q(m,address+8)),
          'scrollWin':widget(m,q(m,address+0x50)),'categories':[]}
@@ -103,6 +124,7 @@ def panel(m,address):
   for inner in nodes(m,outer+0x20,128):
    line=q(m,inner+0x40)
    row={'key':string(m,line+0x28),'address':hex(line),'type':i(m,line+0x118),
+        'skinW1':string(m,line+0xa8),'skinW2':string(m,line+0xd0),
         'w1':widget(m,q(m,line+8)),'w2':widget(m,q(m,line+16))}
    if row['type']==11:
     row['textBox']=widget(m,q(m,line+0x120))
@@ -116,6 +138,12 @@ def panel(m,address):
    rows.append(row)
   result['categories'].append({'category':category,'rows':rows})
  result['parents']=parents
+ result['parent_chains']={}
+ for address in parents:
+  chain=[];seen=set();current=int(address,16)
+  while current and current not in seen and len(chain)<4:
+   seen.add(current);chain.append(widget(m,current));current=q(m,current+0x450)
+  result['parent_chains'][address]=chain
  return result
 
 def binding(m,map_address,reference):
@@ -207,6 +235,11 @@ def sample(m,base,symbols,now):
     'g_diagParentHeight','g_diagValueRight','g_diagCapacity']}}
  if 'g_divider' in a:result['divider']=widget(m,q(m,a['g_divider']+8))
  if 'g_nativeProfile' in a:result['font_profile_verified']=bool(m.read(a['g_nativeProfile'],1)[0])
+ if all(k in a for k in ['g_labels','g_labelSkins','g_labelTypes']):
+  result['owned_labels']=owned_labels(m,a['g_labels'],a['g_labelSkins'],a['g_labelTypes'])
+ if 'g_placement'in a:result['native_placement']=placement_cache(m,a['g_placement'])
+ for counter in ['g_labelCreates','g_labelDestroys','g_labelTypeReads']:
+  if counter in a:result[counter]=unpack(m,'<I',a[counter])[0]
  for key in ('g_nameMeasure','g_valueMeasure'):
   if key in a:
    try:

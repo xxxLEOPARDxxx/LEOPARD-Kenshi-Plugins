@@ -1,0 +1,157 @@
+{
+  "evidence_note": "Coordinates/fonts/regions extracted offline from Root-authorized captures; no raw addresses or character identities.",
+  "profiles": [
+    {
+      "name": "vanilla-five",
+      "capture": "vanilla-37340-five-rows.json",
+      "valid_samples": 15,
+      "stopped": "ReadProcessMemory unavailable after15 valid samples; incomplete6-second request",
+      "parent_width": 297,
+      "parent_height": 181,
+      "row_tops": [
+        5,
+        30,
+        55,
+        80,
+        105
+      ],
+      "row_height": 25,
+      "name_skin": "Kenshi_PaintedWordWrapEmpty",
+      "value_skin": "Kenshi_WordWrapEmpty",
+      "name_font": "Kenshi_PaintedTextFont_Medium",
+      "name_font_height": 25,
+      "name_shadow": false,
+      "value_font_height": 21,
+      "expected_xp_capacity": 2,
+      "observed_old_xp": {
+        "name_height": 23,
+        "name_region": [
+          17,
+          9,
+          106,
+          3
+        ],
+        "bar_height": 23,
+        "skin_children": [
+          [
+            13,
+            2,
+            117,
+            16
+          ],
+          [
+            14,
+            4,
+            114,
+            14
+          ],
+          [
+            0,
+            0,
+            142,
+            23
+          ]
+        ]
+      },
+      "stock": true,
+      "empty_top": 2,
+      "track_top": 4,
+      "bar_height": 23
+    },
+    {
+      "name": "vanilla-six",
+      "capture": "vanilla-37340-baseline.json",
+      "valid_samples": 24,
+      "stopped": null,
+      "parent_width": 297,
+      "parent_height": 181,
+      "row_tops": [
+        5,
+        33,
+        62,
+        90,
+        118,
+        147
+      ],
+      "row_height": 25,
+      "name_skin": "Kenshi_PaintedWordWrapEmpty",
+      "value_skin": "Kenshi_WordWrapEmpty",
+      "name_font": "Kenshi_PaintedTextFont_Medium",
+      "name_font_height": 25,
+      "name_shadow": false,
+      "value_font_height": 21,
+      "expected_xp_capacity": 1,
+      "stock": true,
+      "empty_top": 2,
+      "track_top": 4,
+      "bar_height": 23
+    },
+    {
+      "name": "dark-five",
+      "capture": "runtime-25036-173531.json",
+      "valid_samples": 12,
+      "stopped": null,
+      "parent_width": 320,
+      "parent_height": 185,
+      "row_tops": [
+        5,
+        31,
+        57,
+        83,
+        109
+      ],
+      "row_height": 26,
+      "name_skin": "Kenshi_PaintedWordWrapEmpty",
+      "value_skin": "Kenshi_WordWrapEmpty",
+      "name_font": "Kenshi_PaintedTextFont_Medium",
+      "name_font_height": 25,
+      "name_shadow": true,
+      "value_font_height": 21,
+      "expected_xp_capacity": 2,
+      "observed_old_xp": {
+        "name_height": 24,
+        "name_region": [
+          0,
+          0,
+          152,
+          24
+        ],
+        "bar_height": 24,
+        "skin_children": []
+      },
+      "stock": false,
+      "empty_top": 2,
+      "track_top": 3,
+      "bar_height": 24
+    },
+    {
+      "name": "dark-six",
+      "capture": "runtime-35788-162252.json",
+      "valid_samples": 40,
+      "stopped": null,
+      "parent_width": 320,
+      "parent_height": 185,
+      "row_tops": [
+        5,
+        31,
+        57,
+        83,
+        109,
+        135
+      ],
+      "row_height": 26,
+      "name_skin": "Kenshi_PaintedWordWrapEmpty",
+      "value_skin": "Kenshi_WordWrapEmpty",
+      "name_font": "Kenshi_PaintedTextFont_Medium",
+      "name_font_height": 25,
+      "name_shadow": true,
+      "value_font_height": 21,
+      "expected_xp_capacity": 1,
+      "font_evidence": "runtime-25036-173531.json; same Dark UI profile, later font snapshot",
+      "stock": false,
+      "empty_top": 2,
+      "track_top": 3,
+      "bar_height": 24
+    }
+  ]
+}

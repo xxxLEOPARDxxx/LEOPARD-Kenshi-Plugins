@@ -277,10 +277,20 @@ namespace
         static const std::string keys[5]={"skill_xp_info_slot_0","skill_xp_info_slot_1","skill_xp_info_slot_2","skill_xp_info_slot_3","skill_xp_info_slot_4"};
         return keys[i];
     }
+    #include "PanelPlacement.h"
+    XpPanelPlacement::Cache g_placement;
     XpPanelTextStyle::MeasureCache g_nameMeasure,g_valueMeasure;
     XpPanelTextStyle::MeasureCache g_percentMeasure[5];
+    WidgetRef g_labels[5],g_labelSources[5];
+    std::string g_labelSkins[5],g_labelTypes[5];
+    unsigned int g_labelCreates=0,g_labelDestroys=0,g_labelTypeReads=0;
+    void HideLabels()
+    {
+        for(int i=0;i<5;++i)if(g_labels[i].get() && g_labels[i].get()->getVisible())g_labels[i].get()->setVisible(false);
+    }
     void HidePanel(DatapanelGUI* panel,int category)
     {
+        g_placement.Restore();HideLabels();
         for(int i=0;i<5;++i){
             const std::string& key=SlotKey(i);
             if(panel->lineExists(key,category)){
@@ -293,59 +303,50 @@ namespace
         }
         if(g_divider.get())g_divider.get()->setVisible(false);
     }
-    struct BarVisualCache {
-        WidgetRef bar,background,track;bool checked;
-        BarVisualCache():checked(false){}
-    } g_barVisual[5];
-    struct SkinChildAccess:MyGUI::Widget {
-        static MyGUI::VectorWidgetPtr Find(MyGUI::Widget* widget,const std::string& name)
-        {
-            // SDK skin API, through a legal base member pointer. Content-child
-            // enumeration redirects to WidgetClient and excludes skin children.
-            MyGUI::VectorWidgetPtr (MyGUI::Widget::*getter)(const std::string&)=&SkinChildAccess::getSkinWidgetsByName;
-            return (widget->*getter)(name);
-        }
-    };
-    bool LowerProgressVisual(MyGUI::ProgressBar* bar,BarVisualCache& cache)
+    MyGUI::TextBox* NativeLabel(int slot,MyGUI::Widget* parent,MyGUI::TextBox* source,const std::string& skin,
+                               const MyGUI::IntCoord& coord,bool& created)
     {
-        if(!bar)return false;
-        if(cache.bar.get()!=bar){cache.bar.set(bar);cache.background.set(NULL);cache.track.set(NULL);cache.checked=false;}
-        const int width=bar->getWidth(),height=bar->getHeight();
-        if(!cache.checked){
-            cache.checked=true;
-            // Only this owned bar's tiny template, once per widget lifetime.
-            MyGUI::VectorWidgetPtr unnamed=SkinChildAccess::Find(bar,"");
-            MyGUI::VectorWidgetPtr tracks=SkinChildAccess::Find(bar,"TrackPlace");
-            if(unnamed.size()>8 || tracks.size()!=1)return false;
-            MyGUI::Widget* background=NULL;
-            for(size_t n=0;n<unnamed.size();++n){
-                MyGUI::Widget* child=unnamed[n];const MyGUI::IntCoord& c=child->getCoord();
-                if(child->getParent()==bar && c.left==10 && c.width==width-19 && c.height==height-5 && (c.top==2 || c.top==4)){
-                    if(background)return false;background=child;
+        created=false;if(!source || skin.empty())return NULL;
+        MyGUI::Widget* label=g_labels[slot].get();
+        if(!label || label->getParent()!=parent || g_labelSources[slot].get()!=source || g_labelSkins[slot]!=skin){
+            ++g_labelTypeReads;const std::string& type=source->getTypeName();
+            if(!label || label->getParent()!=parent || g_labelSkins[slot]!=skin || g_labelTypes[slot]!=type){
+                if(label){MyGUI::Gui::getInstance().destroyWidget(label);++g_labelDestroys;}
+                label=parent->createWidgetT(type,skin,coord,MyGUI::Align::Default);
+                if(label)++g_labelCreates;
+                g_labels[slot].set(label);created=true;
+                // Native source may be an EditBox with a rendered TextBox client.
+                // This column is one line; wrapping long translated names would
+                // silently create a second line outside its measured native row.
+                MyGUI::EditBox* edit=label?label->castType<MyGUI::EditBox>(false):NULL;
+                if(edit){edit->setEditStatic(true);edit->setEditWordWrap(false);}
+                MyGUI::Widget* chain[4];int count=0;MyGUI::Widget* current=label;
+                while(current && count<4){bool repeated=false;
+                    for(int n=0;n<count;++n)if(chain[n]==current)repeated=true;
+                    if(repeated)break;chain[count++]=current;
+                    current->setNeedMouseFocus(false);current->setNeedKeyFocus(false);current->setInheritsPick(false);
+                    current=current->getClientWidget();
                 }
             }
-            if(!background || tracks[0]->getParent()!=bar)return false;
-            cache.background.set(background);cache.track.set(tracks[0]);
+            g_labelSources[slot].set(source);g_labelSkins[slot]=skin;g_labelTypes[slot]=type;
         }
-        MyGUI::Widget* background=cache.background.get();MyGUI::Widget* track=cache.track.get();
-        if(!background || !track)return false;
-        const MyGUI::IntCoord& b=background->getCoord();const MyGUI::IntCoord& t=track->getCoord();
-        if(b.left!=10 || b.width!=width-19 || b.height!=height-5 || (b.top!=2 && b.top!=4) ||
-           t.left!=11 || t.width!=width-21 || t.height!=height-7 || (t.top!=3 && t.top!=5) ||
-           background->getHeight()<=0 || track->getHeight()<=0 ||
-           4+background->getHeight()>height || 5+track->getHeight()>height)return false;
-        MyGUI::IntCoord c=background->getCoord();if(c.top!=4){c.top=4;background->setCoord(c);}
-        c=track->getCoord();if(c.top!=5){c.top=5;track->setCoord(c);}
-        return true;
+        if(label && label->getCoord()!=coord)label->setCoord(coord);
+        // The factory type is taken from an existing native TextBox (possibly
+        // EditBox-derived), so it has the same TextBox base and virtual caption.
+        return static_cast<MyGUI::TextBox*>(label);
     }
+    struct NativeRow {
+        DataPanelLine* line;MyGUI::IntCoord name,value;int top,bottom;
+    };
+    bool RowBefore(const NativeRow& a,const NativeRow& b){return a.top<b.top;}
     void DrawPanel(CharStats* stats,DatapanelGUI* panel,int category)
     {
         if((!g_enabled || !g_bars) && !g_panelDirty)return;
         if(!panel || !stats || !stats->me){PanelStatus("missing native panel/stat owner");return;}
         MyGUI::Widget* root=panel->getWidget();if(!root){PanelStatus("missing native root widget");return;}
         const hand owner(stats->me);
-        if(root!=g_panelRoot.get() || !(owner==g_panelCharacter)){
-            g_slots=XpInfoCore::Slots();g_panelCharacter=owner;
+        if(root!=g_panelRoot.get() || !(owner==g_panelCharacter) || panel!=g_panel || category!=g_panelCategory){
+            g_placement.Restore();HideLabels();g_slots=XpInfoCore::Slots();g_panelCharacter=owner;
             for(int i=0;i<5;++i)g_rowSkill[i]=-1;
             if(g_divider.get())MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
         }
@@ -359,124 +360,119 @@ namespace
             if(found==g_seen.end()){PanelStatus("waiting for character baseline");HidePanel(panel,category);return;}
             for(size_t i=0;i<kCount;++i)skills[i]=found->second.skills[i];
         }
-        // Read a bounded list of existing vanilla line widgets. Use their actual
-        // parent and pitch rather than translated captions or a global UI search.
-        int bottom=0,pitch=20,left=0,width=root->getWidth(),valueRight=width-4;
-        int rowBottoms[512],rowCount=0;
-        MyGUI::Widget* parent=root;
-        MyGUI::Widget* nameStyle=NULL;MyGUI::Widget* valueStyle=NULL;
+        const DWORD now=GetTickCount();bool recent=false;
+        for(size_t i=0;i<kCount;++i)if(skills[i].Recent(now,g_recent))recent=true;
+        if(!recent){g_slots.Select(skills,(int)kCount,now,g_recent,0);PanelStatus("no recent XP for this character");HidePanel(panel,category);return;}
+        // Only the native rows of this panel; no UI tree/name lookup.
+        NativeRow rows[XpPanelPlacement::Limit/2];MyGUI::Widget* widgets[XpPanelPlacement::Limit];
+        int rowCount=0,widgetCount=0;MyGUI::Widget* parent=NULL;
         const int lines=panel->getNumLines(category);
         for(int i=0;i<lines && i<512;++i){
-            DataPanelLine* line=panel->getLineByNum(category,i);if(!line)continue;
-            if(line->getType()==DataPanelLine::DPL_PROGRESS)continue;
-            MyGUI::Widget* w=line->w2?line->w2:line->w1;
-            if(!w || !w->getVisible())continue;
-            rowBottoms[rowCount++]=w->getBottom();
-            if(w->getBottom()>bottom){
-                bottom=w->getBottom();parent=w->getParent();
-                nameStyle=line->w1;valueStyle=line->w2;
-                if(line->w1)left=line->w1->getLeft();
-                if(line->w2)valueRight=line->w2->getLeft()+line->w2->getWidth();
+            DataPanelLine* line=panel->getLineByNum(category,i);
+            if(!line || line->getType()==DataPanelLine::DPL_PROGRESS)continue;
+            if(!line->w1 || !line->w2 || !line->w1->getVisible() || !line->w2->getVisible())continue;
+            MyGUI::Widget* p=line->w1->getParent();
+            if(!p || line->w2->getParent()!=p || (parent && p!=parent) || rowCount>=XpPanelPlacement::Limit/2){
+                PanelStatus("unsupported mixed native layout");HidePanel(panel,category);return;
             }
+            parent=p;rows[rowCount++].line=line;widgets[widgetCount++]=line->w1;widgets[widgetCount++]=line->w2;
         }
-        // getLineByNum walks a key-sorted native map, not visual row order.
-        // Original XP Info sorts non-progress row bottoms and takes their
-        // smallest positive gap. A late map key must not turn
-        // one normal row pitch into a two/three-row jump and erase capacity.
-        std::sort(rowBottoms,rowBottoms+rowCount);
-        int smallestGap=0;
-        for(int i=1;i<rowCount;++i){const int gap=rowBottoms[i]-rowBottoms[i-1];if(gap>0 && (!smallestGap || gap<smallestGap))smallestGap=gap;}
-        if(smallestGap)pitch=smallestGap;
-        if(!parent || pitch<=0){PanelStatus("missing usable native layout");return;}
-        width=parent->getWidth()-left-4;
-        // Native w1/w2 overlap: both start at 3% of the row, while w2's
-        // text is right-aligned. Its left edge is not a value-column boundary.
-        // DataPanelLine_Progress(showKey=true) uses 48% of its parent width.
-        // xp_info aligns that native bar to vanilla w2's RIGHT edge +10px.
-        const int barWidth=(int)(parent->getWidth()*.48f);
-        int barRight=valueRight+10;
-        if(barRight>parent->getWidth()-2)barRight=parent->getWidth()-2;
-        const int barLeft=barRight-barWidth;
-        int top=bottom;
+        if(!rowCount || !g_placement.Capture(parent,widgets,widgetCount)){PanelStatus("missing usable native layout");HidePanel(panel,category);return;}
+        int total=0,rowHeight=0;
+        for(int i=0;i<rowCount;++i){
+            NativeRow& row=rows[i];row.name=g_placement.Original(row.line->w1);row.value=g_placement.Original(row.line->w2);
+            row.top=row.name.top<row.value.top?row.name.top:row.value.top;
+            row.bottom=row.name.bottom()>row.value.bottom()?row.name.bottom():row.value.bottom();
+            if(row.top<0 || row.bottom<=row.top){PanelStatus("invalid native row bounds");HidePanel(panel,category);return;}
+            const int height=row.bottom-row.top;total+=height;if(height>rowHeight)rowHeight=height;
+        }
+        std::sort(rows,rows+rowCount,RowBefore);
+        MyGUI::TextBox* nameStyle=rows[rowCount-1].line->w1;MyGUI::TextBox* valueStyle=rows[rowCount-1].line->w2;
+        const std::string& nameSkin=rows[rowCount-1].line->skinW1;
+        const int left=rows[rowCount-1].name.left,valueRight=rows[rowCount-1].value.right();
+        const int width=parent->getWidth()-left-4;
         const int availableHeight=parent->getHeight()<panel->getHeight()?parent->getHeight():panel->getHeight();
-        // The final row needs its actual widget height, not a trailing full
-        // pitch. Native185px panels can fit24px after bottom161 exactly.
-        const int rowHeight=pitch-2;
-        const int remaining=availableHeight-top;
-        int capacity=rowHeight>0 && remaining>=rowHeight?1+(remaining-rowHeight)/pitch:0;
+        // Preserve complete native row sizes. Redistribute only proven empty
+        // top/inter-row spacing, bounded by the configured capacity, not the
+        // number of currently active skills (the first XP row must not jump).
+        int capacity=rowHeight>2?(availableHeight-total-1)/rowHeight:0;
         if(capacity>g_maxRows)capacity=g_maxRows;
-        if(capacity<0 || width<24 || barWidth<8 || barLeft<left+8 || barLeft+barWidth>parent->getWidth())capacity=0;
-        // Reserve a divider only from spare space after the full allowed
-        // capacity, so adding another recent skill cannot shift the first row.
-        const bool dividerAllowed=capacity>0 && remaining-(rowHeight+(capacity-1)*pitch)>=2;
-        if(dividerAllowed)top+=2;
+        const int barWidth=(int)(parent->getWidth()*.48f);
+        int barRight=valueRight+10;if(barRight>parent->getWidth()-2)barRight=parent->getWidth()-2;
+        const int barLeft=barRight-barWidth;
+        if(capacity<0 || width<24 || barWidth<8 || barLeft<left+8 || nameSkin.empty())capacity=0;
+        if(!capacity){g_slots.Select(skills,(int)kCount,now,g_recent,0);PanelStatus("no room for complete native XP rows");HidePanel(panel,category);return;}
+        int spare=availableHeight-total-capacity*rowHeight-1;
+        int cursor=rows[0].top<spare?rows[0].top:spare;spare-=cursor;
+        for(int i=0;i<rowCount;++i){
+            NativeRow& row=rows[i];if(i){int gap=row.top-rows[i-1].bottom;if(gap<0)gap=0;if(gap>spare)gap=spare;cursor+=gap;spare-=gap;}
+            const int delta=cursor-row.top;MyGUI::IntCoord name=row.name,value=row.value;name.top+=delta;value.top+=delta;
+            g_placement.Apply(row.line->w1,name);g_placement.Apply(row.line->w2,value);cursor+=row.bottom-row.top;
+        }
+        const int bottom=cursor,dividerTop=bottom,top=bottom+1;
+        g_slots.Select(skills,(int)kCount,now,g_recent,capacity);
         MyGUI::ISubWidgetText* const nameText=XpPanelTextStyle::RenderedText(nameStyle);
         MyGUI::ISubWidgetText* const valueText=XpPanelTextStyle::RenderedText(valueStyle);
-        const bool paddingDivider=!dividerAllowed && bottom>0 &&
-            XpPanelTextStyle::PaddingBefore(nameStyle,parent->getAbsoluteTop()+bottom-1,g_nameMeasure) &&
-            XpPanelTextStyle::PaddingBefore(valueStyle,parent->getAbsoluteTop()+bottom-1,g_valueMeasure);
-        const int dividerTop=dividerAllowed?bottom:bottom-1;
-        g_slots.Select(skills,(int)kCount,GetTickCount(),g_recent,capacity);
-        PanelStatus(capacity<=0?"no room for XP rows":g_slots.count?"showing recent XP rows":"no recent XP for this character");
         for(int slot=0;slot<g_slots.count;++slot){
             const int index=g_slots.ids[slot];const float value=skills[index].value;
-            const float fraction=value-(float)std::floor(value);
-            const std::string& key=SlotKey(slot);
-            DataPanelLine_Progress* line=NULL;
-            bool created=!panel->lineExists(key,category);
+            const float fraction=value-(float)std::floor(value);const std::string& key=SlotKey(slot);
+            DataPanelLine_Progress* line=NULL;const bool created=!panel->lineExists(key,category);
             if(!created){DataPanelLine* base=panel->getLine(key,category);if(base && base->getType()==DataPanelLine::DPL_PROGRESS)line=static_cast<DataPanelLine_Progress*>(base);}
             if(created || (line && (g_rowSkill[slot]!=index || g_rowValue[slot]!=value))){
                 char number[32];sprintf_s(number,"%d%%",(int)(fraction*100));
-                if(created)line=panel->setLineProgress(key,category,fraction,number,true);
-                else line->setProgress(fraction,number);
+                if(created)line=panel->setLineProgress(key,category,fraction,number,true);else line->setProgress(fraction,number);
             }
             if(!line)continue;
-            XpPanelTextStyle::Copy(line->textBox,nameText);
-            XpPanelTextStyle::Copy(line->progressText,valueText);
-            if(created || g_rowSkill[slot]!=index){if(line->textBox)line->textBox->setCaption(Name(index));g_rowSkill[slot]=index;}
-            g_rowValue[slot]=value;
+            const int y=top+slot*rowHeight;
+            bool createdName=false;MyGUI::TextBox* label=NativeLabel(slot,parent,nameStyle,nameSkin,
+                MyGUI::IntCoord(left,y,barLeft-left-4,rowHeight),createdName);
+            XpPanelTextStyle::Copy(label,nameText);XpPanelTextStyle::Copy(line->progressText,valueText);
+            if(label){if(createdName || created || g_rowSkill[slot]!=index)label->setCaption(Name(index));if(!label->getVisible())label->setVisible(true);}
+            g_rowSkill[slot]=index;g_rowValue[slot]=value;
             if(line->progress && !line->progress->getVisible())line->setVisible(true);
-            const MyGUI::IntCoord coord(barLeft,top+slot*pitch,barWidth,rowHeight);
-            if(line->progress && line->progress->getCoord()!=coord)line->progress->setCoord(coord);
-            const bool lowered=LowerProgressVisual(line->progress,g_barVisual[slot]);
+            // Its generic flat TextBox can carry a heavy scaled frame/insets.
+            // Keep native ownership/bookkeeping, but display our native-style label.
+            if(line->textBox && line->textBox->getVisible())line->textBox->setVisible(false);
+            // Native content-height/getBottom bookkeeping can still inspect
+            // hidden widgets. Keep its placeholder inside the same row bounds.
+            const MyGUI::IntCoord placeholder(left,y,barLeft-left-4,rowHeight);
+            if(line->textBox && line->textBox->getCoord()!=placeholder)line->textBox->setCoord(placeholder);
+            const MyGUI::IntCoord barCoord(barLeft,y+2,barWidth,rowHeight-2);
+            if(line->progress && line->progress->getCoord()!=barCoord)line->progress->setCoord(barCoord);
             MyGUI::ISubWidgetText* percent=XpPanelTextStyle::Measure(line->progressText,g_percentMeasure[slot]);
-            MyGUI::Widget* percentClient=g_percentMeasure[slot].renderedSource.get();
-            const int drop=lowered && percent && percentClient && percent->getTextAlign().isTop() && percent->getViewOffset().top==0 &&
-                percentClient->getAbsoluteTop()==line->progressText->getAbsoluteTop() &&
-                percentClient->getHeight()==line->progressText->getHeight() &&
+            MyGUI::Widget* client=g_percentMeasure[slot].renderedSource.get();
+            const bool lowerPercent=percent && client && percent->getTextAlign().isTop() && percent->getViewOffset().top==0 &&
+                client->getAbsoluteTop()==line->progressText->getAbsoluteTop() && client->getHeight()==line->progressText->getHeight() &&
                 percent->getCoord().top==0 && percent->getCoord().height==line->progressText->getHeight() &&
                 g_percentMeasure[slot].textHeight>0 && g_percentMeasure[slot].textHeight<=rowHeight-2 &&
-                (!g_percentMeasure[slot].shadow || g_percentMeasure[slot].textHeight<rowHeight-2)?2:0;
-            const MyGUI::IntCoord percentCoord(barLeft,top+slot*pitch+drop,barWidth,rowHeight-drop);
+                (!g_percentMeasure[slot].shadow || g_percentMeasure[slot].textHeight<rowHeight-2);
+            const MyGUI::IntCoord percentCoord=lowerPercent?barCoord:MyGUI::IntCoord(barLeft,y,barWidth,rowHeight);
             if(line->progressText && line->progressText->getCoord()!=percentCoord){
-                line->progressText->setCoord(percentCoord);
-                XpPanelTextStyle::Measure(line->progressText,g_percentMeasure[slot]);
+                line->progressText->setCoord(percentCoord);XpPanelTextStyle::Measure(line->progressText,g_percentMeasure[slot]);
             }
-            const MyGUI::IntCoord nameCoord(left,top+slot*pitch,barLeft-left-4,rowHeight);
-            if(line->textBox && line->textBox->getCoord()!=nameCoord)line->textBox->setCoord(nameCoord);
         }
         for(int slot=g_slots.count;slot<5;++slot){
+            if(g_labels[slot].get() && g_labels[slot].get()->getVisible())g_labels[slot].get()->setVisible(false);
             const std::string& key=SlotKey(slot);
             if(panel->lineExists(key,category)){DataPanelLine* row=panel->getLine(key,category);
                 if(row && row->getType()==DataPanelLine::DPL_PROGRESS){DataPanelLine_Progress* progress=static_cast<DataPanelLine_Progress*>(row);
                     if(progress->progress && progress->progress->getVisible())row->setVisible(false);}}
         }
-        if(g_slots.count && (dividerAllowed || paddingDivider)){
+        if(g_slots.count){
             if(g_divider.get() && g_divider.get()->getParent()!=parent)MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
             if(!g_divider.get()){
                 MyGUI::Widget* divider=parent->createWidget<MyGUI::Widget>("WhiteSkin",MyGUI::IntCoord(left,dividerTop,width,1),MyGUI::Align::Default);
                 divider->setNeedMouseFocus(false);divider->setColour(MyGUI::Colour(.35f,.3f,.25f));g_divider.set(divider);
             }
-            MyGUI::Widget* divider=g_divider.get();
-            const MyGUI::IntCoord coord(left,dividerTop,width,1);
-            if(divider->getCoord()!=coord)divider->setCoord(coord);
-            if(!divider->getVisible())divider->setVisible(true);
-        }else if(g_divider.get() && g_divider.get()->getVisible())g_divider.get()->setVisible(false);
+            MyGUI::Widget* divider=g_divider.get();const MyGUI::IntCoord coord(left,dividerTop,width,1);
+            if(divider->getCoord()!=coord)divider->setCoord(coord);if(!divider->getVisible())divider->setVisible(true);
+        }else HidePanel(panel,category);
+        PanelStatus("showing recent XP rows");
         if(PluginDiagnostics::Enabled() && (g_diagRows!=g_slots.count || g_diagBottom!=bottom || g_diagWidth!=width ||
             g_diagParentHeight!=parent->getHeight() || g_diagValueRight!=valueRight || g_diagCapacity!=capacity)){
             std::ostringstream s;s<<"SkillLevelUpInfo: panel height="<<panel->getHeight()<<" vanillaBottom="<<bottom
                 <<" parent="<<parent<<" parentSize="<<parent->getWidth()<<"x"<<parent->getHeight()
-                <<" pitch="<<pitch<<" width="<<width<<" nameLeft="<<left<<" valueRight="<<valueRight
+                <<" pitch="<<rowHeight<<" width="<<width<<" nameLeft="<<left<<" valueRight="<<valueRight
                 <<" barLeft="<<barLeft<<" barWidth="<<barWidth<<" capacity="<<capacity<<" rows="<<g_slots.count;
             DebugLog(s.str());g_diagRows=g_slots.count;g_diagBottom=bottom;g_diagWidth=width;
             g_diagParentHeight=parent->getHeight();g_diagValueRight=valueRight;g_diagCapacity=capacity;
@@ -486,6 +482,13 @@ namespace
     void (*g_origPanel)(CharStats*,DatapanelGUI*,int,bool)=NULL;
     void Panel(CharStats* stats,DatapanelGUI* panel,int category,bool combat)
     {
+        // Retire the old arrangement before native code lays out another
+        // owner/category. This avoids restoring old coordinates over a fresh
+        // native context that happens to reuse the same widgets/positions.
+        if(g_uiThread && GetCurrentThreadId()==g_uiThread && g_panel &&
+           (panel!=g_panel || category!=g_panelCategory || (stats && stats->me && !(hand(stats->me)==g_panelCharacter)))){
+            g_placement.Restore();HideLabels();
+        }
         g_origPanel(stats,panel,category,combat);
         if(!g_uiThread || GetCurrentThreadId()!=g_uiThread){PanelStatus("waiting for GUI thread");return;}
         DrawPanel(stats,panel,category);

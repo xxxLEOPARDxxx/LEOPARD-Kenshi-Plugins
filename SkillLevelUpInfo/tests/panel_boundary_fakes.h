@@ -1,11 +1,13 @@
 #include "head_boundary_fakes.h"
 #include <algorithm>
 namespace MyGUI {
+bool vanillaUiProfile=false;int widgetCreates=0,widgetDestroys=0,typeReads=0;
 typedef std::string UString;
 struct IntCoord {
  int left,top,width,height;
  IntCoord(int a=0,int b=0,int c=0,int d=0):left(a),top(b),width(c),height(d){}
  bool operator!=(const IntCoord& o)const{return left!=o.left||top!=o.top||width!=o.width||height!=o.height;}
+ bool operator==(const IntCoord&o)const{return !(*this!=o);}int bottom()const{return top+height;}int right()const{return left+width;}
 };
 struct IntPoint {int left,top;IntPoint(int x=0,int y=0):left(x),top(y){}};
 struct IntSize {int width,height;IntSize(int w=0,int h=0):width(w),height(h){}};
@@ -24,8 +26,9 @@ struct ISubWidgetText {
 struct EditText:ISubWidgetText{};
 struct Widget;typedef std::vector<Widget*>VectorWidgetPtr;
 struct Widget {
- IntCoord coord;Widget*parent,*client;bool visible,textEnabled,isEditBox,editWordWrap,stretch,stretchText;int moves,clientReads,skinQueries;std::string caption,skinName;EditText text;VectorWidgetPtr children,skinChildren;
- Widget():coord(0,0,400,300),parent(NULL),client(NULL),visible(true),textEnabled(true),isEditBox(false),editWordWrap(false),stretch(false),stretchText(false),moves(0),clientReads(0),skinQueries(0){}
+ IntCoord coord;Widget*parent,*client;bool visible,textEnabled,isEditBox,editWordWrap,stretch,stretchText,needMouse,needKey,inheritsPick;int moves,clientReads,skinQueries;std::string caption,skinName,skinResource,typeName;EditText text;VectorWidgetPtr children,skinChildren;
+ Widget():coord(0,0,400,300),parent(NULL),client(NULL),visible(true),textEnabled(true),isEditBox(false),editWordWrap(false),stretch(false),stretchText(false),needMouse(true),needKey(true),inheritsPick(true),moves(0),clientReads(0),skinQueries(0),typeName("TextBox"){}
+ const std::string&getTypeName(){++typeReads;return typeName;}
  size_t getChildCount(){return children.size();}Widget*getChildAt(size_t n){return children[n];}
  VectorWidgetPtr getSkinWidgetsByName(const std::string&name){++skinQueries;VectorWidgetPtr result;for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->skinName==name)result.push_back(skinChildren[n]);return result;}
  template<class T>T*castType(bool){return isEditBox?static_cast<T*>(this):NULL;}bool getEditWordWrap(){return editWordWrap;}
@@ -36,13 +39,22 @@ struct Widget {
  int getAbsoluteTop(){return coord.top+(parent?parent->getAbsoluteTop():0);}
  bool getVisible(){return visible;}Widget*getParent(){return parent;}
  IntCoord getCoord(){return coord;}
- void setCoord(IntCoord c){if(stretchText){text.coord.width+=c.width-coord.width;text.coord.height+=c.height-coord.height;}for(size_t n=0;n<children.size();++n)if(children[n]->stretch){children[n]->coord.width+=c.width-coord.width;children[n]->coord.height+=c.height-coord.height;}for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->stretch){skinChildren[n]->coord.width+=c.width-coord.width;skinChildren[n]->coord.height+=c.height-coord.height;}coord=c;++moves;}void setVisible(bool b){visible=b;}
- void setCaption(const std::string& c){caption=c;text.caption=c;}void setNeedMouseFocus(bool){}void setColour(Colour){}
- template<class T>T* createWidget(const std::string&,IntCoord c,int){T*p=new T;p->parent=this;p->coord=c;return p;}
+ void setCoord(IntCoord c){const int dx=c.width-coord.width,dy=c.height-coord.height;if(stretchText){text.coord.width+=dx;text.coord.height+=dy;}for(size_t n=0;n<children.size();++n)if(children[n]->stretch){IntCoord a=children[n]->coord;a.width+=dx;a.height+=dy;children[n]->setCoord(a);}for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->stretch){IntCoord a=skinChildren[n]->coord;a.width+=dx;a.height+=dy;skinChildren[n]->setCoord(a);}coord=c;++moves;}void setVisible(bool b){visible=b;}
+ void setCaption(const std::string& c){caption=c;text.caption=c;if(client)client->setCaption(c);}void setNeedMouseFocus(bool v){needMouse=v;}void setNeedKeyFocus(bool v){needKey=v;}void setInheritsPick(bool v){inheritsPick=v;}void setEditStatic(bool){}void setEditWordWrap(bool v){editWordWrap=v;}void setColour(Colour){}
+ Widget*createWidgetT(const std::string&type,const std::string&skin,IntCoord c,int,const std::string&name=""){
+  Widget*p=new Widget;++widgetCreates;p->typeName=type;p->skinResource=skin;p->skinName=name;p->coord=c;p->parent=this;children.push_back(p);
+  p->stretchText=true;p->text.coord=IntCoord(0,0,c.width,c.height);
+  if(type=="EditBox"){
+   p->isEditBox=true;p->editWordWrap=true;p->textEnabled=false;Widget*q=new Widget;++widgetCreates;
+   const int inset=skin=="InsetProfile"?2:0;q->coord=IntCoord(0,inset,c.width,c.height-inset*2);q->parent=p;q->stretch=true;q->stretchText=true;
+   q->text.coord=IntCoord(0,0,c.width,c.height-inset*2);q->text.vertical=0;q->text.shadow=!vanillaUiProfile;p->client=q;p->children.push_back(q);
+  }return p;
+ }
+ template<class T>T* createWidget(const std::string&skin,IntCoord c,int){T*p=new T;++widgetCreates;p->parent=this;p->coord=c;p->skinResource=skin;children.push_back(p);return p;}
 };
-typedef Widget EditBox;typedef Widget ProgressBar;
+typedef Widget TextBox;typedef Widget EditBox;typedef Widget ProgressBar;
 void UnlinkWidget(Widget*);
-struct Gui{static Gui&getInstance(){static Gui g;return g;}void destroyWidget(Widget*w){UnlinkWidget(w);delete w;}};
+struct Gui{static Gui&getInstance(){static Gui g;return g;}void destroyWidget(Widget*w){while(!w->children.empty())destroyWidget(w->children.back());if(w->parent){VectorWidgetPtr&v=w->parent->children;v.erase(std::remove(v.begin(),v.end(),w),v.end());}UnlinkWidget(w);++widgetDestroys;delete w;}};
 }
 struct WidgetRef;
 std::vector<WidgetRef*>widgetRefs;
@@ -51,8 +63,8 @@ void MyGUI::UnlinkWidget(Widget*w){for(size_t i=0;i<widgetRefs.size();++i)if(wid
 #include "PanelTextStyle.h"
 bool XpPanelTextStyle::g_nativeProfile=false;
 struct DataPanelLine {
- enum{DPL_BASE,DPL_PROGRESS};MyGUI::Widget*w1,*w2;std::string keyValue;int type;
- DataPanelLine():w1(NULL),w2(NULL),type(DPL_BASE){}
+ enum{DPL_BASE,DPL_PROGRESS};MyGUI::Widget*w1,*w2;std::string keyValue,skinW1,skinW2;int type;
+ DataPanelLine():w1(NULL),w2(NULL),skinW1("Kenshi_PaintedWordWrapEmpty"),skinW2("Kenshi_WordWrapEmpty"),type(DPL_BASE){}
  int getType(){return type;}
  virtual void setVisible(bool b){if(w1)w1->setVisible(b);if(w2)w2->setVisible(b);}
 };
@@ -71,9 +83,11 @@ struct DatapanelGUI {
  DataPanelLine_Progress*setLineProgress(const std::string&k,int,float v,const std::string&t,bool){
   DataPanelLine_Progress*r=new DataPanelLine_Progress;r->keyValue=k;
   r->textBox=new MyGUI::Widget;r->progress=new MyGUI::Widget;r->progressText=new MyGUI::Widget;
-  r->progressText->text.vertical=0;r->progressText->stretchText=true;r->progressText->text.coord=MyGUI::IntCoord(0,0,400,300);
+  r->textBox->skinResource="Kenshi_GenericTextBoxFlat";r->textBox->stretchText=true;
+  r->textBox->text.coord=MyGUI::vanillaUiProfile?MyGUI::IntCoord(17,9,365,280):MyGUI::IntCoord(0,0,400,300);
+  r->progressText->text.vertical=0;r->progressText->text.shadow=!MyGUI::vanillaUiProfile;r->progressText->stretchText=true;r->progressText->text.coord=MyGUI::IntCoord(0,0,400,300);
   const int w=r->progress->getWidth(),h=r->progress->getHeight();
-  const MyGUI::IntCoord skin[]={MyGUI::IntCoord(10,2,w-19,h-5),MyGUI::IntCoord(11,3,w-21,h-7),MyGUI::IntCoord(0,0,w,h)};
+  const MyGUI::IntCoord skin[]={MyGUI::vanillaUiProfile?MyGUI::IntCoord(13,2,w-25,h-7):MyGUI::IntCoord(10,2,w-19,h-5),MyGUI::vanillaUiProfile?MyGUI::IntCoord(14,4,w-28,h-9):MyGUI::IntCoord(11,3,w-21,h-7),MyGUI::IntCoord(0,0,w,h)};
   for(int i=0;i<3;++i){MyGUI::Widget*c=new MyGUI::Widget;c->coord=skin[i];c->parent=r->progress;c->stretch=true;if(i==1)c->skinName="TrackPlace";r->progress->skinChildren.push_back(c);}
   r->w1=r->textBox;r->w2=r->progress;r->textBox->parent=r->progress->parent=r->progressText->parent=lines.empty()?&root:lines[0]->w1->parent;
   r->setProgress(v,t);lines.push_back(r);named[k]=r;return r;

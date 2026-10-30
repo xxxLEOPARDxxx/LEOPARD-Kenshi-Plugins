@@ -6,8 +6,10 @@
 #include <string>
 #include <WidgetRef.h>
 #include "PanelTextStyle.h"
+#include "PanelPlacement.h"
 #include <cstdio>
 #include <cstring>
+#include <cstddef>
 bool XpPanelTextStyle::g_nativeProfile=false;
 int main(){
  HMODULE engine=LoadLibraryW(L"D:/SteamLibrary/steamapps/common/Kenshi/MyGUIEngine_x64.dll");
@@ -19,5 +21,9 @@ int main(){
  const bool vectorOk=sizeof(vector)==32 && sizeof(std::allocator<MyGUI::Widget*>)==1 &&
      words[0]==reinterpret_cast<UINT_PTR>(&vector[0]) && words[1]-words[0]==8 && words[2]-words[0]==24;
  printf("%s production VC10 VectorWidgetPtr size32 empty allocator1 begin/end/cap offsets0/8/16\n",vectorOk?"PASS":"FAIL");
- FreeLibrary(engine);return result && vectorOk?0:1;
+ const bool cacheOk=sizeof(WidgetRef)==24 && sizeof(std::string)==40 && sizeof(XpPanelPlacement::Entry)==56 &&
+     offsetof(XpPanelPlacement::Cache,entries)==24 && offsetof(XpPanelPlacement::Cache,count)==3608 &&
+     offsetof(XpPanelPlacement::Cache,writes)==3612 && sizeof(XpPanelPlacement::Cache)==3616;
+ printf("%s production readonly label/cache ABI: ref24 string40 entry56 entries24 count3608 cache3616\n",cacheOk?"PASS":"FAIL");
+ FreeLibrary(engine);return result && vectorOk && cacheOk?0:1;
 }

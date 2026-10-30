@@ -11,10 +11,27 @@ class Memory:
  def zero(self,a,n):self.write(a,bytes(n))
 
 class ProbeTests(unittest.TestCase):
+ def test_owned_native_labels_use_verified_ref_string_arrays(self):
+  m=Memory();refs,skins,types,w=0x60000,0x61000,0x62000,0x70000
+  m.zero(refs,120);m.zero(skins,200);m.zero(types,200);m.pack(refs+8,'<Q',w)
+  for address,text in [(skins,b'PaintedSkin'),(types,b'EditBox')]:
+   m.write(address,text);m.pack(address+16,'<2Q',len(text),15)
+  m.pack(w+0x20,'<4i',8,131,141,25);m.pack(w+0x30,'<2i',18,1378);m.pack(w+0x450,'<Q',0)
+  m.write(w+0x46c,b'\1');m.pack(w+0x330,'<Q',0);m.pack(w+0x3d0,'<Q',0)
+  labels=probe.owned_labels(m,refs,skins,types)
+  self.assertEqual((labels[0]['skin'],labels[0]['native_type'],labels[0]['widget']['coord']),('PaintedSkin','EditBox',[8,131,141,25]))
+ def test_reversible_placement_cache_has_compiler_verified_layout_and_budget(self):
+  m=Memory();cache,w=0x80000,0x90000;m.zero(cache,3616);m.pack(cache+3608,'<i',1)
+  m.pack(cache+32,'<Q',w);m.pack(cache+48,'<4i',8,147,285,25);m.pack(cache+64,'<4i',8,130,285,25);m.pack(w+0x20,'<4i',8,130,285,25)
+  result=probe.placement_cache(m,cache)
+  self.assertEqual((result['entries'][0]['original'][1],result['entries'][0]['current'][1]),(147,130))
+  m.pack(cache+3608,'<i',65)
+  with self.assertRaisesRegex(ValueError,'budget'):probe.placement_cache(m,cache)
  def test_owned_skin_vector_uses_native_skin_children_not_content_children(self):
   m=Memory();bar,storage,child=0x10000,0x20000,0x30000
   m.pack(bar+0x3f8,'<3Q',storage,storage+8,storage+8);m.pack(storage,'<Q',child)
   m.pack(child+0x20,'<4i',11,5,132,17);m.pack(child+0x450,'<Q',bar);m.write(child+0x46c,b'\1')
+  m.pack(child+0x30,'<2i',11,5)
   m.pack(child+0x3d0,'<Q',0);m.pack(child+0x330,'<Q',0)
   m.zero(child+0x428,32);m.write(child+0x428,b'TrackPlace');m.pack(child+0x438,'<2Q',10,15)
   result=probe.skin_children(m,bar)
@@ -23,9 +40,9 @@ class ProbeTests(unittest.TestCase):
   with self.assertRaisesRegex(ValueError,'budget'):probe.skin_children(m,bar)
  def test_current_dll_and_map_match(self):
   symbols,stamp=probe.map_symbols(probe.BUILD/'SkillLevelUpInfo.map',probe.BUILD/'SkillLevelUpInfo.dll')
-  self.assertEqual(symbols['g_panel'],0x25248)
-  self.assertEqual(symbols['g_slots'],0x252c8)
-  self.assertEqual(stamp,0x6ae4b896)
+  self.assertEqual(symbols['g_panel'],0x26248)
+  self.assertEqual(symbols['g_slots'],0x26348)
+  self.assertEqual(stamp,0x6ae4e0bf)
  def test_vc10_map_keeps_key_order_not_visual_order(self):
   m=Memory();obj,head=0x10000,0x11000
   m.pack(obj+8,'<QQ',head,3);m.pack(head+8,'<Q',0x13000)
@@ -41,6 +58,7 @@ class ProbeTests(unittest.TestCase):
   self.assertEqual(probe.string(m,0x10000),value.decode())
  def test_real_widget_offsets_and_parent(self):
   m=Memory();m.pack(0x10020,'<4i',9,105,307,22);m.pack(0x10450,'<Q',0x20000);m.write(0x1046c,b'\1');m.pack(0x103d0,'<Q',0);m.pack(0x10330,'<Q',0)
+  m.pack(0x10030,'<2i',9,105)
   w=probe.widget(m,0x10000)
   self.assertEqual((w['bottom'],w['parent'],w['visible']),(127,'0x20000',True))
  def test_owner_snapshot_uses_node_plus56_not64(self):
@@ -67,6 +85,8 @@ class ProbeTests(unittest.TestCase):
   self.assertIsNone(probe.binding(m,obj,0x40004))
  def test_composite_font_snapshot_uses_verified_native_getter_offsets(self):
   m=Memory();outer,client,text,font=0x10000,0x20000,0x30000,0x40000
+  m.pack(outer+0x20,'<4i',9,109,307,26);m.pack(outer+0x30,'<2i',9,109)
+  m.pack(client+0x20,'<4i',0,0,307,26);m.pack(client+0x30,'<2i',9,109)
   m.pack(outer+0x3d0,'<Q',client);m.pack(client+0x3d0,'<Q',0);m.pack(client+0x330,'<Q',text)
   m.pack(text+0xe0,'<Q',font);m.pack(text+0xf0,'<i',25)
   m.pack(text+0x18,'<4i',0,0,307,26);m.pack(text+0x28,'<2i',9,109)
@@ -75,6 +95,7 @@ class ProbeTests(unittest.TestCase):
   m.zero(font+8,32);m.write(font+8,b'ActualFont');m.pack(font+24,'<QQ',10,15)
   style=probe.rendered_font(m,outer)
   self.assertEqual((style['face'],style['font_height'],style['widget']),('ActualFont',25,hex(client)))
+  self.assertEqual(style['client_chain'][1]['absolute'],[9,109])
   self.assertEqual(style['text_view_size'],[100,25])
  def test_actual_rendered_caption_supports_inline_and_heap_utf16(self):
   m=Memory();m.zero(0x10000,32);m.write(0x10000,'Уворот'.encode('utf-16-le'));m.pack(0x10010,'<QQ',6,7)

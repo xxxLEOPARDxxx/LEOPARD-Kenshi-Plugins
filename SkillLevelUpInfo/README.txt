@@ -1,4 +1,4 @@
-SKILL LEVEL UP INFO / XP INFO PARITY
+﻿SKILL LEVEL UP INFO / XP INFO PARITY
 
 Original / Оригинал: XP Info - experience gain notifications, semper1dem
 (Steam: Alexander). Thanks to the original author for this feature design.
@@ -193,52 +193,51 @@ Removed the redundant MCM sentence from the MCM-page description.
 
 STABLE ROW SPACING / УСТОЙЧИВЫЙ ШАГ СТРОК
 
-Vanilla rows are stored in key order, not vertical order. XP layout now follows
-the original XP Info: collect non-progress row bottoms, sort them and use the
-smallest positive gap. An armed character with six vanilla rows no longer loses
-all XP bars because a multi-row gap was mistaken for one row. Two is an upper
-limit, not a promise to overlap the HUD: the actual number respects the current
-viewport. Tiny positive XP and recent-activity lifetime have not been changed.
+Native UI layouts / Штатные и заменённые интерфейсы
 
-Штатные строки хранятся не в визуальном порядке. Теперь, как в XP Info,
-нижние границы обычных строк сортируются и используется минимальный
-положительный интервал. Переход от пяти к шести характеристикам больше
-не обнуляет место из-за ошибочно большого шага. Два — верхний предел;
-фактическое число учитывает видимую область и не перекрывает интерфейс.
-Порог малых прибавок и срок хранения активности не менялись.
+XP names use the actual runtime widget type, skin and rendered font of the
+native attribute labels. The generic progress-line name stays hidden: its
+vanilla frame can leave only3px of text after resizing. At most two owned
+labels replace it, with mouse/key/picking disabled. Long names remain a single
+native text column instead of wrapping into an invisible second line.
 
-VANILLA TEXT STYLE / ШТАТНЫЙ СТИЛЬ ТЕКСТА
+Rows preserve native widget/font sizes. When space is tight, only empty top
+and inter-row spacing is redistributed inside the real viewport. The original
+layout returns when XP is disabled/expired or the context changes; external
+native relayout becomes the new baseline. Current measured vanilla/Dark UI
+profiles show two XP rows with five attributes and one with six. MaxRows1..2
+is an upper bound, and old larger INI values clamp without rewriting the file.
 
-XP skill labels inherit the actual rendered vanilla label font and height;
-percentages inherit the vanilla value style. Existing 24 px XP rectangles and
-bar colors are unchanged. Font setters and text-size measurements are cached
-or skipped when unchanged. A 1 px divider uses verified lower text padding in
-tight layouts; unknown padding does not reduce XP row capacity. MaxRows now
-offers 1..2 by explicit user choice; old values above 2 clamp when read without
-rewriting the personal INI.
+The complete native progress bar and its frame move together2px down beside
+the name. Actual23/24px bar heights, scaled skin offsets, palettes and full
+25/26px name regions are retained. Percentage text uses the same offset only
+when its actual client/text region fits; unfamiliar insets retain a full row.
+A1px divider has its own space and does not cross glyphs. Stable frames create
+no widgets, repeat no type lookup, and write no geometry. Debug counters for
+owned labels/native placement are available to the bounded read-only probe.
 
-Названия навыков опыта используют реальный шрифт и размер штатных названий,
-проценты — оформление штатных значений. Прямоугольники полос высотой 24 px и цвета
-сохранены. Неизменившийся шрифт не назначается повторно; измерения кешируются.
-В тесной панели разделитель 1 px использует подтверждённый нижний отступ текста;
-неизвестный отступ не уменьшает число полос. По выбору пользователя MaxRows
-ограничен 1..2; старые значения выше 2 ограничиваются при чтении без перезаписи INI.
+Названия опыта используют реальный тип виджета, skin и шрифт штатных атрибутов.
+Стандартное имя progress-строки скрывается: его рамка vanilla после сжатия
+может оставить всего3px для текста. Вместо него создаются максимум два своих
+штатных текстовых виджета без перехвата мыши, клавиш и выбора. Длинные названия
+остаются одной колонкой, а не переносятся в невидимую вторую строку.
 
-The visual fill/background and percentage now sit 2 px lower beside the skill
-name. Verified vanilla/Dark UI skin elements keep their physical 17/19 px heights;
-the name and logical 24 px bar rectangles, divider and one/two-row capacity stay
-unchanged. The 21 px percentage fits its remaining 22 px box; it moves only when
-the actual rendered client/text region has full height and no vertical insets.
-Unknown skins or
-text without enough lower padding retain their safe existing placement. Skin
-lookup occurs once per owned bar; stable frames do not allocate or rewrite it.
+Размеры штатных виджетов и шрифтов сохранены. При нехватке места перераспределяются
+только пустые верхние/межстрочные отступы внутри реальной видимой области.
+Исходная геометрия восстанавливается при выключении/истечении XP и смене
+контекста; штатное переразмещение игры становится новой исходной геометрией.
+Измеренные vanilla/Dark UI показывают две XP-строки при пяти атрибутах и одну
+при шести. MaxRows1..2 — верхняя граница; старые большие INI-значения ограничиваются
+при чтении без перезаписи личного файла.
 
-Заполнение полосы, фон и проценты опущены на 2 px относительно названия навыка.
-Фактическая высота элементов vanilla/Dark UI (17/19 px), положение названия,
-общая строка 24 px, разделитель и вместимость одной/двух строк сохранены.
-Проценты высотой 21 px помещаются в оставшиеся 22 px; сдвиг применяется только
-при полной высоте реального клиентского текста без верхнего/нижнего отступа.
-Для неизвестного скина или
-текста без достаточного отступа сохраняется безопасное прежнее положение.
-Поиск элементов скина выполняется один раз; стабильный кадр не создаёт объекты
-и не меняет их геометрию повторно.
+Вся штатная полоса вместе с рамкой опущена на2px. Сохранены высота23/24px,
+масштабированные элементы skin, цвета и полная область названия25/26px.
+Проценты сдвигаются только при достаточной реальной клиентской области;
+неизвестные отступы сохраняют полную строку. Разделитель1px занимает отдельное
+место без пересечения букв. Стабильный кадр не создаёт виджеты, не повторяет
+определение типа и не меняет геометрию. Диагностические счётчики своих надписей
+и штатного размещения доступны ограниченному read-only probe.
+
+Technical evidence / Техническая проверка: UI_PROFILE_REPAIR.md,
+tests/ui_profiles.json (address-free native captures), tests/test_skin_profiles.py.
+Native acceptance of the new repair remains pending the next user launch.

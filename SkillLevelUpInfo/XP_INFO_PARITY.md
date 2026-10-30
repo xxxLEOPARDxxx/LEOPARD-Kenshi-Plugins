@@ -157,3 +157,22 @@ origin-only changes cannot inherit stale permission. RED/GREEN cases cover a3px
 inset with21px glyphs and2px bottom padding, including100 stable frames without
 22/24px oscillation, repeated writes or measurements. The captured1487 percentage
 region[0,0,153,24] confirms the ordinary full-height zero-inset layout.
+
+### Universal native UI follow-up (vanilla regression)
+
+The preceding inner-skin nudge/exact-fit name rectangles are superseded by
+`UI_PROFILE_REPAIR.md`. Root's actual vanilla captures prove that the generic
+progress name can expose only3px of its25px text, and that scaled bar offsets
+do not match the unscaled XML constants. The repair creates at most two owned
+labels from the actual native source type/skin (a composite EditBox in the
+measured profiles), hides the generic placeholder without changing native
+ownership, and moves the complete bar/frame together. Full25/26px row sizes
+are retained; only unused top/inter-row spacing is redistributed reversibly.
+
+Four address-free measured profiles and lifecycle/skin/viewport transitions
+execute the real production draw function. The original implementation is RED;
+the repaired source passes48 profile checks. A tiny read-only diagnostic cache
+records original/applied native coordinates and cumulative writes. Own-label
+creation/destruction/type-read counters allow the next native run to verify
+the steady-frame behavior, rather than infer it from fake boundaries alone.
+The UI repair is not installed or runtime-accepted by this implementation task.
