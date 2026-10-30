@@ -29,9 +29,9 @@ struct hand {
 template<class T>struct lektor:std::vector<T>{};
 typedef int StatsEnumerated;
 struct CharStats {
- float value;Character* me;float refs[64];int firstRef,alias[64],unsupported;
- CharStats():value(1.5f),me(NULL),firstRef(-1),unsupported(-1){for(int i=0;i<64;++i){refs[i]=0;alias[i]=-1;}}
- float getStat(int,bool base){if(!base)abort();return value;}
+ float value;Character* me;float refs[64];int firstRef,alias[64],unsupported;bool independent;
+ CharStats():value(1.5f),me(NULL),firstRef(-1),unsupported(-1),independent(false){for(int i=0;i<64;++i){refs[i]=0;alias[i]=-1;}}
+ float getStat(int index,bool base){if(!base)abort();return independent?getStatRef(index):value;}
  float& getStatRef(int index){static float outside=0;if(index==unsupported)return outside;if(alias[index]>=0)index=alias[index];if(firstRef<0)firstRef=index;return index==firstRef?value:refs[index];}
 };
 struct Character {

@@ -28,6 +28,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
 
 typedef char CharStatsAbiSizeMustMatchOriginal[(sizeof(CharStats)==0x230)?1:-1];
 namespace
@@ -310,21 +311,30 @@ namespace
         }
         // Read a bounded list of existing vanilla line widgets. Use their actual
         // parent and pitch rather than translated captions or a global UI search.
-        int bottom=0,pitch=20,lastTop=-1,left=0,width=root->getWidth(),valueRight=width-4;
+        int bottom=0,pitch=20,left=0,width=root->getWidth(),valueRight=width-4;
+        int rowBottoms[512],rowCount=0;
         MyGUI::Widget* parent=root;
         const int lines=panel->getNumLines(category);
         for(int i=0;i<lines && i<512;++i){
             DataPanelLine* line=panel->getLineByNum(category,i);if(!line)continue;
-            if(line->keyValue.compare(0,19,"skill_xp_info_slot_")==0)continue;
+            if(line->getType()==DataPanelLine::DPL_PROGRESS)continue;
             MyGUI::Widget* w=line->w2?line->w2:line->w1;
             if(!w || !w->getVisible())continue;
+            rowBottoms[rowCount++]=w->getBottom();
             if(w->getBottom()>bottom){
-                if(lastTop>=0 && w->getTop()>lastTop && w->getTop()-lastTop<100)pitch=w->getTop()-lastTop;
-                lastTop=w->getTop();bottom=w->getBottom();parent=w->getParent();
+                bottom=w->getBottom();parent=w->getParent();
                 if(line->w1)left=line->w1->getLeft();
                 if(line->w2)valueRight=line->w2->getLeft()+line->w2->getWidth();
             }
         }
+        // getLineByNum walks a key-sorted native map, not visual row order.
+        // Original XP Info sorts non-progress row bottoms and takes their
+        // smallest positive gap. A late map key must not turn
+        // one normal row pitch into a two/three-row jump and erase capacity.
+        std::sort(rowBottoms,rowBottoms+rowCount);
+        int smallestGap=0;
+        for(int i=1;i<rowCount;++i){const int gap=rowBottoms[i]-rowBottoms[i-1];if(gap>0 && (!smallestGap || gap<smallestGap))smallestGap=gap;}
+        if(smallestGap)pitch=smallestGap;
         if(!parent || pitch<=0){PanelStatus("missing usable native layout");return;}
         width=parent->getWidth()-left-4;
         // Native w1/w2 overlap: both start at 3% of the row, while w2's

@@ -190,3 +190,19 @@ Removed the redundant MCM sentence from the MCM-page description.
 Это устраняет нулевое число строк при настоящей разметке игры. Эту панель
 и отдельное окно LiveXpBars можно использовать вместе, если они размещены
 в разных местах. Из подсказки внутри MCM убрано лишнее упоминание MCM.
+
+STABLE ROW SPACING / УСТОЙЧИВЫЙ ШАГ СТРОК
+
+Vanilla rows are stored in key order, not vertical order. XP layout now follows
+the original XP Info: collect non-progress row bottoms, sort them and use the
+smallest positive gap. An armed character with six vanilla rows no longer loses
+all XP bars because a multi-row gap was mistaken for one row. Five is an upper
+limit, not a promise to overlap the HUD: the actual number respects the current
+viewport. Tiny positive XP and recent-activity lifetime have not been changed.
+
+Штатные строки хранятся не в визуальном порядке. Теперь, как в XP Info,
+нижние границы обычных строк сортируются и используется минимальный
+положительный интервал. Переход от пяти к шести характеристикам больше
+не обнуляет место из-за ошибочно большого шага. Пять — верхний предел;
+фактическое число учитывает видимую область и не перекрывает интерфейс.
+Порог малых прибавок и срок хранения активности не менялись.

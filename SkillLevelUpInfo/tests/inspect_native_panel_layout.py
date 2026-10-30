@@ -31,3 +31,20 @@ print('Native basic name/value boxes overlap: both left=3% parent width; widths9
 print('Native keyed progress bar width=48%; original XP Info left=valueRight-nativeBarWidth+10px.')
 print('GUIWindow.getHeight reads win Widget.height; content-height getter is separate.')
 print('At400px: vanilla name/value left12, valueRight384; XP bar left202 width192, right394.')
+
+# getLineByNum's inner walk is std::map in-order iteration, unrelated to
+# widget coordinates. Original XP Info explicitly sorts native row bottoms.
+def instructions(pe,rva,size):
+ return [(i.mnemonic,i.op_str) for i in cs.disasm(pe.get_data(rva,size),pe.OPTIONAL_HEADER.ImageBase+rva)]
+walk=instructions(exe,0x6fc470,0x56)
+assert ('mov','rax, qword ptr [rbx + 0x10]') in walk
+assert ('mov','rbx, rax') in walk and ('mov','rax, qword ptr [rax]') in walk
+assert ('mov','rax, qword ptr [rbx + 8]') in walk
+helper=instructions(original,0x2b05,0x49)
+assert ('call','0x180016190') in helper # original sort<int>
+assert ('sub','eax, dword ptr [rdi + rdx*4 - 4]') in helper
+assert ('cmp','eax, esi') in helper and ('mov','esi, eax') in helper
+skip=instructions(original,0x2972,0x20)
+assert ('cmp','eax, 0xb') in skip # DPL_PROGRESS excluded from native baseline
+assert ('call','qword ptr [rdx + 0x58]') in skip # DataPanelLine::getBottom
+print('Native getLineByNum walks map successors; original sorts non-progress bottoms and takes minimum positive adjacent gap.')

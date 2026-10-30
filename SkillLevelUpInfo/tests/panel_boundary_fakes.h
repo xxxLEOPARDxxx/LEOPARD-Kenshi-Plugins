@@ -19,9 +19,13 @@ struct Widget {
  template<class T>T* createWidget(const std::string&,IntCoord c,int){T*p=new T;p->parent=this;p->coord=c;return p;}
 };
 typedef Widget EditBox;typedef Widget ProgressBar;
-struct Gui{static Gui&getInstance(){static Gui g;return g;}void destroyWidget(Widget*w){delete w;}};
+void UnlinkWidget(Widget*);
+struct Gui{static Gui&getInstance(){static Gui g;return g;}void destroyWidget(Widget*w){UnlinkWidget(w);delete w;}};
 }
-struct WidgetRef{MyGUI::Widget*w;WidgetRef():w(NULL){}MyGUI::Widget*get(){return w;}void set(MyGUI::Widget*p){w=p;}void reset(){w=NULL;}};
+struct WidgetRef;
+std::vector<WidgetRef*>widgetRefs;
+struct WidgetRef{MyGUI::Widget*w;WidgetRef():w(NULL){widgetRefs.push_back(this);}~WidgetRef(){widgetRefs.erase(std::find(widgetRefs.begin(),widgetRefs.end(),this));}MyGUI::Widget*get(){return w;}void set(MyGUI::Widget*p){w=p;}void reset(){w=NULL;}};
+void MyGUI::UnlinkWidget(Widget*w){for(size_t i=0;i<widgetRefs.size();++i)if(widgetRefs[i]->w==w)widgetRefs[i]->w=NULL;}
 struct DataPanelLine {
  enum{DPL_BASE,DPL_PROGRESS};MyGUI::Widget*w1,*w2;std::string keyValue;int type;
  DataPanelLine():w1(NULL),w2(NULL),type(DPL_BASE){}
