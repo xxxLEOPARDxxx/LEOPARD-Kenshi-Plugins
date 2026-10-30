@@ -42,7 +42,10 @@ namespace
     void Move(Character* c, DfMemberWork& w, const Ogre::Vector3& target)
     {
         const bool newTarget=!w.moving || w.destination.squaredDistance(target)>4.0f;
-        if (newTarget) w.progressAt=0;
+        // A wandering trader changes the destination, not the worker's actual
+        // progress. Preserve the stall deadline until the worker moves; a new
+        // route alone must not keep an obstructed hauler waiting forever.
+        if (!w.moving) w.progressAt=0;
         if (newTarget || DfGoalOf(c) != MOVE_ON_FREE_WILL)
         {
             c->setDestination(target,false);

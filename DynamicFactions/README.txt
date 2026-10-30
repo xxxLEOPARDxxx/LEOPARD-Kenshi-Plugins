@@ -133,3 +133,16 @@ the open window and pending mouse item are not rebuilt. Native routing, build
 and failure models are checked; live visibility after a new sale, reopening and
 save/load still needs acceptance. Items sold by the older C5 build remain in the
 merchant's personal inventory; no automatic relocation or duplicate payment occurs.
+
+ПРОГРЕСС ПРИ СБЛИЖЕНИИ / APPROACH PROGRESS
+
+Движение торговца обновляет точку назначения, но не сбрасывает отсчёт
+застревания. Его сбрасывает реальное продвижение носильщика; неподвижный
+носильщик больше не может бесконечно ждать только из-за блуждания цели.
+Moving merchants update the native destination without resetting the stuck
+worker deadline. Actual worker movement remains the progress criterion.
+
+30.10: пользователь подтвердил всплывающую сумму при продаже бармену.
+Физический запас магазина и save/load после сделки ещё требуют приёмки.
+The user confirmed the currency popup when selling to the barman. Physical
+shop stock and save/load after the trade still await acceptance.

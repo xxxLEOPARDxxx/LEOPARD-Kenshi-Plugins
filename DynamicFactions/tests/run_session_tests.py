@@ -46,10 +46,11 @@ struct Platoon { Faction* owner; };
 struct ActivePlatoon { Platoon* me; };
 int resolutions=0, cleared=0;
 struct hand;
-struct Character { Faction* faction; ActivePlatoon* platoon; int mode; bool player;
+struct Character { Faction* faction; ActivePlatoon* platoon; int mode; bool player; int goal, destinationCalls;
  Ogre::Vector3 position;Ogre::Vector3 getPosition(){return position;}
  StatsEnumerated currentSkillUsing;
- Character():currentSkillUsing(0),faction(0),platoon(0),mode(0),player(false){}
+ Character():currentSkillUsing(0),faction(0),platoon(0),mode(0),player(false),goal(0),destinationCalls(0){}
+ void setDestination(const Ogre::Vector3&,bool){++destinationCalls;goal=55;}
  bool isDead(){return false;} bool isUnconcious(){return false;} bool isDown(){return false;}
  bool isPlayerCharacter(){return player;} Faction* getFaction(){return faction;}
  ActivePlatoon* getPlatoon(){return platoon;}
@@ -79,6 +80,13 @@ struct DfNode {GameData* item;int itemValue;Ogre::Vector3 pos;};
 Ogre::Vector3 Pos(const DfKnownNode& n){return Ogre::Vector3(n.x,n.y,n.z);}
 '''
 code += function(labour,'int Known(')+'\n'
+code += r'''
+const int MOVE_ON_FREE_WILL=55;
+int DfGoalOf(Character* c){return c->goal;}
+struct DfMemberWork {bool moving,ordered;Ogre::Vector3 destination;unsigned long progressAt;
+ DfMemberWork():moving(false),ordered(false),progressAt(0){} };
+'''
+code += function(labour,'void Move(')+'\n'
 code += r'''
 bool g_ready=false,g_debug=false;DWORD g_readyAt=0;int readyRestores=0;
 void RestoreTreasuries(){++readyRestores;}
@@ -122,6 +130,19 @@ void hireCase(int moneyMode,int factionMode,bool expected,int balance,bool membe
  check(result==expected && o.money==balance && (recruit.faction==&f)==member && g_joinUncertain==blocked,name);
 }
 int main(){
+ {Character c;DfMemberWork w;
+ Move(&c,w,Ogre::Vector3(10,0,0));
+ check(c.destinationCalls==1&&w.moving&&w.ordered&&w.progressAt==0,"first route starts native movement and its progress baseline");
+ w.progressAt=1000;
+ Move(&c,w,Ogre::Vector3(20,0,0));
+ check(c.destinationCalls==2&&w.destination.x==20,"moving trader updates native destination");
+ check(w.progressAt==1000,"a moving target cannot reset the stationary hauler's no-progress deadline");
+ for(int tick=1;tick<=8;++tick)Move(&c,w,Ogre::Vector3(20+10.0f*tick,0,0));
+ check(w.progressAt==1000,"repeated target movement cannot postpone no-progress recovery indefinitely");
+ const int calls=c.destinationCalls;Move(&c,w,w.destination);
+ check(c.destinationCalls==calls&&w.progressAt==1000,"stable destination avoids redundant native orders and keeps progress baseline");
+ c.goal=0;Move(&c,w,w.destination);
+ check(c.destinationCalls==calls+1&&w.progressAt==1000,"reissuing a missing native goal does not erase the progress deadline");}
  {Character c;Ownerships wallet;Faction f;f.factionOwnerships=&wallet;c.faction=&f;
  ShowReceipt(&c,97);check(receiptGui.caption=="c.97"&&receiptGui.size==ScreenLabel::LS_LARGE&&receiptGui.speed==ScreenLabel::RS_SLOW,"native currency receipt format and vanilla style");
  check(receiptGui.label.tracked.character==&c&&receiptGui.label.offset.y==15,"currency receipt tracks trading actor at native head offset");
