@@ -1,0 +1,23 @@
+0070e670 mov      qword ptr [rsp + 8], rbx
+0070e675 mov      qword ptr [rsp + 0x10], rsi
+0070e67a push     rdi
+0070e67b sub      rsp, 0x20
+0070e67f mov      rcx, qword ptr [rip + 0x1a24eca]
+0070e686 mov      edi, r8d
+0070e689 mov      rsi, rdx
+0070e68c call     0x14004704b ; ?copyItem@RootObjectFactory@@QEAAPEAVItem@@PEAV2@@Z
+0070e691 mov      r9d, edi
+0070e694 mov      rdx, rsi
+0070e697 mov      dword ptr [rax + 0x12c], edi
+0070e69d sub      dword ptr [rsi + 0x12c], edi
+0070e6a3 mov      rcx, qword ptr [rip + 0x1a2351e]
+0070e6aa mov      r8, rax
+0070e6ad mov      rbx, rax
+0070e6b0 call     0x1400240cd ; ?tryToEquip@InventoryGUI@@QEAA_NPEAVItem@@_N@Z+0x630
+0070e6b5 mov      rsi, qword ptr [rsp + 0x38]
+0070e6ba mov      rax, rbx
+0070e6bd mov      rbx, qword ptr [rsp + 0x30]
+0070e6c2 add      rsp, 0x20
+0070e6c6 pop      rdi
+0070e6c7 ret      
+0070e6c8 int3     

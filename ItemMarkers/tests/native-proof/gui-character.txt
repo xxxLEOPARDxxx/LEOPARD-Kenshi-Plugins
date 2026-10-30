@@ -1,0 +1,10 @@
+0070c410 sub      rsp, 0x28
+0070c414 mov      rax, qword ptr [rcx]
+0070c417 call     qword ptr [rax + 0x70]
+0070c41a test     rax, rax
+0070c41d je       0x14070c42b
+0070c41f mov      rcx, rax
+0070c422 add      rsp, 0x28
+0070c426 jmp      0x14002aa36 ; ?getCallbackCharacter@Inventory@@QEBAPEAVCharacter@@XZ
+0070c42b add      rsp, 0x28
+0070c42f ret      

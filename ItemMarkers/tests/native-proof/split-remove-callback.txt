@@ -1,0 +1,14 @@
+00746ac0 push     rbx
+00746ac2 sub      rsp, 0x20
+00746ac6 mov      rax, qword ptr [rcx]
+00746ac9 xor      r8d, r8d
+00746acc mov      rbx, rcx
+00746acf call     qword ptr [rax + 0x68]
+00746ad2 mov      rcx, qword ptr [rbx + 8]
+00746ad6 test     rcx, rcx
+00746ad9 je       0x140746ae0
+00746adb call     0x14005032b ; ?hasRoomFor@HasRoomCache@Inventory@@QEBA_NPEAVGameData@@@Z+0x190
+00746ae0 add      rsp, 0x20
+00746ae4 pop      rbx
+00746ae5 ret      
+00746ae6 int3     

@@ -1,0 +1,36 @@
+00711420 push     rbx
+00711422 sub      rsp, 0x20
+00711426 mov      rbx, rcx
+00711429 mov      rcx, qword ptr [rcx + 0x38]
+0071142d test     rcx, rcx
+00711430 je       0x140711444
+00711432 mov      rax, qword ptr [rcx]
+00711435 mov      edx, 1
+0071143a call     qword ptr [rax]
+0071143c mov      qword ptr [rbx + 0x38], 0
+00711444 mov      rcx, qword ptr [rbx + 0x30]
+00711448 test     rcx, rcx
+0071144b je       0x1407114af
+0071144d movd     xmm0, dword ptr [rbx + 0x84]
+00711455 movd     xmm1, dword ptr [rbx + 0x80]
+0071145d cvtdq2ps xmm0, xmm0
+00711460 cvtdq2ps xmm1, xmm1
+00711463 addss    xmm0, dword ptr [rip + 0x1a20fbd]
+0071146b addss    xmm1, dword ptr [rip + 0x1a20fb1]
+00711473 cvttss2si r8d, xmm0
+00711478 cvttss2si edx, xmm1
+0071147c call     0x140044d41 ; ?makeIconForItem@InventoryGUI@@SAPEAVInventoryIcon@@PEAVItem@@HH@Z
+00711481 lea      rdx, [rsp + 0x30]
+00711486 mov      qword ptr [rbx + 0x38], rax
+0071148a mov      rcx, qword ptr [rax + 8]
+0071148e add      rcx, 8
+00711492 call     qword ptr [rip + 0x1b34630]
+00711498 mov      rcx, qword ptr [rbx + 0xb8]
+0071149f lea      rdx, [rsp + 0x30]
+007114a4 mov      rax, qword ptr [rcx + 8]
+007114a8 add      rcx, 8
+007114ac call     qword ptr [rax + 0x10]
+007114af add      rsp, 0x20
+007114b3 pop      rbx
+007114b4 ret      
+007114b5 int3     

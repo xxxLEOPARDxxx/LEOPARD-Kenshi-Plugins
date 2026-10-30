@@ -1,0 +1,29 @@
+0070c440 push     rbx
+0070c442 sub      rsp, 0x20
+0070c446 mov      rbx, rcx
+0070c449 mov      rcx, qword ptr [rcx + 0x50]
+0070c44d mov      rax, qword ptr [rcx]
+0070c450 call     qword ptr [rax + 0x20]
+0070c453 cmp      eax, 0x2e
+0070c456 jne      0x14070c470
+0070c458 mov      rax, qword ptr [rbx + 0x50]
+0070c45c mov      rcx, qword ptr [rax + 0x230]
+0070c463 test     rcx, rcx
+0070c466 cmovne   rax, rcx
+0070c46a add      rsp, 0x20
+0070c46e pop      rbx
+0070c46f ret      
+0070c470 mov      rcx, qword ptr [rbx + 0x50]
+0070c474 mov      rax, qword ptr [rcx]
+0070c477 call     qword ptr [rax + 0x20]
+0070c47a cmp      eax, 0x6f
+0070c47d jne      0x14070c48d
+0070c47f mov      rcx, qword ptr [rbx + 0x50]
+0070c483 add      rsp, 0x20
+0070c487 pop      rbx
+0070c488 jmp      0x140032619 ; ?destroyInventoryInterface@RobotLimbs@@QEAAXXZ+0x30
+0070c48d mov      rax, qword ptr [rbx + 0x50]
+0070c491 add      rsp, 0x20
+0070c495 pop      rbx
+0070c496 ret      
+0070c497 int3     

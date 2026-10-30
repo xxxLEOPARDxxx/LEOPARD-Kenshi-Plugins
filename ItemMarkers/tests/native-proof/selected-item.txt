@@ -1,0 +1,80 @@
+00710120 push     rsi
+00710122 push     r12
+00710124 sub      rsp, 0x38
+00710128 mov      rax, qword ptr [rcx]
+0071012b mov      r12, rdx
+0071012e mov      rsi, rcx
+00710131 call     qword ptr [rax + 0x70]
+00710134 test     rax, rax
+00710137 jne      0x140710141
+00710139 add      rsp, 0x38
+0071013d pop      r12
+0071013f pop      rsi
+00710140 ret      
+00710141 mov      rdx, r12
+00710144 mov      rcx, rax
+00710147 mov      qword ptr [rsp + 0x28], rbp
+0071014c call     0x14004fdb8 ; ?getSection@Inventory@@QEBAPEAVInventorySection@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+00710151 mov      rbp, rax
+00710154 test     rax, rax
+00710157 jne      0x140710166
+00710159 mov      rbp, qword ptr [rsp + 0x28]
+0071015e add      rsp, 0x38
+00710162 pop      r12
+00710164 pop      rsi
+00710165 ret      
+00710166 mov      qword ptr [rsp + 0x30], rbx
+0071016b cvttss2si ebx, dword ptr [rip + 0x1a222b1]
+00710173 lea      rcx, [rsi + 0x60]
+00710177 mov      rdx, r12
+0071017a mov      qword ptr [rsp + 0x20], rdi
+0071017f cvttss2si edi, dword ptr [rip + 0x1a222a1]
+00710187 call     0x14000a704 ; exe+0x161d20
+0071018c xor      r10d, r10d
+0071018f mov      rcx, qword ptr [rax]
+00710192 mov      dword ptr [rsp + 0x68], r10d
+00710197 mov      r8, qword ptr [rcx]
+0071019a mov      ecx, dword ptr [rbp + 0x30]
+0071019d sub      ebx, dword ptr [r8 + 0x30]
+007101a1 sub      edi, dword ptr [r8 + 0x34]
+007101a5 dec      ecx
+007101a7 mov      dword ptr [rsp + 0x50], ecx
+007101ab mov      eax, ebx
+007101ad cdq      
+007101ae idiv     dword ptr [rip + 0x1a1728c]
+007101b4 mov      r9d, eax
+007101b7 mov      eax, edi
+007101b9 cdq      
+007101ba mov      dword ptr [rsp + 0x60], r9d
+007101bf idiv     dword ptr [rip + 0x1a1727f]
+007101c5 cmp      ecx, r9d
+007101c8 lea      r9, [rsp + 0x60]
+007101cd lea      rdx, [rsp + 0x50]
+007101d2 lea      rcx, [rsp + 0x68]
+007101d7 mov      r8d, eax
+007101da lea      rax, [rsp + 0x60]
+007101df cmovge   rdx, rax
+007101e3 mov      eax, dword ptr [rbp + 0x34]
+007101e6 cmp      dword ptr [rdx], r10d
+007101e9 cmovge   rcx, rdx
+007101ed dec      eax
+007101ef mov      edx, dword ptr [rcx]
+007101f1 cmp      eax, r8d
+007101f4 mov      dword ptr [rsp + 0x50], eax
+007101f8 mov      dword ptr [rsp + 0x60], r8d
+007101fd mov      dword ptr [rsp + 0x68], r10d
+00710202 lea      rcx, [rsp + 0x50]
+00710207 cmovge   rcx, r9
+0071020b lea      rax, [rsp + 0x68]
+00710210 cmp      dword ptr [rcx], r10d
+00710213 cmovge   rax, rcx
+00710217 mov      rcx, rbp
+0071021a mov      r8d, dword ptr [rax]
+0071021d mov      rdi, qword ptr [rsp + 0x20]
+00710222 mov      rbx, qword ptr [rsp + 0x30]
+00710227 mov      rbp, qword ptr [rsp + 0x28]
+0071022c add      rsp, 0x38
+00710230 pop      r12
+00710232 pop      rsi
+00710233 jmp      0x140034982 ; ?getItemAt@InventorySection@@QEAAPEAVItem@@HH@Z
+00710238 int3     

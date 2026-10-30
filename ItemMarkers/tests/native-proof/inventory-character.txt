@@ -1,0 +1,63 @@
+0070c320 push     rbx
+0070c322 sub      rsp, 0x20
+0070c326 mov      rbx, rcx
+0070c329 mov      rcx, qword ptr [rcx + 0x80]
+0070c330 mov      rax, qword ptr [rcx]
+0070c333 call     qword ptr [rax + 0x20]
+0070c336 cmp      eax, 1
+0070c339 jne      0x14070c348
+0070c33b mov      rax, qword ptr [rbx + 0x80]
+0070c342 add      rsp, 0x20
+0070c346 pop      rbx
+0070c347 ret      
+0070c348 mov      rcx, qword ptr [rbx + 0x80]
+0070c34f mov      qword ptr [rsp + 0x30], rdi
+0070c354 mov      rax, qword ptr [rcx]
+0070c357 call     qword ptr [rax + 0x20]
+0070c35a cmp      eax, 0x2e
+0070c35d jne      0x14070c38e
+0070c35f mov      rax, qword ptr [rbx + 0x80]
+0070c366 mov      rdi, qword ptr [rax + 0x230]
+0070c36d test     rdi, rdi
+0070c370 je       0x14070c38e
+0070c372 mov      rdx, qword ptr [rdi]
+0070c375 mov      rcx, rdi
+0070c378 call     qword ptr [rdx + 0x20]
+0070c37b cmp      eax, 1
+0070c37e jne      0x14070c38e
+0070c380 mov      rax, rdi
+0070c383 mov      rdi, qword ptr [rsp + 0x30]
+0070c388 add      rsp, 0x20
+0070c38c pop      rbx
+0070c38d ret      
+0070c38e mov      rcx, qword ptr [rbx + 0x80]
+0070c395 mov      rax, qword ptr [rcx]
+0070c398 call     qword ptr [rax + 0x20]
+0070c39b mov      rcx, qword ptr [rbx + 0x80]
+0070c3a2 cmp      eax, 0x6f
+0070c3a5 jne      0x14070c3b6
+0070c3a7 mov      rdi, qword ptr [rsp + 0x30]
+0070c3ac add      rsp, 0x20
+0070c3b0 pop      rbx
+0070c3b1 jmp      0x140032619 ; ?destroyInventoryInterface@RobotLimbs@@QEAAXXZ+0x30
+0070c3b6 mov      rax, qword ptr [rcx]
+0070c3b9 call     qword ptr [rax + 0x20]
+0070c3bc test     eax, eax
+0070c3be jne      0x14070c3ef
+0070c3c0 mov      rcx, qword ptr [rbx + 0x80]
+0070c3c7 mov      rax, qword ptr [rcx]
+0070c3ca call     qword ptr [rax + 0x1d8]
+0070c3d0 mov      rcx, rax
+0070c3d3 call     0x14003f92c ; ?getBuilding@hand@@QEBAPEAVBuilding@@XZ
+0070c3d8 test     rax, rax
+0070c3db je       0x14070c3ef
+0070c3dd mov      rcx, rax
+0070c3e0 mov      rdi, qword ptr [rsp + 0x30]
+0070c3e5 add      rsp, 0x20
+0070c3e9 pop      rbx
+0070c3ea jmp      0x14005232e ; ?getResidentSquadLeader@Building@@QEBAPEAVCharacter@@XZ
+0070c3ef xor      eax, eax
+0070c3f1 mov      rdi, qword ptr [rsp + 0x30]
+0070c3f6 add      rsp, 0x20
+0070c3fa pop      rbx
+0070c3fb ret      

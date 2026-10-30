@@ -1,0 +1,85 @@
+00712990 push     rbx
+00712992 push     rsi
+00712993 push     rdi
+00712994 sub      rsp, 0x20
+00712998 mov      rbx, r8
+0071299b mov      rdi, r9
+0071299e mov      qword ptr [rcx + 0x30], rdx
+007129a2 mov      rsi, rcx
+007129a5 mov      qword ptr [rcx + 0x68], rbx
+007129a9 or       r9, 0xffffffffffffffff
+007129ad xor      r8d, r8d
+007129b0 mov      rdx, rdi
+007129b3 add      rcx, 0x40
+007129b7 call     0x14002808d ; ?_DESTRUCTOR@GameDataReference@@QEAAXXZ+0x600
+007129bc mov      r11, qword ptr [rbx]
+007129bf mov      rcx, rbx
+007129c2 call     qword ptr [r11 + 0x70]
+007129c6 test     rax, rax
+007129c9 je       0x1407129d6
+007129cb mov      rdx, rdi
+007129ce mov      rcx, rax
+007129d1 call     0x14004fdb8 ; ?getSection@Inventory@@QEBAPEAVInventorySection@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+007129d6 mov      rcx, qword ptr [rsp + 0x60]
+007129db mov      qword ptr [rsi + 0x70], rax
+007129df mov      eax, dword ptr [rcx]
+007129e1 mov      dword ptr [rsi + 0x80], eax
+007129e7 mov      eax, dword ptr [rcx + 4]
+007129ea mov      dword ptr [rsi + 0x84], eax
+007129f0 mov      eax, dword ptr [rip + 0x1a14a4a]
+007129f6 mov      rcx, qword ptr [rsi + 0x30]
+007129fa neg      eax
+007129fc movd     xmm0, eax
+00712a00 mov      eax, dword ptr [rip + 0x1a14a3e]
+00712a06 neg      eax
+00712a08 cvtdq2ps xmm0, xmm0
+00712a0b mulss    xmm0, dword ptr [rip + 0xf6aec5]
+00712a13 cvttss2si ebx, xmm0
+00712a17 movd     xmm0, eax
+00712a1b mov      rax, qword ptr [rcx]
+00712a1e cvtdq2ps xmm0, xmm0
+00712a21 mulss    xmm0, dword ptr [rip + 0xf6aeaf]
+00712a29 cvttss2si edi, xmm0
+00712a2d call     qword ptr [rax + 0x18]
+00712a30 lea      rcx, [rsp + 0x50]
+00712a35 mov      rdx, rax
+00712a38 call     0x140035805 ; ?getItemSize@InventoryIcon@@SA?AU?$TSize@H@types@MyGUI@@PEAVGameData@@@Z
+00712a3d mov      eax, dword ptr [rsi + 0x80]
+00712a43 mov      edx, dword ptr [rsp + 0x50]
+00712a47 mov      dword ptr [rsp + 0x40], eax
+00712a4b add      edx, ebx
+00712a4d mov      dword ptr [rsp + 0x60], ebx
+00712a51 neg      edx
+00712a53 cmp      ebx, eax
+00712a55 lea      r8, [rsp + 0x40]
+00712a5a mov      dword ptr [rsp + 0x48], edx
+00712a5e lea      rcx, [rsp + 0x60]
+00712a63 lea      rax, [rsp + 0x48]
+00712a68 cmovge   rcx, r8
+00712a6c lea      r8, [rsp + 0x40]
+00712a71 cmp      dword ptr [rcx], edx
+00712a73 mov      edx, dword ptr [rsp + 0x54]
+00712a77 cmovge   rax, rcx
+00712a7b add      edx, edi
+00712a7d lea      rcx, [rsp + 0x60]
+00712a82 mov      eax, dword ptr [rax]
+00712a84 neg      edx
+00712a86 mov      dword ptr [rsp + 0x60], edi
+00712a8a mov      dword ptr [rsi + 0x80], eax
+00712a90 mov      eax, dword ptr [rsi + 0x84]
+00712a96 mov      dword ptr [rsp + 0x48], edx
+00712a9a cmp      edi, eax
+00712a9c mov      dword ptr [rsp + 0x40], eax
+00712aa0 lea      rax, [rsp + 0x48]
+00712aa5 cmovge   rcx, r8
+00712aa9 cmp      dword ptr [rcx], edx
+00712aab cmovge   rax, rcx
+00712aaf mov      rcx, rsi
+00712ab2 mov      eax, dword ptr [rax]
+00712ab4 mov      dword ptr [rsi + 0x84], eax
+00712aba add      rsp, 0x20
+00712abe pop      rdi
+00712abf pop      rsi
+00712ac0 pop      rbx
+00712ac1 jmp      0x140034874 ; ?refreshIcons@InventorySectionGUI@@QEAAXPEAVInventorySection@@@Z+0x6d0
+00712ac6 int3     

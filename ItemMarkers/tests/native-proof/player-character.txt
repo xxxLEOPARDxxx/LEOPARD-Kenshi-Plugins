@@ -1,0 +1,9 @@
+00790b30 sub      rsp, 0x28
+00790b34 mov      rax, qword ptr [rcx]
+00790b37 call     qword ptr [rax + 0x58]
+00790b3a xor      ecx, ecx
+00790b3c cmp      qword ptr [rax + 0x250], rcx
+00790b43 setne    al
+00790b46 add      rsp, 0x28
+00790b4a ret      
+00790b4b int3     

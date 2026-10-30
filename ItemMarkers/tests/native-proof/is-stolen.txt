@@ -1,0 +1,103 @@
+0079d9b0 mov      qword ptr [rsp + 8], rbx
+0079d9b5 mov      qword ptr [rsp + 0x10], rbp
+0079d9ba mov      qword ptr [rsp + 0x18], rsi
+0079d9bf push     rdi
+0079d9c0 push     r12
+0079d9c2 push     r13
+0079d9c4 sub      rsp, 0x20
+0079d9c8 movzx    r12d, dl
+0079d9cc mov      rbx, rcx
+0079d9cf lea      rdx, [rcx + 0x140]
+0079d9d6 lea      rcx, [rip + 0x1995553]
+0079d9dd mov      r8b, 1
+0079d9e0 call     0x140023e43 ; ?getAnything@HandleManager@@QEAAPEAVRootObjectBase@@AEBVhand@@_N@Z
+0079d9e5 xor      edi, edi
+0079d9e7 mov      rbp, rax
+0079d9ea test     rax, rax
+0079d9ed je       0x14079dab2
+0079d9f3 cmp      dword ptr [rbx + 0x168], 0x2e
+0079d9fa mov      esi, edi
+0079d9fc jne      0x14079da64
+0079d9fe lea      rdx, [rbx + 0x160]
+0079da05 mov      ecx, dword ptr [rdx + 8]
+0079da08 cmp      ecx, 4
+0079da0b je       0x14079da30
+0079da0d cmp      ecx, 2
+0079da10 je       0x14079da30
+0079da12 cmp      ecx, 3
+0079da15 je       0x14079da30
+0079da17 cmp      ecx, 0x2e
+0079da1a je       0x14079da30
+0079da1c cmp      ecx, 0x56
+0079da1f je       0x14079da30
+0079da21 cmp      ecx, 0x66
+0079da24 je       0x14079da30
+0079da26 cmp      ecx, 0x6b
+0079da29 je       0x14079da30
+0079da2b cmp      ecx, 0x6f
+0079da2e jne      0x14079da64
+0079da30 mov      rax, qword ptr [rip + 0x1995549]
+0079da37 lea      rcx, [rip + 0x1995542]
+0079da3e call     qword ptr [rax + 0x20]
+0079da41 test     rax, rax
+0079da44 je       0x14079da64
+0079da46 cmp      qword ptr [rax + 0x230], rsi
+0079da4d je       0x14079da64
+0079da4f mov      rcx, qword ptr [rax + 0x230]
+0079da56 mov      rax, qword ptr [rcx]
+0079da59 call     qword ptr [rax + 0x58]
+0079da5c mov      rsi, rax
+0079da5f test     rax, rax
+0079da62 jne      0x14079da8b
+0079da64 lea      rdx, [rbx + 0x160]
+0079da6b lea      rcx, [rip + 0x19954be]
+0079da72 mov      r8b, 1
+0079da75 call     0x140023e43 ; ?getAnything@HandleManager@@QEAAPEAVRootObjectBase@@AEBVhand@@_N@Z
+0079da7a test     rax, rax
+0079da7d je       0x14079da8b
+0079da7f mov      rdx, qword ptr [rax]
+0079da82 mov      rcx, rax
+0079da85 call     qword ptr [rdx + 0x58]
+0079da88 mov      rsi, rax
+0079da8b mov      rax, qword ptr [rbp]
+0079da8f mov      rcx, rbp
+0079da92 call     qword ptr [rax + 0x58]
+0079da95 cmp      rax, rsi
+0079da98 jne      0x14079da9e
+0079da9a xor      al, al
+0079da9c jmp      0x14079db09 ; ?isStolen@InventoryItemBase@@QEBA_N_N@Z+0x159
+0079da9e test     rsi, rsi
+0079daa1 je       0x14079dab2
+0079daa3 cmp      dword ptr [rsi + 0x34], 8
+0079daa7 je       0x14079da9a
+0079daa9 cmp      byte ptr [rsi + 0x1d0], dil
+0079dab0 jne      0x14079da9a
+0079dab2 test     r12b, r12b
+0079dab5 jne      0x14079dae9
+0079dab7 cmp      dword ptr [rbx + 0x148], 0xb
+0079dabe je       0x14079db05
+0079dac0 mov      eax, dword ptr [rbx + 0x16c]
+0079dac6 cmp      dword ptr [rbx + 0x14c], eax
+0079dacc je       0x14079db05
+0079dace lea      rdx, [rbx + 0x140]
+0079dad5 lea      rcx, [rip + 0x1995454]
+0079dadc mov      r8b, 1
+0079dadf call     0x140023e43 ; ?getAnything@HandleManager@@QEAAPEAVRootObjectBase@@AEBVhand@@_N@Z
+0079dae4 test     rax, rax
+0079dae7 jmp      0x14079dafe ; ?isStolen@InventoryItemBase@@QEBA_N_N@Z+0x14e
+0079dae9 cmp      dword ptr [rbx + 0x148], 0xb
+0079daf0 je       0x14079db05
+0079daf2 mov      eax, dword ptr [rbx + 0x16c]
+0079daf8 cmp      dword ptr [rbx + 0x14c], eax
+0079dafe je       0x14079db05
+0079db00 mov      edi, 1
+0079db05 movzx    eax, dil
+0079db09 mov      rbx, qword ptr [rsp + 0x40]
+0079db0e mov      rbp, qword ptr [rsp + 0x48]
+0079db13 mov      rsi, qword ptr [rsp + 0x50]
+0079db18 add      rsp, 0x20
+0079db1c pop      r13
+0079db1e pop      r12
+0079db20 pop      rdi
+0079db21 ret      
+0079db22 int3     

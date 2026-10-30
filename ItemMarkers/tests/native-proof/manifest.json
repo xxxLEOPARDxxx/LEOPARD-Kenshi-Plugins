@@ -1,0 +1,81 @@
+{
+  "game_exe": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\Kenshi_x64.exe",
+  "game_sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
+  "installed_KenshiLib_sha256": "5b6240622d06801dc39896e385efb834b8e1fe2fcdf86067d071ae7a04f6c83b",
+  "rva_table_sha256": "573c395997ed8d93dd837e27f89a440323089edd1ba93f68291631b448f9cbd0",
+  "null_hand": {
+    "rva": "0x1e395f8",
+    "bytes": "d0426841010000000b0000000000000000000000000000000000000000000000",
+    "fields_type_container_containerSerial_index_serial": [
+      11,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "resolved_public_APIs": {
+    "pickupItemToMouse": [
+      {
+        "symbol": "?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+        "steam_rva": "0x712dd0",
+        "slot": 4289
+      }
+    ],
+    "takeCertainAmountFrom": [
+      {
+        "symbol": "?takeCertainAmountFrom@InventoryGUI@@QEAAPEAVItem@@PEAV2@H@Z",
+        "steam_rva": "0x70e670",
+        "slot": 4292
+      }
+    ],
+    "getSelectedItem@InventoryGUI": [
+      {
+        "symbol": "?getSelectedItem@InventoryGUI@@QEAAPEAVItem@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+        "steam_rva": "0x710120",
+        "slot": 4279
+      }
+    ],
+    "getCallbackCharacter@InventoryGUI": [
+      {
+        "symbol": "?_NV_getCallbackCharacter@InventoryGUI@@QEAAPEAVCharacter@@XZ",
+        "steam_rva": "0x70c410",
+        "slot": 4277
+      },
+      {
+        "symbol": "?getCallbackCharacter@InventoryGUI@@UEAAPEAVCharacter@@XZ",
+        "steam_rva": "0x70c410",
+        "slot": 4277
+      }
+    ],
+    "isPlayerCharacter@Character": [
+      {
+        "symbol": "?isPlayerCharacter@Character@@QEBA_NXZ",
+        "steam_rva": "0x790b30",
+        "slot": 1822
+      }
+    ],
+    "isStolen@InventoryItemBase": [
+      {
+        "symbol": "?isStolen@InventoryItemBase@@QEBA_N_N@Z",
+        "steam_rva": "0x79d9b0",
+        "slot": 4363
+      }
+    ],
+    "getCallbackObject@InventoryGUI": [
+      {
+        "symbol": "?_NV_getCallbackObject@InventoryGUI@@QEBAPEAVRootObject@@XZ",
+        "steam_rva": "0x70c440",
+        "slot": 4278
+      },
+      {
+        "symbol": "?getCallbackObject@InventoryGUI@@UEBAPEAVRootObject@@XZ",
+        "steam_rva": "0x70c440",
+        "slot": 4278
+      }
+    ]
+  },
+  "no_live_process_access": true,
+  "hypothesis_limits": "Offline native path and production-boundary fixtures prove the transient-holder branch; exact user drag needs live acceptance. Owner/money/sale persistence bugs not changed.",
+  "official_headers_verified": "source-v0.5.0 InventoryGUI.h declarations match by-value pickup/const-ref selection/int amount signatures"
+}

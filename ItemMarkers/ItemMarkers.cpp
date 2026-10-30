@@ -65,6 +65,7 @@
 
 #include <GameTheme.h>
 #include <HoldKey.h>
+#include "StolenPresentation.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -293,6 +294,45 @@ namespace
         return false;
     }
 
+    // Native isStolen is contextual: detach clears the current inventory hand.
+    // Preserve its source-context answer only for an exact player-owned drag.
+    // No owner/theft/quantity fields are written; foreign origins stay native.
+    bool g_dragCaptureReady = false;
+    ItemMarkersStolen::DragState g_drag = {};
+    struct StolenNative
+    {
+        typedef Item ItemType;
+        bool Enabled() const { return g_enabled && g_stolen && g_dragCaptureReady; }
+        bool PlayerOwned(void* raw) const
+        {
+            InventoryGUI* const inventory = static_cast<InventoryGUI*>(raw);
+            Character* const character = inventory != NULL ? inventory->getCallbackCharacter() : NULL;
+            if (character != NULL)
+                return character->isPlayerCharacter();
+            // An unequipped/nested backpack can have no callback character yet.
+            // Native getCallbackObject then returns the container itself.
+            RootObject* const callback = inventory != NULL ? inventory->getCallbackObject() : NULL;
+            return callback != NULL && callback->getDataType() == CONTAINER &&
+                   HeldByPlayer(static_cast<Item*>(callback));
+        }
+        Item* Selected(void* raw, const std::string& section) const
+        {
+            return static_cast<InventoryGUI*>(raw)->getSelectedItem(section);
+        }
+        bool NativeStolen(Item* item) const { return item->isStolen(true); }
+    };
+
+    bool CaptureDragRaw(InventoryGUI* inventory, const std::string* section, ItemMarkersStolen::DragState* state)
+    {
+        __try
+        {
+            StolenNative native;
+            *state = ItemMarkersStolen::Capture(native,inventory,*section);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+    }
+
     void ReadColours()
     {
         if (g_coloursRead)
@@ -333,7 +373,8 @@ namespace
         std::vector<MyGUI::Widget*> marks;     // дети корня иконки
         hand handle;                           // вещь по ссылке игры: удалена - пусто
         bool bag;                              // нарисован мешочек сделки
-        IconEntry() : item(NULL), bag(false) {}
+        ItemMarkersStolen::IconState stolen;
+        IconEntry() : item(NULL), bag(false) { ItemMarkersStolen::Reset(stolen); }
     };
     std::map<MyGUI::Widget*, IconEntry> g_icons;   // корень иконки -> вещь
     // пометка -> корень её иконки. Игра может удалить детей иконки сама
@@ -564,7 +605,8 @@ namespace
         // значки - слева сверху, по очереди; звезда там же - значки за ней
         int corner = (g_rarity && g_style == 3 && g_starCorner == 0 && GradeOf(item) >= g_minGrade)
                          ? (size.width < 80 ? 16 : 20) + 4 : 2;
-        if (g_stolen && item->isStolen(true))
+        StolenNative stolenNative;
+        if (g_stolen && ItemMarkersStolen::Show(entry.stolen,stolenNative,item))
         {
             MyGUI::ImageBox* const mark = MakeImage(root, MyGUI::IntCoord(corner, 2, g_stolenSize, g_stolenSize),
                                                     MyGUI::Align::Left | MyGUI::Align::Top);
@@ -707,8 +749,21 @@ namespace
         IconEntry& entry = g_icons[root];
         entry.item = item;
         entry.handle = item->getHandle();
+        ItemMarkersStolen::OnIcon(entry.stolen,g_drag,item);
         ForgetMarks(entry);
         Decorate(root, entry);
+        if (g_debug && entry.stolen.frozen)
+        {
+            static unsigned logged = 0;
+            if (logged < 64)
+            {
+                ++logged;
+                char line[192];
+                sprintf_s(line,"ItemMarkers: player drag stolen badge source=%d current=%d; icon-local snapshot",
+                          entry.stolen.stolen ? 1 : 0,item->isStolen(true) ? 1 : 0);
+                DebugLog(line);
+            }
+        }
         if (g_debug && item->getClassType() == BLUEPRINT)
         {
             static unsigned s_blueprints = 0;
@@ -724,6 +779,7 @@ namespace
         }
         if (g_debug && Graded(item))
         {
+            StolenNative native;
             static unsigned s_logged = 0;
             if (s_logged < 200)
             {
@@ -731,7 +787,7 @@ namespace
                 char line[256];
                 sprintf_s(line, "ItemMarkers: '%s' type %d level %d -> grade %d, stolen %d, uniform %d, marks %u",
                           item->data->name.c_str(), static_cast<int>(item->data->type), LevelOf(item), GradeOf(item),
-                          item->isStolen(true) ? 1 : 0, IsUniform(item) ? 1 : 0,
+                          ItemMarkersStolen::Show(entry.stolen,native,item) ? 1 : 0, IsUniform(item) ? 1 : 0,
                           static_cast<unsigned>(entry.marks.size()));
                 DebugLog(line);
             }
@@ -872,6 +928,50 @@ namespace
         return result;
     }
 
+    bool (*g_origPickup)(InventoryGUI*,std::string) = NULL;
+    Item* (*g_origTakeAmount)(InventoryGUI*,Item*,int) = NULL;
+
+    struct PickupCall
+    {
+        InventoryGUI* inventory;
+        const std::string* section;
+        bool Original() { return g_origPickup(inventory,*section); }
+    };
+
+    bool PickupScopedRaw(InventoryGUI* inventory,const std::string* section,
+                         const ItemMarkersStolen::DragState* next)
+    {
+        const ItemMarkersStolen::DragState previous = g_drag;
+        PickupCall call = { inventory,section };
+        // POD locals only. Run handles C++ unwinding; finally also handles SEH.
+        __try { return ItemMarkersStolen::Run(g_drag,*next,call); }
+        __finally { g_drag = previous; }
+    }
+
+    bool Pickup_hook(InventoryGUI* self,std::string section)
+    {
+        ItemMarkersStolen::DragState next = {};
+        if (!CaptureDragRaw(self,&section,&next))
+        {
+            const ItemMarkersStolen::DragState empty = {};
+            next = empty;
+            static bool logged = false;
+            if (!logged)
+            {
+                logged = true;
+                ErrorLog("ItemMarkers: drag source context unavailable; native badge retained");
+            }
+        }
+        return PickupScopedRaw(self,&section,&next);
+    }
+
+    Item* TakeAmount_hook(InventoryGUI* self,Item* source,int amount)
+    {
+        Item* const result = g_origTakeAmount(self,source,amount);
+        ItemMarkersStolen::SplitResult(g_drag,self,source,result);
+        return result;
+    }
+
     // Продали или купили в уже лежащую стопку - игра новую иконку не
     // создаёт, только число меняет: мешочка не было (15.10.2026). Пока
     // открыты окна, раз в 0,4 с видимые иконки спрашиваются заново; сменилось
@@ -999,6 +1099,13 @@ __declspec(dllexport) void startPlugin()
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&ForgottenGUI::update), GuiUpdate_hook, &g_origGuiUpdate))
         ErrorLog("ItemMarkers: could not hook the interface update - the show key does not work");
+    const bool takeHook = KenshiLib::SUCCESS == KenshiLib::AddHook(
+        KenshiLib::GetRealAddress(&InventoryGUI::takeCertainAmountFrom),TakeAmount_hook,&g_origTakeAmount);
+    const bool pickupHook = KenshiLib::SUCCESS == KenshiLib::AddHook(
+        KenshiLib::GetRealAddress(&InventoryGUI::pickupItemToMouse),Pickup_hook,&g_origPickup);
+    g_dragCaptureReady = takeHook && pickupHook;
+    if (!g_dragCaptureReady)
+        ErrorLog("ItemMarkers: drag badge hooks unavailable; native badge retained");
     // строка класса мейто в подсказке оружия - цветом мейто
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&Weapon::_NV_getTooltipData1), WeaponTip1_hook, &g_origWeaponTip1) ||

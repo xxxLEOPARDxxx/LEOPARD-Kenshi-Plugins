@@ -1,0 +1,12 @@
+000d22f0 mov      eax, dword ptr [rdx + 8]
+000d22f3 mov      dword ptr [rcx + 0x168], eax
+000d22f9 mov      eax, dword ptr [rdx + 0xc]
+000d22fc mov      dword ptr [rcx + 0x16c], eax
+000d2302 mov      eax, dword ptr [rdx + 0x10]
+000d2305 mov      dword ptr [rcx + 0x170], eax
+000d230b mov      eax, dword ptr [rdx + 0x14]
+000d230e mov      dword ptr [rcx + 0x174], eax
+000d2314 mov      eax, dword ptr [rdx + 0x18]
+000d2317 mov      dword ptr [rcx + 0x178], eax
+000d231d ret      
+000d231e int3     

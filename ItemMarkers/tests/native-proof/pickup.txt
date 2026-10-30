@@ -1,0 +1,229 @@
+00712dd0 push     rbp
+00712dd2 push     rsi
+00712dd3 push     rdi
+00712dd4 push     r12
+00712dd6 push     r13
+00712dd8 push     r14
+00712dda push     r15
+00712ddc sub      rsp, 0x70
+00712de0 mov      qword ptr [rsp + 0x50], 0xfffffffffffffffe
+00712de9 mov      qword ptr [rsp + 0xc0], rbx
+00712df1 mov      rax, qword ptr [rip + 0x1a035c0]
+00712df8 xor      rax, rsp
+00712dfb mov      qword ptr [rsp + 0x60], rax
+00712e00 mov      rdi, rdx
+00712e03 mov      rbp, rcx
+00712e06 mov      qword ptr [rsp + 0x58], rdx
+00712e0b mov      rax, qword ptr [rcx]
+00712e0e call     qword ptr [rax + 0x70]
+00712e11 mov      r12, rax
+00712e14 test     rax, rax
+00712e17 jne      0x140712e1e
+00712e19 jmp      0x140713101 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x331
+00712e1e mov      rdx, rdi
+00712e21 mov      rcx, rax
+00712e24 call     0x14004fdb8 ; ?getSection@Inventory@@QEBAPEAVInventorySection@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+00712e29 mov      r13, rax
+00712e2c test     rax, rax
+00712e2f je       0x140713101
+00712e35 cmp      byte ptr [rax + 0xd0], 0
+00712e3c je       0x140713101
+00712e42 mov      rcx, qword ptr [r12 + 0x88]
+00712e4a mov      rdx, qword ptr [rcx]
+00712e4d call     qword ptr [rdx + 0x20]
+00712e50 test     eax, eax
+00712e52 jne      0x140712eba
+00712e54 mov      rdx, rbp
+00712e57 mov      rcx, rbp
+00712e5a call     0x14000f056 ; ?isStealing@InventoryGUI@@QEAA_NPEAV1@@Z
+00712e5f movzx    ebx, al
+00712e62 mov      rdx, qword ptr [rbp]
+00712e66 mov      rcx, rbp
+00712e69 call     qword ptr [rdx + 0x80]
+00712e6f mov      rdx, rax
+00712e72 movzx    r8d, bl
+00712e76 mov      rcx, rbp
+00712e79 call     0x14002a1c1 ; ?isWithinRangeToTrade@InventoryGUI@@QEAA_NPEAVRootObject@@_N@Z
+00712e7e test     al, al
+00712e80 jne      0x140712eba
+00712e82 mov      dword ptr [rsp + 0x38], 1
+00712e8a lea      rcx, [rsp + 0x38]
+00712e8f call     0x140031d95 ; ?showMessage@TradeResult@InventoryGUI@@QEAAXXZ
+00712e94 call     0x14002abcb ; ?getBuildingInventoryPosition@MainBarGUI@@QEBAAEBU?$TPoint@H@types@MyGUI@@XZ+0x20
+00712e99 mov      r8, qword ptr [rax + 0x30]
+00712e9d lea      rdx, [rip + 0xff39bc]
+00712ea4 mov      rcx, rbp
+00712ea7 call     0x140029915 ; ?playSound@InventoryGUI@@QEAAXPEBDPEAVItem@@@Z
+00712eac nop      
+00712ead mov      rcx, rdi
+00712eb0 call     0x1400146be ; exe+0x69160
+00712eb5 jmp      0x140713122 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x352
+00712eba cvttss2si ebx, dword ptr [rip + 0x1a1f566]
+00712ec2 cvttss2si r14d, dword ptr [rip + 0x1a1f559]
+00712ecb lea      rcx, [rbp + 0x60]
+00712ecf mov      rdx, rdi
+00712ed2 call     0x14000a704 ; exe+0x161d20
+00712ed7 mov      r15, qword ptr [rax]
+00712eda mov      rcx, qword ptr [r15]
+00712edd mov      eax, r14d
+00712ee0 sub      eax, dword ptr [rcx + 0x30]
+00712ee3 cdq      
+00712ee4 idiv     dword ptr [rip + 0x1a14556]
+00712eea mov      r8d, eax
+00712eed mov      eax, ebx
+00712eef sub      eax, dword ptr [rcx + 0x34]
+00712ef2 cdq      
+00712ef3 idiv     dword ptr [rip + 0x1a1454b]
+00712ef9 mov      r9d, eax
+00712efc mov      ecx, dword ptr [r13 + 0x30]
+00712f00 dec      ecx
+00712f02 mov      dword ptr [rsp + 0x38], ecx
+00712f06 xor      r10d, r10d
+00712f09 mov      dword ptr [rsp + 0x30], r10d
+00712f0e mov      dword ptr [rsp + 0x40], r8d
+00712f13 lea      rdx, [rsp + 0x38]
+00712f18 lea      rax, [rsp + 0x40]
+00712f1d cmp      ecx, r8d
+00712f20 cmovge   rdx, rax
+00712f24 lea      rcx, [rsp + 0x30]
+00712f29 cmp      dword ptr [rdx], r10d
+00712f2c cmovge   rcx, rdx
+00712f30 mov      edx, dword ptr [rcx]
+00712f32 mov      eax, dword ptr [r13 + 0x34]
+00712f36 dec      eax
+00712f38 mov      dword ptr [rsp + 0x30], eax
+00712f3c mov      dword ptr [rsp + 0x38], r10d
+00712f41 mov      dword ptr [rsp + 0x40], r9d
+00712f46 lea      rcx, [rsp + 0x30]
+00712f4b lea      r8, [rsp + 0x40]
+00712f50 cmp      eax, r9d
+00712f53 cmovge   rcx, r8
+00712f57 lea      rax, [rsp + 0x38]
+00712f5c cmp      dword ptr [rcx], r10d
+00712f5f cmovge   rax, rcx
+00712f63 mov      qword ptr [rsp + 0x48], r10
+00712f68 mov      r8d, dword ptr [rax]
+00712f6b mov      rcx, r13
+00712f6e call     0x140034982 ; ?getItemAt@InventorySection@@QEAAPEAVItem@@HH@Z
+00712f73 mov      rsi, rax
+00712f76 test     rax, rax
+00712f79 je       0x1407130f7
+00712f7f mov      rdx, qword ptr [rax]
+00712f82 mov      rcx, rax
+00712f85 call     qword ptr [rdx + 0x2f0]
+00712f8b mov      rcx, rax
+00712f8e call     0x140029d6b ; ?lockedItemCheck@InventoryGUI@@SA_NPEAVLockedArmour@@@Z
+00712f93 test     al, al
+00712f95 je       0x140712fa4
+00712f97 mov      rcx, rdi
+00712f9a call     0x1400146be ; exe+0x69160
+00712f9f jmp      0x140713122 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x352
+00712fa4 call     0x140020c4d ; ?isTradingForMoney_static@InventoryGUI@@SAPEAVRootObject@@XZ
+00712fa9 test     rax, rax
+00712fac je       0x140712fef
+00712fae cmp      byte ptr [rsi + 0x129], 0
+00712fb5 je       0x140712fef
+00712fb7 mov      rcx, qword ptr [r12 + 0x80]
+00712fbf mov      rax, qword ptr [rcx]
+00712fc2 call     qword ptr [rax + 0x58]
+00712fc5 cmp      qword ptr [rax + 0x250], 0
+00712fcd jne      0x140712fef
+00712fcf mov      dword ptr [rsp + 0x30], 0xc
+00712fd7 lea      rcx, [rsp + 0x30]
+00712fdc call     0x140031d95 ; ?showMessage@TradeResult@InventoryGUI@@QEAAXXZ
+00712fe1 nop      
+00712fe2 mov      rcx, rdi
+00712fe5 call     0x1400146be ; exe+0x69160
+00712fea jmp      0x140713122 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x352
+00712fef mov      rdx, rsi
+00712ff2 mov      rcx, r12
+00712ff5 call     0x14000ce82 ; ?deathCheck@Inventory@@QEAA_NPEAVItem@@@Z
+00712ffa mov      r11d, dword ptr [rsi + 0xe0]
+00713001 mov      ecx, dword ptr [rsi + 0xdc]
+00713007 mov      rax, qword ptr [r15]
+0071300a imul     r11d, dword ptr [rip + 0x1a14432]
+00713012 add      r11d, dword ptr [rax + 0x34]
+00713016 imul     ecx, dword ptr [rip + 0x1a14423]
+0071301d add      ecx, dword ptr [rax + 0x30]
+00713020 sub      ecx, r14d
+00713023 mov      dword ptr [rsp + 0x48], ecx
+00713027 sub      r11d, ebx
+0071302a mov      dword ptr [rsp + 0x4c], r11d
+0071302f cmp      dword ptr [rsi + 0x12c], 1
+00713036 jle      0x14071307a
+00713038 cmp      byte ptr [rip + 0x1a1f3ba], 0
+0071303f jne      0x14071307a
+00713041 cmp      byte ptr [rip + 0x1a1f3b0], 0
+00713048 jne      0x14071307a
+0071304a mov      rbx, rsi
+0071304d mov      r8d, 1
+00713053 mov      rdx, rsi
+00713056 mov      rcx, rbp
+00713059 call     0x14004d41e ; ?takeCertainAmountFrom@InventoryGUI@@QEAAPEAVItem@@PEAV2@H@Z
+0071305e mov      rsi, rax
+00713061 mov      rax, qword ptr [r12]
+00713065 mov      rdx, rsi
+00713068 mov      rcx, r12
+0071306b call     qword ptr [rax + 0x50]
+0071306e xor      edx, edx
+00713070 mov      rcx, rbx
+00713073 call     0x1400115e5 ; ?resetCharges@InventoryItemBase@@QEAAX_N@Z
+00713078 jmp      0x140713090 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x2c0
+0071307a mov      rdx, rdi
+0071307d mov      rcx, r12
+00713080 call     0x14004fdb8 ; ?getSection@Inventory@@QEBAPEAVInventorySection@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+00713085 mov      rcx, rax
+00713088 mov      rdx, rsi
+0071308b call     0x140042118 ; ?removeItem@InventorySection@@QEAA_NPEAVItem@@@Z
+00713090 call     0x14002abcb ; ?getBuildingInventoryPosition@MainBarGUI@@QEBAAEBU?$TPoint@H@types@MyGUI@@XZ+0x20
+00713095 mov      rcx, rax
+00713098 lea      rax, [rsp + 0x48]
+0071309d mov      qword ptr [rsp + 0x20], rax
+007130a2 mov      r9, rdi
+007130a5 mov      r8, rbp
+007130a8 mov      rdx, rsi
+007130ab call     0x14004a381 ; ?refreshSection@InventoryTraderGUI@@UEAAXPEAVInventorySection@@@Z+0x70
+007130b0 mov      byte ptr [rsi + 0xd8], 1
+007130b7 mov      rax, qword ptr [rsi]
+007130ba lea      rdx, [rip + 0x1726537]
+007130c1 mov      rcx, rsi
+007130c4 call     qword ptr [rax + 0x358]
+007130ca mov      r11, qword ptr [rbp]
+007130ce mov      rdx, r13
+007130d1 mov      rcx, rbp
+007130d4 call     qword ptr [r11 + 0x68]
+007130d8 mov      r8, rsi
+007130db lea      rdx, [rip + 0xff313e]
+007130e2 mov      rcx, rbp
+007130e5 call     0x140029915 ; ?playSound@InventoryGUI@@QEAAXPEBDPEAVItem@@@Z
+007130ea nop      
+007130eb mov      rcx, rdi
+007130ee call     0x1400146be ; exe+0x69160
+007130f3 mov      al, 1
+007130f5 jmp      0x140713124 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x354
+007130f7 mov      rcx, rdi
+007130fa call     0x1400146be ; exe+0x69160
+007130ff jmp      0x140713122 ; ?pickupItemToMouse@InventoryGUI@@QEAA_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z+0x352
+00713101 cmp      qword ptr [rdi + 0x18], 0x10
+00713106 jb       0x140713110
+00713108 mov      rcx, qword ptr [rdi]
+0071310b call     0x140ed5628 ; exe+0xed5628
+00713110 xor      r10d, r10d
+00713113 mov      qword ptr [rdi + 0x18], 0xf
+0071311b mov      qword ptr [rdi + 0x10], r10
+0071311f mov      byte ptr [rdi], r10b
+00713122 xor      al, al
+00713124 mov      rcx, qword ptr [rsp + 0x60]
+00713129 xor      rcx, rsp
+0071312c call     0x140ed5db0 ; exe+0xed5db0
+00713131 mov      rbx, qword ptr [rsp + 0xc0]
+00713139 add      rsp, 0x70
+0071313d pop      r15
+0071313f pop      r14
+00713141 pop      r13
+00713143 pop      r12
+00713145 pop      rdi
+00713146 pop      rsi
+00713147 pop      rbp
+00713148 ret      
+00713149 int3     
