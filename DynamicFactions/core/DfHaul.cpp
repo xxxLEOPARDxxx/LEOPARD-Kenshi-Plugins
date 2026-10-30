@@ -10,7 +10,7 @@ DfHaulAction DfChooseHaulAction(const DfHaulSnapshot& s)
             return DF_HAUL_WAIT;
         if (!s.atTrader)
             return DF_HAUL_GO_TRADER;
-        return s.greeted ? DF_HAUL_SELL : DF_HAUL_TALK;
+        return DF_HAUL_SELL;
     }
     if (!s.hasRoom)
         return DF_HAUL_WAIT;

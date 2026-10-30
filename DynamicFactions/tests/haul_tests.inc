@@ -17,8 +17,7 @@ static void RunHaulTests()
     s.hasTrader = true;
     CHECK(DfChooseHaulAction(s) == DF_HAUL_GO_TRADER);
     s.atTrader = true;
-    CHECK(DfChooseHaulAction(s) == DF_HAUL_TALK);
-    s.greeted = true;
+    CHECK(DfChooseHaulAction(s) == DF_HAUL_SELL);
     CHECK(DfChooseHaulAction(s) == DF_HAUL_SELL);
     s.able = false;
     CHECK(DfChooseHaulAction(s) == DF_HAUL_WAIT);

@@ -29,13 +29,12 @@ struct DfMemberWork
     bool moving;
     Ogre::Vector3 destination;
     hand trader;
-    unsigned long talkedAt;
     unsigned long progressAt;
     unsigned long blockedUntil;
     hand failedTrader;
     Ogre::Vector3 progressPosition;
     DfMemberWork() : role(DF_ROLE_IDLE), node(-1), ordered(false), moving(false),
-        destination(0,0,0), talkedAt(0), progressAt(0), blockedUntil(0), progressPosition(0,0,0) {}
+        destination(0,0,0), progressAt(0), blockedUntil(0), progressPosition(0,0,0) {}
 };
 struct DfLabour
 {

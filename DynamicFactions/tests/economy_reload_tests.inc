@@ -5,7 +5,7 @@ static void RunEconomyReloadTests()
     for (int reloadStep=0;reloadStep<8;++reloadStep)
     {
         int ore=5,cargo=0,stock=0,buyer=7,seller=0;
-        bool atNode=false,atTrader=false,greeted=false;
+        bool atNode=false,atTrader=false;
         DfFactionState metadata=Founded(0.0);
         metadata.recordId="reload-test";
         DfKnownNode node;node.x=node.y=node.z=0;node.itemSid="modded-ore";node.stored=17;
@@ -22,12 +22,12 @@ static void RunEconomyReloadTests()
                 CHECK(DfDeserialize(DfSerialize(std::vector<DfFactionState>(1,metadata)),loaded));
                 CHECK(loaded.size()==1);
                 if(loaded.empty()) return;
-                metadata=loaded[0];greeted=false;
+                metadata=loaded[0];
                 ore=savedOre;cargo=savedCargo;stock=savedStock;buyer=savedBuyer;seller=savedSeller;
             }
             DfHaulSnapshot s={};s.able=true;s.carried=cargo;s.nodeLoaded=true;
             s.atNode=atNode;s.nodeHasOre=ore>0;s.hasRoom=cargo<2;
-            s.hasTrader=buyer>=3;s.atTrader=atTrader;s.greeted=greeted;
+            s.hasTrader=buyer>=3;s.atTrader=atTrader;
             switch(DfChooseHaulAction(s))
             {
             case DF_HAUL_GO_NODE:atNode=true;atTrader=false;break;
@@ -38,7 +38,6 @@ static void RunEconomyReloadTests()
                 ore=move.source;cargo=move.destination;break;
             }
             case DF_HAUL_GO_TRADER:atNode=false;atTrader=true;break;
-            case DF_HAUL_TALK:greeted=true;break;
             case DF_HAUL_SELL:
             {
                 FakeDfTransfer move;move.source=cargo;move.destination=stock;

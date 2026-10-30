@@ -9,6 +9,7 @@ recruit = (root/'game/DfRecruit.cpp').read_text(encoding='utf-8-sig')
 main = (root/'DynamicFactions.cpp').read_text(encoding='utf-8-sig')
 labour = (root/'game/DfLabour.cpp').read_text(encoding='utf-8-sig')
 workinfo = (root/'ui/DfWorkInfo.cpp').read_text(encoding='utf-8-sig')
+receipt = (root/'ui/DfTradeReceipt.cpp').read_text(encoding='utf-8-sig')
 
 def function(text, signature):
     start = text.index(signature)
@@ -93,6 +94,14 @@ void (*g_original)(Character*,DatapanelGUI*,int)=FakeGuiData;
 '''
 code += function(workinfo,'void GuiData_hook(')+'\n'
 code += r'''
+namespace MyGUI {struct Colour {float red,green,blue,alpha;Colour(float r,float g,float b,float a):red(r),green(g),blue(b),alpha(a){}};}
+struct ScreenLabel {enum LabelSize{LS_SMALL,LS_MEDIUM,LS_LARGE};enum RisingSpeed{RS_STOPPED,RS_SLOW,RS_NORMAL,RS_FAST};hand tracked;Ogre::Vector3 offset;void setTracking(const hand& h,const Ogre::Vector3& o){tracked=h;offset=o;}};
+struct ReceiptGui {int count,size,speed;bool fail;std::string caption;MyGUI::Colour colour;ScreenLabel label;ReceiptGui():count(0),size(0),speed(0),fail(false),colour(0,0,0,0){} ScreenLabel* createScreenLabel(const std::string& s,const MyGUI::Colour& c,int z,int r){++count;caption=s;colour=c;size=z;speed=r;return fail?0:&label;}};
+ReceiptGui receiptGui;ReceiptGui* gui=&receiptGui;
+'''
+code += function(receipt,'void ShowReceipt(')+'\n'
+
+code += r'''
 bool GuiInfoFault(Character* c){bool fault=false;__try{GuiData_hook(c,0,0);}__except(EXCEPTION_EXECUTE_HANDLER){fault=true;}return fault;}
 '''
 
@@ -113,6 +122,14 @@ void hireCase(int moneyMode,int factionMode,bool expected,int balance,bool membe
  check(result==expected && o.money==balance && (recruit.faction==&f)==member && g_joinUncertain==blocked,name);
 }
 int main(){
+ {Character c;Ownerships wallet;Faction f;f.factionOwnerships=&wallet;c.faction=&f;
+ ShowReceipt(&c,97);check(receiptGui.caption=="c.97"&&receiptGui.size==ScreenLabel::LS_LARGE&&receiptGui.speed==ScreenLabel::RS_SLOW,"native currency receipt format and vanilla style");
+ check(receiptGui.label.tracked.character==&c&&receiptGui.label.offset.y==15,"currency receipt tracks trading actor at native head offset");
+ check(wallet.money==100,"receipt does not perform another payment");
+ int before=receiptGui.count;ShowReceipt(&c,0);ShowReceipt(&c,-1);ShowReceipt(0,97);check(receiptGui.count==before,"empty invalid receipts do not allocate labels");
+ gui=0;ShowReceipt(&c,97);check(receiptGui.count==before,"no GUI remains visual-only and safe");gui=&receiptGui;
+ receiptGui.fail=true;ShowReceipt(&c,97);check(wallet.money==100,"failed receipt allocation does not alter completed payment");receiptGui.fail=false;}
+
  {Character c;infoEligible=true;infoMode=0;GuiData_hook(&c,0,0);
  check(infoShown==STAT_LABOURING&&c.currentSkillUsing==STAT_NONE,"offscreen work row is supplied only during native GUI rendering");
  c.currentSkillUsing=4;GuiData_hook(&c,0,0);check(infoShown==4&&c.currentSkillUsing==0,"native nonempty work stat retains native consumption");
@@ -183,3 +200,7 @@ print('Treasury save/restore boundary contracts passed')
 
 assert 'g_runtime[i].treasuryRestoreFailed=true' in function(main,'void RestoreTreasuries(')
 assert 'g_runtime[i].treasuryRestoreFailed,s.treasury' in function(main,'void WriteState(')
+
+assert 'say(' not in function(labour,'void DfLabourStep(')
+assert 'DF_HAUL_TALK' not in labour
+print('Silent trade and native receipt contracts passed')

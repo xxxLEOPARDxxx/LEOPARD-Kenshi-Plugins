@@ -11,9 +11,10 @@ Dynamic Factions - development build / рабочая сборка 30.10.2026
 
 Работники ищут естественные жилы, в том числе добавленные модами, добывают
 штатным заданием игры, забирают реальные предметы и несут их торговцам Хаба.
-Перед продажей носильщик подходит к торговцу и произносит реплику. Продажа
-передаёт предмет в настоящий инвентарь торговца и переводит его деньги в
-бюджет фракции. Проверяются цена этого торговца/города, деньги, вместимость,
+Носильщик подходит к торговцу и продаёт без диалога. Предмет попадает
+в реальный запас лавки, который отображается в торговом окне, а деньги
+переводятся из кошелька торговца в бюджет фракции. После подтверждённой
+сделки над носильщиком появляется штатная всплывающая сумма. Проверяются цена этого торговца/города, деньги, вместимость,
 принадлежность, здоровье, бой и допустимая дистанция. Нет оплаты - груз остаётся.
 
 Полный носильщик освобождает очередь забора, недостижимые назначения получают
@@ -66,8 +67,9 @@ ENGLISH
 Experimental loaded-world mining, hauling and trading for one faction in the
 Hub. Founding grants are explicit and one-time. Ongoing passive income and
 cash-for-tech research are disabled. Real items are mined, carried and
-transferred to the actual merchant inventory; the merchant pays the faction
-from its real purse. Native town/trader pricing, inventory room, funds,
+transferred to the real shop stock shown by its trade window; the merchant
+pays the faction from its real purse. Sales do not start dialogue. A native-style
+currency popup above the hauler shows only the confirmed payment. Native town/trader pricing, inventory room, funds,
 ownership, distance and actor condition are checked again before mutation.
 
 Cargo, characters and platoon wallets are saved by Kenshi. The shared NPC
@@ -103,3 +105,31 @@ DEVELOPMENT REFERENCES
 docs/superpowers/specs/2026-10-30-dynamic-factions-fair-simulation.md
 docs/superpowers/plans/2026-10-30-dynamic-factions-economy-foundation.md
 docs/dependencies/kenshilib-sdk-audit-2026-10-30.md
+
+ПРОВЕРКА ХРАНИЛИЩА МАГАЗИНА / SHOP STOCK CHECK
+
+Исправлен адресат продажи: личные карманы NPC не совпадают с запасом окна
+торговли. На один прибывший рейс создаётся временный штатный ShopTrader;
+из его карты выбирается реальная секция склада лавки или рюкзака отряда.
+Сверяется именно эта секция: рост остатка в другой секции того же инвентаря
+не подтверждает продажу и не разрешает оплату.
+Товар переносится именно туда, а оплата разрешается только после сверки
+настоящего остатка. Копии торгового окна не считаются запасом. Предел проверки
+128 секций; нет места или доступного склада - продажи нет. Пока игрок торгует
+с этим магазином, NPC ждёт: окно и предмет на курсоре не перестраиваются.
+Проверены native-маршрут, сборка и модель отказов; показ товара в игре после
+новой продажи, закрытия окна и сохранения/загрузки ещё требует приёмки.
+Уже проданные старой C5 сборкой вещи остаются в личном инвентаре торговца;
+эта правка не переносит их автоматически и не выплачивает деньги повторно.
+
+The sale destination now uses the shop's real backing section, not the NPC's
+personal pockets or copied trade-window items. One disposable native ShopTrader
+view resolves stock per arrived batch; at most128 backing sections are checked.
+Payment requires growth in that exact published section; a hidden section of
+the same parent inventory cannot substitute for visible shop stock.
+Only a confirmed real stock increase permits payment. Full/unavailable stock
+refuses the sale. NPC trades defer while the player uses that shared shop;
+the open window and pending mouse item are not rebuilt. Native routing, build
+and failure models are checked; live visibility after a new sale, reopening and
+save/load still needs acceptance. Items sold by the older C5 build remain in the
+merchant's personal inventory; no automatic relocation or duplicate payment occurs.

@@ -7,7 +7,6 @@ enum DfHaulAction
     DF_HAUL_GO_NODE,
     DF_HAUL_TAKE,
     DF_HAUL_GO_TRADER,
-    DF_HAUL_TALK,
     DF_HAUL_SELL
 };
 
@@ -21,7 +20,6 @@ struct DfHaulSnapshot
     bool hasRoom;
     bool hasTrader;
     bool atTrader;
-    bool greeted;
 };
 
 DfHaulAction DfChooseHaulAction(const DfHaulSnapshot& snap);

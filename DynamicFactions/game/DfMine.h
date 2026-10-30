@@ -19,6 +19,7 @@ class Faction;
 class GameData;
 class TownBase;
 class Inventory;
+class InventorySection;
 class Item;
 
 const float kDfTakeRange = 6.0f;
@@ -97,6 +98,9 @@ Item* DfFirstInventoryItem(Inventory* root, GameData* item, Inventory*& actual, 
 int DfCountInventoryItem(Inventory* root, GameData* item);
 bool DfInventoryHasRoom(Inventory* root, GameData* item);
 bool DfMoveInventoryUnit(Inventory* from, Inventory* actual, Item* source, Inventory* to, GameData* item);
+// Pin an actual persistent section (e.g. merchant stock), never a GUI proxy.
+bool DfMoveInventoryUnitToSection(Inventory* from, Inventory* actual, Item* source,
+                                  InventorySection* to, GameData* item);
 void DfQuarantineTransfer(const char* reason);
 
 // Снять приказы персонажа (работа кончилась).

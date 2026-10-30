@@ -97,6 +97,26 @@ struct FakeDfTrade : DfTradePort
     }
 };
 
+// The merchant's visual shop inventory is a copy snapshot, and personal pockets
+// are a different persistent inventory. Only actual backing stock authorizes pay.
+struct FakeDfShopTrade : FakeDfTrade
+{
+    int destinationMode, proxyCopies, personalPockets, hiddenSection;
+    FakeDfShopTrade() : destinationMode(0), proxyCopies(2), personalPockets(0), hiddenSection(0) {}
+    DfUnitResult Deliver()
+    {
+        if (destinationMode==3) return DF_UNIT_STOP; // all real sections full
+        if (destinationMode==0) return FakeDfTrade::Deliver();
+        --goods.source;
+        if (destinationMode==1) ++proxyCopies;
+        if (destinationMode==2) ++personalPockets;
+        if (destinationMode==4) ++hiddenSection; // same parent, NOT its published backing section
+        return DF_UNIT_MOVED; // claimed success is disproved by backing counts
+    }
+    void ReopenShopWindow() { proxyCopies=goods.destination; }
+    int WholeParentStock() const { return goods.destination+hiddenSection; }
+};
+
 static void RunTransferTests()
 {
     int workerFaction = 1, defaultFaction = 2, foreignOwner = 3;
@@ -244,4 +264,35 @@ static void RunTransferTests()
     transferRejected.goods.addMode=1;
     CHECK(DfTradeOne(transferRejected,25)==DF_TRADE_STOP);
     CHECK(transferRejected.money.debits==0 && transferRejected.returnCalls==0);
+    FakeDfShopTrade shopSale;
+    CHECK(DfTradeOne(shopSale,25)==DF_TRADE_COMPLETE);
+    CHECK(shopSale.goods.source==4 && shopSale.goods.destination==3 && shopSale.personalPockets==0);
+    CHECK(shopSale.proxyCopies==2); // closed-window snapshot is not authoritative
+    shopSale.ReopenShopWindow();
+    CHECK(shopSale.proxyCopies==3 && shopSale.money.buyer==75 && shopSale.money.seller==225);
+    FakeDfShopTrade copyOnly;
+    copyOnly.destinationMode=1;
+    CHECK(DfTradeOne(copyOnly,25)==DF_TRADE_FAULT);
+    CHECK(copyOnly.goods.destination==2 && copyOnly.proxyCopies==3);
+    CHECK(copyOnly.money.debits==0 && copyOnly.money.credits==0);
+    FakeDfShopTrade pocketsOnly;
+    pocketsOnly.destinationMode=2;
+    CHECK(DfTradeOne(pocketsOnly,25)==DF_TRADE_FAULT);
+    CHECK(pocketsOnly.goods.destination==2 && pocketsOnly.personalPockets==1);
+    CHECK(pocketsOnly.money.debits==0 && pocketsOnly.money.credits==0);
+    FakeDfShopTrade fullStock;
+    fullStock.destinationMode=3;
+    CHECK(DfTradeOne(fullStock,25)==DF_TRADE_STOP);
+    CHECK(fullStock.goods.source==5 && fullStock.goods.destination==2 && fullStock.money.debits==0);
+    FakeDfShopTrade shopRefund;
+    shopRefund.money.ignoreCredit=true;
+    CHECK(DfTradeOne(shopRefund,25)==DF_TRADE_RESTORED);
+    CHECK(shopRefund.goods.source==5 && shopRefund.goods.destination==2 && shopRefund.personalPockets==0);
+    CHECK(shopRefund.money.buyer==100 && shopRefund.money.seller==200 && shopRefund.returnCalls==1);
+    FakeDfShopTrade redirectedWithinParent;
+    redirectedWithinParent.destinationMode=4;
+    CHECK(DfTradeOne(redirectedWithinParent,25)==DF_TRADE_FAULT);
+    CHECK(redirectedWithinParent.WholeParentStock()==3 && redirectedWithinParent.goods.destination==2);
+    CHECK(redirectedWithinParent.money.debits==0 && redirectedWithinParent.money.credits==0);
+    CHECK(redirectedWithinParent.returnCalls==0);
 }

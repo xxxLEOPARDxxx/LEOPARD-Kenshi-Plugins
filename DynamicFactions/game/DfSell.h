@@ -24,8 +24,18 @@ struct DfTrader
 void DfFindTraders(TownBase* town, std::vector<DfTrader>& out);
 
 // Read-only selection predicate. Excludes distance/current hauler town so the
-// worker can approach from an ore node; checks actual price/purse/capacity.
+// worker can approach from an ore node; checks price/purse, defers player trading.
+// Physical shop capacity is resolved once on arrival, not in each candidate scan.
 bool DfTraderCanBuy(Character* hauler, Character* trader, Faction* f, GameData* item);
+
+enum DfSellStatus
+{
+    DF_SELL_OK,
+    DF_SELL_NO_STOCK_ROOM,
+    DF_SELL_PLAYER_TRADING,
+    DF_SELL_INVALID,
+    DF_SELL_FAULT
+};
 
 // Conservative subset of native interaction ranges: InventoryGUI uses 60 for
 // restricted interactions, DialogueController allows 260 for ordinary talking.
@@ -36,4 +46,4 @@ const float kDfTradeRange = 60.0f;
 // of the player's trading GUI. Merchant purse -> faction purse, money conserved.
 // false means stop/reconcile; outputs retain prior confirmed deals. No replay.
 bool DfSellOre(Character* hauler, Character* trader, Faction* f, GameData* item, int maxUnits, int& sold,
-               int& paid);
+               int& paid, DfSellStatus* status = NULL);

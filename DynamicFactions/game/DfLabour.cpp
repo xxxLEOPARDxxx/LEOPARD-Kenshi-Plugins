@@ -6,6 +6,7 @@
 #include "core/DfHaul.h"
 #include "game/DfGame.h"
 #include "game/DfSell.h"
+#include "ui/DfTradeReceipt.h"
 #include <Windows.h>
 #include <Debug.h>
 #include <climits>
@@ -149,7 +150,7 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
         {
             // Hiring already issued an envoy order earlier in this same tick.
             if(!ms[i].hiring) Stop(c,w);else w.ordered=w.moving=false;
-            w.talkedAt=0;w.trader=hand();w.progressAt=clockMs;w.progressPosition=c->getPosition();
+            w.trader=hand();w.progressAt=clockMs;w.progressPosition=c->getPosition();
         }
         w.role=ms[i].role;w.node=ms[i].node;rt.carried+=ms[i].carried;
         if(!ms[i].able || ms[i].hiring) {if(!ms[i].hiring) Stop(c,w);continue;}
@@ -200,7 +201,7 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
             if(distance<best) {best=distance;trader=candidate;}
         }
         if(trader==NULL || !SameHand(w.trader,trader->getHandle()))
-        {w.trader=trader!=NULL?trader->getHandle():hand();w.talkedAt=0;}
+        {w.trader=trader!=NULL?trader->getHandle():hand();}
         const bool nodeLoaded=live[j]>=0;
         const Ogre::Vector3 nodePos=nodeLoaded?loaded[live[j]].pos:Pos(s.nodes[j]);
         const float takeRange=nodeLoaded?loaded[live[j]].takeRange:kDfTakeRange;
@@ -211,7 +212,6 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
         if(hs.carried==0 && !hs.hasRoom)
         {Stop(c,w);w.blockedUntil=clockMs+30000;w.role=DF_ROLE_IDLE;w.node=-1;continue;}
         hs.hasTrader=trader!=NULL;hs.atTrader=best<=kDfTradeRange*kDfTradeRange;
-        hs.greeted=w.talkedAt!=0 && clockMs-w.talkedAt>=3000;
         switch(DfChooseHaulAction(hs))
         {
         case DF_HAUL_GO_NODE:Move(c,w,nodePos);break;
@@ -219,27 +219,28 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
         {
             Stop(c,w);
             const int moved=DfTakeOreFromNode(c,loaded[live[j]].building,item,kDfTransferMaxUnits);
-            if(moved>0) w.talkedAt=0;
-            else {w.blockedUntil=clockMs+30000;w.role=DF_ROLE_IDLE;w.node=-1;}
+            if(moved<=0) {w.blockedUntil=clockMs+30000;w.role=DF_ROLE_IDLE;w.node=-1;}
             break;
         }
         case DF_HAUL_GO_TRADER:Move(c,w,trader->getPosition());break;
-        case DF_HAUL_TALK:
-            Stop(c,w);
-            if(w.talkedAt==0) {c->say(Tr("I have ore to sell."));w.talkedAt=clockMs;}
-            break;
         case DF_HAUL_SELL:
         {
-            Stop(c,w);int sold=0,paid=0;
-            const bool ok=DfSellOre(c,trader,f,item,kDfTransferMaxUnits,sold,paid);
+            Stop(c,w);int sold=0,paid=0;DfSellStatus status=DF_SELL_OK;
+            const bool ok=DfSellOre(c,trader,f,item,kDfTransferMaxUnits,sold,paid,&status);
             if(sold>0)
             {
                 if(rt.sold<=INT_MAX-sold) rt.sold+=sold;
                 if(rt.revenue<=INT_MAX-paid) rt.revenue+=paid;
                 char event[96];sprintf_s(event,sizeof(event),"sale %d %d",sold,paid);DfAddEvent(s,hour,event);
                 if(debug) DebugLog(std::string("DynamicFactions: ")+event);
-                w.talkedAt=0;
+                DfShowTradeReceipt(c,paid);
+                if(debug) DebugLog(std::string("DynamicFactions: sale confirmed to shop of ")+trader->getName()+
+                    "; item "+item->stringID);
             }
+            if(status==DF_SELL_NO_STOCK_ROOM)
+            {w.failedTrader=w.trader;w.blockedUntil=clockMs+30000;}
+            else if(status==DF_SELL_PLAYER_TRADING || status==DF_SELL_INVALID)
+                w.blockedUntil=clockMs+5000;
             if(!ok && debug) DebugLog("DynamicFactions: sale deferred; an ambiguous transfer stops the session");
             break;
         }

@@ -442,6 +442,15 @@ namespace
         }
         __except (EXCEPTION_EXECUTE_HANDLER) { ErrorLog("DynamicFactions: native ore insertion fault"); return false; }
     }
+    bool SafeAddSection(InventorySection* section, Item* detached, bool& accepted)
+    {
+        __try
+        {
+            accepted = section->addItem(detached, 1);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) { ErrorLog("DynamicFactions: native stock section insertion fault"); return false; }
+    }
 
     class NativeTransfer : public DfTransferPort
     {
@@ -450,11 +459,13 @@ namespace
         Item* source_;
         Inventory* to_;
         Inventory* destination_;
+        InventorySection* section_;
         GameData* item_;
     public:
         NativeTransfer(Inventory* from, Inventory* actual, Item* source, Inventory* to,
-                       Inventory* destination, GameData* item) : from_(from), actual_(actual), source_(source),
-            to_(to), destination_(destination), item_(item) {}
+                       Inventory* destination, GameData* item, InventorySection* section = NULL)
+            : from_(from), actual_(actual), source_(source), to_(to), destination_(destination),
+            section_(section), item_(item) {}
         virtual bool Read(int& source, int& destination)
         {
             source = DfCountInventoryItem(from_, item_);
@@ -475,6 +486,7 @@ namespace
         }
         virtual bool Add(void* item, bool& accepted)
         {
+            if (section_ != NULL) return SafeAddSection(section_, static_cast<Item*>(item), accepted);
             return SafeAdd(destination_, static_cast<Item*>(item), accepted);
         }
         virtual bool Restore(void* item, bool& accepted)
@@ -483,14 +495,25 @@ namespace
         }
     };
 
-    bool MoveUnit(Inventory* from, Inventory* actual, Item* source, Inventory* to, GameData* item)
+    bool MoveUnit(Inventory* from, Inventory* actual, Item* source, Inventory* to, GameData* item,
+                  InventorySection* pinned = NULL)
     {
         if (g_transferFault || from == NULL || actual == NULL || source == NULL ||
             to == NULL || from == to || item == NULL || source->isEquipped ||
             source->quantity <= 0 || source->getGameData() != item || !actual->hasItem(source)) return false;
-        Inventory* const destination = WithRoom(to, item);
+        if (pinned != NULL)
+        {
+            if (pinned->getInventory() != to || !pinned->enabled ||
+                !pinned->isLimitedSlotCompatible(source) || !pinned->hasRoomForItem(item, 1)) return false;
+            const lektor<InventorySection*>& sections = to->getAllSections();
+            if (sections.size() > 128) return false;
+            bool found = false;
+            for (uint32_t k = 0; k < sections.size(); ++k) if (sections.stuff[k] == pinned) found = true;
+            if (!found) return false;
+        }
+        Inventory* const destination = pinned != NULL ? to : WithRoom(to, item);
         if (destination == NULL) return false;
-        NativeTransfer native(from, actual, source, to, destination, item);
+        NativeTransfer native(from, actual, source, to, destination, item, pinned);
         const DfUnitResult result = DfTransferOne(native);
         if (result == DF_UNIT_FAULT) DfQuarantineTransfer("ore delivery requires reconciliation; no replay");
         return result == DF_UNIT_MOVED;
@@ -568,6 +591,13 @@ bool DfMoveInventoryUnit(Inventory* from, Inventory* actual, Item* source, Inven
 {
     __try { return MoveUnit(from, actual, source, to, item); }
     __except (EXCEPTION_EXECUTE_HANDLER) { DfQuarantineTransfer("moving ore raised a native fault"); return false; }
+}
+bool DfMoveInventoryUnitToSection(Inventory* from, Inventory* actual, Item* source,
+                                  InventorySection* to, GameData* item)
+{
+    __try { return to != NULL && MoveUnit(from, actual, source, to->getInventory(), item, to); }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    { DfQuarantineTransfer("moving ore to real merchant stock raised a native fault"); return false; }
 }
 
 int DfTakeOreFromNode(Character* c, const hand& node, GameData* item, int maxUnits)
