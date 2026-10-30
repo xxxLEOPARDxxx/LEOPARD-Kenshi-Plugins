@@ -1,6 +1,12 @@
 msgid ""
 msgstr "Language: ru_RU\nContent-Type: text/plain; charset=UTF-8\n"
 
+msgid "+{1} more"
+msgstr "+ещё {1}"
+
+msgid "Accumulate small skill gains until this percentage can be announced. Level-ups always appear immediately."
+msgstr "Накапливать малые прибавки до этого процента. Повышение целого уровня показывается сразу."
+
 msgid "Also add the character name and new skill level to the game's message log."
 msgstr "Также добавлять имя персонажа и новый уровень навыка в игровой журнал."
 
@@ -31,14 +37,17 @@ msgstr "Арбалеты"
 msgid "Detailed log"
 msgstr "Подробный журнал"
 
-msgid "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
-msgstr "В RE_Kenshi_log.txt: настройки, повышения навыков и сброс исходных уровней при загрузке."
+msgid "Details in RE_Kenshi_log.txt: settings, XP and level messages, and save-load baseline resets."
+msgstr "В RE_Kenshi_log.txt: настройки, сообщения об опыте и уровнях, сброс исходных значений при загрузке."
 
 msgid "Dexterity"
 msgstr "Ловкость"
 
 msgid "Dodge"
 msgstr "Уворот"
+
+msgid "Enable XP gain text, level-up messages and character-panel bars."
+msgstr "Включить текст прибавок опыта, сообщения о повышении уровня и полосы в панели персонажа."
 
 msgid "Enabled"
 msgstr "Включено"
@@ -49,17 +58,20 @@ msgstr "Инженерия"
 msgid "Farming"
 msgstr "Фермерство"
 
-msgid "First aid"
-msgstr "Медицина"
-
 msgid "Hackers"
 msgstr "Тесаки"
 
 msgid "Heavy weapons"
 msgstr "Тяжёлое оружие"
 
+msgid "Hive medic"
+msgstr "Медицина улья"
+
 msgid "Katanas"
 msgstr "Катаны"
+
+msgid "Keep a skill in the panel for this long after its last XP gain."
+msgstr "Оставлять навык в панели на это время после последней прибавки опыта."
 
 msgid "Labouring"
 msgstr "Физический труд"
@@ -70,6 +82,15 @@ msgstr "Взлом"
 msgid "Martial arts"
 msgstr "Боевые искусства"
 
+msgid "Mass combat"
+msgstr "Массовый бой"
+
+msgid "Maximum XP rows"
+msgstr "Максимум строк опыта"
+
+msgid "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
+msgstr "Максимальное число недавних навыков в панели персонажа. При нехватке места строк будет меньше."
+
 msgid "Medic"
 msgstr "Медицина"
 
@@ -79,8 +100,11 @@ msgstr "Атака"
 msgid "Melee defence"
 msgstr "Защита"
 
-msgid "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
-msgstr "Только сообщения о достигнутом целом уровне навыка над персонажами. Без полос опыта и дробных прибавок."
+msgid "Minimum XP gain, %"
+msgstr "Минимальная прибавка опыта, %"
+
+msgid "Minimum collection time for fractional XP messages. Level-up messages do not wait."
+msgstr "Минимальное время накопления дробных прибавок опыта. Сообщения о повышении уровня не ждут."
 
 msgid "Perception"
 msgstr "Восприятие"
@@ -90,6 +114,9 @@ msgstr "Древковое оружие"
 
 msgid "Precision shooting"
 msgstr "Точная стрельба"
+
+msgid "Recent training duration, s"
+msgstr "Время недавней тренировки, с"
 
 msgid "Robotics"
 msgstr "Робототехника"
@@ -103,14 +130,26 @@ msgstr "Наука"
 msgid "Selected characters only"
 msgstr "Только выбранные персонажи"
 
-msgid "Show a message when a skill reaches a new whole level."
-msgstr "Показывать сообщение при достижении нового целого уровня навыка."
+msgid "Show accumulated skill gains as rising blue text, such as +3% Athletics."
+msgstr "Показывать накопленный прирост навыка синим всплывающим текстом, например +3% Атлетика."
+
+msgid "Show reached whole skill levels as rising gold text."
+msgstr "Показывать достигнутый целый уровень навыка золотым всплывающим текстом."
+
+msgid "Show recently trained skills below the vanilla character stats, separated by a divider."
+msgstr "Показывать недавно тренируемые навыки под обычными характеристиками персонажа, после разделителя."
+
+msgid "Skill level-up text"
+msgstr "Текст повышения навыка"
 
 msgid "Stealth"
 msgstr "Скрытность"
 
 msgid "Strength"
 msgstr "Сила"
+
+msgid "Survival"
+msgstr "Выживание"
 
 msgid "Swimming"
 msgstr "Плавание"
@@ -127,5 +166,20 @@ msgstr "Следить за всей фракцией игрока, но соо�
 msgid "Turrets"
 msgstr "Турели"
 
+msgid "Vet"
+msgstr "Ветеринария"
+
 msgid "Weapon smith"
 msgstr "Ковка оружия"
+
+msgid "XP announcement interval, s"
+msgstr "Интервал сообщений опыта, с"
+
+msgid "XP bars in character panel"
+msgstr "Полосы опыта в панели персонажа"
+
+msgid "XP gain text"
+msgstr "Текст прибавок опыта"
+
+msgid "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
+msgstr "Текст прибавок опыта, повышения навыков и полосы недавних тренировок из XP Info. Все настройки доступны в MCM."

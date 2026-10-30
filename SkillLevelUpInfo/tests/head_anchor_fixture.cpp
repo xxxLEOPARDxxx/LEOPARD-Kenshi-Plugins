@@ -2,6 +2,7 @@ bool Near(float a,float b){return fabs(a-b)<0.001f;}
 bool Same(const Ogre::Vector3& a,const Ogre::Vector3& b){return Near(a.x,b.x)&&Near(a.y,b.y)&&Near(a.z,b.z);}
 void Gain(Character& c){c.stats.value+=1;Scan();}
 int main(){
+ InitializeCriticalSection(&g_lock);
  PlayerInterface player;GameWorld world;world.player=&player;ou=&world;ForgottenGUI ui;gui=&ui;
  Character c;player.playerCharacters.push_back(&c);Scan();
  check(c.boneCalls==0&&c.positionCalls==0,"silent baseline performs no anchor queries");

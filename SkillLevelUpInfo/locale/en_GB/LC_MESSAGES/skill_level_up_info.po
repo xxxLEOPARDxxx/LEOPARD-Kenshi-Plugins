@@ -1,6 +1,12 @@
 msgid ""
 msgstr "Language: en_GB\nContent-Type: text/plain; charset=UTF-8\n"
 
+msgid "+{1} more"
+msgstr "+{1} more"
+
+msgid "Accumulate small skill gains until this percentage can be announced. Level-ups always appear immediately."
+msgstr "Accumulate small skill gains until this percentage can be announced. Level-ups always appear immediately."
+
 msgid "Also add the character name and new skill level to the game's message log."
 msgstr "Also add the character name and new skill level to the game's message log."
 
@@ -20,7 +26,7 @@ msgid "Cooking"
 msgstr "Cooking"
 
 msgid "Copy to game log"
-msgstr "Level-ups in game log"
+msgstr "Copy to game log"
 
 msgid "Crossbow smith"
 msgstr "Crossbow smith"
@@ -31,14 +37,17 @@ msgstr "Crossbows"
 msgid "Detailed log"
 msgstr "Detailed log"
 
-msgid "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
-msgstr "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
+msgid "Details in RE_Kenshi_log.txt: settings, XP and level messages, and save-load baseline resets."
+msgstr "Details in RE_Kenshi_log.txt: settings, XP and level messages, and save-load baseline resets."
 
 msgid "Dexterity"
 msgstr "Dexterity"
 
 msgid "Dodge"
 msgstr "Dodge"
+
+msgid "Enable XP gain text, level-up messages and character-panel bars."
+msgstr "Enable XP gain text, level-up messages and character-panel bars."
 
 msgid "Enabled"
 msgstr "Enabled"
@@ -49,17 +58,20 @@ msgstr "Engineering"
 msgid "Farming"
 msgstr "Farming"
 
-msgid "First aid"
-msgstr "First aid"
-
 msgid "Hackers"
 msgstr "Hackers"
 
 msgid "Heavy weapons"
 msgstr "Heavy weapons"
 
+msgid "Hive medic"
+msgstr "Hive medic"
+
 msgid "Katanas"
 msgstr "Katanas"
+
+msgid "Keep a skill in the panel for this long after its last XP gain."
+msgstr "Keep a skill in the panel for this long after its last XP gain."
 
 msgid "Labouring"
 msgstr "Labouring"
@@ -70,6 +82,15 @@ msgstr "Lockpicking"
 msgid "Martial arts"
 msgstr "Martial arts"
 
+msgid "Mass combat"
+msgstr "Mass combat"
+
+msgid "Maximum XP rows"
+msgstr "Maximum XP rows"
+
+msgid "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
+msgstr "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
+
 msgid "Medic"
 msgstr "Medic"
 
@@ -79,8 +100,11 @@ msgstr "Melee attack"
 msgid "Melee defence"
 msgstr "Melee defence"
 
-msgid "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
-msgstr "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
+msgid "Minimum XP gain, %"
+msgstr "Minimum XP gain, %"
+
+msgid "Minimum collection time for fractional XP messages. Level-up messages do not wait."
+msgstr "Minimum collection time for fractional XP messages. Level-up messages do not wait."
 
 msgid "Perception"
 msgstr "Perception"
@@ -90,6 +114,9 @@ msgstr "Polearms"
 
 msgid "Precision shooting"
 msgstr "Precision shooting"
+
+msgid "Recent training duration, s"
+msgstr "Recent training duration, s"
 
 msgid "Robotics"
 msgstr "Robotics"
@@ -103,14 +130,26 @@ msgstr "Science"
 msgid "Selected characters only"
 msgstr "Selected characters only"
 
-msgid "Show a message when a skill reaches a new whole level."
-msgstr "Show a message when a skill reaches a new whole level."
+msgid "Show accumulated skill gains as rising blue text, such as +3% Athletics."
+msgstr "Show accumulated skill gains as rising blue text, such as +3% Athletics."
+
+msgid "Show reached whole skill levels as rising gold text."
+msgstr "Show reached whole skill levels as rising gold text."
+
+msgid "Show recently trained skills below the vanilla character stats, separated by a divider."
+msgstr "Show recently trained skills below the vanilla character stats, separated by a divider."
+
+msgid "Skill level-up text"
+msgstr "Skill level-up text"
 
 msgid "Stealth"
 msgstr "Stealth"
 
 msgid "Strength"
 msgstr "Strength"
+
+msgid "Survival"
+msgstr "Survival"
 
 msgid "Swimming"
 msgstr "Swimming"
@@ -127,5 +166,20 @@ msgstr "Track the whole player faction, but only announce gains for selected cha
 msgid "Turrets"
 msgstr "Turrets"
 
+msgid "Vet"
+msgstr "Vet"
+
 msgid "Weapon smith"
 msgstr "Weapon smith"
+
+msgid "XP announcement interval, s"
+msgstr "XP announcement interval, s"
+
+msgid "XP bars in character panel"
+msgstr "XP bars in character panel"
+
+msgid "XP gain text"
+msgstr "XP gain text"
+
+msgid "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
+msgstr "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."

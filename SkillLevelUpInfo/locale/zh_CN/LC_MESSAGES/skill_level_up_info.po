@@ -1,6 +1,12 @@
 msgid ""
 msgstr "Language: zh_CN\nContent-Type: text/plain; charset=UTF-8\n"
 
+msgid "+{1} more"
+msgstr "+另有 {1} 项"
+
+msgid "Accumulate small skill gains until this percentage can be announced. Level-ups always appear immediately."
+msgstr "累积小幅技能增量，达到此百分比后显示。技能升级会立即显示。"
+
 msgid "Also add the character name and new skill level to the game's message log."
 msgstr "同时将角色名称和新的技能等级添加到游戏消息日志。"
 
@@ -31,14 +37,17 @@ msgstr "弩"
 msgid "Detailed log"
 msgstr "详细日志"
 
-msgid "Details in RE_Kenshi_log.txt: settings, skill level increases and save-load baseline resets."
-msgstr "在 RE_Kenshi_log.txt 中记录设置、技能升级和读档后的基础等级重置。"
+msgid "Details in RE_Kenshi_log.txt: settings, XP and level messages, and save-load baseline resets."
+msgstr "在 RE_Kenshi_log.txt 中记录设置、经验和升级提示，以及读档后的基准值重置。"
 
 msgid "Dexterity"
 msgstr "敏捷"
 
 msgid "Dodge"
 msgstr "闪避"
+
+msgid "Enable XP gain text, level-up messages and character-panel bars."
+msgstr "启用经验获取文字、升级提示和角色面板进度条。"
 
 msgid "Enabled"
 msgstr "启用"
@@ -49,17 +58,20 @@ msgstr "工程"
 msgid "Farming"
 msgstr "农业"
 
-msgid "First aid"
-msgstr "医疗"
-
 msgid "Hackers"
 msgstr "砍刀"
 
 msgid "Heavy weapons"
 msgstr "重武器"
 
+msgid "Hive medic"
+msgstr "蜂巢医疗"
+
 msgid "Katanas"
 msgstr "刀"
+
+msgid "Keep a skill in the panel for this long after its last XP gain."
+msgstr "技能最后一次获得经验后，在面板中保留的时间。"
 
 msgid "Labouring"
 msgstr "劳动"
@@ -70,6 +82,15 @@ msgstr "开锁"
 msgid "Martial arts"
 msgstr "武术"
 
+msgid "Mass combat"
+msgstr "群体战斗"
+
+msgid "Maximum XP rows"
+msgstr "经验条最大行数"
+
+msgid "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
+msgstr "角色面板中近期技能的最大数量。空间不足时会显示较少行。"
+
 msgid "Medic"
 msgstr "医疗"
 
@@ -79,8 +100,11 @@ msgstr "近战攻击"
 msgid "Melee defence"
 msgstr "近战防御"
 
-msgid "Only whole skill level increases above your characters. No XP bars or fractional gain messages."
-msgstr "仅在角色头顶显示技能提升到新整数等级的提示。不显示经验条或零碎经验增量。"
+msgid "Minimum XP gain, %"
+msgstr "最小经验增量，%"
+
+msgid "Minimum collection time for fractional XP messages. Level-up messages do not wait."
+msgstr "小幅经验增量提示的最短累积时间。升级提示无需等待。"
 
 msgid "Perception"
 msgstr "感知"
@@ -90,6 +114,9 @@ msgstr "长柄武器"
 
 msgid "Precision shooting"
 msgstr "射击精准"
+
+msgid "Recent training duration, s"
+msgstr "近期训练保留时间，秒"
 
 msgid "Robotics"
 msgstr "机器人学"
@@ -103,14 +130,26 @@ msgstr "科学"
 msgid "Selected characters only"
 msgstr "仅所选角色"
 
-msgid "Show a message when a skill reaches a new whole level."
-msgstr "技能达到新的整数等级时显示提示。"
+msgid "Show accumulated skill gains as rising blue text, such as +3% Athletics."
+msgstr "以向上飘动的蓝色文字显示累积的技能经验，例如 +3% 运动。"
+
+msgid "Show reached whole skill levels as rising gold text."
+msgstr "以向上飘动的金色文字显示达到的技能整数等级。"
+
+msgid "Show recently trained skills below the vanilla character stats, separated by a divider."
+msgstr "在原版角色属性下方显示近期训练的技能，并用分隔线区分。"
+
+msgid "Skill level-up text"
+msgstr "技能升级文字"
 
 msgid "Stealth"
 msgstr "隐匿"
 
 msgid "Strength"
 msgstr "力量"
+
+msgid "Survival"
+msgstr "生存"
 
 msgid "Swimming"
 msgstr "游泳"
@@ -127,5 +166,20 @@ msgstr "跟踪玩家所有角色，但仅提示所选角色的技能提升。"
 msgid "Turrets"
 msgstr "炮塔"
 
+msgid "Vet"
+msgstr "兽医"
+
 msgid "Weapon smith"
 msgstr "武器锻造"
+
+msgid "XP announcement interval, s"
+msgstr "经验提示间隔，秒"
+
+msgid "XP bars in character panel"
+msgstr "角色面板经验条"
+
+msgid "XP gain text"
+msgstr "经验获取文字"
+
+msgid "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
+msgstr "显示 XP Info 的经验获取文字、技能升级和近期训练进度条，所有设置均可在 MCM 中调整。"
