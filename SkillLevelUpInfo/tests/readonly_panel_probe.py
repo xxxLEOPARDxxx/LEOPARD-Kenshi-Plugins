@@ -3,14 +3,14 @@
 Never enumerates processes, injects code, invokes game functions or writes game
 memory/files. The only output is a local JSON artifact. ABI offsets measured
 by probe_layout.cpp with the production VC10/SDK headers. This version accepts
-only audited XP candidates, including native-UI-repairca0f3e41, with matching maps.
+only audited XP candidates, including underlay-alignment a63b8462, with matching maps.
 """
 from pathlib import Path
 import argparse, ctypes, ctypes.wintypes as wt, datetime, hashlib, json
 import math, re, struct, sys, time
 
-EXPECTED_SHA = 'ca0f3e41a5f3bae2119885598ee464474df24e164e10df01493dea4dcc5df642'
-APPROVED_SHAS = {EXPECTED_SHA,'d06b90cf19149f160e9fcef28dde56dc1bd5e856b40d9a7388f2606df50ae7e2','1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43','df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
+EXPECTED_SHA = 'a63b8462542a0cf5263fc9b50e8a72b81be02290981665922db408fcdadf80f3'
+APPROVED_SHAS = {EXPECTED_SHA,'ca0f3e41a5f3bae2119885598ee464474df24e164e10df01493dea4dcc5df642','d06b90cf19149f160e9fcef28dde56dc1bd5e856b40d9a7388f2606df50ae7e2','1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43','df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
 BUILD = Path(r'D:\DEV\Kenshi\build\SkillLevelUpInfo')
 NAMES = ['Strength','Toughness','Dexterity','Perception','Katanas','Sabres',
  'Hackers','Heavy weapons','Blunt','Polearms','Melee attack','Melee defence',
@@ -218,6 +218,28 @@ def loaded_header(header,disk,base,module_size):
   'module_base':hex(base),'image_size':size,'changed_offsets':[hex(j) for j in range(len(header)) if header[j]!=disk[j]],
   'header_bytes_verified':len(header)}
 
+def lifecycle_trace(m,address,head_address):
+ """104-byte VC10 production entries; only committed sequences are returned.
+
+ Owner/panel/widget addresses are opaque history keys, never dereferenced here.
+ A racing in-flight entry is skipped, without weakening the main identity gate.
+ """
+ head=unpack(m,'<I',head_address)[0]
+ if not head:return {'head':0,'records':[],'stable_head':True}
+ raw=m.read(address,32*104);records=[]
+ for slot in range(32):
+  at=slot*104;sequence,tick,mask,generation=struct.unpack_from('<IIIi',raw,at)
+  if not sequence or sequence>head or head-sequence>=32:continue
+  if unpack(m,'<I',address+at)[0]!=sequence:continue
+  panel,root,owner,category,combat=struct.unpack_from('<QQQii',raw,at+16)
+  pointers=struct.unpack_from('<7Q',raw,at+48)
+  records.append({'sequence':sequence,'tick':tick,'context_mask':mask,'generation':generation,
+   'panel':hex(panel),'root':hex(root),'owner_opaque':hex(owner),'category':category,'combat':bool(combat),
+   'progress_before':[hex(v)for v in pointers[:2]],'progress_after_original':[hex(v)for v in pointers[2:4]],
+   'divider_before':hex(pointers[4]),'divider_after_original':hex(pointers[5]),'divider_after_draw':hex(pointers[6])})
+ records.sort(key=lambda r:r['sequence'])
+ return {'head':head,'records':records,'stable_head':head==unpack(m,'<I',head_address)[0]}
+
 def sample(m,base,symbols,now):
  a={name:base+rva for name,rva in symbols.items()};owner=hand(m,a['g_panelCharacter'])
  native=q(m,a['g_panel']);category=i(m,a['g_panelCategory'])
@@ -238,8 +260,16 @@ def sample(m,base,symbols,now):
  if all(k in a for k in ['g_labels','g_labelSkins','g_labelTypes']):
   result['owned_labels']=owned_labels(m,a['g_labels'],a['g_labelSkins'],a['g_labelTypes'])
  if 'g_placement'in a:result['native_placement']=placement_cache(m,a['g_placement'])
- for counter in ['g_labelCreates','g_labelDestroys','g_labelTypeReads']:
+ for counter in ['g_labelCreates','g_labelDestroys','g_labelTypeReads','g_panelCalls','g_contextResets',
+                 'g_progressCreates','g_dividerCreates','g_dividerContextHides','g_dividerParentDestroys']:
   if counter in a:result[counter]=unpack(m,'<I',a[counter])[0]
+ if 'g_panelTrace'in a and 'g_panelTraceHead'in a:
+  result['lifecycle_trace']=lifecycle_trace(m,a['g_panelTrace'],a['g_panelTraceHead'])
+ if 'g_underlay'in a:
+  cache=a['g_underlay'];result['underlay_profile']={'source_opaque':hex(q(m,cache+8)),
+   'main_opaque':hex(q(m,cache+24)),'resource_profile_known':bool(m.read(cache+32,1)[0]),
+   'actual_quad_profile_applied':bool(m.read(cache+33,1)[0]),
+   'resource_lookups':unpack(m,'<I',cache+36)[0]}
  for key in ('g_nameMeasure','g_valueMeasure'):
   if key in a:
    try:

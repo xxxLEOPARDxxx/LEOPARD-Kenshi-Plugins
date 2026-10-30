@@ -212,9 +212,25 @@ The complete native progress bar and its frame move together2px down beside
 the name. Actual23/24px bar heights, scaled skin offsets, palettes and full
 25/26px name regions are retained. Percentage text uses the same offset only
 when its actual client/text region fits; unfamiliar insets retain a full row.
-A1px divider has its own space and does not cross glyphs. Stable frames create
-no widgets, repeat no type lookup, and write no geometry. Debug counters for
-owned labels/native placement are available to the bounded read-only probe.
+A1px divider has its own space and does not cross glyphs. Owned labels remain
+allocated; stable source bindings repeat no owned-label type lookup or geometry writes.
+Native Russian UI can rebuild its own rows on each update: the game's English
+sentinel lookup misses its translated line keys. Native progress recreation
+therefore remains distinct from our label counters. Both XP labels share one
+type validation per live source binding. Interleaved NPC/quiet panels hide and
+reuse the divider; a different active parent retires it. Detailed Debug tracing
+uses a bounded32-entry before/native/after ring without per-frame log messages.
+
+For the verified stock StatsPanel atlas profile, progress frames follow the
+actual stretched value backing instead of the former48%-width estimate. The
+captured324px background maps to absolute203..303; names have181px, fitting the
+measured150px Martial arts caption. Public resource/ancestor geometry supplies
+the transform. The actual SubSkin UV is validated through a legal protected
+member pointer after RTTI and a one-time native layout/body guard. Dark UI's277px atlas and unfamiliar resource profiles retain
+the previous native placement. Replacement artwork with identical resource/UV
+metadata cannot be identified; this profile does not promise arbitrary artwork
+compatibility. Skin colours, frame/track offsets, fonts and vertical capacity
+remain native. The narrower native frame still requires visual acceptance.
 
 Названия опыта используют реальный тип виджета, skin и шрифт штатных атрибутов.
 Стандартное имя progress-строки скрывается: его рамка vanilla после сжатия
@@ -234,10 +250,30 @@ owned labels/native placement are available to the bounded read-only probe.
 масштабированные элементы skin, цвета и полная область названия25/26px.
 Проценты сдвигаются только при достаточной реальной клиентской области;
 неизвестные отступы сохраняют полную строку. Разделитель1px занимает отдельное
-место без пересечения букв. Стабильный кадр не создаёт виджеты, не повторяет
-определение типа и не меняет геометрию. Диагностические счётчики своих надписей
-и штатного размещения доступны ограниченному read-only probe.
+место без пересечения букв. Свои надписи сохраняются; при неизменной привязке
+не повторяются определение типа своей надписи и запись координат. Русский интерфейс игры
+может заново создавать штатные строки: проверка английского ключа не находит
+переведённую строку. Это отдельная причина пересоздания native progress, которую
+счётчики своих надписей не охватывают. Две XP-строки используют одну проверку
+типа на новую живую привязку. Промежуточные NPC/неактивные панели скрывают и
+повторно используют разделитель; другой активный parent заменяет его.
+Подробная диагностика Debug хранит32 ограниченных записи до/native/после без
+покадрового вывода сообщений в журнал.
+
+Для проверенного штатного StatsPanel atlas рамка XP следует фактической
+растянутой подложке значений. Измеренный фон324px даёт область203..303 и181px
+для названия — достаточно для измеренных150px «Боевые искусства».
+Преобразование вычисляется через public resource/геометрию предков. Actual UV
+SubSkin проверяется легальным protected member-pointer после RTTI и одноразовой
+проверки native layout/кода. Dark UI
+с atlas277px и неизвестные профили сохраняют прежнее штатное размещение.
+Изменённую картинку при тех же resource/UV метаданных различить невозможно;
+профиль не гарантирует поддержку любой перерисованной текстуры. Цвета,
+внутренние отступы рамки/полосы, шрифты и вертикальная вместимость сохранены.
+Более узкая штатная рамка ещё требует визуальной проверки.
 
 Technical evidence / Техническая проверка: UI_PROFILE_REPAIR.md,
 tests/ui_profiles.json (address-free native captures), tests/test_skin_profiles.py.
+UI_UNDERLAY_INVESTIGATION.md, tests/underlay_profile.json,
+tests/test_underlay_layout.py and tests/test_underlay_resource.py.
 Native acceptance of the new repair remains pending the next user launch.

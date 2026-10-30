@@ -11,6 +11,17 @@ class Memory:
  def zero(self,a,n):self.write(a,bytes(n))
 
 class ProbeTests(unittest.TestCase):
+ def test_committed_bounded_trace_has_native_before_after_and_no_stale_inflight_entry(self):
+  m=Memory();ring,head=0x10000,0x20000;m.zero(ring,32*104);m.pack(head,'<I',2)
+  m.pack(ring,'<IIIiQQQii7Q',1,1234,5,337,0x30000,0x40000,0x50000,6,0,0x60000,0x70000,0,0,0x80000,0x80000,0x80000)
+  # The reserved second entry is still being written (sequence0).
+  m.pack(ring+104,'<I',0)
+  result=probe.lifecycle_trace(m,ring,head);self.assertEqual(len(result['records']),1)
+  row=result['records'][0];self.assertEqual((row['generation'],row['context_mask'],row['progress_after_original']),(337,5,['0x0','0x0']))
+  self.assertEqual(row['divider_before'],row['divider_after_draw']);self.assertTrue(result['stable_head'])
+ def test_debug_off_trace_does_not_read_uninitialized_ring(self):
+  m=Memory();m.pack(0x20000,'<I',0)
+  self.assertEqual(probe.lifecycle_trace(m,0x10000,0x20000),{'head':0,'records':[],'stable_head':True})
  def test_owned_native_labels_use_verified_ref_string_arrays(self):
   m=Memory();refs,skins,types,w=0x60000,0x61000,0x62000,0x70000
   m.zero(refs,120);m.zero(skins,200);m.zero(types,200);m.pack(refs+8,'<Q',w)
@@ -40,9 +51,11 @@ class ProbeTests(unittest.TestCase):
   with self.assertRaisesRegex(ValueError,'budget'):probe.skin_children(m,bar)
  def test_current_dll_and_map_match(self):
   symbols,stamp=probe.map_symbols(probe.BUILD/'SkillLevelUpInfo.map',probe.BUILD/'SkillLevelUpInfo.dll')
-  self.assertEqual(symbols['g_panel'],0x26248)
-  self.assertEqual(symbols['g_slots'],0x26348)
-  self.assertEqual(stamp,0x6ae4e0bf)
+  self.assertEqual(symbols['g_panel'],0x28ff0)
+  self.assertEqual(symbols['g_slots'],0x29108)
+  self.assertEqual(symbols['g_panelTrace'],0x282d0)
+  self.assertEqual(symbols['g_underlay'],0x27a18)
+  self.assertEqual(stamp,0x6ae4f78e)
  def test_vc10_map_keeps_key_order_not_visual_order(self):
   m=Memory();obj,head=0x10000,0x11000
   m.pack(obj+8,'<QQ',head,3);m.pack(head+8,'<Q',0x13000)

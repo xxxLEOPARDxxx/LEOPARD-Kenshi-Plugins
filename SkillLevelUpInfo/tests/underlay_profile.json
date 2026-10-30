@@ -1,0 +1,62 @@
+{
+  "source": "underlay-ca0-27924-vanilla.json",
+  "source_sha256": "e8f2771b63b18832f1cba1a02b72d23499cf2263fa0a70b668a477eb93d15d64",
+  "samples": 24,
+  "valid_samples": 22,
+  "polling_races": 2,
+  "loaded_dll_sha256": "ca0f3e41a5f3bae2119885598ee464474df24e164e10df01493dea4dcc5df642",
+  "background_coord": [
+    0,
+    483,
+    324,
+    219
+  ],
+  "background_absolute": [
+    0,
+    1228
+  ],
+  "background_quad": [
+    0,
+    0,
+    324,
+    219
+  ],
+  "stock_atlas": [
+    0,
+    907,
+    240,
+    165
+  ],
+  "value_backing_atlas_x": 150,
+  "content_absolute": [
+    10,
+    1247
+  ],
+  "content_size": [
+    297,
+    181
+  ],
+  "native_value_right_local": 293,
+  "old_bar": [
+    153,
+    133,
+    142,
+    23
+  ],
+  "candidate_bar_local": [
+    193,
+    133,
+    100,
+    23
+  ],
+  "candidate_bar_absolute_x": [
+    203,
+    303
+  ],
+  "measured_caption_width": 150,
+  "old_name_width": 141,
+  "candidate_name_width": 181,
+  "five_rows_capacity": 2,
+  "six_rows_capacity": 1,
+  "runtime_candidate_accepted": false
+}

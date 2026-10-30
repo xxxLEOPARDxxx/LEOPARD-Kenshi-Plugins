@@ -14,7 +14,7 @@ DWORD ProbeTick(){return fakeNow;}
 #define GetTickCount ProbeTick
 void DebugLog(const std::string&){}
 const char* Tr(const char* s){return s;}
-namespace PluginDiagnostics {bool Enabled(){return false;}void Write(const char*){}void Configure(const char*,const std::string&) {}}
+namespace PluginDiagnostics {bool enabled=false;bool Enabled(){return enabled;}void Write(const char*){}void Configure(const char*,const std::string&) {}}
 namespace MyGUI {struct Colour {float r,g,b;Colour(float a,float c,float d):r(a),g(c),b(d){}};}
 class Character;
 struct GameSaveState {};
@@ -36,12 +36,12 @@ struct CharStats {
 };
 struct Character {
  Ogre::Vector3 base,bones[3];int boneCalls,positionCalls;bool positionFault,boneFault[3];
- std::string displayName;unsigned serial;bool dead;CharStats stats;
- Character():base(100,7,200),boneCalls(0),positionCalls(0),positionFault(false),displayName("character"),serial(1),dead(false){
+ std::string displayName;unsigned serial;bool dead,playerControlled;CharStats stats;
+ Character():base(100,7,200),boneCalls(0),positionCalls(0),positionFault(false),displayName("character"),serial(1),dead(false),playerControlled(true){
   stats.me=this;
   for(int i=0;i<3;++i){bones[i]=base;boneFault[i]=false;}
  }
- bool isDead(){return dead;}bool isPlayerCharacter(){return true;}CharStats* getStats(){return &stats;}
+ bool isDead(){return dead;}bool isPlayerCharacter(){return playerControlled;}CharStats* getStats(){return &stats;}
  Ogre::Vector3 getPosition(){++positionCalls;if(positionFault)RaiseException(0xE1234567,0,0,NULL);return base;}
  Ogre::Vector3 getBoneWorldPosition(const std::string& name){
   ++boneCalls;int i=name=="Bip01 Head"?0:name=="Head"?1:2;

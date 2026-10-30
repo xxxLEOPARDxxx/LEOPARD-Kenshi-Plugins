@@ -1,6 +1,7 @@
 #include "head_boundary_fakes.h"
 #include <algorithm>
 namespace MyGUI {
+#define XP_PANEL_FAKE_GUI 1
 bool vanillaUiProfile=false;int widgetCreates=0,widgetDestroys=0,typeReads=0;
 typedef std::string UString;
 struct IntCoord {
@@ -12,6 +13,21 @@ struct IntCoord {
 struct IntPoint {int left,top;IntPoint(int x=0,int y=0):left(x),top(y){}};
 struct IntSize {int width,height;IntSize(int w=0,int h=0):width(w),height(h){}};
 struct Align{enum{Default};int vertical;Align(int v=1):vertical(v){}bool isBottom()const{return vertical==2;}bool isVCenter()const{return vertical==1;}bool isTop()const{return vertical==0;}};
+struct FloatRect{float left,top,right,bottom;FloatRect(float a=0,float b=0,float c=0,float d=0):left(a),top(b),right(c),bottom(d){}};
+struct IStateInfo{template<class T>T*castType(bool){return static_cast<T*>(this);}};
+struct SubSkinStateInfo:IStateInfo{FloatRect rect;const FloatRect&getRect()const{return rect;}};
+typedef std::vector<IStateInfo*>VectorStateInfo;typedef std::map<std::string,VectorStateInfo>MapWidgetStateInfo;
+struct SubWidgetInfo{IntCoord coord;Align align;std::string type;SubWidgetInfo():coord(0,0,320,219),type("SubSkin"){}};
+typedef std::vector<SubWidgetInfo>VectorSubWidgetInfo;
+struct IResource{template<class T>T*castType(bool){return static_cast<T*>(this);}};
+struct ResourceSkin:IResource{VectorSubWidgetInfo basis;MapWidgetStateInfo states;std::string texture;
+ const VectorSubWidgetInfo&getBasisInfo()const{return basis;}const MapWidgetStateInfo&getStateInfo()const{return states;}const std::string&getTextureName()const{return texture;}};
+struct ResourceManager{ResourceSkin*skin;int reads;ResourceManager():skin(NULL),reads(0){}static ResourceManager*getInstancePtr(){static ResourceManager r;return &r;}
+ IResource*getByName(const std::string&,bool){++reads;return skin;}};
+struct ISubWidgetRect{IntCoord coord;bool subSkin;ISubWidgetRect():subSkin(false){}const IntCoord&getCoord(){return coord;}
+ template<class T>T*castType(bool){return subSkin?static_cast<T*>(this):NULL;}};
+struct SubSkin:ISubWidgetRect{protected:FloatRect mRectTexture;public:SubSkin():mRectTexture(0,907.f/1080,240.f/1920,1072.f/1080){subSkin=true;}
+ void setNativeUv(FloatRect uv){mRectTexture=uv;}};
 struct ISubWidgetText {
  char nativePrefix[0xe0];void*nativeFont;
  std::string fontName;UString caption;int fontHeight,fontWrites,heightWrites,measures,measuredHeight,vertical;bool hasFont,shadow;IntCoord coord;IntPoint absolute,viewOffset;
@@ -26,8 +42,9 @@ struct ISubWidgetText {
 struct EditText:ISubWidgetText{};
 struct Widget;typedef std::vector<Widget*>VectorWidgetPtr;
 struct Widget {
- IntCoord coord;Widget*parent,*client;bool visible,textEnabled,isEditBox,editWordWrap,stretch,stretchText,needMouse,needKey,inheritsPick;int moves,clientReads,skinQueries;std::string caption,skinName,skinResource,typeName;EditText text;VectorWidgetPtr children,skinChildren;
- Widget():coord(0,0,400,300),parent(NULL),client(NULL),visible(true),textEnabled(true),isEditBox(false),editWordWrap(false),stretch(false),stretchText(false),needMouse(true),needKey(true),inheritsPick(true),moves(0),clientReads(0),skinQueries(0),typeName("TextBox"){}
+ IntCoord coord;Widget*parent,*client;ISubWidgetRect*mainSkin;bool visible,textEnabled,isEditBox,editWordWrap,stretch,stretchText,needMouse,needKey,inheritsPick;int moves,clientReads,skinQueries;std::string caption,skinName,skinResource,typeName,textureName;EditText text;VectorWidgetPtr children,skinChildren;
+ Widget():coord(0,0,400,300),parent(NULL),client(NULL),mainSkin(NULL),visible(true),textEnabled(true),isEditBox(false),editWordWrap(false),stretch(false),stretchText(false),needMouse(true),needKey(true),inheritsPick(true),moves(0),clientReads(0),skinQueries(0),typeName("TextBox"){}
+ ISubWidgetRect*getSubWidgetMain(){return mainSkin;}const std::string&_getTextureName()const{return textureName;}
  const std::string&getTypeName(){++typeReads;return typeName;}
  size_t getChildCount(){return children.size();}Widget*getChildAt(size_t n){return children[n];}
  VectorWidgetPtr getSkinWidgetsByName(const std::string&name){++skinQueries;VectorWidgetPtr result;for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->skinName==name)result.push_back(skinChildren[n]);return result;}
@@ -37,6 +54,7 @@ struct Widget {
  int getWidth(){return coord.width;}int getHeight(){return coord.height;}
  int getLeft(){return coord.left;}int getTop(){return coord.top;}int getBottom(){return coord.top+coord.height;}
  int getAbsoluteTop(){return coord.top+(parent?parent->getAbsoluteTop():0);}
+ int getAbsoluteLeft(){return coord.left+(parent?parent->getAbsoluteLeft():0);}
  bool getVisible(){return visible;}Widget*getParent(){return parent;}
  IntCoord getCoord(){return coord;}
  void setCoord(IntCoord c){const int dx=c.width-coord.width,dy=c.height-coord.height;if(stretchText){text.coord.width+=dx;text.coord.height+=dy;}for(size_t n=0;n<children.size();++n)if(children[n]->stretch){IntCoord a=children[n]->coord;a.width+=dx;a.height+=dy;children[n]->setCoord(a);}for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->stretch){IntCoord a=skinChildren[n]->coord;a.width+=dx;a.height+=dy;skinChildren[n]->setCoord(a);}coord=c;++moves;}void setVisible(bool b){visible=b;}

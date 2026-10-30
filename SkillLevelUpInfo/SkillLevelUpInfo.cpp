@@ -23,6 +23,10 @@
 #include <mygui/MyGUI.h>
 #include <WidgetRef.h>
 #include <mygui/MyGUI_EditText.h>
+#include <mygui/MyGUI_ResourceManager.h>
+#include <mygui/MyGUI_ResourceSkin.h>
+#include <mygui/MyGUI_CommonStateInfo.h>
+#include <mygui/MyGUI_SubSkin.h>
 #include "HeadAnchor.h"
 #include "XpInfoCore.h"
 #include "PanelTextStyle.h"
@@ -278,10 +282,25 @@ namespace
         return keys[i];
     }
     #include "PanelPlacement.h"
+    #include "PanelUnderlay.h"
     XpPanelPlacement::Cache g_placement;
+    XpPanelUnderlay::Cache g_underlay;
     XpPanelTextStyle::MeasureCache g_nameMeasure,g_valueMeasure;
     XpPanelTextStyle::MeasureCache g_percentMeasure[5];
     WidgetRef g_labels[5],g_labelSources[5];
+    // Main-thread scalar counters; the detailed ring is populated only with
+    // Debug enabled. A bounded read-only probe can distinguish native rebuilds
+    // from our context retirement without frame-by-frame log output.
+    unsigned int g_panelCalls=0,g_contextResets=0,g_progressCreates=0;
+    unsigned int g_dividerCreates=0,g_dividerContextHides=0,g_dividerParentDestroys=0;
+    struct PanelTrace
+    {
+        volatile LONG sequence;DWORD tick;unsigned int contextMask;LONG generation;
+        UINT_PTR panel,root,owner;int category,combat;
+        UINT_PTR before[2],after[2],dividerBefore,dividerNative,dividerAfter;
+    };
+    typedef char PanelTraceAbi[(sizeof(PanelTrace)==104)?1:-1];
+    PanelTrace g_panelTrace[32];unsigned int g_panelTraceHead=0;
     std::string g_labelSkins[5],g_labelTypes[5];
     unsigned int g_labelCreates=0,g_labelDestroys=0,g_labelTypeReads=0;
     void HideLabels()
@@ -309,7 +328,12 @@ namespace
         created=false;if(!source || skin.empty())return NULL;
         MyGUI::Widget* label=g_labels[slot].get();
         if(!label || label->getParent()!=parent || g_labelSources[slot].get()!=source || g_labelSkins[slot]!=skin){
-            ++g_labelTypeReads;const std::string& type=source->getTypeName();
+            // Slot zero already validated this live source/skin in this draw.
+            // Native RU refresh can replace the source every frame; two labels
+            // must not repeat the same RTTI query for that one binding.
+            const bool shared=slot>0 && g_labelSources[0].get()==source && g_labelSkins[0]==skin && !g_labelTypes[0].empty();
+            if(!shared)++g_labelTypeReads;
+            const std::string& type=shared?g_labelTypes[0]:source->getTypeName();
             if(!label || label->getParent()!=parent || g_labelSkins[slot]!=skin || g_labelTypes[slot]!=type){
                 if(label){MyGUI::Gui::getInstance().destroyWidget(label);++g_labelDestroys;}
                 label=parent->createWidgetT(type,skin,coord,MyGUI::Align::Default);
@@ -339,16 +363,24 @@ namespace
         DataPanelLine* line;MyGUI::IntCoord name,value;int top,bottom;
     };
     bool RowBefore(const NativeRow& a,const NativeRow& b){return a.top<b.top;}
+    unsigned int ContextMask(DatapanelGUI* panel,MyGUI::Widget* root,const hand& owner,int category)
+    {
+        return (panel!=g_panel?1:0)|(root!=g_panelRoot.get()?2:0)|(!(owner==g_panelCharacter)?4:0)|(category!=g_panelCategory?8:0);
+    }
     void DrawPanel(CharStats* stats,DatapanelGUI* panel,int category)
     {
         if((!g_enabled || !g_bars) && !g_panelDirty)return;
         if(!panel || !stats || !stats->me){PanelStatus("missing native panel/stat owner");return;}
         MyGUI::Widget* root=panel->getWidget();if(!root){PanelStatus("missing native root widget");return;}
         const hand owner(stats->me);
-        if(root!=g_panelRoot.get() || !(owner==g_panelCharacter) || panel!=g_panel || category!=g_panelCategory){
+        if(ContextMask(panel,root,owner,category)){
+            ++g_contextResets;
             g_placement.Restore();HideLabels();g_slots=XpInfoCore::Slots();g_panelCharacter=owner;
             for(int i=0;i<5;++i)g_rowSkill[i]=-1;
-            if(g_divider.get())MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
+            // Ineligible/NPC/quiet panels can interleave with the main panel.
+            // Preserve ownership and reuse its divider on return; a genuinely
+            // different parent is retired below when another divider is needed.
+            if(g_divider.get() && g_divider.get()->getVisible()){g_divider.get()->setVisible(false);++g_dividerContextHides;}
         }
         g_panelRoot.set(root);g_panel=panel;g_panelCategory=category;
         if(!g_enabled || !g_bars){PanelStatus("disabled");HidePanel(panel,category);g_panelDirty=false;return;}
@@ -397,9 +429,10 @@ namespace
         // number of currently active skills (the first XP row must not jump).
         int capacity=rowHeight>2?(availableHeight-total-1)/rowHeight:0;
         if(capacity>g_maxRows)capacity=g_maxRows;
-        const int barWidth=(int)(parent->getWidth()*.48f);
+        int barWidth=(int)(parent->getWidth()*.48f);
         int barRight=valueRight+10;if(barRight>parent->getWidth()-2)barRight=parent->getWidth()-2;
-        const int barLeft=barRight-barWidth;
+        int barLeft=barRight-barWidth;
+        if(g_underlay.Resolve(root,parent,valueRight,barLeft,barRight))barWidth=barRight-barLeft;
         if(capacity<0 || width<24 || barWidth<8 || barLeft<left+8 || nameSkin.empty())capacity=0;
         if(!capacity){g_slots.Select(skills,(int)kCount,now,g_recent,0);PanelStatus("no room for complete native XP rows");HidePanel(panel,category);return;}
         int spare=availableHeight-total-capacity*rowHeight-1;
@@ -423,6 +456,7 @@ namespace
                 if(created)line=panel->setLineProgress(key,category,fraction,number,true);else line->setProgress(fraction,number);
             }
             if(!line)continue;
+            if(created)++g_progressCreates;
             const int y=top+slot*rowHeight;
             bool createdName=false;MyGUI::TextBox* label=NativeLabel(slot,parent,nameStyle,nameSkin,
                 MyGUI::IntCoord(left,y,barLeft-left-4,rowHeight),createdName);
@@ -459,9 +493,10 @@ namespace
                     if(progress->progress && progress->progress->getVisible())row->setVisible(false);}}
         }
         if(g_slots.count){
-            if(g_divider.get() && g_divider.get()->getParent()!=parent)MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
+            if(g_divider.get() && g_divider.get()->getParent()!=parent){MyGUI::Gui::getInstance().destroyWidget(g_divider.get());++g_dividerParentDestroys;}
             if(!g_divider.get()){
                 MyGUI::Widget* divider=parent->createWidget<MyGUI::Widget>("WhiteSkin",MyGUI::IntCoord(left,dividerTop,width,1),MyGUI::Align::Default);
+                ++g_dividerCreates;
                 divider->setNeedMouseFocus(false);divider->setColour(MyGUI::Colour(.35f,.3f,.25f));g_divider.set(divider);
             }
             MyGUI::Widget* divider=g_divider.get();const MyGUI::IntCoord coord(left,dividerTop,width,1);
@@ -480,8 +515,23 @@ namespace
         g_panelDirty=false;
     }
     void (*g_origPanel)(CharStats*,DatapanelGUI*,int,bool)=NULL;
+    UINT_PTR TraceProgress(DatapanelGUI* panel,int category,int slot)
+    {
+        if(!panel || !panel->lineExists(SlotKey(slot),category))return 0;
+        DataPanelLine* line=panel->getLine(SlotKey(slot),category);
+        return line && line->getType()==DataPanelLine::DPL_PROGRESS?
+            reinterpret_cast<UINT_PTR>(static_cast<DataPanelLine_Progress*>(line)->progress):0;
+    }
     void Panel(CharStats* stats,DatapanelGUI* panel,int category,bool combat)
     {
+        PanelTrace* trace=NULL;LONG sequence=0;
+        if(g_uiThread && GetCurrentThreadId()==g_uiThread && PluginDiagnostics::Enabled()){
+            trace=&g_panelTrace[g_panelTraceHead++%32];sequence=(LONG)g_panelTraceHead;
+            InterlockedExchange(&trace->sequence,0);trace->tick=GetTickCount();trace->generation=InterlockedCompareExchange(&g_loadGeneration,0,0);
+            trace->panel=reinterpret_cast<UINT_PTR>(panel);trace->owner=reinterpret_cast<UINT_PTR>(stats?stats->me:NULL);
+            trace->category=category;trace->combat=combat?1:0;trace->dividerBefore=reinterpret_cast<UINT_PTR>(g_divider.get());
+            for(int i=0;i<2;++i)trace->before[i]=TraceProgress(panel,category,i);
+        }
         // Retire the old arrangement before native code lays out another
         // owner/category. This avoids restoring old coordinates over a fresh
         // native context that happens to reuse the same widgets/positions.
@@ -491,7 +541,15 @@ namespace
         }
         g_origPanel(stats,panel,category,combat);
         if(!g_uiThread || GetCurrentThreadId()!=g_uiThread){PanelStatus("waiting for GUI thread");return;}
+        ++g_panelCalls;
+        if(trace){
+            MyGUI::Widget* root=panel?panel->getWidget():NULL;trace->root=reinterpret_cast<UINT_PTR>(root);
+            trace->contextMask=stats && stats->me?ContextMask(panel,root,hand(stats->me),category):16;
+            trace->dividerNative=reinterpret_cast<UINT_PTR>(g_divider.get());
+            for(int i=0;i<2;++i)trace->after[i]=TraceProgress(panel,category,i);
+        }
         DrawPanel(stats,panel,category);
+        if(trace){trace->dividerAfter=reinterpret_cast<UINT_PTR>(g_divider.get());InterlockedExchange(&trace->sequence,sequence);}
     }
     void (*g_origUpdate)(ForgottenGUI*) = NULL;
     void Update(ForgottenGUI* self)
