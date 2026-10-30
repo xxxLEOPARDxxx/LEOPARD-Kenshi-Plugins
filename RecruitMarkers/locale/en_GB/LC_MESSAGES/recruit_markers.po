@@ -13,8 +13,8 @@ msgstr "A marker over the heads of characters you can recruit."
 msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
 msgstr "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
 
-msgid "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
-msgstr "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
+msgid "A star above the actual leader of a loaded squad with at least two living members. Solo traders and recruits are not squad leaders. Uses the shared show key."
+msgstr "A star above the actual leader of a loaded squad with at least two living members. Solo traders and recruits are not squad leaders. Uses the shared show key."
 
 msgid "Also mark leaders of player squads when the game has assigned one."
 msgstr "Also mark leaders of player squads when the game has assigned one."

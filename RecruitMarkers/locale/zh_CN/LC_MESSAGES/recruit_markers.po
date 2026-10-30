@@ -13,8 +13,8 @@ msgstr "可招募角色头顶显示标记。"
 msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
 msgstr "在与你交易的人头顶显示一摞硬币。也能招募的商人会同时显示两个标记。"
 
-msgid "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
-msgstr "在已加载小队的实际队长头顶显示星星，与招募和商人标记共用显示按键。"
+msgid "A star above the actual leader of a loaded squad with at least two living members. Solo traders and recruits are not squad leaders. Uses the shared show key."
+msgstr "在至少有两名存活成员的已加载小队实际队长头顶显示星星。单独的商人和可招募角色不标为队长。共用显示按键。"
 
 msgid "Also mark leaders of player squads when the game has assigned one."
 msgstr "游戏已为玩家小队指定队长时，也显示队长标记。"

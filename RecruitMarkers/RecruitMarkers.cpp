@@ -416,6 +416,30 @@ namespace
 
     bool TemplateUnique(Character* c) { return TemplateFlag(c, g_uniqueKey); }
 
+    // Kenshi also makes a one-person platoon its own leader. Require both the
+    // leader and another living member in this exact active roster. This runs
+    // only for actual leader candidates, on the existing 750ms scan, and exits
+    // as soon as the two identities are found; no world/faction lookup or cache.
+    // The caller's SEH boundary also covers transient native roster teardown.
+    bool HasLiveSquadFollower(Character* leader, ActivePlatoon* platoon)
+    {
+        const int count = platoon->things.size();
+        if (count < 2 || count > 1024) return false;
+        bool foundLeader = false, foundFollower = false;
+        for (int i = 0; i < count; ++i)
+        {
+            RootObject* const member = platoon->things[i];
+            if (member == leader) foundLeader = true;
+            else if (!foundFollower && member != NULL && member->getDataType() == CHARACTER)
+            {
+                Character* const follower = static_cast<Character*>(member);
+                foundFollower = follower->getPlatoon() == platoon && !follower->isDead();
+            }
+            if (foundLeader && foundFollower) return true;
+        }
+        return false;
+    }
+
     // recruitKind - проверять ли найм (по настройкам «кого»); trader - торговец.
     bool SafeFilter(Character* c, const Ogre::Vector3& camera, bool& unique, bool& recruitKind, bool& trader, bool& leader,
                     float& distance)
@@ -431,7 +455,8 @@ namespace
             recruitKind = !player && (c->isAnimal() == NULL || g_showAnimals) && (unique ? g_showUnique : g_showGeneric);
             trader = !player && g_showTraders && TemplateFlag(c, g_traderKey);
             ActivePlatoon* const platoon = g_showLeaders ? c->getPlatoon() : NULL;
-            leader = g_showLeaders && (!player || g_playerLeaders) && platoon != NULL && platoon->squadleader == c;
+            leader = g_showLeaders && (!player || g_playerLeaders) && platoon != NULL &&
+                     platoon->squadleader == c && HasLiveSquadFollower(c, platoon);
             if (!recruitKind && !trader && !leader)
                 return false;
             return true;
@@ -1028,7 +1053,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "ShowGeneric", Tr("Ordinary recruits"), Tr("Bar recruits, drifters and other ordinary characters who can join you."), 1, 0);
     api->toggle(api, kSec, "ShowAnimals", Tr("Animals"), Tr("Animals that can join you."), 1, 0);
     api->toggle(api, kSec, "ShowTraders", Tr("Traders"), Tr("A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."), 1, 0);
-    api->toggle(api, kSec, "ShowLeaders", Tr("Squad leaders"), Tr("A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."), 1, 0);
+    api->toggle(api, kSec, "ShowLeaders", Tr("Squad leaders"), Tr("A star above the actual leader of a loaded squad with at least two living members. Solo traders and recruits are not squad leaders. Uses the shared show key."), 1, 0);
     api->toggle(api, kSec, "ShowPlayerLeaders", Tr("Include player leaders"), Tr("Also mark leaders of player squads when the game has assigned one."), 1, 0);
     api->integer(api, kSec, "LeaderSize", Tr("Leader star size"), Tr("Star size in pixels, independent of recruit and trader markers."), 20, 8, 64, 0);
     api->colour(api, kSec, "LeaderColour", Tr("Leader colour"), Tr("Colour of the leader star, #RRGGBB."), "#ffda40", 0);

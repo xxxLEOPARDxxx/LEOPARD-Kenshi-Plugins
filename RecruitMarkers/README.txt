@@ -158,9 +158,19 @@ ForgottenGUI::update (в главном меню и на загрузке зна
 игрой. Значки найма, торговца и лидера располагаются рядом.
 Используются общие клавиша, прозрачность и дальность показа.
 Размер звезды отдельный — LeaderSize.
+Звезда требует хотя бы двух живых участников в одном загруженном отряде,
+включая самого лидера. Одиночные торговцы, рекруты и прочие одиночки больше
+не получают звезду только потому, что игра считает их лидерами самих себя.
+Мёртвые, пустые и уже сменившие отряд записи не считаются последователями.
+Торговец с настоящим живым отрядом по-прежнему может быть его лидером.
 MCM: "Squad leaders", "Include player leaders", "Leader star size"
 и "Leader colour".
 Лидеры игрока отмечаются, если игра назначила их отрядам лидера.
+The star requires the actual leader and at least one other living member in
+the same loaded squad. Solo merchants/recruits are excluded; dead, empty or
+stale roster entries do not count. A merchant leading a real living group can
+still be marked. Roster checks run only for leaders on the existing scan;
+they stop after finding the two members and do not add a world scan or cache.
 
 Исправления по проверке 29.10.2026:
 Звезда лидера: отдельная настройка LeaderSize, 8..64 пикселя, по умолчанию 20. Размер других значков не меняется; звезда квадратная, выровнена по нижнему краю. Применяется сразу.

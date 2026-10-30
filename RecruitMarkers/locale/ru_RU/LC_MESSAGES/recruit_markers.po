@@ -13,8 +13,8 @@ msgstr "Значок над головой у тех, кого можно нан
 msgid "A stack of coins over those who trade with you. Someone you can also recruit gets both markers side by side."
 msgstr "Стопка монет над теми, кто с вами торгует. Если торговца можно и нанять - оба значка рядом."
 
-msgid "A star above the actual leader of a loaded squad, using the same show key as recruit and trader markers."
-msgstr "Звезда над фактическим лидером загруженного отряда. Общая клавиша со значками найма и торговцев."
+msgid "A star above the actual leader of a loaded squad with at least two living members. Solo traders and recruits are not squad leaders. Uses the shared show key."
+msgstr "Звезда над фактическим лидером отряда хотя бы из двух живых участников. Одиночные торговцы и рекруты не отмечаются как лидеры. Общая клавиша показа."
 
 msgid "Also mark leaders of player squads when the game has assigned one."
 msgstr "Также отмечать лидеров отрядов игрока, если игра их назначила."
