@@ -13,6 +13,11 @@ int main(){
  check(g_divider.get()&&g_divider.get()->getVisible()&&g_divider.get()->getTop()>=48&&g_divider.get()->getBottom()<=row->progress->getTop(),"divider stays in free space between vanilla stats and XP rows");
  int moves=row->progress->moves,updates=row->updates;Panel(&c.stats,&panel,0,false);
  check(row->progress->moves==moves&&row->updates==updates,"stable panel does not repeat geometry or progress writes");
+ sdkBrokenEquality=true;unsigned abiResets=g_contextResets;
+ check(ContextMask(&panel,g_panelRoot.get(),hand(&c),0)==0,"Native SDK broken virtual equality cannot invalidate stable owner context");
+ for(int abi=0;abi<100;++abi)Panel(&c.stats,&panel,0,false);
+ check(g_contextResets==abiResets,"100 stable frames avoid owner context resets with actual SDK equality trap");
+ sdkBrokenEquality=false;
  g_bars=false;g_panelDirty=true;Panel(&c.stats,&panel,0,false);
  check(!row->progress->visible&&!g_divider.get()->visible,"bar toggle immediately hides rows and divider");
  g_bars=true;g_panelDirty=true;Panel(&c.stats,&panel,0,false);check(row->progress->visible,"bar toggle restores recent rows");

@@ -365,7 +365,8 @@ namespace
     bool RowBefore(const NativeRow& a,const NativeRow& b){return a.top<b.top;}
     unsigned int ContextMask(DatapanelGUI* panel,MyGUI::Widget* root,const hand& owner,int category)
     {
-        return (panel!=g_panel?1:0)|(root!=g_panelRoot.get()?2:0)|(!(owner==g_panelCharacter)?4:0)|(category!=g_panelCategory?8:0);
+        // Explicit Native comparison avoids the SDK/VC10 overloaded == vtable mismatch.
+        return (panel!=g_panel?1:0)|(root!=g_panelRoot.get()?2:0)|(!owner._NV_operator_equal(g_panelCharacter)?4:0)|(category!=g_panelCategory?8:0);
     }
     void DrawPanel(CharStats* stats,DatapanelGUI* panel,int category)
     {
@@ -536,7 +537,7 @@ namespace
         // owner/category. This avoids restoring old coordinates over a fresh
         // native context that happens to reuse the same widgets/positions.
         if(g_uiThread && GetCurrentThreadId()==g_uiThread && g_panel &&
-           (panel!=g_panel || category!=g_panelCategory || (stats && stats->me && !(hand(stats->me)==g_panelCharacter)))){
+           (panel!=g_panel || category!=g_panelCategory || (stats && stats->me && !hand(stats->me)._NV_operator_equal(g_panelCharacter)))){
             g_placement.Restore();HideLabels();
         }
         g_origPanel(stats,panel,category,combat);

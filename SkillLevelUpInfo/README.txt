@@ -270,10 +270,27 @@ SubSkin проверяется легальным protected member-pointer по�
 Изменённую картинку при тех же resource/UV метаданных различить невозможно;
 профиль не гарантирует поддержку любой перерисованной текстуры. Цвета,
 внутренние отступы рамки/полосы, шрифты и вертикальная вместимость сохранены.
-Более узкая штатная рамка ещё требует визуальной проверки.
+Полная штатная подложка и шрифты подтверждены пользователем на ванильном и Dark UI.
 
 Technical evidence / Техническая проверка: UI_PROFILE_REPAIR.md,
 tests/ui_profiles.json (address-free native captures), tests/test_skin_profiles.py.
 UI_UNDERLAY_INVESTIGATION.md, tests/underlay_profile.json,
 tests/test_underlay_layout.py and tests/test_underlay_resource.py.
-Native acceptance of the new repair remains pending the next user launch.
+Vanilla and Dark UI visual acceptance was confirmed by the user on 2026-10-30.
+The subsequent Native owner-comparison repair has separate runtime verification pending.
+
+
+Native owner identity repair / Сравнение владельца панели
+SDK/VC10 overloaded virtual hand equality selected the wrong Native vtable slot.
+Both owner guards now call the verified nonvirtual Native method. A regression
+traps the wrong virtual comparison: the old code fails2 stable-context checks;
+the corrected code retains the owner over100 unchanged frames. This avoids
+spurious panel-context resets without changing bar appearance. It does not claim
+to eliminate Native progress-row churn or prove runtime FPS/memory performance.
+
+Перегрузка виртуального сравнения hand в SDK/VC10 выбирала неверный слот.
+Обе проверки владельца используют проверенный невиртуальный метод игры.
+Регрессия воспроизводит ошибочное сравнение и проверяет100 кадров без смены
+персонажа: контекст больше не сбрасывается из-за этой ошибки. Внешний вид полос
+не меняется. Нативные пересоздания строк и итоговые FPS/память требуют отдельного
+игрового замера.

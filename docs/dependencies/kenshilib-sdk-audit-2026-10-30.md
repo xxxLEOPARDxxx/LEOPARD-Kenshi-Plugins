@@ -103,3 +103,29 @@ FileVersion; версия KenshiLib установлена сравнением 
 `official-releases.json`, `SDK-AUDIT.json`, `SDK-BINARY-MANIFEST.json`, исходные
 архивы и распакованные официальные релизы/исходники. Общие зависимости и
 файлы установленной игры при проверке не менялись.
+
+
+## 2026-10-31: verified overloaded `hand` comparison ABI
+
+The installed v0.5.0 export and Native Steam 1.0.65 establish a real exception to
+symbol/field-layout compatibility. VC10 compilation of `a == otherHand` emits
+vtable slot 0; `a == bool` emits slot 8. Native hand's actual vtable is reversed:
+slot0 -> CD0C0 (bool), slot8 -> CD020 (hand), slot16 -> CD070 (!=hand).
+Native copy constructor slot3808/D1AE0 writes vtable16842D0. Native canStackWith
+calls owner equality through slot8 at75C9AA/75C9BD. Thus SDK source-level virtual
+comparison can reject every live token or reset an unchanged panel owner.
+
+Use `a._NV_operator_equal(otherHand)` at the affected module boundaries. Its
+installed export stub1B4B0 jumps via DE738, table slot3815 -> CD020. It is
+nonvirtual and preserves all five identity fields plus the Native NULL_ITEM
+special case (two type11 handles compare equal). Copy constructors, nonvirtual
+getItem/getCharacter, and map ordering are unaffected by this particular defect.
+No global SDK header, Native vtable or process code is patched.
+
+Affected sites found in the six recently touched modules: StackSort token Find;
+SkillLevelUpInfo context mask and pre-panel owner guard. All three use the
+explicit Native method now. Regression fixtures deliberately break the virtual
+comparison while retaining faithful nonvirtual equality: StackSort previously
+failed3 checks; the XP panel failed stable-context and100-frame reset checks.
+The fixes pass both fixtures. This does not certify all other overloaded SDK
+virtual methods or establish GOG runtime behavior.

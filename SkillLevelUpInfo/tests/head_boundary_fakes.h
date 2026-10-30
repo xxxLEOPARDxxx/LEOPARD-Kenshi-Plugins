@@ -19,11 +19,13 @@ namespace MyGUI {struct Colour {float r,g,b;Colour(float a,float c,float d):r(a)
 class Character;
 struct GameSaveState {};
 struct SaveFileSystem {};
+bool sdkBrokenEquality=false;
 struct hand {
  Character* ptr;unsigned serial;
  hand():ptr(NULL),serial(0){}hand(Character* p);
  bool operator<(const hand& h)const{return ptr<h.ptr||(ptr==h.ptr&&serial<h.serial);}
- bool operator==(const hand& h)const{return ptr==h.ptr&&serial==h.serial;}
+ bool operator==(const hand& h)const{return !sdkBrokenEquality && ptr==h.ptr&&serial==h.serial;}
+ bool _NV_operator_equal(const hand& h)const{return ptr==h.ptr&&serial==h.serial;}
  Character* getCharacter()const;
 };
 template<class T>struct lektor:std::vector<T>{};
