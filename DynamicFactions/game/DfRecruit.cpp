@@ -438,6 +438,11 @@ bool DfInstallHireBlock()
                                                     CheckConditions_hook, &g_origCheckConditions);
 }
 
+bool DfIsOwnFaction(Faction* faction)
+{
+    return faction != NULL && std::find(g_own.begin(),g_own.end(),faction) != g_own.end();
+}
+
 void DfSetOwnFactions(const std::vector<Faction*>& factions)
 {
     if (factions == g_own)

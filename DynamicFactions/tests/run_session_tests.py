@@ -8,6 +8,7 @@ hire = (root/'game/DfHire.cpp').read_text(encoding='utf-8-sig')
 recruit = (root/'game/DfRecruit.cpp').read_text(encoding='utf-8-sig')
 main = (root/'DynamicFactions.cpp').read_text(encoding='utf-8-sig')
 labour = (root/'game/DfLabour.cpp').read_text(encoding='utf-8-sig')
+workinfo = (root/'ui/DfWorkInfo.cpp').read_text(encoding='utf-8-sig')
 
 def function(text, signature):
     start = text.index(signature)
@@ -33,6 +34,8 @@ code = r'''
 #include <algorithm>
 #include <vector>
 namespace Ogre { struct Vector3 {float x,y,z;Vector3(float a=0,float b=0,float c=0):x(a),y(b),z(c){} Vector3 operator+(const Vector3& b)const{return Vector3(x+b.x,y+b.y,z+b.z);} float squaredDistance(const Vector3& b)const {return (x-b.x)*(x-b.x)+(y-b.y)*(y-b.y)+(z-b.z)*(z-b.z);} }; }
+typedef int StatsEnumerated;const int STAT_NONE=0;const int STAT_LABOURING=3;
+struct DatapanelGUI {};
 struct Faction;
 struct Ownerships { int money, mode, calls; Ownerships():money(100),mode(0),calls(0){}
  void setMoney(int value) { ++calls; if(mode==1 || (mode==5 && calls==2)) RaiseException(EXCEPTION_ACCESS_VIOLATION,0,0,0); money=value; if(mode==2) RaiseException(EXCEPTION_ACCESS_VIOLATION,0,0,0); if(mode==3) money-=3; }
@@ -44,7 +47,8 @@ int resolutions=0, cleared=0;
 struct hand;
 struct Character { Faction* faction; ActivePlatoon* platoon; int mode; bool player;
  Ogre::Vector3 position;Ogre::Vector3 getPosition(){return position;}
- Character():faction(0),platoon(0),mode(0),player(false){}
+ StatsEnumerated currentSkillUsing;
+ Character():currentSkillUsing(0),faction(0),platoon(0),mode(0),player(false){}
  bool isDead(){return false;} bool isUnconcious(){return false;} bool isDown(){return false;}
  bool isPlayerCharacter(){return player;} Faction* getFaction(){return faction;}
  ActivePlatoon* getPlatoon(){return platoon;}
@@ -81,6 +85,18 @@ void UpdateOwnFactions(){}
 void DebugLog(const std::string&){}
 '''
 code += function(main,'void MarkReady(')+'\n'
+code += r'''
+bool infoEligible=true;int infoShown=-1,infoMode=0;
+bool SafeSkill(Character* c,StatsEnumerated& shown){shown=STAT_LABOURING;return infoEligible&&c->currentSkillUsing==STAT_NONE;}
+void FakeGuiData(Character* c,DatapanelGUI*,int){infoShown=c->currentSkillUsing;c->currentSkillUsing=infoMode==2?4:0;if(infoMode==1)RaiseException(EXCEPTION_ACCESS_VIOLATION,0,0,0);}
+void (*g_original)(Character*,DatapanelGUI*,int)=FakeGuiData;
+'''
+code += function(workinfo,'void GuiData_hook(')+'\n'
+code += r'''
+bool GuiInfoFault(Character* c){bool fault=false;__try{GuiData_hook(c,0,0);}__except(EXCEPTION_EXECUTE_HANDLER){fault=true;}return fault;}
+'''
+
+
 for signature in ['bool Able(', 'bool SetMoneySafely(', 'bool SetFactionSafely(', 'bool Join(', 'void DfHireCancel(']:
     code += function(hire, signature)+'\n'
 start = recruit.index('    struct RecruitKey')
@@ -97,6 +113,14 @@ void hireCase(int moneyMode,int factionMode,bool expected,int balance,bool membe
  check(result==expected && o.money==balance && (recruit.faction==&f)==member && g_joinUncertain==blocked,name);
 }
 int main(){
+ {Character c;infoEligible=true;infoMode=0;GuiData_hook(&c,0,0);
+ check(infoShown==STAT_LABOURING&&c.currentSkillUsing==STAT_NONE,"offscreen work row is supplied only during native GUI rendering");
+ c.currentSkillUsing=4;GuiData_hook(&c,0,0);check(infoShown==4&&c.currentSkillUsing==0,"native nonempty work stat retains native consumption");
+ infoEligible=false;GuiData_hook(&c,0,0);check(infoShown==0&&c.currentSkillUsing==0,"nonworker or unmanaged character is not given a work row");
+ infoEligible=true;infoMode=1;const bool fault=GuiInfoFault(&c);
+ check(fault&&c.currentSkillUsing==0,"temporary UI stat is restored after native GUI fault");
+ infoMode=2;GuiData_hook(&c,0,0);check(c.currentSkillUsing==4,"a different native state written during rendering is preserved");}
+
  g_ready=false;readyRestores=0;MarkReady("loaded");
  check(g_ready&&readyRestores==1,"treasury restored before first ready boundary");
  MarkReady("duplicate hook completion");check(readyRestores==1,"repeated ready callback cannot restore cash again");

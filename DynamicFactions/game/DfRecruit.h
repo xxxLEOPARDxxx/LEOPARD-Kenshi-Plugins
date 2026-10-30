@@ -8,6 +8,7 @@
 class Character;
 class Faction;
 class TownBase;
+bool DfIsOwnFaction(Faction* faction);
 
 // Самый дешёвый обычный рекрут города town (при равной цене - ближайший к
 // центру города): его шаблон - из списков «choosefrom list» отрядов бара этого

@@ -623,6 +623,15 @@ static void test_work_miners_limit()
     CHECK(CountRole(ms, DF_ROLE_IDLE, -1) == 1);
 }
 
+static void test_work_haul_first_real_item()
+{
+    std::vector<DfMember> ms(2,Member(0,DF_ROLE_MINE,0,0));
+    std::vector<DfNodeState> nodes(1,Node(150,100.0f,1,5));
+    DfAssignRoles(ms,nodes,true,true);
+    CHECK(CountRole(ms,DF_ROLE_HAUL,0)==1);
+    CHECK(CountRole(ms,DF_ROLE_MINE,0)==1);
+}
+
 static void test_work_haul_when_stored()
 {
     std::vector<DfMember> ms;
@@ -855,6 +864,7 @@ int main()
     test_work_home_unloaded_all_idle();
     test_work_hiring_kept();
     test_work_miners_limit();
+    test_work_haul_first_real_item();
     test_work_haul_when_stored();
     test_work_no_trader_money_no_haul();
     test_work_hauler_keeps_load();

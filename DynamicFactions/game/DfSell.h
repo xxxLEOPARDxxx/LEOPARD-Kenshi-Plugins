@@ -27,7 +27,9 @@ void DfFindTraders(TownBase* town, std::vector<DfTrader>& out);
 // worker can approach from an ore node; checks actual price/purse/capacity.
 bool DfTraderCanBuy(Character* hauler, Character* trader, Faction* f, GameData* item);
 
-const float kDfTradeRange = 6.0f;
+// Conservative subset of native interaction ranges: InventoryGUI uses 60 for
+// restricted interactions, DialogueController allows 260 for ordinary talking.
+const float kDfTradeRange = 60.0f;
 
 // Only real items, maxUnits <= 64, delivered to the merchant. Price follows the
 // verified native NPC receiving formula with the explicit trader/town, independent

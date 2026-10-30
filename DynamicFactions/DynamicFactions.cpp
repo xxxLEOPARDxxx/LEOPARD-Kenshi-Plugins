@@ -51,6 +51,7 @@
 #include "game/DfSell.h"
 #include "game/DfRecruit.h"
 #include "ui/DfWindow.h"
+#include "ui/DfWorkInfo.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -158,6 +159,11 @@ namespace
     void UpdateOwnFactions();
     void BeginSession(const char* why);
     void RestoreTreasuries();
+
+    bool WorkInfoManaged(Character* c)
+    {
+        return g_ready && c!=NULL && DfIsOwnFaction(c->getFaction());
+    }
 
 
     void SetStates(std::vector<DfFactionState>& states, const char* why)
@@ -838,6 +844,9 @@ __declspec(dllexport) void startPlugin()
 
     if (!DfInstallHireBlock())
         ErrorLog("DynamicFactions: could not hook dialogue conditions - the player can re-hire faction members");
+
+    if (!DfInstallWorkInfo(WorkInfoManaged))
+        ErrorLog("DynamicFactions: could not stabilize the native work-skill information");
 
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
                                                  GuiUpdate_hook, &g_origGuiUpdate))

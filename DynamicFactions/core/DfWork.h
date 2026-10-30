@@ -36,7 +36,7 @@ struct DfNodeState
     int maxMiners;
 };
 
-const int kDfHaulAt = 30;       // в жиле столько - зовём носильщика
+const int kDfHaulAt = 1;        // First real output starts delivery; take all available units on arrival.
 
 // Выгода жилы: value / (1 + distance / 100). Индексы по убыванию выгоды;
 // value <= 0, отрицательные/NaN/бесконечные расстояния - не попадают.

@@ -18,7 +18,10 @@ Dynamic Factions - development build / рабочая сборка 30.10.2026
 
 Полный носильщик освобождает очередь забора, недостижимые назначения получают
 паузу перед повтором. Найм посланника имеет приоритет. Пауза игры останавливает
-экономику. Доступные публичные жилы в радиусе поиска от Хаба используются
+экономику. Первая готовая единица вызывает носильщика: старого ожидания 30
+единиц нет; при подходе он забирает доступный товар в пределах вместимости.
+Строка рабочего навыка в карточке нашего действующего шахтёра остаётся видимой
+и вне камеры; значение подставляется только на время отрисовки карточки. Доступные публичные жилы в радиусе поиска от Хаба используются
 сразу, без обязательного маршрута разведчика по городу. Фракция пока работает
 только в загруженных участках; полноценная дальняя экономика ещё не реализована.
 
@@ -86,7 +89,9 @@ Work toggles immediately; disabling also stops saved native mining/movement
 jobs of the faction's available workers. Enabled requires restart. Search
 radius500-5000m; public local deposits are available immediately, without a
 mandatory scouting circuit. Combat and recruiting
-take priority; full carriers/unreachable targets use bounded retry. No virtual
+take priority; full carriers/unreachable targets use bounded retry. The first real output starts delivery; the former 30-unit wait is removed.
+The native work-skill row stays stable for managed, actually operating members
+offscreen; its transient value is supplied only during GUI rendering. No virtual
 production is active; a persistent distant economy is a later stage.
 
 UI: ru_RU/en_GB/zh_CN. Detailed logging is off by default and last in MCM;
