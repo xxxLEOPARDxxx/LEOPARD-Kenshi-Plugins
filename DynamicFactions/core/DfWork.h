@@ -23,6 +23,8 @@ struct DfMember
     int carried;                // руды при себе (носильщик)
     int node;                   // индекс жилы или -1
     DfRole role;
+    bool canHaul;
+    DfMember() : id(0), able(false), hiring(false), carried(0), node(-1), role(DF_ROLE_IDLE), canHaul(true) {}
 };
 
 struct DfNodeState

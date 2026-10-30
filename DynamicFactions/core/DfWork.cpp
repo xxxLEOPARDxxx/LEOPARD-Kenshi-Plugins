@@ -26,6 +26,11 @@ namespace
         // Also rejects NaN, infinities and the distance -100 singularity.
         return value > 0 && distance >= 0.0f && distance <= std::numeric_limits<float>::max();
     }
+
+    int HaulAt(const DfNodeState& node)
+    {
+        return node.cap > 0 && node.cap < kDfHaulAt ? node.cap : kDfHaulAt;
+    }
 }
 
 void DfRankNodes(const std::vector<DfNodeOffer>& nodes, std::vector<int>& order)
@@ -83,8 +88,8 @@ void DfAssignRoles(std::vector<DfMember>& members, const std::vector<DfNodeState
             continue;
         }
         const bool usable = valid && ValidOffer(nodes[m.node].value, nodes[m.node].distance);
-        if (m.role == DF_ROLE_HAUL && usable && !hauled[m.node] &&
-            traderHasMoney && nodes[m.node].stored >= kDfHaulAt)
+        if (m.role == DF_ROLE_HAUL && m.canHaul && usable && !hauled[m.node] &&
+            traderHasMoney && nodes[m.node].stored >= HaulAt(nodes[m.node]))
         {
             hauled[m.node] = true;
             continue;
@@ -114,14 +119,14 @@ void DfAssignRoles(std::vector<DfMember>& members, const std::vector<DfNodeState
         for (size_t o = 0; o < order.size(); ++o)
         {
             const int k = order[o];
-            if (hauled[k] || nodes[k].stored < kDfHaulAt)
+            if (hauled[k] || nodes[k].stored < HaulAt(nodes[k]))
                 continue;
             int pick = -1;
             for (size_t i = 0; i < members.size() && pick < 0; ++i)
-                if (!open[i] && members[i].role == DF_ROLE_MINE && members[i].node == k)
+                if (!open[i] && members[i].canHaul && members[i].role == DF_ROLE_MINE && members[i].node == k)
                     pick = static_cast<int>(i);
             for (size_t i = 0; i < members.size() && pick < 0; ++i)
-                if (open[i])
+                if (open[i] && members[i].canHaul)
                     pick = static_cast<int>(i);
             if (pick < 0)
                 continue;

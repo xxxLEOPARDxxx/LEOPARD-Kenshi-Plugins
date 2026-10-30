@@ -28,6 +28,7 @@ struct DfFactionState
     std::string race;
     bool founded;
     bool extinct;
+    bool workFault;             // durable quarantine; never retry an unknown transfer after loading
     double foundedHour;
     double lastTickHour;
     int techLevel;
@@ -39,10 +40,18 @@ struct DfFactionState
 };
 
 const size_t kDfMaxEvents = 20;
+// Defensive file limits, above the currently supported faction/node counts.
+const size_t kDfMaxStateBytes = 16 * 1024 * 1024;
+const size_t kDfMaxStateLineBytes = 64 * 1024;
+const size_t kDfMaxStateFactions = 1024;
+const size_t kDfMaxStateNodesPerFaction = 16384;
+// Legacy bookkeeping's complete technology range (not the game's research).
+const int kDfMaxStateTechLevel = 10;
 
 void DfAddEvent(DfFactionState& s, double hour, const std::string& text);
 
 // Строки key=value, секции [faction N]. Переводы строк и '\' в значениях экранируются.
 std::string DfSerialize(const std::vector<DfFactionState>& all);
-// false - файл испорчен, out пуст. Пустой текст - true и пустой out.
+// false - файл испорчен/превышает лимиты, out пуст. Пустой текст - true.
+// Unknown fields are ignored. No native inventory or money is restored here.
 bool DfDeserialize(const std::string& text, std::vector<DfFactionState>& out);

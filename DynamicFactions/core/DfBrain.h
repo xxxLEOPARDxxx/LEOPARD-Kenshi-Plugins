@@ -46,6 +46,7 @@ const int kDfMaxResearchPerTick = 5;
 const int kDfMaxTickHours = 24;
 
 DfRules DfPhase1Rules();
+DfRules DfPhase2Rules();
 
 // Тик - раз в целый игровой час с прошлого тика (пропущенное - не больше суток).
 // Вымирание (численность 0) - только при загруженном доме.

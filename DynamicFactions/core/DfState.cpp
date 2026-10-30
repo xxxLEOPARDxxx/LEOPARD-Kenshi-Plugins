@@ -2,9 +2,12 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
+#include <limits>
+#include <set>
 
 DfFactionState::DfFactionState()
-    : founded(false), extinct(false), foundedHour(0.0), lastTickHour(0.0), techLevel(0), techPoints(0)
+    : founded(false), extinct(false), workFault(false), foundedHour(0.0), lastTickHour(0.0), techLevel(0), techPoints(0)
 {
 }
 
@@ -82,8 +85,10 @@ namespace
         if (v.empty())
             return false;
         char* end = NULL;
+        errno = 0;
         out = std::strtod(v.c_str(), &end);
-        return end == v.c_str() + v.size();
+        const double max = (std::numeric_limits<double>::max)();
+        return end == v.c_str() + v.size() && errno != ERANGE && out == out && out >= -max && out <= max;
     }
 
     bool ParseInt(const std::string& v, int& out)
@@ -91,9 +96,13 @@ namespace
         if (v.empty())
             return false;
         char* end = NULL;
+        errno = 0;
         const long n = std::strtol(v.c_str(), &end, 10);
+        if (end != v.c_str() + v.size() || errno == ERANGE ||
+            n < (std::numeric_limits<int>::min)() || n > (std::numeric_limits<int>::max)())
+            return false;
         out = static_cast<int>(n);
-        return end == v.c_str() + v.size();
+        return true;
     }
 
     bool ParseBool(const std::string& v, bool& out)
@@ -116,6 +125,11 @@ namespace
     // (файл от более новой версии), испорченные значения - ошибка.
     bool ApplyField(DfFactionState& s, const std::string& key, const std::string& raw)
     {
+        // Future keys may use a future value syntax; do not interpret them.
+        if (key != "id" && key != "name" && key != "race" && key != "founded" && key != "extinct" &&
+            key != "workFault" && key != "foundedHour" && key != "lastTickHour" && key != "techLevel" &&
+            key != "techPoints" && key != "node" && key != "event")
+            return true;
         std::string value;
         if (!Unescape(raw, value))
             return false;
@@ -129,16 +143,20 @@ namespace
             return ParseBool(value, s.founded);
         else if (key == "extinct")
             return ParseBool(value, s.extinct);
+        else if (key == "workFault")
+            return ParseBool(value, s.workFault);
         else if (key == "foundedHour")
-            return ParseDouble(value, s.foundedHour);
+            return ParseDouble(value, s.foundedHour) && s.foundedHour >= 0.0;
         else if (key == "lastTickHour")
-            return ParseDouble(value, s.lastTickHour);
+            return ParseDouble(value, s.lastTickHour) && s.lastTickHour >= 0.0;
         else if (key == "techLevel")
-            return ParseInt(value, s.techLevel);
+            return ParseInt(value, s.techLevel) && s.techLevel >= 0 && s.techLevel <= kDfMaxStateTechLevel;
         else if (key == "techPoints")
-            return ParseInt(value, s.techPoints);
+            return ParseInt(value, s.techPoints) && s.techPoints >= 0;
         else if (key == "node")
         {
+            if (s.nodes.size() >= kDfMaxStateNodesPerFaction)
+                return false;
             // x|y|z|stringID|stored
             std::vector<std::string> parts;
             size_t from = 0;
@@ -153,7 +171,10 @@ namespace
             double x = 0.0, y = 0.0, z = 0.0;
             DfKnownNode n;
             if (parts.size() != 5 || !ParseDouble(parts[0], x) || !ParseDouble(parts[1], y) ||
-                !ParseDouble(parts[2], z) || parts[3].empty() || !ParseInt(parts[4], n.stored))
+                !ParseDouble(parts[2], z) || parts[3].empty() || !ParseInt(parts[4], n.stored) || n.stored < 0)
+                return false;
+            const double max = (std::numeric_limits<float>::max)();
+            if (x < -max || x > max || y < -max || y > max || z < -max || z > max)
                 return false;
             n.x = static_cast<float>(x);
             n.y = static_cast<float>(y);
@@ -165,7 +186,7 @@ namespace
         {
             const size_t bar = value.find('|');
             double hour = 0.0;
-            if (bar == std::string::npos || !ParseDouble(value.substr(0, bar), hour))
+            if (bar == std::string::npos || !ParseDouble(value.substr(0, bar), hour) || hour < 0.0)
                 return false;
             DfAddEvent(s, hour, value.substr(bar + 1));
         }
@@ -185,6 +206,7 @@ std::string DfSerialize(const std::vector<DfFactionState>& all)
         Line(out, "race", Escape(s.race));
         Line(out, "founded", s.founded ? "1" : "0");
         Line(out, "extinct", s.extinct ? "1" : "0");
+        Line(out, "workFault", s.workFault ? "1" : "0");
         Line(out, "foundedHour", Num(s.foundedHour));
         Line(out, "lastTickHour", Num(s.lastTickHour));
         Line(out, "techLevel", Num(s.techLevel));
@@ -204,6 +226,8 @@ std::string DfSerialize(const std::vector<DfFactionState>& all)
 bool DfDeserialize(const std::string& text, std::vector<DfFactionState>& out)
 {
     out.clear();
+    if (text.size() > kDfMaxStateBytes || text.find('\0') != std::string::npos)
+        return false;
     std::vector<DfFactionState> result;
     size_t pos = 0;
     while (pos < text.size())
@@ -211,6 +235,8 @@ bool DfDeserialize(const std::string& text, std::vector<DfFactionState>& out)
         size_t end = text.find('\n', pos);
         if (end == std::string::npos)
             end = text.size();
+        if (end - pos > kDfMaxStateLineBytes)
+            return false;
         std::string line = text.substr(pos, end - pos);
         pos = end + 1;
         if (!line.empty() && line[line.size() - 1] == '\r')
@@ -220,7 +246,10 @@ bool DfDeserialize(const std::string& text, std::vector<DfFactionState>& out)
 
         if (line[0] == '[')
         {
-            if (line.compare(0, 9, "[faction ") != 0 || line[line.size() - 1] != ']')
+            int index = 0;
+            if (line.size() < 11 || line.compare(0, 9, "[faction ") != 0 || line[line.size() - 1] != ']' ||
+                !ParseInt(line.substr(9, line.size() - 10), index) || index < 0 ||
+                result.size() >= kDfMaxStateFactions)
                 return false;
             result.push_back(DfFactionState());
             continue;
@@ -233,9 +262,17 @@ bool DfDeserialize(const std::string& text, std::vector<DfFactionState>& out)
             return false;
     }
 
+    std::set<std::string> ids;
     for (size_t i = 0; i < result.size(); ++i)
-        if (result[i].recordId.empty())
+    {
+        const DfFactionState& s = result[i];
+        if (s.recordId.empty() || !ids.insert(s.recordId).second)
             return false;
+        // A completed legacy level consumes all its points immediately.
+        if ((s.techLevel == kDfMaxStateTechLevel && s.techPoints != 0) ||
+            s.techPoints >= 100 * (s.techLevel + 1))
+            return false;
+    }
     out.swap(result);
     return true;
 }

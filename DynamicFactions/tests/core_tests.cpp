@@ -771,9 +771,45 @@ static void test_work_invalid_distance_releases_miner()
     CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == -1);
 }
 
+#include "state_validation_tests.inc"
+#include "haul_tests.inc"
+#include "transfer_tests.inc"
+#include "economy_reload_tests.inc"
+
+static void test_economy_rules_no_created_income_or_tech()
+{
+    DfRules r = DfPhase2Rules();
+    CHECK(r.incomePerMemberHour == 0 && r.techPointCost == 0);
+    DfFactionState s = Founded(10.0);
+    DfSnapshot snap = Snap(4, 7000, 11.0, true);
+    snap.recruitPrice = 3000;
+    std::vector<DfAction> a = DfDecide(s, snap, r);
+    CHECK(FindAction(a, DF_INCOME) < 0);
+    CHECK(FindAction(a, DF_RESEARCH) < 0);
+    CHECK(FindAction(a, DF_RECRUIT) >= 0);
+    snap.money = 0;
+    a = DfDecide(s, snap, r);
+    CHECK(FindAction(a, DF_INCOME) < 0 && FindAction(a, DF_RECRUIT) < 0);
+}
+
+static void test_work_small_node_still_hauls()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_MINE, 0, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, 10.0f, 5, 1));
+    nodes[0].cap = 5;
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0);
+}
+
 int main()
 {
     test_harness_runs();
+    RunStateValidationTests();
+    RunHaulTests();
+    RunTransferTests();
+    RunEconomyReloadTests();
+    test_economy_rules_no_created_income_or_tech();
+    test_work_small_node_still_hauls();
     test_names_deterministic();
     test_names_skip_taken();
     test_names_all_races_ascii();

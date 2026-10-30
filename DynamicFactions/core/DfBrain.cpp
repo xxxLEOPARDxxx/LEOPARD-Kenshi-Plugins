@@ -39,6 +39,14 @@ DfRules DfPhase1Rules()
     return r;
 }
 
+DfRules DfPhase2Rules()
+{
+    DfRules r = DfPhase1Rules();
+    r.incomePerMemberHour = 0;
+    r.techPointCost = 0;
+    return r;
+}
+
 std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, const DfRules& r)
 {
     std::vector<DfAction> acts;
@@ -66,7 +74,8 @@ std::vector<DfAction> DfDecide(const DfFactionState& s, const DfSnapshot& snap, 
         hours = kDfMaxTickHours;
 
     const int income = hours * snap.members * r.incomePerMemberHour;
-    acts.push_back(Make(DF_INCOME, income));
+    if (income > 0)
+        acts.push_back(Make(DF_INCOME, income));
     int money = snap.money + income;
 
     // Найм - как у игрока: кто сидит в баре и сколько просит (его диалог),
