@@ -87,7 +87,8 @@
       "Сохранены дополнительные настройки выбранных персонажей и игрового журнала. Подробный журнал остаётся последней настройкой и выключен по умолчанию.",
       "Исправлена разметка полос под характеристиками: штатное поле значения выровнено вправо на всю строку и больше не трактуется как отдельная узкая колонка. Убрана лишняя фраза о MCM из описания внутри меню.",
       "Устранено исчезновение полос при переходе от пяти к шести характеристикам: шаг вычисляется по отсортированным нижним границам, как в оригинале. Малые приросты и удержание не изменялись.",
-      "Полосы используют шрифт и стиль обычных характеристик, с разделителем. Настраивается максимум одна или две строки; при шести штатных характеристиках число строк автоматически уменьшается по свободному месту."
+      "Полосы используют шрифт и стиль обычных характеристик, с разделителем. Настраивается максимум одна или две строки; при шести штатных характеристиках число строк автоматически уменьшается по свободному месту.",
+      "Устранён лишний сброс контекста полос, когда выбранный персонаж не меняется."
     ],
     "en": [
       "Restored all three xp_info displays: blue XP-gain notifications, gold level increases and recently trained skill bars below character statistics.",
@@ -97,7 +98,8 @@
       "Retained selected-character filtering and optional game-log copies. Detailed logging remains the final setting and is disabled by default.",
       "Corrected character-panel bar layout: the native full-row right-aligned value field is no longer mistaken for a separate narrow column. Removed the redundant MCM sentence inside the menu.",
       "Fixed bars disappearing when switching from five to six vanilla stats: spacing uses sorted row bottoms, as in the original. Tiny-gain detection and retention were not changed.",
-      "Bars follow the font and style of the normal character stats, with a divider. The maximum is one or two rows; with six native stats the visible count automatically drops to fit the available space."
+      "Bars follow the font and style of the normal character stats, with a divider. The maximum is one or two rows; with six native stats the visible count automatically drops to fit the available space.",
+      "Prevented unnecessary bar-context resets while the selected character remains unchanged."
     ]
   },
   "MultiXPMining": {
@@ -206,16 +208,18 @@
     "version": "2",
     "published_version": "1",
     "ru": [
-      "[b]Отдельный размер стрелки камеры.[/b] Регулируется в MCM; 0 сохраняет прежнюю зависимость от размера меток.",
+      "[b]Отдельный размер стрелки камеры.[/b] Абсолютное значение от 4 до 64 пикселей можно уменьшать и увеличивать независимо от размера меток.",
       "[b]Более заметная граница камеры.[/b] Толщина 1–8 пикселей для пунктира и сплошной линии, без обрезки толстого контура у края карты.",
       "[b]Исправлена автодальность.[/b] При 0 используется проверенный предел игры, а не сохранённый ошибочный максимальный замер. Проверки учитывают полный список персонажей игрока; для неизвестных модификаций камеры доступна ручная дальность.",
-      "Убран постоянный сбор максимального расстояния и его периодическая запись; новые настройки применяются сразу. Переводы обновлены на русском, английском и китайском."
+      "Убран постоянный сбор максимального расстояния и его периодическая запись; новые настройки применяются сразу. Переводы обновлены на русском, английском и китайском.",
+      "Русские игровые подсказки используют короткие дефисы; проверка готовых переводов предотвращает повторное появление неподдерживаемых длинных тире."
     ],
     "en": [
-      "[b]Independent camera arrow size.[/b] Adjustable through MCM; 0 preserves the original scaling with marker size.",
+      "[b]Independent camera arrow size.[/b] An absolute 4-64 pixel value can be reduced or enlarged independently of marker size.",
       "[b]Clearer camera boundary.[/b] A 1–8 pixel width for dotted and solid lines, with thick contours retained at map edges.",
       "[b]Automatic reach corrected.[/b] Range 0 uses the verified game limit instead of a persisted incorrect maximum observation. Checks use the complete player-character list; manual distance remains available for unknown camera modifications.",
-      "Removed the ongoing maximum-distance observation scan and periodic writes. New settings apply immediately. English, Russian and Chinese translations updated."
+      "Removed the ongoing maximum-distance observation scan and periodic writes. New settings apply immediately. English, Russian and Chinese translations updated.",
+      "Russian in-game tooltips use supported hyphens; compiled-translation checks prevent unsupported typographic dashes returning."
     ]
   }
 }
