@@ -1,2 +1,6 @@
-__pycache__/
-*.pyc
+# Generated player descriptions are reproduced from the versioned metadata.
+/*/description_en.txt
+/*/description_ru.txt
+/desc/*.en.txt
+/desc/*.ru.txt
+/nexus/*_description.txt

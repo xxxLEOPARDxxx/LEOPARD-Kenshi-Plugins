@@ -71,7 +71,7 @@ ITEMS = [
             "characters nearby, discovered towns, attack alerts, Map-markers and "
             "WantedMap marks, camera range; right click to send the selected, "
             "double click to move the camera."),
-    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="10",
+    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="11",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='Interface fixes for queues, descriptions, squad panels and tooltips, plus fewer redundant name-label and status-bar updates. Works with vanilla and modded interfaces.'),
     dict(mod="PatientSelfAid", title="Patient Self Aid (QoL)", nexus=2193, version="4",
@@ -123,7 +123,7 @@ ITEMS = [
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT for state and bounty markers over visible characters - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Organize-the-Trader", title="Organize the Trader (MCM fork) (QoL)", nexus=2212, version="5",
+    dict(mod="Organize-the-Trader", title="Organize the Trader (MCM fork) (QoL)", nexus=2212, version="6",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Search and sorting in the trader window - a fork of Emkej8's mod with settings "
             "in Mod Config Menu."),
