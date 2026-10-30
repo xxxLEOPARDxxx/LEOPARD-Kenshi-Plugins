@@ -1,4 +1,4 @@
-BEST MINIMAP (QoL)
+﻿BEST MINIMAP (QoL)
 
 Миникарта в углу экрана. Требуется RE_Kenshi.
 
@@ -12,7 +12,13 @@ BEST MINIMAP (QoL)
     блёкло.
   * Метки мода Map-markers (из текущего сохранения) и цели WantedMap.
     Метки за пределами обзора прижимаются к краю и показывают направление.
-  * Стрелку в центре: куда смотрит камера.
+  * Стрелку в центре: куда смотрит камера. Цвет и размер настраиваются отдельно;
+    размер 0 сохраняет зависимость от размера меток, как в первой версии.
+  * Границу камеры: пунктир или сплошная линия, с цветом и толщиной 1-8 пкс.
+    Дальность 0 берётся из проверенного ограничения игры, а не из старого
+    максимального расстояния. Высота и рельеф могут уменьшать реальную
+    досягаемость относительно проекции на карту. Неизвестные изменения
+    камеры требуют ручного расстояния.
   * Тревогу: если персонажа вашей фракции атакуют - пульсирующее кольцо
     на месте атаки (за краем обзора - у края), мигающая рамка и строка в
     сообщениях игры.
@@ -92,3 +98,50 @@ WantedMap_GetMarkers (из этого же набора).
 Где мировая точка на картинке, плагин спрашивает у самой игры
 (MapScreen::worldToMapCoords) - поэтому и карты модов, где мир другого
 размера, ложатся правильно.
+
+
+ENGLISH GUIDE
+
+Best Minimap uses the game's map image and follows map replacements. Requires
+RE_Kenshi; MCM provides in-game settings. UI text supports English, Russian and
+Chinese. The same minimap works with vanilla and modified interface themes.
+
+Features: nearby characters by relation, selected-character highlights, discovered
+towns, tooltips, attack alerts, Map-markers and WantedMap integration. A camera
+arrow shows direction; its colour and size are independent settings. Size 0 keeps
+the original marker-based scale. The camera boundary supports dotted and solid
+lines, colour and a 1-8 pixel width. Range 0 reads the verified game restriction;
+unknown camera modifications require a manual distance. The planar map outline
+can slightly overestimate actual reach when camera height or terrain differs.
+
+Controls: drag to move an unlocked minimap; wheel zooms, Ctrl+wheel resizes.
+Right-click sends selected characters to a point, double left-click moves the
+camera within reach. The assigned keys toggle visibility, zoom and resize.
+MCM settings or BestMinimap.ini control appearance, filters, alerts and colours.
+Camera arrow size, line width and manual range apply without a game restart.
+Detailed logging is the last setting and defaults to off.
+
+Prepared update 2 / Подготовленный выпуск 2
+EN: Added independent camera arrow size and adjustable, clearer boundary width.
+Auto range uses the verified game limit instead of a persisted maximum observed
+distance. Range checks include the complete player-character list used by the
+game. Existing personal settings are preserved; obsolete CameraRangeLearned is
+ignored. UI translations remain English, Russian and Chinese.
+RU: Добавлены отдельный размер стрелки камеры и настройка толщины более заметной
+границы. Автодальность берётся из проверенного предела игры вместо сохранённого
+максимального замера. Проверки учитывают полный список персонажей игрока, как
+сама игра. Личные настройки сохраняются; CameraRangeLearned игнорируется.
+Интерфейс переведён на английский, русский и китайский.
+
+Implementation / Реализация
+Auto range verifies a 359-byte Native restrictPosition profile resolved through
+KenshiLib, masking only 12 audited RIP-relative operands, then reads the actual
+radius and squared threshold within readable main-image pages. Unknown opcodes,
+detours or inconsistent constants disable automatic range with a diagnostic;
+manual override remains available. Steam 1.0.65 was verified from the actual
+unpacked executable. GOG has not been tested at runtime; its RVA alone does not
+establish support. No code patching or calls to restrictPosition are performed.
+The checked limit is cached once; the old four-per-second observation scan and
+periodic learned-range INI writes were removed. Worker jobs own line-width values;
+arrow size is copied into draw commands. Dotted and solid circles are capped at
+20,000 samples each. Runtime FPS and long-run memory still require game testing.

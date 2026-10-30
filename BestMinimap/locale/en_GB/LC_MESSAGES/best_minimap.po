@@ -445,3 +445,18 @@ msgstr "Double click - camera there"
 
 msgid "A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
 msgstr "A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
+
+msgid "Camera arrow size, px"
+msgstr "Camera arrow size, px"
+
+msgid "0 - follow marker size. A positive value sets the arrow independently."
+msgstr "0 - follow marker size. A positive value sets the arrow independently."
+
+msgid "Camera line width, px"
+msgstr "Camera line width, px"
+
+msgid "The map boundary around your characters. Camera height and terrain can slightly reduce its actual reach."
+msgstr "The map boundary around your characters. Camera height and terrain can slightly reduce its actual reach."
+
+msgid "0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."
+msgstr "0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."

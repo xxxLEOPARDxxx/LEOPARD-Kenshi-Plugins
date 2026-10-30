@@ -1,4 +1,4 @@
-// BestMinimap - миникарта в углу экрана.
+﻿// BestMinimap - миникарта в углу экрана.
 //
 // ЧТО РИСУЕМ. Фон - та же картинка, что на большой карте игры: берём имя
 // текстуры у MapScreen::mapImage, значит моды на карту (другая картинка,
@@ -61,6 +61,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include "CameraRangePolicy.h"
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -204,8 +205,9 @@ namespace
     bool g_alertMessage = true;         // ещё и сообщение игры
     bool g_alertFlash = true;           // рамка мигает цветом тревоги
     bool g_camRange = true;             // круг: докуда долетает камера
-    int g_camRangeSet = 0;              // метров; 0 - узнаём сами (см. LearnCameraRange)
-    float g_camRangeLearned = 0.0f;
+    int g_camRangeSet = 0;              // метров; 0 - проверенный предел игры
+    int g_cameraArrowSize = 0;          // 0 retains marker-based size
+    int g_cameraLineWidth = 3;
     unsigned g_camRangeColour = 0xFFE8E2D0u;
     unsigned g_viewColour = 0xFFF0EAD8u;    // стрелка камеры в центре
     bool g_camRangeDots = true;         // пунктиром (dots) или сплошной (line)
@@ -367,7 +369,8 @@ namespace
         g_alertFlash = ReadBool(ini, "AlertFlashFrame", true);
         g_camRange = ReadBool(ini, "ShowCameraRange", true);
         g_camRangeSet = ReadInt(ini, "CameraRange", 0, 0, 50000);
-        g_camRangeLearned = static_cast<float>(ReadInt(ini, "CameraRangeLearned", 0, 0, 50000));
+        g_cameraArrowSize = ReadInt(ini, "CameraArrowSize", 0, 0, 64);
+        g_cameraLineWidth = ReadInt(ini, "CameraLineWidth", 3, 1, 8);
         ReadColour(ini, "CameraRangeColour", "#E8E2D0", unused, g_camRangeColour);
         g_camRangeDots = ReadText(ini, "CameraRangeStyle", "dots") != "line";
         g_showFacing = ReadBool(ini, "ShowFacing", true);
@@ -1289,50 +1292,60 @@ namespace
 
     // Игра держит камеру рядом со своими персонажами (CameraClass::
     // restrictPosition), но сам предел в заголовках KenshiLib не виден.
-    // Поэтому CameraRange=0 - узнаём его сами: самое большое расстояние от
-    // центра камеры до ближайшего своего персонажа, какое удалось увидеть.
-    // Отвели камеру до упора - предел записан (CameraRangeLearned в ini).
-    // В свободной камере не учимся: там предела нет.
-    DWORD g_camLearnSaved = 0;
-    float g_camLearnSavedValue = 0.0f;
+    // Auto mode reads the actual checked Native restriction constants once.
+    // Old maximum-observation CameraRangeLearned is deliberately ignored.
+    bool ReadMainImage(const void* address,void* output,size_t count)
+    {
+        const BYTE* image=reinterpret_cast<const BYTE*>(GetModuleHandleW(NULL));
+        if(!image)return false;
+        const IMAGE_DOS_HEADER* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
+        if(dos->e_magic!=IMAGE_DOS_SIGNATURE || dos->e_lfanew<=0 || dos->e_lfanew>0x100000)return false;
+        const IMAGE_NT_HEADERS* nt=reinterpret_cast<const IMAGE_NT_HEADERS*>(image+dos->e_lfanew);
+        if(nt->Signature!=IMAGE_NT_SIGNATURE)return false;
+        const UINT_PTR lo=reinterpret_cast<UINT_PTR>(image), ptr=reinterpret_cast<UINT_PTR>(address);
+        const size_t size=nt->OptionalHeader.SizeOfImage;
+        if(ptr<lo || count>size || ptr-lo>size-count)return false;
+        UINT_PTR cursor=ptr, end=ptr+count;
+        while(cursor<end)
+        {
+            MEMORY_BASIC_INFORMATION info;
+            if(!VirtualQuery(reinterpret_cast<const void*>(cursor),&info,sizeof(info)) ||
+               info.State!=MEM_COMMIT || (info.Protect&(PAGE_GUARD|PAGE_NOACCESS)) ||
+               !(info.Protect&(PAGE_READONLY|PAGE_READWRITE|PAGE_WRITECOPY|PAGE_EXECUTE_READ|PAGE_EXECUTE_READWRITE|PAGE_EXECUTE_WRITECOPY)))return false;
+            const UINT_PTR next=reinterpret_cast<UINT_PTR>(info.BaseAddress)+info.RegionSize;
+            if(next<=cursor)return false;
+            cursor=next<end?next:end;
+        }
+        std::memcpy(output,address,count);return true;
+    }
+
+    float DetectNativeCameraRange()
+    {
+        const unsigned char* fn=reinterpret_cast<const unsigned char*>(KenshiLib::GetRealAddress(&CameraClass::restrictPosition));
+        unsigned char code[BestCamera::ProfileSize];
+        float radius=0,threshold=0;int radiusOffset=0,thresholdOffset=0;
+        if(ReadMainImage(fn,code,sizeof(code)) && BestCamera::Matches(code,sizeof(code)))
+        {
+            std::memcpy(&radiusOffset,code+0x12d,4);std::memcpy(&thresholdOffset,code+0xf1,4);
+            const INT_PTR at=reinterpret_cast<INT_PTR>(fn);
+            if(ReadMainImage(reinterpret_cast<const void*>(at+0x131+radiusOffset),&radius,4) &&
+               ReadMainImage(reinterpret_cast<const void*>(at+0xf5+thresholdOffset),&threshold,4))
+            {
+                const float checked=BestCamera::Radius(radius,threshold);
+                if(checked>0)return checked;
+            }
+        }
+        ErrorLog("BestMinimap: automatic camera limit unavailable for this code profile; set CameraRange manually");
+        return 0;
+    }
 
     float CameraRange()
     {
-        return g_camRangeSet > 0 ? static_cast<float>(g_camRangeSet) : g_camRangeLearned;
-    }
-
-    DWORD g_camLearnAt = 0;
-
-    void LearnCameraRange(DWORD now)
-    {
-        if (g_camRangeSet > 0 || !g_camRange || now - g_camLearnAt < 250)
-            return;
-        g_camLearnAt = now;
-        CameraClass* const cam = ou->player->camera;
-        if (cam == NULL || cam->isFreeCameraMode())
-            return;
-        const Ogre::Vector3 c = ou->getCameraCenter();
-        const lektor<Character*>& mine = ou->player->playerCharacters;
-        float best = -1.0f;
-        for (uint32_t i = 0; i < mine.size(); ++i)
-        {
-            Character* const ch = mine[i];
-            if (ch == NULL || ch->isDead())
-                continue;
-            const Ogre::Vector3 p = ch->getPosition();
-            const float d = std::sqrt((p.x - c.x) * (p.x - c.x) + (p.z - c.z) * (p.z - c.z));
-            if (best < 0.0f || d < best)
-                best = d;
-        }
-        if (best > g_camRangeLearned && best < 50000.0f)
-            g_camRangeLearned = best;
-        // В ini - когда выросло хотя бы на 10 м и не чаще раза в 5 с.
-        if (g_camRangeLearned >= g_camLearnSavedValue + 10.0f && now - g_camLearnSaved >= 5000)
-        {
-            g_camLearnSaved = now;
-            g_camLearnSavedValue = g_camRangeLearned;
-            WriteInt("CameraRangeLearned", static_cast<int>(g_camRangeLearned + 0.5f));
-        }
+        if(g_camRangeSet>0)return static_cast<float>(g_camRangeSet);
+        // C++03 local initialization is used only from the game/UI thread.
+        static const float nativeRange=DetectNativeCameraRange();
+        if(ou->player->characterEditorMode || ou->player->getLevelEditor()!=NULL)return 0;
+        return nativeRange;
     }
 
 
@@ -1885,12 +1898,15 @@ namespace
     // склеиваем; каждую точку проверяем лишь по соседним кругам; пунктир -
     // сразу точками через 7 пикселей, без промежуточных выборок.
     void DrawCameraRange(const std::vector<float>& sx, const std::vector<float>& sy, float r, bool dotted,
-                         unsigned colour)
+                         unsigned colour, int lineWidth)
     {
         if (r < 3.0f || sx.empty())
             return;
         const float w = static_cast<float>(g_rw), h = static_cast<float>(g_rh);
         const float r2 = r * r;
+        const float margin=lineWidth*0.5f+1.0f;
+        const float innerRadius=Hi(0.0f,r-margin);
+        const float coveredRadius2=innerRadius*innerRadius;
         const float merge = Hi(1.5f, r * 0.02f);
         std::vector<float> cx, cy;
         for (size_t i = 0; i < sx.size(); ++i)
@@ -1899,11 +1915,11 @@ namespace
             // Круг не задевает миникарту - не нужен ни для линии, ни для
             // проверки «внутри».
             const float nx = Clamp(x, 0.0f, w), ny = Clamp(y, 0.0f, h);
-            if ((nx - x) * (nx - x) + (ny - y) * (ny - y) > (r + 2.0f) * (r + 2.0f))
+            if ((nx - x) * (nx - x) + (ny - y) * (ny - y) > (r + margin) * (r + margin))
                 continue;
             // Круг накрывает всю миникарту - линии в ней нет вовсе.
             const float fx = Hi(std::fabs(x), std::fabs(x - w)), fy = Hi(std::fabs(y), std::fabs(y - h));
-            if (fx * fx + fy * fy < r2)
+            if (fx * fx + fy * fy < coveredRadius2)
                 return;
             bool dup = false;
             for (size_t j = 0; j < cx.size() && !dup; ++j)
@@ -1914,9 +1930,10 @@ namespace
                 cy.push_back(y);
             }
         }
-        const float r2in = (r - 0.75f) * (r - 0.75f);
+        const float unionInner=Hi(0.0f,r-lineWidth*0.5f);
+        const float r2in=unionInner*unionInner;
         const float circ = 6.2832f * r;
-        const int steps = dotted ? Hi(8, static_cast<int>(circ / 7.0f))
+        const int steps = dotted ? Clamp(static_cast<int>(circ / 7.0f), 8, 20000)
                                          : Clamp(static_cast<int>(circ * 1.5f), 32, 20000);
         std::vector<size_t> nearby;
         for (size_t i = 0; i < cx.size(); ++i)
@@ -1930,7 +1947,7 @@ namespace
             {
                 const float a = 6.2832f * k / steps;
                 const float x = cx[i] + r * std::cos(a), y = cy[i] + r * std::sin(a);
-                if (x < -1 || y < -1 || x > w + 1 || y > h + 1)
+                if (x < -margin || y < -margin || x > w + margin || y > h + margin)
                     continue;
                 bool inside = false;
                 for (size_t n = 0; n < nearby.size() && !inside; ++n)
@@ -1942,14 +1959,10 @@ namespace
                     continue;
                 if (dotted)
                 {
-                    DrawDisc(x, y, 1.1f, colour, colour, 0.85f);
+                    DrawDisc(x, y, lineWidth*0.5f, colour, colour, 1.0f);
                     continue;
                 }
-                const int px = static_cast<int>(x), py = static_cast<int>(y);
-                if (px < 0 || py < 0 || px >= g_rw || py >= g_rh)
-                    continue;
-                const size_t idx = static_cast<size_t>(py) * g_rw + px;
-                g_buf[idx] = Blend(g_buf[idx], colour, 0.7f * (g_mask[idx] / 255.0f));
+                DrawDisc(x, y, lineWidth*0.5f, colour, colour, 1.0f);
             }
         }
     }
@@ -2636,6 +2649,7 @@ namespace
         std::vector<float> camX, camY;
         float camR;
         bool camDots;
+        int camLineWidth;
         unsigned camColour;
         bool frame;
         unsigned frameColour;
@@ -2775,7 +2789,7 @@ namespace
             case OP_RING: DrawRing(o.f[0], o.f[1], o.f[2], o.f[3], o.colour, o.alpha); break;
             case OP_TRI: DrawTri(o.f[0], o.f[1], o.f[2], o.f[3], o.f[4], o.f[5], o.colour, o.alpha); break;
             case OP_VIEW: DrawView(o.f[0], o.f[1], o.f[2], o.f[3], o.f[4], o.colour); break;
-            case OP_CAMRANGE: DrawCameraRange(j.camX, j.camY, j.camR, j.camDots, j.camColour); break;
+            case OP_CAMRANGE: DrawCameraRange(j.camX, j.camY, j.camR, j.camDots, j.camColour, j.camLineWidth); break;
             case OP_ICON: DrawIcon(o.f[0], o.f[1], *o.icon); break;
             }
         }
@@ -3010,12 +3024,13 @@ namespace
         // --- граница полёта камеры ---
         g_lastView = v;
         g_haveView = true;
-        const float camR = CameraRange() * pxPerMetreScreen;
-        if (g_camRange && CameraRange() >= 20.0f && camR >= 3.0f)
+        const float cameraRange = g_camRange ? CameraRange() : 0.0f;
+        const float camR = cameraRange * pxPerMetreScreen;
+        if (g_camRange && cameraRange >= 20.0f && camR >= 3.0f)
         {
             const lektor<Character*>& mine = ou->player->playerCharacters;
             for (uint32_t i = 0; i < mine.size(); ++i)
-                if (mine[i] != NULL && !mine[i]->isDead())
+                if (mine[i] != NULL)
                 {
                     const Ogre::Vector3 p = mine[i]->getPosition();
                     double u, vv;
@@ -3027,6 +3042,7 @@ namespace
                 }
             job.camR = camR;
             job.camDots = g_camRangeDots;
+            job.camLineWidth = BestCamera::Stroke(g_cameraLineWidth);
             job.camColour = g_camRangeColour;
             Op op = {};
             op.kind = OP_CAMRANGE;
@@ -3114,7 +3130,7 @@ namespace
                 dirX = 0.0f;
                 dirY = -1.0f;
             }
-            QView(v.cx, v.cy, dirX, dirY, Hi(8.0f, g_dot * 2.2f), g_viewColour);
+            QView(v.cx, v.cy, dirX, dirY, static_cast<float>(BestCamera::ArrowSize(g_cameraArrowSize,g_dot)), g_viewColour);
         }
 
         // --- рамка ---
@@ -3325,14 +3341,14 @@ namespace
         if (cam == NULL)
             return;
         const float range = CameraRange();
-        if (!cam->isFreeCameraMode() && range >= 20.0f)
+        if (range >= 20.0f)
         {
             const lektor<Character*>& mine = ou->player->playerCharacters;
             float best = -1.0f;
             for (uint32_t i = 0; i < mine.size(); ++i)
             {
                 Character* const ch = mine[i];
-                if (ch == NULL || ch->isDead())
+                if (ch == NULL)
                     continue;
                 const Ogre::Vector3 p = ch->getPosition();
                 const float d = std::sqrt((p.x - pos.x) * (p.x - pos.x) + (p.z - pos.z) * (p.z - pos.z));
@@ -3503,7 +3519,7 @@ namespace
         // Тревога и учёт предела камеры - и при скрытой миникарте: сообщение
         // игры об атаке нужно и без неё.
         ScanAttacks(now);
-        LearnCameraRange(now);
+        // Native camera range needs no observation scan or INI writes.
         if (!g_visible)
             return Hide("switched off by the key (Visible=0)");
         MapScreen* const map = GetMapScreen();
@@ -3657,6 +3673,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "RotateWithCamera", Tr("Rotate with the camera"), Tr("Off - north is always up."), 0, 0);
     api->toggle(api, kSec, "CenterOnSelected", Tr("Centre on the selected"), Tr("Off - on the centre of the camera."), 0, 0);
     api->toggle(api, kSec, "ShowView", Tr("Camera direction"), Tr("A small arrow in the centre."), 1, 0);
+    api->integer(api, kSec, "CameraArrowSize", Tr("Camera arrow size, px"), Tr("0 - follow marker size. A positive value sets the arrow independently."), 0, 0, 64, 0);
     api->colour(api, kSec, "ViewColour", Tr("Camera arrow colour"), Tr("The white arrow is hard to see on light sand - pick a brighter or darker one."), "#F0EAD8", 0);
     api->toggle(api, kSec, "RightClickMove", Tr("Right click - go there"), Tr("Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."), 1, 0);
     api->toggle(api, kSec, "DoubleClickCamera", Tr("Double click - camera there"), Tr("A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."), 1, 0);
@@ -3705,8 +3722,9 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "AlertFlashFrame", Tr("Flash the frame"), Tr("While someone is attacked the frame of the minimap blinks in the alert colour."), 1, 0);
 
     api->section(api, Tr("Camera range"));
-    api->toggle(api, kSec, "ShowCameraRange", Tr("Show how far the camera can go"), Tr("A thin line around your characters: the camera cannot be moved farther."), 1, 0);
-    api->integer(api, kSec, "CameraRange", Tr("Camera range, m"), Tr("0 - found out by itself: move the camera away from your people as far as it goes once, and the line takes that distance."), 0, 0, 50000, 0);
+    api->toggle(api, kSec, "ShowCameraRange", Tr("Show how far the camera can go"), Tr("The map boundary around your characters. Camera height and terrain can slightly reduce its actual reach."), 1, 0);
+    api->integer(api, kSec, "CameraRange", Tr("Camera range, m"), Tr("0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."), 0, 0, 50000, 0);
+    api->integer(api, kSec, "CameraLineWidth", Tr("Camera line width, px"), NULL, 3, 1, 8, 0);
     api->colour(api, kSec, "CameraRangeColour", Tr("Camera line colour"), NULL, "#E8E2D0", 0);
     static const char* const rangeStyles[] = { "dots", "line" };
     static const char* rangeStyleLabels[2];

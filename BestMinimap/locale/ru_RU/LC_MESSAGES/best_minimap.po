@@ -445,3 +445,18 @@ msgstr "Двойной щелчок - камера туда"
 
 msgid "A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
 msgstr "Двойной щелчок ЛКМ по миникарте переносит камеру в эту точку, если камера может отойти так далеко от ваших персонажей (линия предела камеры). Дальше - ничего не происходит."
+
+msgid "Camera arrow size, px"
+msgstr "Размер стрелки камеры, пкс"
+
+msgid "0 - follow marker size. A positive value sets the arrow independently."
+msgstr "0 — размер зависит от меток. Значение от 4 до 64 задаёт размер стрелки отдельно."
+
+msgid "Camera line width, px"
+msgstr "Толщина линии камеры, пкс"
+
+msgid "The map boundary around your characters. Camera height and terrain can slightly reduce its actual reach."
+msgstr "Граница камеры вокруг ваших персонажей. Высота камеры и рельеф могут немного уменьшать реальную дальность."
+
+msgid "0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."
+msgstr "0 — автоматически использовать проверенный предел игры. Если мод на камеру меняет ограничение и оно не определяется, задайте дальность вручную."

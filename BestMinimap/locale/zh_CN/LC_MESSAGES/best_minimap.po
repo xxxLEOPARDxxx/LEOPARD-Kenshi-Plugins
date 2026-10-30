@@ -445,3 +445,18 @@ msgstr "双击 - 镜头移过去"
 
 msgid "A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."
 msgstr "在小地图上双击左键，把镜头移到该点，前提是镜头能离你的角色那么远（镜头范围线）。更远则无反应。"
+
+msgid "Camera arrow size, px"
+msgstr "相机箭头大小，像素"
+
+msgid "0 - follow marker size. A positive value sets the arrow independently."
+msgstr "0 表示跟随标记大小；4 至 64 可独立设置箭头大小。"
+
+msgid "Camera line width, px"
+msgstr "相机边界线宽度，像素"
+
+msgid "The map boundary around your characters. Camera height and terrain can slightly reduce its actual reach."
+msgstr "显示己方角色周围的相机移动边界。相机高度和地形可能略微缩小实际范围。"
+
+msgid "0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."
+msgstr "0 表示自动读取已验证的游戏限制。如果其他相机模组修改限制而无法识别，请手动输入距离。"
