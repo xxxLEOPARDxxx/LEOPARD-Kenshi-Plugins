@@ -206,7 +206,7 @@ namespace
     bool g_alertFlash = true;           // рамка мигает цветом тревоги
     bool g_camRange = true;             // круг: докуда долетает камера
     int g_camRangeSet = 0;              // метров; 0 - проверенный предел игры
-    int g_cameraArrowSize = 0;          // 0 retains marker-based size
+    int g_cameraArrowSize = 11;         // absolute size in pixels
     int g_cameraLineWidth = 3;
     unsigned g_camRangeColour = 0xFFE8E2D0u;
     unsigned g_viewColour = 0xFFF0EAD8u;    // стрелка камеры в центре
@@ -369,7 +369,14 @@ namespace
         g_alertFlash = ReadBool(ini, "AlertFlashFrame", true);
         g_camRange = ReadBool(ini, "ShowCameraRange", true);
         g_camRangeSet = ReadInt(ini, "CameraRange", 0, 0, 50000);
-        g_cameraArrowSize = ReadInt(ini, "CameraArrowSize", 0, 0, 64);
+        const int oldArrowSize = ReadInt(ini, "CameraArrowSize", 0, 0, 64);
+        g_cameraArrowSize = BestCamera::ArrowSize(oldArrowSize,g_dot);
+        if(oldArrowSize!=g_cameraArrowSize)
+        {
+            WriteInt("CameraArrowSize",g_cameraArrowSize);
+            // Complete this one-time migration before MCM can submit a new size.
+            FlushWrites();
+        }
         g_cameraLineWidth = ReadInt(ini, "CameraLineWidth", 3, 1, 8);
         ReadColour(ini, "CameraRangeColour", "#E8E2D0", unused, g_camRangeColour);
         g_camRangeDots = ReadText(ini, "CameraRangeStyle", "dots") != "line";
@@ -3673,7 +3680,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, kSec, "RotateWithCamera", Tr("Rotate with the camera"), Tr("Off - north is always up."), 0, 0);
     api->toggle(api, kSec, "CenterOnSelected", Tr("Centre on the selected"), Tr("Off - on the centre of the camera."), 0, 0);
     api->toggle(api, kSec, "ShowView", Tr("Camera direction"), Tr("A small arrow in the centre."), 1, 0);
-    api->integer(api, kSec, "CameraArrowSize", Tr("Camera arrow size, px"), Tr("0 - follow marker size. A positive value sets the arrow independently."), 0, 0, 64, 0);
+    api->integer(api, kSec, "CameraArrowSize", Tr("Camera arrow size, px"), Tr("Arrow size in pixels, independently of marker size."), 11, 4, 64, 0);
     api->colour(api, kSec, "ViewColour", Tr("Camera arrow colour"), Tr("The white arrow is hard to see on light sand - pick a brighter or darker one."), "#F0EAD8", 0);
     api->toggle(api, kSec, "RightClickMove", Tr("Right click - go there"), Tr("Right click on the minimap sends the selected characters to that spot, as a right click on the ground does."), 1, 0);
     api->toggle(api, kSec, "DoubleClickCamera", Tr("Double click - camera there"), Tr("A double left click on the minimap moves the camera to that spot, if the camera can go that far from your characters (the camera range line). Farther - nothing happens."), 1, 0);

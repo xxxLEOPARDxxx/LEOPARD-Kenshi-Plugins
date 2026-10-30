@@ -460,3 +460,6 @@ msgstr "The map boundary around your characters. Camera height and terrain can s
 
 msgid "0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."
 msgstr "0 - use the verified game limit automatically. If another camera mod changes it and the limit cannot be detected, enter the distance manually."
+
+msgid "Arrow size in pixels, independently of marker size."
+msgstr "Arrow size in pixels, independently of marker size."

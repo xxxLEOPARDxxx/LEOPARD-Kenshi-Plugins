@@ -13,7 +13,7 @@
   * Метки мода Map-markers (из текущего сохранения) и цели WantedMap.
     Метки за пределами обзора прижимаются к краю и показывают направление.
   * Стрелку в центре: куда смотрит камера. Цвет и размер настраиваются отдельно;
-    размер 0 сохраняет зависимость от размера меток, как в первой версии.
+    размер задаётся числом от 4 до 64 пикселей и не зависит от меток.
   * Границу камеры: пунктир или сплошная линия, с цветом и толщиной 1-8 пкс.
     Дальность 0 берётся из проверенного ограничения игры, а не из старого
     максимального расстояния. Высота и рельеф могут уменьшать реальную
@@ -108,8 +108,7 @@ Chinese. The same minimap works with vanilla and modified interface themes.
 
 Features: nearby characters by relation, selected-character highlights, discovered
 towns, tooltips, attack alerts, Map-markers and WantedMap integration. A camera
-arrow shows direction; its colour and size are independent settings. Size 0 keeps
-the original marker-based scale. The camera boundary supports dotted and solid
+arrow shows direction; its colour and size are independent settings. Size is an absolute 4-64 pixel value that can be reduced independently of markers. The camera boundary supports dotted and solid
 lines, colour and a 1-8 pixel width. Range 0 reads the verified game restriction;
 unknown camera modifications require a manual distance. The planar map outline
 can slightly overestimate actual reach when camera height or terrain differs.
@@ -145,3 +144,7 @@ The checked limit is cached once; the old four-per-second observation scan and
 periodic learned-range INI writes were removed. Worker jobs own line-width values;
 arrow size is copied into draw commands. Dotted and solid circles are capped at
 20,000 samples each. Runtime FPS and long-run memory still require game testing.
+
+Legacy CameraArrowSize=0 is migrated once to the actual previous pixel size,
+so the displayed value can be reduced. Russian in-game text uses ASCII hyphens;
+typographic dashes are unsupported by the game font.
