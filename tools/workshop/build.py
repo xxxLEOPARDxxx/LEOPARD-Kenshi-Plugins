@@ -321,11 +321,22 @@ GLYPH_BAD = re.compile(u"[^\x00-\x7f\u0400-\u04ff]")
 
 
 def check_glyphs(mod, src):
+    import gettext
     bad = []
     for root, _dirs, names in os.walk(src):
         if not ("ru_RU" in root or "en_GB" in root):
             continue
         for name in names:
+            # Releases contain MO only; checking PO alone silently skipped all
+            # runtime translations after PO sources were removed from packages.
+            if name.endswith(".mo"):
+                path = os.path.join(root, name)
+                with open(path, "rb") as stream:
+                    catalog = gettext.GNUTranslations(stream)._catalog
+                for key, value in catalog.items():
+                    if key and isinstance(value, str) and GLYPH_BAD.search(value):
+                        bad.append("%s: %s" % (os.path.relpath(path, src), "".join(sorted(set(GLYPH_BAD.findall(value))))))
+                continue
             if not name.endswith(".po"):
                 continue
             path = os.path.join(root, name)
@@ -333,7 +344,7 @@ def check_glyphs(mod, src):
                 if line.startswith("msgstr") and GLYPH_BAD.search(line):
                     bad.append("%s:%d  %s" % (os.path.relpath(path, src), n, "".join(sorted(set(GLYPH_BAD.findall(line))))))
     if bad:
-        sys.exit("%s: символы, которых нет в шрифтах игры (заменить на \" - ...):\n  %s" % (mod, "\n  ".join(bad)))
+        raise SystemExit("%s: символы, которых нет в шрифтах игры (заменить на \" - ...):\n  %s" % (mod, "\n  ".join(bad)))
 
 
 # Языки мода - по папкам его locale (09.10.2026: в шапке было «русском или
