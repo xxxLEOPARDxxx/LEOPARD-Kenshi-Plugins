@@ -3354,6 +3354,11 @@ namespace
         if (window == NULL || plate->getWidth() < window->getWidth() * 8 / 10)
             return;
 
+        // OTT owns this live header only; its teardown removes the marker.
+        static const std::string ottHeaderMarker("LEOPARD_OTT_MoneyHeader");
+        if (datapanel != NULL && datapanel->getUserString(ottHeaderMarker) == "1")
+            return;
+
         if (line->getWidth() != holder->getWidth())
             line->setSize(holder->getWidth(), line->getHeight());
 

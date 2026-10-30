@@ -1,6 +1,32 @@
 UI Tweaks — доработки интерфейса, которых не сделать разметкой
 
-ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 10 (30.10.2026)
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 11 (30.10.2026)
+
+  * Совместимость с новой верхней строкой Organize the Trader:
+    деньги торговца остаются слева, итог сделки — по центру.
+    TraderMoneyCentre не перезаписывает разметку этой строки.
+    Обычные денежные панели по-прежнему обрабатываются как раньше.
+  * Отдельной настройки нет; личный UITweaks.ini сохраняется.
+    Для загрузки новой DLL нужен перезапуск игры.
+  * Технически пропускается только денежная панель с временной
+    меткой LEOPARD_OTT_MoneyHeader. Метку ставит и снимает Organize
+    the Trader, когда управляет своей строкой. Остальные окна и
+    функция TraderMoneyCentre не отключаются.
+
+VERSION 11 CHANGES (30 OCTOBER 2026)
+
+  * Compatibility with Organize the Trader's custom header:
+    trader money stays on the left and the deal in the centre.
+    TraderMoneyCentre no longer overwrites this header layout.
+    Ordinary money panels retain their previous behaviour.
+  * No additional setting is required; UITweaks.ini is preserved.
+    Restart the game to load the replacement DLL.
+  * The guard applies only to a money panel bearing the temporary
+    LEOPARD_OTT_MoneyHeader marker. Organize the Trader acquires and
+    releases that marker while managing its custom header. Other
+    windows and the TraderMoneyCentre feature remain active.
+
+ИСТОРИЯ: ВЕРСИЯ 10 (30.10.2026)
 
   * SkipSameMoves теперь пропускает и повторную установку относительного
     размера обычного MyGUI::Widget, если штатное преобразование в
