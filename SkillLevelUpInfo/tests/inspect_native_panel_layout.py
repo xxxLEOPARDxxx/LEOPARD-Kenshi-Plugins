@@ -48,3 +48,9 @@ skip=instructions(original,0x2972,0x20)
 assert ('cmp','eax, 0xb') in skip # DPL_PROGRESS excluded from native baseline
 assert ('call','qword ptr [rdx + 0x58]') in skip # DataPanelLine::getBottom
 print('Native getLineByNum walks map successors; original sorts non-progress bottoms and takes minimum positive adjacent gap.')
+vertical=instructions(original,0x3d8c,0x12)
+assert vertical[:2]==[('call','qword ptr [rax + 0x30]'),('sub','eax, dword ptr [rbp - 0x68]')]
+assert ('idiv','dword ptr [rbp - 0x64]') in vertical
+assert instructions(original,0x2d14,3)==[('mov','eax, dword ptr [rsi + 0x2c]')]
+assert instructions(original,0x2d8b,3)==[('mov','eax, dword ptr [rcx + 0x2c]')]
+print('Original capacity subtracts vanilla bottom without+6px; original placement retains actual progress/name widget heights.')
