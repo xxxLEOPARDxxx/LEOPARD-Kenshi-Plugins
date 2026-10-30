@@ -89,7 +89,10 @@ int main(){
  check(r.scoutStep==1&&moves==0,"scout reaches horizontal waypoint despite terrain elevation");
  DfLabour r2;scout.position=Ogre::Vector3(250,100,0);moves=0;
  Scout(&scout,w,r2,home,3000,1000);
- check(r2.scoutStep==0&&moves==1,"scout still walks when horizontally outside arrival range");}
+ check(r2.scoutStep==0&&moves==1,"scout still walks when horizontally outside arrival range");
+ DfLabour r3;r3.scoutAt=1000;scout.position=Ogre::Vector3(50,100,0);moves=0;
+ Scout(&scout,w,r3,home,3000,70000);
+ check(r3.scoutStep==0&&moves==1,"long moving scout leg is not abandoned by an absolute timeout");}
  hireCase(0,0,true,70,true,false,"hire success");
  hireCase(0,1,false,100,false,false,"join faults before mutation: refund");
  hireCase(0,2,true,70,true,false,"join faults after mutation: no duplicate/refund");

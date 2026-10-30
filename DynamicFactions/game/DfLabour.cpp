@@ -88,7 +88,9 @@ namespace
         Ogre::Vector3 target=home+Ogre::Vector3(std::cos(angle)*ring,0,std::sin(angle)*ring);
         if (rt.scoutAt==0) rt.scoutAt=now;
         Ogre::Vector3 horizontal=c->getPosition();horizontal.y=target.y;
-        if (horizontal.squaredDistance(target)<225.0f || now-rt.scoutAt>60000)
+        // A long walk that still makes progress must reach its waypoint.
+        // Otherwise a rotating distant target can keep the scout near home.
+        if (horizontal.squaredDistance(target)<225.0f)
         { ++rt.scoutStep;rt.scoutAt=now;w.moving=false;return; }
         Move(c,w,target);
     }
@@ -174,6 +176,7 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
             {w.progressAt=clockMs;w.progressPosition=c->getPosition();}
             else if(clockMs-w.progressAt>=30000)
             {
+                if(w.role==DF_ROLE_IDLE) {++rt.scoutStep;rt.scoutAt=clockMs;}
                 Stop(c,w);w.failedTrader=w.trader;w.blockedUntil=clockMs+30000;
                 if(ms[i].carried==0) {w.role=DF_ROLE_IDLE;w.node=-1;}
                 continue;
