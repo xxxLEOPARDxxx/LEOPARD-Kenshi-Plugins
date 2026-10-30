@@ -3,14 +3,14 @@
 Never enumerates processes, injects code, invokes game functions or writes game
 memory/files. The only output is a local JSON artifact. ABI offsets measured
 by probe_layout.cpp with the production VC10/SDK headers. This version accepts
-only audited XP candidates, including corrected-style1487b01b, with matching maps.
+only audited XP candidates, including visual-nudged06b90cf, with matching maps.
 """
 from pathlib import Path
 import argparse, ctypes, ctypes.wintypes as wt, datetime, hashlib, json
 import math, re, struct, sys, time
 
-EXPECTED_SHA = '1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43'
-APPROVED_SHAS = {EXPECTED_SHA,'df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
+EXPECTED_SHA = 'd06b90cf19149f160e9fcef28dde56dc1bd5e856b40d9a7388f2606df50ae7e2'
+APPROVED_SHAS = {EXPECTED_SHA,'1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43','df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
 BUILD = Path(r'D:\DEV\Kenshi\build\SkillLevelUpInfo')
 NAMES = ['Strength','Toughness','Dexterity','Perception','Katanas','Sabres',
  'Hackers','Heavy weapons','Blunt','Polearms','Melee attack','Melee defence',
@@ -83,6 +83,17 @@ def widget(m,address):
  return {'address':hex(address),'coord':coord,'bottom':coord[1]+coord[3],
          'parent':hex(parent),'visible':m.read(address+0x46c,1)[0] != 0,'rendered_font':rendered_font(m,address)}
 
+def skin_children(m,address):
+ """Own progress skin only: native getSkinWidgetsByName verified vector3f8."""
+ begin,end,capacity=unpack(m,'<3Q',address+0x3f8)
+ if end<begin or capacity<end or (end-begin)%8 or (end-begin)//8>8:
+  raise ValueError('owned progress skin child budget/header exceeded')
+ result=[]
+ for offset in range(0,end-begin,8):
+  child=q(m,begin+offset);item=widget(m,child)
+  if item:item['name']=string(m,child+0x428);result.append(item)
+ return result
+
 def panel(m,address):
  result={'address':hex(address),'root':widget(m,q(m,address+8)),
          'scrollWin':widget(m,q(m,address+0x50)),'categories':[]}
@@ -97,6 +108,9 @@ def panel(m,address):
     row['textBox']=widget(m,q(m,line+0x120))
     row['progress']=widget(m,q(m,line+0x128))
     row['progressText']=widget(m,q(m,line+0x130))
+    if isinstance(row['key'],str) and row['key'].startswith('skill_xp_info_slot_'):
+     try:row['progress_skin_children']=skin_children(m,q(m,line+0x128))
+     except (OSError,ValueError) as error:row['progress_skin_error']=str(error)
    for w in [row['w1'],row['w2']]:
     if w and int(w['parent'],16): parents[w['parent']]=widget(m,int(w['parent'],16))
    rows.append(row)

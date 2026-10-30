@@ -11,11 +11,21 @@ class Memory:
  def zero(self,a,n):self.write(a,bytes(n))
 
 class ProbeTests(unittest.TestCase):
+ def test_owned_skin_vector_uses_native_skin_children_not_content_children(self):
+  m=Memory();bar,storage,child=0x10000,0x20000,0x30000
+  m.pack(bar+0x3f8,'<3Q',storage,storage+8,storage+8);m.pack(storage,'<Q',child)
+  m.pack(child+0x20,'<4i',11,5,132,17);m.pack(child+0x450,'<Q',bar);m.write(child+0x46c,b'\1')
+  m.pack(child+0x3d0,'<Q',0);m.pack(child+0x330,'<Q',0)
+  m.zero(child+0x428,32);m.write(child+0x428,b'TrackPlace');m.pack(child+0x438,'<2Q',10,15)
+  result=probe.skin_children(m,bar)
+  self.assertEqual((result[0]['name'],result[0]['coord']),('TrackPlace',[11,5,132,17]))
+  m.pack(bar+0x3f8,'<3Q',storage,storage+72,storage+72)
+  with self.assertRaisesRegex(ValueError,'budget'):probe.skin_children(m,bar)
  def test_current_dll_and_map_match(self):
   symbols,stamp=probe.map_symbols(probe.BUILD/'SkillLevelUpInfo.map',probe.BUILD/'SkillLevelUpInfo.dll')
-  self.assertEqual(symbols['g_panel'],0x24248)
-  self.assertEqual(symbols['g_slots'],0x242c8)
-  self.assertEqual(stamp,0x6ae4a90a)
+  self.assertEqual(symbols['g_panel'],0x25248)
+  self.assertEqual(symbols['g_slots'],0x252c8)
+  self.assertEqual(stamp,0x6ae4b896)
  def test_vc10_map_keeps_key_order_not_visual_order(self):
   m=Memory();obj,head=0x10000,0x11000
   m.pack(obj+8,'<QQ',head,3);m.pack(head+8,'<Q',0x13000)

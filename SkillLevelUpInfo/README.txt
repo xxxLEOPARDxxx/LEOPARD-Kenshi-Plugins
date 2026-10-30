@@ -223,3 +223,22 @@ rewriting the personal INI.
 В тесной панели разделитель 1 px использует подтверждённый нижний отступ текста;
 неизвестный отступ не уменьшает число полос. По выбору пользователя MaxRows
 ограничен 1..2; старые значения выше 2 ограничиваются при чтении без перезаписи INI.
+
+The visual fill/background and percentage now sit 2 px lower beside the skill
+name. Verified vanilla/Dark UI skin elements keep their physical 17/19 px heights;
+the name and logical 24 px bar rectangles, divider and one/two-row capacity stay
+unchanged. The 21 px percentage fits its remaining 22 px box; it moves only when
+the actual rendered client/text region has full height and no vertical insets.
+Unknown skins or
+text without enough lower padding retain their safe existing placement. Skin
+lookup occurs once per owned bar; stable frames do not allocate or rewrite it.
+
+Заполнение полосы, фон и проценты опущены на 2 px относительно названия навыка.
+Фактическая высота элементов vanilla/Dark UI (17/19 px), положение названия,
+общая строка 24 px, разделитель и вместимость одной/двух строк сохранены.
+Проценты высотой 21 px помещаются в оставшиеся 22 px; сдвиг применяется только
+при полной высоте реального клиентского текста без верхнего/нижнего отступа.
+Для неизвестного скина или
+текста без достаточного отступа сохраняется безопасное прежнее положение.
+Поиск элементов скина выполняется один раз; стабильный кадр не создаёт объекты
+и не меняет их геометрию повторно.

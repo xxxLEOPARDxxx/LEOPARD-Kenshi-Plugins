@@ -9,22 +9,25 @@ struct IntCoord {
 };
 struct IntPoint {int left,top;IntPoint(int x=0,int y=0):left(x),top(y){}};
 struct IntSize {int width,height;IntSize(int w=0,int h=0):width(w),height(h){}};
-struct Align{enum{Default};bool isBottom()const{return false;}bool isVCenter()const{return true;}};
+struct Align{enum{Default};int vertical;Align(int v=1):vertical(v){}bool isBottom()const{return vertical==2;}bool isVCenter()const{return vertical==1;}bool isTop()const{return vertical==0;}};
 struct ISubWidgetText {
  char nativePrefix[0xe0];void*nativeFont;
- std::string fontName;UString caption;int fontHeight,fontWrites,heightWrites,measures,measuredHeight;bool hasFont,shadow;IntCoord coord;IntPoint absolute,viewOffset;
- ISubWidgetText():nativeFont(reinterpret_cast<void*>(1)),fontName("Regular"),fontHeight(20),fontWrites(0),heightWrites(0),measures(0),measuredHeight(-1),hasFont(true),shadow(false),coord(0,0,300,26){}
+ std::string fontName;UString caption;int fontHeight,fontWrites,heightWrites,measures,measuredHeight,vertical;bool hasFont,shadow;IntCoord coord;IntPoint absolute,viewOffset;
+ ISubWidgetText():nativeFont(reinterpret_cast<void*>(1)),fontName("Regular"),fontHeight(20),fontWrites(0),heightWrites(0),measures(0),measuredHeight(-1),vertical(1),hasFont(true),shadow(false),coord(0,0,300,26){}
  template<class T>bool isType(){return true;}
  const std::string&getFontName(){if(!hasFont)abort();return fontName;}int getFontHeight(){return fontHeight;}
  void setFontName(const std::string&v){fontName=v;++fontWrites;}void setFontHeight(int v){fontHeight=v;++heightWrites;}
- IntSize getTextSize(){++measures;return IntSize(100,measuredHeight>=0?measuredHeight:fontHeight);}Align getTextAlign(){return Align();}
+ IntSize getTextSize(){++measures;return IntSize(100,measuredHeight>=0?measuredHeight:fontHeight);}Align getTextAlign(){return Align(vertical);}
  const UString&getCaption()const{return caption;}bool getShadow()const{return shadow;}
  const IntCoord&getCoord(){return coord;}const IntPoint&getAbsolutePosition(){return absolute;}IntPoint getViewOffset(){return viewOffset;}
 };
 struct EditText:ISubWidgetText{};
+struct Widget;typedef std::vector<Widget*>VectorWidgetPtr;
 struct Widget {
- IntCoord coord;Widget*parent,*client;bool visible,textEnabled,isEditBox,editWordWrap;int moves,clientReads;std::string caption;EditText text;
- Widget():coord(0,0,400,300),parent(NULL),client(NULL),visible(true),textEnabled(true),isEditBox(false),editWordWrap(false),moves(0),clientReads(0){}
+ IntCoord coord;Widget*parent,*client;bool visible,textEnabled,isEditBox,editWordWrap,stretch,stretchText;int moves,clientReads,skinQueries;std::string caption,skinName;EditText text;VectorWidgetPtr children,skinChildren;
+ Widget():coord(0,0,400,300),parent(NULL),client(NULL),visible(true),textEnabled(true),isEditBox(false),editWordWrap(false),stretch(false),stretchText(false),moves(0),clientReads(0),skinQueries(0){}
+ size_t getChildCount(){return children.size();}Widget*getChildAt(size_t n){return children[n];}
+ VectorWidgetPtr getSkinWidgetsByName(const std::string&name){++skinQueries;VectorWidgetPtr result;for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->skinName==name)result.push_back(skinChildren[n]);return result;}
  template<class T>T*castType(bool){return isEditBox?static_cast<T*>(this):NULL;}bool getEditWordWrap(){return editWordWrap;}
  Widget*getClientWidget(){++clientReads;return client;}ISubWidgetText*getSubWidgetText(){text.nativeFont=text.hasFont?reinterpret_cast<void*>(1):NULL;text.absolute.top=getAbsoluteTop()+text.coord.top;return textEnabled?&text:NULL;}
  const std::string&getFontName(){static std::string empty;return empty;}int getFontHeight(){return 0;}
@@ -33,7 +36,7 @@ struct Widget {
  int getAbsoluteTop(){return coord.top+(parent?parent->getAbsoluteTop():0);}
  bool getVisible(){return visible;}Widget*getParent(){return parent;}
  IntCoord getCoord(){return coord;}
- void setCoord(IntCoord c){coord=c;++moves;}void setVisible(bool b){visible=b;}
+ void setCoord(IntCoord c){if(stretchText){text.coord.width+=c.width-coord.width;text.coord.height+=c.height-coord.height;}for(size_t n=0;n<children.size();++n)if(children[n]->stretch){children[n]->coord.width+=c.width-coord.width;children[n]->coord.height+=c.height-coord.height;}for(size_t n=0;n<skinChildren.size();++n)if(skinChildren[n]->stretch){skinChildren[n]->coord.width+=c.width-coord.width;skinChildren[n]->coord.height+=c.height-coord.height;}coord=c;++moves;}void setVisible(bool b){visible=b;}
  void setCaption(const std::string& c){caption=c;text.caption=c;}void setNeedMouseFocus(bool){}void setColour(Colour){}
  template<class T>T* createWidget(const std::string&,IntCoord c,int){T*p=new T;p->parent=this;p->coord=c;return p;}
 };
@@ -56,7 +59,7 @@ struct DataPanelLine {
 struct DataPanelLine_Progress:DataPanelLine {
  MyGUI::EditBox*textBox,*progressText;MyGUI::ProgressBar*progress;float value;int updates;
  DataPanelLine_Progress():textBox(NULL),progressText(NULL),progress(NULL),value(0),updates(0){type=DPL_PROGRESS;}
- void setProgress(float v,const std::string&t){value=v;progressText->caption=t;++updates;}
+ void setProgress(float v,const std::string&t){value=v;progressText->setCaption(t);++updates;}
  virtual void setVisible(bool b){textBox->setVisible(b);progress->setVisible(b);progressText->setVisible(b);}
 };
 struct DatapanelGUI {
@@ -68,6 +71,10 @@ struct DatapanelGUI {
  DataPanelLine_Progress*setLineProgress(const std::string&k,int,float v,const std::string&t,bool){
   DataPanelLine_Progress*r=new DataPanelLine_Progress;r->keyValue=k;
   r->textBox=new MyGUI::Widget;r->progress=new MyGUI::Widget;r->progressText=new MyGUI::Widget;
+  r->progressText->text.vertical=0;r->progressText->stretchText=true;r->progressText->text.coord=MyGUI::IntCoord(0,0,400,300);
+  const int w=r->progress->getWidth(),h=r->progress->getHeight();
+  const MyGUI::IntCoord skin[]={MyGUI::IntCoord(10,2,w-19,h-5),MyGUI::IntCoord(11,3,w-21,h-7),MyGUI::IntCoord(0,0,w,h)};
+  for(int i=0;i<3;++i){MyGUI::Widget*c=new MyGUI::Widget;c->coord=skin[i];c->parent=r->progress;c->stretch=true;if(i==1)c->skinName="TrackPlace";r->progress->skinChildren.push_back(c);}
   r->w1=r->textBox;r->w2=r->progress;r->textBox->parent=r->progress->parent=r->progressText->parent=lines.empty()?&root:lines[0]->w1->parent;
   r->setProgress(v,t);lines.push_back(r);named[k]=r;return r;
  }

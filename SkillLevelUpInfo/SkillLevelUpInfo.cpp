@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-only
+﻿// SPDX-License-Identifier: GPL-3.0-only
 // XP Info feature design: semper1dem (Alexander), Nexus mod 2160.
 // Independent MCM implementation; see README.txt and XP_INFO_PARITY.md.
 #define WIN32_LEAN_AND_MEAN
@@ -278,6 +278,7 @@ namespace
         return keys[i];
     }
     XpPanelTextStyle::MeasureCache g_nameMeasure,g_valueMeasure;
+    XpPanelTextStyle::MeasureCache g_percentMeasure[5];
     void HidePanel(DatapanelGUI* panel,int category)
     {
         for(int i=0;i<5;++i){
@@ -291,6 +292,51 @@ namespace
             }
         }
         if(g_divider.get())g_divider.get()->setVisible(false);
+    }
+    struct BarVisualCache {
+        WidgetRef bar,background,track;bool checked;
+        BarVisualCache():checked(false){}
+    } g_barVisual[5];
+    struct SkinChildAccess:MyGUI::Widget {
+        static MyGUI::VectorWidgetPtr Find(MyGUI::Widget* widget,const std::string& name)
+        {
+            // SDK skin API, through a legal base member pointer. Content-child
+            // enumeration redirects to WidgetClient and excludes skin children.
+            MyGUI::VectorWidgetPtr (MyGUI::Widget::*getter)(const std::string&)=&SkinChildAccess::getSkinWidgetsByName;
+            return (widget->*getter)(name);
+        }
+    };
+    bool LowerProgressVisual(MyGUI::ProgressBar* bar,BarVisualCache& cache)
+    {
+        if(!bar)return false;
+        if(cache.bar.get()!=bar){cache.bar.set(bar);cache.background.set(NULL);cache.track.set(NULL);cache.checked=false;}
+        const int width=bar->getWidth(),height=bar->getHeight();
+        if(!cache.checked){
+            cache.checked=true;
+            // Only this owned bar's tiny template, once per widget lifetime.
+            MyGUI::VectorWidgetPtr unnamed=SkinChildAccess::Find(bar,"");
+            MyGUI::VectorWidgetPtr tracks=SkinChildAccess::Find(bar,"TrackPlace");
+            if(unnamed.size()>8 || tracks.size()!=1)return false;
+            MyGUI::Widget* background=NULL;
+            for(size_t n=0;n<unnamed.size();++n){
+                MyGUI::Widget* child=unnamed[n];const MyGUI::IntCoord& c=child->getCoord();
+                if(child->getParent()==bar && c.left==10 && c.width==width-19 && c.height==height-5 && (c.top==2 || c.top==4)){
+                    if(background)return false;background=child;
+                }
+            }
+            if(!background || tracks[0]->getParent()!=bar)return false;
+            cache.background.set(background);cache.track.set(tracks[0]);
+        }
+        MyGUI::Widget* background=cache.background.get();MyGUI::Widget* track=cache.track.get();
+        if(!background || !track)return false;
+        const MyGUI::IntCoord& b=background->getCoord();const MyGUI::IntCoord& t=track->getCoord();
+        if(b.left!=10 || b.width!=width-19 || b.height!=height-5 || (b.top!=2 && b.top!=4) ||
+           t.left!=11 || t.width!=width-21 || t.height!=height-7 || (t.top!=3 && t.top!=5) ||
+           background->getHeight()<=0 || track->getHeight()<=0 ||
+           4+background->getHeight()>height || 5+track->getHeight()>height)return false;
+        MyGUI::IntCoord c=background->getCoord();if(c.top!=4){c.top=4;background->setCoord(c);}
+        c=track->getCoord();if(c.top!=5){c.top=5;track->setCoord(c);}
+        return true;
     }
     void DrawPanel(CharStats* stats,DatapanelGUI* panel,int category)
     {
@@ -392,7 +438,20 @@ namespace
             if(line->progress && !line->progress->getVisible())line->setVisible(true);
             const MyGUI::IntCoord coord(barLeft,top+slot*pitch,barWidth,rowHeight);
             if(line->progress && line->progress->getCoord()!=coord)line->progress->setCoord(coord);
-            if(line->progressText && line->progressText->getCoord()!=coord)line->progressText->setCoord(coord);
+            const bool lowered=LowerProgressVisual(line->progress,g_barVisual[slot]);
+            MyGUI::ISubWidgetText* percent=XpPanelTextStyle::Measure(line->progressText,g_percentMeasure[slot]);
+            MyGUI::Widget* percentClient=g_percentMeasure[slot].renderedSource.get();
+            const int drop=lowered && percent && percentClient && percent->getTextAlign().isTop() && percent->getViewOffset().top==0 &&
+                percentClient->getAbsoluteTop()==line->progressText->getAbsoluteTop() &&
+                percentClient->getHeight()==line->progressText->getHeight() &&
+                percent->getCoord().top==0 && percent->getCoord().height==line->progressText->getHeight() &&
+                g_percentMeasure[slot].textHeight>0 && g_percentMeasure[slot].textHeight<=rowHeight-2 &&
+                (!g_percentMeasure[slot].shadow || g_percentMeasure[slot].textHeight<rowHeight-2)?2:0;
+            const MyGUI::IntCoord percentCoord(barLeft,top+slot*pitch+drop,barWidth,rowHeight-drop);
+            if(line->progressText && line->progressText->getCoord()!=percentCoord){
+                line->progressText->setCoord(percentCoord);
+                XpPanelTextStyle::Measure(line->progressText,g_percentMeasure[slot]);
+            }
             const MyGUI::IntCoord nameCoord(left,top+slot*pitch,barLeft-left-4,rowHeight);
             if(line->textBox && line->textBox->getCoord()!=nameCoord)line->textBox->setCoord(nameCoord);
         }

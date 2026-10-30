@@ -10,7 +10,7 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--dll',type=Path,default=Path(r'D:\DEV\Kenshi\build\SkillLevelUpInfoParityCheck\SkillLevelUpInfoParityCheck.dll'))
 options=parser.parse_args()
 commands=[['test_xp_core.py'],['test_head_anchor.py'],
-          ['test_head_anchor.py','xp_boundary_fixture.cpp'],['test_panel.py'],['test_update.py'],['test_settings.py'],['test_native_font_profile.py']]
+          ['test_head_anchor.py','xp_boundary_fixture.cpp'],['test_panel.py'],['test_update.py'],['test_settings.py'],['test_native_font_profile.py'],['test_progress_skin.py']]
 log=[]
 for args in commands:
  result=subprocess.run([sys.executable,str(here/args[0]),*args[1:]],text=True,capture_output=True)
@@ -31,7 +31,7 @@ if dll.exists():
  cmd=[sys.executable,r'D:\DEV\Kenshi\forks\KEO\tools\kenshilib\check_imports.py',str(dll)]
  subprocess.run(cmd,check=True)
  evidence={'dll':str(dll),'bytes':dll.stat().st_size,'sha256':hashlib.sha256(dll.read_bytes()).hexdigest(),
-           'checks':{'xp_core':18,'head_anchor':19,'xp_native_boundary':19,'panel_native_boundary':52,'timing_lifecycle_registration':12,'actual_settings_mcm':5,'installed_font_profile':1},
+           'checks':{'xp_core':18,'head_anchor':19,'xp_native_boundary':19,'panel_native_boundary':65,'timing_lifecycle_registration':12,'actual_settings_mcm':5,'installed_font_profile':1,'production_vector_layout':1,'actual_progress_skin':3},
            'runtime_verified':False,'installed':False}
  out=here/'_generated';out.mkdir(exist_ok=True)
  (out/'verification.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')

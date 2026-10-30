@@ -207,6 +207,60 @@ int main(){
  XpPanelTextStyle::MeasureCache clientWrapCache;XpPanelTextStyle::PaddingBefore(&padOuter,134,clientWrapCache);
  padClient.editWordWrap=true;padClient.text.measuredHeight=26;
  check(!XpPanelTextStyle::PaddingBefore(&padOuter,134,clientWrapCache),"rendered EditBox wrap changes invalidate proof when logical wrapper has no wrap getter");
+ measured.lines[5]->setVisible(false);measured.root.coord.height=185;g_maxRows=2;lastName.fontHeight=25;
+ exactFirst->progressText->client=NULL;exactSecond->progressText->client=NULL;
+ Panel(&runner.stats,&measured,0,false);
+ MyGUI::Widget*bg=exactSecond->progress->skinChildren[0];MyGUI::Widget*track=exactSecond->progress->skinChildren[1];
+ check(g_slots.count==2&&bg->getTop()==4&&bg->getHeight()==19&&track->getTop()==5&&track->getHeight()==17,
+       "native stretch-skin background and fill track move down2px without shrinking19px or17px physical height");
+ check(exactSecond->progress->getTop()==161&&exactSecond->progress->getHeight()==24&&exactSecond->textBox->getTop()==161&&exactSecond->textBox->getHeight()==24,
+       "visual nudge preserves logical24px progress row and accepted name rectangle");
+ check(exactSecond->progressText->getTop()==163&&exactSecond->progressText->getHeight()==22&&exactSecond->progressText->getBottom()==185,
+       "21px top-aligned percentage moves down2px within22px box ending at185");
+ const int visualWrites=bg->moves+track->moves+exactSecond->progressText->moves;
+ const int skinQueries=exactSecond->progress->skinQueries;
+ for(int n=0;n<100;++n)Panel(&runner.stats,&measured,0,false);
+ check(visualWrites==bg->moves+track->moves+exactSecond->progressText->moves&&track->getTop()==5,
+       "100 stable visual-nudge refreshes neither accumulate offset nor repeat child geometry writes");
+ check(skinQueries==2&&exactSecond->progress->skinQueries==skinQueries&&exactSecond->progress->getChildCount()==0,
+       "actual skin children are resolved independently of empty content children and never searched again on stable frames");
+ const int percentMeasures=exactSecond->progressText->text.measures;
+ for(int n=0;n<100;++n)Panel(&runner.stats,&measured,0,false);
+ check(exactSecond->progressText->text.measures==percentMeasures,"stable percentage nudge reuses existing caption/style measurement cache");
+ MyGUI::ProgressBar unknown;MyGUI::Widget unknownBg,unknownTrack;
+ unknown.coord=MyGUI::IntCoord(0,0,153,24);unknownBg.coord=MyGUI::IntCoord(10,2,134,20);unknownTrack.coord=MyGUI::IntCoord(11,3,132,17);
+ unknownBg.parent=&unknown;unknownTrack.parent=&unknown;unknownTrack.skinName="TrackPlace";
+ unknown.skinChildren.push_back(&unknownBg);unknown.skinChildren.push_back(&unknownTrack);BarVisualCache unknownCache;LowerProgressVisual(&unknown,unknownCache);
+ check(unknownBg.getTop()==2&&unknownTrack.getTop()==3&&unknownBg.getHeight()==20,"unknown progress skin is left unchanged rather than resized or guessed");
+ lastValue.fontHeight=25;Panel(&runner.stats,&measured,0,false);
+ check(g_slots.count==2&&exactSecond->progressText->getTop()==161&&exactSecond->progressText->getHeight()==24,
+       "percentage text too tall for22px keeps its original24px rectangle instead of clipping for the nudge");
+ lastValue.fontHeight=22;exactSecond->progressText->text.shadow=true;Panel(&runner.stats,&measured,0,false);
+ check(exactSecond->progressText->getTop()==161&&exactSecond->progressText->getHeight()==24,
+       "shadowed percentage with no remaining padding safely retains its full24px text rectangle");
+ lastValue.fontHeight=21;exactSecond->progressText->text.coord.top=0;Panel(&runner.stats,&measured,0,false);
+ exactSecond->progressText->setCoord(MyGUI::IntCoord(165,161,153,24));
+ XpPanelTextStyle::Measure(exactSecond->progressText,g_percentMeasure[1]);const int originMeasures=exactSecond->progressText->text.measures;
+ exactSecond->progressText->text.coord.top=3;
+ Panel(&runner.stats,&measured,0,false);
+ check(exactSecond->progressText->getTop()==161&&exactSecond->progressText->getHeight()==24&&
+       exactSecond->progressText->getSubWidgetText()->getAbsolutePosition().top+21==185&&track->getTop()==5,
+       "actual3px rendered text inset retains24px percentage box and visible21px glyphs while the bar remains lowered");
+ const int insetWrites=exactSecond->progressText->moves;
+ for(int n=0;n<100;++n)Panel(&runner.stats,&measured,0,false);
+ check(exactSecond->progressText->text.measures==originMeasures&&exactSecond->progressText->moves==insetWrites,
+       "origin-only geometry changes invalidate nudge permission without stale cached fit or repeated measurements/writes");
+ exactSecond->progressText->text.coord.top=0;exactSecond->progressText->text.coord.height=22;
+ Panel(&runner.stats,&measured,0,false);const int bottomInsetWrites=exactSecond->progressText->moves;
+ for(int n=0;n<100;++n)Panel(&runner.stats,&measured,0,false);
+ check(exactSecond->progressText->getTop()==161&&exactSecond->progressText->getHeight()==24&&
+       exactSecond->progressText->moves==bottomInsetWrites&&track->getTop()==5,
+       "2px lower text padding retains full percentage box for100 frames without22-to24px geometry oscillation");
+ exactSecond->progressText->text.coord.height=24;measured.lines[5]->setVisible(true);Panel(&runner.stats,&measured,0,false);
+ bool nudgeSwitch=g_slots.count==1&&exactFirst->textBox->getTop()==161&&exactFirst->progressText->getTop()==163&&exactFirst->progressText->getBottom()==185;
+ measured.lines[5]->setVisible(false);Panel(&runner.stats,&measured,0,false);
+ check(nudgeSwitch&&g_slots.count==2&&exactSecond->progressText->getBottom()==185&&track->getHeight()==17,
+       "nudge preserves both five-row and six-row capacities and the185px lower bound");
  XpPanelTextStyle::g_nativeProfile=false;
  check(!XpPanelTextStyle::RenderedText(stableFirst->textBox),"unknown MyGUI getter profile skips font access safely without SEH or default-style writes");
  printf("native panel boundary: %s\n",failures?"FAILED":"PASSED");return failures?1:0;

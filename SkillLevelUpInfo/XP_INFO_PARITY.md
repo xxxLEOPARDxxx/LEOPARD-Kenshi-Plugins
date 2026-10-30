@@ -106,3 +106,54 @@ Verification limits: automatic tests cover arithmetic/state/selection and native
 boundary integration. Visual geometry, non-overlap with UI overhauls/LiveXpBars,
 save/load and real game XP still require in-game acceptance. Do not report those
 as runtime-verified merely because compilation passed.
+
+### Native accepted baseline and visual alignment follow-up, 30 October
+
+The user accepted candidate1487 fonts/divider. The saved read-only capture
+`tests/_generated/runtime-25036-173531.json` has12 successful samples: capacity2,
+two24px XP rows, divider[9,134,307,1], names matching vanilla PaintedMedium25,
+and actual Top-aligned percentage clients StandardMedium21 with21px text size.
+The game was closed before the next change; that PID is not inspected again.
+
+The requested2px visual drop preserves name coordinates, outer24px progress
+rectangles, colors, divider and adaptive1/2-row layout. Actual vanilla and Dark UI
+`Kenshi_ProgressBarFill` templates use Stretch Empty(10,2,131,15) and
+TrackPlace(11,3,129,13) inside150x20. At the observed153x24 rectangle these are
+19/17px tall; moving their tops to4/5 preserves both heights inside the row.
+Shrinking the outer progress widget would shrink these visible elements and is
+therefore avoided. Percentages use y+2/h22 only when public actual text metrics
+fit with safe padding; otherwise the existing text rectangle stays intact.
+
+Native `getChildCount/getChildAt` follows WidgetClient and enumerates content,
+not skin widgets. The official protected SDK `getSkinWidgetsByName` is invoked
+through a legal derived-access/base-member pointer, only for the owned bar's
+skin and once per live widget. Weak WidgetRefs invalidate destroyed widgets;
+stable frames neither search/allocate nor repeat geometry writes. Exact known
+layout checks protect custom/unknown skins. No production private offsets are
+introduced. The read-only probe separately captures at most8 own skin widgets.
+
+ABI proof uses the actual installed MyGUI export bodies plus production VC10
+helper/assembly, without calling game objects: getSkinWidgetsByName RVA1c32c0
+has RCX=this/RDX=hidden result/R8=name, initializes result pointers0/8/16 and
+iterates skin vector3f8/400; findWidgets uses allocator member24. VC10 verifies
+VectorWidgetPtr size32 and empty allocator size1; the assembly-only accessor
+passes the same registers. This container contract is independent of the
+previously discovered EditText header/native layout difference. Reproducible
+evidence: `tests/test_progress_skin.py`, `tests/native_font_profile.cpp`, ignored
+`tests/_generated/progress_skin_proof.json` and `native_skin_abi.asm`.
+
+TDD caught the first content-child assumption by modelling actual skin/content
+separately (RED), then passed with the skin API. New checks cover both physical
+heights, percentage fit/fallback, stable zero writes/searches/measurements and
+five/six-row capacity transitions. The new visual drop still requires user
+acceptance after the parent installs its final candidate; accepted1487 geometry
+does not constitute runtime proof of the later change.
+
+Review follow-up: percent movement now requires the actual rendered Widget
+client to share the logical top/full height, and public text region top0/full
+logical height. Insets retain the24px percentage box while the bar stays lowered.
+The live geometry guard is evaluated independently of the cached text size:
+origin-only changes cannot inherit stale permission. RED/GREEN cases cover a3px
+inset with21px glyphs and2px bottom padding, including100 stable frames without
+22/24px oscillation, repeated writes or measurements. The captured1487 percentage
+region[0,0,153,24] confirms the ordinary full-height zero-inset layout.

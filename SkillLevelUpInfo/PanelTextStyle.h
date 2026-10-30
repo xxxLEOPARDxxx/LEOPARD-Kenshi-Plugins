@@ -74,14 +74,14 @@ inline void Copy(MyGUI::Widget* destination,MyGUI::ISubWidgetText* source)
     if(target->getFontName()!=face)target->setFontName(face);
     if(target->getFontHeight()!=height)target->setFontHeight(height);
 }
-inline bool PaddingBefore(MyGUI::Widget* source,int absoluteBoundary,MeasureCache& cache)
+inline MyGUI::ISubWidgetText* Measure(MyGUI::Widget* source,MeasureCache& cache)
 {
     MyGUI::Widget* rendered=NULL;
     MyGUI::ISubWidgetText* text=RenderedText(source,&rendered);
-    if(!text)return false;
+    if(!text)return NULL;
     const MyGUI::IntCoord& region=text->getCoord();
     const int fontHeight=text->getFontHeight();const std::string& face=text->getFontName();
-    if(region.width<=0 || region.height<=0 || fontHeight<=0 || face.empty())return false;
+    if(region.width<=0 || region.height<=0 || fontHeight<=0 || face.empty())return NULL;
     const MyGUI::Align alignment=text->getTextAlign();
     const int align=alignment.isBottom()?2:alignment.isVCenter()?1:0;
     const MyGUI::UString& caption=text->getCaption();const bool shadow=text->getShadow();
@@ -100,7 +100,13 @@ inline bool PaddingBefore(MyGUI::Widget* source,int absoluteBoundary,MeasureCach
         cache.face=face;cache.fontHeight=fontHeight;cache.width=region.width;cache.height=region.height;cache.align=align;
         cache.textHeight=text->getTextSize().height;
     }
-    if(cache.textHeight<=0 || text->getViewOffset().top!=0)return false;
+    return text;
+}
+inline bool PaddingBefore(MyGUI::Widget* source,int absoluteBoundary,MeasureCache& cache)
+{
+    MyGUI::ISubWidgetText* text=Measure(source,cache);
+    if(!text || cache.textHeight<=0 || text->getViewOffset().top!=0)return false;
+    const MyGUI::IntCoord& region=text->getCoord();const int align=cache.align;
     int free=region.height-cache.textHeight;if(free<0)free=0;
     const int offset=align==2?free:align==1?free/2:0;
     int extent=offset+cache.textHeight;if(extent>region.height)extent=region.height;
