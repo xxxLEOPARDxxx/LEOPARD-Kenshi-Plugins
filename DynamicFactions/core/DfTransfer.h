@@ -68,3 +68,18 @@ enum DfTradeResult { DF_TRADE_STOP, DF_TRADE_COMPLETE, DF_TRADE_RESTORED, DF_TRA
 // One bounded physical deal. Compensation is allowed only with exact observed
 // original wallets; goods are returned through the same real-transfer primitive.
 DfTradeResult DfTradeOne(DfTradePort& port, int price);
+
+class DfTreasuryPort
+{
+public:
+    virtual ~DfTreasuryPort() {}
+    virtual bool Read(int& amount) = 0;
+    virtual bool Set(int amount) = 0;
+};
+// Load boundary only: absolute restoration, never add a grant or replay revenue.
+// Missing legacy snapshots do not modify the native wallet. The session owner
+// consumes restoration once, before economic work can resume.
+bool DfRestoreTreasuryBalance(DfTreasuryPort& port, int saved);
+// A failed load restoration must not overwrite the authoritative snapshot with
+// the native wallet that has not yet received it. Read failures are not zero.
+bool DfCaptureTreasuryBalance(DfTreasuryPort& port, bool restoreFailed, int& saved);

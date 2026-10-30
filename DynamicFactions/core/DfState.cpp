@@ -7,7 +7,7 @@
 #include <set>
 
 DfFactionState::DfFactionState()
-    : founded(false), extinct(false), workFault(false), foundedHour(0.0), lastTickHour(0.0), techLevel(0), techPoints(0)
+    : founded(false), extinct(false), workFault(false), treasury(-1), foundedHour(0.0), lastTickHour(0.0), techLevel(0), techPoints(0)
 {
 }
 
@@ -127,7 +127,7 @@ namespace
     {
         // Future keys may use a future value syntax; do not interpret them.
         if (key != "id" && key != "name" && key != "race" && key != "founded" && key != "extinct" &&
-            key != "workFault" && key != "foundedHour" && key != "lastTickHour" && key != "techLevel" &&
+            key != "workFault" && key != "treasury" && key != "foundedHour" && key != "lastTickHour" && key != "techLevel" &&
             key != "techPoints" && key != "node" && key != "event")
             return true;
         std::string value;
@@ -145,6 +145,8 @@ namespace
             return ParseBool(value, s.extinct);
         else if (key == "workFault")
             return ParseBool(value, s.workFault);
+        else if (key == "treasury")
+            return s.treasury < 0 && ParseInt(value, s.treasury) && s.treasury >= 0;
         else if (key == "foundedHour")
             return ParseDouble(value, s.foundedHour) && s.foundedHour >= 0.0;
         else if (key == "lastTickHour")
@@ -207,6 +209,7 @@ std::string DfSerialize(const std::vector<DfFactionState>& all)
         Line(out, "founded", s.founded ? "1" : "0");
         Line(out, "extinct", s.extinct ? "1" : "0");
         Line(out, "workFault", s.workFault ? "1" : "0");
+        if (s.treasury >= 0) Line(out, "treasury", Num(s.treasury));
         Line(out, "foundedHour", Num(s.foundedHour));
         Line(out, "lastTickHour", Num(s.lastTickHour));
         Line(out, "techLevel", Num(s.techLevel));
@@ -267,6 +270,8 @@ bool DfDeserialize(const std::string& text, std::vector<DfFactionState>& out)
     {
         const DfFactionState& s = result[i];
         if (s.recordId.empty() || !ids.insert(s.recordId).second)
+            return false;
+        if (!s.founded && s.treasury >= 0)
             return false;
         // A completed legacy level consumes all its points immediately.
         if ((s.techLevel == kDfMaxStateTechLevel && s.techPoints != 0) ||

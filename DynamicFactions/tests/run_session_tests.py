@@ -12,6 +12,9 @@ labour = (root/'game/DfLabour.cpp').read_text(encoding='utf-8-sig')
 def function(text, signature):
     start = text.index(signature)
     brace = text.index('{', start)
+    while ';' in text[start:brace]:
+        start = text.index(signature, text.index(';', start)+1)
+        brace = text.index('{', start)
     depth = 1
     end = brace + 1
     while depth:
@@ -28,6 +31,7 @@ code = r'''
 #include <cstdio>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 namespace Ogre { struct Vector3 {float x,y,z;Vector3(float a=0,float b=0,float c=0):x(a),y(b),z(c){} Vector3 operator+(const Vector3& b)const{return Vector3(x+b.x,y+b.y,z+b.z);} float squaredDistance(const Vector3& b)const {return (x-b.x)*(x-b.x)+(y-b.y)*(y-b.y)+(z-b.z)*(z-b.z);} }; }
 struct Faction;
 struct Ownerships { int money, mode, calls; Ownerships():money(100),mode(0),calls(0){}
@@ -63,11 +67,20 @@ void ErrorLog(const char*){}
 void ClearOrder(Character*){++cleared;}
 '''
 code += r'''
-struct DfMemberWork {bool moving;DfMemberWork():moving(false){}};
-struct DfLabour {unsigned int scoutStep;unsigned long scoutAt;DfLabour():scoutStep(0),scoutAt(0){}};
-int moves=0;void Move(Character*,DfMemberWork& w,const Ogre::Vector3&){++moves;w.moving=true;}
+struct GameData {std::string stringID;};
+struct DfKnownNode {float x,y,z;std::string itemSid;int stored;};
+struct DfFactionState {std::vector<DfKnownNode> nodes;};
+struct DfNode {GameData* item;int itemValue;Ogre::Vector3 pos;};
+Ogre::Vector3 Pos(const DfKnownNode& n){return Ogre::Vector3(n.x,n.y,n.z);}
 '''
-code += function(labour,'void Scout(')+'\n'
+code += function(labour,'int Known(')+'\n'
+code += r'''
+bool g_ready=false,g_debug=false;DWORD g_readyAt=0;int readyRestores=0;
+void RestoreTreasuries(){++readyRestores;}
+void UpdateOwnFactions(){}
+void DebugLog(const std::string&){}
+'''
+code += function(main,'void MarkReady(')+'\n'
 for signature in ['bool Able(', 'bool SetMoneySafely(', 'bool SetFactionSafely(', 'bool Join(', 'void DfHireCancel(']:
     code += function(hire, signature)+'\n'
 start = recruit.index('    struct RecruitKey')
@@ -84,15 +97,15 @@ void hireCase(int moneyMode,int factionMode,bool expected,int balance,bool membe
  check(result==expected && o.money==balance && (recruit.faction==&f)==member && g_joinUncertain==blocked,name);
 }
 int main(){
- {Character scout;DfMemberWork w;DfLabour r;Ogre::Vector3 home(0,100,0);scout.position=Ogre::Vector3(300,152,0);moves=0;
- Scout(&scout,w,r,home,3000,1000);
- check(r.scoutStep==1&&moves==0,"scout reaches horizontal waypoint despite terrain elevation");
- DfLabour r2;scout.position=Ogre::Vector3(250,100,0);moves=0;
- Scout(&scout,w,r2,home,3000,1000);
- check(r2.scoutStep==0&&moves==1,"scout still walks when horizontally outside arrival range");
- DfLabour r3;r3.scoutAt=1000;scout.position=Ogre::Vector3(50,100,0);moves=0;
- Scout(&scout,w,r3,home,3000,70000);
- check(r3.scoutStep==0&&moves==1,"long moving scout leg is not abandoned by an absolute timeout");}
+ g_ready=false;readyRestores=0;MarkReady("loaded");
+ check(g_ready&&readyRestores==1,"treasury restored before first ready boundary");
+ MarkReady("duplicate hook completion");check(readyRestores==1,"repeated ready callback cannot restore cash again");
+ {Character worker;worker.position=Ogre::Vector3(0,0,0);std::vector<Character*> people(1,&worker);
+ GameData data;data.stringID="ore";DfNode node;node.item=&data;node.itemValue=90;node.pos=Ogre::Vector3(1694,50,0);DfFactionState state;
+ check(Known(state,node,people)==0&&state.nodes.size()==1,"public local vein is available immediately without scouting circles");
+ check(Known(state,node,people)==0&&state.nodes.size()==1,"same real vein is not duplicated");
+ node.item=0;check(Known(state,node,people)==-1,"missing output is not a known mine");node.item=&data;
+ node.itemValue=0;check(Known(state,node,people)==-1,"invalid output value is not a known mine");}
  hireCase(0,0,true,70,true,false,"hire success");
  hireCase(0,1,false,100,false,false,"join faults before mutation: refund");
  hireCase(0,2,true,70,true,false,"join faults after mutation: no duplicate/refund");
@@ -137,3 +150,12 @@ assert 'g_completedSfs == SESSION_LOAD' in function(main,'int LoadGame_hook(')
 assert 'g_completedSfs == SESSION_NEW' in function(main,'void InitNewWorld_hook(')
 assert function(main,'void ReadState(').index('g_states.clear()') < function(main,'void ReadState(').index('fileExists(')
 print('Lifecycle/save ordering source contracts passed')
+
+assert function(main,'void MarkReady(').index('RestoreTreasuries(')<function(main,'void MarkReady(').index('g_ready = true')
+assert function(main,'void RestoreTreasuries(').index('g_restoreTreasury = false')<function(main,'void RestoreTreasuries(').index('DfRestoreTreasury(')
+assert 'g_restoreTreasury = false' in function(main,'void BeginSession(')
+assert function(main,'void WriteState(').index('DfCaptureTreasury(')<function(main,'void WriteState(').index('DfSerialize(')
+print('Treasury save/restore boundary contracts passed')
+
+assert 'g_runtime[i].treasuryRestoreFailed=true' in function(main,'void RestoreTreasuries(')
+assert 'g_runtime[i].treasuryRestoreFailed,s.treasury' in function(main,'void WriteState(')

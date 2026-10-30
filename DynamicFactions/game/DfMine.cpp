@@ -103,6 +103,7 @@ namespace
             n.itemName = n.item != NULL ? n.item->name : std::string();
             n.itemValue = IntField(n.item, "value");
             n.distance = n.pos.distance(centre);
+            if (!_finite(n.distance) || n.distance > radius) continue;
             UseableStuff* const use = b->getUseableStuff();
             n.takeRange = use != NULL && _finite(use->maxUseRange) && use->maxUseRange > 0.0f
                 ? use->maxUseRange : kDfTakeRange;

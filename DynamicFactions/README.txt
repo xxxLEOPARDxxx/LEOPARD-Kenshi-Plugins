@@ -18,17 +18,20 @@ Dynamic Factions - development build / рабочая сборка 30.10.2026
 
 Полный носильщик освобождает очередь забора, недостижимые назначения получают
 паузу перед повтором. Найм посланника имеет приоритет. Пауза игры останавливает
-экономику. Известными становятся жилы, замеченные людьми фракции, а не только
-камерой игрока. Свободные люди разведывают окрестности. Фракция пока работает
+экономику. Доступные публичные жилы в радиусе поиска от Хаба используются
+сразу, без обязательного маршрута разведчика по городу. Фракция пока работает
 только в загруженных участках; полноценная дальняя экономика ещё не реализована.
 
 СОХРАНЕНИЕ
 
-Настоящие вещи, кошельки и персонажей сохраняет Kenshi. Плагин пишет имена,
-известные жилы и историю в dynamicfactions.txt внутри того же сейва. После
+Настоящие вещи, кошельки отрядов и персонажей сохраняет Kenshi. Общая казна
+NPC-фракции движком не сохраняется: её точная сумма вместе с именами, жилами
+и историей записывается в dynamicfactions.txt внутри того же сейва. После
 загрузки груз восстанавливается из настоящего инвентаря, включая рюкзак;
 повторных выдач груза и повторной выплаты по журналу задач нет. Выручка,
-показанная как "за сеанс", сбрасывается; настоящий бюджет фракции сохраняется.
+показанная как "за сеанс", сбрасывается. Казна восстанавливается точной суммой
+однократно после загрузки мира, до найма/работы; стартовый грант не повторяется.
+Старый сейв без снимка казны не получает выдуманную компенсацию автоматически.
 
 Старые условные запасы сохранены совместимо, но не прибавляются к настоящим,
 не добываются снова и не продаются. Испорченное состояние отвергается; уже
@@ -49,7 +52,7 @@ Difficulty=medium     easy/medium/hard/veryhard: навыки основател
 StartMoney=5000       только новая фракция; личный INI при установке сохраняется.
 WindowKey=CTRL+F10    окно наблюдения; NONE отключает клавишу.
 Work=1                реальная добыча/переноска/торговля, применяется сразу.
-MineRadius=3000       радиус разведки и поиска от Хаба,500-5000метров.
+MineRadius=3000       радиус поиска местных жил от Хаба,500-5000метров.
 Debug=0               подробный журнал, последняя настройка MCM. Ошибки всегда.
 
 Переводы интерфейса: русский, английский, китайский. В поставке только MO;
@@ -64,11 +67,14 @@ transferred to the actual merchant inventory; the merchant pays the faction
 from its real purse. Native town/trader pricing, inventory room, funds,
 ownership, distance and actor condition are checked again before mutation.
 
-Cargo and wallets are saved by Kenshi. The plugin saves faction metadata,
+Cargo, characters and platoon wallets are saved by Kenshi. The shared NPC
+faction treasury is not: its exact saved balance is written with metadata,
 known resources and events in dynamicfactions.txt. On load, work is rebuilt
 from actual inventory contents, including backpacks. It never replays payment
 or creates cargo from a saved task counter. Displayed session revenue resets;
-the real treasury does not. Legacy virtual ore stays preserved but inactive.
+the real treasury is restored absolutely once after world loading, before
+economic actions. No starting grant is replayed. Legacy saves lacking this
+snapshot receive no guessed refund. Legacy virtual ore stays preserved but inactive.
 
 Confirmed rejection restores goods; confirmed unpaid trades can compensate
 only when original balances and counts are proven. Unknown native outcomes
@@ -78,7 +84,8 @@ this is not a guarantee of recovery from arbitrary engine corruption.
 
 Work toggles immediately; disabling also stops saved native mining/movement
 jobs of the faction's available workers. Enabled requires restart. Search
-radius500-5000m; resources must be observed by members. Combat and recruiting
+radius500-5000m; public local deposits are available immediately, without a
+mandatory scouting circuit. Combat and recruiting
 take priority; full carriers/unreachable targets use bounded retry. No virtual
 production is active; a persistent distant economy is a later stage.
 

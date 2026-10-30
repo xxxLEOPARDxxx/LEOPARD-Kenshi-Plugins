@@ -2,6 +2,25 @@
 #include <climits>
 #include <float.h>
 
+bool DfRestoreTreasuryBalance(DfTreasuryPort& port, int saved)
+{
+    if (saved == -1) return true;
+    if (saved < 0) return false;
+    int actual = -1;
+    if (!port.Read(actual) || actual < 0) return false;
+    if (actual == saved) return true;
+    port.Set(saved); // A late native fault may follow a successful absolute write.
+    return port.Read(actual) && actual == saved;
+}
+bool DfCaptureTreasuryBalance(DfTreasuryPort& port, bool restoreFailed, int& saved)
+{
+    if (restoreFailed) return saved >= 0;
+    int actual = -1;
+    if (!port.Read(actual) || actual < 0) return false;
+    saved = actual;
+    return true;
+}
+
 DfGoodsState DfGoodsResult(int s0, int d0, int s1, int d1)
 {
     if (s0 <= 0 || d0 < 0 || s1 < 0 || d1 < 0 || d0 == INT_MAX)

@@ -1,6 +1,7 @@
 #pragma once
 // Своё состояние динамических фракций и его файл рядом с сохранением.
-// Деньги и численность здесь не хранятся - их берём у игры.
+// Members and items use the native save. NPC faction treasury needs a snapshot:
+// Kenshi serializes platoon wallets, but not Faction::factionOwnerships.
 
 #include <string>
 #include <vector>
@@ -29,6 +30,7 @@ struct DfFactionState
     bool founded;
     bool extinct;
     bool workFault;             // durable quarantine; never retry an unknown transfer after loading
+    int treasury;               // -1 = legacy/absent; otherwise exact balance captured at the save boundary
     double foundedHour;
     double lastTickHour;
     int techLevel;

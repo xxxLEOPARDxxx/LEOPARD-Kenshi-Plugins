@@ -30,6 +30,10 @@ double DfGameHour();
 // Численность (живые по взводам фракции), деньги, время, загружен ли дом.
 bool DfTakeSnapshot(Faction* f, DfSnapshot& out);
 
+// Exact saved balance, once after native world loading; never an additive grant.
+bool DfRestoreTreasury(Faction* f, int saved);
+bool DfCaptureTreasury(Faction* f, bool restoreFailed, int& saved);
+
 // Стартовый отряд в Хабе (members человек, все навыки = statLevel) и
 // стартовые деньги. false - отряд не создан.
 bool DfFound(Faction* f, TownBase* hub, int members, int money, float statLevel);

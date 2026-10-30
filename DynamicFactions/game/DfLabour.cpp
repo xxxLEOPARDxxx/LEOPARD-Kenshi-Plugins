@@ -49,18 +49,15 @@ namespace
             w.ordered = w.moving = true;
         }
     }
-    int Known(DfFactionState& s, const DfNode& n, const std::vector<Character*>& people)
+    int Known(DfFactionState& s, const DfNode& n, const std::vector<Character*>&)
     {
         if (n.item == NULL || n.itemValue <= 0) return -1;
         for (size_t k=0;k<s.nodes.size();++k)
             if (s.nodes[k].itemSid == n.item->stringID && Pos(s.nodes[k]).squaredDistance(n.pos) < 9.0f)
                 return static_cast<int>(k);
-        // The player's camera is not faction scouting. Only remember a resource
-        // observed within 300m of an actual member; old known resources remain.
-        bool seen=false;
-        for (size_t i=0;i<people.size() && !seen;++i)
-            seen=people[i]->getPosition().squaredDistance(n.pos) <= 300.0f*300.0f;
-        if (!seen || s.nodes.size() >= 512) return -1;
+        // Public local deposits come from the bounded home-area query. They do
+        // not require a speculative scouting circuit before actual mining.
+        if (s.nodes.size() >= 512) return -1;
         DfKnownNode k; k.x=n.pos.x;k.y=n.pos.y;k.z=n.pos.z;k.itemSid=n.item->stringID;k.stored=0;
         s.nodes.push_back(k);
         return static_cast<int>(s.nodes.size()-1);
@@ -81,19 +78,6 @@ namespace
     }
     bool SameHand(const hand& a,const hand& b)
     { DfWorkHandLess less; return !less(a,b) && !less(b,a); }
-    void Scout(Character* c,DfMemberWork& w,DfLabour& rt,const Ogre::Vector3& home,float radius,unsigned long now)
-    {
-        const float angle=static_cast<float>(rt.scoutStep%8)*0.785398163f;
-        const float ring=(std::min)(radius,300.0f*(1+(rt.scoutStep/8)%10));
-        Ogre::Vector3 target=home+Ogre::Vector3(std::cos(angle)*ring,0,std::sin(angle)*ring);
-        if (rt.scoutAt==0) rt.scoutAt=now;
-        Ogre::Vector3 horizontal=c->getPosition();horizontal.y=target.y;
-        // A long walk that still makes progress must reach its waypoint.
-        // Otherwise a rotating distant target can keep the scout near home.
-        if (horizontal.squaredDistance(target)<225.0f)
-        { ++rt.scoutStep;rt.scoutAt=now;w.moving=false;return; }
-        Move(c,w,target);
-    }
 }
 
 void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Character* envoy,
@@ -155,7 +139,7 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
     std::vector<DfTrader> traders;DfFindTraders(hub,traders);
     bool money=false;for(size_t t=0;t<traders.size();++t) if(traders[t].money>0) money=true;
     DfAssignRoles(ms,nodes,true,money);
-    bool scouting=false;rt.carried=0;
+    rt.carried=0;
     for(size_t i=0;i<people.size();++i)
     {
         if(DfTransferFaulted()) break;
@@ -176,7 +160,6 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
             {w.progressAt=clockMs;w.progressPosition=c->getPosition();}
             else if(clockMs-w.progressAt>=30000)
             {
-                if(w.role==DF_ROLE_IDLE) {++rt.scoutStep;rt.scoutAt=clockMs;}
                 Stop(c,w);w.failedTrader=w.trader;w.blockedUntil=clockMs+30000;
                 if(ms[i].carried==0) {w.role=DF_ROLE_IDLE;w.node=-1;}
                 continue;
@@ -201,7 +184,6 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
         }
         if(w.role!=DF_ROLE_HAUL || j<0 || j>=static_cast<int>(n))
         {
-            if(!scouting && w.role==DF_ROLE_IDLE) {Scout(c,w,rt,home,radius,clockMs);scouting=true;}
             continue;
         }
         GameData* item=cargo[i];

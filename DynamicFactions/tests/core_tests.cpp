@@ -775,6 +775,7 @@ static void test_work_invalid_distance_releases_miner()
 #include "haul_tests.inc"
 #include "transfer_tests.inc"
 #include "economy_reload_tests.inc"
+#include "treasury_tests.inc"
 
 static void test_economy_rules_no_created_income_or_tech()
 {
@@ -808,6 +809,7 @@ int main()
     RunHaulTests();
     RunTransferTests();
     RunEconomyReloadTests();
+    RunTreasuryTests();
     test_economy_rules_no_created_income_or_tech();
     test_work_small_node_still_hauls();
     test_names_deterministic();

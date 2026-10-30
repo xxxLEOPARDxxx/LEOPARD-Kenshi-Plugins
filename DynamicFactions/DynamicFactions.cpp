@@ -137,11 +137,12 @@ namespace
 
     struct Runtime
     {
+        bool treasuryRestoreFailed;
         double zeroSince;                   // с какого часа численность 0 (-1 - не 0)
         DfHireTask hire;                    // поход в бар за рекрутом
         DfLabour labour;                    // работа: жилы, копатели, носильщики
         int lastPrice;                      // самый дешёвый рекрут на последнем ходе (для окна)
-        Runtime() : zeroSince(-1.0), lastPrice(-1) {}
+        Runtime() : treasuryRestoreFailed(false), zeroSince(-1.0), lastPrice(-1) {}
     };
 
     std::vector<DfFactionState> g_states;
@@ -150,11 +151,13 @@ namespace
     DWORD g_readyAt = 0;
     DWORD g_lastTick = 0;
     volatile LONG g_saveDepth = 0;
+    bool g_restoreTreasury = false;
     enum SessionSource { SESSION_NONE, SESSION_LOAD, SESSION_NEW };
     SessionSource g_completedSfs = SESSION_NONE;
 
     void UpdateOwnFactions();
     void BeginSession(const char* why);
+    void RestoreTreasuries();
 
 
     void SetStates(std::vector<DfFactionState>& states, const char* why)
@@ -176,6 +179,8 @@ namespace
 
     void MarkReady(const char* why)
     {
+        if (g_ready) return;
+        RestoreTreasuries();
         g_ready = true;
         g_readyAt = GetTickCount();
         UpdateOwnFactions();
@@ -457,6 +462,7 @@ namespace
         // Must run BEFORE native teardown/loading. Clearing these containers
         // does not dereference Character/Faction pointers or resolve any hand.
         g_ready = false;
+        g_restoreTreasury = false;
         g_completedSfs = SESSION_NONE;
         g_readyAt = g_lastTick = 0;
         DfRecruitResetSession();
@@ -611,12 +617,51 @@ namespace
             UpdateWindow();
     }
 
+    void RestoreTreasuries()
+    {
+        if (!g_restoreTreasury) return;
+        g_restoreTreasury = false; // Consume before writes: no repeated credit within this session.
+        for (size_t i=0;i<g_states.size();++i)
+        {
+            DfFactionState& s=g_states[i];
+            if (!s.founded) continue;
+            if (s.treasury < 0)
+            {
+                ErrorLog("DynamicFactions: legacy save has no treasury snapshot; native balance kept");
+                continue;
+            }
+            if (!DfRestoreTreasury(DfBindFaction(s.recordId),s.treasury))
+            {
+                g_runtime[i].treasuryRestoreFailed=true;
+                s.workFault=true;
+                DfQuarantineTransfer("DynamicFactions: saved treasury could not be restored - economy stopped");
+            }
+            else if (g_debug)
+            {
+                char line[128];
+                sprintf_s(line,sizeof(line),"DynamicFactions: treasury restored exactly %d",s.treasury);
+                DebugLog(line);
+            }
+        }
+    }
+
     void WriteState(SaveFileSystem* sfs)
     {
         if (!g_ready)
             return;
         if (DfTransferFaulted())
             for (size_t i=0;i<g_states.size();++i) g_states[i].workFault=true;
+        for (size_t i=0;i<g_states.size();++i)
+        {
+            DfFactionState& s=g_states[i];
+            if (!s.founded) continue;
+            if (!DfCaptureTreasury(DfBindFaction(s.recordId),g_runtime[i].treasuryRestoreFailed,s.treasury))
+            {
+                s.workFault=true;
+                DfQuarantineTransfer("DynamicFactions: could not capture treasury for saving");
+                return;
+            }
+        }
         const std::string path = sfs->writeFile(kStateFile);
         if (path.empty() || !WriteFile(path, DfSerialize(g_states)))
             ErrorLog("DynamicFactions: could not write the faction state (" + path + ")");
@@ -644,6 +689,7 @@ namespace
             loaded.clear();
         }
         SetStates(loaded, "loaded");
+        g_restoreTreasury = true;
         for (size_t i=0;i<g_states.size();++i)
             if (g_states[i].workFault) DfQuarantineTransfer("DynamicFactions: save contains an unresolved transfer - work remains stopped");
         for (size_t i = 0; i < g_states.size(); ++i)

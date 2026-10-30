@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include "game/DfGame.h"
+#include "core/DfTransfer.h"
 
 #include <Windows.h>
 
@@ -375,6 +376,52 @@ double DfGameHour()
 bool DfTakeSnapshot(Faction* f, DfSnapshot& out)
 {
     return SafeTakeSnapshot(f, out);
+}
+
+namespace
+{
+    bool ReadTreasury(Faction* f, int& amount)
+    {
+        __try
+        {
+            if (f == NULL || f->factionOwnerships == NULL) return false;
+            amount = f->factionOwnerships->money;
+            return amount >= 0;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        { ErrorLog("DynamicFactions: treasury read fault"); return false; }
+    }
+    bool SetTreasury(Faction* f, int amount)
+    {
+        __try
+        {
+            if (f == NULL || f->factionOwnerships == NULL || amount < 0) return false;
+            f->factionOwnerships->setMoney(amount);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        { ErrorLog("DynamicFactions: treasury restoration fault"); return false; }
+    }
+    class NativeTreasury : public DfTreasuryPort
+    {
+        Faction* f_;
+    public:
+        explicit NativeTreasury(Faction* f) : f_(f) {}
+        virtual bool Read(int& amount) { return ReadTreasury(f_, amount); }
+        virtual bool Set(int amount) { return SetTreasury(f_, amount); }
+    };
+}
+
+bool DfRestoreTreasury(Faction* f, int saved)
+{
+    NativeTreasury port(f);
+    return DfRestoreTreasuryBalance(port, saved);
+}
+
+bool DfCaptureTreasury(Faction* f, bool restoreFailed, int& saved)
+{
+    NativeTreasury port(f);
+    return DfCaptureTreasuryBalance(port, restoreFailed, saved);
 }
 
 bool DfFound(Faction* f, TownBase* hub, int members, int money, float statLevel)

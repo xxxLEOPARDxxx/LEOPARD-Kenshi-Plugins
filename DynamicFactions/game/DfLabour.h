@@ -41,12 +41,10 @@ struct DfLabour
 {
     std::map<hand, DfMemberWork, DfWorkHandLess> members;
     unsigned long loggedMs;
-    unsigned long scoutAt;
-    unsigned int scoutStep;
     int carried;
     int sold;
     int revenue;
-    DfLabour() : loggedMs(0), scoutAt(0), scoutStep(0), carried(0), sold(0), revenue(0) {}
+    DfLabour() : loggedMs(0), carried(0), sold(0), revenue(0) {}
 };
 // Work only with real inventories in the loaded world. Legacy virtual stock is
 // preserved in the save, quarantined from production, pickup and sale.
