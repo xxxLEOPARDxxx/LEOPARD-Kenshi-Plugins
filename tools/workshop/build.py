@@ -190,7 +190,7 @@ ITEMS = [
          en="Bannerlord-style squad formations: drag a shape, march in order, and keep a formation "
             "while following the leader - 13 follow shapes, a shape of its own for every squad. A fork of "
             "Slinkysalmon03's Formations with settings in Mod Config Menu."),
-    dict(mod="RecruitMarkers", title="Recruit Markers (QoL)", nexus=2232, version="3",
+    dict(mod="RecruitMarkers", title="Recruit Markers (QoL)", nexus=2232, version="4",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='Recruit bubbles, trader coins and gold squad-leader stars, with a shared show key and independent star size.'),
 ]

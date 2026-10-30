@@ -1,15 +1,14 @@
 {
   "RecruitMarkers": {
-    "version": "3",
+    "version": "4",
+    "published_version": "3",
     "ru": [
-      "[b]Звёзды над лидерами отрядов.[/b] Лидеры отмечаются золотой звездой по той же клавише и на той же дальности, что рекруты и торговцы; можно отдельно скрыть лидеров игрока.",
-      "[b]Отдельный размер звезды.[/b] Настраивается независимо от значков найма и монет, по умолчанию 20 пикселей. Цвет тоже можно изменить.",
-      "[b]Меньше повторной работы.[/b] Проверки диалогов распределены по времени, а не повторяются для всех персонажей каждый кадр."
+      "[b]Звёзды только у настоящих лидеров группы.[/b] У лидера должен быть хотя бы один другой живой участник того же загруженного отряда. Одиночные торговцы и рекруты больше не получают звезду.",
+      "[b]Корректный состав отряда.[/b] Мёртвые участники и персонажи, уже перешедшие в другую группу, не создают ложную отметку лидера. Торговец с реальной охраной по-прежнему может быть лидером."
     ],
     "en": [
-      "[b]Stars above squad leaders.[/b] A gold star identifies leaders using the same show key and range as recruit and trader markers; player leaders can be hidden separately.",
-      "[b]Independent star size.[/b] Adjustable separately from recruit bubbles and coins, 20 pixels by default. Star colour is adjustable too.",
-      "[b]Less repeated work.[/b] Dialogue checks are spread over time instead of being repeated for every character every frame."
+      "[b]Stars for actual group leaders.[/b] A leader must have at least one other living member in the same loaded squad. Solo traders and recruits no longer receive a star.",
+      "[b]Accurate squad membership.[/b] Dead members and characters who have moved to another group cannot create a false leader marker. A trader with real followers can still be a leader."
     ]
   },
   "AssignedWorkers": {

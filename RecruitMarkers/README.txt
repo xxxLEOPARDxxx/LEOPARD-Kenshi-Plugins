@@ -1,6 +1,18 @@
 RECRUIT MARKERS (QoL)
 
-ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 3 (29–30.10.2026)
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 4 (30.10.2026)
+
+Звезда требует фактического лидера и хотя бы одного другого живого участника
+того же загруженного отряда. Одиночные торговцы и рекруты больше не отмечаются.
+Мёртвые, пустые и сменившие отряд записи не считаются последователями.
+
+VERSION 4 CHANGES (30 OCTOBER 2026)
+
+A star requires the actual leader and at least one other living member of the
+same loaded squad. Solo traders and recruits no longer receive a leader marker.
+Dead, empty and stale roster entries do not count as followers.
+
+ИЗМЕНЕНИЯ ВЕРСИИ 3 (29–30.10.2026)
 
   * Над фактическим лидером загруженного отряда появляется золотая
     звезда. Используется лидер, назначенный самой игрой, а не первый
