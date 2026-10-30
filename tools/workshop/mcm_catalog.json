@@ -1,0 +1,648 @@
+[
+  {
+    "package": "AIFixed",
+    "name": "AI Fixed",
+    "id": "AIFixed",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\AIFixed",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\AIFixed\\AIFixed.cpp",
+        "line": 1139,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "AssignedWorkers",
+    "name": "Assigned Workers",
+    "id": "AssignedWorkers",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\AssignedWorkers",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\AssignedWorkers\\AssignedWorkers.cpp",
+        "line": 1095,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "BestMinimap",
+    "name": "Best Minimap",
+    "id": "BestMinimap",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\BestMinimap",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\BestMinimap\\BestMinimap.cpp",
+        "line": 3619,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "BuildModeGizmo",
+    "name": "Build Mode Gizmo",
+    "id": "BuildModeGizmo",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\BuildModeGizmo",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\BuildModeGizmo\\BuildModeGizmo.cpp",
+        "line": 1301,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "DynamicFactions",
+    "name": "Dynamic Factions",
+    "id": "DynamicFactions",
+    "group": "optional_experimental",
+    "status": "in_development_not_release_catalog",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\DynamicFactions",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\DynamicFactions\\DynamicFactions.cpp",
+        "line": 669,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "GearCompare",
+    "name": "Gear Compare Alt",
+    "id": "GearCompare",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\GearCompare",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\GearCompare\\GearCompare.cpp",
+        "line": 2769,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "ItemMarkers",
+    "name": "Item Markers",
+    "id": "ItemMarkers",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\ItemMarkers",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\ItemMarkers\\ItemMarkers.cpp",
+        "line": 941,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "LiveXpBars",
+    "name": "Live Xp Bars",
+    "id": "LiveXpBars",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\LiveXpBars",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\LiveXpBars\\LiveXpBars.cpp",
+        "line": 1520,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "ModConfigMenu",
+    "name": "Mod Config Menu",
+    "id": "ModConfigMenu",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\ModConfigMenu",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\ModConfigMenu\\ModConfigMenu.cpp",
+        "line": 3013,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "MultiXPMining",
+    "name": "Multi XP Mining",
+    "id": "MultiXPMining",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\MultiXPMining",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\MultiXPMining\\MiningSettings.cpp",
+        "line": 75,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "PatientSelfAid",
+    "name": "Patient Self Aid",
+    "id": "PatientSelfAid",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\PatientSelfAid",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\PatientSelfAid\\PatientSelfAid.cpp",
+        "line": 592,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "QuickStartSelect",
+    "name": "Quick Start Select",
+    "id": "QuickStartSelect",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\QuickStartSelect",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\QuickStartSelect\\QuickStartSelect.cpp",
+        "line": 2413,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "RangedDamageXp",
+    "name": "Ranged Damage Xp",
+    "id": "RangedDamageXp",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\RangedDamageXp",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\RangedDamageXp\\RangedDamageXp.cpp",
+        "line": 309,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "RecruitMarkers",
+    "name": "Recruit Markers",
+    "id": "RecruitMarkers",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\RecruitMarkers",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\RecruitMarkers\\RecruitMarkers.cpp",
+        "line": 1017,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "SkillLevelUpInfo",
+    "name": "Skill Level Up Info",
+    "id": "SkillLevelUpInfo",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\SkillLevelUpInfo",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\SkillLevelUpInfo\\SkillLevelUpInfo.cpp",
+        "line": 165,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "StatColours",
+    "name": "Stat Colours",
+    "id": "StatColours",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\StatColours",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\StatColours\\StatColours.cpp",
+        "line": 2531,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "UITweaks",
+    "name": "UI Tweaks",
+    "id": "UITweaks",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\UITweaks",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\UITweaks\\UITweaks.cpp",
+        "line": 3667,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "WantedMap",
+    "name": "Wanted Map",
+    "id": "WantedMap",
+    "group": "own",
+    "status": "canonical_supported",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\WantedMap",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\WantedMap\\WantedMap.cpp",
+        "line": 1619,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Auto-Pause-on-Load",
+    "name": "Auto Pause on Load",
+    "id": "auto_pause_on_load",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Auto-Pause-on-Load",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Auto-Pause-on-Load\\AutoPauseModHub.inl",
+        "line": 446,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "BetterLooting",
+    "name": "Better Looting",
+    "id": "BetterLooting",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "XxAtreuSSxX",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\BetterLooting",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\BetterLooting\\Source\\BetterLooting.cpp",
+        "line": 8600,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Character-Highlight",
+    "name": "Character Highlight",
+    "id": "CharacterHighlight",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "BFrizzleFoShizzle",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Character-Highlight",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Character-Highlight\\CharacterHighlight.cpp",
+        "line": 496,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Character Inspector",
+    "name": "Character Inspector",
+    "id": "CharacterInspector",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "shutori",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\CharacterInspector",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\CharacterInspector\\src\\InspectorSettings.cpp",
+        "line": 22,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Container-Highlight",
+    "name": "Container Highlight",
+    "id": "container_highlight",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Container-Highlight",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Container-Highlight\\Container-Highlight.cpp",
+        "line": 8640,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Formations",
+    "name": "Formations",
+    "id": "Formations",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "Slinkysalmon03",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Formations",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Formations\\Formations.cpp",
+        "line": 893,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Hidden-Faction-Relations",
+    "name": "Hidden Faction Relations",
+    "id": "hidden_faction_relations",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Hidden-Faction-Relations",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Hidden-Faction-Relations\\src\\HiddenFactionRelationsModHub.cpp",
+        "line": 294,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Job-B-Gone",
+    "name": "Job-B-Gone",
+    "id": "job_b_gone",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Job-B-Gone",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Job-B-Gone\\src\\JobBGoneModHub.inl",
+        "line": 710,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "KenshiJobManagement",
+    "name": "Kenshi Job Management",
+    "id": "KenshiJobManagement",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "SirixKC",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KenshiJobManagement",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KenshiJobManagement\\src\\KenshiJobManagement.cpp",
+        "line": 751,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "KenshiRotate",
+    "name": "Rotate Items",
+    "id": "KenshiRotate",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "jacobericson",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KenshiRotate",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KenshiRotate\\src\\McmSettings.cpp",
+        "line": 100,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "KillCounter",
+    "name": "Kill Counter",
+    "id": "KillCounter",
+    "group": "other_fork",
+    "status": "local_only_permission_unconfirmed",
+    "author": "Rokeshi",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KillCounter",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KillCounter\\KillCounter.cpp",
+        "line": 624,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Loot-Scoot-Execute",
+    "name": "Loot-Scoot-Execute",
+    "id": "loot_scoot_execute",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Loot-Scoot-Execute",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Loot-Scoot-Execute\\LootScootExecuteModHubBridge.inl",
+        "line": 709,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Map-markers",
+    "name": "Map-markers",
+    "id": "map_markers",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Map-markers",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Map-markers\\src\\MapMarkersModHub.cpp",
+        "line": 380,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Organize-the-Crafting-Stations",
+    "name": "Organize the Crafting Stations",
+    "id": "organize_the_crafting_stations",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Crafting-Stations",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Crafting-Stations\\src\\CraftingModHub.cpp",
+        "line": 420,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Organize-the-Inventory",
+    "name": "Organize the Inventory",
+    "id": "organize_the_inventory",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Inventory",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Inventory\\src\\InventoryModHub.cpp",
+        "line": 826,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Organize-the-Trader",
+    "name": "Organize the Trader",
+    "id": "organize_the_trader",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Trader",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Trader\\src\\TraderModHub.cpp",
+        "line": 582,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Vital-Read",
+    "name": "Vital Read",
+    "id": "vital_read",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Vital-Read",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Vital-Read\\VitalReadModHub.inl",
+        "line": 472,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Vital-Sense",
+    "name": "Vital Sense",
+    "id": "vital_sense",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Vital-Sense",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Vital-Sense\\src\\vs_mod_hub.cpp",
+        "line": 1140,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "Wall-B-Gone",
+    "name": "Wall-B-Gone",
+    "id": "wall_b_gone",
+    "group": "emkej_fork",
+    "status": "canonical_supported",
+    "author": "Emkej8",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Wall-B-Gone",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Wall-B-Gone\\src\\WallBGoneModHub.inl",
+        "line": 730,
+        "method": "bridge"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "XP_Overhaul",
+    "name": "XP Overhaul",
+    "id": "XP_Overhaul",
+    "group": "optional_experimental",
+    "status": "external_local_noncanonical",
+    "author": "Asur",
+    "source": null,
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\XP_Overhaul-src\\XP_Overhaul\\XP_Overhaul.cpp",
+        "line": 3068,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  }
+]

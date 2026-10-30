@@ -188,7 +188,7 @@ ITEMS = [
     dict(mod="Formations", title="Formations Extended (MCM fork) (QoL)", nexus=2235, version="1",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Bannerlord-style squad formations: drag a shape, march in order, and keep a formation "
-            "while following the leader - 14 shapes, a shape of its own for every squad. A fork of "
+            "while following the leader - 13 follow shapes, a shape of its own for every squad. A fork of "
             "Slinkysalmon03's Formations with settings in Mod Config Menu."),
     dict(mod="RecruitMarkers", title="Recruit Markers (QoL)", nexus=2232, version="3",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
@@ -382,6 +382,58 @@ def is_player_ini(mod, name):
             and os.path.isfile(os.path.join(d, name[:-4] + ".defaults.ini")))
 
 
+def render_descriptions(item):
+    """Render the same complete headers/bodies without rebuilding files/screens."""
+    mod = item["mod"]
+    src = mod_dir(mod)
+    readme_path = os.path.join(src, "README.txt") if src else ""
+    readme = io.open(readme_path, encoding="utf-8-sig").read() if readme_path and os.path.isfile(readme_path) else ""
+    nexus = "https://www.nexusmods.com/kenshi/mods/%d" % item["nexus"] if item.get("nexus") else None
+    # Русское описание - README с Nexus, шапка по-русски.
+    # plugin=False - мод без DLL (интерфейс): ни RE_Kenshi, ни MCM ему не нужны.
+    plugin = item.get("plugin", True)
+    ru = [u"[b]Требуется RE_Kenshi.[/b]"] if plugin else []
+    # Ссылка на MCM - у всех модов, кроме него самого (просьба игрока в Steam,
+    # 05.10.2026: «чтобы новичкам было легко найти»). В Steam - на Мастерскую,
+    # для Nexus nexus_desc.py меняет её на страницу Nexus.
+    if mod != "ModConfigMenu" and plugin:
+        ru.append(u"Настройки прямо в игре - с модом [url=%s]Mod Config Menu[/url] (не обязателен)." % MCM_STEAM_URL)
+    if item["lang"]:
+        ru.append(u"[i]Текст в игре - на языке игры: %s.[/i]" % mod_languages(mod)[0])
+    ru += ["", (u"Версия %s · Nexus: %s" % (item["version"], nexus)) if nexus
+           else (u"Версия %s" % item["version"]), ""]
+    overrides = {}
+    odir = os.path.join(HERE, "ru_sections", mod)
+    if os.path.isdir(odir):
+        for f in os.listdir(odir):
+            if f.endswith(".txt"):
+                overrides[f[:-4]] = io.open(os.path.join(odir, f), encoding="utf-8").read()
+    # Текст для игроков (desc/<Mod>.ru.txt, make_desc.py) - если есть; иначе
+    # README. README - полный справочник с ключами ini и устройством, игрокам
+    # в Steam и на Nexus это не нужно.
+    player_ru = os.path.join(HERE, "desc", mod + ".ru.txt")
+    if os.path.isfile(player_ru):
+        body_ru = io.open(player_ru, encoding="utf-8").read().strip("\n")
+    else:
+        body_ru = readme_to_bbcode(readme, item["drop"], overrides)
+    desc_ru = "\n".join(ru) + "\n" + body_ru
+
+    # Английское - перевод тех же разделов (workshop\\en\\<Mod>.txt).
+    en = [("[b]Requires RE_Kenshi.[/b] " if plugin else "") + item["en"]]
+    if mod != "ModConfigMenu" and plugin:
+        en.append("In-game settings with [url=%s]Mod Config Menu[/url] (optional)." % MCM_STEAM_URL)
+    if item["lang"]:
+        en.append("[i]In-game text follows the game language: %s.[/i]" % mod_languages(mod)[1])
+    en += ["", ("Version %s · Nexus: %s" % (item["version"], nexus)) if nexus
+           else ("Version %s" % item["version"]), ""]
+    player_en = os.path.join(HERE, "desc", mod + ".en.txt")
+    body_en = io.open(player_en if os.path.isfile(player_en) else os.path.join(HERE, "en", mod + ".txt"),
+                      encoding="utf-8").read().strip("\n")
+    desc_en = "\n".join(en) + "\n" + body_en
+
+    return desc_ru, desc_en
+
+
 def build(item):
     mod = item["mod"]
     check_glyphs(mod, mod_dir(mod))
@@ -438,47 +490,7 @@ def build(item):
     readme = io.open(readme_path, encoding="utf-8-sig").read() if os.path.isfile(readme_path) else ""
     nexus = "https://www.nexusmods.com/kenshi/mods/%d" % item["nexus"] if item.get("nexus") else None
 
-    # Русское описание - README с Nexus, шапка по-русски.
-    # plugin=False - мод без DLL (интерфейс): ни RE_Kenshi, ни MCM ему не нужны.
-    plugin = item.get("plugin", True)
-    ru = [u"[b]Требуется RE_Kenshi.[/b]"] if plugin else []
-    # Ссылка на MCM - у всех модов, кроме него самого (просьба игрока в Steam,
-    # 05.10.2026: «чтобы новичкам было легко найти»). В Steam - на Мастерскую,
-    # для Nexus nexus_desc.py меняет её на страницу Nexus.
-    if mod != "ModConfigMenu" and plugin:
-        ru.append(u"Настройки прямо в игре - с модом [url=%s]Mod Config Menu[/url] (не обязателен)." % MCM_STEAM_URL)
-    if item["lang"]:
-        ru.append(u"[i]Текст в игре - на языке игры: %s.[/i]" % mod_languages(mod)[0])
-    ru += ["", (u"Версия %s · Nexus: %s" % (item["version"], nexus)) if nexus
-           else (u"Версия %s" % item["version"]), ""]
-    overrides = {}
-    odir = os.path.join(HERE, "ru_sections", mod)
-    if os.path.isdir(odir):
-        for f in os.listdir(odir):
-            if f.endswith(".txt"):
-                overrides[f[:-4]] = io.open(os.path.join(odir, f), encoding="utf-8").read()
-    # Текст для игроков (desc/<Mod>.ru.txt, make_desc.py) - если есть; иначе
-    # README. README - полный справочник с ключами ini и устройством, игрокам
-    # в Steam и на Nexus это не нужно.
-    player_ru = os.path.join(HERE, "desc", mod + ".ru.txt")
-    if os.path.isfile(player_ru):
-        body_ru = io.open(player_ru, encoding="utf-8").read().strip("\n")
-    else:
-        body_ru = readme_to_bbcode(readme, item["drop"], overrides)
-    desc_ru = "\n".join(ru) + "\n" + body_ru
-
-    # Английское - перевод тех же разделов (workshop\\en\\<Mod>.txt).
-    en = [("[b]Requires RE_Kenshi.[/b] " if plugin else "") + item["en"]]
-    if mod != "ModConfigMenu" and plugin:
-        en.append("In-game settings with [url=%s]Mod Config Menu[/url] (optional)." % MCM_STEAM_URL)
-    if item["lang"]:
-        en.append("[i]In-game text follows the game language: %s.[/i]" % mod_languages(mod)[1])
-    en += ["", ("Version %s · Nexus: %s" % (item["version"], nexus)) if nexus
-           else ("Version %s" % item["version"]), ""]
-    player_en = os.path.join(HERE, "desc", mod + ".en.txt")
-    body_en = io.open(player_en if os.path.isfile(player_en) else os.path.join(HERE, "en", mod + ".txt"),
-                      encoding="utf-8").read().strip("\n")
-    desc_en = "\n".join(en) + "\n" + body_en
+    desc_ru, desc_en = render_descriptions(item)
 
     for name, text in (("description_ru.txt", desc_ru), ("description_en.txt", desc_en)):
         io.open(os.path.join(dst, name), "w", encoding="utf-8", newline="\n").write(text)

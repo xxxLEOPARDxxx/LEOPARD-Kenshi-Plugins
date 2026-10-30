@@ -1,0 +1,940 @@
+{
+  "Auto-Pause-on-Load": {
+    "name": "Auto-Pause on Load",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1867",
+    "source_url": "https://github.com/Emkej/Auto-Pause-on-Load",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "5",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Исправлена передача паузы между торговлей и инвентарём при переключении персонажа.",
+        "Добавлена устойчивая пауза после импорта сохранения, прекращающая удержание при вводе игрока.",
+        "Добавлена пауза при ударе по невыбранному отряду с интервалом 0–300 секунд."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Fixed pause ownership when switching characters between trade and inventory.",
+        "Added a stable save-import pause that stops holding when the player provides input.",
+        "Added pausing when an unselected squad is hit, with a 0–300 second interval."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Исправлена пауза, остававшаяся после торговли при переключении персонажа: окна торговли и инвентаря корректно передают друг другу паузу плагина."
+        ],
+        "en": [
+          "Fixed the pause remaining after trade when switching characters: trade and inventory windows now pass the plugin-owned pause between them."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Добавлены пауза после импорта сохранения и пауза при ударе по персонажу невыбранного отряда. На чистой установке настройки создаются из defaults."
+        ],
+        "en": [
+          "Added pausing after save import and when a character in an unselected squad is hit. Fresh installations create settings from defaults."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Интервал паузы при нападении на отряд настраивается от 0 до 300 секунд; по умолчанию 30, ноль означает каждый удар."
+        ],
+        "en": [
+          "The attacked-squad pause interval is adjustable from 0 to 300 seconds; default 30, with zero pausing on every hit."
+        ]
+      },
+      "5": {
+        "ru": [
+          "Пауза после импорта ждёт стабилизации загрузки и восстанавливается, если игра снимет её сама. Нажатие игроком клавиши или кнопки прекращает удержание."
+        ],
+        "en": [
+          "The import pause waits for loading to settle and is restored if the game lifts it automatically. Player keyboard or mouse-button input stops the hold."
+        ]
+      }
+    }
+  },
+  "BetterLooting": {
+    "name": "Better Looting",
+    "author": "XxAtreuSSxX",
+    "original_url": "https://github.com/XxAtreuSSxX/BetterLooting",
+    "source_url": "https://github.com/XxAtreuSSxX/BetterLooting",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "4",
+    "changes": {
+      "ru": [
+        "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
+        "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже."
+      ],
+      "en": [
+        "MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.",
+        "Required items, protected player storage and nearest-first ground pickup. Details and settings are below."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки, профили и выбор клавиши перенесены из отдельного окна в MCM; интерфейс следует английскому, русскому или китайскому языку игры."
+        ],
+        "en": [
+          "Settings, profiles and key assignment moved from the separate window to MCM; text follows the English, Russian or Chinese game language."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Исправлен повторный перенос уже принятой игрой вещи, вызывавший вылет с рюкзаками KEO и объединением стопок. Краденым считается взятое у живого человека без сознания, но не с мёртвых, животных и животных-роботов."
+        ],
+        "en": [
+          "Fixed duplicate transfers after the game accepted an item, preventing the backpack/KEO and merged-stack crash. Taking from dead characters, animals or animal robots is no longer treated as stealing from a living unconscious person."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Восстановлен доступ к прежней раскладке по хранилищам: Alt+Insert кладёт всё ненадетое в ближайшее принимающее хранилище игрока. Можно ограничить раскладку правилами сбора; непоместившиеся вещи остаются у персонажа."
+        ],
+        "en": [
+          "Restored access to upstream storage deposit: Alt+Insert puts unequipped items into nearby player storage that accepts them. Deposit can follow loot filters; items with no room stay with the character."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Добавлены точный список имён/ID обязательной добычи, защита хранилищ игрока по умолчанию и необязательный подбор с земли, изначально выключенный. Подбор ограничен 256 результатами и 32 приказами; маршрут идёт от ближайшей вещи к следующей ближайшей без приоритета цены за вес, сохраняя прежние приказы и проверки кражи/вместимости."
+        ],
+        "en": [
+          "Added an exact name/ID required-item list, player-storage protection enabled by default and optional ground pickup, off by default. Ground pickup is bounded to 256 results and 32 orders and follows nearest-neighbor routing instead of value-per-weight priority, preserving existing orders and theft/capacity checks."
+        ]
+      }
+    }
+  },
+  "Character-Highlight": {
+    "name": "Character Highlight",
+    "author": "BFrizzleFoShizzle",
+    "original_url": "https://github.com/BFrizzleFoShizzle/KenshiLib_Examples",
+    "source_url": "https://github.com/BFrizzleFoShizzle/KenshiLib_Examples",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "2",
+    "changes": {
+      "ru": [
+        "Добавлены MCM и русский/английский/китайский интерфейс, отдельные переключатели категорий, дальность и настройки окраски.",
+        "Отношения кэшируются; неизменная окраска не повторяется каждый кадр, без клавиши выполняется однократный сброс.",
+        "Добавлен отдельный цвет дипломатов с распознаванием класса персонажа, исправлен персонаж без фракции; прежние исправления портретов сохранены."
+      ],
+      "en": [
+        "Added MCM and Russian/English/Chinese text, separate category toggles, range and tint settings.",
+        "Relations are cached; unchanged tint is not rewritten every frame, and releasing the key performs a single reset.",
+        "Added a separate diplomat color with character-class detection, fixed factionless characters and retained upstream portrait fixes."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Добавлены MCM и три языка, отдельные переключатели категорий и цвет дипломатов, исправлен персонаж без фракции. Отношения кэшируются, неизменная окраска не записывается каждый кадр, после отпускания клавиши она снимается один раз."
+        ],
+        "en": [
+          "Added MCM and three languages, separate category toggles and diplomat color, plus a factionless-character fix. Relations are cached, unchanged tint is not written every frame, and releasing the key resets it once."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Дипломаты распознаются также по классу персонажа, поэтому отмечаются посланники, добавленные модами, а не только отряды с подходящим именем."
+        ],
+        "en": [
+          "Diplomats are also recognized by character class, covering modded envoys rather than relying only on squad names."
+        ]
+      }
+    }
+  },
+  "Character Inspector": {
+    "name": "Character Inspector",
+    "author": "shutori",
+    "original_url": "https://github.com/shutori/Shutori_Re_Kenshi_Source",
+    "source_url": "https://github.com/shutori/Shutori_Re_Kenshi_Source",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "1",
+    "changes": {
+      "ru": [
+        "В MCM можно включить осмотр и кнопку инвентаря; отдельное назначение открытия убрано.",
+        "Интерфейс и настройки поддерживают русский, английский и китайский; прежние переводы сообщества и исправления LEOPARD сохранены.",
+        "Убраны повторные поиски и лишние перестановки кнопок; привязки очищаются при закрытии окон, осмотр закрывается при удалении персонажа."
+      ],
+      "en": [
+        "MCM controls enable inspection and the inventory button; the separate open binding is removed.",
+        "Interface and settings support Russian, English and Chinese; earlier community translations and LEOPARD fixes are retained.",
+        "Repeated button searches and unnecessary layout changes were removed; bindings are cleared on window close, and inspection closes when its character is destroyed."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Добавлены MCM-переключатели осмотра и кнопки инвентаря, английский/русский/китайский интерфейс; старое назначение открытия больше не используется. Убраны повторные поиски и лишние перестановки кнопок, кэш очищается при закрытии окон, осмотр закрывается при удалении персонажа."
+        ],
+        "en": [
+          "Added MCM controls for the inspector and inventory button with English, Russian and Chinese text; the obsolete open binding is no longer used. Repeated button searches and unnecessary layout changes were removed, cached controls are cleared on close, and inspection closes when its character is destroyed."
+        ]
+      }
+    }
+  },
+  "Container-Highlight": {
+    "name": "Container-Highlight",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1953",
+    "source_url": "https://github.com/Emkej/Container-Highlight",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "2",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Исправлена очистка копий материалов и повторных выделений памяти при поиске; значки и окраска не настраиваются заново каждый кадр.",
+        "Клавиша и Ctrl/Shift/Alt задаются одним сочетанием; постоянная диагностическая нагрузка сокращена."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Corrected material-clone cleanup and repeated scan allocations; markers and tint are not reset every frame.",
+        "The key and Ctrl/Shift/Alt use one binding, with reduced always-on diagnostic overhead."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы. Исправлено удержание копий материалов, сокращена постоянная диагностическая нагрузка."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations. Retained material clones and always-on diagnostic overhead were corrected."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Значки и окраска обновляются при изменениях вместо повторной настройки каждый кадр; исправлены выделения памяти при поиске контейнеров. Клавиша с Ctrl/Shift/Alt задаётся одним сочетанием без отдельных флажков модификаторов."
+        ],
+        "en": [
+          "Markers and tint update when needed instead of being reset every frame, and container-scan allocations were corrected. Ctrl/Shift/Alt modifiers are assigned as one binding rather than separate checkboxes."
+        ]
+      }
+    }
+  },
+  "Formations": {
+    "name": "Formations - Squad Formations",
+    "author": "Slinkysalmon03",
+    "original_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3795714050",
+    "source_url": null,
+    "source_note": {
+      "ru": "Автор приложил исходники к оригинальному моду в Steam Workshop; отдельный публичный репозиторий не подтверждён.",
+      "en": "The author shipped source code with the original Steam Workshop mod; no separate public repository has been verified."
+    },
+    "version": "1",
+    "changes": {
+      "ru": [
+        "Добавлен строй при следовании с 13 доступными фигурами: 3 игровых и 10 новых; выбор каждого отряда хранится с сохранением.",
+        "К четырём исходным фигурам перетаскивания добавлены семь, всего 11.",
+        "Любая клавиша или сочетание как модификатор; «Держать» после построения можно отключить; MCM и три языка."
+      ],
+      "en": [
+        "Added follow formations with 13 offered shapes: 3 native and 10 new; each squad selection is stored with the save.",
+        "Seven shapes join the four original drag formations, for 11 in total.",
+        "Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Добавлен строй при следовании: 13 доступных фигур (3 игровых и 10 новых), отдельный выбор для каждого отряда с сохранением; для перетаскивания доступны 11 фигур (4 исходных и 7 новых). Добавлены произвольный модификатор, отключаемое «Держать» после построения и MCM на английском, русском и китайском."
+        ],
+        "en": [
+          "Added follow formations with 13 offered shapes (3 native and 10 new), per-squad selection saved with the game, and 11 drag shapes (4 original and 7 new). Added an arbitrary modifier key, optional Hold after forming up, and English/Russian/Chinese MCM settings."
+        ]
+      }
+    }
+  },
+  "Hidden-Faction-Relations": {
+    "name": "Hidden-Faction-Relations",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1915",
+    "source_url": "https://github.com/Emkej/Hidden-Faction-Relations",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "2",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Список открывается на странице MCM; убраны неработавшая Ctrl+Alt+G и настройки размера поиска."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The list opens from MCM; the nonworking Ctrl+Alt+G shortcut and search-size controls were removed."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Убраны неработавшая клавиша Ctrl+Alt+G и настройки размеров поиска: список открывается на странице MCM."
+        ],
+        "en": [
+          "Removed the nonworking Ctrl+Alt+G shortcut and search-size controls; the list opens from its MCM page."
+        ]
+      }
+    }
+  },
+  "Job-B-Gone": {
+    "name": "Job-B-Gone",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1870",
+    "source_url": "https://github.com/Emkej/Job-B-Gone",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "5",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Панель прячется под локализованным меню паузы и запоминает скрытие клавишей между запусками.",
+        "Одно сочетание вместо отдельных модификаторов; читаемые цвета и меньше повторной перестройки панели.",
+        "Режим подтверждения переведён целиком."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The panel respects localized pause menus and remembers hotkey hiding across restarts.",
+        "One binding replaces separate modifier controls, with readable colors and fewer repeated panel updates.",
+        "The confirmation mode is fully translated."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Панель корректно прячется под меню паузы в неанглийской игре; убраны частые обходы всего интерфейса."
+        ],
+        "en": [
+          "The panel hides under the pause menu in non-English games; frequent full-interface scans were removed."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Скрытие панели клавишей Ctrl+B запоминается между перезапусками игры и загрузками сохранений."
+        ],
+        "en": [
+          "Hiding the panel with Ctrl+B is remembered across game restarts and save loads."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Клавиша задаётся одним сочетанием с модификаторами. Неизменная раскладка не перестраивается повторно, надписи используют читаемые цвета кнопок панели."
+        ],
+        "en": [
+          "The key is assigned as one binding with modifiers. Unchanged layouts are not rebuilt, and labels use readable colors from the panel buttons."
+        ]
+      },
+      "5": {
+        "ru": [
+          "Переведены подписи после первого щелчка, подсказка и окно режима подтверждения."
+        ],
+        "en": [
+          "Translated the first-click confirmation captions, hint and confirmation dialog."
+        ]
+      }
+    }
+  },
+  "KenshiJobManagement": {
+    "name": "Kenshi Job Management",
+    "author": "SirixKC",
+    "original_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3785306982",
+    "source_url": "https://github.com/SirixKC/KenshiJobManagement",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "4",
+    "changes": {
+      "ru": [
+        "Окно переведено на родные скины, шрифты и палитру игры с масштабированием; поддерживаются и темы из Workshop.",
+        "Добавлены MCM и русский/английский/китайский; исправлено колесо во вкладке станций и окне работников.",
+        "Более чёткие значки 256×256; восстановлены флаги сборки для переноса и групповых действий с задачами."
+      ],
+      "en": [
+        "The window uses native game skins, fonts and palette with scaling, including Workshop themes.",
+        "Added MCM and Russian/English/Chinese text, and fixed wheel scrolling in the Stations tab and worker window.",
+        "Sharper 256×256 icons and restored build flags for job transfer and batch actions."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Окно переведено на родные скины, шрифты и цвета игры с масштабированием, MCM и английским/русским/китайским интерфейсом. Исправлены скачки колеса во вкладке станций и окне работников."
+        ],
+        "en": [
+          "Reworked the window with native game skins, fonts and colors, scaling, MCM and English/Russian/Chinese text. Fixed mouse-wheel jumps in the Stations tab and worker window."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Значки категорий, карточек задач и кнопки JM заменены более чёткими изображениями 256×256 вместо 96×96."
+        ],
+        "en": [
+          "Station-category, job-card and JM-button icons were replaced with sharper 256×256 images instead of 96×96."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Восстановлены флаги сборки, включающие перенос и копирование задач, добавление и приоритет лечения, удаление недействительных задач."
+        ],
+        "en": [
+          "Restored build flags enabling job transfer/copy, adding and prioritizing healing, and removing invalid jobs."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Поиск палитры учитывает интерфейсы из Steam Workshop, устраняя светлые карточки и тёмный текст при тёмном интерфейсе."
+        ],
+        "en": [
+          "Theme lookup now includes Steam Workshop interface mods, correcting light cards and dark text under a dark interface."
+        ]
+      }
+    }
+  },
+  "KenshiRotate": {
+    "name": "Rotate Items",
+    "author": "jacobericson",
+    "original_url": "https://github.com/jacobericson/KenshiRotate",
+    "source_url": "https://github.com/jacobericson/KenshiRotate",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "1",
+    "changes": {
+      "ru": [
+        "MCM заменяет прежнюю вкладку MODS: одно назначение клавиатуры или мыши с модификаторами, MMB по умолчанию; NONE отключает ввод. Для назначения мыши нужен MCM 10 или новее.",
+        "Первый активный прежний способ переносится автоматически; существующее новое сочетание и личные настройки сохраняются.",
+        "Исправлены повторные повороты после фокуса инвентаря; редактируемые поля и окно настроек блокируют вращение.",
+        "Добавлены русский, английский и китайский, сокращены лишние обновления значков, ссылки очищаются при удалении предметов и значков."
+      ],
+      "en": [
+        "MCM replaces the old MODS controls: one keyboard or mouse binding with modifiers, MMB by default; NONE disables input. Mouse assignment requires MCM 10 or newer.",
+        "The first active legacy binding migrates automatically; an existing new binding and personal settings are preserved.",
+        "Repeated rotation after inventory focus was fixed; editable fields and the Options window block rotation.",
+        "Added Russian, English and Chinese text, fewer redundant icon updates, and reference cleanup when items or icons are destroyed."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из MODS в MCM с одним назначением клавиатуры/мыши и модификаторов: MMB по умолчанию, NONE отключает ввод, первый активный старый способ переносится автоматически. Исправлены повторные повороты при фокусе инвентаря с защитой ввода текста; добавлены три языка, сокращены лишние обновления значков, состояние очищается при удалении предметов и значков."
+        ],
+        "en": [
+          "Settings moved from MODS to MCM with one keyboard/mouse binding and modifiers: MMB by default, NONE disables input, and the first active old binding migrates automatically. Repeated rotation with inventory focus was fixed while protecting text entry; three languages, fewer redundant icon updates and item/icon lifetime cleanup were added."
+        ]
+      }
+    }
+  },
+  "KillCounter": {
+    "name": "Kill Counter",
+    "author": "Rokeshi",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/2103",
+    "source_url": null,
+    "source_note": {
+      "ru": "Исходники поставлялись с установленным оригиналом; публичный репозиторий и разрешение автора на распространение изменённой версии не подтверждены. Явной лицензии локально не было.",
+      "en": "Source code shipped with the installed original; a public repository and author permission to redistribute a modified version have not been verified. No explicit license was present locally."
+    },
+    "version": "1",
+    "changes": {
+      "ru": [
+        "В MCM добавлены общее включение учёта и независимый показ каждой строки; скрытие строки не останавливает её учёт, отключение сохраняет накопленное.",
+        "Подписи и настройки переведены на русский, английский и китайский; прежние исправления сообщества и совместимость со StatColours сохранены.",
+        "Числа обновляются только при изменении; очищаются записи удалённых персонажей и просроченных скрытных оглушений, не накапливаются пустые записи статистики."
+      ],
+      "en": [
+        "MCM adds a tracking enable switch and independent row visibility; hiding a row does not stop counting, and disabling retains totals.",
+        "Labels and settings support Russian, English and Chinese, retaining community fixes and StatColours compatibility.",
+        "Numbers refresh only when changed; destroyed-character and expired stealth-attempt records are removed, and empty statistics records do not accumulate."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Добавлены MCM-переключатели нового учёта и независимого показа каждой строки, английские/русские/китайские подписи. Обновляются только изменившиеся числа, удаляются записи об уничтоженных персонажах и просроченных попытках оглушения; отключение сохраняет накопленное, совместимость со StatColours сохранена."
+        ],
+        "en": [
+          "Added MCM controls for new-event tracking and independent visibility of each row, with English, Russian and Chinese labels. Only changed numbers are refreshed, destroyed-character and expired stealth-attempt records are removed, disabling retains totals, and StatColours compatibility is preserved."
+        ]
+      }
+    }
+  },
+  "Loot-Scoot-Execute": {
+    "name": "Loot-Scoot-Execute",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1871",
+    "source_url": "https://github.com/Emkej/Loot-Scoot-Execute",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "5",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Переведены кнопки действий; несколько исполнителей добивают отдельные ближайшие цели, новый приказ игрока отменяет действие.",
+        "Исправлены мелькание задачи и звуки людей, животных и скелетов.",
+        "Действия встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Action buttons are translated; multiple executioners take separate nearest targets, and a new player order cancels execution.",
+        "Corrected task flicker and sounds for people, animals and skeletons.",
+        "Actions are integrated into the native context menu, retaining the separate panel as fallback."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Переведены сами кнопки «Добить» и «Добить всех» на русский и китайский."
+        ],
+        "en": [
+          "Translated the Execute and Execute All buttons into Russian and Chinese."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Несколько выделенных исполнителей получают отдельные ближайшие цели; новый приказ игрока отменяет добивание. Подход к цели больше не вызывает мелькание задачи, лишняя кнопка сброса убрана."
+        ],
+        "en": [
+          "Multiple selected executioners receive separate nearest targets; a new player order cancels execution. Movement no longer makes the task flicker, and the duplicate reset control was removed."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Исправлены звуки добивания: удар и вскрик у людей, предсмертный крик у животных, металлический звук у скелетов."
+        ],
+        "en": [
+          "Corrected execution sounds: impact and cry for people, a death cry for animals, and a metal sound for skeletons."
+        ]
+      },
+      "5": {
+        "ru": [
+          "«Добить» и «Добить всех» встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом. На чистой установке настройки создаются из defaults."
+        ],
+        "en": [
+          "Execute and Execute All were integrated into the native context menu, with the separate panel retained as fallback. Fresh installations create settings from defaults."
+        ]
+      }
+    }
+  },
+  "Map-markers": {
+    "name": "Map markers",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1887",
+    "source_url": "https://github.com/Emkej/Map-markers",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "3",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Редактор переведён, расширен и показан поверх значков карты; добавлены удаление, закрытие с сохранением и выбор цвета подписи.",
+        "Подписи и кнопка не обрезаются; меньше повторных поисков и обновлений карты и меток."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The translated editor is wider and above map icons, with Delete, save-and-close and label-color controls.",
+        "Labels and the button no longer clip, with fewer repeated searches and updates of the map and markers."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Редактор метки переведён, расширен, рисуется поверх значков карты и получил кнопку «Удалить». Сокращены повторные поиски и обновления карты и меток."
+        ],
+        "en": [
+          "The marker editor was translated, widened, placed above map icons and given a Delete button. Repeated map/marker searches and updates were reduced."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Добавлены крестик закрытия с сохранением и выбор цвета подписи; кнопка «Метки» и подсказки больше не обрезаются."
+        ],
+        "en": [
+          "Added a save-and-close button and label-color selection; the Markers button and hover labels no longer clip."
+        ]
+      }
+    }
+  },
+  "Organize-the-Crafting-Stations": {
+    "name": "Organize the Crafting Stations",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1900",
+    "source_url": "https://github.com/Emkej/Organize-the-Crafting-Stations",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "1",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Подсказка поиска переводится; счётчик корректно измеряется и не налезает на рамку.",
+        "Панель запоминается до удаления, проверки строк выполняются реже."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The search hint is translated; the counter is measured correctly and does not overlap the frame.",
+        "The panel is cached until deletion, and row checks run less often."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены в MCM с переводами; подсказка поиска следует языку игры, счётчик корректно помещается в рамку. Панель запоминается до удаления, повторные проверки строк выполняются реже."
+        ],
+        "en": [
+          "Settings moved to MCM with translations; the search hint follows the game language and the counter fits its frame. The panel is cached until deletion and repeated row checks run less often."
+        ]
+      }
+    }
+  },
+  "Organize-the-Inventory": {
+    "name": "Organize the Inventory",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1936",
+    "source_url": "https://github.com/Emkej/Organize-the-Inventory",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": null,
+    "changes": {
+      "ru": [
+        "Настройки перенесены в MCM; собственная панель поиска запоминается вместо обхода интерфейса каждый кадр."
+      ],
+      "en": [
+        "Settings moved to MCM; the search panel is cached instead of being searched for throughout the interface every frame."
+      ]
+    },
+    "history": {}
+  },
+  "Organize-the-Trader": {
+    "name": "Organize the Trader",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1886",
+    "source_url": "https://github.com/Emkej/Organize-the-Trader",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "5",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Найденные вещи плотно укладываются в начало сетки; меньше повторных проверок и перестройки при продажах.",
+        "Поиск и сортировка размещены в нижнем ряду, их ширина настраивается; исправлены переводы, выравнивание и обрезание списка.",
+        "Добавлен отключаемый итог сделки рядом с деньгами торговца."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Search results are packed at the start of the grid, with fewer repeated checks and rearrangements during sales.",
+        "Search and sorting share the bottom row with adjustable widths; translations, list alignment and clipping were corrected.",
+        "Added an optional deal balance beside the trader money."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы. Найденные вещи укладываются в начало сетки без лишних пустых рядов; панели запоминаются."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations. Search results are packed at the start of the grid without unnecessary empty rows, and panels are cached."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Убраны неработавшие настройки размеров встроенных панелей; подсказка поиска переведена. Сокращены повторные проверки ассортимента и ненужная перекладка вещей при продажах."
+        ],
+        "en": [
+          "Removed ineffective sizing controls for inline panels and translated the search hint. Repeated stock checks and unnecessary repacking during sales were reduced."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Сортировка переведена на английский и китайский; исправлены обрезание и выравнивание списка на ванильном интерфейсе."
+        ],
+        "en": [
+          "Sorting was translated into English and Chinese; list clipping and alignment were corrected on the vanilla interface."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Добавлена ширина списка сортировки в MCM, длинные режимы помещаются в узком окне; английские подписи уточнены."
+        ],
+        "en": [
+          "Added an MCM sort-list width control so long modes fit narrow windows, and clarified the English labels."
+        ]
+      },
+      "5": {
+        "ru": [
+          "Поиск и сортировка расположены в нижнем ряду с настройкой ширины поиска; рядом с деньгами торговца показывается отключаемый итог сделки. Исправлены расположение панелей и повторные поиски частей окна, настройки создаются из defaults."
+        ],
+        "en": [
+          "Search and sorting share the bottom row with adjustable search width; an optional deal balance appears beside trader money. Panel placement and repeated window-part searches were corrected, and settings are created from defaults."
+        ]
+      }
+    }
+  },
+  "Vital-Read": {
+    "name": "Vital Read",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1910",
+    "source_url": "https://github.com/Emkej/Vital-Read",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "5",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Значки закреплены за портретами, остаются над ними и под перекрывающими окнами; исправлены пропадание, прозрачность и очистка виджетов.",
+        "«Умирает» следует штатному состоянию, в том числе у скелетов и перевязанных персонажей.",
+        "Добавлены голубые значки обычной и ремонтной кроватей."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Overlays are attached to portraits, above them and below covering windows; disappearance, opacity and widget cleanup were corrected.",
+        "Dying follows the native status, including skeletons and bandaged characters.",
+        "Added blue ordinary-bed and repair-bed indicators."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы. Значки перенесены со сквозного верхнего слоя."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations. Overlays were moved away from the top layer that showed through windows."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Значки снова видны поверх портретов, но под окнами. «Умирает» соответствует штатному статусу, включая скелетов и перевязанных персонажей."
+        ],
+        "en": [
+          "Icons are visible above portraits but below windows again. Dying follows the native status, including skeletons and bandaged characters."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Значки стали частью портретов и больше не пропадают под их панелью; исправлены прозрачность, поиск больших отрядов и очистка удалённых виджетов."
+        ],
+        "en": [
+          "Overlays became portrait children and no longer disappear beneath the panel; opacity, large-squad discovery and deleted-widget cleanup were corrected."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Добавлены ключ на портрете скелета в ремонтной кровати и плюс у персонажа в обычной кровати."
+        ],
+        "en": [
+          "Added a wrench on a skeleton in a repair bed and a plus on a character in an ordinary bed."
+        ]
+      },
+      "5": {
+        "ru": [
+          "Плюс обычной кровати стал голубым, как ключ ремонта: общий цвет означает лечение."
+        ],
+        "en": [
+          "The ordinary-bed plus became blue like the repair wrench, using one color for healing."
+        ]
+      }
+    }
+  },
+  "Vital-Sense": {
+    "name": "Vital Sense",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1873",
+    "source_url": "https://github.com/Emkej/Vital-Sense",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "6",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Значки не просвечивают сквозь окна; исправлена очистка материалов, нейтралы получили отдельный цвет.",
+        "Лимит 8–256 значков: приоритет у видимых ближайших к центру камеры целей.",
+        "Цели с наградой используют цвет тира; окраска сосуществует с Character Highlight и не попадает в портреты.",
+        "Клавиша задаётся одним сочетанием с модификаторами."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Markers no longer show through windows; material cleanup was corrected and neutrals have a separate color.",
+        "An 8–256 marker budget prioritizes visible targets nearest the camera center.",
+        "Bounty targets use tier colors; tint coexists with Character Highlight and is not baked into portraits.",
+        "The show key is assigned as one binding with modifiers."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы. Значки рисуются под окнами, исправлена очистка материалов подсветки."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations. Markers draw below windows, and highlight-material cleanup was corrected."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Нейтральные персонажи получили отдельный цвет вместо вражеского; настройки на чистой установке создаются из defaults."
+        ],
+        "en": [
+          "Neutral characters received their own color instead of the enemy color; fresh settings are created from defaults."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Число значков настраивается от 8 до 256, по умолчанию 96; места получают видимые цели, ближайшие к центру камеры."
+        ],
+        "en": [
+          "The marker budget is adjustable from 8 to 256, default 96; visible targets nearest the camera center receive the available slots."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Цели с наградой окрашиваются цветом тира награды; окраска Character Highlight больше не перекрывает Vital Sense."
+        ],
+        "en": [
+          "Bounty targets use their bounty-tier color, and Character Highlight tint no longer overrides Vital Sense."
+        ]
+      },
+      "5": {
+        "ru": [
+          "Клавиша подсветки задаётся одним сочетанием с Ctrl/Shift/Alt вместо отдельных флажков модификаторов."
+        ],
+        "en": [
+          "The highlight key is assigned as one Ctrl/Shift/Alt combination instead of separate modifier checkboxes."
+        ]
+      },
+      "6": {
+        "ru": [
+          "На время отрисовки портрета окраска снимается с персонажа и возвращается после неё, чтобы не попадать в портрет."
+        ],
+        "en": [
+          "Tint is lifted while the game renders a portrait and restored afterwards so it is not baked into the portrait."
+        ]
+      }
+    }
+  },
+  "Wall-B-Gone": {
+    "name": "Wall-B-Gone",
+    "author": "Emkej8",
+    "original_url": "https://www.nexusmods.com/kenshi/mods/1863",
+    "source_url": "https://github.com/Emkej/Wall-B-Gone",
+    "source_note": {
+      "ru": "Исходники оригинала доступны в указанном репозитории.",
+      "en": "Original source code is available in the linked repository."
+    },
+    "version": "4",
+    "changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Добавлены необязательные разбор других своих построек и предварительная выгрузка вещей с проверками содержимого и занятости.",
+        "Добавлено подтверждение Enter/Esc; лишняя настройка сброса клавиши убрана."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Added optional dismantling of other player buildings and item unloading, with contents and occupancy checks.",
+        "Added Enter/Esc confirmation and removed the duplicate reset-key control."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы. Добавлен необязательный разбор других собственных построек с проверками занятости и содержимого."
+        ],
+        "en": [
+          "Settings moved from Mod Hub to MCM, with Russian and Chinese translations. Added optional dismantling of other player buildings with occupancy and contents checks."
+        ]
+      },
+      "2": {
+        "ru": [
+          "Добавлена выгрузка вещей на землю перед разборкой хранилища или станка; снос выполняется только после освобождения содержимого."
+        ],
+        "en": [
+          "Added unloading items to the ground before dismantling storage or workbenches; removal proceeds only after contents are cleared."
+        ]
+      },
+      "3": {
+        "ru": [
+          "Убрана лишняя строка клавиши по умолчанию: сброс страницы уже есть в MCM."
+        ],
+        "en": [
+          "Removed the duplicate default-key row because MCM already resets the page."
+        ]
+      },
+      "4": {
+        "ru": [
+          "Добавлено подтверждение быстрой разборки: Enter подтверждает, Esc отменяет. На чистой установке настройки создаются из defaults."
+        ],
+        "en": [
+          "Added quick-dismantle confirmation: Enter accepts and Esc cancels. Fresh installations create settings from defaults."
+        ]
+      }
+    }
+  }
+}

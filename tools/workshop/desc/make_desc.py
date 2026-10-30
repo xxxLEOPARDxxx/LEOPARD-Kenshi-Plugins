@@ -1575,6 +1575,9 @@ for mod, pair in current.items():
     T[mod] = tuple(localized)
 
 
+from publication_sections import apply_sections
+apply_sections(T, build.ITEMS)
+
 if __name__ == "__main__":
     only = set(sys.argv[1:])
     for mod, (ru, en) in sorted(T.items()):

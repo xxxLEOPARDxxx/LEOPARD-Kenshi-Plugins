@@ -72,18 +72,10 @@
   "BetterLooting": {
     "version": "4",
     "ru": [
-      "[b]«Всегда брать эти предметы».[/b] Список имён или ID позволяет забирать нужные вещи независимо от категории, цены и цены за вес. Вместимость и правила кражи сохраняются.",
-      "[b]Защита хранилищ игрока.[/b] По умолчанию сбор больше не забирает вещи из собственных построек, даже если их инвентарь открыт. Раскладка ALT+INSERT продолжает работать.",
-      "[b]Подбор отдельных вещей с земли.[/b] По желанию персонаж сам подходит к подходящим предметам и поднимает их. Настройка выключена по умолчанию.",
-      "[b]Длинный список без обрезания.[/b] Для полного редактирования списка обязательных предметов нужен Mod Config Menu версии 10 или новее.",
-      "[b]Ближайшие вещи с земли первыми.[/b] Маршрут начинается у персонажа, затем выбирает ближайшую вещь к предыдущей цели. Цена за вес больше не отправляет его сначала к далёкой добыче."
+      "Добавлены точный список имён/ID обязательной добычи, защита хранилищ игрока по умолчанию и необязательный подбор с земли, изначально выключенный. Подбор ограничен 256 результатами и 32 приказами; маршрут идёт от ближайшей вещи к следующей ближайшей без приоритета цены за вес, сохраняя прежние приказы и проверки кражи/вместимости."
     ],
     "en": [
-      "[b]Required-item list.[/b] Always take items by name or ID regardless of category, value and value-per-weight filters. Capacity and theft rules still apply.",
-      "[b]Protect player storage.[/b] Looting ignores your own building inventories by default, even when their window is open. ALT+INSERT deposit still works.",
-      "[b]Pick up loose ground items.[/b] Optionally, the character walks to suitable items and picks them up. Disabled by default.",
-      "[b]Long lists without truncation.[/b] Mod Config Menu version 10 or newer is needed to edit the full required-item list.",
-      "[b]Nearest ground items first.[/b] The route starts with the item nearest the character, then chooses the nearest item to the previous target. Value per weight no longer sends the character to distant loot first."
+      "Added an exact name/ID required-item list, player-storage protection enabled by default and optional ground pickup, off by default. Ground pickup is bounded to 256 results and 32 orders and follows nearest-neighbor routing instead of value-per-weight priority, preserving existing orders and theft/capacity checks."
     ]
   },
   "SkillLevelUpInfo": {
@@ -123,48 +115,28 @@
   "Character Inspector": {
     "version": "1",
     "ru": [
-      "[b]Открытие из инвентаря.[/b] Кнопка STATS открывает осмотр персонажа этого инвентаря; отдельная горячая клавиша не нужна.",
-      "[b]Покрытие и слои защиты.[/b] Выберите часть тела, чтобы увидеть, какая броня её прикрывает, защитные слои и сопротивления.",
-      "[b]Настройки перенесены в MCM.[/b] Включение и показ кнопки меняются прямо в игре; интерфейс переведён на русский, английский и китайский.",
-      "Убраны повторные поиски и перестановки кнопок; осмотр остаётся привязан к открытому инвентарю и безопасно закрывается при удалении персонажа."
+      "Добавлены MCM-переключатели осмотра и кнопки инвентаря, английский/русский/китайский интерфейс; старое назначение открытия больше не используется. Убраны повторные поиски и лишние перестановки кнопок, кэш очищается при закрытии окон, осмотр закрывается при удалении персонажа."
     ],
     "en": [
-      "[b]Open from the inventory.[/b] The STATS button inspects the character whose inventory is open; no separate hotkey is needed.",
-      "[b]Coverage and protective layers.[/b] Select a body part to inspect its armour coverage, protective layers and resistances.",
-      "[b]Settings moved to MCM.[/b] Enable the plugin and its inventory button in game, with English, Russian and Chinese interface text.",
-      "Repeated button searches and layout changes are removed; inspection stays with its source inventory and closes safely when the character is removed."
+      "Added MCM controls for the inspector and inventory button with English, Russian and Chinese text; the obsolete open binding is no longer used. Repeated button searches and unnecessary layout changes were removed, cached controls are cleared on close, and inspection closes when its character is destroyed."
     ]
   },
   "KenshiRotate": {
     "version": "1",
     "ru": [
-      "[b]Одно универсальное назначение.[/b] По умолчанию - средняя кнопка мыши; можно выбрать клавишу или кнопку мыши с CTRL, SHIFT и ALT. Лишние отдельные назначения убраны.",
-      "[b]Повторный поворот без переоткрытия.[/b] Предметы поворачиваются несколько раз подряд в том же инвентаре или рюкзаке; набор текста не вызывает поворот.",
-      "[b]Прежнее назначение переносится.[/b] Используется первый включённый старый способ; уже выбранное новое сочетание имеет приоритет.",
-      "[b]Сохранения и стопки.[/b] Сохранена исходная механика сетки, повёрнутых изображений, стопок и сохранения поворота.",
-      "Убраны лишние обновления значков. Состояние очищается при удалении предмета или значка; ссылки на удалённые вещи не остаются."
+      "Настройки перенесены из MODS в MCM с одним назначением клавиатуры/мыши и модификаторов: MMB по умолчанию, NONE отключает ввод, первый активный старый способ переносится автоматически. Исправлены повторные повороты при фокусе инвентаря с защитой ввода текста; добавлены три языка, сокращены лишние обновления значков, состояние очищается при удалении предметов и значков."
     ],
     "en": [
-      "[b]One universal binding.[/b] Middle mouse by default; choose a keyboard key or mouse button with CTRL, SHIFT and ALT. Redundant separate bindings are removed.",
-      "[b]Repeat without reopening.[/b] Rotate items repeatedly in the same inventory or backpack; typing text does not rotate items.",
-      "[b]Legacy binding migration.[/b] The first active old binding is migrated; an existing new binding takes priority.",
-      "[b]Saves and stacks.[/b] The original grid, rotated icons, stack behavior and saved rotations are preserved.",
-      "Redundant icon updates are removed. State is cleared when an item or icon is destroyed, preventing stale references."
+      "Settings moved from MODS to MCM with one keyboard/mouse binding and modifiers: MMB by default, NONE disables input, and the first active old binding migrates automatically. Repeated rotation with inventory focus was fixed while protecting text entry; three languages, fewer redundant icon updates and item/icon lifetime cleanup were added."
     ]
   },
   "KillCounter": {
     "version": "1",
     "ru": [
-      "[b]Счётчики в окне характеристик.[/b] Убийства, оглушения и оторванные конечности отображаются отдельными строками.",
-      "[b]Выбор нужных строк.[/b] Каждый счётчик можно показать или скрыть в MCM, без отдельной горячей клавиши.",
-      "[b]Три языка.[/b] Подписи и настройки переведены на русский, английский и китайский.",
-      "Обновляются только изменившиеся значения; устранено накопление записей об удалённых персонажах. Совместная работа со Stat Colours сохранена."
+      "Добавлены MCM-переключатели нового учёта и независимого показа каждой строки, английские/русские/китайские подписи. Обновляются только изменившиеся числа, удаляются записи об уничтоженных персонажах и просроченных попытках оглушения; отключение сохраняет накопленное, совместимость со StatColours сохранена."
     ],
     "en": [
-      "[b]Counters in the stats window.[/b] Kills, knockouts and severed limbs are shown as separate rows.",
-      "[b]Choose which rows to show.[/b] Show or hide each counter in MCM without a separate hotkey.",
-      "[b]Three languages.[/b] Labels and settings are available in English, Russian and Chinese.",
-      "Only changed values are refreshed, and records for removed characters no longer accumulate. Stat Colours compatibility is preserved."
+      "Added MCM controls for new-event tracking and independent visibility of each row, with English, Russian and Chinese labels. Only changed numbers are refreshed, destroyed-character and expired stealth-attempt records are removed, disabling retains totals, and StatColours compatibility is preserved."
     ]
   },
   "AIFixed": {
