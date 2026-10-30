@@ -195,7 +195,9 @@ ITEMS = [
          en='Recruit bubbles, trader coins and gold squad-leader stars, with a shared show key and independent star size.'),
 ]
 
-ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': 2257, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Gold skill level-up text that rises above your characters and fades out, without XP bars or fractional gain messages.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': 2258, 'version': '1', 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': 2261, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': 2259, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': 2260, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
+ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': 2257, 'version': '2', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Full XP Info displays: blue experience gains, gold level increases and recent-training bars, configured through MCM.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': 2258, 'version': '1', 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': 2261, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': 2259, 'version': '1', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': 2260, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
+
+ITEMS.append(dict(mod="StackSort",title="Stack Sort (MCM fork) (QoL)",nexus=None,version="1",tags=["GUI","Gameplay","RE_Kenshi"],lang=True,drop=[],en="Pack inventories, consolidate compatible stacks and reserve free space, with Rotate Items support and MCM settings."))
 
 SKIP = re.compile(r"(^_.*\.(info|img)$)|(\.bak$)|(\.pre[^.]*$)|(\.prelog$)|"
                   r"(\.bak-[^.]*$)|(\.log$)|(_runtime_table\.txt$)|"
@@ -434,6 +436,17 @@ def render_descriptions(item):
     return desc_ru, desc_en
 
 
+def runtime_source_path(mod, folder, name):
+    # StackSort.cfg contains advanced player tuning. Ship the reviewed factory
+    # copy rather than republishing a live installation's personal values.
+    if mod == "StackSort" and name == "StackSort.cfg" and os.path.normcase(os.path.abspath(folder)) == os.path.normcase(os.path.abspath(mod_dir(mod))):
+        factory = os.path.join(source_dir(mod), name)
+        if not os.path.isfile(factory):
+            raise ValueError("Missing factory StackSort.cfg")
+        return factory
+    return os.path.join(folder, name)
+
+
 def build(item):
     mod = item["mod"]
     check_glyphs(mod, mod_dir(mod))
@@ -450,8 +463,9 @@ def build(item):
                 continue
             rel = os.path.relpath(os.path.join(root, n), src)
             os.makedirs(os.path.join(content, os.path.dirname(rel)), exist_ok=True)
-            shutil.copy2(os.path.join(root, n), os.path.join(content, rel))
-            files.append((rel.replace(os.sep, "/"), os.path.getsize(os.path.join(root, n))))
+            runtime_source = runtime_source_path(mod, root, n)
+            shutil.copy2(runtime_source, os.path.join(content, rel))
+            files.append((rel.replace(os.sep, "/"), os.path.getsize(runtime_source)))
 
     # <Mod>.ini - настройки игрока: не раздаём, иначе обновление их затирает
     # (жалобы игроков, 11.10.2026). Раздаём <Mod>.defaults.ini - значения по

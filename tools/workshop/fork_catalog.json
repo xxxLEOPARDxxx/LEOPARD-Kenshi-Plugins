@@ -1172,5 +1172,66 @@
         "Added Enter/Esc confirmation and removed the duplicate reset-key control."
       ]
     }
+  },
+  "StackSort": {
+    "name": "StackSort",
+    "author": "Jakematt2004",
+    "original_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813810734",
+    "source_url": "https://github.com/jacobericson/StackSort",
+    "source_note": {
+      "ru": "Исходники оригинала в репозитории автора.",
+      "en": "Original source code in the author's repository."
+    },
+    "version": "1",
+    "changes": {
+      "ru": [
+        "Первый MCM-форк StackSort от Jakematt2004: настройки и интерфейс на русском, английском и китайском.",
+        "Сохранены выбор лучших раскладок, свободная область В/Ш, стрелки и отмена расположения правой кнопкой.",
+        "Исправлено объединение совместимых стопок, включая частично использованные аптечки и ремонтные комплекты; несовместимые предметы остаются отдельно по правилам игры.",
+        "Убраны кнопки из однослотовых и рассчитанных на одну стопку специализированных хранилищ.",
+        "Включена поддержка поворотов через Rotate Items; фоновые расчёты не обращаются к игровым объектам и отменяются при смене мира.",
+        "Подробный журнал выключен по умолчанию. Число потоков и начальное направление помечены требованием перезапуска."
+      ],
+      "en": [
+        "First MCM fork of Jakematt2004's StackSort, with Russian, English and Chinese settings and interface text.",
+        "Retained best-layout cycling, H/W free-space goals, arrow controls and right-click position undo.",
+        "Fixed compatible-stack consolidation, including partially used medical and repair kits; incompatible items remain separate under the game's rules.",
+        "Removed extra controls from single-slot and specialized one-stack storage.",
+        "Enabled Rotate Items integration; background calculations do not access game objects and are cancelled on world changes.",
+        "Detailed logging defaults to off. Worker count and initial free-space direction carry restart markers."
+      ]
+    },
+    "history": {
+      "1": {
+        "ru": [
+          "Первый MCM-форк StackSort от Jakematt2004: настройки и интерфейс на русском, английском и китайском.",
+          "Сохранены выбор лучших раскладок, свободная область В/Ш, стрелки и отмена расположения правой кнопкой.",
+          "Исправлено объединение совместимых стопок, включая частично использованные аптечки и ремонтные комплекты; несовместимые предметы остаются отдельно по правилам игры.",
+          "Убраны кнопки из однослотовых и рассчитанных на одну стопку специализированных хранилищ.",
+          "Включена поддержка поворотов через Rotate Items; фоновые расчёты не обращаются к игровым объектам и отменяются при смене мира.",
+          "Подробный журнал выключен по умолчанию. Число потоков и начальное направление помечены требованием перезапуска."
+        ],
+        "en": [
+          "First MCM fork of Jakematt2004's StackSort, with Russian, English and Chinese settings and interface text.",
+          "Retained best-layout cycling, H/W free-space goals, arrow controls and right-click position undo.",
+          "Fixed compatible-stack consolidation, including partially used medical and repair kits; incompatible items remain separate under the game's rules.",
+          "Removed extra controls from single-slot and specialized one-stack storage.",
+          "Enabled Rotate Items integration; background calculations do not access game objects and are cancelled on world changes.",
+          "Detailed logging defaults to off. Worker count and initial free-space direction carry restart markers."
+        ]
+      }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены в MCM; добавлены русский, английский и китайский интерфейс.",
+        "Исправлено объединение подходящих стопок, в том числе частично использованных аптечек и ремкомплектов.",
+        "Убраны лишние кнопки из хранилищ, где возможно размещение лишь одной стопки."
+      ],
+      "en": [
+        "Moved settings into MCM and added Russian, English and Chinese interface text.",
+        "Fixed compatible-stack consolidation, including partially used medical and repair kits.",
+        "Removed extra controls from storage that can hold only one stack."
+      ]
+    }
   }
 }

@@ -79,20 +79,21 @@
     ]
   },
   "SkillLevelUpInfo": {
-    "version": "1",
+    "version": "2",
+    "published_version": "1",
     "ru": [
-      "[b]Только повышение целого уровня.[/b] Над персонажем появляются название навыка и его новый уровень; полос опыта и сообщений о каждом приросте нет.",
-      "[b]Золотой текст с анимацией.[/b] Надпись поднимается над персонажем и плавно исчезает, сохраняя вид исходной механики xp_info.",
-      "[b]Настройки в MCM.[/b] Можно ограничить сообщения выбранными персонажами и включить дублирование в игровой журнал.",
-      "Меньше лишних сообщений: после загрузки и повторного включения текущие уровни принимаются за исходные; старые повышения не высыпаются на экран.",
-      "[b]Исправлена стартовая высота.[/b] Точка появления учитывает кость модели или запасной отступ; надпись поднимается и плавно затухает. Точное положение зависит от модели персонажа."
+      "Возвращены все три вида отображения xp_info: синие сообщения о приросте опыта, золотые повышения уровня и полосы недавно тренируемых навыков под характеристиками персонажа.",
+      "В MCM доступны все восемь исходных настроек: три независимых вида отображения, число строк, минимальный процент, интервал сообщений, время активности и подробный журнал.",
+      "Сохранены объединение приростов и краткий остаток списка, цвета, подъём и затухание надписей. Уровни показываются независимо от порога дробного опыта.",
+      "Убраны лишние обновления неизменившейся панели; обработка опыта защищена от смены мира и повторного использования объектов при загрузке.",
+      "Сохранены дополнительные настройки выбранных персонажей и игрового журнала. Подробный журнал остаётся последней настройкой и выключен по умолчанию."
     ],
     "en": [
-      "[b]Whole-level increases only.[/b] The skill name and new level appear above the character, without XP bars or notifications for every small gain.",
-      "[b]Animated gold text.[/b] Messages rise above the character and fade smoothly, preserving the original xp_info presentation.",
-      "[b]MCM settings.[/b] Limit messages to selected characters and optionally copy them to the game log.",
-      "Less notification noise: after loading or re-enabling, current levels become the baseline instead of replaying old increases.",
-      "[b]Corrected starting height.[/b] The starting point uses a model bone or fallback offset, preserving upward movement and fading. Exact placement depends on the character model."
+      "Restored all three xp_info displays: blue XP-gain notifications, gold level increases and recently trained skill bars below character statistics.",
+      "MCM exposes all eight original settings: three independent displays, row count, minimum percentage, announcement interval, recent-activity duration and detailed logging.",
+      "Preserved gain aggregation, the short remainder summary, colours, rising motion and fading. Whole levels are independent of the fractional XP threshold.",
+      "Avoided redundant updates of an unchanged panel; XP processing is protected against world changes and object-address reuse during loading.",
+      "Retained selected-character filtering and optional game-log copies. Detailed logging remains the final setting and is disabled by default."
     ]
   },
   "MultiXPMining": {
@@ -154,6 +155,25 @@
       "[b]Automatic wear repair.[/b] Player skeletons and biological characters with prosthetics can seek repairs when wear exceeds a configurable threshold, 50 by default.",
       "[b]Separate controls.[/b] Bed fixes and automatic repair trips can be enabled independently, with English, Russian and Chinese interface text.",
       "[b]No old assignments between worlds.[/b] Temporary repair records are cleared on loading and new games; reused objects do not inherit old assignments."
+    ]
+  },
+  "StackSort": {
+    "version": "1",
+    "ru": [
+      "Первый MCM-форк StackSort от Jakematt2004: настройки и интерфейс на русском, английском и китайском.",
+      "Сохранены выбор лучших раскладок, свободная область В/Ш, стрелки и отмена расположения правой кнопкой.",
+      "Исправлено объединение совместимых стопок, включая частично использованные аптечки и ремонтные комплекты; несовместимые предметы остаются отдельно по правилам игры.",
+      "Убраны кнопки из однослотовых и рассчитанных на одну стопку специализированных хранилищ.",
+      "Включена поддержка поворотов через Rotate Items; фоновые расчёты не обращаются к игровым объектам и отменяются при смене мира.",
+      "Подробный журнал выключен по умолчанию. Число потоков и начальное направление помечены требованием перезапуска."
+    ],
+    "en": [
+      "First MCM fork of Jakematt2004's StackSort, with Russian, English and Chinese settings and interface text.",
+      "Retained best-layout cycling, H/W free-space goals, arrow controls and right-click position undo.",
+      "Fixed compatible-stack consolidation, including partially used medical and repair kits; incompatible items remain separate under the game's rules.",
+      "Removed extra controls from single-slot and specialized one-stack storage.",
+      "Enabled Rotate Items integration; background calculations do not access game objects and are cancelled on world changes.",
+      "Detailed logging defaults to off. Worker count and initial free-space direction carry restart markers."
     ]
   }
 }

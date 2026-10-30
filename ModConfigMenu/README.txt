@@ -120,18 +120,31 @@ MCM. Слева — список модов, у которых есть наст
 
 КАКИЕ МОДЫ
 
-Любой плагин RE_Kenshi, который описал свои настройки для MCM (см.
-ниже). Наши уже умеют: Live Xp Bars, Stat Colours, Gear Compare Alt,
-Assigned Workers, UI Tweaks, Patient Self Aid, Wanted Map, Build Mode
-Gizmo, Ranged Damage Xp, Quick Start Select, Item Markers, Recruit
-Markers, Skill Level Up Info, Multi XP Mining; наши форки модов Emkej8: Auto-Pause on Load, Container
-Highlight, Hidden Faction Relations, Job B Gone, Loot Scoot Execute, Map
-markers, Organize the Crafting Stations, Organize the Trader, Vital
-Read, Vital Sense, Wall B Gone; и форки модов других авторов: Better
-Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Formations
-Extended (Slinkysalmon03), Kenshi
-Job Management (SirixKC). Для всех них
-MCM не обязателен: без него они читают свои настройки, как раньше.
+Любой плагин RE_Kenshi, который экспортирует настройки для MCM.
+
+Наши плагины: AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map.
+
+Наши форки Emkej8: Auto Pause on Load, Container Highlight, Hidden Faction Relations, Job-B-Gone, Loot-Scoot-Execute, Map-markers, Organize the Crafting Stations, Organize the Inventory, Organize the Trader, Vital Read, Vital Sense, Wall-B-Gone.
+
+Наши форки других авторов: Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004).
+
+В список входят подготовленные и отключённые сборки. Dynamic Factions
+продолжает разрабатываться; Organize the Inventory — локальная сборка.
+Stack Sort и полный XP Info проходят игровую проверку. Плагины
+устанавливаются отдельно; без MCM читают свои настройки из файлов.
+
+SUPPORTED PLUGINS
+
+Our plugins: AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map.
+
+Our Emkej8 forks: Auto Pause on Load, Container Highlight, Hidden Faction Relations, Job-B-Gone, Loot-Scoot-Execute, Map-markers, Organize the Crafting Stations, Organize the Inventory, Organize the Trader, Vital Read, Vital Sense, Wall-B-Gone.
+
+Our forks of other authors: Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004).
+
+Includes prepared and disabled builds. Dynamic Factions remains in
+development; Organize the Inventory is a local build. Stack Sort and full
+XP Info await in-game acceptance. Install plugins separately; without MCM
+they read their own configuration files.
 
 
 ДЛЯ АВТОРОВ ПЛАГИНОВ

@@ -248,7 +248,7 @@
     "source_export": [
       {
         "path": "D:\\DEV\\Kenshi\\ours\\SkillLevelUpInfo\\SkillLevelUpInfo.cpp",
-        "line": 165,
+        "line": 413,
         "method": "direct"
       }
     ],
@@ -640,6 +640,23 @@
       {
         "path": "D:\\DEV\\Kenshi\\forks\\XP_Overhaul-src\\XP_Overhaul\\XP_Overhaul.cpp",
         "line": 3068,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
+  },
+  {
+    "package": "StackSort",
+    "name": "Stack Sort",
+    "id": "StackSort",
+    "group": "other_fork",
+    "status": "canonical_supported",
+    "author": "Jakematt2004",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\StackSort",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\StackSort\\src\\common\\McmSettings.cpp",
+        "line": 35,
         "method": "direct"
       }
     ],

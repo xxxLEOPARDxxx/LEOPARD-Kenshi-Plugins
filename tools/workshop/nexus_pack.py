@@ -16,7 +16,7 @@ def pack(item):
             for name in sorted(names):
                 if not build.runtime_file_allowed(mod,folder,name):continue
                 if folder==src and (build.is_player_ini(mod,name) or (src_ini and name.lower().endswith(".defaults.ini"))):continue
-                full=os.path.join(folder,name);rel=os.path.relpath(full,src).replace(os.sep,"/")
+                full=build.runtime_source_path(mod,folder,name);rel=os.path.relpath(os.path.join(folder,name),src).replace(os.sep,"/")
                 z.write(full,mod+"/"+rel);n+=1
         if src_ini:
             base="CharacterInspector" if mod=="Character Inspector" else mod
