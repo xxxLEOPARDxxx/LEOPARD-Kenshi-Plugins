@@ -1,7 +1,7 @@
 # One-run native XP panel telemetry
 
-`readonly_panel_probe.py` accepts only the audited872b candidate and the
-exact-fit candidate SHA-256 `df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf`,
+`readonly_panel_probe.py` accepts the audited872b/df789 candidates and the
+corrected-style candidate SHA-256 `1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43`,
 each with its matching linker-map timestamp and loaded-module header. The verified
 header gate permits only OptionalHeader.ImageBase to contain the actual module
 base instead of the on-disk preferred base; all other 1024 header bytes must
@@ -52,7 +52,7 @@ SDK. It makes no game calls and does not build/change the plugin. Measured:
 hand32, Skill28, Snapshot1344, refs1040, live1336, pending1337; VC10 node value24,
 pair<hand,Snapshot>.second32, therefore Snapshot at node+56. Native panel's
 inner map is at outer-node+32 and row pointer at inner-node+64. VC10 string
-size40, buffer0, length16, capacity24. Nine offline parser tests verify these
+size40, buffer0, length16, capacity24. Eleven offline parser tests verify these
 layouts, native map ordering, selected-owner skill decoding and binding lookup:
 
 ```powershell
@@ -67,6 +67,19 @@ the module inventory, and every other header byte matched. The corrected gate
 is restricted to this proven field change; tests reject wrong bases, image
 sizes and timestamp changes. Raw header and byte diff remain in ignored
 `_generated/runtime-26720-header.bin` / `runtime-26720-header-diff.json`.
+
+The current probe also reads actual direct/client text fonts, text-region/view
+size, alignment/shadow, divider coordinates and the two cached measurements.
+The loaded-font-profile flag is available in the new matching map. Eleven offline
+parser checks include the getter-verified native EditText offsets and composite
+font capture. For the previous df789 process use its explicitly retained
+`SkillLevelUpInfo-df789.dll/.map` pair; default paths refer to the new candidate.
+
+Corrected192-byte measurement cache: logical/rendered WidgetRefs at0/24,
+text/font pointers48/56, actual UString caption64, face128, numeric fields168,
+shadow188, logical EditBox word-wrap189, rendered EditBox word-wrap190. These offsets were measured using
+production VC10/SDK sizeof/offsetof. Source EditText::getCaption returns+0x70,
+verified in the actual installed getter; UTF16 caption backing is bounded.
 
 ## Are existing Debug logs sufficient?
 

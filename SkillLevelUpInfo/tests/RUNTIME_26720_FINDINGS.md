@@ -104,4 +104,19 @@ Final exact-fit artifact: `D:/DEV/Kenshi/build/SkillLevelUpInfo/SkillLevelUpInfo
 Adjacent map timestamp0x6ae48f91 matches the final link. All99 behavior checks
 (31panel),9 probe parser checks,37 KenshiLib0.5.0 imports,15 installed MyGUI
 imports, the exact two exports and three62-entry MO catalogs are verified.
-The new candidate has not been installed or observed in game by this agent.
+## Native acceptance of the exact-fit candidate
+
+Root installed df789 and sampled PID35788 after confirming its creation time,
+executable path and matching loaded-module header. Two separate 10-second runs
+each produced 40 successful samples with unchanged panel/owner identity:
+
+- Six vanilla rows: bottom161, capacity1; the visible XP label/progress/value
+  rectangles were y161,h24, ending at185 inside the185px parent in all 40 samples.
+- Five vanilla rows: bottom135, capacity2; both visible rows were y135/h24 and
+  y161/h24, ending at159 and185 in all 40 samples. No sampled row flickered away.
+
+Ignored raw artifacts: runtime-35788-162252.json and runtime-35788-162516.json.
+The user subsequently requested the vanilla label font, a maximum of two rows
+in MCM and restoration of the separator in these tightly fitted layouts. Those
+changes are a new candidate and require their own acceptance; these observations
+prove the df789 geometry, not that later candidate's appearance.

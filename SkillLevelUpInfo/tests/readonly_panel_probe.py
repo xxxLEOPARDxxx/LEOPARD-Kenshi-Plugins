@@ -3,14 +3,14 @@
 Never enumerates processes, injects code, invokes game functions or writes game
 memory/files. The only output is a local JSON artifact. ABI offsets measured
 by probe_layout.cpp with the production VC10/SDK headers. This version accepts
-only the audited872b5526 and exact-fitdf789027 DLLs with matching linker maps.
+only audited XP candidates, including corrected-style1487b01b, with matching maps.
 """
 from pathlib import Path
 import argparse, ctypes, ctypes.wintypes as wt, datetime, hashlib, json
 import math, re, struct, sys, time
 
-EXPECTED_SHA = 'df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf'
-APPROVED_SHAS = {EXPECTED_SHA,'872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
+EXPECTED_SHA = '1487b01b6194345ead383a1708565ce5b5c6e2669fc0c472fb1332ed6185ee43'
+APPROVED_SHAS = {EXPECTED_SHA,'df789027e693578087824a40f58f96dd50374d148aa0622f921052cd0e292cdf','872b5526f1e3fd074a21431414dc7b814d0afbbead05efb3dcbf553078db3c1b'}
 BUILD = Path(r'D:\DEV\Kenshi\build\SkillLevelUpInfo')
 NAMES = ['Strength','Toughness','Dexterity','Perception','Katanas','Sabres',
  'Hackers','Heavy weapons','Blunt','Polearms','Melee attack','Melee defence',
@@ -48,11 +48,40 @@ def string(m, address, maximum=192):
  pointer=struct.unpack_from('<Q',raw)[0] if capacity >= 16 else address
  return m.read(pointer,size).decode('utf-8','replace')
 
+def caption(m,address,maximum=256):
+ """UString's public UTF16 code-point backing string, bounded VC10 layout."""
+ raw=m.read(address,32);size,capacity=struct.unpack_from('<QQ',raw,16)
+ if size>maximum or capacity<size or capacity>1048576:return {'unreadable_caption_header':raw.hex()}
+ if not size:return ''
+ pointer=struct.unpack_from('<Q',raw)[0] if capacity>=8 else address
+ return m.read(pointer,size*2).decode('utf-16-le','replace')
+
+def rendered_font(m,address):
+ """Direct/client text only; native getter-verified EditText offsets, no calls."""
+ chain=[];seen=set();current=address
+ try:
+  while current and len(chain)<4 and current not in seen:
+   seen.add(current);chain.append(current);current=q(m,current+0x3d0)
+  for current in reversed(chain):
+   text=q(m,current+0x330)
+   if not text:continue
+   font=q(m,text+0xe0)
+   if not font:continue
+   height=i(m,text+0xf0)
+   if not 0<height<4096:return {'unrecognized_text_height':height}
+   return {'widget':hex(current),'text':hex(text),'font_resource':hex(font),'face':string(m,font+8),'caption':caption(m,text+0x70),
+    'font_height':height,'region':list(unpack(m,'<4i',text+0x18)),
+    'absolute':list(unpack(m,'<2i',text+0x28)),'text_view_size':list(unpack(m,'<2i',text+0x140)),
+    'align':i(m,text+0xb4),'view_offset':list(unpack(m,'<2i',text+0x114)),
+    'shadow':bool(m.read(text+0x112,1)[0]),'layout_profile':'native EditText/SimpleText getter offsets'}
+  return None
+ except (OSError,ValueError) as error:return {'font_read_error':str(error)}
+
 def widget(m,address):
  if not address: return None
  coord=list(unpack(m,'<4i',address+0x20));parent=q(m,address+0x450)
  return {'address':hex(address),'coord':coord,'bottom':coord[1]+coord[3],
-         'parent':hex(parent),'visible':m.read(address+0x46c,1)[0] != 0}
+         'parent':hex(parent),'visible':m.read(address+0x46c,1)[0] != 0,'rendered_font':rendered_font(m,address)}
 
 def panel(m,address):
  result={'address':hex(address),'root':widget(m,q(m,address+8)),
@@ -162,6 +191,16 @@ def sample(m,base,symbols,now):
   'rowValue':[finite(v) for v in unpack(m,'<5f',a['g_rowValue'])],
   'diagnostics':{name:i(m,a[name]) for name in ['g_diagRows','g_diagBottom','g_diagWidth',
     'g_diagParentHeight','g_diagValueRight','g_diagCapacity']}}
+ if 'g_divider' in a:result['divider']=widget(m,q(m,a['g_divider']+8))
+ if 'g_nativeProfile' in a:result['font_profile_verified']=bool(m.read(a['g_nativeProfile'],1)[0])
+ for key in ('g_nameMeasure','g_valueMeasure'):
+  if key in a:
+   try:
+    result[key]={'source':hex(q(m,a[key]+8)),'rendered_source':hex(q(m,a[key]+32)),
+     'text':hex(q(m,a[key]+48)),'font_resource':hex(q(m,a[key]+56)),'caption':caption(m,a[key]+64),
+     'face':string(m,a[key]+128),'fontHeight_width_height_align_textHeight':list(unpack(m,'<5i',a[key]+168)),
+     'shadow':bool(m.read(a[key]+188,1)[0]),'word_wrap':bool(m.read(a[key]+189,1)[0]),'rendered_word_wrap':bool(m.read(a[key]+190,1)[0])}
+   except (OSError,ValueError) as error:result[key]={'cache_read_error':str(error)}
  if status:
   result['diagnostics']['status']=m.read(status,96).split(b'\0',1)[0].decode('ascii','replace')
  result['selected_state']=selected_state(m,a['g_seen'],owner,now,recent,a['g_index'])

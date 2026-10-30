@@ -39,7 +39,7 @@ Options -> MCM -> Skill Level Up Info, all changes immediate:
   FloatingLabels=1           Fractional XP text.
   LevelUpLabels=1            Whole-level text.
   PanelBars=1                Character-panel recent training bars.
-  MaxRows=2                  1..5 rows, subject to available space.
+  MaxRows=2                  1..2 rows, subject to available space.
   MinPercent=1.00            Accumulated percentage threshold, 0..100.
   AnnounceEverySeconds=1.0   Minimum collection time, .1..60 seconds.
   RecentSeconds=120          Recent training lifetime, 1..3600 seconds.
@@ -107,7 +107,7 @@ en_GB/ru_RU/zh_CN translations; release MO only, source PO stays here.
   FloatingLabels=1           Дробные прибавки опыта.
   LevelUpLabels=1            Достигнутые целые уровни.
   PanelBars=1                Недавние тренировки в панели персонажа.
-  MaxRows=2                  От 1 до 5 строк, если хватает места.
+  MaxRows=2                  От 1 до 2 строк, если хватает места.
   MinPercent=1.00            Порог накопления, 0..100 процентов.
   AnnounceEverySeconds=1.0   Минимальное накопление, .1..60 секунд.
   RecentSeconds=120          Время недавней тренировки, 1..3600 секунд.
@@ -172,8 +172,8 @@ VERSION 1 - RELEASED 30 OCTOBER 2026 / ВЫПУСК 30.10.2026
 
 VERIFICATION / ПРОВЕРКИ
 See XP_INFO_PARITY.md and tests/run_tests.py for reproducible checks.
-Installed locally for acceptance; visuals have not been accepted in-game.
-Локально установлен для проверки; игровая визуальная приёмка ещё ожидается.
+The layout with one or two bars was accepted in-game; vanilla fonts await acceptance.
+Разметка с одной или двумя полосами принята в игре; штатный шрифт ожидает проверки.
 
 PANEL LAYOUT CORRECTION / ИСПРАВЛЕНИЕ ПОЛОС
 
@@ -196,13 +196,30 @@ STABLE ROW SPACING / УСТОЙЧИВЫЙ ШАГ СТРОК
 Vanilla rows are stored in key order, not vertical order. XP layout now follows
 the original XP Info: collect non-progress row bottoms, sort them and use the
 smallest positive gap. An armed character with six vanilla rows no longer loses
-all XP bars because a multi-row gap was mistaken for one row. Five is an upper
+all XP bars because a multi-row gap was mistaken for one row. Two is an upper
 limit, not a promise to overlap the HUD: the actual number respects the current
 viewport. Tiny positive XP and recent-activity lifetime have not been changed.
 
 Штатные строки хранятся не в визуальном порядке. Теперь, как в XP Info,
 нижние границы обычных строк сортируются и используется минимальный
 положительный интервал. Переход от пяти к шести характеристикам больше
-не обнуляет место из-за ошибочно большого шага. Пять — верхний предел;
+не обнуляет место из-за ошибочно большого шага. Два — верхний предел;
 фактическое число учитывает видимую область и не перекрывает интерфейс.
 Порог малых прибавок и срок хранения активности не менялись.
+
+VANILLA TEXT STYLE / ШТАТНЫЙ СТИЛЬ ТЕКСТА
+
+XP skill labels inherit the actual rendered vanilla label font and height;
+percentages inherit the vanilla value style. Existing 24 px XP rectangles and
+bar colors are unchanged. Font setters and text-size measurements are cached
+or skipped when unchanged. A 1 px divider uses verified lower text padding in
+tight layouts; unknown padding does not reduce XP row capacity. MaxRows now
+offers 1..2 by explicit user choice; old values above 2 clamp when read without
+rewriting the personal INI.
+
+Названия навыков опыта используют реальный шрифт и размер штатных названий,
+проценты — оформление штатных значений. Прямоугольники полос высотой 24 px и цвета
+сохранены. Неизменившийся шрифт не назначается повторно; измерения кешируются.
+В тесной панели разделитель 1 px использует подтверждённый нижний отступ текста;
+неизвестный отступ не уменьшает число полос. По выбору пользователя MaxRows
+ограничен 1..2; старые значения выше 2 ограничиваются при чтении без перезаписи INI.

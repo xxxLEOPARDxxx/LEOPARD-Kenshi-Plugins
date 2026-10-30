@@ -26,7 +26,7 @@ Original DLL SHA-256: `7d76575c0e167e96d219a02c4ee069c92abb69f690b08d96f38cf6f22
 | Panel | getGUIDataForMainInfo hook, native progress rows, divider | Recent skills under vanilla character stats, native progress widgets, divider, adaptive capacity |
 | Panel order | Stable slots; replacement only after old slot idle >5 seconds | Stable slots with same hold period and newest eligible skill replacement |
 | Factory defaults | Original DLL data RVA 422f0: all 3 on; rows=2; minPercent=1; emit=1s; recent=120s | Same defaults for added settings; existing Enabled/SelectedOnly/LogToGame retained |
-| Settings limits | Original load clamps rows 1..5, emit >=.1s, recent >=1s; minimum >=0 | MCM rows 1..5; minimum 0..100%; interval .1..60s; recent 1..3600s (bounded UI) |
+| Settings limits | Original load clamps rows 1..5, emit >=.1s, recent >=1s; minimum >=0 | User explicitly limited MCM/runtime rows to1..2 after native HUD acceptance; minimum0..100%; interval.1..60s; recent1..3600s (bounded UI) |
 | Settings UI | Original Mods-list Settings button, no original hotkey | Same functionality through MCM, all changes immediate; no invented default binding |
 | Diagnostics | verboseLog default off | Existing Debug default off, last; errors always |
 | Saves | No save writes | Session state cleared on load/new game/settings changes; no sidecar |

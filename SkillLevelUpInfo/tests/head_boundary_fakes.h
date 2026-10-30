@@ -14,7 +14,7 @@ DWORD ProbeTick(){return fakeNow;}
 #define GetTickCount ProbeTick
 void DebugLog(const std::string&){}
 const char* Tr(const char* s){return s;}
-namespace PluginDiagnostics {bool Enabled(){return false;}void Write(const char*){}}
+namespace PluginDiagnostics {bool Enabled(){return false;}void Write(const char*){}void Configure(const char*,const std::string&) {}}
 namespace MyGUI {struct Colour {float r,g,b;Colour(float a,float c,float d):r(a),g(c),b(d){}};}
 class Character;
 struct GameSaveState {};

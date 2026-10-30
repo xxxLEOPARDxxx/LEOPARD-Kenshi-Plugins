@@ -88,9 +88,6 @@ msgstr "Mass combat"
 msgid "Maximum XP rows"
 msgstr "Maximum XP rows"
 
-msgid "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
-msgstr "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
-
 msgid "Medic"
 msgstr "Medic"
 
@@ -138,6 +135,9 @@ msgstr "Show reached whole skill levels as rising gold text."
 
 msgid "Show recently trained skills below the vanilla character stats, separated by a divider."
 msgstr "Show recently trained skills below the vanilla character stats, separated by a divider."
+
+msgid "Show up to two recent skills in the character panel. Only one row appears when space is limited."
+msgstr "Show up to two recent skills in the character panel. Only one row appears when space is limited."
 
 msgid "Skill level-up text"
 msgstr "Skill level-up text"

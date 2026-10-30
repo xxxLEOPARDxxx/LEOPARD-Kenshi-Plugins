@@ -23,7 +23,7 @@ translations={
 'XP bars in character panel':('Полосы опыта в панели персонажа','角色面板经验条'),
 'Show recently trained skills below the vanilla character stats, separated by a divider.':('Показывать недавно тренируемые навыки под обычными характеристиками персонажа, после разделителя.','在原版角色属性下方显示近期训练的技能，并用分隔线区分。'),
 'Maximum XP rows':('Максимум строк опыта','经验条最大行数'),
-'Maximum number of recent skills in the character panel. Fewer rows appear when space is limited.':('Максимальное число недавних навыков в панели персонажа. При нехватке места строк будет меньше.','角色面板中近期技能的最大数量。空间不足时会显示较少行。'),
+'Show up to two recent skills in the character panel. Only one row appears when space is limited.':('Показывать до двух недавно тренируемых навыков в панели персонажа. При нехватке места остаётся одна строка.','角色面板最多显示两项近期训练的技能。空间不足时仅显示一行。'),
 'Minimum XP gain, %':('Минимальная прибавка опыта, %','最小经验增量，%'),
 'Accumulate small skill gains until this percentage can be announced. Level-ups always appear immediately.':('Накапливать малые прибавки до этого процента. Повышение целого уровня показывается сразу.','累积小幅技能增量，达到此百分比后显示。技能升级会立即显示。'),
 'XP announcement interval, s':('Интервал сообщений опыта, с','经验提示间隔，秒'),

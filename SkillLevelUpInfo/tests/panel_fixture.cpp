@@ -1,6 +1,6 @@
 void NoopPanel(CharStats*,DatapanelGUI*,int,bool){}
 int main(){
- InitializeCriticalSection(&g_lock);g_uiThread=GetCurrentThreadId();g_origPanel=NoopPanel;
+ InitializeCriticalSection(&g_lock);XpPanelTextStyle::g_nativeProfile=true;g_uiThread=GetCurrentThreadId();g_origPanel=NoopPanel;
  PlayerInterface player;GameWorld world;world.player=&player;ou=&world;ForgottenGUI ui;gui=&ui;
  Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;Scan();
  DatapanelGUI panel;panel.Vanilla(10);panel.Vanilla(30);Panel(&c.stats,&panel,0,false);
@@ -102,12 +102,15 @@ int main(){
  DataPanelLine_Progress*exactFirst=measured.lineExists(SlotKey(0),0)?static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(0),0)):NULL;
  check(exactFirst&&exactFirst->progress->getTop()==161&&exactFirst->progress->getHeight()==24&&exactFirst->progress->getBottom()==185,
        "single measured XP row ends exactly at185 with unchanged24px widget height");
- check(!g_divider.get()||!g_divider.get()->visible,"divider hides when exact-fit rows leave no safe gap");
+ check(g_divider.get()&&g_divider.get()->visible&&g_divider.get()->getTop()==160&&g_divider.get()->getBottom()<=161,
+       "exact-fit six-row panel retains a1px divider inside safe native text padding at160");
  measured.lines[5]->setVisible(false);Panel(&robotA.stats,&measured,0,false);
  check(g_slots.count==2,"actual185px viewport fits two24px XP rows on26px pitch after five rows ending135");
  DataPanelLine_Progress*exactSecond=measured.lineExists(SlotKey(1),0)?static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(1),0)):NULL;
  check(exactFirst&&exactSecond&&exactFirst->progress->getTop()==135&&exactSecond->progress->getTop()==161&&exactSecond->progress->getBottom()==185,
        "second measured XP row ends exactly at185 without overlap or trailing-pitch padding");
+ check(g_divider.get()&&g_divider.get()->visible&&g_divider.get()->getTop()==134&&g_divider.get()->getBottom()<=135,
+       "exact-fit five-row panel retains its1px divider at134 without stealing XP row capacity");
  bool measuredStable=true;
  for(int frame=0;frame<100;++frame){measured.lines[5]->setVisible(frame%2!=0);Panel(&robotA.stats,&measured,0,false);
   if(g_slots.count!=(frame%2?1:2))measuredStable=false;}
@@ -130,5 +133,81 @@ int main(){
  Panel(&runner.stats,&measured,0,false);
  check(g_slots.count==2&&reservedTop==137&&stableFirst->progress->getTop()==reservedTop&&g_divider.get()&&g_divider.get()->visible,
        "conditional divider reserves gap by allowed capacity so a second active skill never moves the first row");
+ for(int i=0;i<6;++i){measured.lines[i]->w1->text.fontName="ActualVanillaBold";measured.lines[i]->w1->text.fontHeight=25;
+  measured.lines[i]->w2->text.fontName="ActualVanillaValue";measured.lines[i]->w2->text.fontHeight=23;}
+ Panel(&runner.stats,&measured,0,false);
+ check(stableFirst->textBox->text.fontName=="ActualVanillaBold"&&stableFirst->textBox->text.fontHeight==25,
+       "XP skill names copy direct rendered vanilla font face and effective height");
+ check(stableFirst->progressText->text.fontName=="ActualVanillaValue"&&stableFirst->progressText->text.fontHeight==23,
+       "XP percentages copy rendered vanilla value style independently from skill labels");
+ const int styleWrites=stableFirst->textBox->text.fontWrites+stableFirst->textBox->text.heightWrites+
+  stableFirst->progressText->text.fontWrites+stableFirst->progressText->text.heightWrites;
+ const int styleMoves=stableFirst->progress->moves;const MyGUI::IntCoord styledCoord=stableFirst->progress->getCoord();
+ for(int n=0;n<100;++n)Panel(&runner.stats,&measured,0,false);
+ check(styleWrites==stableFirst->textBox->text.fontWrites+stableFirst->textBox->text.heightWrites+
+  stableFirst->progressText->text.fontWrites+stableFirst->progressText->text.heightWrites&&styleMoves==stableFirst->progress->moves,
+       "100 stable font refreshes perform zero extra font setters or geometry writes");
+ MyGUI::Widget sourceClient,sourceDeep,destClient,destValue;
+ sourceClient.client=&sourceDeep;sourceClient.textEnabled=false;
+ sourceDeep.text.fontName="CompositeVanillaBold";sourceDeep.text.fontHeight=25;
+ for(int i=0;i<6;++i){measured.lines[i]->w1->client=&sourceClient;measured.lines[i]->w1->textEnabled=false;}
+ stableFirst->textBox->client=&destClient;stableFirst->progressText->client=&destValue;
+ Panel(&runner.stats,&measured,0,false);
+ check(destClient.text.fontName=="CompositeVanillaBold"&&destClient.text.fontHeight==25&&
+       destValue.text.fontName=="ActualVanillaValue"&&destValue.text.fontHeight==23,
+       "composite EditBox styles follow rendered client text despite empty nonvirtual TextBox getters");
+ check(!(stableFirst->progress->getCoord()!=styledCoord)&&stableFirst->progress->getHeight()==24&&g_slots.count==2,
+       "copying25px vanilla font preserves accepted24px XP rectangles and two-row capacity");
+ const std::string kept=destClient.text.fontName;sourceDeep.text.hasFont=false;
+ for(int i=0;i<6;++i)measured.lines[i]->w1->textEnabled=false;
+ Panel(&runner.stats,&measured,0,false);
+ check(destClient.text.fontName==kept,"missing actual source font never clears or invents XP label font");
+ for(int i=0;i<6;++i){measured.lines[i]->w1->client=NULL;measured.lines[i]->w1->textEnabled=true;measured.lines[i]->w1->text.hasFont=true;
+  measured.lines[i]->w1->text.fontHeight=25;measured.lines[i]->w2->text.fontHeight=21;}
+ measured.root.coord.height=185;Panel(&runner.stats,&measured,0,false);
+ MyGUI::ISubWidgetText&lastName=measured.lines[4]->w1->text;MyGUI::ISubWidgetText&lastValue=measured.lines[4]->w2->text;
+ check(g_slots.count==2&&g_divider.get()&&g_divider.get()->visible&&g_divider.get()->getTop()==134&&
+       lastName.absolute.top+(26-25)/2+25<=g_divider.get()->getTop()&&lastValue.absolute.top+(26-21)/2+21<=g_divider.get()->getTop(),
+       "measured25px name and21px value glyph cells leave safe1px divider padding in26px vanilla row");
+ const int measurements=lastName.measures+lastValue.measures;
+ for(int n=0;n<100;++n)Panel(&runner.stats,&measured,0,false);
+ check(lastName.measures+lastValue.measures==measurements,"100 stable padding checks perform zero extra native text-size measurements");
+ lastName.fontHeight=26;Panel(&runner.stats,&measured,0,false);
+ check(g_slots.count==2&&(!g_divider.get()||!g_divider.get()->visible),"unverified full-height glyph cell hides exact-fit divider without losing either XP row");
+ MyGUI::Widget cycleA,cycleB;cycleA.client=&cycleB;cycleB.client=&cycleA;cycleA.textEnabled=cycleB.textEnabled=false;
+ check(!XpPanelTextStyle::RenderedText(&cycleA)&&cycleA.clientReads+cycleB.clientReads<=4,
+       "malformed composite-client cycle stops within bounded font lookup without child traversal");
+ MyGUI::EditText absent;absent.nativeFont=NULL;absent.fontName="NonzeroNativeTextureDecoy";
+ check(!XpPanelTextStyle::HasFont(&absent),"native0xe0 null-font guard rejects decoy data at incompatible SDK0xe8 offset");
+ MyGUI::Widget padSource,padOther;padSource.coord.top=padOther.coord.top=109;
+ padSource.text.fontHeight=padOther.text.fontHeight=25;padSource.text.measuredHeight=25;padOther.text.measuredHeight=26;
+ padSource.text.caption="old";padOther.text.caption="new";padSource.getSubWidgetText();padOther.getSubWidgetText();
+ XpPanelTextStyle::MeasureCache captionCache;
+ check(XpPanelTextStyle::PaddingBefore(&padSource,134,captionCache),"initial25px rendered caption proves padding before134");
+ padSource.text.caption="new";padSource.text.measuredHeight=26;
+ check(!XpPanelTextStyle::PaddingBefore(&padSource,134,captionCache),"changed rendered caption remeasures26px text instead of reusing25px padding proof");
+ XpPanelTextStyle::MeasureCache identityCache;padSource.text.measuredHeight=25;
+ XpPanelTextStyle::PaddingBefore(&padSource,134,identityCache);
+ check(!XpPanelTextStyle::PaddingBefore(&padOther,134,identityCache),"another native text source cannot inherit the prior source padding proof");
+ XpPanelTextStyle::MeasureCache shadowCache;padSource.text.shadow=false;padSource.text.measuredHeight=25;
+ XpPanelTextStyle::PaddingBefore(&padSource,134,shadowCache);padSource.text.shadow=true;padSource.text.measuredHeight=26;
+ check(!XpPanelTextStyle::PaddingBefore(&padSource,134,shadowCache),"public shadow change invalidates padding using actual newly measured text size");
+ XpPanelTextStyle::MeasureCache wrapCache;padSource.isEditBox=true;padSource.editWordWrap=false;padSource.text.measuredHeight=25;
+ XpPanelTextStyle::PaddingBefore(&padSource,134,wrapCache);padSource.editWordWrap=true;padSource.text.measuredHeight=26;
+ check(!XpPanelTextStyle::PaddingBefore(&padSource,134,wrapCache),"public EditBox word-wrap change invalidates padding without guessing extra pixels");
+ XpPanelTextStyle::MeasureCache unlinkCache;padSource.text.measuredHeight=25;
+ XpPanelTextStyle::PaddingBefore(&padSource,134,unlinkCache);MyGUI::UnlinkWidget(&padSource);padSource.text.measuredHeight=26;
+ check(!XpPanelTextStyle::PaddingBefore(&padSource,134,unlinkCache),"native unlink invalidates cached source even if its address is immediately reused");
+ MyGUI::Widget padOuter,padClient;padOuter.textEnabled=false;padOuter.client=&padClient;padClient.coord.top=109;
+ padClient.text.fontHeight=25;padClient.text.measuredHeight=25;padClient.text.caption="same";
+ XpPanelTextStyle::MeasureCache clientCache;XpPanelTextStyle::PaddingBefore(&padOuter,134,clientCache);
+ MyGUI::UnlinkWidget(&padClient);padClient.text.measuredHeight=26;
+ check(!XpPanelTextStyle::PaddingBefore(&padOuter,134,clientCache),"rendered-client unlink invalidates proof while logical EditBox owner remains alive");
+ padClient.isEditBox=true;padClient.editWordWrap=false;padClient.text.measuredHeight=25;
+ XpPanelTextStyle::MeasureCache clientWrapCache;XpPanelTextStyle::PaddingBefore(&padOuter,134,clientWrapCache);
+ padClient.editWordWrap=true;padClient.text.measuredHeight=26;
+ check(!XpPanelTextStyle::PaddingBefore(&padOuter,134,clientWrapCache),"rendered EditBox wrap changes invalidate proof when logical wrapper has no wrap getter");
+ XpPanelTextStyle::g_nativeProfile=false;
+ check(!XpPanelTextStyle::RenderedText(stableFirst->textBox),"unknown MyGUI getter profile skips font access safely without SEH or default-style writes");
  printf("native panel boundary: %s\n",failures?"FAILED":"PASSED");return failures?1:0;
 }

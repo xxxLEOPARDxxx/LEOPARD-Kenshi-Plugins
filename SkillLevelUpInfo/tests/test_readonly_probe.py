@@ -13,9 +13,9 @@ class Memory:
 class ProbeTests(unittest.TestCase):
  def test_current_dll_and_map_match(self):
   symbols,stamp=probe.map_symbols(probe.BUILD/'SkillLevelUpInfo.map',probe.BUILD/'SkillLevelUpInfo.dll')
-  self.assertEqual(symbols['g_panel'],0x22078)
-  self.assertEqual(symbols['g_slots'],0x220f8)
-  self.assertEqual(stamp,0x6ae48f91)
+  self.assertEqual(symbols['g_panel'],0x24248)
+  self.assertEqual(symbols['g_slots'],0x242c8)
+  self.assertEqual(stamp,0x6ae4a90a)
  def test_vc10_map_keeps_key_order_not_visual_order(self):
   m=Memory();obj,head=0x10000,0x11000
   m.pack(obj+8,'<QQ',head,3);m.pack(head+8,'<Q',0x13000)
@@ -30,7 +30,7 @@ class ProbeTests(unittest.TestCase):
   value=b'skill_xp_info_slot_1';m.pack(0x10000,'<Q',0x20000);m.pack(0x10010,'<QQ',len(value),31);m.write(0x20000,value)
   self.assertEqual(probe.string(m,0x10000),value.decode())
  def test_real_widget_offsets_and_parent(self):
-  m=Memory();m.pack(0x10020,'<4i',9,105,307,22);m.pack(0x10450,'<Q',0x20000);m.write(0x1046c,b'\1')
+  m=Memory();m.pack(0x10020,'<4i',9,105,307,22);m.pack(0x10450,'<Q',0x20000);m.write(0x1046c,b'\1');m.pack(0x103d0,'<Q',0);m.pack(0x10330,'<Q',0)
   w=probe.widget(m,0x10000)
   self.assertEqual((w['bottom'],w['parent'],w['visible']),(127,'0x20000',True))
  def test_owner_snapshot_uses_node_plus56_not64(self):
@@ -55,6 +55,22 @@ class ProbeTests(unittest.TestCase):
   m.pack(node+24,'<Q',0x40000);m.pack(node+32,'<4Q',0x50000,0x60000,13,77)
   self.assertEqual(probe.binding(m,obj,0x40000),{'skill':'0x50000','owner':'0x60000','statIndex':13,'token':77})
   self.assertIsNone(probe.binding(m,obj,0x40004))
+ def test_composite_font_snapshot_uses_verified_native_getter_offsets(self):
+  m=Memory();outer,client,text,font=0x10000,0x20000,0x30000,0x40000
+  m.pack(outer+0x3d0,'<Q',client);m.pack(client+0x3d0,'<Q',0);m.pack(client+0x330,'<Q',text)
+  m.pack(text+0xe0,'<Q',font);m.pack(text+0xf0,'<i',25)
+  m.pack(text+0x18,'<4i',0,0,307,26);m.pack(text+0x28,'<2i',9,109)
+  m.pack(text+0x140,'<2i',100,25);m.pack(text+0xb4,'<i',1);m.pack(text+0x114,'<2i',0,0);m.write(text+0x112,b'\0')
+  m.zero(text+0x70,32)
+  m.zero(font+8,32);m.write(font+8,b'ActualFont');m.pack(font+24,'<QQ',10,15)
+  style=probe.rendered_font(m,outer)
+  self.assertEqual((style['face'],style['font_height'],style['widget']),('ActualFont',25,hex(client)))
+  self.assertEqual(style['text_view_size'],[100,25])
+ def test_actual_rendered_caption_supports_inline_and_heap_utf16(self):
+  m=Memory();m.zero(0x10000,32);m.write(0x10000,'Уворот'.encode('utf-16-le'));m.pack(0x10010,'<QQ',6,7)
+  self.assertEqual(probe.caption(m,0x10000),'Уворот')
+  text='Боевые искусства';m.pack(0x10000,'<Q',0x20000);m.pack(0x10010,'<QQ',len(text),31);m.write(0x20000,text.encode('utf-16-le'))
+  self.assertEqual(probe.caption(m,0x10000),text)
  def test_import_has_no_process_side_effects(self):
   # Import above succeeded without calling kernel() or requiring a PID.
   self.assertEqual(len(probe.NAMES),37)
@@ -62,14 +78,16 @@ class ProbeTests(unittest.TestCase):
  def test_only_actual_loader_imagebase_rewrite_is_allowed(self):
   disk=(probe.BUILD/'SkillLevelUpInfo.dll').read_bytes();pe=struct.unpack_from('<I',disk,0x3c)[0];opt=pe+24
   base=0x7ffe7f480000;header=bytearray(disk[:1024]);struct.pack_into('<Q',header,opt+24,base)
-  verified=probe.loaded_header(header,disk,base,0x27000)
-  self.assertEqual(verified['changed_offsets'],['0x14a','0x14b','0x14c','0x14d'])
+  image_size=struct.unpack_from('<I',disk,opt+56)[0]
+  verified=probe.loaded_header(header,disk,base,image_size)
+  self.assertEqual(verified['changed_offsets'],[hex(opt+24+n) for n in (2,3,4,5)])
   header[pe+8]^=1
-  with self.assertRaisesRegex(ValueError,'outside'):probe.loaded_header(header,disk,base,0x27000)
+  with self.assertRaisesRegex(ValueError,'outside'):probe.loaded_header(header,disk,base,image_size)
  def test_wrong_loader_base_and_image_size_are_rejected(self):
   disk=(probe.BUILD/'SkillLevelUpInfo.dll').read_bytes();pe=struct.unpack_from('<I',disk,0x3c)[0];opt=pe+24
   header=bytearray(disk[:1024]);struct.pack_into('<Q',header,opt+24,0x12340000)
-  with self.assertRaisesRegex(ValueError,'neither actual nor preferred'):probe.loaded_header(header,disk,0x7ffe7f480000,0x27000)
-  with self.assertRaisesRegex(ValueError,'size'):probe.loaded_header(disk[:1024],disk,0x7ffe7f480000,0x28000)
+  image_size=struct.unpack_from('<I',disk,opt+56)[0]
+  with self.assertRaisesRegex(ValueError,'neither actual nor preferred'):probe.loaded_header(header,disk,0x7ffe7f480000,image_size)
+  with self.assertRaisesRegex(ValueError,'size'):probe.loaded_header(disk[:1024],disk,0x7ffe7f480000,image_size+0x1000)
 
 if __name__=='__main__':unittest.main()

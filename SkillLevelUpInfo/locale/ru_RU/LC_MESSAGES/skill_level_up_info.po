@@ -88,9 +88,6 @@ msgstr "Массовый бой"
 msgid "Maximum XP rows"
 msgstr "Максимум строк опыта"
 
-msgid "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
-msgstr "Максимальное число недавних навыков в панели персонажа. При нехватке места строк будет меньше."
-
 msgid "Medic"
 msgstr "Медицина"
 
@@ -138,6 +135,9 @@ msgstr "Показывать достигнутый целый уровень н
 
 msgid "Show recently trained skills below the vanilla character stats, separated by a divider."
 msgstr "Показывать недавно тренируемые навыки под обычными характеристиками персонажа, после разделителя."
+
+msgid "Show up to two recent skills in the character panel. Only one row appears when space is limited."
+msgstr "Показывать до двух недавно тренируемых навыков в панели персонажа. При нехватке места остаётся одна строка."
 
 msgid "Skill level-up text"
 msgstr "Текст повышения навыка"

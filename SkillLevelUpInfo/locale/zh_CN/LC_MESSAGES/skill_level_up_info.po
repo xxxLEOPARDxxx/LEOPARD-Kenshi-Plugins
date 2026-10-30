@@ -88,9 +88,6 @@ msgstr "群体战斗"
 msgid "Maximum XP rows"
 msgstr "经验条最大行数"
 
-msgid "Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."
-msgstr "角色面板中近期技能的最大数量。空间不足时会显示较少行。"
-
 msgid "Medic"
 msgstr "医疗"
 
@@ -138,6 +135,9 @@ msgstr "以向上飘动的金色文字显示达到的技能整数等级。"
 
 msgid "Show recently trained skills below the vanilla character stats, separated by a divider."
 msgstr "在原版角色属性下方显示近期训练的技能，并用分隔线区分。"
+
+msgid "Show up to two recent skills in the character panel. Only one row appears when space is limited."
+msgstr "角色面板最多显示两项近期训练的技能。空间不足时仅显示一行。"
 
 msgid "Skill level-up text"
 msgstr "技能升级文字"

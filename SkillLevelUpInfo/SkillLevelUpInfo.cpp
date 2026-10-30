@@ -22,14 +22,17 @@
 #include <kenshi/gui/DataPanelLine.h>
 #include <mygui/MyGUI.h>
 #include <WidgetRef.h>
+#include <mygui/MyGUI_EditText.h>
 #include "HeadAnchor.h"
 #include "XpInfoCore.h"
+#include "PanelTextStyle.h"
 #include <map>
 #include <string>
 #include <sstream>
 #include <cmath>
 #include <algorithm>
 
+bool XpPanelTextStyle::g_nativeProfile=false;
 typedef char CharStatsAbiSizeMustMatchOriginal[(sizeof(CharStats)==0x230)?1:-1];
 namespace
 {
@@ -120,7 +123,7 @@ namespace
         g_floating = PluginSettings::Bool("SkillLevelUpInfo", "FloatingLabels", true, p);
         g_levels = PluginSettings::Bool("SkillLevelUpInfo", "LevelUpLabels", true, p);
         g_bars = PluginSettings::Bool("SkillLevelUpInfo", "PanelBars", true, p);
-        g_maxRows = (int)PluginSettings::Number("SkillLevelUpInfo", "MaxRows", 2, 1, 5, p);
+        g_maxRows = (int)PluginSettings::Number("SkillLevelUpInfo", "MaxRows", 2, 1, 2, p);
         g_minPercent = PluginSettings::Number("SkillLevelUpInfo", "MinPercent", 1, 0, 100, p);
         g_emit = (DWORD)(PluginSettings::Number("SkillLevelUpInfo", "AnnounceEverySeconds", 1, .1f, 60, p)*1000);
         g_recent = (DWORD)(PluginSettings::Number("SkillLevelUpInfo", "RecentSeconds", 120, 1, 3600, p)*1000);
@@ -274,6 +277,7 @@ namespace
         static const std::string keys[5]={"skill_xp_info_slot_0","skill_xp_info_slot_1","skill_xp_info_slot_2","skill_xp_info_slot_3","skill_xp_info_slot_4"};
         return keys[i];
     }
+    XpPanelTextStyle::MeasureCache g_nameMeasure,g_valueMeasure;
     void HidePanel(DatapanelGUI* panel,int category)
     {
         for(int i=0;i<5;++i){
@@ -314,6 +318,7 @@ namespace
         int bottom=0,pitch=20,left=0,width=root->getWidth(),valueRight=width-4;
         int rowBottoms[512],rowCount=0;
         MyGUI::Widget* parent=root;
+        MyGUI::Widget* nameStyle=NULL;MyGUI::Widget* valueStyle=NULL;
         const int lines=panel->getNumLines(category);
         for(int i=0;i<lines && i<512;++i){
             DataPanelLine* line=panel->getLineByNum(category,i);if(!line)continue;
@@ -323,6 +328,7 @@ namespace
             rowBottoms[rowCount++]=w->getBottom();
             if(w->getBottom()>bottom){
                 bottom=w->getBottom();parent=w->getParent();
+                nameStyle=line->w1;valueStyle=line->w2;
                 if(line->w1)left=line->w1->getLeft();
                 if(line->w2)valueRight=line->w2->getLeft()+line->w2->getWidth();
             }
@@ -358,6 +364,12 @@ namespace
         // capacity, so adding another recent skill cannot shift the first row.
         const bool dividerAllowed=capacity>0 && remaining-(rowHeight+(capacity-1)*pitch)>=2;
         if(dividerAllowed)top+=2;
+        MyGUI::ISubWidgetText* const nameText=XpPanelTextStyle::RenderedText(nameStyle);
+        MyGUI::ISubWidgetText* const valueText=XpPanelTextStyle::RenderedText(valueStyle);
+        const bool paddingDivider=!dividerAllowed && bottom>0 &&
+            XpPanelTextStyle::PaddingBefore(nameStyle,parent->getAbsoluteTop()+bottom-1,g_nameMeasure) &&
+            XpPanelTextStyle::PaddingBefore(valueStyle,parent->getAbsoluteTop()+bottom-1,g_valueMeasure);
+        const int dividerTop=dividerAllowed?bottom:bottom-1;
         g_slots.Select(skills,(int)kCount,GetTickCount(),g_recent,capacity);
         PanelStatus(capacity<=0?"no room for XP rows":g_slots.count?"showing recent XP rows":"no recent XP for this character");
         for(int slot=0;slot<g_slots.count;++slot){
@@ -373,6 +385,8 @@ namespace
                 else line->setProgress(fraction,number);
             }
             if(!line)continue;
+            XpPanelTextStyle::Copy(line->textBox,nameText);
+            XpPanelTextStyle::Copy(line->progressText,valueText);
             if(created || g_rowSkill[slot]!=index){if(line->textBox)line->textBox->setCaption(Name(index));g_rowSkill[slot]=index;}
             g_rowValue[slot]=value;
             if(line->progress && !line->progress->getVisible())line->setVisible(true);
@@ -388,14 +402,14 @@ namespace
                 if(row && row->getType()==DataPanelLine::DPL_PROGRESS){DataPanelLine_Progress* progress=static_cast<DataPanelLine_Progress*>(row);
                     if(progress->progress && progress->progress->getVisible())row->setVisible(false);}}
         }
-        if(g_slots.count && dividerAllowed){
+        if(g_slots.count && (dividerAllowed || paddingDivider)){
             if(g_divider.get() && g_divider.get()->getParent()!=parent)MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
             if(!g_divider.get()){
-                MyGUI::Widget* divider=parent->createWidget<MyGUI::Widget>("WhiteSkin",MyGUI::IntCoord(left,bottom,width,1),MyGUI::Align::Default);
+                MyGUI::Widget* divider=parent->createWidget<MyGUI::Widget>("WhiteSkin",MyGUI::IntCoord(left,dividerTop,width,1),MyGUI::Align::Default);
                 divider->setNeedMouseFocus(false);divider->setColour(MyGUI::Colour(.35f,.3f,.25f));g_divider.set(divider);
             }
             MyGUI::Widget* divider=g_divider.get();
-            const MyGUI::IntCoord coord(left,bottom,width,1);
+            const MyGUI::IntCoord coord(left,dividerTop,width,1);
             if(divider->getCoord()!=coord)divider->setCoord(coord);
             if(!divider->getVisible())divider->setVisible(true);
         }else if(g_divider.get() && g_divider.get()->getVisible())g_divider.get()->setVisible(false);
@@ -459,7 +473,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "SkillLevelUpInfo", "FloatingLabels", Tr("XP gain text"), Tr("Show accumulated skill gains as rising blue text, such as +3% Athletics."), 1, 0);
     api->toggle(api, "SkillLevelUpInfo", "LevelUpLabels", Tr("Skill level-up text"), Tr("Show reached whole skill levels as rising gold text."), 1, 0);
     api->toggle(api, "SkillLevelUpInfo", "PanelBars", Tr("XP bars in character panel"), Tr("Show recently trained skills below the vanilla character stats, separated by a divider."), 1, 0);
-    api->integer(api, "SkillLevelUpInfo", "MaxRows", Tr("Maximum XP rows"), Tr("Maximum number of recent skills in the character panel. Fewer rows appear when space is limited."), 2, 1, 5, 0);
+    api->integer(api, "SkillLevelUpInfo", "MaxRows", Tr("Maximum XP rows"), Tr("Show up to two recent skills in the character panel. Only one row appears when space is limited."), 2, 1, 2, 0);
     api->number(api, "SkillLevelUpInfo", "MinPercent", Tr("Minimum XP gain, %"), Tr("Accumulate small skill gains until this percentage can be announced. Level-ups always appear immediately."), 1, 0, 100, 2, 0);
     api->number(api, "SkillLevelUpInfo", "AnnounceEverySeconds", Tr("XP announcement interval, s"), Tr("Minimum collection time for fractional XP messages. Level-up messages do not wait."), 1, .1f, 60, 1, 0);
     api->integer(api, "SkillLevelUpInfo", "RecentSeconds", Tr("Recent training duration, s"), Tr("Keep a skill in the panel for this long after its last XP gain."), 120, 1, 3600, 0);
@@ -470,6 +484,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 __declspec(dllexport) void startPlugin()
 {
     InitializeCriticalSection(&g_lock);
+    if(!XpPanelTextStyle::InitializeNativeProfile())
+        ErrorLog("SkillLevelUpInfo: unsupported MyGUI font ABI; retaining default XP text style");
     LoadSettings();
     if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&increaseStat), Increase, &g_origIncrease) != KenshiLib::SUCCESS)
         ErrorLog("SkillLevelUpInfo: cannot hook XP increase; baseline polling remains active");
