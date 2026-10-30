@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-30",
+  "mods": {
+    "PatientSelfAid": {
+      "nexus": 2193,
+      "workshop_id": 3812149895,
+      "version": "4"
+    },
+    "AssignedWorkers": {
+      "nexus": 2191,
+      "workshop_id": 3812150807,
+      "version": "7"
+    },
+    "RecruitMarkers": {
+      "nexus": 2232,
+      "workshop_id": 3820514162,
+      "version": "3"
+    },
+    "BetterLooting": {
+      "nexus": 2218,
+      "workshop_id": 3816121198,
+      "version": "4"
+    },
+    "UITweaks": {
+      "nexus": 2192,
+      "workshop_id": 3812150876,
+      "version": "10"
+    },
+    "ModConfigMenu": {
+      "nexus": 2202,
+      "workshop_id": 3813761584,
+      "version": "10"
+    },
+    "AIFixed": {
+      "nexus": 2256,
+      "workshop_id": 3829845490,
+      "version": "1"
+    },
+    "SkillLevelUpInfo": {
+      "nexus": 2257,
+      "workshop_id": 3829848328,
+      "version": "1"
+    },
+    "MultiXPMining": {
+      "nexus": 2258,
+      "workshop_id": 3829848414,
+      "version": "1"
+    },
+    "Character Inspector": {
+      "nexus": 2259,
+      "workshop_id": 3829848451,
+      "version": "1"
+    },
+    "KenshiRotate": {
+      "nexus": 2260,
+      "workshop_id": 3829848534,
+      "version": "1"
+    },
+    "KillCounter": {
+      "nexus": 2261,
+      "workshop_id": 3829848599,
+      "version": "1"
+    },
+    "Auto-Pause-on-Load": {
+      "nexus": 2206,
+      "workshop_id": 3813851956,
+      "version": "5"
+    },
+    "Character-Highlight": {
+      "nexus": 2233,
+      "workshop_id": 3820546396,
+      "version": "2"
+    },
+    "Container-Highlight": {
+      "nexus": 2207,
+      "workshop_id": 3813852014,
+      "version": "2"
+    },
+    "Formations": {
+      "nexus": 2235,
+      "workshop_id": 3821113149,
+      "version": "1"
+    },
+    "Hidden-Faction-Relations": {
+      "nexus": 2208,
+      "workshop_id": 3813852055,
+      "version": "2"
+    },
+    "Job-B-Gone": {
+      "nexus": 2209,
+      "workshop_id": 3813852087,
+      "version": "5"
+    },
+    "KenshiJobManagement": {
+      "nexus": 2225,
+      "workshop_id": 3818460323,
+      "version": "4"
+    },
+    "Loot-Scoot-Execute": {
+      "nexus": 2210,
+      "workshop_id": 3813852124,
+      "version": "5"
+    },
+    "Map-markers": {
+      "nexus": 2211,
+      "workshop_id": 3813852161,
+      "version": "3"
+    },
+    "Organize-the-Crafting-Stations": {
+      "nexus": 2219,
+      "workshop_id": 3816121254,
+      "version": "1"
+    },
+    "Organize-the-Trader": {
+      "nexus": 2212,
+      "workshop_id": 3813852189,
+      "version": "5"
+    },
+    "Vital-Read": {
+      "nexus": 2213,
+      "workshop_id": 3813852230,
+      "version": "5"
+    },
+    "Vital-Sense": {
+      "nexus": 2214,
+      "workshop_id": 3813852288,
+      "version": "6"
+    },
+    "Wall-B-Gone": {
+      "nexus": 2215,
+      "workshop_id": 3813852362,
+      "version": "4"
+    }
+  }
+}

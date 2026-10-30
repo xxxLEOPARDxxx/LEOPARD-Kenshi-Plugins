@@ -1,5 +1,7 @@
 ﻿MULTI XP MINING - универсальная добыча с MCM
 
+[Nexus — our release / наша версия](https://www.nexusmods.com/kenshi/mods/2258)
+
 ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 1 (29–30.10.2026)
 
   * Универсальная добыча по объединённой базе игры: BUILDING ->

@@ -64,6 +64,20 @@
           "The import pause waits for loading to settle and is restored if the game lifts it automatically. Player keyboard or mouse-button input stops the hold."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Исправлена передача паузы между торговлей и инвентарём при переключении персонажа.",
+        "Добавлена устойчивая пауза после импорта сохранения, прекращающая удержание при вводе игрока.",
+        "Добавлена пауза при ударе по невыбранному отряду с интервалом 0–300 секунд."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Fixed pause ownership when switching characters between trade and inventory.",
+        "Added a stable save-import pause that stops holding when the player provides input.",
+        "Added pausing when an unselected squad is hit, with a 0–300 second interval."
+      ]
     }
   },
   "BetterLooting": {
@@ -119,6 +133,16 @@
           "Added an exact name/ID required-item list, player-storage protection enabled by default and optional ground pickup, off by default. Ground pickup is bounded to 256 results and 32 orders and follows nearest-neighbor routing instead of value-per-weight priority, preserving existing orders and theft/capacity checks."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
+        "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже."
+      ],
+      "en": [
+        "MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.",
+        "Required items, protected player storage and nearest-first ground pickup. Details and settings are below."
+      ]
     }
   },
   "Character-Highlight": {
@@ -160,6 +184,18 @@
           "Diplomats are also recognized by character class, covering modded envoys rather than relying only on squad names."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Добавлены MCM и русский/английский/китайский интерфейс, отдельные переключатели категорий, дальность и настройки окраски.",
+        "Снижена фоновая нагрузка подсветки, особенно в больших поселениях.",
+        "Добавлен отдельный цвет дипломатов, в том числе из других модов; исправлена подсветка персонажей без фракции."
+      ],
+      "en": [
+        "Added MCM and Russian/English/Chinese text, separate category toggles, range and tint settings.",
+        "Reduced background highlighting overhead, especially in large settlements.",
+        "Added a separate diplomat color, including modded envoys, and fixed highlighting for factionless characters."
+      ]
     }
   },
   "Character Inspector": {
@@ -193,6 +229,18 @@
           "Added MCM controls for the inspector and inventory button with English, Russian and Chinese text; the obsolete open binding is no longer used. Repeated button searches and unnecessary layout changes were removed, cached controls are cleared on close, and inspection closes when its character is destroyed."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "В MCM можно включить осмотр и кнопку инвентаря; отдельное назначение открытия убрано.",
+        "Интерфейс и настройки поддерживают русский, английский и китайский; прежние переводы сообщества и исправления LEOPARD сохранены.",
+        "Снижена нагрузка окна инвентаря; проверка брони не мешает открывать и закрывать другие окна."
+      ],
+      "en": [
+        "MCM controls enable inspection and the inventory button; the separate open binding is removed.",
+        "Interface and settings support Russian, English and Chinese; earlier community translations and LEOPARD fixes are retained.",
+        "Reduced inventory-window overhead; inspecting armour does not interfere with opening and closing other windows."
+      ]
     }
   },
   "Container-Highlight": {
@@ -234,6 +282,18 @@
           "Markers and tint update when needed instead of being reset every frame, and container-scan allocations were corrected. Ctrl/Shift/Alt modifiers are assigned as one binding rather than separate checkboxes."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Исправлено снятие подсветки после отпускания клавиши; снижена фоновая нагрузка.",
+        "Клавиша и Ctrl/Shift/Alt задаются одним сочетанием; постоянная диагностическая нагрузка сокращена."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Highlighting now clears correctly after releasing the key, with lower background overhead.",
+        "The key and Ctrl/Shift/Alt use one binding, with reduced always-on diagnostic overhead."
+      ]
     }
   },
   "Formations": {
@@ -267,6 +327,18 @@
           "Added follow formations with 13 offered shapes (3 native and 10 new), per-squad selection saved with the game, and 11 drag shapes (4 original and 7 new). Added an arbitrary modifier key, optional Hold after forming up, and English/Russian/Chinese MCM settings."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Добавлен строй при следовании с 13 доступными фигурами: 3 игровых и 10 новых; выбор каждого отряда хранится с сохранением.",
+        "К четырём исходным фигурам перетаскивания добавлены семь, всего 11.",
+        "Любая клавиша или сочетание как модификатор; «Держать» после построения можно отключить; MCM и три языка."
+      ],
+      "en": [
+        "Added follow formations with 13 offered shapes: 3 native and 10 new; each squad selection is stored with the save.",
+        "Seven shapes join the four original drag formations, for 11 in total.",
+        "Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages."
+      ]
     }
   },
   "Hidden-Faction-Relations": {
@@ -306,6 +378,16 @@
           "Removed the nonworking Ctrl+Alt+G shortcut and search-size controls; the list opens from its MCM page."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Список открывается на странице MCM; убраны неработавшая Ctrl+Alt+G и настройки размера поиска."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The list opens from MCM; the nonworking Ctrl+Alt+G shortcut and search-size controls were removed."
+      ]
     }
   },
   "Job-B-Gone": {
@@ -373,6 +455,20 @@
           "Translated the first-click confirmation captions, hint and confirmation dialog."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Панель прячется под локализованным меню паузы и запоминает скрытие клавишей между запусками.",
+        "Одно сочетание вместо отдельных модификаторов; читаемые цвета и меньше повторной перестройки панели.",
+        "Режим подтверждения переведён целиком."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The panel respects localized pause menus and remembers hotkey hiding across restarts.",
+        "One binding replaces separate modifier controls, with readable colors and fewer repeated panel updates.",
+        "The confirmation mode is fully translated."
+      ]
     }
   },
   "KenshiJobManagement": {
@@ -430,6 +526,18 @@
           "Theme lookup now includes Steam Workshop interface mods, correcting light cards and dark text under a dark interface."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Окно переведено на родные скины, шрифты и палитру игры с масштабированием; поддерживаются и темы из Workshop.",
+        "Добавлены MCM и русский/английский/китайский; исправлено колесо во вкладке станций и окне работников.",
+        "Более чёткие значки; исправлены перенос и групповые действия с задачами."
+      ],
+      "en": [
+        "The window uses native game skins, fonts and palette with scaling, including Workshop themes.",
+        "Added MCM and Russian/English/Chinese text, and fixed wheel scrolling in the Stations tab and worker window.",
+        "Clearer icons and fixes for moving jobs and applying group actions."
+      ]
     }
   },
   "KenshiRotate": {
@@ -465,6 +573,20 @@
           "Settings moved from MODS to MCM with one keyboard/mouse binding and modifiers: MMB by default, NONE disables input, and the first active old binding migrates automatically. Repeated rotation with inventory focus was fixed while protecting text entry; three languages, fewer redundant icon updates and item/icon lifetime cleanup were added."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "MCM заменяет прежнюю вкладку MODS: одно назначение клавиатуры или мыши с модификаторами, MMB по умолчанию; NONE отключает ввод. Для назначения мыши нужен MCM 10 или новее.",
+        "Первый активный прежний способ переносится автоматически; существующее новое сочетание и личные настройки сохраняются.",
+        "Исправлены повторные повороты после фокуса инвентаря; редактируемые поля и окно настроек блокируют вращение.",
+        "Добавлены русский, английский и китайский; снижена нагрузка обновления значков инвентаря."
+      ],
+      "en": [
+        "MCM replaces the old MODS controls: one keyboard or mouse binding with modifiers, MMB by default; NONE disables input. Mouse assignment requires MCM 10 or newer.",
+        "The first active legacy binding migrates automatically; an existing new binding and personal settings are preserved.",
+        "Repeated rotation after inventory focus was fixed; editable fields and the Options window block rotation.",
+        "Added Russian, English and Chinese, with lower inventory-icon update overhead."
+      ]
     }
   },
   "KillCounter": {
@@ -498,6 +620,18 @@
           "Added MCM controls for new-event tracking and independent visibility of each row, with English, Russian and Chinese labels. Only changed numbers are refreshed, destroyed-character and expired stealth-attempt records are removed, disabling retains totals, and StatColours compatibility is preserved."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "В MCM добавлены общее включение учёта и независимый показ каждой строки; скрытие строки не останавливает её учёт, отключение сохраняет накопленное.",
+        "Подписи и настройки переведены на русский, английский и китайский; прежние исправления сообщества и совместимость со StatColours сохранены.",
+        "Убраны лишние обновления счётчиков, снижающие производительность интерфейса."
+      ],
+      "en": [
+        "MCM adds a tracking enable switch and independent row visibility; hiding a row does not stop counting, and disabling retains totals.",
+        "Labels and settings support Russian, English and Chinese, retaining community fixes and StatColours compatibility.",
+        "Reduced unnecessary counter updates to improve interface performance."
+      ]
     }
   },
   "Loot-Scoot-Execute": {
@@ -565,6 +699,20 @@
           "Execute and Execute All were integrated into the native context menu, with the separate panel retained as fallback. Fresh installations create settings from defaults."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Переведены кнопки действий; несколько исполнителей добивают отдельные ближайшие цели, новый приказ игрока отменяет действие.",
+        "Исправлены мелькание задачи и звуки людей, животных и скелетов.",
+        "Действия встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Action buttons are translated; multiple executioners take separate nearest targets, and a new player order cancels execution.",
+        "Corrected task flicker and sounds for people, animals and skeletons.",
+        "Actions are integrated into the native context menu, retaining the separate panel as fallback."
+      ]
     }
   },
   "Map-markers": {
@@ -614,6 +762,18 @@
           "Added a save-and-close button and label-color selection; the Markers button and hover labels no longer clip."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Редактор переведён, расширен и показан поверх значков карты; добавлены удаление, закрытие с сохранением и выбор цвета подписи.",
+        "Подписи и кнопка не обрезаются; снижена нагрузка карты с метками."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The translated editor is wider and above map icons, with Delete, save-and-close and label-color controls.",
+        "Labels and the button no longer clip; reduced map-marker overhead."
+      ]
     }
   },
   "Organize-the-Crafting-Stations": {
@@ -647,6 +807,18 @@
           "Settings moved to MCM with translations; the search hint follows the game language and the counter fits its frame. The panel is cached until deletion and repeated row checks run less often."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Подсказка поиска переводится; счётчик корректно измеряется и не налезает на рамку.",
+        "Снижена нагрузка открытой панели поиска."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "The search hint is translated; the counter is measured correctly and does not overlap the frame.",
+        "Reduced overhead while the search panel is open."
+      ]
     }
   },
   "Organize-the-Inventory": {
@@ -667,7 +839,15 @@
         "Settings moved to MCM; the search panel is cached instead of being searched for throughout the interface every frame."
       ]
     },
-    "history": {}
+    "history": {},
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены в MCM; собственная панель поиска запоминается вместо обхода интерфейса каждый кадр."
+      ],
+      "en": [
+        "Settings moved to MCM; the search panel is cached instead of being searched for throughout the interface every frame."
+      ]
+    }
   },
   "Organize-the-Trader": {
     "name": "Organize the Trader",
@@ -734,6 +914,20 @@
           "Search and sorting share the bottom row with adjustable search width; an optional deal balance appears beside trader money. Panel placement and repeated window-part searches were corrected, and settings are created from defaults."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Найденные вещи плотно укладываются в начало сетки; снижена нагрузка при продаже.",
+        "Поиск и сортировка размещены в нижнем ряду, их ширина настраивается; исправлены переводы, выравнивание и обрезание списка.",
+        "Добавлен отключаемый итог сделки рядом с деньгами торговца."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Matching items are packed at the start of the grid, with lower overhead during sales.",
+        "Search and sorting share the bottom row with adjustable widths; translations, list alignment and clipping were corrected.",
+        "Added an optional deal balance beside the trader money."
+      ]
     }
   },
   "Vital-Read": {
@@ -801,6 +995,20 @@
           "The ordinary-bed plus became blue like the repair wrench, using one color for healing."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Значки остаются у портретов, не просвечивают сквозь окна; исправлены пропадание и прозрачность.",
+        "«Умирает» следует штатному состоянию, в том числе у скелетов и перевязанных персонажей.",
+        "Добавлены голубые значки обычной и ремонтной кроватей."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Icons remain attached to portraits and behind overlapping windows, with fixes for disappearing icons and transparency.",
+        "Dying follows the native status, including skeletons and bandaged characters.",
+        "Added blue ordinary-bed and repair-bed indicators."
+      ]
     }
   },
   "Vital-Sense": {
@@ -878,6 +1086,22 @@
           "Tint is lifted while the game renders a portrait and restored afterwards so it is not baked into the portrait."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Значки не просвечивают сквозь окна; нейтралы получили отдельный цвет.",
+        "Лимит 8–256 значков: приоритет у видимых ближайших к центру камеры целей.",
+        "Цели с наградой используют цвет тира; окраска сосуществует с Character Highlight и не попадает в портреты.",
+        "Клавиша задаётся одним сочетанием с модификаторами."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Icons stay behind overlapping windows; neutral characters have a separate color.",
+        "An 8–256 marker budget prioritizes visible targets nearest the camera center.",
+        "Bounty targets use tier colors; tint coexists with Character Highlight and is not baked into portraits.",
+        "The show key is assigned as one binding with modifiers."
+      ]
     }
   },
   "Wall-B-Gone": {
@@ -935,6 +1159,18 @@
           "Added quick-dismantle confirmation: Enter accepts and Esc cancels. Fresh installations create settings from defaults."
         ]
       }
+    },
+    "player_changes": {
+      "ru": [
+        "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
+        "Добавлены необязательные разбор других своих построек и предварительная выгрузка вещей с проверками содержимого и занятости.",
+        "Добавлено подтверждение Enter/Esc; лишняя настройка сброса клавиши убрана."
+      ],
+      "en": [
+        "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
+        "Added optional dismantling of other player buildings and item unloading, with contents and occupancy checks.",
+        "Added Enter/Esc confirmation and removed the duplicate reset-key control."
+      ]
     }
   }
 }

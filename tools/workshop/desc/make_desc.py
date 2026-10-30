@@ -1562,16 +1562,9 @@ for mod, pair in current.items():
     if note["version"] != item["version"]:
         raise ValueError("Release notes do not match version: " + mod)
     localized = []
-    for lang, heading in (("ru", "Что изменено в версии %s:"), ("en", "What's changed in version %s:")):
-        changes = "[b]" + heading % note["version"] + "[/b]\n[list]\n"
-        changes += "\n".join("[*]" + line for line in note[lang]) + "\n[/list]\n\n"
-        body = pair[lang]
-        if mod in {"BetterLooting", "Character Inspector", "KenshiRotate", "KillCounter"}:
-            credit, body = body.split("\n\n", 1)
-            body = credit + "\n\n" + changes + body
-        else:
-            body = changes + body
-        localized.append(body)
+    for lang in ("ru", "en"):
+        # Full version notes belong in Steam Updates and README, not the guide.
+        localized.append(pair[lang])
     T[mod] = tuple(localized)
 
 

@@ -1,5 +1,7 @@
 SKILL LEVEL UP INFO
 
+[Nexus — our release / наша версия](https://www.nexusmods.com/kenshi/mods/2257)
+
 ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 1 (29–30.10.2026)
 
   * Расчёт начала метки: кость головы в координатах мира минус позиция

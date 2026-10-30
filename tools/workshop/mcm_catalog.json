@@ -480,7 +480,7 @@
     "name": "Kill Counter",
     "id": "KillCounter",
     "group": "other_fork",
-    "status": "local_only_permission_unconfirmed",
+    "status": "release_authorized_by_user",
     "author": "Rokeshi",
     "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KillCounter",
     "source_export": [
