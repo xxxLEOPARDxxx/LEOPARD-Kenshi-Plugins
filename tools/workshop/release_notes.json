@@ -201,5 +201,21 @@
       "[b]Stable resizing.[/b] Space reserved for controls is restored after widening, closing or disabling the window; repeated measurements and unchanged text updates are reduced.",
       "[b]Compatibility.[/b] Corrected the normal trader-window binding for GOG and checked it against game files; GOG runtime acceptance is not claimed. Updated Russian, English and Chinese interface text and help."
     ]
+  },
+  "BestMinimap": {
+    "version": "2",
+    "published_version": "1",
+    "ru": [
+      "[b]Отдельный размер стрелки камеры.[/b] Регулируется в MCM; 0 сохраняет прежнюю зависимость от размера меток.",
+      "[b]Более заметная граница камеры.[/b] Толщина 1–8 пикселей для пунктира и сплошной линии, без обрезки толстого контура у края карты.",
+      "[b]Исправлена автодальность.[/b] При 0 используется проверенный предел игры, а не сохранённый ошибочный максимальный замер. Проверки учитывают полный список персонажей игрока; для неизвестных модификаций камеры доступна ручная дальность.",
+      "Убран постоянный сбор максимального расстояния и его периодическая запись; новые настройки применяются сразу. Переводы обновлены на русском, английском и китайском."
+    ],
+    "en": [
+      "[b]Independent camera arrow size.[/b] Adjustable through MCM; 0 preserves the original scaling with marker size.",
+      "[b]Clearer camera boundary.[/b] A 1–8 pixel width for dotted and solid lines, with thick contours retained at map edges.",
+      "[b]Automatic reach corrected.[/b] Range 0 uses the verified game limit instead of a persisted incorrect maximum observation. Checks use the complete player-character list; manual distance remains available for unknown camera modifications.",
+      "Removed the ongoing maximum-distance observation scan and periodic writes. New settings apply immediately. English, Russian and Chinese translations updated."
+    ]
   }
 }

@@ -65,7 +65,7 @@ ITEMS = [
     dict(mod="AssignedWorkers", title="Assigned Workers (QoL)", nexus=2191, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='See who is assigned to a building, select idle characters and spot switched-off or unpowered player machines by red lightning markers.'),
-    dict(mod="BestMinimap", title="Best Minimap (QoL)", nexus=2242, version="1",
+    dict(mod="BestMinimap", title="Best Minimap (QoL)", nexus=2242, version="2",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="A minimap in the corner of the screen on the game's own map picture: "
             "characters nearby, discovered towns, attack alerts, Map-markers and "
