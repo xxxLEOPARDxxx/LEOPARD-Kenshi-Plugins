@@ -8,8 +8,8 @@ int main(){
  DataPanelLine_Progress*row=static_cast<DataPanelLine_Progress*>(panel.getLine(SlotKey(0),0));
  check(row->textBox->caption=="Strength"&&row->progressText->caption=="52%","panel preserves skill label and fractional percent separately");
  check(row->progress->getLeft()==198&&row->progress->getWidth()==192,"XP bar preserves native48percent width and aligns with vanilla value right edge");
- check(row->progress->getTop()>48&&row->progress->getBottom()<=300,"XP rows stay below vanilla stats and inside panel");
- check(g_divider.get()&&g_divider.get()->getVisible()&&g_divider.get()->getTop()==50,"divider separates vanilla stats and XP rows");
+ check(row->progress->getTop()>=48&&row->progress->getBottom()<=300,"XP rows stay below vanilla stats and inside panel");
+ check(g_divider.get()&&g_divider.get()->getVisible()&&g_divider.get()->getTop()>=48&&g_divider.get()->getBottom()<=row->progress->getTop(),"divider stays in free space between vanilla stats and XP rows");
  int moves=row->progress->moves,updates=row->updates;Panel(&c.stats,&panel,0,false);
  check(row->progress->moves==moves&&row->updates==updates,"stable panel does not repeat geometry or progress writes");
  g_bars=false;g_panelDirty=true;Panel(&c.stats,&panel,0,false);
@@ -91,5 +91,44 @@ int main(){
  shuffled.root.coord.height=200;Panel(&robotA.stats,&shuffled,0,false);
  check(g_slots.count==3&&static_cast<DataPanelLine_Progress*>(shuffled.getLine(SlotKey(2),0))->progress->getBottom()<=200,
        "maximumfive adapts to three safe rows in a shorter viewport without changing font or overlapping HUD");
+ // PID26720 measured actual185px parent,26px ordinary rows/pitch: six-row
+ // bottom161 leaves EXACTLY24px, five-row bottom135 leaves EXACTLY50px.
+ DatapanelGUI measured;measured.root.coord=MyGUI::IntCoord(0,0,320,185);
+ const int measuredTops[]={5,31,83,57,109,135};
+ for(int i=0;i<6;++i){measured.Vanilla(measuredTops[i]);DataPanelLine*l=measured.lines.back();
+  l->w1->coord=MyGUI::IntCoord(9,measuredTops[i],307,26);l->w2->coord=MyGUI::IntCoord(9,measuredTops[i],307,26);}
+ Panel(&robotA.stats,&measured,0,false);
+ check(g_slots.count==1,"actual185px viewport fits one24px XP row after six vanilla rows ending161");
+ DataPanelLine_Progress*exactFirst=measured.lineExists(SlotKey(0),0)?static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(0),0)):NULL;
+ check(exactFirst&&exactFirst->progress->getTop()==161&&exactFirst->progress->getHeight()==24&&exactFirst->progress->getBottom()==185,
+       "single measured XP row ends exactly at185 with unchanged24px widget height");
+ check(!g_divider.get()||!g_divider.get()->visible,"divider hides when exact-fit rows leave no safe gap");
+ measured.lines[5]->setVisible(false);Panel(&robotA.stats,&measured,0,false);
+ check(g_slots.count==2,"actual185px viewport fits two24px XP rows on26px pitch after five rows ending135");
+ DataPanelLine_Progress*exactSecond=measured.lineExists(SlotKey(1),0)?static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(1),0)):NULL;
+ check(exactFirst&&exactSecond&&exactFirst->progress->getTop()==135&&exactSecond->progress->getTop()==161&&exactSecond->progress->getBottom()==185,
+       "second measured XP row ends exactly at185 without overlap or trailing-pitch padding");
+ bool measuredStable=true;
+ for(int frame=0;frame<100;++frame){measured.lines[5]->setVisible(frame%2!=0);Panel(&robotA.stats,&measured,0,false);
+  if(g_slots.count!=(frame%2?1:2))measuredStable=false;}
+ check(measuredStable,"actual measured five-six-five row transitions remain stable over100 refreshes");
+ bool bounded=true;
+ for(int maximum=1;maximum<=5;++maximum){g_maxRows=maximum;
+  for(int fit=0;fit<=5;++fit){measured.lines[5]->setVisible(true);measured.root.coord.height=161+(fit?24+(fit-1)*26:23);
+   Panel(&robotA.stats,&measured,0,false);const int expected=fit<maximum?fit:maximum;
+   if(g_slots.count!=expected)bounded=false;
+   for(int n=0;n<g_slots.count;++n){DataPanelLine_Progress*l=static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(n),0));
+    if(!l||l->progress->getTop()<161||l->progress->getHeight()!=24||l->progress->getBottom()>measured.root.getHeight())bounded=false;
+    if(n){DataPanelLine_Progress*before=static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(n-1),0));if(before->progress->getBottom()>l->progress->getTop())bounded=false;}}
+  }
+ }
+ check(bounded,"every configured maximum1..5 honors exact-fit capacity and nonoverlap including one-pixel-too-short viewport");
+ g_maxRows=3;measured.lines[5]->setVisible(false);measured.root.coord.height=187;
+ Panel(&runner.stats,&measured,0,false);
+ DataPanelLine_Progress*stableFirst=static_cast<DataPanelLine_Progress*>(measured.getLine(SlotKey(0),0));
+ const int reservedTop=stableFirst->progress->getTop();runner.stats.refs[STAT_DEXTERITY]+=.0001f;Scan();
+ Panel(&runner.stats,&measured,0,false);
+ check(g_slots.count==2&&reservedTop==137&&stableFirst->progress->getTop()==reservedTop&&g_divider.get()&&g_divider.get()->visible,
+       "conditional divider reserves gap by allowed capacity so a second active skill never moves the first row");
  printf("native panel boundary: %s\n",failures?"FAILED":"PASSED");return failures?1:0;
 }

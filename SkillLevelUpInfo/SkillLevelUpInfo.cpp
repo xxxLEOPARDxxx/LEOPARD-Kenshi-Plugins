@@ -345,11 +345,19 @@ namespace
         int barRight=valueRight+10;
         if(barRight>parent->getWidth()-2)barRight=parent->getWidth()-2;
         const int barLeft=barRight-barWidth;
-        const int top=bottom+6;
+        int top=bottom;
         const int availableHeight=parent->getHeight()<panel->getHeight()?parent->getHeight():panel->getHeight();
-        int capacity=(availableHeight-top)/pitch;
+        // The final row needs its actual widget height, not a trailing full
+        // pitch. Native185px panels can fit24px after bottom161 exactly.
+        const int rowHeight=pitch-2;
+        const int remaining=availableHeight-top;
+        int capacity=rowHeight>0 && remaining>=rowHeight?1+(remaining-rowHeight)/pitch:0;
         if(capacity>g_maxRows)capacity=g_maxRows;
         if(capacity<0 || width<24 || barWidth<8 || barLeft<left+8 || barLeft+barWidth>parent->getWidth())capacity=0;
+        // Reserve a divider only from spare space after the full allowed
+        // capacity, so adding another recent skill cannot shift the first row.
+        const bool dividerAllowed=capacity>0 && remaining-(rowHeight+(capacity-1)*pitch)>=2;
+        if(dividerAllowed)top+=2;
         g_slots.Select(skills,(int)kCount,GetTickCount(),g_recent,capacity);
         PanelStatus(capacity<=0?"no room for XP rows":g_slots.count?"showing recent XP rows":"no recent XP for this character");
         for(int slot=0;slot<g_slots.count;++slot){
@@ -368,10 +376,10 @@ namespace
             if(created || g_rowSkill[slot]!=index){if(line->textBox)line->textBox->setCaption(Name(index));g_rowSkill[slot]=index;}
             g_rowValue[slot]=value;
             if(line->progress && !line->progress->getVisible())line->setVisible(true);
-            const MyGUI::IntCoord coord(barLeft,top+slot*pitch,barWidth,pitch-2);
+            const MyGUI::IntCoord coord(barLeft,top+slot*pitch,barWidth,rowHeight);
             if(line->progress && line->progress->getCoord()!=coord)line->progress->setCoord(coord);
             if(line->progressText && line->progressText->getCoord()!=coord)line->progressText->setCoord(coord);
-            const MyGUI::IntCoord nameCoord(left,top+slot*pitch,barLeft-left-4,pitch-2);
+            const MyGUI::IntCoord nameCoord(left,top+slot*pitch,barLeft-left-4,rowHeight);
             if(line->textBox && line->textBox->getCoord()!=nameCoord)line->textBox->setCoord(nameCoord);
         }
         for(int slot=g_slots.count;slot<5;++slot){
@@ -380,14 +388,14 @@ namespace
                 if(row && row->getType()==DataPanelLine::DPL_PROGRESS){DataPanelLine_Progress* progress=static_cast<DataPanelLine_Progress*>(row);
                     if(progress->progress && progress->progress->getVisible())row->setVisible(false);}}
         }
-        if(g_slots.count){
+        if(g_slots.count && dividerAllowed){
             if(g_divider.get() && g_divider.get()->getParent()!=parent)MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
             if(!g_divider.get()){
-                MyGUI::Widget* divider=parent->createWidget<MyGUI::Widget>("WhiteSkin",MyGUI::IntCoord(left,bottom+2,width,1),MyGUI::Align::Default);
+                MyGUI::Widget* divider=parent->createWidget<MyGUI::Widget>("WhiteSkin",MyGUI::IntCoord(left,bottom,width,1),MyGUI::Align::Default);
                 divider->setNeedMouseFocus(false);divider->setColour(MyGUI::Colour(.35f,.3f,.25f));g_divider.set(divider);
             }
             MyGUI::Widget* divider=g_divider.get();
-            const MyGUI::IntCoord coord(left,bottom+2,width,1);
+            const MyGUI::IntCoord coord(left,bottom,width,1);
             if(divider->getCoord()!=coord)divider->setCoord(coord);
             if(!divider->getVisible())divider->setVisible(true);
         }else if(g_divider.get() && g_divider.get()->getVisible())g_divider.get()->setVisible(false);

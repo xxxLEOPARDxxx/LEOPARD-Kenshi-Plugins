@@ -31,7 +31,7 @@ if dll.exists():
  cmd=[sys.executable,r'D:\DEV\Kenshi\forks\KEO\tools\kenshilib\check_imports.py',str(dll)]
  subprocess.run(cmd,check=True)
  evidence={'dll':str(dll),'bytes':dll.stat().st_size,'sha256':hashlib.sha256(dll.read_bytes()).hexdigest(),
-           'checks':{'xp_core':18,'head_anchor':19,'xp_native_boundary':19,'panel_native_boundary':23,'timing_lifecycle_registration':12},
+           'checks':{'xp_core':18,'head_anchor':19,'xp_native_boundary':19,'panel_native_boundary':31,'timing_lifecycle_registration':12},
            'runtime_verified':False,'installed':False}
  out=here/'_generated';out.mkdir(exist_ok=True)
  (out/'verification.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
