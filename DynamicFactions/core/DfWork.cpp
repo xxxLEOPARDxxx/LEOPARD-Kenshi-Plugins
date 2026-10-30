@@ -1,6 +1,7 @@
 #include "core/DfWork.h"
 
 #include <algorithm>
+#include <limits>
 
 namespace
 {
@@ -19,6 +20,12 @@ namespace
     {
         return node >= 0 && node < static_cast<int>(nodes.size());
     }
+
+    bool ValidOffer(int value, float distance)
+    {
+        // Also rejects NaN, infinities and the distance -100 singularity.
+        return value > 0 && distance >= 0.0f && distance <= std::numeric_limits<float>::max();
+    }
 }
 
 void DfRankNodes(const std::vector<DfNodeOffer>& nodes, std::vector<int>& order)
@@ -26,7 +33,7 @@ void DfRankNodes(const std::vector<DfNodeOffer>& nodes, std::vector<int>& order)
     std::vector<Ranked> ranked;
     for (size_t i = 0; i < nodes.size(); ++i)
     {
-        if (nodes[i].value <= 0)
+        if (!ValidOffer(nodes[i].value, nodes[i].distance))
             continue;
         Ranked r;
         r.index = static_cast<int>(i);
@@ -51,26 +58,38 @@ void DfAssignRoles(std::vector<DfMember>& members, const std::vector<DfNodeState
     for (size_t i = 0; i < members.size(); ++i)
     {
         DfMember& m = members[i];
+        const bool valid = ValidNode(m.node, nodes);
+        const bool cargo = valid && m.carried > 0;
         if (m.hiring)
         {
             m.role = DF_ROLE_HIRE;
-            m.node = -1;
+            if (!cargo)
+                m.node = -1;
             continue;
         }
         if (!homeLoaded || !m.able)
         {
             m.role = DF_ROLE_IDLE;
-            m.node = -1;
+            if (!cargo)
+                m.node = -1;
             continue;
         }
-        const bool valid = ValidNode(m.node, nodes);
-        if (m.role == DF_ROLE_HAUL && valid && !hauled[m.node] &&
-            (m.carried > 0 || (traderHasMoney && nodes[m.node].stored >= kDfHaulAt)))
+        // Already carried goods must be delivered, even if another carrier
+        // from this node exists. The reservation limits new pickups only.
+        if (cargo)
+        {
+            m.role = DF_ROLE_HAUL;
+            hauled[m.node] = true;
+            continue;
+        }
+        const bool usable = valid && ValidOffer(nodes[m.node].value, nodes[m.node].distance);
+        if (m.role == DF_ROLE_HAUL && usable && !hauled[m.node] &&
+            traderHasMoney && nodes[m.node].stored >= kDfHaulAt)
         {
             hauled[m.node] = true;
             continue;
         }
-        if (m.role == DF_ROLE_MINE && valid && nodes[m.node].stored < nodes[m.node].cap &&
+        if (m.role == DF_ROLE_MINE && usable && nodes[m.node].stored < nodes[m.node].cap &&
             miners[m.node] < nodes[m.node].maxMiners)
         {
             ++miners[m.node];

@@ -1,5 +1,35 @@
 Dynamic Factions - фракции, которые живут сами
 
+
+РАЗРАБОТКА / DEVELOPMENT - 30.10.2026
+
+Актуальная цель и границы честной симуляции:
+docs/superpowers/specs/2026-10-30-dynamic-factions-fair-simulation.md
+План продолжения:
+docs/superpowers/plans/2026-10-30-dynamic-factions-economy-foundation.md
+
+Текущая установленная версия остаётся экспериментом этапа 1 с заглушкой
+дохода. Полный цикл перевозки и продажи ещё не готов. Ниже описано именно
+это историческое поведение, а не законченная честная экономика.
+
+Первое исправление ядра: уже имеющийся груз сохраняет источник при
+перерыве/бое/выгрузке дома/найме, а несколько нагруженных носильщиков не
+отменяют доставку друг другу. Невалидные жилы/расстояния исключены из
+выбора и продолжения добычи. Это не восстановление груза из сейва и не
+законченный исполнитель торговли. 189 проверок, 0 ошибок; проверочная DLL
+собрана отдельно, без установки. Обновления интерфейса в этом срезе нет.
+
+Current development still has phase-1 placeholder income; the real
+mining-hauling-trading loop is unfinished. The updated design requires
+conservation of items/money, verified native transactions, lifecycle
+isolation and a reconciled distant simulation before scaling up.
+The first core fix retains known cargo origin through interruptions,
+preserves delivery for multiple loaded carriers and rejects invalid
+resource offers. It does not implement save recovery or merchant trade.
+189 checks passed; a separate check DLL built successfully and was not
+installed. No interface strings changed in this slice.
+
+
 Требуется RE_Kenshi и мод DynamicFactions.mod (включён в списке модов).
 Mod Config Menu - по желанию (настройки в игре).
 

@@ -37,7 +37,7 @@ struct DfNodeState
 const int kDfHaulAt = 30;       // в жиле столько - зовём носильщика
 
 // Выгода жилы: value / (1 + distance / 100). Индексы по убыванию выгоды;
-// value <= 0 - не попадает.
+// value <= 0, отрицательные/NaN/бесконечные расстояния - не попадают.
 struct DfNodeOffer
 {
     int value;
@@ -46,7 +46,9 @@ struct DfNodeOffer
 void DfRankNodes(const std::vector<DfNodeOffer>& nodes, std::vector<int>& order);
 
 // Пишет role и node каждому. Дом не загружен - все IDLE (кроме найма);
-// носильщик с грузом остаётся носильщиком; у жилы с запасом >= kDfHaulAt
+// при грузе сохраняется node для продолжения после перерыва. Работоспособный
+// человек с грузом продолжает перевозку независимо от прежней роли и других
+// носильщиков; у жилы с запасом >= kDfHaulAt
 // и без носильщика (если торговцу есть чем платить) - один носильщик, из её
 // копателей, иначе из свободных; копатели - к выгодным жилам с местом.
 void DfAssignRoles(std::vector<DfMember>& members, const std::vector<DfNodeState>& nodes, bool homeLoaded,

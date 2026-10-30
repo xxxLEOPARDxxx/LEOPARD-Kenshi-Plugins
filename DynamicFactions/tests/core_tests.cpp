@@ -1,6 +1,7 @@
 // Тесты ядра Dynamic Factions: только core/, без игры.
 // Сборка и запуск: tests/build_tests.ps1. Код возврата - число провалов.
 #include <cstdio>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -682,6 +683,94 @@ static void test_work_unable_idle()
     CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == -1);
 }
 
+// Cargo belongs to its carrier, not to the one-empty-hauler reservation.
+static void test_work_loaded_haulers_keep_all_cargo()
+{
+    std::vector<DfMember> ms;
+    ms.push_back(Member(1, DF_ROLE_HAUL, 0, 5));
+    ms.push_back(Member(2, DF_ROLE_HAUL, 0, 7));
+    ms.push_back(Member(3, DF_ROLE_IDLE, -1, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 50, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0);
+    CHECK(ms[1].role == DF_ROLE_HAUL && ms[1].node == 0);
+    CHECK(ms[0].carried == 5 && ms[1].carried == 7);
+    CHECK(ms[2].role == DF_ROLE_IDLE);
+}
+
+static void test_work_interrupted_carrier_recovers()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_HAUL, 0, 5));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    ms[0].able = false;
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == 0 && ms[0].carried == 5);
+    ms[0].able = true;
+    DfAssignRoles(ms, nodes, true, false);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0);
+}
+
+static void test_work_unloaded_carrier_keeps_origin()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_HAUL, 0, 5));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, false, true);
+    CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == 0 && ms[0].carried == 5);
+    DfAssignRoles(ms, nodes, true, false);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0);
+}
+
+static void test_work_hiring_carrier_keeps_origin()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_HAUL, 0, 5));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    ms[0].hiring = true;
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_HIRE && ms[0].node == 0);
+    ms[0].hiring = false;
+    DfAssignRoles(ms, nodes, true, false);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0 && ms[0].carried == 5);
+}
+
+static void test_work_cargo_recovers_from_idle_role()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_IDLE, 0, 5));
+    std::vector<DfNodeState> nodes(1, Node(150, 100.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, false);
+    CHECK(ms[0].role == DF_ROLE_HAUL && ms[0].node == 0);
+}
+
+static void test_rank_rejects_invalid_distances()
+{
+    std::vector<DfNodeOffer> nodes;
+    nodes.push_back(Offer(800, -100.0f));
+    nodes.push_back(Offer(800, std::numeric_limits<float>::infinity()));
+    nodes.push_back(Offer(800, std::numeric_limits<float>::quiet_NaN()));
+    nodes.push_back(Offer(150, 0.0f));
+    std::vector<int> order;
+    DfRankNodes(nodes, order);
+    CHECK(order.size() == 1);
+    CHECK(!order.empty() && order[0] == 3);
+}
+
+static void test_work_invalid_node_releases_miner()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_MINE, 0, 0));
+    std::vector<DfNodeState> nodes;
+    nodes.push_back(Node(0, 100.0f, 0, 3));
+    nodes.push_back(Node(150, 300.0f, 0, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_MINE && ms[0].node == 1);
+}
+
+static void test_work_invalid_distance_releases_miner()
+{
+    std::vector<DfMember> ms(1, Member(1, DF_ROLE_MINE, 0, 0));
+    std::vector<DfNodeState> nodes(1, Node(150, std::numeric_limits<float>::infinity(), 0, 3));
+    DfAssignRoles(ms, nodes, true, true);
+    CHECK(ms[0].role == DF_ROLE_IDLE && ms[0].node == -1);
+}
+
 int main()
 {
     test_harness_runs();
@@ -734,6 +823,14 @@ int main()
     test_work_hauler_done_back_to_mine();
     test_work_full_node_moves_miner();
     test_work_unable_idle();
+    test_work_loaded_haulers_keep_all_cargo();
+    test_work_interrupted_carrier_recovers();
+    test_work_unloaded_carrier_keeps_origin();
+    test_work_hiring_carrier_keeps_origin();
+    test_work_cargo_recovers_from_idle_role();
+    test_rank_rejects_invalid_distances();
+    test_work_invalid_node_releases_miner();
+    test_work_invalid_distance_releases_miner();
     std::printf("%d checks, %d failed\n", g_checks, g_failed);
     return g_failed;
 }
