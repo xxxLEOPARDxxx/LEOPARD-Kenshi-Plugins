@@ -1204,29 +1204,19 @@
       "ru": "Исходники оригинала в репозитории автора.",
       "en": "Original source code in the author's repository."
     },
-    "version": "1",
+    "version": "2",
     "changes": {
       "ru": [
-        "Первый MCM-форк StackSort от Jakematt2004: настройки и интерфейс на русском, английском и китайском.",
-        "Сохранены выбор лучших раскладок, свободная область В/Ш, стрелки и отмена расположения правой кнопкой.",
-        "Исправлено объединение совместимых стопок, включая частично использованные аптечки и ремонтные комплекты; несовместимые предметы остаются отдельно по правилам игры.",
-        "Убраны кнопки из однослотовых и рассчитанных на одну стопку специализированных хранилищ.",
-        "Включена поддержка поворотов через Rotate Items; фоновые расчёты не обращаются к игровым объектам и отменяются при смене мира.",
-        "Подробный журнал выключен по умолчанию. Число потоков и начальное направление помечены требованием перезапуска.",
-        "Кнопка сортировки переведена; подписи проверены по установленным шрифтам и ширине кнопки.",
-        "Кнопки рюкзака и галочка KEO выровнены единым рядом под сеткой; положение основного инвентаря сохранено. Закрытие или отключение возвращает исходные кнопки и положение галочки, в том числе после сброса отслеживания.",
-        "Повороты через Rotate Items работают независимо от порядка двух модов. Позднее подключение сохраняет отмену расположения и заменяет устаревшие расчёты."
+        "[b]Исправлено объединение стопок.[/b] Сортировка теперь находит предметы и запускает штатное складывание совместимых вещей, включая болты, аптечки и ремкомплекты.",
+        "[b]Повторная сортировка без закрытия окна.[/b] После разделения стопки, изменения количества или ресурса объединение снова проверяется при следующем нажатии. Переключение неизменённых раскладок не выполняет лишнее попарное объединение.",
+        "[b]Правила игры сохраняются.[/b] Владение, совместимость и перенос ресурса определяются нативными методами; повороты и отмена раскладки сохраняются.",
+        "В подробный журнал добавлены ограниченные сводки этапов объединения. Устранено несовпадение виртуального сравнения hand в SDK/VC10; используется проверенный невиртуальный экспорт. Диагностика не добавляет нативных проверок в горячий игровой цикл."
       ],
       "en": [
-        "First MCM fork of Jakematt2004's StackSort, with Russian, English and Chinese settings and interface text.",
-        "Retained best-layout cycling, H/W free-space goals, arrow controls and right-click position undo.",
-        "Fixed compatible-stack consolidation, including partially used medical and repair kits; incompatible items remain separate under the game's rules.",
-        "Removed extra controls from single-slot and specialized one-stack storage.",
-        "Enabled Rotate Items integration; background calculations do not access game objects and are cancelled on world changes.",
-        "Detailed logging defaults to off. Worker count and initial free-space direction carry restart markers.",
-        "Localized the sorting button and checked captions against the installed fonts and button width.",
-        "Backpack controls and the KEO checkbox form one centred row beneath the grid; body-inventory placement is preserved. Closing or disabling restores the original controls and checkbox position, including after lost tracking.",
-        "Rotate Items integration works in either mod-list order. Late detection preserves position undo and replaces outdated arrangements."
+        "[b]Stack merging corrected.[/b] Sorting now finds live items and invokes native consolidation for compatible goods, including bolts, medical kits and repair kits.",
+        "[b]Repeated sorting without reopening.[/b] Splitting stacks or changing quantities or charges triggers a fresh merge check on the next click. Cycling unchanged arrangements avoids unnecessary pairwise consolidation.",
+        "[b]Game rules preserved.[/b] Ownership, compatibility and charge transfer remain controlled by native methods; rotation and arrangement undo remain available.",
+        "Detailed logging gains bounded merge-stage summaries. Corrected an SDK/VC10 virtual hand-comparison mismatch using the verified nonvirtual export. Diagnostics add no native checks to the hot gameplay loop."
       ]
     },
     "history": {
@@ -1253,6 +1243,20 @@
           "Backpack controls and the KEO checkbox form one centred row beneath the grid; body-inventory placement is preserved. Closing or disabling restores the original controls and checkbox position, including after lost tracking.",
           "Rotate Items integration works in either mod-list order. Late detection preserves position undo and replaces outdated arrangements."
         ]
+      },
+      "2": {
+        "ru": [
+          "[b]Исправлено объединение стопок.[/b] Сортировка теперь находит предметы и запускает штатное складывание совместимых вещей, включая болты, аптечки и ремкомплекты.",
+          "[b]Повторная сортировка без закрытия окна.[/b] После разделения стопки, изменения количества или ресурса объединение снова проверяется при следующем нажатии. Переключение неизменённых раскладок не выполняет лишнее попарное объединение.",
+          "[b]Правила игры сохраняются.[/b] Владение, совместимость и перенос ресурса определяются нативными методами; повороты и отмена раскладки сохраняются.",
+          "В подробный журнал добавлены ограниченные сводки этапов объединения. Устранено несовпадение виртуального сравнения hand в SDK/VC10; используется проверенный невиртуальный экспорт. Диагностика не добавляет нативных проверок в горячий игровой цикл."
+        ],
+        "en": [
+          "[b]Stack merging corrected.[/b] Sorting now finds live items and invokes native consolidation for compatible goods, including bolts, medical kits and repair kits.",
+          "[b]Repeated sorting without reopening.[/b] Splitting stacks or changing quantities or charges triggers a fresh merge check on the next click. Cycling unchanged arrangements avoids unnecessary pairwise consolidation.",
+          "[b]Game rules preserved.[/b] Ownership, compatibility and charge transfer remain controlled by native methods; rotation and arrangement undo remain available.",
+          "Detailed logging gains bounded merge-stage summaries. Corrected an SDK/VC10 virtual hand-comparison mismatch using the verified nonvirtual export. Diagnostics add no native checks to the hot gameplay loop."
+        ]
       }
     },
     "player_changes": {
@@ -1261,14 +1265,16 @@
         "Исправлено объединение подходящих стопок, в том числе частично использованных аптечек и ремкомплектов.",
         "Убраны лишние кнопки из хранилищ, где возможно размещение лишь одной стопки.",
         "Кнопки заменяют «Разложить»; в рюкзаке образуют единый центрированный ряд с галочкой KEO.",
-        "Повороты через Rotate Items не зависят от порядка модов; отмена расположения сохраняется и при позднем подключении."
+        "Повороты через Rotate Items не зависят от порядка модов; отмена расположения сохраняется и при позднем подключении.",
+        "Разделение стопок и изменение содержимого снова учитываются при следующей сортировке без закрытия окна."
       ],
       "en": [
         "Moved settings into MCM and added Russian, English and Chinese interface text.",
         "Fixed compatible-stack consolidation, including partially used medical and repair kits.",
         "Removed extra controls from storage that can hold only one stack.",
         "Controls replace Arrange; backpack controls share one centred row with the KEO checkbox.",
-        "Rotate Items works in either mod-list order, retaining position undo even after late detection."
+        "Rotate Items works in either mod-list order, retaining position undo even after late detection.",
+        "Splitting stacks or changing contents is respected on the next sort without reopening the window."
       ]
     }
   }
