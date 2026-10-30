@@ -95,6 +95,14 @@ namespace
     int g_rowSkill[5]={-1,-1,-1,-1,-1};
     float g_rowValue[5]={0};
     int g_diagRows=-1,g_diagBottom=-1,g_diagWidth=-1;
+    int g_diagParentHeight=-1,g_diagValueRight=-1,g_diagCapacity=-1;
+    const char* g_diagPanelStatus=NULL;
+    void PanelStatus(const char* status)
+    {
+        if(!PluginDiagnostics::Enabled() || g_diagPanelStatus==status)return;
+        DebugLog(std::string("SkillLevelUpInfo: panel status=")+status);
+        g_diagPanelStatus=status;
+    }
     void Reset()
     {
         Lock lock;
@@ -282,8 +290,8 @@ namespace
     void DrawPanel(CharStats* stats,DatapanelGUI* panel,int category)
     {
         if((!g_enabled || !g_bars) && !g_panelDirty)return;
-        if(!panel || !stats || !stats->me)return;
-        MyGUI::Widget* root=panel->getWidget();if(!root)return;
+        if(!panel || !stats || !stats->me){PanelStatus("missing native panel/stat owner");return;}
+        MyGUI::Widget* root=panel->getWidget();if(!root){PanelStatus("missing native root widget");return;}
         const hand owner(stats->me);
         if(root!=g_panelRoot.get() || !(owner==g_panelCharacter)){
             g_slots=XpInfoCore::Slots();g_panelCharacter=owner;
@@ -291,17 +299,18 @@ namespace
             if(g_divider.get())MyGUI::Gui::getInstance().destroyWidget(g_divider.get());
         }
         g_panelRoot.set(root);g_panel=panel;g_panelCategory=category;
-        if(!g_enabled || !g_bars || !stats->me->isPlayerCharacter() ||
-           InterlockedCompareExchange(&g_loadGeneration,0,0)!=g_seenGeneration){HidePanel(panel,category);g_panelDirty=false;return;}
+        if(!g_enabled || !g_bars){PanelStatus("disabled");HidePanel(panel,category);g_panelDirty=false;return;}
+        if(!stats->me->isPlayerCharacter()){PanelStatus("non-player panel");HidePanel(panel,category);return;}
+        if(InterlockedCompareExchange(&g_loadGeneration,0,0)!=g_seenGeneration){PanelStatus("waiting for session baseline");HidePanel(panel,category);return;}
         XpInfoCore::Skill skills[kCount];
         {
             Lock lock;std::map<hand,Snapshot>::iterator found=g_seen.find(owner);
-            if(found==g_seen.end()){HidePanel(panel,category);return;}
+            if(found==g_seen.end()){PanelStatus("waiting for character baseline");HidePanel(panel,category);return;}
             for(size_t i=0;i<kCount;++i)skills[i]=found->second.skills[i];
         }
         // Read a bounded list of existing vanilla line widgets. Use their actual
         // parent and pitch rather than translated captions or a global UI search.
-        int bottom=0,pitch=20,lastTop=-1,left=0,width=root->getWidth(),barLeft=width/2,barWidth=width/2-4;
+        int bottom=0,pitch=20,lastTop=-1,left=0,width=root->getWidth(),valueRight=width-4;
         MyGUI::Widget* parent=root;
         const int lines=panel->getNumLines(category);
         for(int i=0;i<lines && i<512;++i){
@@ -313,17 +322,26 @@ namespace
                 if(lastTop>=0 && w->getTop()>lastTop && w->getTop()-lastTop<100)pitch=w->getTop()-lastTop;
                 lastTop=w->getTop();bottom=w->getBottom();parent=w->getParent();
                 if(line->w1)left=line->w1->getLeft();
-                if(line->w2){barLeft=line->w2->getLeft();barWidth=line->w2->getWidth();}
+                if(line->w2)valueRight=line->w2->getLeft()+line->w2->getWidth();
             }
         }
-        if(!parent || pitch<=0)return;
+        if(!parent || pitch<=0){PanelStatus("missing usable native layout");return;}
         width=parent->getWidth()-left-4;
+        // Native w1/w2 overlap: both start at 3% of the row, while w2's
+        // text is right-aligned. Its left edge is not a value-column boundary.
+        // DataPanelLine_Progress(showKey=true) uses 48% of its parent width.
+        // xp_info aligns that native bar to vanilla w2's RIGHT edge +10px.
+        const int barWidth=(int)(parent->getWidth()*.48f);
+        int barRight=valueRight+10;
+        if(barRight>parent->getWidth()-2)barRight=parent->getWidth()-2;
+        const int barLeft=barRight-barWidth;
         const int top=bottom+6;
         const int availableHeight=parent->getHeight()<panel->getHeight()?parent->getHeight():panel->getHeight();
         int capacity=(availableHeight-top)/pitch;
         if(capacity>g_maxRows)capacity=g_maxRows;
         if(capacity<0 || width<24 || barWidth<8 || barLeft<left+8 || barLeft+barWidth>parent->getWidth())capacity=0;
         g_slots.Select(skills,(int)kCount,GetTickCount(),g_recent,capacity);
+        PanelStatus(capacity<=0?"no room for XP rows":g_slots.count?"showing recent XP rows":"no recent XP for this character");
         for(int slot=0;slot<g_slots.count;++slot){
             const int index=g_slots.ids[slot];const float value=skills[index].value;
             const float fraction=value-(float)std::floor(value);
@@ -363,10 +381,14 @@ namespace
             if(divider->getCoord()!=coord)divider->setCoord(coord);
             if(!divider->getVisible())divider->setVisible(true);
         }else if(g_divider.get() && g_divider.get()->getVisible())g_divider.get()->setVisible(false);
-        if(PluginDiagnostics::Enabled() && (g_diagRows!=g_slots.count || g_diagBottom!=bottom || g_diagWidth!=width)){
+        if(PluginDiagnostics::Enabled() && (g_diagRows!=g_slots.count || g_diagBottom!=bottom || g_diagWidth!=width ||
+            g_diagParentHeight!=parent->getHeight() || g_diagValueRight!=valueRight || g_diagCapacity!=capacity)){
             std::ostringstream s;s<<"SkillLevelUpInfo: panel height="<<panel->getHeight()<<" vanillaBottom="<<bottom
-                <<" pitch="<<pitch<<" width="<<width<<" capacity="<<capacity<<" rows="<<g_slots.count;
+                <<" parent="<<parent<<" parentSize="<<parent->getWidth()<<"x"<<parent->getHeight()
+                <<" pitch="<<pitch<<" width="<<width<<" nameLeft="<<left<<" valueRight="<<valueRight
+                <<" barLeft="<<barLeft<<" barWidth="<<barWidth<<" capacity="<<capacity<<" rows="<<g_slots.count;
             DebugLog(s.str());g_diagRows=g_slots.count;g_diagBottom=bottom;g_diagWidth=width;
+            g_diagParentHeight=parent->getHeight();g_diagValueRight=valueRight;g_diagCapacity=capacity;
         }
         g_panelDirty=false;
     }
@@ -374,7 +396,7 @@ namespace
     void Panel(CharStats* stats,DatapanelGUI* panel,int category,bool combat)
     {
         g_origPanel(stats,panel,category,combat);
-        if(!g_uiThread || GetCurrentThreadId()!=g_uiThread)return;
+        if(!g_uiThread || GetCurrentThreadId()!=g_uiThread){PanelStatus("waiting for GUI thread");return;}
         DrawPanel(stats,panel,category);
     }
     void (*g_origUpdate)(ForgottenGUI*) = NULL;
@@ -414,7 +436,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 {
     static const std::string p = PluginSettings::Path();
     api->beginMod(api, "SkillLevelUpInfo", "Skill Level Up Info", p.c_str(), LoadSettings);
-    if (api->version >= 2) api->info(api, Tr("XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."));
+    if (api->version >= 2) api->info(api, Tr("XP gain text, skill level-ups and recent training bars from XP Info."));
     api->toggle(api, "SkillLevelUpInfo", "Enabled", Tr("Enabled"), Tr("Enable XP gain text, level-up messages and character-panel bars."), 1, 0);
     api->toggle(api, "SkillLevelUpInfo", "FloatingLabels", Tr("XP gain text"), Tr("Show accumulated skill gains as rising blue text, such as +3% Athletics."), 1, 0);
     api->toggle(api, "SkillLevelUpInfo", "LevelUpLabels", Tr("Skill level-up text"), Tr("Show reached whole skill levels as rising gold text."), 1, 0);

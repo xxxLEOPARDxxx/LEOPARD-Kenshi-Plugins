@@ -174,3 +174,19 @@ VERIFICATION / ПРОВЕРКИ
 See XP_INFO_PARITY.md and tests/run_tests.py for reproducible checks.
 Installed locally for acceptance; visuals have not been accepted in-game.
 Локально установлен для проверки; игровая визуальная приёмка ещё ожидается.
+
+PANEL LAYOUT CORRECTION / ИСПРАВЛЕНИЕ ПОЛОС
+
+The native value TextBox covers almost the full row and is right-aligned.
+XP bars now use the native progress geometry aligned to its right edge,
+instead of mistaking its left edge for a separate value column. This fixes
+the zero-row result with the actual game layout. Both this panel and the
+separate LiveXpBars overlay may be used together when their positions differ.
+Removed the redundant MCM sentence from the MCM-page description.
+
+Исправлен расчёт полос под характеристиками: значение штатной строки
+выровнено вправо на всю её ширину, а не находится в отдельном узком поле.
+Полосы используют штатную геометрию прогресса с выравниванием по правому краю.
+Это устраняет нулевое число строк при настоящей разметке игры. Эту панель
+и отдельное окно LiveXpBars можно использовать вместе, если они размещены
+в разных местах. Из подсказки внутри MCM убрано лишнее упоминание MCM.

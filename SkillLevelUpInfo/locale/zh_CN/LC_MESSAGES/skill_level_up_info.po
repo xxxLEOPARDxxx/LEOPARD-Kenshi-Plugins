@@ -181,5 +181,5 @@ msgstr "角色面板经验条"
 msgid "XP gain text"
 msgstr "经验获取文字"
 
-msgid "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
-msgstr "显示 XP Info 的经验获取文字、技能升级和近期训练进度条，所有设置均可在 MCM 中调整。"
+msgid "XP gain text, skill level-ups and recent training bars from XP Info."
+msgstr "显示 XP Info 的经验获取文字、技能升级和近期训练进度条。"

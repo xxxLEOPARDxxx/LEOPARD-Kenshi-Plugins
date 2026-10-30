@@ -181,5 +181,5 @@ msgstr "XP bars in character panel"
 msgid "XP gain text"
 msgstr "XP gain text"
 
-msgid "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
-msgstr "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
+msgid "XP gain text, skill level-ups and recent training bars from XP Info."
+msgstr "XP gain text, skill level-ups and recent training bars from XP Info."

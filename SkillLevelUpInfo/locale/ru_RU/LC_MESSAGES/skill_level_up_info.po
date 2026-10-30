@@ -181,5 +181,5 @@ msgstr "Полосы опыта в панели персонажа"
 msgid "XP gain text"
 msgstr "Текст прибавок опыта"
 
-msgid "XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM."
-msgstr "Текст прибавок опыта, повышения навыков и полосы недавних тренировок из XP Info. Все настройки доступны в MCM."
+msgid "XP gain text, skill level-ups and recent training bars from XP Info."
+msgstr "Текст прибавок опыта, повышения навыков и полосы недавних тренировок из XP Info."

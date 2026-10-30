@@ -14,7 +14,7 @@ translations={
 'Mass combat':('Массовый бой','群体战斗'),
 'Survival':('Выживание','生存'),
 '+{1} more':('+ещё {1}','+另有 {1} 项'),
-'XP gain text, skill level-ups and recent training bars from XP Info, with all settings in MCM.':('Текст прибавок опыта, повышения навыков и полосы недавних тренировок из XP Info. Все настройки доступны в MCM.','显示 XP Info 的经验获取文字、技能升级和近期训练进度条，所有设置均可在 MCM 中调整。'),
+'XP gain text, skill level-ups and recent training bars from XP Info.':('Текст прибавок опыта, повышения навыков и полосы недавних тренировок из XP Info.','显示 XP Info 的经验获取文字、技能升级和近期训练进度条。'),
 'Enable XP gain text, level-up messages and character-panel bars.':('Включить текст прибавок опыта, сообщения о повышении уровня и полосы в панели персонажа.','启用经验获取文字、升级提示和角色面板进度条。'),
 'XP gain text':('Текст прибавок опыта','经验获取文字'),
 'Show accumulated skill gains as rising blue text, such as +3% Athletics.':('Показывать накопленный прирост навыка синим всплывающим текстом, например +3% Атлетика.','以向上飘动的蓝色文字显示累积的技能经验，例如 +3% 运动。'),
