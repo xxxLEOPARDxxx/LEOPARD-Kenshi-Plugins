@@ -130,6 +130,11 @@
       "nexus": 2215,
       "workshop_id": 3813852362,
       "version": "4"
+    },
+    "StackSort": {
+      "nexus": 2262,
+      "workshop_id": 3830285370,
+      "version": "1"
     }
   }
 }

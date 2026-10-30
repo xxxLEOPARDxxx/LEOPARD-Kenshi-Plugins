@@ -815,12 +815,19 @@
       "sha256": "156dce02d36bf0f9095be7851a4108a583677ebc1169690dfed38b1bd045fd10"
     }
   ],
-  "publication": "Local preparation only; no uploads or version changes",
+  "publication": "Landscape previews published to 37 Steam pages after explicit user authorization; existing plugin binaries and versions unchanged by preview updates. StackSort v1 first publication is separate.",
   "rules": [
     "Original cover illustrations, separate from gameplay screenshots.",
     "MCM plaque on supported plugins; Dark UI Advanced has none.",
     "Depict actual features; Vital Sense has state/bounty icons, never health bars.",
     "Keep cover first by filename; preserve original screenshots.",
     "New mods receive the same approved series style."
-  ]
+  ],
+  "steam_preview_verification": {
+    "published_count": 37,
+    "remote_success": 37,
+    "exact_preview_sha256_matches": 37,
+    "receipt": "cover-concepts/2026-10-30/steam-preview-remote-verification.json",
+    "square_replacements": "Requested after mod fixes; landscape Nexus images must remain unchanged"
+  }
 }
