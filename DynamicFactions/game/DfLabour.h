@@ -1,12 +1,7 @@
 #pragma once
-// Работа фракции в игре (этап 2а): жилы, копатели, условное копание.
-// Роли решает ядро (core/DfWork); здесь - что видно в мире и приказы.
-// Только главный поток; обращения к игре - через game/DfMine (под SEH).
-
 #include <map>
 #include <string>
 #include <vector>
-
 #include "core/DfState.h"
 #include "core/DfWork.h"
 #include "game/DfMine.h"
@@ -15,34 +10,49 @@ class Character;
 class Faction;
 class TownBase;
 
-const float kDfDiscoverRadius = 3000.0f;    // жилы вокруг дома
-const float kDfNearNode = 60.0f;            // ближе - копатель «у жилы» (условное копание)
-const int kDfNodeCap = 50;                  // хранилище жилы (пользователь, 23.10)
-const int kDfMaxMinersPerNode = 3;
-const float kDfOrePerMinerHour = 4.0f;      // условное копание; уточняется замером при загруженной жиле
-
+struct DfWorkHandLess
+{
+    bool operator()(const hand& a, const hand& b) const
+    {
+        if (a.type != b.type) return a.type < b.type;
+        if (a.container != b.container) return a.container < b.container;
+        if (a.containerSerial != b.containerSerial) return a.containerSerial < b.containerSerial;
+        if (a.index != b.index) return a.index < b.index;
+        return a.serial < b.serial;
+    }
+};
 struct DfMemberWork
 {
     DfRole role;
     int node;
-    int virtualCarried;         // условный груз носильщика (жила была не загружена)
-    bool ordered;               // приказ копать/идти отдан
-    DfMemberWork() : role(DF_ROLE_IDLE), node(-1), virtualCarried(0), ordered(false) {}
+    bool ordered;
+    bool moving;
+    Ogre::Vector3 destination;
+    hand trader;
+    unsigned long talkedAt;
+    unsigned long progressAt;
+    unsigned long blockedUntil;
+    hand failedTrader;
+    Ogre::Vector3 progressPosition;
+    DfMemberWork() : role(DF_ROLE_IDLE), node(-1), ordered(false), moving(false),
+        destination(0,0,0), talkedAt(0), progressAt(0), blockedUntil(0), progressPosition(0,0,0) {}
 };
-
 struct DfLabour
 {
-    std::map<Character*, DfMemberWork> members;     // на эту игру; при смене игры - заново
-    double lastHour;                                // для условного копания (игровые часы)
-    std::vector<float> virtualFraction;             // дробная руда условного копания по жилам
-    unsigned long discoveredMs;
+    std::map<hand, DfMemberWork, DfWorkHandLess> members;
     unsigned long loggedMs;
-    DfLabour() : lastHour(-1.0), discoveredMs(0), loggedMs(0) {}
+    unsigned long scoutAt;
+    unsigned int scoutStep;
+    int carried;
+    int sold;
+    int revenue;
+    DfLabour() : loggedMs(0), scoutAt(0), scoutStep(0), carried(0), sold(0), revenue(0) {}
 };
-
-// Раз в 5 с (часы найма - стоят на паузе). envoy - посланник найма (работу не получает).
-void DfLabourStep(DfFactionState& s, DfLabour& rt, Faction* f, TownBase* hub, Character* envoy,
-                  bool traderHasMoney, double hour, unsigned long clockMs, bool debug);
-
-// Для окна: копают N, носят N.
+// Work only with real inventories in the loaded world. Legacy virtual stock is
+// preserved in the save, quarantined from production, pickup and sale.
+void DfLabourStep(DfFactionState& s, DfLabour& rt, Faction* f, TownBase* hub,
+    Character* envoy, bool traderHasMoney, double hour, unsigned long clockMs,
+    bool debug, float radius = 3000.0f);
+void DfLabourStop(DfLabour& rt, Faction* faction=NULL, Character* envoy=NULL);
 void DfLabourCounts(const DfLabour& rt, int& miners, int& haulers);
+std::string DfLabourStatus(const DfLabour& rt);

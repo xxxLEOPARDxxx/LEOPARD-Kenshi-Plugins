@@ -285,14 +285,11 @@ namespace
         switch (a.type)
         {
         case DF_INCOME:
-            if (f->factionOwnerships == NULL || a.amount < 0)
-                return false;
-            f->factionOwnerships->addMoney(a.amount);
-            return true;
+            return false;               // real sales are the only ongoing income
         case DF_RECRUIT:
             return false;               // найм - походом в бар (game/DfHire)
         case DF_RESEARCH:
-            return a.amount > 0 && Spend(f, a.amount * r.techPointCost);
+            return false;               // no abstract tech points bought for cats
         case DF_EXTINCT:
             return true;
         case DF_FOUND:

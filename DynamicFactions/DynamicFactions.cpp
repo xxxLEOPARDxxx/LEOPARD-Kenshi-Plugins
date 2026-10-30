@@ -63,6 +63,8 @@ namespace
 
     bool g_enabled = true;
     bool g_debug = false;
+    bool g_workEnabled = true;
+    int g_mineRadius = 3000;
     HoldKey::Key g_windowKey;
     float g_startStats = 30.0f;             // навыки основателей - по сложности
     int g_startMoney = 5000;                // деньги фракции при основании
@@ -98,6 +100,10 @@ namespace
         g_enabled = GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
         DfHireSetDebug(g_debug);
+        g_workEnabled = GetPrivateProfileIntA(section, "Work", 1, ini.c_str()) != 0;
+        g_mineRadius = GetPrivateProfileIntA(section, "MineRadius", 3000, ini.c_str());
+        if (g_mineRadius < 500) g_mineRadius = 500;
+        if (g_mineRadius > 5000) g_mineRadius = 5000;
         g_startMoney = GetPrivateProfileIntA(section, "StartMoney", 5000, ini.c_str());
         if (g_startMoney < 0)
             g_startMoney = 0;
@@ -143,15 +149,22 @@ namespace
     bool g_ready = false;                   // мир этой игры поднят
     DWORD g_readyAt = 0;
     DWORD g_lastTick = 0;
+    volatile LONG g_saveDepth = 0;
+    enum SessionSource { SESSION_NONE, SESSION_LOAD, SESSION_NEW };
+    SessionSource g_completedSfs = SESSION_NONE;
+
+    void UpdateOwnFactions();
+    void BeginSession(const char* why);
 
 
     void SetStates(std::vector<DfFactionState>& states, const char* why)
     {
-        for (size_t i = 0; i < g_runtime.size(); ++i)
-            DfHireCancel(g_runtime[i].hire);
+        // Replacement is metadata only: native objects may already belong to
+        // another world. Never cancel orders by resolving a previous handle.
         DfSetOwnFactions(std::vector<Faction*>());
         g_states.swap(states);
         g_runtime.assign(g_states.size(), Runtime());
+        UpdateOwnFactions();
         if (g_debug)
         {
             char line[128];
@@ -165,6 +178,7 @@ namespace
     {
         g_ready = true;
         g_readyAt = GetTickCount();
+        UpdateOwnFactions();
         if (g_debug)
             DebugLog(std::string("DynamicFactions: world ready (") + why + ")");
     }
@@ -246,7 +260,7 @@ namespace
         TownBase* const hub = DfFindHub();
         if (hub == NULL || f == NULL)
             return;
-        DfRules rules = DfPhase1Rules();
+        DfRules rules = DfPhase2Rules();
         rules.startMoney = g_startMoney;
         DfSnapshot before;
         if (!DfTakeSnapshot(f, before))
@@ -257,6 +271,7 @@ namespace
         if (before.members > 0)
         {
             DfApplyBookkeeping(s, done, hour, rules);
+            UpdateOwnFactions();
             DfApplyName(f, s.name);
             char line[256];
             sprintf_s(line, sizeof(line), "DynamicFactions: %s took over the faction already in the game, %d members",
@@ -268,6 +283,7 @@ namespace
         if (!DfFound(f, hub, rules.startMembers, rules.startMoney, g_startStats))
             return;
         DfApplyBookkeeping(s, done, hour, rules);
+        UpdateOwnFactions();
         DfSnapshot snap;
         const int members = DfTakeSnapshot(f, snap) ? snap.members : -1;
         char line[256];
@@ -334,7 +350,7 @@ namespace
             DebugLog(line + st.list);
         }
 
-        const DfRules rules = DfPhase1Rules();
+        const DfRules rules = DfPhase2Rules();
         const std::vector<DfAction> acts = DfDecide(s, snap, rules);
         std::vector<DfAction> done;
         for (size_t i = 0; i < acts.size(); ++i)
@@ -391,7 +407,10 @@ namespace
         std::vector<std::string> hires(g_states.size());
         for (size_t i = 0; i < g_states.size() && i < g_runtime.size(); ++i)
             hires[i] = DfHireStatus(g_runtime[i].hire);
-        DfWindowUpdate(g_states, snaps, hires, DfPhase1Rules());
+        std::vector<std::string> work(g_states.size());
+        for (size_t i = 0; i < g_states.size() && i < g_runtime.size(); ++i)
+            work[i] = DfTransferFaulted() ? Tr("Work paused: a transfer needs reconciliation.") : DfLabourStatus(g_runtime[i].labour);
+        DfWindowUpdate(g_states, snaps, hires, work, DfPhase2Rules());
     }
 
     // Хоткей - ровно эта комбинация: CTRL+F10 не срабатывает на CTRL+SHIFT+F10.
@@ -433,16 +452,36 @@ namespace
     unsigned long g_traderCheckedAt = 0;
     bool g_traderHasMoney = false;
 
+    void BeginSession(const char* why)
+    {
+        // Must run BEFORE native teardown/loading. Clearing these containers
+        // does not dereference Character/Faction pointers or resolve any hand.
+        g_ready = false;
+        g_completedSfs = SESSION_NONE;
+        g_readyAt = g_lastTick = 0;
+        DfRecruitResetSession();
+        g_runtime.clear();
+        g_states.clear();
+        DfHireResetClock();
+        DfResetTransferFault();
+        g_workAt = g_traderCheckedAt = 0;
+        g_traderHasMoney = false;
+        g_keyWas = false;
+        if (g_debug)
+            DebugLog(std::string("DynamicFactions: session cleared (") + why + ")");
+    }
+
     bool SafeLabourStep(DfFactionState& s, DfLabour& rt, Faction* f, TownBase* hub, Character* envoy, double hour,
                         unsigned long now)
     {
         __try
         {
-            DfLabourStep(s, rt, f, hub, envoy, g_traderHasMoney, hour, now, g_debug);
+            DfLabourStep(s, rt, f, hub, envoy, g_traderHasMoney, hour, now, g_debug, static_cast<float>(g_mineRadius));
             return true;
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
+            DfQuarantineTransfer("DynamicFactions: work step fault - no automatic retry");
             return false;
         }
     }
@@ -454,15 +493,6 @@ namespace
             return;
         g_workAt = now;
         TownBase* const hub = DfFindHub();
-        if (hub != NULL && (g_traderCheckedAt == 0 || now - g_traderCheckedAt >= kTraderCheckMs))
-        {
-            g_traderCheckedAt = now;
-            std::vector<DfTrader> traders;
-            DfFindTraders(hub, traders);
-            g_traderHasMoney = false;
-            for (size_t i = 0; i < traders.size(); ++i)
-                g_traderHasMoney = g_traderHasMoney || traders[i].money > 0;
-        }
         for (size_t i = 0; i < g_states.size(); ++i)
         {
             DfFactionState& s = g_states[i];
@@ -472,6 +502,7 @@ namespace
             if (f == NULL)
                 continue;
             Character* const envoy = g_runtime[i].hire.busy() ? g_runtime[i].hire.envoy.getCharacter() : NULL;
+            if (!g_workEnabled) { DfLabourStop(g_runtime[i].labour, f, envoy); continue; }
             if (!SafeLabourStep(s, g_runtime[i].labour, f, hub, envoy, hour, now))
             {
                 static bool told = false;
@@ -527,6 +558,7 @@ namespace
         if (!g_ready || ou == NULL || ou->player == NULL)
             return;
         UpdateOwnFactions();
+        if (ou->isPaused() || g_saveDepth != 0) return;
         if (GetTickCount() - g_readyAt < kGraceMs)
             return;
         if (g_states.empty())
@@ -535,6 +567,8 @@ namespace
             SetStates(fresh, "new faction");
             DebugLog("DynamicFactions: new faction " + Quote(g_states[0].name) + " waits for the Hub");
         }
+        if (DfTransferFaulted())
+        { for (size_t i=0;i<g_states.size();++i) g_states[i].workFault=true; return; }
         const double hour = DfGameHour();
         if (hour < 0.0)
             return;
@@ -555,6 +589,7 @@ namespace
     bool (*g_origSfsSave)(SaveFileSystem*, const std::string&) = NULL;
     void (*g_origSfsLoad)(SaveFileSystem*, const std::string&) = NULL;
     void (*g_origSfsNew)(SaveFileSystem*) = NULL;
+    int (*g_origSaveManagerGame)(SaveManager*, const std::string&, const std::string&) = NULL;
     int (*g_origLoadGame)(SaveManager*, const std::string&, const std::string&) = NULL;
     void (*g_origResetGame)(GameWorld*) = NULL;
     void (*g_origInitNewWorld)(GameWorld*, GameDataManager*) = NULL;
@@ -562,7 +597,7 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
-        if (ou == NULL || ou->player == NULL)
+        if (!g_ready || ou == NULL || ou->player == NULL)
             return;
         DfHireClock(ou->isPaused());
         PollKey();
@@ -580,6 +615,8 @@ namespace
     {
         if (!g_ready)
             return;
+        if (DfTransferFaulted())
+            for (size_t i=0;i<g_states.size();++i) g_states[i].workFault=true;
         const std::string path = sfs->writeFile(kStateFile);
         if (path.empty() || !WriteFile(path, DfSerialize(g_states)))
             ErrorLog("DynamicFactions: could not write the faction state (" + path + ")");
@@ -589,6 +626,10 @@ namespace
 
     void ReadState(SaveFileSystem* sfs)
     {
+        // Failure to read any part must never preserve another save's state.
+        g_states.clear();
+        g_runtime.clear();
+        DfSetOwnFactions(std::vector<Faction*>());
         std::vector<DfFactionState> loaded;
         if (!sfs->fileExists(kStateFile))
         {
@@ -603,9 +644,20 @@ namespace
             loaded.clear();
         }
         SetStates(loaded, "loaded");
+        for (size_t i=0;i<g_states.size();++i)
+            if (g_states[i].workFault) DfQuarantineTransfer("DynamicFactions: save contains an unresolved transfer - work remains stopped");
         for (size_t i = 0; i < g_states.size(); ++i)
             DebugLog("DynamicFactions: restored " + Quote(g_states[i].name) +
                      (g_states[i].extinct ? " (extinct)" : g_states[i].founded ? "" : " (not founded yet)"));
+    }
+
+    int SaveManagerGame_hook(SaveManager* self, const std::string& location, const std::string& name)
+    {
+        InterlockedIncrement(&g_saveDepth);
+        if (DfTransferBusy())
+            DfQuarantineTransfer("DynamicFactions: reentrant save during a transfer - manual reconciliation required");
+        __try { return g_origSaveManagerGame(self, location, name); }
+        __finally { InterlockedDecrement(&g_saveDepth); }
     }
 
     bool SfsSave_hook(SaveFileSystem* self, const std::string& path)
@@ -622,6 +674,7 @@ namespace
 
     void SfsLoad_hook(SaveFileSystem* self, const std::string& path)
     {
+        BeginSession("save filesystem load");
         g_origSfsLoad(self, path);
         __try
         {
@@ -629,29 +682,40 @@ namespace
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
+            // No state or native handles from the old game survive a failed read.
+            BeginSession("faction state read failed");
             ErrorLog("DynamicFactions: reading the faction state failed - the faction is taken over from the game");
         }
+        g_completedSfs = SESSION_LOAD;
+        UpdateOwnFactions();
     }
 
     void SfsNew_hook(SaveFileSystem* self)
     {
+        BeginSession("save filesystem new game");
         g_origSfsNew(self);
         std::vector<DfFactionState> none;
         SetStates(none, "new game");
+        g_completedSfs = SESSION_NEW;
     }
 
     // Мир поднят: после загрузки сейва и после создания мира новой игры.
     int LoadGame_hook(SaveManager* self, const std::string& location, const std::string& name)
     {
-        g_ready = false;
+        BeginSession("load requested");
         const int result = g_origLoadGame(self, location, name);
-        MarkReady("save loaded");
+        // The meaning of the native int is not established. Require both the
+        // explicit SFS completion and this known outer completion callback.
+        if (g_completedSfs == SESSION_LOAD)
+            MarkReady("save filesystem and load completed");
+        else
+            ErrorLog("DynamicFactions: no completed save filesystem load - waiting for a valid world");
         return result;
     }
 
     void ResetGame_hook(GameWorld* self)
     {
-        g_ready = false;
+        BeginSession("world reset");
         if (g_debug)
             DebugLog("DynamicFactions: world reset");
         g_origResetGame(self);
@@ -660,7 +724,8 @@ namespace
     void InitNewWorld_hook(GameWorld* self, GameDataManager* data)
     {
         g_origInitNewWorld(self, data);
-        MarkReady("world initialised");
+        if (g_completedSfs == SESSION_NEW)
+            MarkReady("new save filesystem and world initialised");
     }
 }
 
@@ -671,7 +736,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     static const std::string ini = IniPath();
     api->beginMod(api, "DynamicFactions", "Dynamic Factions", ini.c_str(), &LoadSettings);
     if (api->version >= 2)
-        api->info(api, Tr("Factions that live on their own: a new faction with its own name appears in the Hub, earns money, recruits and grows in tech. When all its members are dead it is gone."));
+        api->info(api, Tr("A faction founded in the Hub mines, carries and sells real ore, then hires ordinary recruits from its actual budget. No passive income or purchased tech points."));
     api->section(api, Tr("General"));
     api->toggle(api, "DynamicFactions", "Enabled", Tr("Enabled"), Tr("The whole mod."), 1, MCM_RESTART);
     static const char* labels[kDifficultyCount] = {};
@@ -683,8 +748,12 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
                 Tr("Skills of the founders of a new faction: every skill starts at this level. Applies to factions founded after the change."),
                 "medium", kDifficultyKeys, labels, kDifficultyCount, 0);
     api->integer(api, "DynamicFactions", "StartMoney", Tr("Start money"),
-                 Tr("Money of a new faction when it is founded. Recruits in the Hub ask 3000-6000; until stage 2 the faction only earns 15 per member an hour. Applies to factions founded after the change."),
+                 Tr("Money of a new faction when it is founded. Further income comes only from real sales. Applies to factions founded after the change."),
                  5000, 0, 100000, 0);
+    api->toggle(api, "DynamicFactions", "Work", Tr("Mining and trade"),
+                Tr("Mine real resources, carry ore and sell it to town traders. No passive income or virtual ore."), 1, 0);
+    api->integer(api, "DynamicFactions", "MineRadius", Tr("Resource search radius"),
+                 Tr("Search and scout within this distance from the Hub. Only resources observed by faction members become known."), 3000, 500, 5000, 0);
     api->hotkey(api, "DynamicFactions", "WindowKey", Tr("Faction window key"),
                 Tr("Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."), "CTRL+F10", 0);
     api->section(api, Tr("Diagnostics"));
@@ -702,7 +771,9 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::saveGame),
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveManager::saveGame),
+                                                 SaveManagerGame_hook, &g_origSaveManagerGame) ||
+        KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::saveGame),
                                                  SfsSave_hook, &g_origSfsSave) ||
         KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),
                                                  SfsLoad_hook, &g_origSfsLoad) ||

@@ -152,3 +152,36 @@ msgstr "正前往新兵处（%d）"
 
 msgid "talking to a recruit (%d)"
 msgstr "正在与新兵交谈（%d）"
+
+msgid "A faction founded in the Hub mines, carries and sells real ore, then hires ordinary recruits from its actual budget. No passive income or purchased tech points."
+msgstr "在枢纽镇建立的派系开采、运输并出售真实矿石，再用实际预算招募普通成员。没有被动收入或购买科技点数。"
+
+msgid "Money of a new faction when it is founded. Further income comes only from real sales. Applies to factions founded after the change."
+msgstr "新派系建立时的资金。后续收入仅来自真实交易。更改只适用于此后建立的派系。"
+
+msgid "Mining and trade"
+msgstr "采矿与贸易"
+
+msgid "Mine real resources, carry ore and sell it to town traders. No passive income or virtual ore."
+msgstr "开采真实资源，搬运矿石并出售给城镇商人。没有被动收入或虚拟矿石。"
+
+msgid "Resource search radius"
+msgstr "资源搜索半径"
+
+msgid "Search and scout within this distance from the Hub. Only resources observed by faction members become known."
+msgstr "在距枢纽镇此范围内搜索与侦察。只有派系成员发现的资源才会被记录。"
+
+msgid "Work paused: a transfer needs reconciliation."
+msgstr "工作已暂停：物品转移需要核对。"
+
+msgid "I have ore to sell."
+msgstr "我有矿石要卖。"
+
+msgid "Mining: %d; hauling: %d; cargo: %d; sales this session: %d"
+msgstr "采矿：%d；搬运：%d；货物：%d；本次收入：%d"
+
+msgid "Sold %d units of ore for %d cats"
+msgstr "已出售 %d 单位矿石，收入 %d 开币"
+
+msgid "Research is paused until real research work is implemented."
+msgstr "研究已暂停，等待实现实际研究工作。"

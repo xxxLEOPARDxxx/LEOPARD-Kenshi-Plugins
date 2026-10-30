@@ -89,6 +89,9 @@ namespace
             return Tr("Hired a recruit in town");
         if (key == "extinct")
             return Tr("All members are dead - the faction is extinct");
+        int sold=0,paid=0;
+        if (sscanf_s(key.c_str(), "sale %d %d", &sold, &paid)==2)
+            return Format(Tr("Sold %d units of ore for %d cats"), sold, paid);
         int level = 0;
         if (sscanf_s(key.c_str(), "level %d", &level) == 1)
             return Format(Tr("Reached tech level %d"), level);
@@ -108,7 +111,7 @@ namespace
         return race;
     }
 
-    std::string Describe(const DfFactionState& s, const DfSnapshot& snap, const std::string& hire,
+    std::string Describe(const DfFactionState& s, const DfSnapshot& snap, const std::string& hire, const std::string& work,
                          const DfRules& r)
     {
         std::string t = s.name + "\n";
@@ -127,6 +130,10 @@ namespace
         }
         if (!hire.empty())
             t += std::string(Tr("Hiring:")) + " " + hire + "\n";
+        if (!work.empty()) t += work + "\n";
+        if (r.techPointCost == 0)
+            t += std::string(Tr("Research is paused until real research work is implemented.")) + "\n";
+        else
         if (s.techLevel >= r.maxTech)
             t += Format(Tr("Tech: level %d (maximum)"), s.techLevel) + "\n";
         else
@@ -203,7 +210,7 @@ bool DfWindowIsOpen()
 }
 
 void DfWindowUpdate(const std::vector<DfFactionState>& states, const std::vector<DfSnapshot>& snaps,
-                    const std::vector<std::string>& hires, const DfRules& rules)
+                    const std::vector<std::string>& hires, const std::vector<std::string>& work, const DfRules& rules)
 {
     if (Win() == NULL || g_text == NULL)
         return;
@@ -212,7 +219,7 @@ void DfWindowUpdate(const std::vector<DfFactionState>& states, const std::vector
     {
         if (i > 0)
             text += "\n";
-        text += Describe(states[i], snaps[i], i < hires.size() ? hires[i] : std::string(), rules);
+        text += Describe(states[i], snaps[i], i < hires.size() ? hires[i] : std::string(), i < work.size() ? work[i] : std::string(), rules);
     }
     if (states.empty())
         text = Tr("No dynamic factions in this game yet.");

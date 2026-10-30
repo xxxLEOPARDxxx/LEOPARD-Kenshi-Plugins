@@ -152,3 +152,36 @@ msgstr "идёт к рекруту (%d)"
 
 msgid "talking to a recruit (%d)"
 msgstr "говорит с рекрутом (%d)"
+
+msgid "A faction founded in the Hub mines, carries and sells real ore, then hires ordinary recruits from its actual budget. No passive income or purchased tech points."
+msgstr "Фракция в Хабе добывает, переносит и продаёт настоящую руду, затем нанимает обычных рекрутов на заработанные деньги. Пассивного дохода и покупки очков техники нет."
+
+msgid "Money of a new faction when it is founded. Further income comes only from real sales. Applies to factions founded after the change."
+msgstr "Деньги новой фракции при основании. Дальнейший доход поступает только от настоящих продаж. Изменение действует на новые фракции."
+
+msgid "Mining and trade"
+msgstr "Добыча и торговля"
+
+msgid "Mine real resources, carry ore and sell it to town traders. No passive income or virtual ore."
+msgstr "Добывать настоящие ресурсы, переносить руду и продавать городским торговцам. Без пассивного дохода и условной руды."
+
+msgid "Resource search radius"
+msgstr "Радиус поиска ресурсов"
+
+msgid "Search and scout within this distance from the Hub. Only resources observed by faction members become known."
+msgstr "Искать и разведывать в пределах этого расстояния от Хаба. Известными становятся только ресурсы, замеченные членами фракции."
+
+msgid "Work paused: a transfer needs reconciliation."
+msgstr "Работа остановлена: требуется сверка переноса."
+
+msgid "I have ore to sell."
+msgstr "У меня есть руда на продажу."
+
+msgid "Mining: %d; hauling: %d; cargo: %d; sales this session: %d"
+msgstr "Копают: %d; носят: %d; груза: %d; выручка за сеанс: %d"
+
+msgid "Sold %d units of ore for %d cats"
+msgstr "Продано руды: %d, получено катов: %d"
+
+msgid "Research is paused until real research work is implemented."
+msgstr "Исследования приостановлены до появления настоящей работы учёных."

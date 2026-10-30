@@ -20,9 +20,9 @@ bool DfCanPay(int buyer, int seller, int price)
     return price > 0 && buyer >= price && seller >= 0 && seller <= INT_MAX - price;
 }
 
-bool DfCanHarvestOwner(const void* owner, const void* worker)
+bool DfCanHarvestOwner(const void* owner, const void* worker, const void* emptyFaction)
 {
-    return worker != 0 && (owner == 0 || owner == worker);
+    return worker != 0 && (owner == 0 || owner == worker || (emptyFaction != 0 && owner == emptyFaction));
 }
 
 DfPaymentState DfPaymentResult(int b0, int s0, int price, int b1, int s1)

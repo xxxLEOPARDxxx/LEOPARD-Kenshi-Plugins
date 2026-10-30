@@ -18,7 +18,7 @@ bool DfWindowIsOpen();
 // только при изменении.
 // hires[i] - что с наймом у фракции i (пусто - не идёт).
 void DfWindowUpdate(const std::vector<DfFactionState>& states, const std::vector<DfSnapshot>& snaps,
-                    const std::vector<std::string>& hires, const DfRules& rules);
+                    const std::vector<std::string>& hires, const std::vector<std::string>& work, const DfRules& rules);
 
 // Каждый кадр: закрыть окно, если нажали крестик.
 void DfWindowFrame();

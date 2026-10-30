@@ -100,14 +100,17 @@ struct FakeDfTrade : DfTradePort
 static void RunTransferTests()
 {
     int workerFaction = 1, defaultFaction = 2, foreignOwner = 3;
-    // Native getFaction substitutes defaultFaction for an unowned object.
-    // Ownership eligibility must instead consume the raw NULL owner field.
+    // Actual natural veins can use the engine's nofac sentinel, while another
+    // neutral or non-real faction must not be mistaken for unowned resources.
     CHECK(DfCanHarvestOwner(NULL, &workerFaction));
     CHECK(!DfCanHarvestOwner(&defaultFaction, &workerFaction));
     CHECK(DfCanHarvestOwner(&workerFaction, &workerFaction));
     CHECK(!DfCanHarvestOwner(&foreignOwner, &workerFaction));
     CHECK(!DfCanHarvestOwner(NULL, NULL));
     CHECK(!DfCanHarvestOwner(&workerFaction, NULL));
+    CHECK(DfCanHarvestOwner(&defaultFaction, &workerFaction, &defaultFaction));
+    CHECK(!DfCanHarvestOwner(&foreignOwner, &workerFaction, &defaultFaction));
+    CHECK(!DfCanHarvestOwner(&defaultFaction, NULL, &defaultFaction));
     CHECK(DfGoodsResult(5, 2, 4, 3) == DF_GOODS_MOVED);
     CHECK(DfGoodsResult(5, 2, 5, 2) == DF_GOODS_UNCHANGED);
     CHECK(DfGoodsResult(5, 2, 4, 2) == DF_GOODS_DETACHED);

@@ -55,6 +55,8 @@ struct DfHireTask
     DfHirePhase phase;
     hand envoy;                 // наш, кто идёт договариваться
     hand recruit;
+    Faction* recruitFaction;    // original faction, valid only in this session
+    unsigned long session;
     int price;
     unsigned long startedMs;
     unsigned long phaseMs;      // когда сказана последняя реплика
@@ -65,7 +67,7 @@ struct DfHireTask
     unsigned long movedMs;      // когда последний раз сдвинулся
     std::string why;            // почему сорвалось - для журнала
 
-    DfHireTask() : phase(DF_HIRE_IDLE), price(0), startedMs(0), phaseMs(0), orderMs(0), line(0), target(0.0f, 0.0f, 0.0f), lastPos(0.0f, 0.0f, 0.0f), movedMs(0) {}
+    DfHireTask() : phase(DF_HIRE_IDLE), recruitFaction(NULL), session(0), price(0), startedMs(0), phaseMs(0), orderMs(0), line(0), target(0.0f, 0.0f, 0.0f), lastPos(0.0f, 0.0f, 0.0f), movedMs(0) {}
     bool busy() const { return phase != DF_HIRE_IDLE; }
 };
 
@@ -74,6 +76,9 @@ void DfHireClock(bool paused);
 
 // Сейчас по часам найма (мс; на паузе стоят) - для работы фракции тоже.
 unsigned long DfHireNow();
+
+// Session boundary: discard time/debug/quarantine metadata without touching native objects.
+void DfHireResetClock();
 
 // Начать: рекрут, уже найденный DfFindBarRecruit в этом же кадре (второго
 // поиска нет - ревью этапа 1), если цена не выше maxPrice, и ближайший к

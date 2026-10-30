@@ -1,5 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include "game/DfRecruit.h"
+#include "game/DfHire.h"
 
 #include <Windows.h>
 
@@ -223,14 +225,33 @@ namespace
     }
 
     DfRecruitSearchStats g_stats;
-    std::map<Character*, DWORD> g_skipUntil;    // недостижимые - до какого GetTickCount
+    unsigned long g_session = 1;
+    // Full native identity plus session; no Character* survives a frame.
+    struct RecruitKey
+    {
+        unsigned long session;
+        unsigned int type, container, containerSerial, index, serial;
+        RecruitKey(const hand& h) : session(g_session), type(h.type), container(h.container),
+            containerSerial(h.containerSerial), index(h.index), serial(h.serial) {}
+        bool operator<(const RecruitKey& b) const
+        {
+            if (session != b.session) return session < b.session;
+            if (type != b.type) return type < b.type;
+            if (container != b.container) return container < b.container;
+            if (containerSerial != b.containerSerial) return containerSerial < b.containerSerial;
+            if (index != b.index) return index < b.index;
+            return serial < b.serial;
+        }
+    };
+    std::map<RecruitKey, DWORD> g_skipUntil;
 
     bool Skipped(Character* c)
     {
-        std::map<Character*, DWORD>::iterator it = g_skipUntil.find(c);
+        const RecruitKey key(c->getHandle());
+        std::map<RecruitKey, DWORD>::iterator it = g_skipUntil.find(key);
         if (it == g_skipUntil.end())
             return false;
-        if (static_cast<LONG>(GetTickCount() - it->second) >= 0)
+        if (static_cast<LONG>(DfHireNow() - it->second) >= 0)
         {
             g_skipUntil.erase(it);
             return false;
@@ -328,7 +349,7 @@ bool DfFindBarRecruit(TownBase* town, Faction* ours, Character*& who, int& price
 void DfRecruitSkip(Character* c, unsigned long ms)
 {
     if (c != NULL)
-        g_skipUntil[c] = GetTickCount() + ms;
+        g_skipUntil[RecruitKey(c->getHandle())] = DfHireNow() + (ms > 0x7fffffffUL ? 0x7fffffffUL : ms);
 }
 
 const DfRecruitSearchStats& DfLastRecruitSearch()
@@ -422,9 +443,21 @@ void DfSetOwnFactions(const std::vector<Faction*>& factions)
     if (factions == g_own)
         return;                             // каждую секунду - присваиваем только при изменении
     g_own = factions;
-    if (factions.empty())
-    {
-        g_hireBelow.clear();                // другая игра - реплики могли пересоздаться
-        g_skipUntil.clear();                // и персонажи по тем же адресам - другие
-    }
+}
+
+void DfRecruitResetSession()
+{
+    ++g_session;
+    if (g_session == 0)
+        ++g_session;
+    g_own.clear();
+    g_hireBelow.clear();
+    g_skipUntil.clear();
+    g_stats.templates = g_stats.generic = g_stats.inBar = g_stats.recruitable = 0;
+    g_stats.list.clear();
+}
+
+unsigned long DfRecruitSession()
+{
+    return g_session;
 }

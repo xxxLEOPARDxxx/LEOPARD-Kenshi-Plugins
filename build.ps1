@@ -22,9 +22,10 @@ $VC = "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC"
 # SDK 10 headers use SAL annotations VC10 cannot parse (driverspecs.h errors).
 $SDK = "C:\Program Files\Microsoft SDKs\Windows\v7.1"
 
-# Headers come from the KenshiLib source repo, NOT from the _deps copy:
-# the deps copy is older (no AI/Blackboard.h, enums duplicated across headers).
-# The .lib comes from the KenshiLib v0.2.1 release, which matches those headers.
+# Headers: v0.5.1 source snapshot with local duplicate-enum guards.
+# The local .lib imports exactly the installed official v0.5.0 DLL's exports.
+# Inventory/Item/Research/save headers are unchanged between v0.5.0 and v0.5.1.
+# Keep the local static hook helper fixes; audit: docs/dependencies/kenshilib-sdk-audit-2026-10-30.md.
 $KLINC = "D:\DEV\Kenshi\KenshiLib-src\Include"
 $KLLIB = "D:\DEV\Kenshi\deps\KenshiLib\Libraries"
 

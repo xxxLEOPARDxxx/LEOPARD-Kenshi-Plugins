@@ -45,3 +45,8 @@ bool DfInstallHireBlock();
 
 // Наши фракции игры - для блока найма. Главный поток.
 void DfSetOwnFactions(const std::vector<Faction*>& factions);
+
+// Before native world teardown/load: metadata only, never resolves old handles.
+// Explicit even when the own-faction list was already empty.
+void DfRecruitResetSession();
+unsigned long DfRecruitSession();

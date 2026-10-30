@@ -19,9 +19,10 @@ enum DfPaymentState
 DfGoodsState DfGoodsResult(int sourceBefore, int destinationBefore, int sourceAfter, int destinationAfter);
 bool DfCanPay(int buyerMoney, int sellerMoney, int price);
 DfPaymentState DfPaymentResult(int buyerBefore, int sellerBefore, int price, int buyerAfter, int sellerAfter);
-// Pass RootObjectBase::owner, never getFaction(): the latter substitutes the
-// game's default faction for NULL, so it cannot establish real ownership.
-bool DfCanHarvestOwner(const void* actualOwner, const void* workerFaction);
+// Pass raw owner and the engine's exact empty-faction sentinel. Public veins
+// can use either NULL or nofac; a different neutral faction is still an owner.
+bool DfCanHarvestOwner(const void* actualOwner, const void* workerFaction,
+    const void* emptyFaction = 0);
 
 // Kenshi's NPC receiving price, with the actual trader/town passed explicitly.
 // Native getValueSingle(false) reads the player's GLOBAL trading GUI context.

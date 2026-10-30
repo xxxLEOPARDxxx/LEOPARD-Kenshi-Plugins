@@ -43,6 +43,7 @@ namespace
     // Часы найма: идут вместе с реальным временем, но не на паузе игры.
     DWORD g_clockMs = 0;
     DWORD g_clockSeenAt = 0;
+    bool g_joinUncertain = false;           // no retry after an unreconciled native mutation
 
     void TellOnce(volatile LONG& told, const char* what)
     {
@@ -146,7 +147,8 @@ namespace
 
     bool Start(DfHireTask& t, Faction* f, int maxPrice, Character* recruit, int price)
     {
-        if (recruit == NULL || price < 0 || price > maxPrice)
+        if (g_joinUncertain || !Able(recruit) || recruit->isPlayerCharacter() ||
+            recruit->getFaction() == NULL || recruit->getFaction() == f || price < 0 || price > maxPrice)
             return false;
         Character* const envoy = NearestMember(f, recruit->getPosition());
         if (envoy == NULL)
@@ -155,6 +157,8 @@ namespace
         t.phase = DF_HIRE_GO;
         t.envoy = envoy->getHandle();
         t.recruit = recruit->getHandle();
+        t.recruitFaction = recruit->getFaction();
+        t.session = DfRecruitSession();
         t.price = price;
         t.startedMs = now;
         t.line = 0;
@@ -174,21 +178,72 @@ namespace
         return true;
     }
 
+    // Native mutations can fail after having taken effect. Catch each call,
+    // then inspect the actual balance/faction before declaring success/refunding.
+    bool SetMoneySafely(Ownerships* ownership, int money)
+    {
+        __try { ownership->setMoney(money); return true; }
+        __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+    }
+
+    bool SetFactionSafely(Character* recruit, Faction* faction, ActivePlatoon* platoon)
+    {
+        __try { recruit->setFaction(faction, platoon); return true; }
+        __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
+    }
+
     // Рекрут во взвод посланника; деньги - ещё раз проверка.
     bool Join(DfHireTask& t, Faction* f, Character* envoy, Character* recruit)
     {
         Ownerships* const o = f->factionOwnerships;
         ActivePlatoon* const ap = envoy->getPlatoon();
-        if (o == NULL || ap == NULL || o->money < t.price)
+        if (t.session != DfRecruitSession() || !Able(envoy) || !Able(recruit) ||
+            envoy->getFaction() != f || recruit->isPlayerCharacter() ||
+            recruit->getFaction() != t.recruitFaction || t.recruitFaction == f ||
+            o == NULL || ap == NULL || ap->me == NULL || ap->me->owner != f || t.price < 0 || o->money < t.price)
         {
-            t.why = "not enough money any more";
+            t.why = "the recruit, squad or payment is no longer valid";
             return false;
         }
-        o->setMoney(o->money - t.price);       // сначала оплата: сбой после неё не даёт человека даром
-        recruit->setFaction(f, ap);
-        if (recruit->getPlatoon() != ap)
-            ErrorLog("DynamicFactions: a recruit changed faction but is not in the envoy's squad");
-        return true;
+        const int before = o->money;
+        const int paid = before - t.price;
+        g_joinUncertain = true;              // stays set if even the inspection faults
+        SetMoneySafely(o, paid);
+        if (o->money != paid)
+        {
+            if (o->money == before)
+                g_joinUncertain = false;
+            else
+                ErrorLog("DynamicFactions: hiring balance is uncertain - further hiring is suspended for this session");
+            t.why = "payment was not confirmed";
+            return false;
+        }
+        SetFactionSafely(recruit, f, ap);
+        if (recruit->getFaction() == f)
+        {
+            if (o->money != paid)
+            {
+                ErrorLog("DynamicFactions: recruit joined but payment changed - further hiring is suspended for this session");
+                t.why = "the recruit joined but payment could not be reconciled";
+                return false;
+            }
+            g_joinUncertain = false;
+            if (recruit->getPlatoon() != ap)
+                ErrorLog("DynamicFactions: a paid recruit joined the faction but is not in the envoy's squad");
+            return true;
+        }
+        // Joining did not happen. Refund only the exact debit we observed;
+        // never retry setFaction and never overwrite an unexpected balance.
+        if (o->money == paid)
+        {
+            SetMoneySafely(o, before);
+            if (o->money == before)
+                g_joinUncertain = false;
+        }
+        if (g_joinUncertain)
+            ErrorLog("DynamicFactions: a failed hire could not be refunded - further hiring is suspended for this session");
+        t.why = g_joinUncertain ? "joining failed; payment needs inspection" : "joining failed; payment refunded";
+        return false;
     }
 
     DfHireResult Fail(DfHireTask& t, Character* envoy, const char* why)
@@ -209,7 +264,7 @@ namespace
             return Fail(t, envoy, "the envoy is down or gone");
         if (!Able(recruit))
             return Fail(t, envoy, "the recruit is down or gone");
-        if (recruit->getFaction() == f || recruit->isPlayerCharacter())
+        if (recruit->getFaction() != t.recruitFaction || recruit->getFaction() == f || recruit->isPlayerCharacter())
             return Fail(t, envoy, "the recruit was hired by someone else");
         if (envoy->isInCombatMode(true, true))
             return Fail(t, envoy, "the envoy is fighting");
@@ -298,8 +353,11 @@ bool DfHireStart(DfHireTask& t, Faction* f, TownBase* town, int maxPrice, Charac
 
 DfHireResult DfHireStep(DfHireTask& t, Faction* f, const std::string& factionName)
 {
-    if (!t.busy())
+    if (!t.busy() || t.session != DfRecruitSession())
+    {
+        t.phase = DF_HIRE_IDLE;              // stale session: do not even resolve handles
         return DF_HIRE_FAILED;
+    }
     __try
     {
         return Step(t, f, factionName);
@@ -308,6 +366,8 @@ DfHireResult DfHireStep(DfHireTask& t, Faction* f, const std::string& factionNam
     {
         static volatile LONG told = 0;
         TellOnce(told, "DynamicFactions: a hire step failed once - the hire is dropped");
+        if (g_joinUncertain)
+            ErrorLog("DynamicFactions: a hiring mutation faulted before reconciliation - further hiring is suspended for this session");
         t.phase = DF_HIRE_IDLE;
         return DF_HIRE_FAILED;
     }
@@ -329,6 +389,14 @@ void DfHireClock(bool paused)
 unsigned long DfHireNow()
 {
     return g_clockMs;
+}
+
+void DfHireResetClock()
+{
+    g_clockMs = 0;
+    g_clockSeenAt = 0;
+    g_lastLog = 0;
+    g_joinUncertain = false;
 }
 
 void DfHireSetDebug(bool on)
@@ -356,6 +424,11 @@ void DfHireCancel(DfHireTask& t)
 {
     if (!t.busy())
         return;
+    if (t.session != DfRecruitSession())
+    {
+        t.phase = DF_HIRE_IDLE;
+        return;
+    }
     __try
     {
         ClearOrder(t.envoy.getCharacter());
