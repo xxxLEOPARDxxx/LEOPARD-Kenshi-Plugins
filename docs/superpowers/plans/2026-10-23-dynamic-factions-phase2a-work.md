@@ -1,5 +1,8 @@
 # Dynamic Factions — этап 2а «Работа и добыча» Implementation Plan
 
+**Аудит 30.10.2026:** актуальная последовательность продолжения — [основание честной экономики](2026-10-30-dynamic-factions-economy-foundation.md). Многие мелочи Task1 уже сделаны, HAUL/торговля не подключены, условный запас пока не согласован с настоящим. Старые чекбоксы не являются актуальным отчётом готовности.
+
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Люди фракции сами добывают руду у ближайших к Хабу жил и продают её торговцам Хаба: деньги фракции растут от настоящей работы, а не от заглушки.
