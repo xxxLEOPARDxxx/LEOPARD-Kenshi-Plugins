@@ -1,0 +1,826 @@
+{
+  "date": "2026-10-30",
+  "tool": "built-in image_gen",
+  "covers": [
+    {
+      "mod": "AIFixed",
+      "title": "AI FIXED",
+      "mcm_badge": true,
+      "image": "images/AIFixed/000_LEOPARD_Cover.png",
+      "sha256": "f58c02a5d7ffe53ceaa2ca7aba14e0507724f3eb7e0f0fd5d162e3567e1d28ff",
+      "bytes": 3030150,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"AI FIXED\". Add one small engraved MCM badge beneath the title. Scene: A battered mechanical patient lying on a low rusty repair bed while a compact repair arm mends its knee; the friendly robot foreman offers a repair toolkit. Thoughtful care, practical repairs. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "AIFixed/preview.jpg",
+      "prepared_bytes": 643531,
+      "prepared_sha256": "c86d9c32f2e2b4d127a6a605465794659b01840b7c2c86bb641a2ef005dd1e5e",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "AssignedWorkers",
+      "title": "ASSIGNED WORKERS",
+      "mcm_badge": true,
+      "image": "images/AssignedWorkers/000_LEOPARD_Cover.png",
+      "sha256": "c591c9e6eb05a781eb4fa44df1bdeff21791950db2e7fa2f61a7118fd1355d58",
+      "bytes": 2945092,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"ASSIGNED WORKERS\". Add one small engraved MCM badge beneath the title. Scene: A robot foreman points out workers at two workshop machines; a third idle machine has a clear small glowing RED lightning symbol above it. A practical work assignment board has simple worker and gear icons. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.",
+      "edit_prompts": [
+        "Edit this approved illustrated mod cover with exactly one change: replace the small ornamental icon immediately below the large title with a small rectangular riveted brass metal plaque bearing the clearly readable EXACT three uppercase letters MCM, matching the weathered engraved gold/brass visual style. MCM must be correctly spelled. Preserve the entire illustration, composition, character, colors and existing large mod title. Do not move the title. This is a precise badge correction only. No extra words or other alterations."
+      ],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "AssignedWorkers/preview.jpg",
+      "prepared_bytes": 641820,
+      "prepared_sha256": "a0c5825a7af130683f5967b4946b1b2ca34cb781ae169702e8ed2d5c3f6c4d24",
+      "prepared_gameplay_images": 2
+    },
+    {
+      "mod": "Auto-Pause-on-Load",
+      "title": "AUTO-PAUSE ON LOAD",
+      "mcm_badge": true,
+      "image": "images/Auto-Pause-on-Load/000_LEOPARD_Cover.png",
+      "sha256": "395e167f4226132f725d2f8b9185d78d6650cf7a4e79a1099127056b505c23bc",
+      "bytes": 3442308,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"AUTO-PAUSE ON LOAD\". Add one small engraved MCM badge beneath the title. Scene: A resourceful robot pulls a giant brass lever marked with the two simple PAUSE bars; an arriving desert caravan is caught motionless mid-stride with dust suspended. No clocks, ice, hourglasses or speech bubbles. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Auto-Pause-on-Load/preview.jpg",
+      "prepared_bytes": 754377,
+      "prepared_sha256": "fb3188d948668f50df799cf74c37f7c0ee0845a659717962cbe5ee9b3ab14eff",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "BestMinimap",
+      "title": "BEST MINIMAP",
+      "mcm_badge": true,
+      "image": "images/BestMinimap/000_LEOPARD_Cover.png",
+      "sha256": "2391f087dd2c5873dae35d3fd211b4dff2134a22a3ef602673113d9c908dbb27",
+      "bytes": 3066647,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"BEST MINIMAP\". Add one small engraved MCM badge beneath the title. Scene: A robot navigator leans over a beautiful brass circular map instrument, with a small overhead desert settlement map, tiny colored squad dots, compass ring and camera-view wedge. Winding canyon landscape behind. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.",
+      "edit_prompts": [
+        "Edit this approved illustrated mod cover with exactly one change: replace the small ornamental icon immediately below the large title with a small rectangular riveted brass metal plaque bearing the clearly readable EXACT three uppercase letters MCM, matching the weathered engraved gold/brass visual style. MCM must be correctly spelled. Preserve the entire illustration, composition, character, colors and existing large mod title. Do not move the title. This is a precise badge correction only. No extra words or other alterations."
+      ],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "BestMinimap/preview.jpg",
+      "prepared_bytes": 663709,
+      "prepared_sha256": "81d60f667046a49d299762483c102af7c4160c689426427213eb9d72ed3dba4d",
+      "prepared_gameplay_images": 7
+    },
+    {
+      "mod": "BetterLooting",
+      "title": "BETTER LOOTING",
+      "mcm_badge": true,
+      "image": "images/BetterLooting/000_LEOPARD_Cover.png",
+      "sha256": "fafd95ec83974103b87689aa826324fbf23946599a393959e8acc68de6215e78",
+      "bytes": 2907025,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"BETTER LOOTING\". Add one small engraved MCM badge beneath the title. Scene: A clever robot crouches next to the closest useful supplies on the desert floor and places them in a tidy scavenger bag. A nearby trail of further loot recedes naturally; a medkit and ore are the focal useful objects, no modern guns. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.",
+      "edit_prompts": [
+        "Edit this approved illustrated mod cover with exactly one change: replace the small ornamental icon immediately below the large title with a small rectangular riveted brass metal plaque bearing the clearly readable EXACT three uppercase letters MCM, matching the weathered engraved gold/brass visual style. MCM must be correctly spelled. Preserve the entire illustration, composition, character, colors and existing large mod title. Do not move the title. This is a precise badge correction only. No extra words or other alterations."
+      ],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "BetterLooting/preview.jpg",
+      "prepared_bytes": 600204,
+      "prepared_sha256": "5188ec700a3c3452f906b34f870b200ee7452125ae77eb410e3ea09028b3f51a",
+      "prepared_gameplay_images": 3
+    },
+    {
+      "mod": "BuildModeGizmo",
+      "title": "BUILD MODE GIZMO",
+      "mcm_badge": true,
+      "image": "images/BuildModeGizmo/000_LEOPARD_Cover.png",
+      "sha256": "3a1ea900a2a0a45715204b378d5d18413b11afdff3646bda06f5ef36566915ed",
+      "bytes": 3295584,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"BUILD MODE GIZMO\". Add one small engraved MCM badge beneath the title. Scene: A mechanical builder adjusts a small unfinished adobe outpost building on a drafting table using bold colored directional arrows and one curved rotation arrow. Real scaffold and wind generator behind; precise placement, not destruction. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "BuildModeGizmo/preview.jpg",
+      "prepared_bytes": 728501,
+      "prepared_sha256": "ce35135e9f210c26dd39cddd2a2b4fde8377eb73cd46efd441bc2c2502c460fb",
+      "prepared_gameplay_images": 3
+    },
+    {
+      "mod": "Character Inspector",
+      "title": "CHARACTER INSPECTOR",
+      "mcm_badge": true,
+      "image": "images/Character Inspector/000_LEOPARD_Cover.png",
+      "sha256": "d199c387fe7fd4fda816711a30398664d9f6bf9873d6e6340f29e8c9743fdcca",
+      "bytes": 3421198,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"CHARACTER INSPECTOR\". Add one small engraved MCM badge beneath the title. Scene: A robot armourer studies a human-sized layered armour mannequin with one shoulder plate lifted, revealing overlapping protective layers. A parchment body outline shows simple protected body zones; magnifying optic and shield symbols. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Character Inspector/preview.jpg",
+      "prepared_bytes": 736775,
+      "prepared_sha256": "a2d908550148aaccd26244974e48d8ef24705370e0aba68e275ab9c2fc92e946",
+      "prepared_gameplay_images": 4
+    },
+    {
+      "mod": "Character-Highlight",
+      "title": "CHARACTER HIGHLIGHT",
+      "mcm_badge": true,
+      "image": "images/Character-Highlight/000_LEOPARD_Cover.png",
+      "sha256": "da97637c682f9e9e8faec1cb1fb779c933a395563fca6c0e530fa2404ffdae74",
+      "bytes": 3380310,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"CHARACTER HIGHLIGHT\". Add one small engraved MCM badge beneath the title. Scene: A robot scout watches a small squad in a dusty canyon: a friendly figure has a restrained green contour, hostile figure red, neutral traveller amber. Distinct full silhouettes, tasteful glowing edge outlines. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Character-Highlight/preview.jpg",
+      "prepared_bytes": 716723,
+      "prepared_sha256": "e32588589b7fd4e625fea0f0f05549621f7de4cb7f213d419860d0e1c3f7951c",
+      "prepared_gameplay_images": 4
+    },
+    {
+      "mod": "Container-Highlight",
+      "title": "CONTAINER HIGHLIGHT",
+      "mcm_badge": true,
+      "image": "images/Container-Highlight/000_LEOPARD_Cover.png",
+      "sha256": "a7b5c24db584b7697423e4df094aeec94d4cdfe7984eebe408a8f961bb9aff49",
+      "bytes": 3111223,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"CONTAINER HIGHLIGHT\". Add one small engraved MCM badge beneath the title. Scene: In a dim dusty storehouse, a robot explorer raises a small lantern. Several useful supply chests and urns have subtle warm amber outlines, clearly revealing the searchable containers among dark shelves. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Container-Highlight/preview.jpg",
+      "prepared_bytes": 685354,
+      "prepared_sha256": "9001f812c9789186c6285bfb4cbd365cd1ba6242060e9897233484bf0aa8e948",
+      "prepared_gameplay_images": 3
+    },
+    {
+      "mod": "Dark UI Advanced",
+      "title": "DARK UI ADVANCED",
+      "mcm_badge": false,
+      "image": "images/Dark UI Advanced/000_LEOPARD_Cover.png",
+      "sha256": "c44102dea570e3a5a22ef9fd3f8876c524e368f7a86f464515d0987dc83588d3",
+      "bytes": 2832888,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"DARK UI ADVANCED\". Add one small engraved MCM badge beneath the title. Scene: A calm mechanical traveller at a moonlit outpost operates an elegant dark charcoal mechanical control desk, with clean brass borders and readable pale etched symbols. Dark refined interface metaphor, amber lighting, midnight blue shadows. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [
+        "Make exactly one precise change to this approved cover: REMOVE the small MCM brass plaque below the large title completely and seamlessly reconstruct the underlying night sky. This standalone UI reskin has NO MCM support. Do not replace it with any other label or icon. Keep the large DARK UI ADVANCED title and every other part of the beautiful night-time illustration, mechanical character, colours and composition unchanged. Only lettering on the final image is DARK UI ADVANCED."
+      ],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Dark UI Advanced/preview.jpg",
+      "prepared_bytes": 611801,
+      "prepared_sha256": "aab48a0698e29fbfd17cc38f9c785d45360352f29a7bb1e15d90a8586121bc8c",
+      "prepared_gameplay_images": 5
+    },
+    {
+      "mod": "DynamicFactions",
+      "title": "DYNAMIC FACTIONS",
+      "mcm_badge": true,
+      "image": "images/DynamicFactions/000_LEOPARD_Cover.png",
+      "sha256": "87c367df83955f7fd190c2e0136e0ea66febd23066b965278d14745fbe629872",
+      "bytes": 3678564,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"DYNAMIC FACTIONS\". Add one small engraved MCM badge beneath the title. Scene: A living industrious desert faction: miners extract real ore at a rock vein, a hauler physically carries ore baskets toward a market stall, another worker raises scaffolding, and a robot coordinator surveys their modest growing outpost. Red pennants connect the community. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": true,
+      "prepared_preview": "DynamicFactions/preview.jpg",
+      "prepared_bytes": 831298,
+      "prepared_sha256": "c4da92c0e45a3fb9bed4a84af629ff7c8f5a262c18478e94c0e4c9c92c6ad46a",
+      "prepared_gameplay_images": 0
+    },
+    {
+      "mod": "Formations",
+      "title": "FORMATIONS EXTENDED",
+      "mcm_badge": true,
+      "image": "images/Formations/000_LEOPARD_Cover.png",
+      "sha256": "3dfdfc2abb3e227f01ea243bd790a8abc89f8f70869e419dbe60a1d57daf9ae6",
+      "bytes": 3472596,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"FORMATIONS EXTENDED\". Add one small engraved MCM badge beneath the title. Scene: From a dramatic high oblique angle, a robot squad captain directs a small disciplined squad marching in a clean wedge formation over desert sand. Subtle footprints show the organized formation; a second curved defensive line in the distance. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Formations/preview.jpg",
+      "prepared_bytes": 781758,
+      "prepared_sha256": "292c6519310654a68795aaf12d122aa43f440df958c785cd3e4d0e6819131129",
+      "prepared_gameplay_images": 12
+    },
+    {
+      "mod": "GearCompare",
+      "title": "GEAR COMPARE ALT",
+      "mcm_badge": true,
+      "image": "images/GearCompare/000_LEOPARD_Cover.png",
+      "sha256": "0568deb43653e29fcd7f1dfe4a4f363e19f19981e923ba516422f43fa13e5872",
+      "bytes": 3330194,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"GEAR COMPARE ALT\". Add one small engraved MCM badge beneath the title. Scene: A meticulous robot armourer compares two different worn samurai chest plates on stands using a brass balance scale; clear small green upward and red downward arrows help judge the alternatives. A tiny brass ALT key charm lies on the workbench. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "GearCompare/preview.jpg",
+      "prepared_bytes": 733232,
+      "prepared_sha256": "a2b109539a2f3578ed50d2d8b57eb229ca720ce8b9d50e0807e2176c5512d543",
+      "prepared_gameplay_images": 6
+    },
+    {
+      "mod": "Hidden-Faction-Relations",
+      "title": "HIDDEN FACTION RELATIONS",
+      "mcm_badge": true,
+      "image": "images/Hidden-Faction-Relations/000_LEOPARD_Cover.png",
+      "sha256": "9fc968170b6b10811b4f44a2404fd86c89ef23a6c824612a9b70778ded11ccb5",
+      "bytes": 3328601,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"HIDDEN FACTION RELATIONS\". Add one small engraved MCM badge beneath the title. Scene: A robot diplomat uncovers a cloth from a corkboard of varied desert faction emblems connected by green and red threads, revealing concealed relationships. Anonymous insignia, sealed letters and dusty city silhouettes. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Hidden-Faction-Relations/preview.jpg",
+      "prepared_bytes": 737301,
+      "prepared_sha256": "47f752e174a6626df4c524f218897e0ee39bcf513f43483e9c934d61318ebf1f",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "ItemMarkers",
+      "title": "ITEM MARKERS",
+      "mcm_badge": true,
+      "image": "images/ItemMarkers/000_LEOPARD_Cover.png",
+      "sha256": "5d374cf9f3a54303b62e94135030f115b01e821fbb787f152ef0458f0201faa9",
+      "bytes": 3077807,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"ITEM MARKERS\". Add one small engraved MCM badge beneath the title. Scene: A robot quartermaster examines several distinct equipment items laid on a workbench. Tiny colored grade stars sit near the items, one red hand indicates stolen goods, and a small blue crest marks a uniform. Clear readable icon language. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "ItemMarkers/preview.jpg",
+      "prepared_bytes": 675291,
+      "prepared_sha256": "dadd9237cfd888a99b9a4a7283ece4db933eda177c65673985ffb7efe5af4108",
+      "prepared_gameplay_images": 9
+    },
+    {
+      "mod": "Job-B-Gone",
+      "title": "JOB-B-GONE",
+      "mcm_badge": true,
+      "image": "images/Job-B-Gone/000_LEOPARD_Cover.png",
+      "sha256": "28d11c75478c4baa601098ddea52d8559506459265acd22e53ce1689336e08e1",
+      "bytes": 3311776,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"JOB-B-GONE\". Add one small engraved MCM badge beneath the title. Scene: A relieved mechanical foreman wipes a chaotic chalkboard of crossed-over mining, hauling and crafting pictograms clean with one sweeping brush. Workers in the background set their tools down. No clipboard, flying pickaxes or speech bubble. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Job-B-Gone/preview.jpg",
+      "prepared_bytes": 747938,
+      "prepared_sha256": "8443430969807513b1fc73cc18665929fc197d6d0422d4fd7b94999cde979708",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "KenshiJobManagement",
+      "title": "KENSHI JOB MANAGEMENT",
+      "mcm_badge": true,
+      "image": "images/KenshiJobManagement/000_LEOPARD_Cover.png",
+      "sha256": "2baf6f7bb7c9ea5c6117c6e5b1879c690b89c4c136ef8e8699e553d59333be2a",
+      "bytes": 3508852,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"KENSHI JOB MANAGEMENT\". Add one small engraved MCM badge beneath the title. Scene: A robot workshop planner moves brass worker tokens across a large hanging work board; simple arrows connect a mine, carrying baskets and a crafting bench. Three workers follow their assigned order at the outpost. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "KenshiJobManagement/preview.jpg",
+      "prepared_bytes": 773150,
+      "prepared_sha256": "b569610e0406bcad276b867276f55e75f125ab32e05935172bc20aaaef882f30",
+      "prepared_gameplay_images": 8
+    },
+    {
+      "mod": "KenshiRotate",
+      "title": "ROTATE ITEMS",
+      "mcm_badge": true,
+      "image": "images/KenshiRotate/000_LEOPARD_Cover.png",
+      "sha256": "554e6b83225f8482fde3602867fa679d48ebf11d93aacba6ccbc712b4b6fc778",
+      "bytes": 3284326,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"ROTATE ITEMS\". Add one small engraved MCM badge beneath the title. Scene: A clever robot quartermaster turns a long rectangular metal supply case exactly a quarter-turn to fit a narrow backpack compartment, guided by one clear curved amber arrow. Practical packing on a dusty workbench. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "KenshiRotate/preview.jpg",
+      "prepared_bytes": 732499,
+      "prepared_sha256": "364e5d2f1931c15c82a484ae2e88fe338365832e7fb332476c5acbd3691d2020",
+      "prepared_gameplay_images": 2
+    },
+    {
+      "mod": "KillCounter",
+      "title": "KILL COUNTER",
+      "mcm_badge": true,
+      "image": "images/KillCounter/000_LEOPARD_Cover.png",
+      "sha256": "c583f635d9e3c62959d9cfd8bfe3878b66014a349ca6671b4948b36d48e418bb",
+      "bytes": 3221612,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"KILL COUNTER\". Add one small engraved MCM badge beneath the title. Scene: A battle-worn robot veteran calmly records a tally on a rugged mechanical counter, with three small distinct pictograms for defeated foes, knockouts and severed limbs. A battered helmet and sheathed sword on the table, no graphic wounds. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "KillCounter/preview.jpg",
+      "prepared_bytes": 697920,
+      "prepared_sha256": "2bd695625f58aa0496cc2212b0becf3bb7769eac2b15901b27fe0a39576808bc",
+      "prepared_gameplay_images": 2
+    },
+    {
+      "mod": "LiveXpBars",
+      "title": "LIVE XP BARS",
+      "mcm_badge": true,
+      "image": "images/LiveXpBars/000_LEOPARD_Cover.png",
+      "sha256": "8a3b887ec04f93a58060ccfebf196cbb4a2f03ecf2c1255fcd4f901b96eaed06",
+      "bytes": 3387761,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"LIVE XP BARS\". Add one small engraved MCM badge beneath the title. Scene: A robot training instructor holds a slim parchment board of several horizontal green and amber progress meters with small sword, running and crafting pictograms. Workers train behind him; precise lively progress, not a fake game screenshot. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "LiveXpBars/preview.jpg",
+      "prepared_bytes": 747426,
+      "prepared_sha256": "d1091ca5506585a86ff9af485e5b524d71742478fc63d552e3e73e18cbf9c05c",
+      "prepared_gameplay_images": 4
+    },
+    {
+      "mod": "Loot-Scoot-Execute",
+      "title": "LOOT SCOOT EXECUTE",
+      "mcm_badge": true,
+      "image": "images/Loot-Scoot-Execute/000_LEOPARD_Cover.png",
+      "sha256": "888d40ab51f93780da6b18a3d4ad863db494cbdbaa4fbf40709c8d514514220c",
+      "bytes": 3290023,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"LOOT SCOOT EXECUTE\". Add one small engraved MCM badge beneath the title. Scene: A resourceful mechanical scavenger picks up a supply pouch beside a downed armored bandit; a second panel-like sweep of dust implies the next move away, with a sheathed mercy blade at the robot's side. No gore, no copied striding skull composition. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Loot-Scoot-Execute/preview.jpg",
+      "prepared_bytes": 708118,
+      "prepared_sha256": "a559d8833807af5e3de6e0a23ddd6ef1f9be868009b40fae775d444b1dee50e3",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "Map-markers",
+      "title": "MAP MARKERS",
+      "mcm_badge": true,
+      "image": "images/Map-markers/000_LEOPARD_Cover.png",
+      "sha256": "275443dc73bf0f597fa37b95123e3c7c8d8967379dce7937cf9c30a5e9b55082",
+      "bytes": 3312087,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"MAP MARKERS\". Add one small engraved MCM badge beneath the title. Scene: A close high-oblique view of mechanical hands planting colorful labeled blank pins on a physical parchment desert map spread over a field table. Roads, small town sketches and mountains; an outpost vista beyond. No speech bubble, no copied over-shoulder skeleton composition. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Map-markers/preview.jpg",
+      "prepared_bytes": 734604,
+      "prepared_sha256": "d77704d699a755db6fd30ab3804b0eb5bc8536bba5e3a5b2855c8a8a5f982589",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "ModConfigMenu",
+      "title": "MOD CONFIG MENU",
+      "mcm_badge": true,
+      "image": "images/ModConfigMenu/000_LEOPARD_Cover.png",
+      "sha256": "8e65443a5ded8d87062a0c19eb07c536b23568e66c04ab062e11b248b3225ec0",
+      "bytes": 3357533,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"MOD CONFIG MENU\". Add one small engraved MCM badge beneath the title. Scene: A robot tinkerer operates a central brass and dark iron control panel with orderly toggles, sliders, keycap symbols and several plugin gear emblems. Other small workshop machines are connected to this one useful settings console. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "ModConfigMenu/preview.jpg",
+      "prepared_bytes": 742459,
+      "prepared_sha256": "e82c9b3358f8bfe5647baad70945ae3ed52094f780f5d4995aa9387e8c28fd14",
+      "prepared_gameplay_images": 10
+    },
+    {
+      "mod": "MultiXPMining",
+      "title": "MULTI XP MINING",
+      "mcm_badge": true,
+      "image": "images/MultiXPMining/000_LEOPARD_Cover.png",
+      "sha256": "178b7b639683cc1adbc08cbd8ce819450d6eaf14e035a61790884803a695260d",
+      "bytes": 3544292,
+      "dimensions": [
+        1672,
+        940
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"MULTI XP MINING\". Add one small engraved MCM badge beneath the title. Scene: A hardy miner swings a pick at a real ore vein while the mechanical foreman checks three simple training pictograms: muscle, endurance shield and dexterous hand. Distinct copper, iron and coal piles, practical hauling basket, warm dusty mining camp. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "MultiXPMining/preview.jpg",
+      "prepared_bytes": 784838,
+      "prepared_sha256": "521a24f086f6078c791bb1c296e88d29814a5dc0fcb318a2b5967e4fa1561d8a",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "Organize-the-Crafting-Stations",
+      "title": "ORGANIZE THE CRAFTING STATIONS",
+      "mcm_badge": true,
+      "image": "images/Organize-the-Crafting-Stations/000_LEOPARD_Cover.png",
+      "sha256": "647390db0803031cef81ef3ec32b646cc985f9fe9f55ff6118308d6e840000c3",
+      "bytes": 3414076,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"ORGANIZE THE CRAFTING STATIONS\". Add one small engraved MCM badge beneath the title. Scene: A robot artisan sorts hanging blueprint cards into a clear searchable index in a compact workshop; forge, loom and research desk are visibly organized behind. A small magnifying symbol on the index, no trader inventory. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Organize-the-Crafting-Stations/preview.jpg",
+      "prepared_bytes": 753658,
+      "prepared_sha256": "f8dd290875e9055fcd7b20091b00a5543ce8bae7898fbb8a82a56d7be867c1de",
+      "prepared_gameplay_images": 2
+    },
+    {
+      "mod": "Organize-the-Trader",
+      "title": "ORGANIZE THE TRADER",
+      "mcm_badge": true,
+      "image": "images/Organize-the-Trader/000_LEOPARD_Cover.png",
+      "sha256": "d145c5e20390c59a32b4a8ca5789d23b63777ed5f75517130335781449f6ce6a",
+      "bytes": 3197370,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"ORGANIZE THE TRADER\". Add one small engraved MCM badge beneath the title. Scene: A friendly robot merchant slides one clearly requested medkit from neatly indexed market drawers across a counter toward a traveller. Organized weapon rack, cloth goods and brass price scale behind. No skull peering through a magnifying glass or copied source composition. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Organize-the-Trader/preview.jpg",
+      "prepared_bytes": 701443,
+      "prepared_sha256": "648ed6217ea565889e7ecf7af16d0f9296cec48120338ded46cc88152b212afc",
+      "prepared_gameplay_images": 6
+    },
+    {
+      "mod": "PatientSelfAid",
+      "title": "PATIENT SELF AID",
+      "mcm_badge": true,
+      "image": "images/PatientSelfAid/000_LEOPARD_Cover.png",
+      "sha256": "7e10f042ac742f5a51857d522002db41386417c573bd393e15a9ace38faa8ac4",
+      "bytes": 3393888,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"PATIENT SELF AID\". Add one small engraved MCM badge beneath the title. Scene: A conscious seated desert traveller carefully bandages their own arm while a friendly mechanical assistant supplies clean cloth and a small repair wrench for a prosthetic leg. Cooperative self-treatment, calm and practical, no graphic injury. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "PatientSelfAid/preview.jpg",
+      "prepared_bytes": 748371,
+      "prepared_sha256": "648d589b6d1caf16fab66cfe7c8a19e5a4d607adb98c8bcb256d9d71e361b52e",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "QuickStartSelect",
+      "title": "QUICK START SELECT",
+      "mcm_badge": true,
+      "image": "images/QuickStartSelect/000_LEOPARD_Cover.png",
+      "sha256": "29ffd6ad48ab39f3fe438ef2ab0f3f90b0d6cd7a17ee01842eecbec14bbb6f7b",
+      "bytes": 3501116,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"QUICK START SELECT\". Add one small engraved MCM badge beneath the title. Scene: A robot guide presents a fan of distinct illustrated starting-story cards: lone wanderer, merchant, freed captive and small squad. Beyond the guide, several paths branch toward a rugged desert settlement. Clear choice-of-beginning metaphor. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "QuickStartSelect/preview.jpg",
+      "prepared_bytes": 779122,
+      "prepared_sha256": "de34848a9c05962baacbdbf8f2489ca0f69ade914004957eb3c45eaeed2f83f9",
+      "prepared_gameplay_images": 9
+    },
+    {
+      "mod": "RangedDamageXp",
+      "title": "RANGED DAMAGE XP",
+      "mcm_badge": true,
+      "image": "images/RangedDamageXp/000_LEOPARD_Cover.png",
+      "sha256": "b5b2d7203828ce571992b17f02b55a9838c0287890242b0c590807440ed6baaa",
+      "bytes": 3208417,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"RANGED DAMAGE XP\". Add one small engraved MCM badge beneath the title. Scene: A desert crossbow trainee fires a bolt into a steel-plated practice dummy; sparks show the actual impact, while a small amber progress emblem and eye pictogram suggest skill and perception training. Mechanical instructor watches; no firearms. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "RangedDamageXp/preview.jpg",
+      "prepared_bytes": 705028,
+      "prepared_sha256": "830272af986d43a9be54c6d6f87dd09014a3b659c7969031745c9a4660145b04",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "RecruitMarkers",
+      "title": "RECRUIT MARKERS",
+      "mcm_badge": true,
+      "image": "images/RecruitMarkers/000_LEOPARD_Cover.png",
+      "sha256": "210a14aaf7661b4430e0317c6f6337956acc68dd9f4d10355d714a08bbd73039",
+      "bytes": 3341203,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"RECRUIT MARKERS\". Add one small engraved MCM badge beneath the title. Scene: A robot scout points to three clearly different desert citizens: a recruit with a small warm speech symbol, a merchant with a coin, and the squad leader with a modest gold STAR just above the head. Welcoming outpost street, distinct icon markers. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "RecruitMarkers/preview.jpg",
+      "prepared_bytes": 758601,
+      "prepared_sha256": "ef4e28ced782c003a90d273874af16b6a62c288d74c9ec8a3ac5ae883032045a",
+      "prepared_gameplay_images": 3
+    },
+    {
+      "mod": "SkillLevelUpInfo",
+      "title": "SKILL LEVEL UP INFO",
+      "mcm_badge": true,
+      "image": "images/SkillLevelUpInfo/000_LEOPARD_Cover.png",
+      "sha256": "478bcc91791ba804c3e6aa104cac02917ddb9c59cf08bbcc57b62f7f1a83ccfb",
+      "bytes": 3244736,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing / illustration-story.\nCreate ONE finished 16:9 landscape illustrated cover for a Kenshi game mod, in the same visual family as gritty humorous illustrated wasteland comic mod posters. Exact main title, in three well-spaced stacked lines: \"SKILL\" / \"LEVEL UP\" / \"INFO\". The complete readable title is SKILL LEVEL UP INFO. Oversized distressed condensed golden-ochre lettering on a rough dark brushstroke or battered metal sign, occupying the upper-left portion. Small \"MCM\" badge, and no other written phrases.\nArt direction: sepia parchment texture, engraved scratchy ink outlines, rusty metal, burnt orange and sandy ochre, charcoal shadows, painterly weathered detail, playful but rugged. A recognizable original mechanical skeleton mascot with a dented samurai helmet and faded scarf, matching the visual concept of a robot inventory organizer but in a different pose. No modern polished sci-fi.\nScene: in a desert training yard beside a Kenshi-style canyon outpost, a human or Shek wanderer trains against a worn wooden combat dummy while the skeleton stands in the foreground like a delighted instructor, pointing upward. A small clear burst of blue experience sparks rises ABOVE the trainee's head and becomes a bright gold upward level-up emblem. Near the instructor's hand, a compact parchment card shows exactly TWO simple green training-progress meters with a small sword icon and running-foot icon, no text or made-up numbers. The progress card is a visual metaphor, not a fake game UI screenshot. Keep the title dominant and readable, the characters expressive, the training action and upward progress immediately understandable. Weathered wind turbine silhouettes and sunset dust in the distance.\nOriginal composition. Harmonize with a STACK SORT cover using the same palette, typography and mascot family. No extra slogans, no watermarks, no unrelated brand logos. Perfect spelling of the four title words; no garbled text.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "SkillLevelUpInfo/preview.jpg",
+      "prepared_bytes": 719078,
+      "prepared_sha256": "92a48392f8083aead3c590ba4d4b6b457d0baa9bd05c7f6c4d7c9b83977cd2e5",
+      "prepared_gameplay_images": 3
+    },
+    {
+      "mod": "StackSort",
+      "title": "STACK SORT",
+      "mcm_badge": true,
+      "image": "images/StackSort/000_LEOPARD_Cover.png",
+      "sha256": "15395ff2f2bae2320e55109f427a3314bc2aaca9f625ba13c71046aea5315543",
+      "bytes": 3216185,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing / illustration-story.\nCreate ONE finished 16:9 landscape illustrated cover for a Kenshi game mod, intended as a Steam/Nexus gallery header. Exact main title: \"STACK SORT\". Make it extremely legible even as a small thumbnail, large distressed condensed golden-ochre letters with dark ink outlines on a worn black brushstroke banner across the upper quarter. A small tasteful \"MCM\" badge is the only other text.\nArt direction: a coherent premium wasteland comic poster, sepia parchment grain, scratched rusty metal, bold hand-inked outlines, burnt orange sunset, dusty ochres, charcoal shadows, painterly detail and dry humor. Similar visual language to humorous illustrated Kenshi mod covers with oversized worn headlines, rusty skeleton characters, desert settlements and practical gameplay metaphors. Original composition and original mascot.\nScene: a cobbled-together Kenshi-style mechanical skeleton wearing a dented samurai helmet and faded scarf stands at a battered inventory workbench. The scene clearly communicates organizing and stacking inventory: one side of an open metal-grid backpack tray is messy with medicine tins, metal plates, cloth rolls and tools; the other side is neatly packed with aligned stacks and a large rectangular space left free. The robot cheerfully rotates a rectangular supply case a quarter turn to fit the grid; show one clean curved arrow around that case. Keep the items plausible rugged Kenshi scavenger supplies rather than modern consumer products. Background: wind turbines, rough desert walls and hazy canyon settlement. Let the robot and backpack be large clear focal shapes; controlled detail, high contrast, generous margins.\nThis is cover illustration, not an actual gameplay screenshot or a fabricated in-game interface. Do not depict invented settings menus. No extra slogans, no watermarks, no third-party logos. Correct exact spelling STACK SORT; no duplicate or garbled lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "StackSort/preview.jpg",
+      "prepared_bytes": 695151,
+      "prepared_sha256": "5eb991910c857502bfee5a1cf217b8518cd939d3a90eac3d4b8f559b4a19a4f8",
+      "prepared_gameplay_images": 0
+    },
+    {
+      "mod": "StatColours",
+      "title": "STAT COLOURS",
+      "mcm_badge": true,
+      "image": "images/StatColours/000_LEOPARD_Cover.png",
+      "sha256": "614e84ad953e903a9aaeb1ce9608df001f2ca41ce2c1eae96158347cf6342b1a",
+      "bytes": 3288997,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"STAT COLOURS\". Add one small engraved MCM badge beneath the title. Scene: A robot training examiner marks a rugged parchment character ledger with three simple large colored values: 10 in muted red, 50 in ochre, 90 in green. Gear tokens and an injury-bandage token explain changing attributes, clean visual hierarchy. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "StatColours/preview.jpg",
+      "prepared_bytes": 698743,
+      "prepared_sha256": "3ecb2d8026977d140d18dc37a3c711547976ea166a1af2865c964157cf136ff6",
+      "prepared_gameplay_images": 7
+    },
+    {
+      "mod": "UITweaks",
+      "title": "UI TWEAKS",
+      "mcm_badge": true,
+      "image": "images/UITweaks/000_LEOPARD_Cover.png",
+      "sha256": "21c1bb6caf680fd2863f7cf1faff3a21d2bbad10a194f8d50f72a1dc59cb1525",
+      "bytes": 3437331,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"UI TWEAKS\". Add one small engraved MCM badge beneath the title. Scene: A precise robot craftsman aligns a rugged brass control desk's crooked labels, uneven panels and tiny gauges using a ruler and wrench. The repaired portion is clean and readable; nearby gears run smoothly. A visual interface-polish metaphor. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "UITweaks/preview.jpg",
+      "prepared_bytes": 782048,
+      "prepared_sha256": "945ab8ca79896f9e7dbc216c741db806f023d102f4a7e2593cdc81f532a467b4",
+      "prepared_gameplay_images": 9
+    },
+    {
+      "mod": "Vital-Read",
+      "title": "VITAL READ",
+      "mcm_badge": true,
+      "image": "images/Vital-Read/000_LEOPARD_Cover.png",
+      "sha256": "14efd3dd9286ca67a69898c160b9709a8bc3bbac9ccc21db1c8d9602ab4c8ec8",
+      "bytes": 3312093,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"VITAL READ\". Add one small engraved MCM badge beneath the title. Scene: A mechanical squad medic reviews four small framed portrait plaques, each with one clear status pictogram such as a red medical cross, sleeping/downed symbol, empty food bowl and injured-leg symbol. Quiet desert camp, readable portraits and tiny icons. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Vital-Read/preview.jpg",
+      "prepared_bytes": 724471,
+      "prepared_sha256": "fe22f8693a06e984ea3b4acad7d9d0c8b6041911e46673ddc7a57af01e15937c",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "Vital-Sense",
+      "title": "VITAL SENSE",
+      "mcm_badge": true,
+      "image": "images/Vital-Sense/000_LEOPARD_Cover.png",
+      "sha256": "212e3b65d6f80c143cd757736020f41bb3c1e610d50b8e6cfef5d8a026a9b3a0",
+      "bytes": 2850551,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"VITAL SENSE\". Add one small engraved MCM badge beneath the title. Scene: A watchful robot scout scans a crowded desert outpost street with a simple brass optical device; restrained floating health, unconsciousness and bounty-coin pictograms reveal the states of several distant characters. No modern radar screens. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [
+        "Make a precise correction to this approved VITAL SENSE illustrated cover. Remove EVERY floating horizontal health bar or progress meter: all red/green/black bars above standing figures, the bar above the downed person, and the yellow horizontal line under the coin marker. Reconstruct the underlying street/sky seamlessly. This mod ONLY shows separate small STATE and BOUNTY ICONS, NEVER health bars. Keep a modest white sleeping/downed pictogram just above the lying person, a small red injured-leg pictogram above one wounded traveller, and the small gold bounty-coin pictogram above the rightmost figure. Ordinary unmarked bystanders have no markers. No rectangular gauges, outlines, percentages, health numbers or progress bars anywhere. Preserve the exact large VITAL SENSE title, brass MCM plaque, mechanical observer with optics, original illustration, colours, composition and all other details. Do not invent additional gameplay features."
+      ],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Vital-Sense/preview.jpg",
+      "prepared_bytes": 623708,
+      "prepared_sha256": "94d05f835e158a2f2c16716bb7905c9079aa306494f6cc72b731b43056942ebd",
+      "prepared_gameplay_images": 3
+    },
+    {
+      "mod": "Wall-B-Gone",
+      "title": "WALL-B-GONE",
+      "mcm_badge": true,
+      "image": "images/Wall-B-Gone/000_LEOPARD_Cover.png",
+      "sha256": "3c8bc678e82b9793c1be15fecf30609442e273a68c636756e9b5b0b991e4024d",
+      "bytes": 3648237,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"WALL-B-GONE\". Add one small engraved MCM badge beneath the title. Scene: A robot builder neatly dismantles one unwanted adobe wall section with a practical demolition tool; blocks stack safely in a small pile, opening a useful doorway in the outpost. No huge explosion, no supernatural magic. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "Wall-B-Gone/preview.jpg",
+      "prepared_bytes": 786700,
+      "prepared_sha256": "826e608faf6e47cfa7fe98a17690728314e5e7be2cb233c2e6149a2d054e68b7",
+      "prepared_gameplay_images": 1
+    },
+    {
+      "mod": "WantedMap",
+      "title": "WANTED MAP",
+      "mcm_badge": true,
+      "image": "images/WantedMap/000_LEOPARD_Cover.png",
+      "sha256": "57df193e66dde7c40630e681beb6e1a774459c3e35af5e4e41b064027ec7ca11",
+      "bytes": 3428557,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"WANTED MAP\". Add one small engraved MCM badge beneath the title. Scene: A robot bounty tracker connects a weathered wanted poster to a marked town on a parchment desert map using a red pin and thread. Compass, footprints and a distant fugitive silhouette provide a clear tracking story. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
+      "edit_prompts": [],
+      "visual_review": "title, badge and feature depiction checked",
+      "development_only": false,
+      "prepared_preview": "WantedMap/preview.jpg",
+      "prepared_bytes": 753515,
+      "prepared_sha256": "b7aebb1f110a62d7233681e3c51244f8d5b7aece94d5e83a788dd31a147a7163",
+      "prepared_gameplay_images": 4
+    }
+  ],
+  "archived_upstream_covers": [
+    {
+      "mod": "Wall-B-Gone",
+      "filename": "01_1863-1770477237-1305011772~1.jpg",
+      "sha256": "ea14ed02a22c746ab7a7da897dbec95b4d57166f6e84a2136896f41eefb83006"
+    },
+    {
+      "mod": "Auto-Pause-on-Load",
+      "filename": "01_1867-1770887551-475961591~1.jpg",
+      "sha256": "26c0cca4c62842c3668b43adbe6a0b8cf439e765b2d2e0760c158bf6c0b3f42b"
+    },
+    {
+      "mod": "Loot-Scoot-Execute",
+      "filename": "01_1871-1771794988-1974066368~1.jpg",
+      "sha256": "38a5acafa5d9102a55aa6bef7d7c18b0fe9bf2daf6b99ad480c1b9a022ad4e48"
+    },
+    {
+      "mod": "Vital-Sense",
+      "filename": "01_1873-1772310258-1656518999~1.jpg",
+      "sha256": "51611727cd8451e01ce2946e984a646b0592630205c0a1bc119becdd3f310d39"
+    },
+    {
+      "mod": "Organize-the-Trader",
+      "filename": "00_1886-1773000857-833590989~1.jpg",
+      "sha256": "af3bb0a52059c050d0dc4dd2ce58ff9e83de32ebd9ba7b2c4bc39322c7269c2b"
+    },
+    {
+      "mod": "Job-B-Gone",
+      "filename": "01_1870-1771442062-51425151~1.jpg",
+      "sha256": "c3b6dd37e218920281e6b4e032be3fd1bcc7cbe93ef9055f72e04e5a3f4ada8a"
+    },
+    {
+      "mod": "Map-markers",
+      "filename": "01_1887-1773092752-2027490854~1.jpg",
+      "sha256": "4b150048c1f3e3d6b05a3af3cb4a9c3ac1da0f90fd406dfb3a80c1864ff3600c"
+    },
+    {
+      "mod": "Vital-Read",
+      "filename": "02_1910-1774765912-1932001944.jpg",
+      "sha256": "156dce02d36bf0f9095be7851a4108a583677ebc1169690dfed38b1bd045fd10"
+    }
+  ],
+  "publication": "Local preparation only; no uploads or version changes",
+  "rules": [
+    "Original cover illustrations, separate from gameplay screenshots.",
+    "MCM plaque on supported plugins; Dark UI Advanced has none.",
+    "Depict actual features; Vital Sense has state/bounty icons, never health bars.",
+    "Keep cover first by filename; preserve original screenshots.",
+    "New mods receive the same approved series style."
+  ]
+}
