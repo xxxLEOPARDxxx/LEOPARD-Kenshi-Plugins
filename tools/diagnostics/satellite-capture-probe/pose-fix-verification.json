@@ -2,7 +2,7 @@
   "utc": "2026-10-31T22:51:34.754737+00:00",
   "dll_sha256": "ac91b11ff6f91582763d0cd2ec67a0be282874901070bddbadf8f79c7c5a62ca",
   "bytes": 88576,
-  "status": "Candidate built and independently reviewed; not installed/runtime tested",
+  "status": "Installed and live floating-origin regression checked; full renderer incomplete",
   "red": [
     "live floating-origin shift must not displace cloned view by51km",
     "root with further ancestors refused"
@@ -60,5 +60,44 @@
     "OwnedCameraPose.h": "6ceff1c69c279956edf300d63972dc415dffba6272a0706e3b5efe8b7f9efd89",
     "pose_tests.cpp": "07b91bb510b3fdc298fccb288a4dcc0e3faff1c2404861f8539c3f7dda837af9",
     "build.ps1": "054f40b8b3cf5aff367444b310fb05b9add8452a3f30b5a65d42e1bcd0ce5acd"
+  },
+  "runtime": {
+    "pid": 6628,
+    "start_utc": "2026-10-31T22:54:02.5161986Z",
+    "dll_sha256": "ac91b11ff6f91582763d0cd2ec67a0be282874901070bddbadf8f79c7c5a62ca",
+    "parent_cache_after_clone": [
+      51212.375,
+      0,
+      -2622.64819
+    ],
+    "parent_cache_pre_shot": [
+      51212.375,
+      0,
+      -2622.64819
+    ],
+    "main_position": [
+      -59.3176193,
+      3471.99097,
+      1954.63232
+    ],
+    "owned_position": [
+      -59.3164063,
+      3471.99097,
+      1954.63208
+    ],
+    "view_delta_pre_shot": 0.0927734375,
+    "projection_delta": 0,
+    "nonfinite_entries": 0,
+    "acceptance": "Spurious floating-origin shift removed; Hub visible. No exact-matrix/performance/full-renderer claim.",
+    "images": [
+      {
+        "name": "probe_6628_52995390_1_mode1_final.bmp",
+        "sha256": "34e99b46d8dfd83c2898d8ff9718dabe70861238f98d028c439ddd443cbb9bff"
+      },
+      {
+        "name": "probe_6628_52995390_1_mode1_gbuffer0_raw.bmp",
+        "sha256": "33e2386bcaced381f1422361fe02c4da7d26fbcf03efb9faf71610e47b343355"
+      }
+    ]
   }
 }

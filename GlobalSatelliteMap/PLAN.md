@@ -76,4 +76,7 @@ Matrix baseline subsequently proved the clone defect: new-node cached translatio
 view delta rose from0.049 to50057.6874 while projection stayed equal. OwnedCameraPose now
 refreshes only its explicitly bounded root/owned ancestry before conversion, via public
 Ogre getter. Production regression first reproduced the live offset; correction and ancestry
-refusal tests pass. Live same-view acceptance is still required before advancing lighting.
+refusal tests pass. Live check subsequently confirmed stable parent cache and camera pose,
+view delta0.0927734 instead of50057.6874, about1.24mm positional difference and a visible
+Hub image from the cloned camera. Exact matrix equality is not claimed. Next: private
+orthographic depth reconstruction and image-based/native-lighting validation.

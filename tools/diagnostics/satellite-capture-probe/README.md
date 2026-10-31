@@ -73,7 +73,14 @@ setters invalidate its view cache; no raw-field writes or extra invalidate call 
 The extracted production helper reproduced the live51km defect (RED), then passed floating
 origin changes, borrowed-resource refusal, ancestry bounds and exception-before-write tests.
 The reviewed fixture models ancestor refresh, rather than pretending only one node changes.
-Runtime acceptance of this correction remains pending. Orthographic lighting is separate.
+Runtime check of this correction succeeded in process6628/startUTC2026-10-31T22:54:02.5161986Z,
+installed DLL SHA256 `ac91b11ff6f91582763d0cd2ec67a0be282874901070bddbadf8f79c7c5a62ca`.
+Parent cached translation is now correct immediately after cloning and remains stable at
+pre-shot. Main/owned positions differ by about0.00124m; view delta stays0.0927734 instead
+of jumping to50057.6874, projection delta0/nonfinite0. A mode1 image again shows Hub
+terrain and buildings. Exact matrix equality is not claimed (camera quaternion rounding
+remains); this confirms removal of the spurious floating-origin shift only. Orthographic
+lighting, shadows/fog/water and full-world coverage remain separate unfinished stages.
 
 This is a feasibility experiment for the requested global 4×4 atlas of 8192-square tiles and a native dynamic layer. It does not implement that full feature and does not generate any map art automatically. Source, build products, diagnostics and tests stay in this private directory. No global-map viewer/shared source files were changed during this spike.
 
