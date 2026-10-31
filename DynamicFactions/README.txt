@@ -105,6 +105,8 @@ DEVELOPMENT REFERENCES
 docs/superpowers/specs/2026-10-30-dynamic-factions-fair-simulation.md
 docs/superpowers/plans/2026-10-30-dynamic-factions-economy-foundation.md
 docs/dependencies/kenshilib-sdk-audit-2026-10-30.md
+docs/dependencies/2026-10-31-dynamic-factions-native-ai.md
+docs/superpowers/plans/2026-10-31-dynamic-factions-supplies.md
 
 ПРОВЕРКА ХРАНИЛИЩА МАГАЗИНА / SHOP STOCK CHECK
 
@@ -146,3 +148,30 @@ worker deadline. Actual worker movement remains the progress criterion.
 Физический запас магазина и save/load после сделки ещё требуют приёмки.
 The user confirmed the currency popup when selling to the barman. Physical
 shop stock and save/load after the trade still await acceptance.
+
+ПРОВЕРЕНО31.10 / VERIFIED31 OCTOBER
+
+В отдельном DF-earned-20261031 после обычной загрузки без импорта восстановлены
+та же фракция из6участников и14578катов (14000+578). В настоящих рюкзаках двух
+покупателей найдены все6сохранённых единиц:5железа и1медь. Для этого случая
+повторная выдача/оплата не наблюдалась. Сохранение с грузом в пути, повторные
+загрузки и остальные пограничные случаи ещё не закрыты.
+The isolated DF-earned-20261031 reload restored the same six-member faction
+and14578cats (14000+578). The two buyers' physical backpacks retained all six
+saved units: five iron and one copper. No repeated grant/payment was observed
+in this case. In-transit saves, repeated reloads and other boundaries remain open.
+
+СНАБЖЕНИЕ В РАЗРАБОТКЕ / SUPPLIES IN DEVELOPMENT
+
+Штатная подпитка NPC выявлена, но ещё не отключена: живым участникам нужны
+реальная еда и закупки. Проверена отдельная чистая политика резерва DfBudget;
+она пока не подключена к игровым закупкам. Рюкзаки, мародёрство и улучшение
+экипировки по роли/навыкам входят в план, а не в готовые возможности C7.
+Основой исполнения остаются штатные действия Kenshi; свежая Squad Autonomy
+из GitHub изучена как справочник. Её код и player/NPC-переключатели не переносились.
+Native NPC hunger replenishment is identified but not yet disabled; organic
+members need real food and procurement. The tested pure DfBudget reserve
+policy is not yet connected to live purchases. Backpacks, looting and upgrades
+matching roles/skills are planned, not finished C7 features. Native Kenshi
+actions remain the execution layer. Current GitHub Squad Autonomy was studied
+as a reference; its code and player/NPC switches have not been imported.
