@@ -18,3 +18,35 @@ Prove orthographic/global projection and fixed exposure on a small terrain/hill/
 ## Constraints / review focus
 
 Existing APIs: MapScreen::update and worldToMapCoords; SaveFileSystem::loadGame/newGame/getActiveSave; Ogre's native BC1 image/texture loader. Important risks: map window destroyed/recreated, same-slot reload, interrupted loads, marker stacking, zoom/scroll boundaries, corrupt DDS, memory exhaustion and synchronous disk/GPU stalls. First-stage source validation is bounded but can be expensive: it runs only on explicit enabling/reload with a genuine manifest, never every frame. No runtime performance claims before measurement.
+
+
+## Active capture phase, 2026-11-01 (DF development paused)
+
+The user explicitly switched the active task to real satellite rendering after
+the final focused DF retry correction. The old viewer remains disabled and
+uninstalled; it is not the completed satellite feature.
+
+Canonical one-shot diagnostic source: tools/diagnostics/satellite-capture-probe.
+Root installed only that temporary diagnostic under game/mods/Codex Satellite
+Capture Probe, with an exact mods.cfg backup and a separate SAT-render-proof
+save copy. The RE log confirms the corrected C++ startup entry and native byte
+profile. First actual manual mode0 request reached Ogre but failed before a
+capture: createCamera already attaches to Root SceneNode and attachObject
+therefore rejected the second attachment. No image was created.
+
+The matching SDK documents this behavior explicitly. The production ownership
+helper now transfers ONLY the newly created camera to the probe node, rejects
+the main camera and its node, and leaves all destruction to existing tracked
+cleanup. RED reproduced the existing-parent failure; GREEN11attachment tests,
+13projection/cleanup checks and55native imports. Corrected81408-byte DLL
+SHA256d8db85d1a8d4d7864b7a96cfbd92e8f124752b60e83e599396f3183095cf4a42
+was installed with the game closed. First successful mode0 capture is pending.
+No shader/game data file or native save was edited.
+
+Next: same paused camera with global map open, mode0 then1 (control geometry),
+then2/3/4 with the same fixed global cell. Inspect final/GBuffer evidence and
+normal-view restoration after each. Obtain an actual512image before extending
+to8192, acquiring render-only remote geometry or claiming illumination solved.
+The native deferred shaders reconstruct perspective radial depth; plain
+PT_ORTHOGRAPHIC still does not establish correct lighting. Existing root/distant
+render geometry does not establish complete unloaded/player/modded structures.
