@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-30",
+  "date": "2026-10-31",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -14,7 +14,7 @@
     "RecruitMarkers": {
       "nexus": 2232,
       "workshop_id": 3820514162,
-      "version": "3"
+      "version": "4"
     },
     "BetterLooting": {
       "nexus": 2218,
@@ -24,7 +24,7 @@
     "UITweaks": {
       "nexus": 2192,
       "workshop_id": 3812150876,
-      "version": "10"
+      "version": "11"
     },
     "ModConfigMenu": {
       "nexus": 2202,
@@ -39,7 +39,7 @@
     "SkillLevelUpInfo": {
       "nexus": 2257,
       "workshop_id": 3829848328,
-      "version": "1"
+      "version": "2"
     },
     "MultiXPMining": {
       "nexus": 2258,
@@ -114,7 +114,7 @@
     "Organize-the-Trader": {
       "nexus": 2212,
       "workshop_id": 3813852189,
-      "version": "5"
+      "version": "6"
     },
     "Vital-Read": {
       "nexus": 2213,
@@ -134,7 +134,12 @@
     "StackSort": {
       "nexus": 2262,
       "workshop_id": 3830285370,
-      "version": "1"
+      "version": "2"
+    },
+    "BestMinimap": {
+      "nexus": 2242,
+      "workshop_id": 3824087152,
+      "version": "2"
     }
   }
 }
