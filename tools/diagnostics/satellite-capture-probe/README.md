@@ -45,14 +45,35 @@ evidence under game/_codex_work/global-satellite-20261101/controls-31268/manifes
 - After mode4, the global map and original perspective background remain visible.
   This does not prove quantitative FPS, long-memory, save/load or unloaded-world coverage.
 
-Next diagnostic build: manual-request-only pose/matrix telemetry, no corrective pose refresh.
+The telemetry build added manual-request-only pose/matrix samples, no corrective pose refresh.
 Node convertWorldToLocalPosition/Orientation read cached derived transforms, which the SDK
 does not guarantee immediately after createChildSceneNode. Mode1 copies at creation, while
 orthographic Aim repeats in the compositor callback. NodeSample records cached/local parent
 data before copying; after-clone, before-aim and pre-shot record view/projection, culling/LOD
-camera identity and nonfinite-entry count. No Node *Updated getter is called, since it could
+camera identity and nonfinite-entry count. That build called no Node *Updated getter, since it could
 hide the baseline. Native review confirms camera getters update only camera caches. No new
-long-lived ownership or frame-wide scan is added. Installation/live matrix evidence pending.
+long-lived ownership or frame-wide scan was added.
+
+### Floating-origin cause established and candidate correction
+
+Telemetry DLL SHA256 `67a2fcb75095c55b3fedc1013871f669e39e86379bc02583519c79a026449c8c`
+ran in process7664/startUTC2026-10-31T22:44:16.6138408Z. Newly allocated ownNode cached
+translation was0,0,0 at clone. Main and owned camera initially had the same derived position
+230.612732,3120.27393,2399.58643 (view delta0.0491943). Before rendering, normal node update
+changed the parent's cached translation to51212.375,0,-2622.64819. Owned derived position
+became51442.9883,3120.27393,-223.061768, while main remained unchanged; view delta50057.6874.
+Projection delta was0 and nonfinite count0 throughout. Thus copying with stale parent caches
+applies the floating-origin translation twice; this explains the incorrect mode1 viewpoint.
+
+`OwnedCameraPose.h` now refreshes the owned node's derived cache before converting/copying.
+It accepts only the owned camera, its own node and that node's direct scene-root parent,
+and refuses a root with further parents. The public getter may refresh the root/owned
+ancestry and call node listeners; it never traverses all scene children. Ordinary camera
+setters invalidate its view cache; no raw-field writes or extra invalidate call are needed.
+The extracted production helper reproduced the live51km defect (RED), then passed floating
+origin changes, borrowed-resource refusal, ancestry bounds and exception-before-write tests.
+The reviewed fixture models ancestor refresh, rather than pretending only one node changes.
+Runtime acceptance of this correction remains pending. Orthographic lighting is separate.
 
 This is a feasibility experiment for the requested global 4×4 atlas of 8192-square tiles and a native dynamic layer. It does not implement that full feature and does not generate any map art automatically. Source, build products, diagnostics and tests stay in this private directory. No global-map viewer/shared source files were changed during this spike.
 

@@ -70,3 +70,10 @@ cull/LOD and nonfinite-entry telemetry at clone/before-aim/pre-shot. It delibera
 not refresh the new node before baseline: actual Ogre convertWorldToLocal reads cached
 parent data directly. After this measurement, select one corrective transform experiment.
 The perspective radial-depth lighting limitation remains independent of this clone defect.
+
+Matrix baseline subsequently proved the clone defect: new-node cached translation0 became
+51212.375,0,-2622.64819 before rendering, adding that shift to the copied camera position;
+view delta rose from0.049 to50057.6874 while projection stayed equal. OwnedCameraPose now
+refreshes only its explicitly bounded root/owned ancestry before conversion, via public
+Ogre getter. Production regression first reproduced the live offset; correction and ancestry
+refusal tests pass. Live same-view acceptance is still required before advancing lighting.

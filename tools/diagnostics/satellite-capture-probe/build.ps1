@@ -24,5 +24,9 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/attachment_tests.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/pose_tests.exe" "/Fo$out/pose_tests.obj" "$PSScriptRoot/pose_tests.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/pose_tests.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

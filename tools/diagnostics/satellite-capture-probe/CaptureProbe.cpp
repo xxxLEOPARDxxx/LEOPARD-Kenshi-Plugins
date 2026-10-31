@@ -44,6 +44,7 @@
 #include "GuardProfile.h"
 #include "ProbePolicy.h"
 #include "OwnedCameraAttachment.h"
+#include "OwnedCameraPose.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -745,8 +746,8 @@ void Update(MapScreen *map)
         if(!ProbeOwnership::AttachOwnedCamera(own,c,ownNode))
             throw std::runtime_error("owned camera attachment refused");
         NodeSample("before-clone", ownNode);
-        own->setPosition(ownNode->convertWorldToLocalPosition(c->getDerivedPosition()));
-        own->setOrientation(ownNode->convertWorldToLocalOrientation(c->getDerivedOrientation()));
+        if (!ProbeOwnership::CopyOwnedCameraPose(own,c,ownNode,renderer->scene->getRootSceneNode()))
+            throw std::runtime_error("owned camera pose ancestry refused");
         own->setOrthoWindow(c->getOrthoWindowWidth(), c->getOrthoWindowHeight());
         own->setProjectionType(c->getProjectionType());
         own->setFOVy(c->getFOVy());

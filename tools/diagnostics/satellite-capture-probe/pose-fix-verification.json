@@ -1,0 +1,64 @@
+{
+  "utc": "2026-10-31T22:51:34.754737+00:00",
+  "dll_sha256": "ac91b11ff6f91582763d0cd2ec67a0be282874901070bddbadf8f79c7c5a62ca",
+  "bytes": 88576,
+  "status": "Candidate built and independently reviewed; not installed/runtime tested",
+  "red": [
+    "live floating-origin shift must not displace cloned view by51km",
+    "root with further ancestors refused"
+  ],
+  "green": {
+    "policy": 13,
+    "attachment": 11,
+    "production_pose": 13,
+    "native_imports": 63,
+    "source_contracts": "passed",
+    "diff_check": "passed"
+  },
+  "review": "global_satellite_research: final review clear after native ancestor-refresh model and explicit root bound",
+  "baseline": {
+    "pid": 7664,
+    "start_utc": "2026-10-31T22:44:16.6138408Z",
+    "dll_sha256": "67a2fcb75095c55b3fedc1013871f669e39e86379bc02583519c79a026449c8c",
+    "before_clone_parent_translation": [
+      0,
+      0,
+      0
+    ],
+    "pre_shot_parent_translation": [
+      51212.375,
+      0,
+      -2622.64819
+    ],
+    "main_derived": [
+      230.612732,
+      3120.27393,
+      2399.58643
+    ],
+    "owned_pre_shot_derived": [
+      51442.9883,
+      3120.27393,
+      -223.061768
+    ],
+    "view_delta_after_clone": 0.0491943359,
+    "view_delta_pre_shot": 50057.6874,
+    "projection_delta": 0,
+    "nonfinite_entries": 0,
+    "images": [
+      {
+        "name": "probe_7664_52424765_1_mode1_final.bmp",
+        "sha256": "09f757ece3ee94f5041f8a37a95373ddfd07167b5a442cab06aca273e90d1831"
+      },
+      {
+        "name": "probe_7664_52424765_1_mode1_gbuffer0_raw.bmp",
+        "sha256": "d98560cad6736269cf7a9c883612df31dd6206dd94c918974ab83d9eb613b166"
+      }
+    ]
+  },
+  "sources": {
+    "CaptureProbe.cpp": "bfefd81d46a20b55c308ad7fd9c4605cf5a0581709c7507e14598190c408f3ea",
+    "OwnedCameraPose.h": "6ceff1c69c279956edf300d63972dc415dffba6272a0706e3b5efe8b7f9efd89",
+    "pose_tests.cpp": "07b91bb510b3fdc298fccb288a4dcc0e3faff1c2404861f8539c3f7dda837af9",
+    "build.ps1": "054f40b8b3cf5aff367444b310fb05b9add8452a3f30b5a65d42e1bcd0ce5acd"
+  }
+}
