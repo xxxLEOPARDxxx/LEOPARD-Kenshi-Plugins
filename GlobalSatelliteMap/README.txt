@@ -13,7 +13,8 @@ Save identity = SHA256 of sorted "<relative native file>\n<SHA256>\n" records fo
 
 Pending: native dynamic sun/shadows/lamps, geometry-only DistantTown/render proxy audit, loaded/unloaded/player/modded building coverage, real orthographic/global capture, fixed exposure, overlap and seam-safe mip generation/sampling, capture generation tool, UI skin/input/marker acceptance and actual CPU/FPS/memory tests. Two day/night screenshots are NOT a substitute for native lighting. Never force-activate the world for this renderer. Existing DistantTown models are promising but complete/updated coverage has not been proved.
 
-Build: powershell -ExecutionPolicy Bypass -File D:/DEV/Kenshi/ours/build.ps1 -SrcDir D:/DEV/Kenshi/ours/GlobalSatelliteMap -Name GlobalSatelliteMap
+Build: powershell -ExecutionPolicy Bypass -File D:/DEV/Kenshi/ours/GlobalSatelliteMap/build.ps1
+The scoped build and test runner inspect the actual resulting PE export table: RE_Kenshi Plugins.cpp:43 requires ?startPlugin@@YAXXZ (C++), while MCM requires MCM_Describe (C). Native imports are checked against installed DLL exports. An undecorated C startPlugin does not initialize under this loader, even if linking succeeds.
 Tests: powershell -ExecutionPolicy Bypass -File GlobalSatelliteMap/tests/run_tests.ps1
 Then: python GlobalSatelliteMap/tests/source_contracts.py
 VC10 x64 /GL + /LTCG, official local KenshiLib bindings. No installer/release package is supplied. Runtime MO catalogs only; PO files remain source material.

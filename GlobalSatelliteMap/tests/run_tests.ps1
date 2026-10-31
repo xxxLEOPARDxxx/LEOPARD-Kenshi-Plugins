@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+$python='C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
 $base = Split-Path $PSScriptRoot -Parent
 $out = 'D:/DEV/Kenshi/research/global-satellite-20261031/policy-tests'
 New-Item -ItemType Directory -Force -Path $out | Out-Null
@@ -14,4 +15,8 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/validation_tests.exe" "/Fo$out/" "$base/tests/validation_tests.cpp" "$base/CaptureValidation.cpp"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & "$out/validation_tests.exe"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $python "$base/tests/source_contracts.py"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $python "$base/tests/test_pe_contract.py" 'D:/DEV/Kenshi/build/GlobalSatelliteMap/GlobalSatelliteMap.dll' --mcm --imports-root 'D:/SteamLibrary/steamapps/common/Kenshi'
 exit $LASTEXITCODE

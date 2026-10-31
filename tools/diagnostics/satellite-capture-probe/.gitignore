@@ -1,0 +1,4 @@
+build/
+*.bmp
+loader-contract.json
+__pycache__/

@@ -540,7 +540,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api *api)
                 Tr("Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."), 0,
                 0);
 }
-extern "C" __declspec(dllexport) void startPlugin()
+// RE_Kenshi resolves the decorated C++ name ?startPlugin@@YAXXZ.
+__declspec(dllexport) void startPlugin()
 {
     Settings();
     if (KenshiLib::SUCCESS !=

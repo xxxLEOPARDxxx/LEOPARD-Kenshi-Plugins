@@ -1,0 +1,32 @@
+{
+  "dll": "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\build\\SatelliteCaptureProbe.dll",
+  "bytes": 81408,
+  "sha256": "d8db85d1a8d4d7864b7a96cfbd92e8f124752b60e83e599396f3183095cf4a42",
+  "startup_export": "?startPlugin@@YAXXZ",
+  "mcm_export": null,
+  "native_imports": {
+    "KenshiLib.dll": 16,
+    "OgreMain_x64.dll": 39
+  },
+  "status": "built camera-attachment correction; not installed or invoked by this agent",
+  "utc": "2026-10-31T22:11:48.399679+00:00",
+  "red": "build/attachment-RED.txt: FAIL already attached newly created camera transfers safely",
+  "green": {
+    "production_attachment_checks": 11,
+    "prior_policy_checks": 13,
+    "source_contracts": "passed",
+    "native_imports_total": 55
+  },
+  "source_proof": [
+    "matching OgreCamera.h:74-76",
+    "matching OgreSceneManager.h:1183-1186",
+    "OwnedCameraAttachment.h used by actual CaptureProbe.cpp camera creation"
+  ],
+  "source_sha256": {
+    "CaptureProbe.cpp": "1d7747c299217bb71353a8e3df4b06c6cada4f3ba878fd66314a0f6f63bce819",
+    "OwnedCameraAttachment.h": "d44ef54bbc926641ed7083ee276066a15ea491391d8ddc756d14523e64629d7a",
+    "attachment_tests.cpp": "6931f1e7c19100db984f3dc7ac0af4631721888ca89072fccfe6f08fa0ef0692",
+    "build.ps1": "dac58766a2c0a290e8a2be174eea0064dc5872351f27114d2490cf2a39f30784",
+    "source_contracts.py": "b22bf128b8badd2aff9937255562dfe02eaaa662eff900a20e787237e55ae940"
+  }
+}
