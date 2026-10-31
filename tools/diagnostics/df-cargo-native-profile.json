@@ -1,0 +1,38 @@
+{
+  "game_image_sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
+  "guards": {
+    "0x296b40": "488d4110c3",
+    "0x5e1450": "488b81e8020000c3",
+    "0x76b320": "488b8190020000c3",
+    "0x37db00": "8b8188000000c3",
+    "0x2e71d0": "488d8108020000c3",
+    "0xd1d30": "488b4140c3",
+    "0x748cc7": "6644896c24306644896424320fb78f3001000066894c24340fb78f3401000066894c2436"
+  },
+  "target_faction_prototype_sid": "1-DynamicFactions.mod",
+  "verified_fields": {
+    "GameWorld.factionMgr": "4a8 SDK/current native wrapper existing evidence",
+    "Faction.data": "240 SDK; prototype SID data+58",
+    "Faction.name": "1a8 SDK",
+    "Faction.ownerships": "80 SDK + Character::getOwnerships794b2b",
+    "Ownerships.money": "88 native37db00",
+    "Faction.activePlatoons": "208 native2e71d0",
+    "Faction.unloadedPlatoons": "220 SDK",
+    "Platoon.activePlatoon": "1d8 SDK",
+    "ActivePlatoon.me": "78 SDK/native794b48",
+    "ActivePlatoon.things": "50 SDK RootObjectContainer",
+    "Character.inventory": "2e8 native5e1450",
+    "ContainerItem.inventory": "290 native76b320",
+    "Inventory.allItems": "10 native296b40; borrowed lektor count8/cap12/ptr16",
+    "Inventory.sectionsInSearchOrder": "68 SDK/nativeShopTrader ctor reading+78",
+    "Inventory.owner": "88 native7450b0",
+    "InventorySection.items": "40/48/50 begin/end/cap,16byte records; native748cc2..748d6a",
+    "Item.quantity": "12c native74552c/951aa1",
+    "Item.dimensions": "130/134 native748cd3/748cdf; physical SectionItem w/h native748cda/748ce6",
+    "Item.full_charges/current_charges": "114/118 native7a848c..7a8498 + constructor75f31e/75f3b2",
+    "Item.properOwner/currentInventoryHand": "140/160 nativegettersd2110/595ab0",
+    "RootObjectBase.handle/position": "58/48 SDK + nativeD1DC0",
+    "GameData.sid/name/type": "58/28/50 SDK and prior read-only evidence"
+  },
+  "code_source": "Installed KenshiLib export stubs -> Steam_1.0.65.br; local unpacked executable only; no process access"
+}
