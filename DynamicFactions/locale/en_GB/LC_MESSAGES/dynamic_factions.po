@@ -203,3 +203,21 @@ msgstr "Mine real resources, carry ore and sell it to town traders. Food supply 
 
 msgid "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
 msgstr "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
+
+msgid "Supply run: %s; spent this session: %d"
+msgstr "Supply run: %s; spent this session: %d"
+
+msgid "Bought first-aid supplies for %d cats"
+msgstr "Bought first-aid supplies for %d cats"
+
+msgid "Bought repair supplies for %d cats"
+msgstr "Bought repair supplies for %d cats"
+
+msgid "Bought a backpack for %d cats"
+msgstr "Bought a backpack for %d cats"
+
+msgid "A faction in the Hub mines and sells real ore, buys food, medical supplies and suitable backpacks, and hires recruits from its actual budget. No passive income."
+msgstr "A faction in the Hub mines and sells real ore, buys food, medical supplies and suitable backpacks, and hires recruits from its actual budget. No passive income."
+
+msgid "Mine real resources, carry ore and sell it to town traders. Supply runs continue when work is disabled."
+msgstr "Mine real resources, carry ore and sell it to town traders. Supply runs continue when work is disabled."

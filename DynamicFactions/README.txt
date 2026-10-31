@@ -1,4 +1,4 @@
-Dynamic Factions - development build / рабочая сборка 30.10.2026
+Dynamic Factions - development build / рабочая сборка 31.10.2026
 
 Требуется RE_Kenshi с KenshiLib 0.5.0; поддержка MCM необязательна.
 Это проверочная сборка одной фракции в Хабе, не публичный релиз.
@@ -232,3 +232,93 @@ This verifies one cycle; no-food consequences, other races and long FPS/memory
 acceptance remain open. Backpack
 procurement, looting, role-based gear and the full optional-upgrade reserve
 forecast are later stages. Squad Autonomy code/player-NPC switches were not copied.
+
+
+C9: медикаменты, первый рюкзак и резерв (31.10.2026, НЕ РЕЛИЗ)
+
+Единый маршрут снабжения теперь покупает настоящие аптечки для живых,
+ремкомплекты для скелетов и биологических персонажей с протезами, а затем
+первый подходящий рюкзак. Еда важнее медикаментов и снаряжения; новый голод
+может прервать текущий поход. Штатные лечение, сон, спасение и бой сохраняют
+приоритет. Покупки оплачиваются из настоящей казны в настоящий кошелёк лавки.
+
+Сначала учитываются уже имеющиеся остатки и рюкзаки. При выборе рюкзака
+проверяются вместимость, стаки, вес, снижение веса, штрафы скорости/боя/скрытности
+и расовые ограничения. Лёгкие персонажи отказываются от тяжёлых штрафов.
+Свой рюкзак из основного инвентаря надевается штатным Inventory::equipItem.
+Отказ надевания оставляет вещь на месте и не вызывает повторную покупку.
+Вложенные рюкзаки не извлекаются автоматически; замена занятого рюкзака,
+апгрейды оружия/брони и мародёрство остаются следующими этапами.
+
+Фракция узнаёт цены и ассортимент только при физическом посещении лавки.
+В резерв входят дефицит еды/медикаментов, обещанные наймы и запас не меньше
+1000 катов (250 на участника, если больше). Уже имеющиеся припасы убирают
+дефицит. Реальные конечные количества распределяются между всем составом;
+один общий склад нескольких продавцов не считается несколько раз. Неполный
+или устаревший расчёт откладывает плановые покупки. Еда может использовать
+резерв выживания, но не обещанные деньги найма.
+
+Техническая проверка: 1276 проверок ядра, 40 маршрута, 37 инвентаря,
+35 предложений/транзакций, 23 рынка, 20 рюкзаков и 39 жизненного цикла.
+Все прошли; итоговая DLL совместимо собрана, 132 импорта сверены с реальными
+экспортами установленных KenshiLib/Ogre/MyGUI, привязка голода проверена в PE.
+Независимое ревью исправило учёт конечного/общего склада, защиту сохранения
+при надевании и временное владение памятью на аварийном пути.
+
+Перф: шаг по-прежнему раз в 5 секунд, одна покупка и до четырёх кандидатов
+плюс активный снабженец. Кэш до 32 лавок по 128 записей, срок 120 секунд;
+содержит только SID, полные идентификаторы складов и числовые котировки.
+Все просмотренные склады регистрируются до заполнения списка предложений.
+Прогноз проверяет лимит 2 мс между обходами лавок/членов; это не гарантирует
+прерывание одного штатного вызова. При загрузке/смене мира runtime-кэш сбрасывается,
+владение и остатки вновь читаются из реальных предметов. Нативные объекты
+используются только в главном потоке.
+
+Игровая приёмка C9 ещё НЕ завершена: нужны настоящая покупка/надевание,
+сверка обоих кошельков и загрузка отдельного заработанного сохранения.
+Длительные FPS/память и скелетная фракция отдельно не проверены. Проверки
+исходников и ревью не доказывают отсутствие любых утечек.
+
+C9: medicine, an initial backpack and operating reserve (31 October 2026)
+
+This is an internal test build, NOT a public release. The existing single
+supply route now buys real first aid for organics, repair supplies for robots
+and biological prostheses, then a suitable initial backpack. Food precedes
+medical stock and gear, including hunger that begins during a gear trip.
+Native medical, rescue, sleep and combat tasks retain priority. Real faction
+funds pay the real shop purse; no items or income are generated.
+
+Owned supplies remove their deficits. Bag selection considers useful capacity,
+stacking, weight reduction, empty weight, athletics/combat/stealth penalties
+and native race restrictions. Light characters reject heavy penalties. An
+owned root-inventory bag is equipped through native Inventory::equipItem;
+refusal retains the item and prevents repurchase. Nested bags are not pulled
+out automatically. Replacing occupied bags, weapon/armour upgrades and looting
+remain later work.
+
+Market knowledge comes only from actual shop visits. The reserve protects
+remaining food/medicine deficits, recruitment commitments and at least1000cats
+(or250per member when larger). Limited observed quantities are shared across
+the whole faction; multiple shopkeepers cannot multiply their common stock.
+Incomplete or stale forecasts defer planned spending. Food can use survival
+reserves but cannot spend committed recruitment funds.
+
+Verification passed:1276core,40route,37inventory,35offer/transaction,23market,
+20bag and39session/lifecycle checks. The final compatible DLL build passed;
+132imports match installed KenshiLib/Ogre/MyGUI exports and the nonvirtual
+hunger PE binding is verified. Independent review led to finite/shared-stock
+allocation, reentrant-save protection around equip and non-owning POD storage
+across the native SEH count boundary.
+
+Performance/lifetime: one purchase per existing5-second step, at most four
+candidate stock reads plus the active supplier. Cache:32shops x128records,
+120-second freshness, value/identifier data only. Every backing pool is noted
+before offers fill the cap. Forecast checks its2ms budget between shops and
+members, without claiming it can interrupt a single native call. Runtime
+quotes/routes reset before world teardown and on load; possessions are reread.
+All native objects stay on the game thread.
+
+C9 live acceptance is still OPEN: real purchases/equip, both purses and a
+separate earned-save reload must be compared. Long FPS/memory runs and a
+skeleton faction remain untested. Source tests/review do not prove the absence
+of all leaks.

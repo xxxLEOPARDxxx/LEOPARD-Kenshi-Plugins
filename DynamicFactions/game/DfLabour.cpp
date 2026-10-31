@@ -293,7 +293,7 @@ std::string DfLabourStatus(const DfLabour& rt)
     int miners=0,haulers=0;DfLabourCounts(rt,miners,haulers);
     char b[256];sprintf_s(b,sizeof(b),Tr("Mining: %d; hauling: %d; cargo: %d; sales this session: %d"),miners,haulers,rt.carried,rt.revenue);
     std::string result(b);
-    std::string food(Tr("Food supply: %s; spent this session: %d"));
+    std::string food(Tr("Supply run: %s; spent this session: %d"));
     char spent[40];sprintf_s(spent,sizeof(spent),"%d",rt.provision.spent);
     size_t pos=food.find("%d");if(pos!=std::string::npos)food.replace(pos,2,spent);
     pos=food.find("%s");if(pos!=std::string::npos)

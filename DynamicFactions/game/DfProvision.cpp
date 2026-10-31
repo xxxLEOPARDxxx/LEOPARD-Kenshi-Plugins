@@ -24,29 +24,33 @@ namespace
         if(c!=NULL && rt.moving && DfGoalOf(c)==MOVE_ON_FREE_WILL) DfClearOrders(c);
         rt.member=hand();rt.trader=hand();rt.memberName.clear();rt.failedShops.clear();
         rt.moving=false;rt.progressAt=0;rt.startedAt=0;
+        rt.kind=DF_SUPPLY_FOOD;rt.light=true;
     }
     void Delay(DfProvision& rt,Character* c,unsigned long now)
     {
         if(c!=NULL) rt.cooldown[c->getHandle()]=now+30000;
         ClearRoute(rt,c);
     }
-    bool Food(Character* c,Faction* f,float& rate,float& hunger,float& stock)
+    bool ReadStock(Character* c,Faction* f,DfSupplyStock& stock)
     {
-        return c!=NULL && c->getFaction()==f && !c->isDead() && DfReadFood(c,rate,hunger,stock);
+        return c!=NULL && c->getFaction()==f && !c->isDead() && DfReadSupplyStock(c,stock);
     }
-    bool Failed(const DfProvision& rt,const hand& h)
-    {for(size_t i=0;i<rt.failedShops.size();++i)if(Same(h,rt.failedShops[i]))return true;return false;}
-    Character* ChooseTrader(Character* c,const std::vector<DfTrader>& traders,const DfProvision& rt)
+    int SupplyPriority(const DfSupplyStock& stock,DfSupplyKind kind,bool restocking)
     {
-        Character* best=NULL;float distance=0;
-        for(size_t i=0;i<traders.size() && i<128;++i)
+        if(!stock.known) return 100;
+        if(kind==DF_SUPPLY_BACKPACK) return !stock.animal && !stock.wearingBag ? 3 : 100;
+        float target=0;const DfFoodNeed need=DfPlanSupply(stock,kind,restocking,target);
+        if(need!=DF_FOOD_RESTOCK && need!=DF_FOOD_URGENT) return 100;
+        return kind==DF_SUPPLY_FOOD ? (need==DF_FOOD_URGENT ? 0 : 1) : 2;
+    }
+    DfSupplyKind NextKind(const DfSupplyStock& stock)
+    {
+        DfSupplyKind best=DF_SUPPLY_FOOD;int priority=100;
+        for(int k=DF_SUPPLY_FOOD;k<=DF_SUPPLY_BACKPACK;++k)
         {
-            if(Failed(rt,traders[i].who)) continue;
-            Character* const t=traders[i].who.getCharacter();
-            if(t==NULL || t->isDead() || t->isUnconcious() || t->isInCombatMode(true,true) ||
-               c->isEnemy(t,false) || t->isEnemy(c,false)) continue;
-            const float d=c->getPosition().squaredDistance(t->getPosition());
-            if(_finite(d) && (best==NULL || d<distance)) {best=t;distance=d;}
+            const DfSupplyKind kind=static_cast<DfSupplyKind>(k);
+            const int p=SupplyPriority(stock,kind,false);
+            if(p<priority){best=kind;priority=p;}
         }
         return best;
     }
@@ -74,44 +78,66 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
     {
         // Real movement alone cannot keep an unreachable/chasing route alive
         // forever and starve all other members of the single supply slot.
-        if(debug) DebugLog(std::string("DynamicFactions: food route yielded after deadline: ")+rt.memberName);
+        if(debug) DebugLog(std::string("DynamicFactions: supply route yielded after deadline: ")+rt.memberName);
         Delay(rt,actor,now);return;
     }
-    if(actor==NULL)
+    DfSupplyStock current;
+    if(actor!=NULL && !ReadStock(actor,f,current)){Delay(rt,actor,now);return;}
+    int priority=actor!=NULL ? SupplyPriority(current,rt.kind,true) : 100;
+    if(actor!=NULL)
     {
-        Character* best=NULL;float lowest=0;DfFoodNeed bestNeed=DF_FOOD_UNKNOWN;
-        const size_t count=people.size()<4 ? people.size() : 4;
-        for(size_t k=0;k<count;++k)
+        const DfSupplyKind next=NextKind(current);
+        const int p=SupplyPriority(current,next,false);
+        if(p<priority)
         {
-            Character* const c=people[rt.scanCursor%people.size()];++rt.scanCursor;
-            float rate=0,hunger=0,stock=0,target=0;
-            if(!Food(c,f,rate,hunger,stock))
-            {
-                if(!rt.warnedUnreadable) {ErrorLog("DynamicFactions: food inventory unreadable; supply deferred");rt.warnedUnreadable=true;}
-                continue;
-            }
-            if(c==envoy || !DfEconomyAvailable(c) || rt.cooldown.find(c->getHandle())!=rt.cooldown.end()) continue;
-            const DfFoodNeed need=DfPlanFood(rate,hunger,stock,false,target);
-            if(need!=DF_FOOD_RESTOCK && need!=DF_FOOD_URGENT) continue;
-            if(best==NULL || (need==DF_FOOD_URGENT && bestNeed!=DF_FOOD_URGENT) ||
-               (need==bestNeed && hunger<lowest)) {best=c;lowest=hunger;bestNeed=need;}
+            // A traveller's own food can run low while seeking a bag or kit.
+            ClearRoute(rt,actor);rt.member=actor->getHandle();rt.memberName=actor->getName();
+            rt.kind=next;rt.light=DfLightBagRole(actor);priority=p;
+            rt.progressPosition=actor->getPosition();rt.progressAt=now;rt.startedAt=now;
         }
-        if(best==NULL) return;
-        actor=best;rt.member=actor->getHandle();rt.memberName=actor->getName();
+    }
+    if(actor!=NULL && priority==100){ClearRoute(rt,actor);return;}
+    Character* best=NULL;DfSupplyStock bestStock;DfSupplyKind bestKind=DF_SUPPLY_FOOD;
+    // A bounded scan continues while travelling: food can preempt optional gear.
+    const size_t count=people.size()<4 ? people.size() : 4;
+    for(size_t k=0;k<count;++k)
+    {
+        Character* const c=people[rt.scanCursor%people.size()];++rt.scanCursor;
+        if(c==NULL || c==actor || c==envoy || !DfEconomyAvailable(c) ||
+            rt.cooldown.find(c->getHandle())!=rt.cooldown.end()) continue;
+        DfSupplyStock stock;
+        if(!ReadStock(c,f,stock))
+        {
+            if(!rt.warnedUnreadable){ErrorLog("DynamicFactions: supplies unreadable; procurement deferred");rt.warnedUnreadable=true;}
+            continue;
+        }
+        const DfSupplyKind kind=NextKind(stock);const int p=SupplyPriority(stock,kind,false);
+        if(p<priority){best=c;bestStock=stock;bestKind=kind;priority=p;}
+    }
+    if(best!=NULL)
+    {
+        ClearRoute(rt,actor);actor=best;current=bestStock;rt.kind=bestKind;
+        rt.member=actor->getHandle();rt.memberName=actor->getName();rt.light=DfLightBagRole(actor);
         rt.progressPosition=actor->getPosition();rt.progressAt=now;rt.startedAt=now;
         const int goal=DfGoalOf(actor);
         if(goal==OPERATE_MACHINERY || goal==MOVE_ON_FREE_WILL) DfClearOrders(actor);
-        if(debug) DebugLog(std::string("DynamicFactions: real food supply started for ")+rt.memberName);
+        if(debug) DebugLog(std::string("DynamicFactions: real supply route started for ")+rt.memberName);
     }
-    float rate=0,hunger=0,stock=0,target=0;
-    if(!Food(actor,f,rate,hunger,stock)) {Delay(rt,actor,now);return;}
-    const DfFoodNeed need=DfPlanFood(rate,hunger,stock,true,target);
-    if(need==DF_FOOD_STOCKED || need==DF_FOOD_NOT_NEEDED || need==DF_FOOD_UNKNOWN)
-    {ClearRoute(rt,actor);return;}
+    if(actor==NULL) return;
+    if(rt.kind==DF_SUPPLY_BACKPACK && current.ownedBags>0)
+    {
+        // An owned bag, even if nested or currently unwearable, prevents buying
+        // duplicates. Only a root inventory bag can be safely equipped here.
+        bool equipped=false;
+        if(!DfEquipOwnedBag(actor,rt.light,equipped)) return;
+        if(debug) DebugLog(std::string(equipped ? "DynamicFactions: equipped owned backpack: " :
+            "DynamicFactions: owned backpack retained; equip deferred: ")+rt.memberName);
+        Delay(rt,actor,now);return;
+    }
     Character* trader=rt.trader.isNull() ? NULL : rt.trader.getCharacter();
     if(trader==NULL || trader->isDead() || trader->isUnconcious() || trader->isInCombatMode(true,true))
     {
-        trader=ChooseTrader(actor,traders,rt);
+        trader=DfChooseSupplyTrader(actor,rt.kind,rt.light,traders,rt.market,rt.failedShops,now);
         if(trader==NULL) {Delay(rt,actor,now);return;}
         rt.trader=trader->getHandle();
     }
@@ -132,18 +158,27 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
         return;
     }
     rt.progressAt=now;rt.progressPosition=actor->getPosition();
+    DfBudgetSnapshot budget;budget.committed=committed;
+    budget.money=f->factionOwnerships!=NULL ? f->factionOwnerships->money : -1;
+    const bool forecast=rt.kind==DF_SUPPLY_FOOD ? false : DfForecastSupplies(f,people,rt.market,committed,now,budget);
     int paid=0;rt.lastItemName.clear();DfBuyStatus status=DF_BUY_INVALID;
-    const bool ok=DfBuyFood(actor,trader,f,committed,paid,rt.lastItemName,&status);
+    std::vector<DfSupplyQuote> observed;
+    const bool ok=DfBuySupply(actor,trader,f,rt.kind,rt.light,budget,paid,rt.lastItemName,observed,&status);
+    if(ok && status!=DF_BUY_PLAYER_TRADING && status!=DF_BUY_INVALID && status!=DF_BUY_FAULT)
+        DfRememberShop(rt.market,rt.trader,observed,now);
     if(paid>0)
     {
         if(rt.spent<=INT_MAX-paid)rt.spent+=paid;
-        char event[64];sprintf_s(event,sizeof(event),"food %d",paid);DfAddEvent(s,hour,event);
+        const char* type=rt.kind==DF_SUPPLY_FOOD ? "food" : rt.kind==DF_SUPPLY_FIRSTAID ? "aid" :
+            rt.kind==DF_SUPPLY_REPAIR ? "repair" : "bag";
+        char event[64];sprintf_s(event,sizeof(event),"%s %d",type,paid);DfAddEvent(s,hour,event);
         DfShowTradeReceipt(actor,-paid);
         if(debug)
         {
-            DebugLog(std::string("DynamicFactions: confirmed food purchase: ")+rt.lastItemName+"; buyer "+rt.memberName+"; "+event);
+            DebugLog(std::string("DynamicFactions: confirmed supply purchase: ")+rt.lastItemName+"; buyer "+rt.memberName+"; "+event);
             char detail[192];sprintf_s(detail,sizeof(detail),
-                "DynamicFactions: food pre-purchase: hunger %.4f; stock %.4f; target %.4f; racial rate %.4f",hunger,stock,target,rate);
+                "DynamicFactions: supply reserve: known %d; food %d; medical %d; committed %d; buffer %d",
+                budget.forecastKnown?1:0,budget.foodDeficitCost,budget.medicalDeficitCost,budget.committed,budget.emergencyBuffer);
             DebugLog(detail);
         }
     }
@@ -154,17 +189,24 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
         switch(status)
         {
         case DF_BUY_OK:reason="no confirmed transfer";break;
-        case DF_BUY_NO_FOOD:reason="no eligible food in native stock";break;
+        case DF_BUY_NO_FOOD:reason="no eligible supplies in native stock";break;
         case DF_BUY_NO_MONEY:reason="budget or merchant wallet limit";break;
         case DF_BUY_NO_ROOM:reason="no inventory fit or transfer refused";break;
         case DF_BUY_PLAYER_TRADING:reason="player trading or deal conditions changed";break;
         case DF_BUY_FAULT:reason="transaction quarantined";break;
         default:break;
         }
-        DebugLog(std::string("DynamicFactions: food shop rejected: ")+trader->getName()+"; "+reason);
+        DebugLog(std::string("DynamicFactions: supply shop rejected: ")+trader->getName()+"; "+reason);
     }
     if(status==DF_BUY_NO_MONEY && f->factionOwnerships!=NULL && f->factionOwnerships->money<=committed)
     {Delay(rt,actor,now);return;}
+    if(ok && status==DF_BUY_NO_MONEY && rt.kind!=DF_SUPPLY_FOOD && !forecast)
+    {
+        // This physical visit may have supplied the missing price knowledge.
+        // Wait until the next step before buying; never replay the transaction.
+        DfBudgetSnapshot refreshed;
+        if(DfForecastSupplies(f,people,rt.market,committed,now,refreshed)) return;
+    }
     if(status==DF_BUY_NO_FOOD || status==DF_BUY_INVALID || status==DF_BUY_PLAYER_TRADING ||
        status==DF_BUY_NO_MONEY || status==DF_BUY_NO_ROOM)
     {

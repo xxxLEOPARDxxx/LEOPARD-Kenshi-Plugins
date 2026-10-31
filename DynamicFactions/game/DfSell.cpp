@@ -91,7 +91,8 @@ namespace
     int UnitPrice(Item* item, Character* trader)
     {
         if (item == NULL || trader == NULL || item->isStolen(true) || item->isEquipped ||
-            item->getGameData() == NULL || item->getGameData()->type != ITEM) return 0;
+            item->getGameData() == NULL ||
+            (item->getGameData()->type != ITEM && item->getGameData()->type != CONTAINER)) return 0;
         TownBase* const location = trader->getCurrentTownLocation();
         Town* const town = location != NULL ? location->isTown() : NULL;
         ActivePlatoon* const ap = trader->getPlatoon();
@@ -416,7 +417,7 @@ namespace
         virtual bool ReadGoods(int& seller,int& buyer)
         {
             seller=stock_->getInventory()==from_ ? SafeCountStockSection(stock_,data_) : -1;
-            buyer=DfCountInventoryItem(to_,data_);
+            buyer=data_->type==CONTAINER ? DfCountOwnedInventoryItem(to_,data_) : DfCountInventoryItem(to_,data_);
             return seller>=0 && buyer>=0;
         }
         virtual DfUnitResult Deliver()
@@ -437,6 +438,112 @@ namespace
         Item* item;GameData* data;InventorySection* section;int price;double value;
     };
     bool CheapNutrition(const FoodOffer& a,const FoodOffer& b) {return a.value<b.value;}
+
+    bool SupplyQuoteFromItem(Item* p,Character* trader,DfSupplyQuote& quote)
+    {
+        if(p==NULL || p->getGameData()==NULL || p->quantity<=0 || p->isEquipped || p->deathItem ||
+            !_finite(p->chargesLeft) || p->chargesLeft<=0 || p->chargesLeft!=p->originalFullChargeAmount ||
+            !_finite(p->quality) || p->isStolen(true)) return false;
+        quote=DfSupplyQuote();quote.sid=p->getGameData()->stringID;quote.quantity=p->quantity;
+        if(p->itemFunction==ITEM_FOOD || p->itemFunction==ITEM_FOOD_RESTRICTED)
+        {quote.kind=DF_SUPPLY_FOOD;quote.amount=p->chargesLeft*.01f;}
+        else if(p->itemFunction==ITEM_FIRSTAID)
+        {quote.kind=DF_SUPPLY_FIRSTAID;quote.amount=p->chargesLeft;}
+        else if(p->itemFunction==ITEM_ROBOTREPAIR)
+        {quote.kind=DF_SUPPLY_REPAIR;quote.amount=p->chargesLeft;}
+        else if(p->itemFunction==ITEM_CONTAINER && p->slotType==ATTACH_BACKPACK && p->getGameData()->type==CONTAINER)
+        {quote.kind=DF_SUPPLY_BACKPACK;quote.amount=1;if(!DfReadBagSpec(p,quote.bag,true))return false;}
+        else return false;
+        quote.price=UnitPrice(p,trader);
+        return quote.price>0 && _finite(quote.amount) && quote.amount>0 && !quote.sid.empty();
+    }
+    bool CollectSupplyQuotes(Character* trader,const StockSections& stock,std::vector<DfSupplyQuote>& observed)
+    {
+        observed.clear();if(stock.size()>128)return false;
+        unsigned int examined=0;int counts[4]={0,0,0,0};DfStockPool pools[128];
+        const int caps[4]={64,16,16,32};
+        for(size_t at=0;at<stock.size();++at)
+        {
+            const hand identity=stock[at]->getInventory()->getHandle();
+            DfSupplyQuote marker;marker.pool.type=identity.type;marker.pool.container=identity.container;
+            marker.pool.containerSerial=identity.containerSerial;marker.pool.index=identity.index;marker.pool.serial=identity.serial;
+            if(!marker.pool.Known())return false;
+            pools[at]=marker.pool;
+            bool seenPool=false;
+            for(size_t k=0;k<observed.size();++k)if(observed[k].pool==marker.pool)seenPool=true;
+            // Zero-quantity pool markers also invalidate an alias's old stock
+            // when the last real item has gone. They are never purchase offers.
+            if(!seenPool && observed.size()<128)observed.push_back(marker);
+        }
+        // Register ALL pool identities before offers compete for the cap. An
+        // unquoted last/empty pool must still invalidate stale shared aliases.
+        for(size_t at=0;at<stock.size();++at)
+        {
+            const Ogre::vector<InventorySection::SectionItem>::type& items=stock[at]->getItems();
+            if(items.size()>4096) return false;
+            for(size_t i=0;i<items.size();++i)
+            {
+                if(++examined>4096) return false;
+                DfSupplyQuote q;if(!SupplyQuoteFromItem(items[i].item,trader,q))continue;q.pool=pools[at];
+                size_t existing=observed.size();
+                for(size_t k=0;k<observed.size();++k)
+                    if(observed[k].pool==q.pool && observed[k].kind==q.kind && observed[k].sid==q.sid && observed[k].price==q.price && observed[k].amount==q.amount)existing=k;
+                if(existing<observed.size())
+                {if(observed[existing].quantity>INT_MAX-q.quantity)return false;observed[existing].quantity+=q.quantity;}
+                else if(counts[q.kind]<caps[q.kind] && observed.size()<128)
+                {observed.push_back(q);++counts[q.kind];}
+            }
+        }
+        return true;
+    }
+    bool BuyOtherSupplyFromStock(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool light,
+        const DfBudgetSnapshot& reserve,const StockSections& stock,std::vector<FoodOffer>& offers,
+        std::vector<GameData*>& ranked,int& paid,std::string& itemName,DfBuyStatus& status)
+    {
+        Ownerships* const buyer=f->factionOwnerships;Ownerships* const seller=TraderPurse(trader);
+        RaceData* const race=member->getRace();
+        if(buyer==NULL || seller==NULL || buyer==seller || race==NULL || kind==DF_SUPPLY_FOOD) return false;
+        if(member->isAnimal()!=NULL || (kind==DF_SUPPLY_FIRSTAID && race->robot) ||
+            (kind==DF_SUPPLY_REPAIR && !race->robot && (member->getMedical()==NULL || !member->getMedical()->hasRobotics())))
+        {status=DF_BUY_NO_FOOD;return true;}
+        offers.clear();ranked.clear();bool eligible=false,affordable=false;unsigned int examined=0;
+        DfBudgetSnapshot budget=reserve;budget.money=buyer->money;
+        for(size_t at=0;at<stock.size();++at)
+        {
+            const Ogre::vector<InventorySection::SectionItem>::type& items=stock[at]->getItems();
+            if(items.size()>4096)return false;
+            for(size_t i=0;i<items.size();++i)
+            {
+                if(++examined>4096)return false;
+                Item* const p=items[i].item;DfSupplyQuote q;
+                if(!SupplyQuoteFromItem(p,trader,q) || q.kind!=kind)continue;
+                double value=static_cast<double>(q.price)/q.amount;
+                if(kind==DF_SUPPLY_BACKPACK)
+                {const double score=DfBagScore(q.bag,light,q.price);if(score<=0 || !DfBagCanWear(member,p))continue;value=-score;}
+                eligible=true;
+                if(!DfPlanSupplySpend(budget,q.price,kind).Allowed() || !DfCanPay(buyer->money,seller->money,q.price))continue;
+                affordable=true;FoodOffer offer;offer.item=p;offer.data=p->getGameData();offer.section=stock[at];offer.price=q.price;offer.value=value;
+                size_t existing=offers.size();
+                for(size_t k=0;k<offers.size();++k)if(offers[k].data==offer.data)existing=k;
+                if(existing<offers.size()){if(value<offers[existing].value)offers[existing]=offer;}
+                else if(offers.size()<64)offers.push_back(offer);
+                else {size_t worst=0;for(size_t k=1;k<offers.size();++k)if(offers[k].value>offers[worst].value)worst=k;if(value<offers[worst].value)offers[worst]=offer;}
+            }
+        }
+        std::stable_sort(offers.begin(),offers.end(),CheapNutrition);
+        for(size_t i=0;i<offers.size();++i)ranked.push_back(offers[i].data);
+        const int fit=DfFirstInventoryFit(member->getInventory(),ranked);
+        if(fit<0){status=!eligible ? DF_BUY_NO_FOOD : !affordable ? DF_BUY_NO_MONEY : DF_BUY_NO_ROOM;return true;}
+        const FoodOffer& chosen=offers[fit];
+        if(!ValidDeal(member,trader,f) || PlayerTradingWith(trader)){status=DF_BUY_PLAYER_TRADING;return true;}
+        budget.money=buyer->money;
+        if(buyer!=f->factionOwnerships || seller!=TraderPurse(trader) || !DfPlanSupplySpend(budget,chosen.price,kind).Allowed())return false;
+        itemName=chosen.item->getName();NativeFoodPurchase purchase(member,buyer,seller,chosen.section,chosen.item);
+        const DfTradeResult result=DfPurchaseOne(purchase,chosen.price);
+        if(result==DF_TRADE_COMPLETE){paid=chosen.price;status=DF_BUY_OK;return true;}
+        if(result==DF_TRADE_STOP || result==DF_TRADE_RESTORED){status=DF_BUY_NO_ROOM;return true;}
+        DfQuarantineTransfer("supply purchase requires reconciliation; no replay");status=DF_BUY_FAULT;return false;
+    }
 
     bool BuyFoodFromStock(Character* member,Character* trader,Faction* f,int committed,
                           const StockSections& stock,std::vector<FoodOffer>& offers,std::vector<GameData*>& ranked,
@@ -545,6 +652,41 @@ namespace
         __except(EXCEPTION_EXECUTE_HANDLER)
         {DfQuarantineTransfer("food purchase setup fault; no replay");status=DF_BUY_FAULT;return false;}
     }
+    bool SupplyFromStock(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool light,
+        const DfBudgetSnapshot& budget,const StockSections& stock,std::vector<FoodOffer>& offers,
+        std::vector<GameData*>& ranked,int& paid,std::string& name,std::vector<DfSupplyQuote>& observed,DfBuyStatus& status)
+    {
+        const bool ok=kind==DF_SUPPLY_FOOD ? BuyFoodFromStock(member,trader,f,budget.committed,stock,offers,ranked,paid,name,status) :
+            BuyOtherSupplyFromStock(member,trader,f,kind,light,budget,stock,offers,ranked,paid,name,status);
+        // Read the backing sections again, within this same native shop view.
+        // The last unit may have been consumed by the transaction above.
+        return ok && CollectSupplyQuotes(trader,stock,observed);
+    }
+    bool SafeSupplyFromStock(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool light,
+        const DfBudgetSnapshot& budget,const StockSections& stock,std::vector<FoodOffer>& offers,
+        std::vector<GameData*>& ranked,int& paid,std::string& name,std::vector<DfSupplyQuote>& observed,DfBuyStatus& status)
+    {
+        __try {return SupplyFromStock(member,trader,f,kind,light,budget,stock,offers,ranked,paid,name,observed,status);}
+        __except(EXCEPTION_EXECUTE_HANDLER){DfQuarantineTransfer("native supply purchase fault; no replay");status=DF_BUY_FAULT;return false;}
+    }
+    bool BuySupply(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool light,
+        const DfBudgetSnapshot& budget,int& paid,std::string& name,std::vector<DfSupplyQuote>& observed,DfBuyStatus& status)
+    {
+        if(!ValidDeal(member,trader,f))return false;
+        if(PlayerTradingWith(trader)){status=DF_BUY_PLAYER_TRADING;return true;}
+        ShopView view(trader);if(view.shop==NULL)return false;
+        StockSections stock;std::vector<FoodOffer> offers;std::vector<GameData*> ranked;
+        bool ok=SafeReadStockSections(view.shop,stock);
+        if(ok)ok=SafeSupplyFromStock(member,trader,f,kind,light,budget,stock,offers,ranked,paid,name,observed,status);
+        if(!view.Close())ok=false;
+        return ok && !DfTransferFaulted();
+    }
+    bool SafeBuySupply(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool light,
+        const DfBudgetSnapshot& budget,int& paid,std::string& name,std::vector<DfSupplyQuote>& observed,DfBuyStatus& status)
+    {
+        __try{return BuySupply(member,trader,f,kind,light,budget,paid,name,observed,status);}
+        __except(EXCEPTION_EXECUTE_HANDLER){DfQuarantineTransfer("supply purchase setup fault; no replay");status=DF_BUY_FAULT;return false;}
+    }
 }
 
 bool DfSellTransferBusy() { return g_sellDepth != 0; }
@@ -557,6 +699,17 @@ bool DfBuyFood(Character* member,Character* trader,Faction* f,int committed,
     const bool ok=SafeBuyFood(member,trader,f,committed,paid,name,result);
     if(!ok && DfTransferFaulted()) result=DF_BUY_FAULT;
     if(status!=NULL) *status=result;
+    return ok;
+}
+bool DfBuySupply(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool light,
+    const DfBudgetSnapshot& budget,int& paid,std::string& name,std::vector<DfSupplyQuote>& observed,DfBuyStatus* status)
+{
+    paid=0;name.clear();observed.clear();DfBuyStatus result=DF_BUY_INVALID;
+    if(DfTransferBusy()){if(status!=NULL)*status=result;return false;}
+    SellGuard guard;
+    const bool ok=SafeBuySupply(member,trader,f,kind,light,budget,paid,name,observed,result);
+    if(!ok && DfTransferFaulted())result=DF_BUY_FAULT;
+    if(status!=NULL)*status=result;
     return ok;
 }
 bool DfTraderCanBuy(Character* hauler, Character* trader, Faction* f, GameData* item)

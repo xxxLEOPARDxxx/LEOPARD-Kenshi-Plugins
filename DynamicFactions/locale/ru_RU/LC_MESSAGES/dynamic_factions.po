@@ -203,3 +203,21 @@ msgstr "Добывать настоящие ресурсы, переносить
 
 msgid "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
 msgstr "Подробности снабжения, подтверждённых покупок, работы, сохранения и загрузки в RE_Kenshi_log.txt. Ошибки записываются всегда."
+
+msgid "Supply run: %s; spent this session: %d"
+msgstr "Снабжение: %s; расходы за сеанс: %d"
+
+msgid "Bought first-aid supplies for %d cats"
+msgstr "Куплены аптечки за %d катов"
+
+msgid "Bought repair supplies for %d cats"
+msgstr "Куплены ремкомплекты за %d катов"
+
+msgid "Bought a backpack for %d cats"
+msgstr "Куплен рюкзак за %d катов"
+
+msgid "A faction in the Hub mines and sells real ore, buys food, medical supplies and suitable backpacks, and hires recruits from its actual budget. No passive income."
+msgstr "Фракция в Хабе добывает и продаёт настоящую руду, покупает еду, медикаменты и подходящие рюкзаки, нанимает рекрутов за свои деньги. Пассивного дохода нет."
+
+msgid "Mine real resources, carry ore and sell it to town traders. Supply runs continue when work is disabled."
+msgstr "Добывать настоящие ресурсы, переносить руду и продавать городским торговцам. При отключении работы снабжение продолжается."

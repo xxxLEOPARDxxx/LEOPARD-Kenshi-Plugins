@@ -5,6 +5,8 @@
 #include <vector>
 
 #include <kenshi/util/hand.h>
+#include "core/DfOffer.h"
+#include "core/DfBudget.h"
 
 class Character;
 class Faction;
@@ -54,3 +56,8 @@ enum DfBuyStatus { DF_BUY_OK, DF_BUY_NO_FOOD, DF_BUY_NO_MONEY, DF_BUY_NO_ROOM,
 // money -> shop purse. Existing recruitment commitments remain protected.
 bool DfBuyFood(Character* member, Character* trader, Faction* faction, int committed,
                int& paid, std::string& itemName, DfBuyStatus* status = NULL);
+// A real visit also returns bounded quotes of the observed shop stock. An
+// unknown reserve prevents planned medicine/gear while food remains essential.
+bool DfBuySupply(Character* member,Character* trader,Faction* faction,DfSupplyKind kind,
+    bool light,const DfBudgetSnapshot& budget,int& paid,std::string& itemName,
+    std::vector<DfSupplyQuote>& observed,DfBuyStatus* status=NULL);

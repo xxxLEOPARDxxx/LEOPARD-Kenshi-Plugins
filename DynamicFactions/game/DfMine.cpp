@@ -10,6 +10,7 @@
 #include <climits>
 #include <float.h>
 #include "core/DfTransfer.h"
+#include "core/DfSupply.h"
 #include <kenshi/Faction.h>
 
 #include <Debug.h>
@@ -19,6 +20,7 @@
 #include <kenshi/Building/Building.h>
 #include <kenshi/Building/UseableStuff.h>
 #include <kenshi/Character.h>
+#include <kenshi/CharStats.h>
 #include <kenshi/Enums.h>
 #include <kenshi/GameData.h>
 #include <kenshi/GameWorld.h>
@@ -422,6 +424,34 @@ namespace
         return units;
     }
 
+    int CountOwnedInventory(Inventory* root,GameData* item)
+    {
+        if(root==NULL || item==NULL) return -1;
+        InventoryView view(root);
+        if(view.count==0) return -1;
+        // Fixed open-addressed set: no owning heap state across native SEH.
+        int count=0;Item* seen[8192]={0};unsigned int entries=0;
+        for(int at=0;at<view.count;++at)
+        {
+            const lektor<InventorySection*>& sections=view.inv[at]->getAllSections();
+            for(uint32_t k=0;k<sections.size();++k)
+            {
+                const Ogre::vector<InventorySection::SectionItem>::type& placed=sections.stuff[k]->getItems();
+                for(size_t j=0;j<placed.size();++j)
+                {
+                    Item* const p=placed[j].item;
+                    if(p==NULL || p->getGameData()!=item) continue;
+                    if(++entries>4096) return -1;
+                    size_t slot=(reinterpret_cast<size_t>(p)>>4)&8191;
+                    while(seen[slot]!=NULL && seen[slot]!=p) slot=(slot+1)&8191;
+                    if(seen[slot]==p || p->quantity<=0 || count>INT_MAX-p->quantity) return -1;
+                    seen[slot]=p;
+                    count+=p->quantity;
+                }
+            }
+        }
+        return count;
+    }
     Item* FirstInventory(Inventory* root, GameData* item, Inventory*& actual, bool onlyClean = false)
     {
         actual = NULL;
@@ -528,8 +558,9 @@ namespace
             purchaseTitle_(title!=NULL ? *title : hand()) {}
         virtual bool Read(int& source, int& destination)
         {
-            source = DfCountInventoryItem(from_, item_);
-            destination = DfCountInventoryItem(to_, item_);
+            const bool bag=item_->type==CONTAINER;
+            source = bag ? DfCountOwnedInventoryItem(from_,item_) : DfCountInventoryItem(from_, item_);
+            destination = bag ? DfCountOwnedInventoryItem(to_,item_) : DfCountInventoryItem(to_, item_);
             return source >= 0 && destination >= 0;
         }
         virtual bool Remove(void*& item)
@@ -649,6 +680,11 @@ int DfFirstInventoryFit(Inventory* root,const std::vector<GameData*>& ranked)
     __try {return FirstFit(root,ranked);}
     __except(EXCEPTION_EXECUTE_HANDLER) {return -1;}
 }
+int DfCountOwnedInventoryItem(Inventory* root,GameData* item)
+{
+    __try {return CountOwnedInventory(root,item);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {return -1;}
+}
 Item* DfFirstInventoryItem(Inventory* root, GameData* item, Inventory*& actual, bool onlyClean)
 {
     __try { return FirstInventory(root, item, actual, onlyClean); }
@@ -677,46 +713,211 @@ bool DfMovePurchasedUnit(Inventory* from, Inventory* actual, Item* source, Inven
 
 namespace
 {
-    bool ReadFood(Character* actor,float& rate,float& hunger,float& nutrition)
+    bool ReadSupplyItem(Item* p,RaceData* race,bool animal,DfSupplyStock& stock,
+        Item** bags,int& bagCount,double* totals)
     {
-        if(actor==NULL || actor->getRace()==NULL) return false;
+        if(p==NULL) return true;
+        if(p->itemFunction==ITEM_CONTAINER && p->slotType==ATTACH_BACKPACK)
+        {
+            bool seen=false;for(int k=0;k<bagCount;++k)if(bags[k]==p)seen=true;
+            if(!seen)
+            {
+                if(bagCount==128 || p->quantity<=0 || stock.ownedBags>INT_MAX-p->quantity) return false;
+                bags[bagCount++]=p;stock.ownedBags+=p->quantity;
+                if(p->isEquipped) stock.wearingBag=true;
+            }
+        }
+        if(p->isEquipped || p->deathItem) return true;
+        int kind=-1;
+        if((p->itemFunction==ITEM_FOOD || p->itemFunction==ITEM_FOOD_RESTRICTED) &&
+            !stock.robot && race->canEat(p,animal)) kind=0;
+        else if(p->itemFunction==ITEM_FIRSTAID) kind=1;
+        else if(p->itemFunction==ITEM_ROBOTREPAIR) kind=2;
+        if(kind<0) return true;
+        if(p->quantity<=0 || !_finite(p->chargesLeft) || !_finite(p->originalFullChargeAmount) ||
+            p->chargesLeft<0 || p->originalFullChargeAmount<=0 || p->chargesLeft>p->originalFullChargeAmount) return false;
+        totals[kind]+=p->chargesLeft+static_cast<double>(p->quantity-1)*p->originalFullChargeAmount;
+        return totals[kind]<=FLT_MAX;
+    }
+    bool ReadSupplies(Character* actor,DfSupplyStock& stock)
+    {
+        stock=DfSupplyStock();
+        if(actor==NULL || actor->getRace()==NULL || actor->getMedical()==NULL) return false;
         RaceData* const race=actor->getRace();
-        rate=race->robot ? 0.0f : race->hungerRate;
-        hunger=actor->getMedical()->hunger;nutrition=0;
-        if(!_finite(rate) || rate<0 || !_finite(hunger)) return false;
-        if(rate==0) return true;
+        stock.robot=race->robot;stock.foodRate=stock.robot ? 0.0f : race->hungerRate;
+        stock.hunger=actor->getMedical()->hunger;stock.animal=actor->isAnimal()!=NULL;
+        stock.robotLimbs=stock.robot || actor->getMedical()->hasRobotics();
+        if(!_finite(stock.foodRate) || stock.foodRate<0 || !_finite(stock.hunger)) return false;
         InventoryView view(actor->getInventory());
         if(view.count==0) return false;
-        double total=0;
-        const bool animal=actor->isAnimal()!=NULL;
+        double totals[3]={0,0,0};Item* bags[128];int bagCount=0;
         for(int at=0;at<view.count;++at)
         {
             const lektor<Item*>& all=view.inv[at]->getAllItems();
             for(uint32_t k=0;k<all.size();++k)
-            {
-                Item* const p=all.stuff[k];
-                if(p==NULL || p->isEquipped || p->deathItem ||
-                   (p->itemFunction!=ITEM_FOOD && p->itemFunction!=ITEM_FOOD_RESTRICTED)) continue;
-                if(!race->canEat(p,animal)) continue;
-                if(p->quantity<=0 || !_finite(p->chargesLeft) || !_finite(p->originalFullChargeAmount) ||
-                   p->chargesLeft<0 || p->originalFullChargeAmount<=0 || p->chargesLeft>p->originalFullChargeAmount)
-                    return false;
-                // Native stacks have one partly used unit plus untouched units.
-                total+=p->chargesLeft+static_cast<double>(p->quantity-1)*p->originalFullChargeAmount;
-                if(total>FLT_MAX) return false;
-            }
+                if(!ReadSupplyItem(all.stuff[k],race,stock.animal,stock,bags,bagCount,totals)) return false;
+            // Worn bags may be absent from allItems. Visit only equipped items
+            // here; bag identity deduplication handles SDKs publishing both.
+            const lektor<InventorySection*>& sections=view.inv[at]->getAllSections();
+            for(uint32_t k=0;k<sections.size();++k)
+                for(size_t j=0;j<sections.stuff[k]->getItems().size();++j)
+                {
+                    Item* const p=sections.stuff[k]->getItems()[j].item;
+                    if(p!=NULL && p->isEquipped && !ReadSupplyItem(p,race,stock.animal,stock,bags,bagCount,totals)) return false;
+                }
         }
-        // Food charges are displayed NU; native eatItem converts each mouthful
-        // to MedicalSystem::fed with *0.01. Procurement uses those hunger units.
-        nutrition=static_cast<float>(total*0.01);
+        stock.food=static_cast<float>(totals[0]*.01);stock.firstAid=static_cast<float>(totals[1]);
+        stock.repair=static_cast<float>(totals[2]);stock.known=true;
         return true;
     }
+    bool ReadFood(Character* actor,float& rate,float& hunger,float& nutrition)
+    {
+        DfSupplyStock stock;
+        if(!ReadSupplies(actor,stock)) return false;
+        rate=stock.foodRate;hunger=stock.hunger;nutrition=stock.food;return true;
+    }
+}
+
+bool DfReadSupplyStock(Character* actor,DfSupplyStock& stock)
+{
+    __try {return ReadSupplies(actor,stock);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {stock=DfSupplyStock();return false;}
 }
 
 bool DfReadFood(Character* actor,float& rate,float& hunger,float& nutrition)
 {
     __try {return ReadFood(actor,rate,hunger,nutrition);}
     __except(EXCEPTION_EXECUTE_HANDLER) {return false;}
+}
+
+namespace
+{
+    bool ReadBagSpec(Item* item,DfBagSpec& spec,bool mustBeEmpty)
+    {
+        spec=DfBagSpec();
+        if(item==NULL || item->getGameData()==NULL || item->getGameData()->type!=CONTAINER ||
+           item->itemFunction!=ITEM_CONTAINER || item->slotType!=ATTACH_BACKPACK || item->quantity!=1) return false;
+        Inventory* const inside=item->getInventory();
+        if(inside==NULL) return false;
+        const lektor<InventorySection*>& sections=inside->getAllSections();
+        if(sections.size()==0 || sections.size()>16) return false;
+        for(uint32_t k=0;k<sections.size();++k)
+        {
+            InventorySection* const s=sections.stuff[k];
+            if(s==NULL || s->getInventory()!=inside || s->getItems().size()>4096 ||
+                (mustBeEmpty && !s->getItems().empty())) return false;
+            if(!s->enabled || s->isAnEquippedItemSection) continue;
+            if(s->width<=0 || s->height<=0 || s->width>128 || s->height>128 ||
+                spec.cells>4096-s->width*s->height || !_finite(s->stackingBonusMult) ||
+                s->stackingBonusMult<0 || s->stackingBonusMin<0) return false;
+            spec.cells+=s->width*s->height;
+            const float mult=s->stackingBonusMult>s->stackingBonusMin ? s->stackingBonusMult : static_cast<float>(s->stackingBonusMin);
+            if(mult>spec.stackMult) spec.stackMult=mult;
+        }
+        ContainerItem* const bag=static_cast<ContainerItem*>(item);
+        spec.weight=item->weight;spec.weightMult=bag->weightMult;
+        spec.athletics=bag->athleticsMult;spec.combatSpeed=bag->combatSpeedMult;
+        spec.combatBonus=bag->combatSkillBonus;spec.stealth=bag->stealthMult;
+        return spec.cells>0;
+    }
+    bool BagCanWear(Character* actor,Item* item)
+    {
+        if(actor==NULL || actor->isAnimal()!=NULL || actor->getRace()==NULL || actor->getRace()->data==NULL ||
+            actor->getInventory()==NULL || item==NULL || item->getGameData()==NULL || item->getGameData()->type!=CONTAINER) return false;
+        if(!static_cast<ContainerItem*>(item)->_NV_canEquip(actor->getRace()->data)) return false;
+        const lektor<InventorySection*>& slots=actor->getInventory()->getAllSections();
+        if(slots.size()>128) return false;
+        for(uint32_t k=0;k<slots.size();++k)
+        {
+            InventorySection* const s=slots.stuff[k];
+            if(s!=NULL && s->enabled && s->isAnEquippedItemSection && s->limitedSlot==ATTACH_BACKPACK &&
+                s->getItems().empty() && s->isLimitedSlotCompatible(item) && s->_NV_hasRoomForItem(item->getGameData(),1)) return true;
+        }
+        return false;
+    }
+    bool EquipOwnedBag(Character* actor,bool light,bool& equipped)
+    {
+        equipped=false;
+        if(actor==NULL || actor->getInventory()==NULL) return false;
+        Inventory* const root=actor->getInventory();
+        const lektor<InventorySection*>& sections=root->getAllSections();
+        if(sections.size()>128) return false;
+        for(uint32_t k=0;k<sections.size();++k)
+        {
+            if(sections.stuff[k]==NULL || sections.stuff[k]->getItems().size()>4096) return false;
+            for(size_t j=0;j<sections.stuff[k]->getItems().size();++j)
+            {
+                Item* const p=sections.stuff[k]->getItems()[j].item;
+                if(p!=NULL && p->isEquipped && p->itemFunction==ITEM_CONTAINER && p->slotType==ATTACH_BACKPACK)
+                {equipped=true;return true;}
+            }
+        }
+        const lektor<Item*>& all=root->getAllItems();
+        if(all.size()>4096) return false;
+        Item* best=NULL;double score=-1;
+        for(uint32_t k=0;k<all.size();++k)
+        {
+            Item* const p=all.stuff[k];DfBagSpec spec;
+            if(p==NULL || p->isEquipped || p->deathItem || !ReadBagSpec(p,spec,false) || !BagCanWear(actor,p)) continue;
+            const double candidate=DfBagScore(spec,light,0);
+            if(candidate>score) {score=candidate;best=p;}
+        }
+        if(best==NULL) return true;
+        GameData* const data=best->getGameData();const hand identity=best->getHandle();
+        const int before=DfCountOwnedInventoryItem(root,data);
+        if(before<=0) return false;
+        root->equipItem(best);
+        Item* const after=identity.getItem();
+        if(after==NULL || !SameTitle(identity,after->getHandle()) || DfCountOwnedInventoryItem(root,data)!=before)
+        {DfQuarantineTransfer("owned backpack equip requires reconciliation; no replay");return false;}
+        const lektor<InventorySection*>& updated=root->getAllSections();
+        if(updated.size()>128){DfQuarantineTransfer("backpack equip section list changed unexpectedly");return false;}
+        if(after->isEquipped)
+            for(uint32_t k=0;k<updated.size();++k)
+            {
+                InventorySection* const s=updated.stuff[k];
+                if(s==NULL || s->getItems().size()>4096)
+                {DfQuarantineTransfer("backpack equip sections require reconciliation");return false;}
+                if(s->isAnEquippedItemSection && s->limitedSlot==ATTACH_BACKPACK)
+                    for(size_t j=0;j<s->getItems().size();++j)
+                        if(s->getItems()[j].item==after) equipped=true;
+            }
+        return true;
+    }
+    bool LightBagRole(Character* actor)
+    {
+        if(actor==NULL || actor->getStats()==NULL) return true;
+        const float strength=actor->getStats()->getStat(STAT_STRENGTH,true);
+        const float athletics=actor->getStats()->getStat(STAT_ATHLETICS,true);
+        return !_finite(strength) || !_finite(athletics) || strength<30 || strength<athletics*.7f;
+    }
+}
+bool DfReadBagSpec(Item* item,DfBagSpec& spec,bool mustBeEmpty)
+{
+    __try {return ReadBagSpec(item,spec,mustBeEmpty);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {return false;}
+}
+bool DfBagCanWear(Character* actor,Item* item)
+{
+    __try {return BagCanWear(actor,item);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {return false;}
+}
+static bool SafeEquipOwnedBag(Character* actor,bool light,bool& equipped)
+{
+    __try {return EquipOwnedBag(actor,light,equipped);}
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {equipped=false;DfQuarantineTransfer("backpack equip fault; no replay");return false;}
+}
+bool DfEquipOwnedBag(Character* actor,bool light,bool& equipped)
+{
+    equipped=false;if(DfTransferBusy() || DfTransferFaulted()) return false;
+    TransferGuard guard;
+    return SafeEquipOwnedBag(actor,light,equipped);
+}
+bool DfLightBagRole(Character* actor)
+{
+    __try {return LightBagRole(actor);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {return true;}
 }
 
 int DfTakeOreFromNode(Character* c, const hand& node, GameData* item, int maxUnits)

@@ -26,6 +26,9 @@ code = r'''
 #include <cmath>
 #include <float.h>
 #include <limits>
+#include <set>
+#include <climits>
+#include "core/DfSupply.h"
 typedef unsigned int uint32_t;
 template<class T> struct lektor {
     std::vector<T> data; T* stuff;
@@ -35,11 +38,11 @@ template<class T> struct lektor {
 namespace Ogre {template<class T>struct vector{typedef std::vector<T> type;};}
 struct Inventory;
 struct GameData {};
-const int ITEM_FOOD=3,ITEM_FOOD_RESTRICTED=15;
+const int ITEM_FOOD=3,ITEM_FOOD_RESTRICTED=15,ITEM_FIRSTAID=1,ITEM_ROBOTREPAIR=12,ITEM_CONTAINER=4,ATTACH_BACKPACK=12;
 struct Item {Inventory* child;bool isEquipped,deathItem,edible;int itemFunction,quantity;
-float chargesLeft,originalFullChargeAmount;
-Item(Inventory* p=NULL,bool e=false):child(p),isEquipped(e),deathItem(false),edible(true),itemFunction(0),quantity(1),chargesLeft(1),originalFullChargeAmount(1){}
-Inventory* getInventory(){return child;}};
+int slotType;GameData* data;float chargesLeft,originalFullChargeAmount;
+Item(Inventory* p=NULL,bool e=false):child(p),isEquipped(e),deathItem(false),edible(true),itemFunction(0),quantity(1),slotType(0),data(NULL),chargesLeft(1),originalFullChargeAmount(1){}
+Inventory* getInventory(){return child;}GameData* getGameData(){return data;}};
 struct InventorySection {struct SectionItem{Item* item;SectionItem(Item* p=NULL):item(p){}};
 std::vector<SectionItem> items; Inventory* parent;
 InventorySection(Inventory* p):parent(p){}
@@ -51,13 +54,13 @@ const lektor<Item*>& getAllItems(){++graphReads;all.sync();return all;}
 const lektor<InventorySection*>& getAllSections(){sections.sync();return sections;}
 bool hasRoomForItem(GameData* d){++fitCalls;return d==allowed;}};
 struct RaceData {bool robot;float hungerRate;RaceData():robot(false),hungerRate(1){}bool canEat(Item* p,bool){return p->edible;}};
-struct Medical {float hunger;Medical():hunger(3){}};
+struct Medical {float hunger;bool robotic;Medical():hunger(3),robotic(false){}bool hasRobotics()const{return robotic;}};
 struct Character {RaceData race;Medical medical;Inventory* inventory;
 Character(Inventory* p):inventory(p){}RaceData* getRace(){return &race;}Medical* getMedical(){return &medical;}
 Inventory* getInventory(){return inventory;}void* isAnimal(){return NULL;}};
 int checks=0,failed=0;
 #define CHECK(x) do{++checks;if(!(x)){++failed;std::printf("FAIL line%d: %s\n",__LINE__,#x);}}while(0)
-'''+production+'\n'+function('    bool ReadFood(')+'\n'+function('    int FirstFit(')+r'''
+'''+production+'\n'+function('    bool ReadSupplyItem(')+'\n'+function('    bool ReadSupplies(')+'\n'+function('    bool ReadFood(')+'\n'+function('    int FirstFit(')+'\n'+function('    int CountOwnedInventory(')+r'''
 int main(){
 CHECK(InventoryView(NULL).count==0);
 Inventory root,bag;Item equipped(&bag,true);InventorySection worn(&root);
@@ -91,6 +94,24 @@ worker.race.robot=true;CHECK(ReadFood(&worker,rate,hunger,nutrition));CHECK(rate
 worker.race.robot=false;meal.edible=false;CHECK(ReadFood(&worker,rate,hunger,nutrition));CHECK(nutrition==0);
 meal.edible=true;meal.quantity=0;CHECK(!ReadFood(&worker,rate,hunger,nutrition));meal.quantity=3;
 meal.chargesLeft=std::numeric_limits<float>::quiet_NaN();CHECK(!ReadFood(&worker,rate,hunger,nutrition));meal.chargesLeft=10.0f;
+// Combined care stock counts actual resource once, including a worn bag that
+// may be published in both the borrowed list and its physical equip section.
+DfSupplyStock supplies;Item aid,kit;
+aid.itemFunction=ITEM_FIRSTAID;aid.quantity=2;aid.chargesLeft=40;aid.originalFullChargeAmount=150;
+kit.itemFunction=ITEM_ROBOTREPAIR;kit.chargesLeft=100;kit.originalFullChargeAmount=500;
+bag.all.data.push_back(&aid);bag.all.data.push_back(&kit);
+equipped.itemFunction=ITEM_CONTAINER;equipped.slotType=ATTACH_BACKPACK;
+worker.medical.robotic=true;
+CHECK(ReadSupplies(&worker,supplies));CHECK(supplies.known && !supplies.robot && supplies.robotLimbs);
+CHECK(supplies.firstAid==190 && supplies.repair==100);
+CHECK(supplies.ownedBags==1 && supplies.wearingBag);
+CHECK(std::fabs(supplies.food-.7f)<.00001f);
+worker.race.robot=true;CHECK(ReadSupplies(&worker,supplies));CHECK(supplies.robot && supplies.foodRate==0);
+worker.race.robot=false;kit.quantity=-1;CHECK(!ReadSupplies(&worker,supplies));kit.quantity=1;
+GameData bagType;equipped.data=&bagType;
+CHECK(CountOwnedInventory(&root,&bagType)==1);
+root.all.data.clear();CHECK(CountOwnedInventory(&root,&bagType)==1);
+CHECK(CountOwnedInventory(&foreign,&bagType)==-1);
 // A ranked offer batch must traverse containers once, not once per meal.
 GameData a,b;bag.allowed=&b;std::vector<GameData*> offers(63,&a);offers.push_back(&b);
 graphReads=fitCalls=0;CHECK(FirstFit(&root,offers)==63);CHECK(graphReads==2);CHECK(fitCalls==128);
@@ -101,7 +122,7 @@ std::printf("%d inventory checks, %d failed\n",checks,failed);return failed;}
 vc = Path(r'C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC')
 sdk = Path(r'C:\Program Files\Microsoft SDKs\Windows\v7.1')
 env = dict(os.environ)
-env['INCLUDE'] = str(vc / 'include') + ';' + str(sdk / 'Include')
+env['INCLUDE'] = str(vc / 'include') + ';' + str(sdk / 'Include') + ';' + str(root)
 env['LIB'] = str(vc / 'lib/amd64') + ';' + str(sdk / 'Lib/x64')
 env['PATH'] = str(vc / 'bin/amd64') + ';' + env['PATH']
 subprocess.run([str(vc / 'bin/amd64/cl.exe'), '/nologo', '/EHsc', '/MD', '/O2',

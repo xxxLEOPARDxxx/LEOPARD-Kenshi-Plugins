@@ -37,6 +37,7 @@ code = r'''
 #include <climits>
 #include <float.h>
 #include "core/DfSupply.h"
+#include "core/DfOffer.h"
 namespace Ogre {struct Vector3 {float x,y,z;Vector3(float a=0,float b=0,float c=0):x(a),y(b),z(c){}
 float squaredDistance(const Vector3& b)const{float a=x-b.x,c=y-b.y,d=z-b.z;return a*a+c*c+d*d;}};}
 struct Character;
@@ -56,11 +57,12 @@ struct StateBroadcastData{int _slaveState;StateBroadcastData():_slaveState(0){}}
 const int NULL_TASK=0,MOVE_ON_FREE_WILL=1,OPERATE_MACHINERY=87;
 struct Character {
  Faction* f;RaceData race;Platoon platoon;ActivePlatoon active;
+ float firstAid,repair;int bags;bool wearing,robotLimbs,equipWorks;
  hand id;std::string name;Ogre::Vector3 pos;float rate,hunger,food,original;
  int goal,clears,moves,price,inSomething;StateBroadcastData state;bool dead,ko,combat,animal,noRoom;
  Character(int i,Faction* faction,const char* n,float x=0):f(faction),id(i),name(n),pos(x,0,0),rate(1),hunger(2.5f),food(0.4f),original(3),
  goal(87),clears(0),moves(0),price(100),inSomething(0),dead(false),ko(false),combat(false),animal(false),noRoom(false)
- {actors[i]=this;platoon.f=f;platoon.malnourishedLevel=3;active.me=&platoon;}
+ {actors[i]=this;platoon.f=f;platoon.malnourishedLevel=3;active.me=&platoon;firstAid=150;repair=500;bags=1;wearing=true;robotLimbs=false;equipWorks=true;}
  Faction* getFaction(){return f;}ActivePlatoon* getPlatoon(){return &active;}RaceData* getRace(){return &race;}
  StateBroadcastData* getStateBroadcast(){return &state;}
  void* isAnimal(){return animal ? this : NULL;}bool isDead(){return dead;}bool isUnconcious(){return ko;}
@@ -87,11 +89,21 @@ bool BuyFood(Character*,Character*,Faction*,int,int&,std::string&,DfBuyStatus&);
 bool DfBuyFood(Character*,Character*,Faction*,int,int&,std::string&,DfBuyStatus*);
 bool Food(Character* c,Faction* f,float& rate,float& hunger,float& stock)
 {rate=c->rate;hunger=c->hunger;stock=c->food;return c->f==f && !c->dead;}
+struct DfMarketCache{};bool forecastKnown=true;int remembered=0;
+bool DfReadSupplyStock(Character* c,DfSupplyStock& s){s=DfSupplyStock();s.known=true;s.robot=c->race.robot;s.robotLimbs=c->robotLimbs;s.animal=c->animal;s.foodRate=c->rate;s.hunger=c->hunger;s.food=c->food;s.firstAid=c->firstAid;s.repair=c->repair;s.ownedBags=c->bags;s.wearingBag=c->wearing;return true;}
+bool DfLightBagRole(Character*){return true;}
+bool DfEquipOwnedBag(Character* c,bool,bool& equipped){equipped=c->wearing=c->equipWorks;return true;}
+bool DfForecastSupplies(Faction* f,const std::vector<Character*>&,const DfMarketCache&,int committed,unsigned long,DfBudgetSnapshot& b){b=DfBudgetSnapshot();b.money=f->factionOwnerships->money;b.committed=committed;b.forecastKnown=forecastKnown;return forecastKnown;}
+void DfRememberShop(DfMarketCache&,const hand&,const std::vector<DfSupplyQuote>&,unsigned long){++remembered;}
+Character* DfChooseSupplyTrader(Character* c,DfSupplyKind,bool,const std::vector<DfTrader>& shops,const DfMarketCache&,const std::vector<hand>& failed,unsigned long){Character* best=NULL;float distance=0;for(size_t i=0;i<shops.size();++i){Character* t=shops[i].who.getCharacter();bool skip=false;for(size_t k=0;k<failed.size();++k)if(failed[k].index==shops[i].who.index)skip=true;if(!t || skip)continue;float d=c->pos.squaredDistance(t->pos);if(!best || d<distance){best=t;distance=d;}}return best;}
+bool BuySupply(Character*,Character*,Faction*,DfSupplyKind,bool,const DfBudgetSnapshot&,int&,std::string&,std::vector<DfSupplyQuote>&,DfBuyStatus&);
 '''
 code += state[start:end] + '\n'
 code += function(mine, 'bool DfEconomyAvailable(') + '\n'
 code += function(sell, 'bool SafeBuyFood(') + '\n'
 code += function(sell, 'bool DfBuyFood(') + '\n'
+code += function(sell, 'bool SafeBuySupply(') + '\n'
+code += function(sell, 'bool DfBuySupply(') + '\n'
 code += r'''
 bool BuyFood(Character* member,Character* trader,Faction* f,int committed,int& paid,std::string& name,DfBuyStatus& status){
  ++buyCalls;
@@ -102,9 +114,17 @@ bool BuyFood(Character* member,Character* trader,Faction* f,int committed,int& p
  if(trader->noRoom){status=DF_BUY_NO_ROOM;return true;}
  paid=trader->price;f->factionOwnerships->money-=paid;member->food+=0.7f;name="Food";status=DF_BUY_OK;return true;
 }
+bool BuySupply(Character* member,Character* trader,Faction* f,DfSupplyKind kind,bool,const DfBudgetSnapshot& budget,int& paid,std::string& name,std::vector<DfSupplyQuote>& observed,DfBuyStatus& status){
+ observed.push_back(DfSupplyQuote());
+ if(kind==DF_SUPPLY_FOOD)return BuyFood(member,trader,f,budget.committed,paid,name,status);
+ ++buyCalls;if(buyMode==1)RaiseException(EXCEPTION_ACCESS_VIOLATION,0,0,NULL);
+ if(!DfPlanSupplySpend(budget,trader->price,kind).Allowed()){status=DF_BUY_NO_MONEY;return true;}
+ paid=trader->price;f->factionOwnerships->money-=paid;name="Supply";status=DF_BUY_OK;
+ if(kind==DF_SUPPLY_FIRSTAID)member->firstAid+=150;else if(kind==DF_SUPPLY_REPAIR)member->repair+=500;else ++member->bags;
+ return true;}
 '''
 for signature in ('bool Same(', 'bool Future(', 'void ClearRoute(', 'void Delay(',
-                  'bool Failed(', 'Character* ChooseTrader(', 'bool DfProvisionOwns(', 'void DfProvisionStep('):
+                  'bool ReadStock(', 'int SupplyPriority(', 'DfSupplyKind NextKind(', 'bool DfProvisionOwns(', 'void DfProvisionStep('):
     code += function(provision, signature) + '\n'
 code += r'''
 struct DfLabour{DfProvision provision;int carried,revenue;DfLabour():carried(0),revenue(0){}};
@@ -178,6 +198,41 @@ for(unsigned long now=6000;now<=181000;now+=5000){member.pos.x+=100;cheap.pos.x+
 CHECK(chase.member.isNull());CHECK(chase.cooldown.find(member.id)!=chase.cooldown.end());
 DfProvisionStep(s,chase,&faction,group,distant,NULL,0,3,186000,false);
 CHECK(!chase.member.isNull() && chase.member.index==next.id.index);
+// Robots replenish repair resource, never food or first-aid stock.
+fault=false;buyMode=0;wallet.money=10000;cheap.pos=Ogre::Vector3();member.pos=Ogre::Vector3();
+Character robot(8,&faction,"Robot");robot.race.robot=true;robot.rate=0;robot.food=0;robot.repair=0;robot.firstAid=0;
+std::vector<Character*> robots(1,&robot);DfProvision care;int oldCalls=buyCalls;
+DfProvisionStep(s,care,&faction,robots,shops,NULL,0,4,1000,false);
+CHECK(care.kind==DF_SUPPLY_REPAIR && robot.repair==500 && robot.food==0 && robot.firstAid==0);CHECK(buyCalls==oldCalls+1);
+// Bought but unworn bags are reused after a refused equip, never repurchased.
+Character carrier(9,&faction,"Carrier");carrier.food=1;carrier.bags=0;carrier.wearing=false;carrier.equipWorks=false;
+std::vector<Character*> carriers(1,&carrier);DfProvision gear;oldCalls=buyCalls;
+DfProvisionStep(s,gear,&faction,carriers,shops,NULL,0,5,1000,false);CHECK(carrier.bags==1 && buyCalls==oldCalls+1);
+DfProvisionStep(s,gear,&faction,carriers,shops,NULL,0,5,6000,false);CHECK(carrier.bags==1 && buyCalls==oldCalls+1 && !carrier.wearing);
+DfProvisionStep(s,gear,&faction,carriers,shops,NULL,0,5,40000,false);CHECK(carrier.bags==1 && buyCalls==oldCalls+1);
+carrier.equipWorks=true;DfProvisionStep(s,gear,&faction,carriers,shops,NULL,0,5,80000,false);CHECK(carrier.wearing && buyCalls==oldCalls+1);
+// Incomplete budgets cannot buy optional gear.
+Character unknownBudget(10,&faction,"Unknown");unknownBudget.food=1;unknownBudget.bags=0;unknownBudget.wearing=false;
+carriers[0]=&unknownBudget;forecastKnown=false;DfProvision blocked;oldCalls=wallet.money;
+DfProvisionStep(s,blocked,&faction,carriers,shops,NULL,0,6,1000,false);CHECK(wallet.money==oldCalls && unknownBudget.bags==0);forecastKnown=true;
+// A hungry member preempts a distant backpack route, without a gear purchase.
+Character gearWalker(11,&faction,"Walking");gearWalker.food=1;gearWalker.bags=0;gearWalker.wearing=false;
+Character hungry(12,&faction,"Hungry");hungry.food=1;std::vector<Character*> priorityPeople;
+cheap.pos=Ogre::Vector3(10000,0,0);
+priorityPeople.push_back(&gearWalker);priorityPeople.push_back(&hungry);DfProvision preempt;
+DfProvisionStep(s,preempt,&faction,priorityPeople,distant,NULL,0,7,1000,false);
+CHECK(preempt.kind==DF_SUPPLY_BACKPACK && preempt.member.index==gearWalker.id.index);
+hungry.food=0;hungry.hunger=1.2f;
+DfProvisionStep(s,preempt,&faction,priorityPeople,distant,NULL,0,7,6000,false);
+CHECK(preempt.kind==DF_SUPPLY_FOOD && preempt.member.index==hungry.id.index && gearWalker.bags==0);
+// The traveller's own hunger also switches the route before buying gear.
+hungry.food=1;gearWalker.food=1;DfProvision ownFood;
+std::vector<Character*> oneWalker(1,&gearWalker);
+DfProvisionStep(s,ownFood,&faction,oneWalker,distant,NULL,0,8,1000,false);
+CHECK(ownFood.kind==DF_SUPPLY_BACKPACK);
+gearWalker.food=0;gearWalker.hunger=1.2f;
+DfProvisionStep(s,ownFood,&faction,oneWalker,distant,NULL,0,8,6000,false);
+CHECK(ownFood.kind==DF_SUPPLY_FOOD && gearWalker.bags==0);
 std::printf("%d supply adapter checks, %d failed\n",checks,failed);return failed;
 }
 '''
@@ -189,7 +244,7 @@ env['INCLUDE'] = ';'.join((str(vc / 'include'), str(sdk / 'Include'), str(root))
 env['LIB'] = str(vc / 'lib/amd64') + ';' + str(sdk / 'Lib/x64')
 env['PATH'] = str(vc / 'bin/amd64') + ';' + env['PATH']
 subprocess.run([str(vc / 'bin/amd64/cl.exe'), '/nologo', '/EHsc', '/MD', '/O2',
-                str(out / 'supply_adapter_tests.cpp'), str(root / 'core/DfSupply.cpp'),
+                str(out / 'supply_adapter_tests.cpp'), str(root / 'core/DfSupply.cpp'),str(root / 'core/DfBudget.cpp'),
                 '/Fo' + str(out) + '\\', '/Fe' + str(out / 'supply_adapter_tests.exe')],
                env=env, check=True)
 subprocess.run([str(out / 'supply_adapter_tests.exe')], check=True)

@@ -90,6 +90,12 @@ namespace
         int food=0;
         if(sscanf_s(key.c_str(),"food %d",&food)==1)
             return Format(Tr("Bought food for %d cats"),food);
+        if(sscanf_s(key.c_str(),"aid %d",&food)==1)
+            return Format(Tr("Bought first-aid supplies for %d cats"),food);
+        if(sscanf_s(key.c_str(),"repair %d",&food)==1)
+            return Format(Tr("Bought repair supplies for %d cats"),food);
+        if(sscanf_s(key.c_str(),"bag %d",&food)==1)
+            return Format(Tr("Bought a backpack for %d cats"),food);
         if (key == "extinct")
             return Tr("All members are dead - the faction is extinct");
         int sold=0,paid=0;

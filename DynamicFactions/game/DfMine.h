@@ -96,6 +96,7 @@ void DfResetTransferFault(); // lifecycle only, before handles of the old world 
 // allocation. A true add is never retried/rolled back (KEO may merge/move it).
 Item* DfFirstInventoryItem(Inventory* root, GameData* item, Inventory*& actual, bool onlyClean = false);
 int DfCountInventoryItem(Inventory* root, GameData* item);
+int DfCountOwnedInventoryItem(Inventory* root,GameData* item);
 bool DfInventoryHasRoom(Inventory* root, GameData* item);
 // One bounded graph snapshot for a ranked batch (max64), avoiding one full
 // inventory walk per offered meal. Returns its first fitting index or -1.
@@ -109,6 +110,13 @@ bool DfMoveInventoryUnitToSection(Inventory* from, Inventory* actual, Item* sour
 bool DfMovePurchasedUnit(Inventory* from, Inventory* actual, Item* source,
     Inventory* to, GameData* item, const hand& newOwner);
 bool DfReadFood(Character* actor, float& rate, float& hunger, float& nutrition);
+struct DfSupplyStock;
+bool DfReadSupplyStock(Character* actor,DfSupplyStock& stock);
+struct DfBagSpec;
+bool DfReadBagSpec(Item* item,DfBagSpec& spec,bool mustBeEmpty);
+bool DfBagCanWear(Character* actor,Item* item);
+bool DfEquipOwnedBag(Character* actor,bool light,bool& equipped);
+bool DfLightBagRole(Character* actor);
 void DfQuarantineTransfer(const char* reason);
 
 // Снять приказы персонажа (работа кончилась).

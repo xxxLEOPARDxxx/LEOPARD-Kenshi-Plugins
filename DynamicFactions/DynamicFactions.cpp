@@ -790,7 +790,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     static const std::string ini = IniPath();
     api->beginMod(api, "DynamicFactions", "Dynamic Factions", ini.c_str(), &LoadSettings);
     if (api->version >= 2)
-        api->info(api, Tr("A faction in the Hub mines and sells real ore, buys and eats food, and hires ordinary recruits from its actual budget. No passive income."));
+        api->info(api, Tr("A faction in the Hub mines and sells real ore, buys food, medical supplies and suitable backpacks, and hires recruits from its actual budget. No passive income."));
     api->section(api, Tr("General"));
     api->toggle(api, "DynamicFactions", "Enabled", Tr("Enabled"), Tr("The whole mod."), 1, MCM_RESTART);
     static const char* labels[kDifficultyCount] = {};
@@ -805,7 +805,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
                  Tr("Money of a new faction when it is founded. Further income comes only from real sales. Applies to factions founded after the change."),
                  5000, 0, 100000, 0);
     api->toggle(api, "DynamicFactions", "Work", Tr("Mining and trade"),
-                Tr("Mine real resources, carry ore and sell it to town traders. Food supply continues when work is disabled."), 1, 0);
+                Tr("Mine real resources, carry ore and sell it to town traders. Supply runs continue when work is disabled."), 1, 0);
     api->integer(api, "DynamicFactions", "MineRadius", Tr("Resource search radius"),
                  Tr("Search and scout within this distance from the Hub. Only resources observed by faction members become known."), 3000, 500, 5000, 0);
     api->hotkey(api, "DynamicFactions", "WindowKey", Tr("Faction window key"),

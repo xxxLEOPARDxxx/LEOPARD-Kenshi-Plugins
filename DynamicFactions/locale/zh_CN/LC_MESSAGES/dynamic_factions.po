@@ -203,3 +203,21 @@ msgstr "开采真实资源、搬运矿石并卖给城镇商人。关闭工作后
 
 msgid "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
 msgstr "在 RE_Kenshi_log.txt 中记录补给、已确认购买、工作、保存和读取的详细信息。错误始终记录。"
+
+msgid "Supply run: %s; spent this session: %d"
+msgstr "补给采购：%s；本次支出：%d"
+
+msgid "Bought first-aid supplies for %d cats"
+msgstr "花费 %d 开币购买急救用品"
+
+msgid "Bought repair supplies for %d cats"
+msgstr "花费 %d 开币购买修理用品"
+
+msgid "Bought a backpack for %d cats"
+msgstr "花费 %d 开币购买背包"
+
+msgid "A faction in the Hub mines and sells real ore, buys food, medical supplies and suitable backpacks, and hires recruits from its actual budget. No passive income."
+msgstr "枢纽城的派系开采并出售真实矿石，使用实际资金购买食物、医疗用品和合适的背包，并雇用新成员。没有凭空收入。"
+
+msgid "Mine real resources, carry ore and sell it to town traders. Supply runs continue when work is disabled."
+msgstr "开采真实资源，运输矿石并卖给城镇商人。关闭工作后仍会采购补给。"

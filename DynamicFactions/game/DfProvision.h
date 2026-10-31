@@ -6,6 +6,7 @@
 #include "game/DfHand.h"
 #include "core/DfState.h"
 #include "game/DfSell.h"
+#include "game/DfMarket.h"
 
 class Character;
 class Faction;
@@ -18,6 +19,9 @@ struct DfProvision
     std::string lastItemName;
     std::vector<hand> failedShops;
     std::map<hand,unsigned long,DfWorkHandLess> cooldown;
+    DfMarketCache market;
+    DfSupplyKind kind;
+    bool light;
     size_t scanCursor;
     unsigned long progressAt;
     unsigned long startedAt;
@@ -26,7 +30,7 @@ struct DfProvision
     bool moving;
     bool warnedUnreadable;
     int spent;
-    DfProvision():scanCursor(0),progressAt(0),startedAt(0),progressPosition(0,0,0),destination(0,0,0),
+    DfProvision():kind(DF_SUPPLY_FOOD),light(true),scanCursor(0),progressAt(0),startedAt(0),progressPosition(0,0,0),destination(0,0,0),
         moving(false),warnedUnreadable(false),spent(0) {}
 };
 
