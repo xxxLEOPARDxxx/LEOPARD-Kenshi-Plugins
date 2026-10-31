@@ -3,7 +3,9 @@
 #include "game/DfSell.h"
 #include "game/DfMine.h"
 #include "core/DfTransfer.h"
+#include "core/DfBudget.h"
 #include <climits>
+#include <algorithm>
 #include <float.h>
 
 #include <Windows.h>
@@ -20,6 +22,7 @@
 #include <kenshi/Platoon.h>
 #include <kenshi/ShopTrader.h>
 #include <kenshi/ShopTraderInventory.h>
+#include <kenshi/RaceData.h>
 #include <kenshi/gui/InventoryGUI.h>
 #include <kenshi/Town.h>
 
@@ -392,9 +395,170 @@ namespace
             return false;
         }
     }
+
+    class NativeFoodPurchase : public DfTradePort
+    {
+        NativePayment money_;
+        InventorySection* stock_;
+        Inventory* from_;
+        Inventory* to_;
+        Item* source_;
+        GameData* data_;
+        hand buyerTitle_;
+    public:
+        NativeFoodPurchase(Character* member,Ownerships* buyer,Ownerships* seller,
+                           InventorySection* stock,Item* source)
+            : money_(buyer,seller),stock_(stock),from_(stock->getInventory()),to_(member->getInventory()),
+              source_(source),data_(source->getGameData()),buyerTitle_(member->getHandle()) {}
+        virtual bool Read(int& buyer,int& seller) {return money_.Read(buyer,seller);}
+        virtual void WriteBuyer(int target) {money_.WriteBuyer(target);}
+        virtual void WriteSeller(int target) {money_.WriteSeller(target);}
+        virtual bool ReadGoods(int& seller,int& buyer)
+        {
+            seller=stock_->getInventory()==from_ ? SafeCountStockSection(stock_,data_) : -1;
+            buyer=DfCountInventoryItem(to_,data_);
+            return seller>=0 && buyer>=0;
+        }
+        virtual DfUnitResult Deliver()
+        {
+            if(DfMovePurchasedUnit(from_,from_,source_,to_,data_,buyerTitle_)) return DF_UNIT_MOVED;
+            return DfTransferFaulted() ? DF_UNIT_FAULT : DF_UNIT_STOP;
+        }
+        virtual bool ReturnGoods()
+        {
+            // Purchases settle money first. Never pull a fresh unit back out
+            // of a native stack containing a partly eaten meal.
+            return false;
+        }
+    };
+
+    struct FoodOffer
+    {
+        Item* item;GameData* data;InventorySection* section;int price;double value;
+    };
+    bool CheapNutrition(const FoodOffer& a,const FoodOffer& b) {return a.value<b.value;}
+
+    bool BuyFoodFromStock(Character* member,Character* trader,Faction* f,int committed,
+                          const StockSections& stock,std::vector<FoodOffer>& offers,std::vector<GameData*>& ranked,
+                          int& paid,std::string& itemName,DfBuyStatus& status)
+    {
+        Ownerships* const buyer=f->factionOwnerships;
+        Ownerships* const seller=TraderPurse(trader);
+        RaceData* const race=member->getRace();
+        if(buyer==NULL || seller==NULL || buyer==seller || race==NULL || committed<0) return false;
+        DfBudgetSnapshot budget;budget.money=buyer->money;budget.committed=committed;
+        // Food is essential. Optional gear remains blocked until all real
+        // deficits/quotes are known; this is not a second wallet/reservation.
+        offers.clear();ranked.clear();
+        bool edible=false,affordable=false;
+        const bool animal=member->isAnimal()!=NULL;
+        unsigned int examined=0;
+        for(size_t at=0;at<stock.size();++at)
+        {
+            InventorySection* const s=stock[at];
+            const Ogre::vector<InventorySection::SectionItem>::type& items=s->getItems();
+            if(items.size()>4096) return false;
+            for(size_t i=0;i<items.size();++i)
+            {
+                if(++examined>4096) return false;
+                Item* const p=items[i].item;
+                // isTradeItem is the commodity pricing flag. Real shop food
+                // normally has it clear; membership in native stock is the
+                // sale-source check, not this flag.
+                if(p==NULL || p->quantity<=0 || p->isEquipped || p->deathItem ||
+                   (p->itemFunction!=ITEM_FOOD && p->itemFunction!=ITEM_FOOD_RESTRICTED) ||
+                   !_finite(p->chargesLeft) || p->chargesLeft<=0 || p->chargesLeft!=p->originalFullChargeAmount ||
+                   !_finite(p->quality) || p->isStolen(true) || !race->canEat(p,animal)) continue;
+                edible=true;
+                const int cost=UnitPrice(p,trader);
+                // For clean fresh shop food the native retail branch has no
+                // used/stolen discount; use this explicit merchant/town formula.
+                if(!DfPlanSpend(budget,cost,true).Allowed() || !DfCanPay(buyer->money,seller->money,cost)) continue;
+                affordable=true;
+                const double perNutrition=static_cast<double>(cost)/p->chargesLeft;
+                FoodOffer offer;offer.item=p;offer.data=p->getGameData();offer.section=s;offer.price=cost;offer.value=perNutrition;
+                size_t existing=offers.size();
+                for(size_t k=0;k<offers.size();++k)
+                    if(offers[k].data==offer.data) {existing=k;break;}
+                if(existing<offers.size())
+                {if(perNutrition<offers[existing].value)offers[existing]=offer;}
+                else if(offers.size()<64) offers.push_back(offer);
+                else
+                {
+                    size_t worst=0;
+                    for(size_t k=1;k<offers.size();++k)if(offers[k].value>offers[worst].value)worst=k;
+                    if(perNutrition<offers[worst].value)offers[worst]=offer;
+                }
+            }
+        }
+        std::stable_sort(offers.begin(),offers.end(),CheapNutrition);
+        for(size_t i=0;i<offers.size();++i) ranked.push_back(offers[i].data);
+        const int fit=DfFirstInventoryFit(member->getInventory(),ranked);
+        if(fit<0)
+        {status=!edible ? DF_BUY_NO_FOOD : !affordable ? DF_BUY_NO_MONEY : DF_BUY_NO_ROOM;return true;}
+        Item* const best=offers[fit].item;
+        InventorySection* const section=offers[fit].section;
+        const int price=offers[fit].price;
+        if(!ValidDeal(member,trader,f) || PlayerTradingWith(trader))
+        {status=DF_BUY_PLAYER_TRADING;return true;}
+        budget.money=buyer->money;
+        if(buyer!=f->factionOwnerships || seller!=TraderPurse(trader) ||
+           !DfPlanSpend(budget,price,true).Allowed()) return false;
+        itemName=best->getName();
+        NativeFoodPurchase purchase(member,buyer,seller,section,best);
+        const DfTradeResult result=DfPurchaseOne(purchase,price);
+        if(result==DF_TRADE_COMPLETE) {paid=price;status=DF_BUY_OK;return true;}
+        if(result==DF_TRADE_STOP || result==DF_TRADE_RESTORED)
+        {status=DF_BUY_NO_ROOM;return true;}
+        DfQuarantineTransfer("food purchase requires reconciliation; no replay");
+        status=DF_BUY_FAULT;return false;
+    }
+    bool SafeBuyFoodFromStock(Character* member,Character* trader,Faction* f,int committed,
+                              const StockSections& stock,std::vector<FoodOffer>& offers,std::vector<GameData*>& ranked,
+                              int& paid,std::string& name,DfBuyStatus& status)
+    {
+        __try {return BuyFoodFromStock(member,trader,f,committed,stock,offers,ranked,paid,name,status);}
+        __except(EXCEPTION_EXECUTE_HANDLER)
+        {DfQuarantineTransfer("native food purchase fault; no replay");status=DF_BUY_FAULT;return false;}
+    }
+    bool BuyFood(Character* member,Character* trader,Faction* f,int committed,
+                 int& paid,std::string& name,DfBuyStatus& status)
+    {
+        if(!ValidDeal(member,trader,f)) return false;
+        if(PlayerTradingWith(trader)) {status=DF_BUY_PLAYER_TRADING;return true;}
+        ShopView view(trader);
+        if(view.shop==NULL) return false;
+        StockSections stock;
+        // Owned buffers live outside the native SEH boundary, so an AV inside
+        // quote/transfer still returns through normal cleanup of these vectors.
+        std::vector<FoodOffer> offers;
+        std::vector<GameData*> ranked;
+        bool ok=SafeReadStockSections(view.shop,stock);
+        if(ok) ok=SafeBuyFoodFromStock(member,trader,f,committed,stock,offers,ranked,paid,name,status);
+        if(!view.Close()) ok=false;
+        return ok && !DfTransferFaulted();
+    }
+    bool SafeBuyFood(Character* member,Character* trader,Faction* f,int committed,
+                     int& paid,std::string& name,DfBuyStatus& status)
+    {
+        __try {return BuyFood(member,trader,f,committed,paid,name,status);}
+        __except(EXCEPTION_EXECUTE_HANDLER)
+        {DfQuarantineTransfer("food purchase setup fault; no replay");status=DF_BUY_FAULT;return false;}
+    }
 }
 
 bool DfSellTransferBusy() { return g_sellDepth != 0; }
+bool DfBuyFood(Character* member,Character* trader,Faction* f,int committed,
+               int& paid,std::string& name,DfBuyStatus* status)
+{
+    paid=0;name.clear();DfBuyStatus result=DF_BUY_INVALID;
+    if(DfTransferBusy()) {if(status!=NULL)*status=result;return false;}
+    SellGuard guard;
+    const bool ok=SafeBuyFood(member,trader,f,committed,paid,name,result);
+    if(!ok && DfTransferFaulted()) result=DF_BUY_FAULT;
+    if(status!=NULL) *status=result;
+    return ok;
+}
 bool DfTraderCanBuy(Character* hauler, Character* trader, Faction* f, GameData* item)
 {
     __try

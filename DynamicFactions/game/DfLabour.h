@@ -5,22 +5,13 @@
 #include "core/DfState.h"
 #include "core/DfWork.h"
 #include "game/DfMine.h"
+#include "game/DfHand.h"
+#include "game/DfProvision.h"
 
 class Character;
 class Faction;
 class TownBase;
 
-struct DfWorkHandLess
-{
-    bool operator()(const hand& a, const hand& b) const
-    {
-        if (a.type != b.type) return a.type < b.type;
-        if (a.container != b.container) return a.container < b.container;
-        if (a.containerSerial != b.containerSerial) return a.containerSerial < b.containerSerial;
-        if (a.index != b.index) return a.index < b.index;
-        return a.serial < b.serial;
-    }
-};
 struct DfMemberWork
 {
     DfRole role;
@@ -38,6 +29,7 @@ struct DfMemberWork
 };
 struct DfLabour
 {
+    DfProvision provision;
     std::map<hand, DfMemberWork, DfWorkHandLess> members;
     unsigned long loggedMs;
     int carried;
@@ -49,7 +41,7 @@ struct DfLabour
 // preserved in the save, quarantined from production, pickup and sale.
 void DfLabourStep(DfFactionState& s, DfLabour& rt, Faction* f, TownBase* hub,
     Character* envoy, bool traderHasMoney, double hour, unsigned long clockMs,
-    bool debug, float radius = 3000.0f);
+    bool debug, float radius = 3000.0f, int committed = 0, bool workEnabled = true);
 void DfLabourStop(DfLabour& rt, Faction* faction=NULL, Character* envoy=NULL);
 void DfLabourCounts(const DfLabour& rt, int& miners, int& haulers);
 std::string DfLabourStatus(const DfLabour& rt);

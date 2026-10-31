@@ -25,6 +25,7 @@
 #include <kenshi/Globals.h>
 #include <kenshi/Inventory.h>
 #include <kenshi/Item.h>
+#include <kenshi/RaceData.h>
 #include <kenshi/Town.h>
 #include <kenshi/ZoneManager.h>
 #include <kenshi/util/lektor.h>
@@ -331,6 +332,14 @@ int DfGoalOf(Character* c)
     }
 }
 
+bool DfEconomyAvailable(Character* c)
+{
+    if(c==NULL || c->isDead() || c->isUnconcious() || c->isInCombatMode(true,true)) return false;
+    const int goal=DfGoalOf(c);
+    // Medical, rescue, sleep, preservation and combat goals stay with native AI.
+    return goal==-1 || goal==NULL_TASK || goal==MOVE_ON_FREE_WILL || goal==OPERATE_MACHINERY;
+}
+
 namespace
 {
     bool g_transferFault = false;
@@ -347,6 +356,14 @@ namespace
     {
         Inventory* inv[16];
         int count;
+        bool AddChild(Inventory* child)
+        {
+            if (child == NULL) return true;
+            for (int k = 0; k < count; ++k) if (inv[k] == child) return true;
+            if (count == 16) return false;
+            inv[count++] = child;
+            return true;
+        }
         explicit InventoryView(Inventory* root) : count(0)
         {
             if (root == NULL) return;
@@ -361,13 +378,24 @@ namespace
                     if (++examined > 4096) { count = 0; return; }
                     Item* const p = all.stuff[i];
                     Inventory* const child = p != NULL ? p->getInventory() : NULL;
-                    if (child == NULL) continue;
-                    bool seen = false;
-                    for (int k = 0; k < count; ++k) if (inv[k] == child) seen = true;
-                    if (!seen)
+                    if (!AddChild(child)) { count = 0; return; }
+                }
+                // Native _allItems excludes equipped gear. The real worn
+                // backpack is published by its physical section, not that list.
+                const lektor<InventorySection*>& sections = inv[at]->getAllSections();
+                if (sections.size() > 128) { count = 0; return; }
+                for (uint32_t s = 0; s < sections.size(); ++s)
+                {
+                    InventorySection* const section = sections.stuff[s];
+                    if (section == NULL || section->getInventory() != inv[at]) { count = 0; return; }
+                    const Ogre::vector<InventorySection::SectionItem>::type& placed = section->getItems();
+                    if (placed.size() > 4096) { count = 0; return; }
+                    for (size_t k = 0; k < placed.size(); ++k)
                     {
-                        if (count == 16) { count = 0; return; }
-                        inv[count++] = child;
+                        if (++examined > 4096) { count = 0; return; }
+                        Item* const p = placed[k].item;
+                        if (p != NULL && p->isEquipped && !AddChild(p->getInventory()))
+                        { count = 0; return; }
                     }
                 }
             }
@@ -423,6 +451,15 @@ namespace
             if (view.inv[i]->hasRoomForItem(item)) return view.inv[i];
         return NULL;
     }
+    int FirstFit(Inventory* root,const std::vector<GameData*>& ranked)
+    {
+        if(ranked.size()>64) return -1;
+        InventoryView view(root);
+        for(size_t i=0;i<ranked.size();++i)
+            for(int at=0;at<view.count;++at)
+                if(ranked[i]!=NULL && view.inv[at]->hasRoomForItem(ranked[i])) return static_cast<int>(i);
+        return -1;
+    }
 
     bool SafeRemove(Inventory* inv, Item* source, Item*& detached)
     {
@@ -452,6 +489,23 @@ namespace
         __except (EXCEPTION_EXECUTE_HANDLER) { ErrorLog("DynamicFactions: native stock section insertion fault"); return false; }
     }
 
+    bool SameTitle(const hand& a, const hand& b)
+    {
+        return a.type==b.type && a.container==b.container && a.containerSerial==b.containerSerial &&
+            a.index==b.index && a.serial==b.serial;
+    }
+    bool SafeTitle(Item* item, const hand& title)
+    {
+        __try
+        {
+            if (item==NULL || item->isInInventory || item->quantity!=1) return false;
+            item->setProperOwner(title);
+            return SameTitle(item->getProperOwner(),title);
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER)
+        { ErrorLog("DynamicFactions: purchase ownership transfer fault");return false; }
+    }
+
     class NativeTransfer : public DfTransferPort
     {
         Inventory* from_;
@@ -461,11 +515,17 @@ namespace
         Inventory* destination_;
         InventorySection* section_;
         GameData* item_;
+        bool purchase_;
+        hand previousTitle_;
+        hand purchaseTitle_;
     public:
         NativeTransfer(Inventory* from, Inventory* actual, Item* source, Inventory* to,
-                       Inventory* destination, GameData* item, InventorySection* section = NULL)
+                       Inventory* destination, GameData* item, InventorySection* section = NULL,
+                       const hand* title = NULL)
             : from_(from), actual_(actual), source_(source), to_(to), destination_(destination),
-            section_(section), item_(item) {}
+            section_(section), item_(item), purchase_(title!=NULL),
+            previousTitle_(title!=NULL ? source->getProperOwner() : hand()),
+            purchaseTitle_(title!=NULL ? *title : hand()) {}
         virtual bool Read(int& source, int& destination)
         {
             source = DfCountInventoryItem(from_, item_);
@@ -486,17 +546,19 @@ namespace
         }
         virtual bool Add(void* item, bool& accepted)
         {
+            if (purchase_ && !SafeTitle(static_cast<Item*>(item),purchaseTitle_)) return false;
             if (section_ != NULL) return SafeAddSection(section_, static_cast<Item*>(item), accepted);
             return SafeAdd(destination_, static_cast<Item*>(item), accepted);
         }
         virtual bool Restore(void* item, bool& accepted)
         {
+            if (purchase_ && !SafeTitle(static_cast<Item*>(item),previousTitle_)) return false;
             return SafeAdd(actual_, static_cast<Item*>(item), accepted);
         }
     };
 
     bool MoveUnit(Inventory* from, Inventory* actual, Item* source, Inventory* to, GameData* item,
-                  InventorySection* pinned = NULL)
+                  InventorySection* pinned = NULL, const hand* title = NULL)
     {
         if (g_transferFault || from == NULL || actual == NULL || source == NULL ||
             to == NULL || from == to || item == NULL || source->isEquipped ||
@@ -513,7 +575,7 @@ namespace
         }
         Inventory* const destination = pinned != NULL ? to : WithRoom(to, item);
         if (destination == NULL) return false;
-        NativeTransfer native(from, actual, source, to, destination, item, pinned);
+        NativeTransfer native(from, actual, source, to, destination, item, pinned, title);
         const DfUnitResult result = DfTransferOne(native);
         if (result == DF_UNIT_FAULT) DfQuarantineTransfer("ore delivery requires reconciliation; no replay");
         return result == DF_UNIT_MOVED;
@@ -582,6 +644,11 @@ bool DfInventoryHasRoom(Inventory* root, GameData* item)
     __try { return root != NULL && item != NULL && WithRoom(root, item) != NULL; }
     __except (EXCEPTION_EXECUTE_HANDLER) { return false; }
 }
+int DfFirstInventoryFit(Inventory* root,const std::vector<GameData*>& ranked)
+{
+    __try {return FirstFit(root,ranked);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {return -1;}
+}
 Item* DfFirstInventoryItem(Inventory* root, GameData* item, Inventory*& actual, bool onlyClean)
 {
     __try { return FirstInventory(root, item, actual, onlyClean); }
@@ -598,6 +665,58 @@ bool DfMoveInventoryUnitToSection(Inventory* from, Inventory* actual, Item* sour
     __try { return to != NULL && MoveUnit(from, actual, source, to->getInventory(), item, to); }
     __except (EXCEPTION_EXECUTE_HANDLER)
     { DfQuarantineTransfer("moving ore to real merchant stock raised a native fault"); return false; }
+}
+
+bool DfMovePurchasedUnit(Inventory* from, Inventory* actual, Item* source, Inventory* to,
+                       GameData* item, const hand& newOwner)
+{
+    __try { return MoveUnit(from,actual,source,to,item,NULL,&newOwner); }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    { DfQuarantineTransfer("physical purchase transfer fault; no replay");return false; }
+}
+
+namespace
+{
+    bool ReadFood(Character* actor,float& rate,float& hunger,float& nutrition)
+    {
+        if(actor==NULL || actor->getRace()==NULL) return false;
+        RaceData* const race=actor->getRace();
+        rate=race->robot ? 0.0f : race->hungerRate;
+        hunger=actor->getMedical()->hunger;nutrition=0;
+        if(!_finite(rate) || rate<0 || !_finite(hunger)) return false;
+        if(rate==0) return true;
+        InventoryView view(actor->getInventory());
+        if(view.count==0) return false;
+        double total=0;
+        const bool animal=actor->isAnimal()!=NULL;
+        for(int at=0;at<view.count;++at)
+        {
+            const lektor<Item*>& all=view.inv[at]->getAllItems();
+            for(uint32_t k=0;k<all.size();++k)
+            {
+                Item* const p=all.stuff[k];
+                if(p==NULL || p->isEquipped || p->deathItem ||
+                   (p->itemFunction!=ITEM_FOOD && p->itemFunction!=ITEM_FOOD_RESTRICTED)) continue;
+                if(!race->canEat(p,animal)) continue;
+                if(p->quantity<=0 || !_finite(p->chargesLeft) || !_finite(p->originalFullChargeAmount) ||
+                   p->chargesLeft<0 || p->originalFullChargeAmount<=0 || p->chargesLeft>p->originalFullChargeAmount)
+                    return false;
+                // Native stacks have one partly used unit plus untouched units.
+                total+=p->chargesLeft+static_cast<double>(p->quantity-1)*p->originalFullChargeAmount;
+                if(total>FLT_MAX) return false;
+            }
+        }
+        // Food charges are displayed NU; native eatItem converts each mouthful
+        // to MedicalSystem::fed with *0.01. Procurement uses those hunger units.
+        nutrition=static_cast<float>(total*0.01);
+        return true;
+    }
+}
+
+bool DfReadFood(Character* actor,float& rate,float& hunger,float& nutrition)
+{
+    __try {return ReadFood(actor,rate,hunger,nutrition);}
+    __except(EXCEPTION_EXECUTE_HANDLER) {return false;}
 }
 
 int DfTakeOreFromNode(Character* c, const hand& node, GameData* item, int maxUnits)

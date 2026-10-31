@@ -185,3 +185,21 @@ msgstr "Sold %d units of ore for %d cats"
 
 msgid "Research is paused until real research work is implemented."
 msgstr "Research is paused until real research work is implemented."
+
+msgid "None"
+msgstr "None"
+
+msgid "Bought food for %d cats"
+msgstr "Bought food for %d cats"
+
+msgid "Food supply: %s; spent this session: %d"
+msgstr "Food supply: %s; spent this session: %d"
+
+msgid "A faction in the Hub mines and sells real ore, buys and eats food, and hires ordinary recruits from its actual budget. No passive income."
+msgstr "A faction in the Hub mines and sells real ore, buys and eats food, and hires ordinary recruits from its actual budget. No passive income."
+
+msgid "Mine real resources, carry ore and sell it to town traders. Food supply continues when work is disabled."
+msgstr "Mine real resources, carry ore and sell it to town traders. Food supply continues when work is disabled."
+
+msgid "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
+msgstr "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."

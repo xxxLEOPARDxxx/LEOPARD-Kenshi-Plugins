@@ -161,17 +161,74 @@ and14578cats (14000+578). The two buyers' physical backpacks retained all six
 saved units: five iron and one copper. No repeated grant/payment was observed
 in this case. In-transit saves, repeated reloads and other boundaries remain open.
 
-СНАБЖЕНИЕ В РАЗРАБОТКЕ / SUPPLIES IN DEVELOPMENT
+СНАБЖЕНИЕ: ЭКСПЕРИМЕНТАЛЬНАЯ C8 / SUPPLIES: EXPERIMENTAL C8
 
-Штатная подпитка NPC выявлена, но ещё не отключена: живым участникам нужны
-реальная еда и закупки. Проверена отдельная чистая политика резерва DfBudget;
-она пока не подключена к игровым закупкам. Рюкзаки, мародёрство и улучшение
-экипировки по роли/навыкам входят в план, а не в готовые возможности C7.
-Основой исполнения остаются штатные действия Kenshi; свежая Squad Autonomy
-из GitHub изучена как справочник. Её код и player/NPC-переключатели не переносились.
-Native NPC hunger replenishment is identified but not yet disabled; organic
-members need real food and procurement. The tested pure DfBudget reserve
-policy is not yet connected to live purchases. Backpacks, looting and upgrades
-matching roles/skills are planned, not finished C7 features. Native Kenshi
-actions remain the execution layer. Current GitHub Squad Autonomy was studied
-as a reference; its code and player/NPC switches have not been imported.
+C8 - внутреннее обозначение тестовой сборки, не новый публичный выпуск.
+Первый игровой цикл еды и загрузка после него проверены31.10; пограничные
+случаи и длительный перф-прогон остаются в плане.
+У обычных живых участников DF отключена штатная подпитка NPC. Функция игры
+вызывается всегда; её расход голода, fed, поедание, расовые правила и штрафы
+не заменяются. Скелеты, животные, рабство/тюрьма и чужие фракции сохраняют
+своё штатное поведение. Проверка действует и до готовности окна после загрузки,
+чтобы задержка тика не выдавала питание заново.
+
+При малом запасе участник идёт к настоящему торговцу и покупает подходящую
+для своей расы свежую еду. Выбирается доступная цена за питательность и место;
+деньги перечисляются из казны фракции в кошелёк магазина. Резерв на уже начатый
+найм защищён. Чужая открытая торговля откладывает сделку. После снабжения
+участник возвращается к добыче/перевозке. Работа не перебивает лечение, сон,
+спасение и бой. Выключение Work останавливает добычу, но не потребность в еде.
+
+Один маршрут и максимум одна покупка на шаг5секунд; до4кандидатов за шаг,
+ограниченные обходы, максимум64вида предложения за одну оценку. Надетые
+рюкзаки учитываются через настоящие секции. Стопки считаются по питательности,
+включая начатую порцию. Оплата подтверждается до передачи еды: при отказе
+инвентаря и доказанном отсутствии передачи возвращаются реальные деньги.
+Еду из надкушенной стопки для отмены не извлекаем. Неизвестный исход сделки
+блокирует дальнейшие операции и сохраняется как workFault, без повторной оплаты.
+Недостижимые/дорогие магазины перебираются; маршрут уступает очередь не позже
+3минут активного времени, даже если участник продолжает двигаться.
+
+Новые события/подсказки доступны RU/EN/CN; подробный журнал по умолчанию0.
+В тестовой копии куплены3настоящих предмета модовой еды за5367катов:
+товар ушёл от продавца, деньги сошлись в обоих кошельках, началось поедание.
+После отдельной продажи меди казна9304и все6персонажей/предметы/остатки
+еды сохранились при обычной загрузке нового DF-food-earned-20261031.
+Это один цикл; голод при отсутствии еды, прочие расы и FPS/долгая память ещё
+не приняты в игре. Рюкзаки покупкой, мародёрство, экипировка и полный прогноз
+резерва для необязательных улучшений остаются следующими этапами. Код
+Squad Autonomy и переключатели player/NPC не переносились.
+
+C8 is an internal test-build label, not a new public release. Source and
+the first live food cycle and its subsequent reload were checked on31October.
+Boundary cases and long performance runs remain open. Ordinary
+organic DF members no longer receive the native NPC hunger floor. The original
+function always runs; native consumption, fed, eating, racial rules and penalties
+remain intact. Robots, animals, slave/prison states and other factions retain
+native behavior. The scope works before delayed UI/session readiness on load,
+so the tick grace period does not grant food again.
+
+A low-stock member physically approaches a real shop and buys fresh food its
+race can eat. Selection considers actual price per nutrition and inventory room.
+Faction treasury pays the shop purse; existing recruitment commitments remain
+protected. Player trading defers shared-shop operations. Normal work resumes
+after supply; medical, rescue, sleep and combat goals take precedence. Turning
+off Work stops mining, but food procurement continues.
+
+One route and at most one purchase per5-second step; at most four candidates
+are scanned per step and64offer types per quote. Equipped backpacks are visited
+through their physical sections. Nutrition includes partly eaten stacks. Payment
+is confirmed before food insertion; proven refused/restored insertion refunds
+real balances. No food is extracted from partly eaten stacks for compensation.
+Unknown outcomes durably quarantine work rather than replay mutations. Other
+shops are tried after local price/shape failures, and any route yields within
+3minutes of active time, including a supplier that keeps moving without arrival.
+
+RU/EN/CN strings are present; detailed logging defaults off. Three real modded
+food items were bought for5367cats: stock and both purses reconciled, and native
+eating began. After a separate copper sale, the new DF-food-earned-20261031
+reload retained9304cats and the same six members, possessions and food charges.
+This verifies one cycle; no-food consequences, other races and long FPS/memory
+acceptance remain open. Backpack
+procurement, looting, role-based gear and the full optional-upgrade reserve
+forecast are later stages. Squad Autonomy code/player-NPC switches were not copied.

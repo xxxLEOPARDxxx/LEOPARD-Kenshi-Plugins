@@ -72,6 +72,12 @@ void DfAssignRoles(std::vector<DfMember>& members, const std::vector<DfNodeState
                 m.node = -1;
             continue;
         }
+        if (m.supplying && m.able)
+        {
+            m.role = DF_ROLE_SUPPLY;
+            if (!cargo) m.node = -1;
+            continue;
+        }
         if (!homeLoaded || !m.able)
         {
             m.role = DF_ROLE_IDLE;

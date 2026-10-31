@@ -12,7 +12,8 @@ enum DfRole
     DF_ROLE_IDLE,
     DF_ROLE_MINE,
     DF_ROLE_HAUL,
-    DF_ROLE_HIRE                // посланник найма - работу не получает
+    DF_ROLE_HIRE,               // посланник найма - работу не получает
+    DF_ROLE_SUPPLY              // настоящее снабжение - приоритет над добычей
 };
 
 struct DfMember
@@ -20,11 +21,12 @@ struct DfMember
     int id;
     bool able;                  // жив, в сознании, не в бою
     bool hiring;                // занят наймом
+    bool supplying;
     int carried;                // руды при себе (носильщик)
     int node;                   // индекс жилы или -1
     DfRole role;
     bool canHaul;
-    DfMember() : id(0), able(false), hiring(false), carried(0), node(-1), role(DF_ROLE_IDLE), canHaul(true) {}
+    DfMember() : id(0), able(false), hiring(false), supplying(false), carried(0), node(-1), role(DF_ROLE_IDLE), canHaul(true) {}
 };
 
 struct DfNodeState

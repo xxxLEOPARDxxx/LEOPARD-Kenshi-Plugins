@@ -85,12 +85,17 @@ namespace
 }
 
 void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Character* envoy,
-    bool traderHasMoney,double hour,unsigned long clockMs,bool debug,float radius)
+    bool traderHasMoney,double hour,unsigned long clockMs,bool debug,float radius,int committed,bool workEnabled)
 {
     (void)traderHasMoney;
     if (f==NULL || hub==NULL || DfTransferFaulted()) return;
     std::vector<Character*> people;DfFactionMembers(f,people);
     if (people.empty()) return;
+    std::vector<DfTrader> traders;DfFindTraders(hub,traders);
+    // One shared merchant search. Needs use the same physical NPCs as work.
+    DfProvisionStep(s,rt.provision,f,people,traders,envoy,committed,hour,clockMs,debug);
+    if(DfTransferFaulted()) return;
+    if(!workEnabled) {DfLabourStop(rt,f,envoy);return;}
     const Ogre::Vector3 home=hub->getPosition();
     // One shared spatial query per faction step, not per worker and saved node.
     std::vector<DfNode> loaded;DfFindNodes(home,radius,NULL,loaded);
@@ -134,13 +139,13 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
         if(units<0) {DfQuarantineTransfer("DynamicFactions: inventory snapshot unreadable - work stopped");return;}
         if(units>0)
             for(size_t k=0;k<n;++k) if(s.nodes[k].itemSid==cargo[i]->stringID) {w.node=static_cast<int>(k);break;}
-        ms[i].id=static_cast<int>(i);ms[i].able=Able(c);ms[i].hiring=c==envoy;
+        ms[i].id=static_cast<int>(i);ms[i].able=DfEconomyAvailable(c);ms[i].hiring=c==envoy;
+        ms[i].supplying=DfProvisionOwns(rt.provision,c);
         ms[i].node=w.node;ms[i].role=w.role;ms[i].carried=units;
         ms[i].canHaul=w.blockedUntil==0 || static_cast<long>(clockMs-w.blockedUntil)>=0;
     }
     for(MemberMap::iterator it=rt.members.begin();it!=rt.members.end();)
         if(living.find(it->first)==living.end()) rt.members.erase(it++);else ++it;
-    std::vector<DfTrader> traders;DfFindTraders(hub,traders);
     bool money=false;for(size_t t=0;t<traders.size();++t) if(traders[t].money>0) money=true;
     DfAssignRoles(ms,nodes,true,money);
     rt.carried=0;
@@ -152,11 +157,12 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
         if(changed)
         {
             // Hiring already issued an envoy order earlier in this same tick.
-            if(!ms[i].hiring) Stop(c,w);else w.ordered=w.moving=false;
+            if(!ms[i].hiring && !ms[i].supplying) Stop(c,w);else w.ordered=w.moving=false;
             w.trader=hand();w.progressAt=clockMs;w.progressPosition=c->getPosition();
         }
         w.role=ms[i].role;w.node=ms[i].node;rt.carried+=ms[i].carried;
-        if(!ms[i].able || ms[i].hiring) {if(!ms[i].hiring) Stop(c,w);continue;}
+        if(!ms[i].able || ms[i].hiring || ms[i].supplying)
+        {if(!ms[i].hiring && !ms[i].supplying) Stop(c,w);continue;}
         if(w.blockedUntil!=0 && static_cast<long>(clockMs-w.blockedUntil)<0) continue;
         if(w.moving)
         {
@@ -259,12 +265,12 @@ void DfLabourStep(DfFactionState& s,DfLabour& rt,Faction* f,TownBase* hub,Charac
 static void StopAllLabour(DfLabour& rt, Faction* faction, Character* envoy)
 {
     for(MemberMap::iterator it=rt.members.begin();it!=rt.members.end();++it)
-    {Character* c=it->first.getCharacter();if(c!=NULL) Stop(c,it->second);}
+    {Character* c=it->first.getCharacter();if(c!=NULL && !DfProvisionOwns(rt.provision,c)) Stop(c,it->second);}
     rt.members.clear();
     if(faction!=NULL)
     {
         std::vector<Character*> people;DfFactionMembers(faction,people);
-        for(size_t i=0;i<people.size();++i) if(people[i]!=envoy && Able(people[i]))
+        for(size_t i=0;i<people.size();++i) if(people[i]!=envoy && !DfProvisionOwns(rt.provision,people[i]) && Able(people[i]))
         {
             const int goal=DfGoalOf(people[i]);
             if(goal==OPERATE_MACHINERY || goal==MOVE_ON_FREE_WILL) DfClearOrders(people[i]);
@@ -286,5 +292,11 @@ std::string DfLabourStatus(const DfLabour& rt)
 {
     int miners=0,haulers=0;DfLabourCounts(rt,miners,haulers);
     char b[256];sprintf_s(b,sizeof(b),Tr("Mining: %d; hauling: %d; cargo: %d; sales this session: %d"),miners,haulers,rt.carried,rt.revenue);
-    return b;
+    std::string result(b);
+    std::string food(Tr("Food supply: %s; spent this session: %d"));
+    char spent[40];sprintf_s(spent,sizeof(spent),"%d",rt.provision.spent);
+    size_t pos=food.find("%d");if(pos!=std::string::npos)food.replace(pos,2,spent);
+    pos=food.find("%s");if(pos!=std::string::npos)
+        food.replace(pos,2,rt.provision.memberName.empty() ? Tr("None") : rt.provision.memberName.c_str());
+    return result+"\n"+food;
 }

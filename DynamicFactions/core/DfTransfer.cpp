@@ -151,3 +151,29 @@ DfTradeResult DfTradeOne(DfTradePort& port, int price)
     return gs1 == goodsSeller && gb1 == goodsBuyer && b1 == b0 && s1 == s0
         ? DF_TRADE_RESTORED : DF_TRADE_FAULT;
 }
+
+DfTradeResult DfPurchaseOne(DfTradePort& port, int price)
+{
+    int b0=0,s0=0,b1=0,s1=0,gs0=0,gb0=0,gs1=0,gb1=0;
+    if(!port.Read(b0,s0) || !DfCanPay(b0,s0,price) || !port.ReadGoods(gs0,gb0) ||
+       gs0<=0 || gb0<0 || gb0==INT_MAX) return DF_TRADE_STOP;
+    const bool paid=DfPayOne(port,price);
+    if(!port.Read(b1,s1) || !port.ReadGoods(gs1,gb1)) return DF_TRADE_FAULT;
+    if(!paid)
+        return b1==b0 && s1==s0 && gs1==gs0 && gb1==gb0 ? DF_TRADE_STOP : DF_TRADE_FAULT;
+    if(DfPaymentResult(b0,s0,price,b1,s1)!=DF_PAYMENT_COMPLETE || gs1!=gs0 || gb1!=gb0)
+        return DF_TRADE_FAULT;
+    const DfUnitResult delivered=port.Deliver();
+    if(!port.Read(b1,s1) || !port.ReadGoods(gs1,gb1) ||
+       DfPaymentResult(b0,s0,price,b1,s1)!=DF_PAYMENT_COMPLETE) return DF_TRADE_FAULT;
+    const DfGoodsState goods=DfGoodsResult(gs0,gb0,gs1,gb1);
+    if(delivered==DF_UNIT_MOVED && goods==DF_GOODS_MOVED) return DF_TRADE_COMPLETE;
+    if(delivered!=DF_UNIT_STOP || goods!=DF_GOODS_UNCHANGED) return DF_TRADE_FAULT;
+    // Delivery demonstrably refused/restored. Recover payment exactly once,
+    // debiting the shop first so a failed refund cannot create money.
+    port.WriteSeller(s0);
+    if(!port.Read(b1,s1) || b1!=b0-price || s1!=s0) return DF_TRADE_FAULT;
+    port.WriteBuyer(b0);
+    if(!port.Read(b1,s1) || !port.ReadGoods(gs1,gb1)) return DF_TRADE_FAULT;
+    return b1==b0 && s1==s0 && gs1==gs0 && gb1==gb0 ? DF_TRADE_RESTORED : DF_TRADE_FAULT;
+}

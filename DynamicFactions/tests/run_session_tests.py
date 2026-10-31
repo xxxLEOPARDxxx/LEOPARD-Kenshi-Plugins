@@ -31,6 +31,7 @@ code = r'''
 #include <string>
 #include <map>
 #include <cstdio>
+#include <climits>
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -147,7 +148,8 @@ int main(){
  ShowReceipt(&c,97);check(receiptGui.caption=="c.97"&&receiptGui.size==ScreenLabel::LS_LARGE&&receiptGui.speed==ScreenLabel::RS_SLOW,"native currency receipt format and vanilla style");
  check(receiptGui.label.tracked.character==&c&&receiptGui.label.offset.y==15,"currency receipt tracks trading actor at native head offset");
  check(wallet.money==100,"receipt does not perform another payment");
- int before=receiptGui.count;ShowReceipt(&c,0);ShowReceipt(&c,-1);ShowReceipt(0,97);check(receiptGui.count==before,"empty invalid receipts do not allocate labels");
+ ShowReceipt(&c,-97);check(receiptGui.caption=="c.-97","confirmed purchase receipt has a negative amount");
+ int before=receiptGui.count;ShowReceipt(&c,0);ShowReceipt(&c,INT_MIN);ShowReceipt(0,97);check(receiptGui.count==before,"empty invalid receipts do not allocate labels");
  gui=0;ShowReceipt(&c,97);check(receiptGui.count==before,"no GUI remains visual-only and safe");gui=&receiptGui;
  receiptGui.fail=true;ShowReceipt(&c,97);check(wallet.money==100,"failed receipt allocation does not alter completed payment");receiptGui.fail=false;}
 

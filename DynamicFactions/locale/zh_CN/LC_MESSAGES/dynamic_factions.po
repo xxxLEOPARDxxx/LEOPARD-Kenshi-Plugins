@@ -185,3 +185,21 @@ msgstr "已出售 %d 单位矿石，收入 %d 开币"
 
 msgid "Research is paused until real research work is implemented."
 msgstr "研究已暂停，等待实现实际研究工作。"
+
+msgid "None"
+msgstr "无"
+
+msgid "Bought food for %d cats"
+msgstr "购买食物花费 %d 开币"
+
+msgid "Food supply: %s; spent this session: %d"
+msgstr "食物补给：%s；本次游戏花费：%d"
+
+msgid "A faction in the Hub mines and sells real ore, buys and eats food, and hires ordinary recruits from its actual budget. No passive income."
+msgstr "中心城的派系开采并出售真实矿石，购买和食用食物，并用自己的资金雇用普通新兵。没有被动收入。"
+
+msgid "Mine real resources, carry ore and sell it to town traders. Food supply continues when work is disabled."
+msgstr "开采真实资源、搬运矿石并卖给城镇商人。关闭工作后，食物补给仍会继续。"
+
+msgid "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
+msgstr "在 RE_Kenshi_log.txt 中记录补给、已确认购买、工作、保存和读取的详细信息。错误始终记录。"

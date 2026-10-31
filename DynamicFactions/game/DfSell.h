@@ -47,3 +47,10 @@ const float kDfTradeRange = 60.0f;
 // false means stop/reconcile; outputs retain prior confirmed deals. No replay.
 bool DfSellOre(Character* hauler, Character* trader, Faction* f, GameData* item, int maxUnits, int& sold,
                int& paid, DfSellStatus* status = NULL);
+
+enum DfBuyStatus { DF_BUY_OK, DF_BUY_NO_FOOD, DF_BUY_NO_MONEY, DF_BUY_NO_ROOM,
+                   DF_BUY_PLAYER_TRADING, DF_BUY_INVALID, DF_BUY_FAULT };
+// One fresh edible unit from the shop's REAL published stock. Real faction
+// money -> shop purse. Existing recruitment commitments remain protected.
+bool DfBuyFood(Character* member, Character* trader, Faction* faction, int committed,
+               int& paid, std::string& itemName, DfBuyStatus* status = NULL);

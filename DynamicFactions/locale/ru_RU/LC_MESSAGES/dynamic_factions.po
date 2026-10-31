@@ -185,3 +185,21 @@ msgstr "Продано руды: %d, получено катов: %d"
 
 msgid "Research is paused until real research work is implemented."
 msgstr "Исследования приостановлены до появления настоящей работы учёных."
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Bought food for %d cats"
+msgstr "Куплена еда за %d катов"
+
+msgid "Food supply: %s; spent this session: %d"
+msgstr "Снабжение едой: %s; расходы за сеанс: %d"
+
+msgid "A faction in the Hub mines and sells real ore, buys and eats food, and hires ordinary recruits from its actual budget. No passive income."
+msgstr "Фракция в Хабе добывает и продаёт настоящую руду, покупает и ест продукты, нанимает обычных рекрутов за свои деньги. Пассивного дохода нет."
+
+msgid "Mine real resources, carry ore and sell it to town traders. Food supply continues when work is disabled."
+msgstr "Добывать настоящие ресурсы, переносить руду и продавать городским торговцам. При отключении работы снабжение едой продолжается."
+
+msgid "Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."
+msgstr "Подробности снабжения, подтверждённых покупок, работы, сохранения и загрузки в RE_Kenshi_log.txt. Ошибки записываются всегда."

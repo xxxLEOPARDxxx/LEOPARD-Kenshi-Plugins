@@ -87,6 +87,9 @@ namespace
             return Tr("Founded in the Hub");
         if (key == "recruit")
             return Tr("Hired a recruit in town");
+        int food=0;
+        if(sscanf_s(key.c_str(),"food %d",&food)==1)
+            return Format(Tr("Bought food for %d cats"),food);
         if (key == "extinct")
             return Tr("All members are dead - the faction is extinct");
         int sold=0,paid=0;

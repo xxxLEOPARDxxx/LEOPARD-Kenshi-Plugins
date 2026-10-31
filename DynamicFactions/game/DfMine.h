@@ -97,10 +97,18 @@ void DfResetTransferFault(); // lifecycle only, before handles of the old world 
 Item* DfFirstInventoryItem(Inventory* root, GameData* item, Inventory*& actual, bool onlyClean = false);
 int DfCountInventoryItem(Inventory* root, GameData* item);
 bool DfInventoryHasRoom(Inventory* root, GameData* item);
+// One bounded graph snapshot for a ranked batch (max64), avoiding one full
+// inventory walk per offered meal. Returns its first fitting index or -1.
+int DfFirstInventoryFit(Inventory* root,const std::vector<GameData*>& ranked);
 bool DfMoveInventoryUnit(Inventory* from, Inventory* actual, Item* source, Inventory* to, GameData* item);
 // Pin an actual persistent section (e.g. merchant stock), never a GUI proxy.
 bool DfMoveInventoryUnitToSection(Inventory* from, Inventory* actual, Item* source,
                                   InventorySection* to, GameData* item);
+// Legal purchase only: caller has settled the checked real payment. Native
+// ownership changes while detached, restored on rejected insertion.
+bool DfMovePurchasedUnit(Inventory* from, Inventory* actual, Item* source,
+    Inventory* to, GameData* item, const hand& newOwner);
+bool DfReadFood(Character* actor, float& rate, float& hunger, float& nutrition);
 void DfQuarantineTransfer(const char* reason);
 
 // Снять приказы персонажа (работа кончилась).
@@ -111,3 +119,4 @@ bool DfOrderMine(Character* c, const DfNode& node);
 
 // Текущая цель персонажа (TaskType) - для журнала; -1 - нет приказов.
 int DfGoalOf(Character* c);
+bool DfEconomyAvailable(Character* c);

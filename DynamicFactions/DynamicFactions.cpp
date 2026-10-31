@@ -43,6 +43,7 @@
 
 #include "core/DfBrain.h"
 #include "core/DfNames.h"
+#include "game/DfHunger.h"
 #include "core/DfState.h"
 #include "game/DfGame.h"
 #include "game/DfHire.h"
@@ -484,11 +485,12 @@ namespace
     }
 
     bool SafeLabourStep(DfFactionState& s, DfLabour& rt, Faction* f, TownBase* hub, Character* envoy, double hour,
-                        unsigned long now)
+                        unsigned long now, int committed)
     {
         __try
         {
-            DfLabourStep(s, rt, f, hub, envoy, g_traderHasMoney, hour, now, g_debug, static_cast<float>(g_mineRadius));
+            DfLabourStep(s, rt, f, hub, envoy, g_traderHasMoney, hour, now, g_debug,
+                static_cast<float>(g_mineRadius),committed,g_workEnabled);
             return true;
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
@@ -514,8 +516,8 @@ namespace
             if (f == NULL)
                 continue;
             Character* const envoy = g_runtime[i].hire.busy() ? g_runtime[i].hire.envoy.getCharacter() : NULL;
-            if (!g_workEnabled) { DfLabourStop(g_runtime[i].labour, f, envoy); continue; }
-            if (!SafeLabourStep(s, g_runtime[i].labour, f, hub, envoy, hour, now))
+            const int committed=g_runtime[i].hire.busy() ? g_runtime[i].hire.price : 0;
+            if (!SafeLabourStep(s, g_runtime[i].labour, f, hub, envoy, hour, now, committed))
             {
                 static bool told = false;
                 if (!told)
@@ -788,7 +790,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     static const std::string ini = IniPath();
     api->beginMod(api, "DynamicFactions", "Dynamic Factions", ini.c_str(), &LoadSettings);
     if (api->version >= 2)
-        api->info(api, Tr("A faction founded in the Hub mines, carries and sells real ore, then hires ordinary recruits from its actual budget. No passive income or purchased tech points."));
+        api->info(api, Tr("A faction in the Hub mines and sells real ore, buys and eats food, and hires ordinary recruits from its actual budget. No passive income."));
     api->section(api, Tr("General"));
     api->toggle(api, "DynamicFactions", "Enabled", Tr("Enabled"), Tr("The whole mod."), 1, MCM_RESTART);
     static const char* labels[kDifficultyCount] = {};
@@ -803,14 +805,14 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
                  Tr("Money of a new faction when it is founded. Further income comes only from real sales. Applies to factions founded after the change."),
                  5000, 0, 100000, 0);
     api->toggle(api, "DynamicFactions", "Work", Tr("Mining and trade"),
-                Tr("Mine real resources, carry ore and sell it to town traders. No passive income or virtual ore."), 1, 0);
+                Tr("Mine real resources, carry ore and sell it to town traders. Food supply continues when work is disabled."), 1, 0);
     api->integer(api, "DynamicFactions", "MineRadius", Tr("Resource search radius"),
                  Tr("Search and scout within this distance from the Hub. Only resources observed by faction members become known."), 3000, 500, 5000, 0);
     api->hotkey(api, "DynamicFactions", "WindowKey", Tr("Faction window key"),
                 Tr("Opens and closes the window with the state of the factions. Click and press a key; Backspace - no key."), "CTRL+F10", 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "DynamicFactions", "Debug", Tr("Detailed log"),
-                Tr("Details in RE_Kenshi_log.txt: every hourly tick of a faction, saving and loading."), 0, 0);
+                Tr("Details of supply, confirmed purchases, work, saving and loading in RE_Kenshi_log.txt. Errors are always logged."), 0, 0);
 }
 
 
@@ -855,5 +857,7 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
+    if(!DfInstallNaturalHunger())
+        ErrorLog("DynamicFactions: could not disable NPC hunger replenishment; native hunger remains");
     DebugLog("DynamicFactions: installed");
 }

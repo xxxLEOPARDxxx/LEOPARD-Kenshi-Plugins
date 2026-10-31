@@ -68,6 +68,10 @@ enum DfTradeResult { DF_TRADE_STOP, DF_TRADE_COMPLETE, DF_TRADE_RESTORED, DF_TRA
 // One bounded physical deal. Compensation is allowed only with exact observed
 // original wallets; goods are returned through the same real-transfer primitive.
 DfTradeResult DfTradeOne(DfTradePort& port, int price);
+// Purchases pay before native insertion: food may merge with a partly eaten
+// stack. Refused/fully restored delivery refunds proven balances; an unknown
+// outcome is quarantined. Never withdraw food again to undo a failed payment.
+DfTradeResult DfPurchaseOne(DfTradePort& port, int price);
 
 class DfTreasuryPort
 {

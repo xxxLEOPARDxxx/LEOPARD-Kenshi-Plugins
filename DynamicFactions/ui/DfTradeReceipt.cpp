@@ -2,6 +2,7 @@
 #include "ui/DfTradeReceipt.h"
 #include <Windows.h>
 #include <cstdio>
+#include <climits>
 #include <Debug.h>
 #include <kenshi/Character.h>
 #include <kenshi/Globals.h>
@@ -12,7 +13,7 @@ namespace
 {
     void ShowReceipt(Character* actor,int paid)
     {
-        if (actor==NULL || gui==NULL || paid<=0) return;
+        if (actor==NULL || gui==NULL || paid==0 || paid==INT_MIN) return;
         char text[40];sprintf_s(text,sizeof(text),"c.%d",paid);
         // Native AI::buySomething uses this currency style and tracking offset.
         ScreenLabel* const label=gui->createScreenLabel(text,MyGUI::Colour(1.0f,1.0f,0.6f,0.9f),
