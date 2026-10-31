@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-31",
+  "date": "2026-11-01",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -140,6 +140,28 @@
       "nexus": 2242,
       "workshop_id": 3824087152,
       "version": "2"
+    },
+    "TauntExpansion": {
+      "nexus": 2265,
+      "workshop_id": 3831174059,
+      "version": "1",
+      "content_manifest": "4130647303315740547",
+      "dll_sha256": "b16d292185d93c02e64edd030f16c1247686faf82b80e7b5f8eb896e6b727636",
+      "preview_sha256": "a64df22b7e44a1d8f22f56dc75f1e3f3934f82ee5989a3b297a6657e3b111fb6",
+      "archive_sha256": "b910b13e61189607df2749d258e42bff30d0cd4c44268687557aa982d4a33595",
+      "published_utc": "2026-10-31T21:12:15.548013+00:00",
+      "bilingual_change_note_sha256": "b39d352f6c1869144800c46fb5fe3efd20be980655e2f2227b84e1a5d98cfcc7"
+    },
+    "GatePushGuard": {
+      "nexus": 2264,
+      "workshop_id": 3831174166,
+      "version": "1",
+      "content_manifest": "5106863727817633660",
+      "dll_sha256": "663eca69da2b838eef333159099a04c0324b4846e9bb65fdffb8a3a8e7f61402",
+      "preview_sha256": "539cc9e19d54ce16b6c06586478b2bb98f4a43c25ef7dc3167d8b300c82eefe7",
+      "archive_sha256": "1c6454246d1bd58d6423a25b93a3db2846170d166735fb444041290163ac1243",
+      "published_utc": "2026-10-31T21:12:15.548013+00:00",
+      "bilingual_change_note_sha256": "90f543e699bddede051ec367b6ec7548880300af1c2bce0c1c028c712f12a5d9"
     }
   }
 }

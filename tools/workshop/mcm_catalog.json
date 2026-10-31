@@ -677,7 +677,10 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "nexus_url": "https://www.nexusmods.com/kenshi/mods/2265",
+    "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831174059",
+    "published_version": "1"
   },
   {
     "package": "GatePushGuard",
@@ -694,7 +697,10 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "nexus_url": "https://www.nexusmods.com/kenshi/mods/2264",
+    "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831174166",
+    "published_version": "1"
   },
   {
     "package": "GlobalSatelliteMap",

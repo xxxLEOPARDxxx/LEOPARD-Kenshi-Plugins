@@ -187,6 +187,20 @@
       "Необязательные настройки MCM с применением сразу, отдельные настройки без MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию."
     ]
   },
-  "publication": "not created; Nexus user upload first; no Steam publication before user link",
-  "runtime_validation": "Independent source/offline native-contract review passed. Live gate/door asset coverage, engineer/turret/carry/KO/load/pause behavior, sustained crowd pressure, vanilla/modded MCM skins, CPU/FPS and sustained memory measurements pending."
+  "publication": "Nexus upload verified by user; Steam published and remotely verified.",
+  "runtime_validation": "Independent source/offline native-contract review passed. Live gate/door asset coverage, engineer/turret/carry/KO/load/pause behavior, sustained crowd pressure, vanilla/modded MCM skins, CPU/FPS and sustained memory measurements pending.",
+  "nexus_url": "https://www.nexusmods.com/kenshi/mods/2264",
+  "workshop_id": 3831174166,
+  "published_version": "1",
+  "publication_record": {
+    "nexus": 2264,
+    "workshop_id": 3831174166,
+    "version": "1",
+    "content_manifest": "5106863727817633660",
+    "dll_sha256": "663eca69da2b838eef333159099a04c0324b4846e9bb65fdffb8a3a8e7f61402",
+    "preview_sha256": "539cc9e19d54ce16b6c06586478b2bb98f4a43c25ef7dc3167d8b300c82eefe7",
+    "archive_sha256": "1c6454246d1bd58d6423a25b93a3db2846170d166735fb444041290163ac1243",
+    "published_utc": "2026-10-31T21:12:15.548013+00:00",
+    "bilingual_change_note_sha256": "90f543e699bddede051ec367b6ec7548880300af1c2bce0c1c028c712f12a5d9"
+  }
 }

@@ -1349,6 +1349,9 @@
           "Сохранены значения поставки оригинала."
         ]
       }
-    }
+    },
+    "nexus_url": "https://www.nexusmods.com/kenshi/mods/2265",
+    "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831174059",
+    "published_version": "1"
   }
 }

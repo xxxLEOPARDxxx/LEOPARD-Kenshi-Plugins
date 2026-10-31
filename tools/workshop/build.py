@@ -199,10 +199,10 @@ ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 
 
 ITEMS.append(dict(mod="StackSort",title="Stack Sort (MCM fork) (QoL)",nexus=2262,version="2",tags=["GUI","Gameplay","RE_Kenshi"],lang=True,drop=[],en="Pack inventories, consolidate compatible stacks and reserve free space, with Rotate Items support and MCM settings."))
 ITEMS.extend([
-    dict(mod="TauntExpansion", title="Taunt Expansion (MCM fork) (QoL)", nexus=None, version="1",
+    dict(mod="TauntExpansion", title="Taunt Expansion (MCM fork) (QoL)", nexus=2265, version="1",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Adjust the native Taunt bonus and enemy retargeting strength through optional MCM settings."),
-    dict(mod="GatePushGuard", title="Gate Push Guard (QoL)", nexus=None, version="1",
+    dict(mod="GatePushGuard", title="Gate Push Guard (QoL)", nexus=2264, version="1",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors."),
 ])
