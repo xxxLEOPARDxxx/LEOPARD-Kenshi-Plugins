@@ -1,0 +1,1608 @@
+{
+  "date": "2026-10-31",
+  "tool": "built-in image_gen",
+  "status": "74 assets visually reviewed and staged; Steam publication checked separately",
+  "rules": "37 public mods, DynamicFactions excluded. Diverse palettes, feature-first. Approved five squares reused; Dark UI Advanced no MCM; Vital Sense icons only.",
+  "fidelity_review": [
+    "Dark UI Advanced has no MCM badge",
+    "Vital Sense uses status icons, no overhead HP bars",
+    "Recruit leader star has actual followers",
+    "Equipment grade uses one coloured star, no repair-kit grade",
+    "Live XP shows percentages, no raw XP totals",
+    "Ranged Damage XP uses an armoured character, not a wooden dummy",
+    "Skeleton repair portrait uses a wrench",
+    "MCM retains its distinct central management-hub identity"
+  ],
+  "covers": [
+    {
+      "mod": "AIFixed",
+      "title": "AI FIXED",
+      "mcm_badge": true,
+      "palette": "oxidized teal, ivory, brushed copper and graphite; mechanical medical schematic rendered as a worn inked field manual",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/AIFixed/steam.png",
+          "sha256": "e9324e353a43eb37549b4e17ed1fa18d211baa5292d4bbecb435f6a02d4a8382",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3335878,
+          "generation": {
+            "mod": "AIFixed",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-219a584d-ab49-4529-a82d-5d24ad9b32e9.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"AI FIXED\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: oxidized teal, ivory, brushed copper and graphite; mechanical medical schematic rendered as a worn inked field manual. Main scene: An injured Kenshi skeleton robot lies on an unmistakable powered repair bed, its mechanical leg being repaired by an ally. A second small inset silhouette shows an ally carrying a disabled robot toward that bed. The repair-bed-and-wrench idea is huge and dominant; robotic bodies, no human hospital surgery.",
+            "sha256": "e9324e353a43eb37549b4e17ed1fa18d211baa5292d4bbecb435f6a02d4a8382"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/AIFixed/nexus.png",
+          "sha256": "93f54937fbf3d3b03660b84d87e79d464970186aa05261e38cbd8c64e9b0b99f",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3199740,
+          "generation": {
+            "mod": "AIFixed",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-61176168-68c6-4750-b89d-496d315ec77e.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"AI FIXED\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: An injured Kenshi skeleton robot lies on an unmistakable powered repair bed, its mechanical leg being repaired by an ally. A second small inset silhouette shows an ally carrying a disabled robot toward that bed. The repair-bed-and-wrench idea is huge and dominant; robotic bodies, no human hospital surgery.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "93f54937fbf3d3b03660b84d87e79d464970186aa05261e38cbd8c64e9b0b99f"
+          }
+        }
+      }
+    },
+    {
+      "mod": "AssignedWorkers",
+      "title": "ASSIGNED WORKERS",
+      "mcm_badge": true,
+      "palette": "construction amber, deep charcoal and electric cyan; bold industrial cutaway infographic",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/AssignedWorkers/steam.png",
+          "sha256": "e703092ce22d5d122b3ee591e62d76a63af4fe1f9a1a95609c855f6499d545dc",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2821953,
+          "generation": {
+            "mod": "AssignedWorkers",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-373e78e0-3e46-435b-8edd-3320cb42734a.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ASSIGNED WORKERS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: construction amber, deep charcoal and electric cyan; bold industrial cutaway infographic. Main scene: A large mine/workshop machine with three physically working labourers. A magnified icon panel links three worker portraits directly to that machine using clear cyan connector lines, explaining who is assigned. A secondary switched-off machine carries one red lightning warning. The worker-to-machine assignment is the main visual, not a robot portrait.",
+            "sha256": "e703092ce22d5d122b3ee591e62d76a63af4fe1f9a1a95609c855f6499d545dc"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/AssignedWorkers/nexus.png",
+          "sha256": "293846e52e9692a2aeecd36477dbf95bb6dd1e9cadccbaecd03292abf2f4447d",
+          "dimensions": [
+            1672,
+            940
+          ],
+          "bytes": 2884852,
+          "generation": {
+            "mod": "AssignedWorkers",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b58a8e71-c155-4cb3-860d-ba49e9436eae.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"ASSIGNED WORKERS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A large mine/workshop machine with three physically working labourers. A magnified icon panel links three worker portraits directly to that machine using clear cyan connector lines, explaining who is assigned. A secondary switched-off machine carries one red lightning warning. The worker-to-machine assignment is the main visual, not a robot portrait.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "293846e52e9692a2aeecd36477dbf95bb6dd1e9cadccbaecd03292abf2f4447d"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Auto-Pause-on-Load",
+      "title": "AUTO-PAUSE ON LOAD",
+      "mcm_badge": true,
+      "palette": "glacier blue, black ink, ivory and saffron; dramatic freeze-frame screenprint",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Auto-Pause-on-Load/steam.png",
+          "sha256": "0c92cc15be80d748fc7e67cf12df92a49491bcba5529bd1c62d1c44cdc0fd5c1",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3473468,
+          "generation": {
+            "mod": "Auto-Pause-on-Load",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-9c727e3b-0b39-467e-bbef-b5a9b7db9ea4.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"AUTO-PAUSE ON LOAD\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: glacier blue, black ink, ivory and saffron; dramatic freeze-frame screenprint. Main scene: A huge bold PAUSE symbol made of two vertical brass bars overlays a caravan frozen mid-step. Windblown cloth and a falling canteen are stopped in mid-air. A small stack of save-file parchment sheets feeds an arrow into the pause symbol. Actual Kenshi ruins, no literal ice prison or magical frost spell.",
+            "sha256": "0c92cc15be80d748fc7e67cf12df92a49491bcba5529bd1c62d1c44cdc0fd5c1"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Auto-Pause-on-Load/nexus.png",
+          "sha256": "4e05a02d6553e1866ae3f5f1a5a0d5d6c615ff3fcea4c87bc14fbe49d8aa5632",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3536568,
+          "generation": {
+            "mod": "Auto-Pause-on-Load",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-04fc0c27-f158-4fba-a517-050360bf724c.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"AUTO-PAUSE ON LOAD\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A huge bold PAUSE symbol made of two vertical brass bars overlays a caravan frozen mid-step. Windblown cloth and a falling canteen are stopped in mid-air. A small stack of save-file parchment sheets feeds an arrow into the pause symbol. Actual Kenshi ruins, no literal ice prison or magical frost spell.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Auto-Pause-on-Load/steam.png"
+            ],
+            "sha256": "4e05a02d6553e1866ae3f5f1a5a0d5d6c615ff3fcea4c87bc14fbe49d8aa5632"
+          }
+        }
+      }
+    },
+    {
+      "mod": "BestMinimap",
+      "title": "BEST MINIMAP",
+      "mcm_badge": true,
+      "palette": "Deep midnight navy, luminous turquoise, glacier blue and crisp cream. Elegant cartographic adventure poster, etched terrain contour lines, striking circular composition, minimal warm colors.",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/BestMinimap/steam.png",
+          "sha256": "eb006041b7b8408425b24e376cf9c07e91ae3fab76e43955695fce1b69ea88fa",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3259475,
+          "generation": {
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-08c488a6-e0c8-4e2b-9a84-1529f3c82a0b.png",
+            "prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"BEST MINIMAP\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Deep midnight navy, luminous turquoise, glacier blue and crisp cream. Elegant cartographic adventure poster, etched terrain contour lines, striking circular composition, minimal warm colors. FEATURE-FIRST COMPOSITION: A LARGE detailed circular minimap is the unmistakable hero: Kenshi canyon terrain, discovered settlement symbols, colored nearby-character dots, a very clear triangular camera-direction arrow and dashed camera-range boundary. A small ruined desert outpost appears behind the rim for context. The map occupies most of the cover and reads instantly at thumbnail size. Brass compass edge is restrained, no large character. Exact title \"BEST MINIMAP\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+            "approved_prototype": true
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/BestMinimap/nexus.png",
+          "sha256": "e05901480b413f27f3cbe9eb379b0af4652b12592dbbffd6e6948af15f6f1f51",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3232354,
+          "generation": {
+            "mod": "BestMinimap",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-ea62d221-1aea-4d5f-9c16-baeaedf93003.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"BEST MINIMAP\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A LARGE detailed circular minimap is the unmistakable hero: Kenshi canyon terrain, discovered settlement symbols, colored nearby-character dots, a very clear triangular camera-direction arrow and dashed camera-range boundary. A small ruined desert outpost appears behind the rim for context. The map occupies most of the cover and reads instantly at thumbnail size. Brass compass edge is restrained, no large character.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "e05901480b413f27f3cbe9eb379b0af4652b12592dbbffd6e6948af15f6f1f51"
+          }
+        }
+      }
+    },
+    {
+      "mod": "BetterLooting",
+      "title": "BETTER LOOTING",
+      "mcm_badge": true,
+      "palette": "olive drab, warm ivory, charcoal and vivid tangerine; tactile scavenger field-guide collage",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/BetterLooting/steam.png",
+          "sha256": "44fce48e309f635353bae2f23bbc975f5b26dbcaab65f1282ea614b4dc312166",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3362779,
+          "generation": {
+            "mod": "BetterLooting",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8fc9f09d-9e0e-45cf-86a0-f00f93abf197.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"BETTER LOOTING\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: olive drab, warm ivory, charcoal and vivid tangerine; tactile scavenger field-guide collage. Main scene: One scavenger kneels to pick up the nearest useful bandage and bolt bundle into an open loot bag. A short dotted route connects nearby desirable loot to the bag; distant worthless scrap is visually crossed out. A very large bag opening and selective item arrows occupy most of the scene; no magnetic superpower or money printing.",
+            "sha256": "44fce48e309f635353bae2f23bbc975f5b26dbcaab65f1282ea614b4dc312166"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/BetterLooting/nexus.png",
+          "sha256": "87d48bfaa307d5db453dc271bc3f509e8de5021795b8794684e89c43fc284ce6",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3495051,
+          "generation": {
+            "mod": "BetterLooting",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-aa1eded0-6ca7-4e6a-b009-2b76b3cd5f59.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"BETTER LOOTING\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: One scavenger kneels to pick up the nearest useful bandage and bolt bundle into an open loot bag. A short dotted route connects nearby desirable loot to the bag; distant worthless scrap is visually crossed out. A very large bag opening and selective item arrows occupy most of the scene; no magnetic superpower or money printing.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/BetterLooting/steam.png"
+            ],
+            "sha256": "87d48bfaa307d5db453dc271bc3f509e8de5021795b8794684e89c43fc284ce6"
+          }
+        }
+      }
+    },
+    {
+      "mod": "BuildModeGizmo",
+      "title": "BUILD MODE GIZMO",
+      "mcm_badge": true,
+      "palette": "deep slate, vivid cyan, fuchsia and off-white; architectural drafting print",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/BuildModeGizmo/steam.png",
+          "sha256": "46137978785aae42adb0f3bb1bd11882e5a4b8b83b3eb17276013f4f0399b92b",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3576831,
+          "generation": {
+            "mod": "BuildModeGizmo",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8eda4275-5e91-40e5-87b6-cc52e4a3605e.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"BUILD MODE GIZMO\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: deep slate, vivid cyan, fuchsia and off-white; architectural drafting print. Main scene: An unfinished Kenshi building foundation shown isometrically, surrounded by giant three-axis translation arrows and curved rotation handles. A builder's gloved hand adjusts the model. The move-and-rotate controls are the main subject and unmistakable even at thumbnail size; no fully built city being teleported.",
+            "sha256": "46137978785aae42adb0f3bb1bd11882e5a4b8b83b3eb17276013f4f0399b92b"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/BuildModeGizmo/nexus.png",
+          "sha256": "00bec6064f7ce6fa5a798bccd85af70b07431cacfa6e9aa263be7152be0bf78b",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3458270,
+          "generation": {
+            "mod": "BuildModeGizmo",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-1e34ae5e-23c5-4d4a-ae23-6625af5294f3.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"BUILD MODE GIZMO\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: An unfinished Kenshi building foundation shown isometrically, surrounded by giant three-axis translation arrows and curved rotation handles. A builder's gloved hand adjusts the model. The move-and-rotate controls are the main subject and unmistakable even at thumbnail size; no fully built city being teleported.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/BuildModeGizmo/steam.png"
+            ],
+            "sha256": "00bec6064f7ce6fa5a798bccd85af70b07431cacfa6e9aa263be7152be0bf78b"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Character Inspector",
+      "title": "CHARACTER INSPECTOR",
+      "mcm_badge": true,
+      "palette": "aged ivory, oxblood, brass and black ink; anatomical armour field manual",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Character Inspector/steam.png",
+          "sha256": "c95fefa59ae77dbf8a9acecde096a08a1286b29ef0a63c885fe1b9654883452a",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3381078,
+          "generation": {
+            "mod": "Character Inspector",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-9c7991f2-d694-424d-9fe0-b32dadace980.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"CHARACTER INSPECTOR\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: aged ivory, oxblood, brass and black ink; anatomical armour field manual. Main scene: A large neutral human mannequin silhouette broken into head, torso, arms and legs, with cutaway layers of leather, chain and plate on the chest. Bold circular coverage diagrams and shield symbols explain armour coverage. Kenshi armour on a table, no sci-fi x-ray or health bars over NPCs.",
+            "sha256": "c95fefa59ae77dbf8a9acecde096a08a1286b29ef0a63c885fe1b9654883452a"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Character Inspector/nexus.png",
+          "sha256": "b04f60a72d1c11c5e7b43e3648ec0a29f2d72c61ffa83df95a792f34688849fb",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3321552,
+          "generation": {
+            "mod": "Character Inspector",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-25ce1c04-779c-4b83-9c2b-3b540d26c9dc.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"CHARACTER INSPECTOR\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A large neutral human mannequin silhouette broken into head, torso, arms and legs, with cutaway layers of leather, chain and plate on the chest. Bold circular coverage diagrams and shield symbols explain armour coverage. Kenshi armour on a table, no sci-fi x-ray or health bars over NPCs.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Character Inspector/steam.png"
+            ],
+            "sha256": "b04f60a72d1c11c5e7b43e3648ec0a29f2d72c61ffa83df95a792f34688849fb"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Character-Highlight",
+      "title": "CHARACTER HIGHLIGHT",
+      "mcm_badge": true,
+      "palette": "near-black navy with strongly separated emerald, scarlet, cyan and violet; night-time graphic stencil",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Character-Highlight/steam.png",
+          "sha256": "0bb72d070a423a9ee50a1db57aef16ddc81263caa21cab44a376a8a4cce7f423",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2707153,
+          "generation": {
+            "mod": "Character-Highlight",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6082f16d-7100-4465-b69a-a65a835880e9.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"CHARACTER HIGHLIGHT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: near-black navy with strongly separated emerald, scarlet, cyan and violet; night-time graphic stencil. Main scene: Five Kenshi wanderers in a dim settlement, their whole silhouettes clearly tinted in different relation colours. An enemy is red, ally green, player cyan, diplomat violet. One large spotlight-like comparison makes the highlight effect dominate. No HP bars or recruitment icons.",
+            "referenced_image_paths": [],
+            "sha256": "0bb72d070a423a9ee50a1db57aef16ddc81263caa21cab44a376a8a4cce7f423"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Character-Highlight/nexus.png",
+          "sha256": "a640d9695f7999153906ac739db33c41d49d53bb6fc1e08aca1d3f54683c47ef",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2823847,
+          "generation": {
+            "mod": "Character-Highlight",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-193074b9-d02b-4065-8aa1-738246230a62.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"CHARACTER HIGHLIGHT\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: Five Kenshi wanderers in a dim settlement, their whole silhouettes clearly tinted in different relation colours. An enemy is red, ally green, player cyan, diplomat violet. One large spotlight-like comparison makes the highlight effect dominate. No HP bars or recruitment icons.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Character-Highlight/steam.png"
+            ],
+            "sha256": "a640d9695f7999153906ac739db33c41d49d53bb6fc1e08aca1d3f54683c47ef"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Container-Highlight",
+      "title": "CONTAINER HIGHLIGHT",
+      "mcm_badge": true,
+      "palette": "soot black, chalk white, acid yellow and turquoise; high-contrast salvage stencil",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Container-Highlight/steam.png",
+          "sha256": "03f0545697eebec5054cef5f51bb2d99810eae24ed2b3824478f9176a37f8a41",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3109500,
+          "generation": {
+            "mod": "Container-Highlight",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-36858cd7-0148-4b14-b68e-7e5465baae9e.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"CONTAINER HIGHLIGHT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: soot black, chalk white, acid yellow and turquoise; high-contrast salvage stencil. Main scene: A large lootable chest and two supply barrels amongst dim ruins. One chest is brightly outlined in turquoise with a hovering chest pictogram and an empty short label plate, while irrelevant background clutter stays subdued. Container detection dominates, no treasure map or automatic collection.",
+            "referenced_image_paths": [],
+            "sha256": "03f0545697eebec5054cef5f51bb2d99810eae24ed2b3824478f9176a37f8a41"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Container-Highlight/nexus.png",
+          "sha256": "29edaff0b41df5d254701a438ebb3571fe40efcaa1793199319ea5cd2e16cdae",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3174255,
+          "generation": {
+            "mod": "Container-Highlight",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-7bde9d24-e6d7-4322-9dbe-dabf0b7ce0fd.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"CONTAINER HIGHLIGHT\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A large lootable chest and two supply barrels amongst dim ruins. One chest is brightly outlined in turquoise with a hovering chest pictogram and an empty short label plate, while irrelevant background clutter stays subdued. Container detection dominates, no treasure map or automatic collection.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Container-Highlight/steam.png"
+            ],
+            "sha256": "29edaff0b41df5d254701a438ebb3571fe40efcaa1793199319ea5cd2e16cdae"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Dark UI Advanced",
+      "title": "DARK UI ADVANCED",
+      "mcm_badge": false,
+      "palette": "graphite, silver, black and icy violet; premium minimalist nocturnal interface illustration",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Dark UI Advanced/steam.png",
+          "sha256": "e1f59a4d8c4b192b0ddcc2bcdc5984eda86a877dc0ca2b00a18527086cd3f25b",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2744719,
+          "generation": {
+            "mod": "Dark UI Advanced",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-45f9452c-644c-4569-9054-0e2366d466f1.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"DARK UI ADVANCED\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. NO MCM badge or MCM lettering: this mod is a pure interface skin. Palette and art direction: graphite, silver, black and icy violet; premium minimalist nocturnal interface illustration. Main scene: A bold before-and-after UI transformation: a small weathered parchment panel on the left becomes a large clean dark Kenshi inventory and character panel on the right, with neat grids and restrained silver controls. Moonlit ruin silhouettes frame the panels. No character mascot. NO MCM badge, NO MCM text; this is an interface skin.",
+            "referenced_image_paths": [],
+            "sha256": "e1f59a4d8c4b192b0ddcc2bcdc5984eda86a877dc0ca2b00a18527086cd3f25b"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Dark UI Advanced/nexus.png",
+          "sha256": "bb87f89e19e75aa06f9c4cc8299e6a07a6867c7f907938fd63f55b7535e30330",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2802489,
+          "generation": {
+            "mod": "Dark UI Advanced",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-002ee9b4-a28a-4aff-8260-2c424eae7bb5.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"DARK UI ADVANCED\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. NO MCM badge or MCM lettering: this mod is a pure interface skin. The main feature occupies at least 60% of the composition: A bold before-and-after UI transformation: a small weathered parchment panel on the left becomes a large clean dark Kenshi inventory and character panel on the right, with neat grids and restrained silver controls. Moonlit ruin silhouettes frame the panels. No character mascot. NO MCM badge, NO MCM text; this is an interface skin.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Dark UI Advanced/steam.png"
+            ],
+            "sha256": "bb87f89e19e75aa06f9c4cc8299e6a07a6867c7f907938fd63f55b7535e30330"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Formations",
+      "title": "FORMATIONS EXTENDED",
+      "mcm_badge": true,
+      "palette": "sandstone ivory, military crimson and steel blue; tactical top-down map screenprint",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Formations/steam.png",
+          "sha256": "f4021b6c084ac43da4baee120df96069dd769ddd0af5c9c833e2c60fd2d2927d",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3672130,
+          "generation": {
+            "mod": "Formations",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-5097416e-4547-4355-be57-fff41630c820.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"FORMATIONS EXTENDED\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: sandstone ivory, military crimson and steel blue; tactical top-down map screenprint. Main scene: A large tactical overhead view of human Kenshi fighters arranged into a wedge, a disciplined line and a circle. Clearly spaced individual units, long formation arrows drawn on the ground and a small banner captain. Formations occupy most of the cover, no fantasy army or automatic combat spell.",
+            "referenced_image_paths": [],
+            "sha256": "f4021b6c084ac43da4baee120df96069dd769ddd0af5c9c833e2c60fd2d2927d"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Formations/nexus.png",
+          "sha256": "f2f74bbf98b0ba8413a168db7450f639954bd9f6c01cd5a276895f654bd60bdb",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3824188,
+          "generation": {
+            "mod": "Formations",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-855aac22-d856-4e0f-980b-e256645c9b71.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"FORMATIONS EXTENDED\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A large tactical overhead view of human Kenshi fighters arranged into a wedge, a disciplined line and a circle. Clearly spaced individual units, long formation arrows drawn on the ground and a small banner captain. Formations occupy most of the cover, no fantasy army or automatic combat spell.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Formations/steam.png"
+            ],
+            "sha256": "f2f74bbf98b0ba8413a168db7450f639954bd9f6c01cd5a276895f654bd60bdb"
+          }
+        }
+      }
+    },
+    {
+      "mod": "GearCompare",
+      "title": "GEAR COMPARE ALT",
+      "mcm_badge": true,
+      "palette": "chalk ivory, ink navy, emerald and crimson; clean equipment comparison plate",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/GearCompare/steam.png",
+          "sha256": "8677547a265f854c4b5b92af4b318c70288e8e2219640797c29e2f123d5c7db0",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3135041,
+          "generation": {
+            "mod": "GearCompare",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-874f8849-761f-4cb0-ad41-7504ac77c94b.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"GEAR COMPARE ALT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: chalk ivory, ink navy, emerald and crimson; clean equipment comparison plate. Main scene: Two large Kenshi armoured vests side by side with a comparison arrow between them. Beneath, one property comparison is visibly green with an up arrow and another red with a down arrow; small shield/weight icons replace verbose labels. Worn versus new equipment is immediately clear. No magical stat upgrades.",
+            "referenced_image_paths": [],
+            "sha256": "8677547a265f854c4b5b92af4b318c70288e8e2219640797c29e2f123d5c7db0"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/GearCompare/nexus.png",
+          "sha256": "771423ad67feece1fa566a9f9c5cc064b26082f450c07df5a562946d4af7a859",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3091172,
+          "generation": {
+            "mod": "GearCompare",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-16a09c51-48cc-4877-8e87-e54fcd693cb7.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"GEAR COMPARE ALT\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: Two large Kenshi armoured vests side by side with a comparison arrow between them. Beneath, one property comparison is visibly green with an up arrow and another red with a down arrow; small shield/weight icons replace verbose labels. Worn versus new equipment is immediately clear. No magical stat upgrades.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/GearCompare/steam.png"
+            ],
+            "sha256": "771423ad67feece1fa566a9f9c5cc064b26082f450c07df5a562946d4af7a859"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Hidden-Faction-Relations",
+      "title": "HIDDEN FACTION RELATIONS",
+      "mcm_badge": true,
+      "palette": "deep aubergine, bone white, poison green and muted scarlet; torn intelligence dossier",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Hidden-Faction-Relations/steam.png",
+          "sha256": "3a266e31e75dd4344604564adf4c0df7a519af222900a7052eee4f9ba7d2706e",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3306390,
+          "generation": {
+            "mod": "Hidden-Faction-Relations",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-74ad745c-fd6f-459b-9221-79cb2c8eb4f5.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"HIDDEN FACTION RELATIONS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: deep aubergine, bone white, poison green and muted scarlet; torn intelligence dossier. Main scene: An opened secret faction ledger, with black redaction strips being lifted by a magnifying glass to reveal linked faction emblems. Large green friendly and red hostile relation arrows connect the nodes; previously hidden faction nodes emerge from shadow. Distinct espionage dossier composition, not a map of bounty targets.",
+            "referenced_image_paths": [],
+            "sha256": "3a266e31e75dd4344604564adf4c0df7a519af222900a7052eee4f9ba7d2706e"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Hidden-Faction-Relations/nexus.png",
+          "sha256": "abea493e138f9ffd0f82172aaf4c9fe3c2b33a71a423a95c172e5dd710a3ffb1",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3324775,
+          "generation": {
+            "mod": "Hidden-Faction-Relations",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-ed93f9d4-b953-4a59-bd45-5d5d6f376fd7.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"HIDDEN FACTION RELATIONS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: An opened secret faction ledger, with black redaction strips being lifted by a magnifying glass to reveal linked faction emblems. Large green friendly and red hostile relation arrows connect the nodes; previously hidden faction nodes emerge from shadow. Distinct espionage dossier composition, not a map of bounty targets.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Hidden-Faction-Relations/steam.png"
+            ],
+            "sha256": "abea493e138f9ffd0f82172aaf4c9fe3c2b33a71a423a95c172e5dd710a3ffb1"
+          }
+        }
+      }
+    },
+    {
+      "mod": "ItemMarkers",
+      "title": "ITEM MARKERS",
+      "mcm_badge": true,
+      "palette": "charcoal, ivory and bright cyan/magenta/yellow accents; graphic inventory specimen board",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/ItemMarkers/steam.png",
+          "sha256": "41d009aae83d9518c1bbefbaebca0e93bc817b150d5e7101a543cdfc73b31ecd",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2704308,
+          "generation": {
+            "mod": "ItemMarkers",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6692c090-cecd-45eb-8ea9-24332f0010c2.png",
+            "prompt": "Edit target: attached square ITEM MARKERS cover. Keep its composition, typography, MCM badge, palette, inventory grid, armour, sword, blueprint, backpack, repair kit and helmet. Correct ONLY the feature badges so they match the real Kenshi plugin. EXACTLY ONE cyan star in the corner of the armour cell, EXACTLY ONE magenta star in the sword cell, EXACTLY ONE yellow star in the helmet cell. A single star uses its colour to indicate equipment grade: NEVER rows of two or three rating stars. The repair kit has NO quality star or coloured grade mark because kits do not have weapon/armour quality. Keep the red stolen-pouch badge on the backpack and the cyan learned-eye badge on the blueprint. No other badges. All title letters remain intact and every item unchanged. True 1:1 square full bleed.",
+            "referenced_image_paths": [
+              "C:/Users/User/.codex/generated_images/01a1884e-9173-7592-977a-11e639d2241a/exec-d93eccc8-54c2-4332-9cf1-1e2442f54a49.png"
+            ],
+            "sha256": "41d009aae83d9518c1bbefbaebca0e93bc817b150d5e7101a543cdfc73b31ecd"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/ItemMarkers/nexus.png",
+          "sha256": "b52a230b2e9767a4118c747ef51468bc1f9c935fb73ef2a22a682ccc75d01ac5",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2856630,
+          "generation": {
+            "mod": "ItemMarkers",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-e551053b-4a3a-4060-80d2-767280c4b25d.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"ITEM MARKERS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A large inventory grid containing armour, a sword, a blueprint and a repair kit. Very clear coloured quality stars on item corners, an eye on the learned blueprint and a small red stolen-pouch badge on one separate item. The item-corner markings are hugely enlarged and legible. No invented stack-quality property for ammunition.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square. Fidelity requirement: equipment grade uses exactly ONE coloured corner star on each armour, sword and helmet, never multiple rating stars. Repair kits and ammunition receive NO quality stars. Keep the stolen-pouch badge and learned-blueprint eye.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/ItemMarkers/steam.png"
+            ],
+            "sha256": "b52a230b2e9767a4118c747ef51468bc1f9c935fb73ef2a22a682ccc75d01ac5"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Job-B-Gone",
+      "title": "JOB-B-GONE",
+      "mcm_badge": true,
+      "palette": "cream paper, bold vermilion and black; vintage bureaucratic cleanup poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Job-B-Gone/steam.png",
+          "sha256": "e237a35611869b6744d6ecf8956ef52dc76e1f46026a1f3003fc1ee45250ca3a",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2799060,
+          "generation": {
+            "mod": "Job-B-Gone",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f754bc94-811f-49a8-840a-d35fbb1356da.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"JOB-B-GONE\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: cream paper, bold vermilion and black; vintage bureaucratic cleanup poster. Main scene: A huge clipboard containing a three-card job queue, represented by mining pick, hauling crate and crafting hammer icons. A decisive red cancellation stroke removes the queue into a small trash symbol, leaving an adjacent empty tidy job panel. The removal of JOBS is clear, not workers abandoning their tools in a riot.",
+            "referenced_image_paths": [],
+            "sha256": "e237a35611869b6744d6ecf8956ef52dc76e1f46026a1f3003fc1ee45250ca3a"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Job-B-Gone/nexus.png",
+          "sha256": "c0044ff80968cd93cd15e9bd04f7e70f941af232bd7057239463edff9ede28ac",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2680788,
+          "generation": {
+            "mod": "Job-B-Gone",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6b7522c6-bb36-4594-bb5b-f503ecdedbf5.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"JOB-B-GONE\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A huge clipboard containing a three-card job queue, represented by mining pick, hauling crate and crafting hammer icons. A decisive red cancellation stroke removes the queue into a small trash symbol, leaving an adjacent empty tidy job panel. The removal of JOBS is clear, not workers abandoning their tools in a riot.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Job-B-Gone/steam.png"
+            ],
+            "sha256": "c0044ff80968cd93cd15e9bd04f7e70f941af232bd7057239463edff9ede28ac"
+          }
+        }
+      }
+    },
+    {
+      "mod": "KenshiJobManagement",
+      "title": "KENSHI JOB MANAGEMENT",
+      "mcm_badge": true,
+      "palette": "blueprint navy, ivory and safety orange; tactile scheduling-board illustration",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/KenshiJobManagement/steam.png",
+          "sha256": "476a919b3fe392c950e663175eae3e7e48663baa1ba1685997de607cde7d4544",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3049395,
+          "generation": {
+            "mod": "KenshiJobManagement",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b429a556-355e-412a-9c5b-7c715a2856a6.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"KENSHI JOB MANAGEMENT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: blueprint navy, ivory and safety orange; tactile scheduling-board illustration. Main scene: Three squad portrait columns with movable job cards for mining, medical aid, hauling and engineering. A large gloved hand drags one card between priority positions, curved arrows show copying jobs between squad members. The multi-character job planner fills the scene, tiny Kenshi workshop behind.",
+            "referenced_image_paths": [],
+            "sha256": "476a919b3fe392c950e663175eae3e7e48663baa1ba1685997de607cde7d4544"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/KenshiJobManagement/nexus.png",
+          "sha256": "acc92c4a6f5e0a205763678281af63650fabf3842d367fa613dc2795f3adf47c",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3037500,
+          "generation": {
+            "mod": "KenshiJobManagement",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-729b4903-6149-481a-8b13-e2dae35a2112.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"KENSHI JOB MANAGEMENT\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: Three squad portrait columns with movable job cards for mining, medical aid, hauling and engineering. A large gloved hand drags one card between priority positions, curved arrows show copying jobs between squad members. The multi-character job planner fills the scene, tiny Kenshi workshop behind.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/KenshiJobManagement/steam.png"
+            ],
+            "sha256": "acc92c4a6f5e0a205763678281af63650fabf3842d367fa613dc2795f3adf47c"
+          }
+        }
+      }
+    },
+    {
+      "mod": "KenshiRotate",
+      "title": "ROTATE ITEMS",
+      "mcm_badge": true,
+      "palette": "mint turquoise, coral red, slate black and cream; bold geometric inventory poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/KenshiRotate/steam.png",
+          "sha256": "f240cc417e2965e060e939e243d6d3bd8d3eb4b3057d5fe8dff84015aa402216",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2686392,
+          "generation": {
+            "mod": "KenshiRotate",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-486ff4ba-dee5-45be-883e-77f305b3ade0.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ROTATE ITEMS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: mint turquoise, coral red, slate black and cream; bold geometric inventory poster. Main scene: A long bundle of crossbow bolts is shown horizontally on one inventory grid, then vertically on another, connected by a giant curved 90-degree rotation arrow. The rotated bundle now fits into the narrow free column beside other items. Main idea is rotating item orientation, not stacking items or changing their quality.",
+            "referenced_image_paths": [],
+            "sha256": "f240cc417e2965e060e939e243d6d3bd8d3eb4b3057d5fe8dff84015aa402216"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/KenshiRotate/nexus.png",
+          "sha256": "b013d559b63c54aaacb3c174e1834e024881910bd692626a5a4c66c1f018b872",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2754609,
+          "generation": {
+            "mod": "KenshiRotate",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-60ee4284-9c75-40d2-88fe-1e324416b7c4.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"ROTATE ITEMS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A long bundle of crossbow bolts is shown horizontally on one inventory grid, then vertically on another, connected by a giant curved 90-degree rotation arrow. The rotated bundle now fits into the narrow free column beside other items. Main idea is rotating item orientation, not stacking items or changing their quality.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/KenshiRotate/steam.png"
+            ],
+            "sha256": "b013d559b63c54aaacb3c174e1834e024881910bd692626a5a4c66c1f018b872"
+          }
+        }
+      }
+    },
+    {
+      "mod": "KillCounter",
+      "title": "KILL COUNTER",
+      "mcm_badge": true,
+      "palette": "ink black, bone white and deep crimson; mechanical tally-counter war poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/KillCounter/steam.png",
+          "sha256": "3f5601cc5ae557f87c7e957334675916ea231e4c33cf0bcb76a1cbfac58544fc",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3383041,
+          "generation": {
+            "mod": "KillCounter",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-e1871e9a-c527-4e98-b4ce-4ee2fa363260.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"KILL COUNTER\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: ink black, bone white and deep crimson; mechanical tally-counter war poster. Main scene: Three large mechanical tally counters with clear skull, knockout-stars and severed-arm pictograms, showing three different numbers. A subdued Kenshi skirmish silhouette is only a backdrop. Counters occupy two thirds of the image. No graphic gore close-up, no game balance buffs.",
+            "referenced_image_paths": [],
+            "sha256": "3f5601cc5ae557f87c7e957334675916ea231e4c33cf0bcb76a1cbfac58544fc"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/KillCounter/nexus.png",
+          "sha256": "cea9eb43fd1278419ee57c83637eeb2b9e0e8362ea57008b6d876c5e0a227490",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3377861,
+          "generation": {
+            "mod": "KillCounter",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-86229921-01e4-4d49-8259-42bf5f24212a.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"KILL COUNTER\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: Three large mechanical tally counters with clear skull, knockout-stars and severed-arm pictograms, showing three different numbers. A subdued Kenshi skirmish silhouette is only a backdrop. Counters occupy two thirds of the image. No graphic gore close-up, no game balance buffs.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/KillCounter/steam.png"
+            ],
+            "sha256": "cea9eb43fd1278419ee57c83637eeb2b9e0e8362ea57008b6d876c5e0a227490"
+          }
+        }
+      }
+    },
+    {
+      "mod": "LiveXpBars",
+      "title": "LIVE XP BARS",
+      "mcm_badge": true,
+      "palette": "midnight green, luminous mint and ivory; restrained instrument-panel screenprint",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/LiveXpBars/steam.png",
+          "sha256": "6b3014f961afe7e07b871f25b2c5882fea65d52d286ea81b9274aea1537f4d10",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2385376,
+          "generation": {
+            "mod": "LiveXpBars",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-51ad028a-10b8-4484-8b57-9feb73722cd5.png",
+            "prompt": "Edit target: attached square LIVE XP BARS cover. Preserve the complete poster, exact title and MCM, palette, character, three skill icons and level numbers 32, 18, 41. Correct ONLY the right-side numeric labels in the three-row progress panel: the real plugin shows percentage toward the next skill level, not raw experience totals. Replace \"2850 / 3600\" with \"79%\", \"620 / 1200\" with \"52%\", and \"4100 / 5000\" with \"82%\". Match each green bar fill approximately to its stated percentage. No raw XP fractions anywhere. Do not add any extra words. True 1:1 square, full bleed.",
+            "referenced_image_paths": [
+              "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-9a7650f2-fe49-4b41-9043-63ad8c167d49.png"
+            ],
+            "sha256": "6b3014f961afe7e07b871f25b2c5882fea65d52d286ea81b9274aea1537f4d10"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/LiveXpBars/nexus.png",
+          "sha256": "4f7635a5174525ba14a4e522c01bf860308c033ca0fb8f553418e2e1d049578c",
+          "dimensions": [
+            1672,
+            940
+          ],
+          "bytes": 2625266,
+          "generation": {
+            "mod": "LiveXpBars",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8995eba5-8b5f-4b21-aee6-333db1af77c4.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"LIVE XP BARS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A very large floating panel with three skill-progress rows, simple skill icons, numerical levels and green progress fills at different percentages. A small lone wanderer training beneath the panel establishes Kenshi context. The floating live XP panel is the hero; no bars above every NPC and no central robot mascot.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square. Accuracy: the panel shows only skill level numbers and percentage-to-next-level labels, such as 79%, 52%, 82%; never raw XP totals like 2850/3600.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/LiveXpBars/steam.png"
+            ],
+            "sha256": "4f7635a5174525ba14a4e522c01bf860308c033ca0fb8f553418e2e1d049578c"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Loot-Scoot-Execute",
+      "title": "LOOT SCOOT EXECUTE",
+      "mcm_badge": true,
+      "palette": "oxblood, charcoal and ivory with a small gold accent; dark action woodcut",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Loot-Scoot-Execute/steam.png",
+          "sha256": "0734ca729c293efc2f3e5e0ee7a8313fc6f81b027d97975e6f6ba932eacb8241",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3101410,
+          "generation": {
+            "mod": "Loot-Scoot-Execute",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-24f364da-3997-4107-ab56-161f0750c56b.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"LOOT SCOOT EXECUTE\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: oxblood, charcoal and ivory with a small gold accent; dark action woodcut. Main scene: A downed armoured enemy with small knockout stars lies intact in the foreground. A large blade-and-skull context-action emblem points to the downed target; a scavenger holding a small loot pouch moves toward the next nearby target along a short route. Clear execution/loot action, no graphic dismemberment, no hanging or torture.",
+            "referenced_image_paths": [],
+            "sha256": "0734ca729c293efc2f3e5e0ee7a8313fc6f81b027d97975e6f6ba932eacb8241"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Loot-Scoot-Execute/nexus.png",
+          "sha256": "0171f47d792d9394a2712b4ba3e204166cee76e65576061f914cec4edcf9074e",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3157497,
+          "generation": {
+            "mod": "Loot-Scoot-Execute",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-d24ba5ff-edaa-44b6-8390-a2627c3bca50.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"LOOT SCOOT EXECUTE\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A downed armoured enemy with small knockout stars lies intact in the foreground. A large blade-and-skull context-action emblem points to the downed target; a scavenger holding a small loot pouch moves toward the next nearby target along a short route. Clear execution/loot action, no graphic dismemberment, no hanging or torture.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Loot-Scoot-Execute/steam.png"
+            ],
+            "sha256": "0171f47d792d9394a2712b4ba3e204166cee76e65576061f914cec4edcf9074e"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Map-markers",
+      "title": "MAP MARKERS",
+      "mcm_badge": true,
+      "palette": "parchment white, turquoise and vivid scarlet; hand-drawn cartographer print",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Map-markers/steam.png",
+          "sha256": "30025e7db26f93a145c3db3eb9493797fbad2a006eb5966f6f3bc9316c53ee94",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3438851,
+          "generation": {
+            "mod": "Map-markers",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-e002436b-e46f-498b-9506-445870046033.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"MAP MARKERS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: parchment white, turquoise and vivid scarlet; hand-drawn cartographer print. Main scene: A gigantic hand-drawn Kenshi world-map fragment with three custom coloured pins for ore, danger and a return location. A gloved hand uses a stylus to place a new pin; tiny blank note tags attached to pins. The player-created map notes dominate, no automatically tracked bounty portraits.",
+            "referenced_image_paths": [],
+            "sha256": "30025e7db26f93a145c3db3eb9493797fbad2a006eb5966f6f3bc9316c53ee94"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Map-markers/nexus.png",
+          "sha256": "c958bc72bf63e4dff67c24b4ac641c39f649561a07b5d58be0ca6acd91e22b47",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3451950,
+          "generation": {
+            "mod": "Map-markers",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4b97aab1-6894-42a1-a59b-088c6c687761.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"MAP MARKERS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A gigantic hand-drawn Kenshi world-map fragment with three custom coloured pins for ore, danger and a return location. A gloved hand uses a stylus to place a new pin; tiny blank note tags attached to pins. The player-created map notes dominate, no automatically tracked bounty portraits.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Map-markers/steam.png"
+            ],
+            "sha256": "c958bc72bf63e4dff67c24b4ac641c39f649561a07b5d58be0ca6acd91e22b47"
+          }
+        }
+      }
+    },
+    {
+      "mod": "ModConfigMenu",
+      "title": "MOD CONFIG MENU",
+      "mcm_badge": true,
+      "palette": "royal midnight blue, luminous ivory, polished gold and turquoise; prestigious flagship mechanical command-hub poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/ModConfigMenu/steam.png",
+          "sha256": "4f76003c7bfb83b5e541e9bb05c1d5fe8a401ef4a0df7cb2774db37ce9987948",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3342546,
+          "generation": {
+            "mod": "ModConfigMenu",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-96282fa5-3530-4ecd-b9c8-bf49a96ea38d.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"MOD CONFIG MENU\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: royal midnight blue, luminous ivory, polished gold and turquoise; prestigious flagship mechanical command-hub poster. Main scene: A magnificent central brass gear engraved MCM operates a physical modular control console. Thick elegant connector lines link it to distinct slider, checkbox, key-binding, colour-wheel and text-field modules, with a few empty sockets for future authors. The central hub is huge, brilliantly lit and unmistakably the core controlling every mod. Tiny Kenshi citadel silhouettes only at the edges. Premium symmetrical master-control identity, no ordinary sunset mascot scene.",
+            "sha256": "4f76003c7bfb83b5e541e9bb05c1d5fe8a401ef4a0df7cb2774db37ce9987948"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/ModConfigMenu/nexus.png",
+          "sha256": "19bf13eccc901528d2a81f4b141fa9020b68da2230380c182e9707f7d49d6f7e",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3251882,
+          "generation": {
+            "mod": "ModConfigMenu",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-204d046c-ba8d-4cef-b096-379a6e4804ba.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"MOD CONFIG MENU\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A magnificent central brass gear engraved MCM operates a physical modular control console. Thick elegant connector lines link it to distinct slider, checkbox, key-binding, colour-wheel and text-field modules, with a few empty sockets for future authors. The central hub is huge, brilliantly lit and unmistakably the core controlling every mod. Tiny Kenshi citadel silhouettes only at the edges. Premium symmetrical master-control identity, no ordinary sunset mascot scene.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "19bf13eccc901528d2a81f4b141fa9020b68da2230380c182e9707f7d49d6f7e"
+          }
+        }
+      }
+    },
+    {
+      "mod": "MultiXPMining",
+      "title": "MULTI XP MINING",
+      "mcm_badge": true,
+      "palette": "dark violet, sulphur yellow, graphite and icy lavender; powerful industrial training print",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/MultiXPMining/steam.png",
+          "sha256": "e5cbfc6b9a3eeaab32437314a8182d919505731ea9c8db018857e02ac293e052",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3320867,
+          "generation": {
+            "mod": "MultiXPMining",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b481a193-c0d4-49bf-900c-bbd1faf7b5b9.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"MULTI XP MINING\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: dark violet, sulphur yellow, graphite and icy lavender; powerful industrial training print. Main scene: A miner physically swings a pick into a vein beside separate coal, copper and iron ore piles. Three huge attribute icons - a flexed arm, a protective shield and a swift hand - each connect to a growing progress strip. Mining turns real work into Strength, Toughness and Dexterity training. No coins or income from nowhere.",
+            "referenced_image_paths": [],
+            "sha256": "e5cbfc6b9a3eeaab32437314a8182d919505731ea9c8db018857e02ac293e052"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/MultiXPMining/nexus.png",
+          "sha256": "a3dd35877fd44d6d6e277222f73bcd625c9e6bb1fe471654e37e55686496b45e",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3391130,
+          "generation": {
+            "mod": "MultiXPMining",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-98fc931d-8c7a-40ed-8228-85b266a6aea3.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"MULTI XP MINING\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A miner physically swings a pick into a vein beside separate coal, copper and iron ore piles. Three huge attribute icons - a flexed arm, a protective shield and a swift hand - each connect to a growing progress strip. Mining turns real work into Strength, Toughness and Dexterity training. No coins or income from nowhere.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/MultiXPMining/steam.png"
+            ],
+            "sha256": "a3dd35877fd44d6d6e277222f73bcd625c9e6bb1fe471654e37e55686496b45e"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Organize-the-Crafting-Stations",
+      "title": "ORGANIZE THE CRAFTING STATIONS",
+      "mcm_badge": true,
+      "palette": "ivory, deep violet and burnt orange; workshop recipe-catalogue illustration",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Organize-the-Crafting-Stations/steam.png",
+          "sha256": "5b1534555379ba5bcd62701243dfa6fc583bf96c163780ac6b54dba22107d208",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2844011,
+          "generation": {
+            "mod": "Organize-the-Crafting-Stations",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-2abe524c-adac-47a6-8e0c-13404f9b3bac.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ORGANIZE THE CRAFTING STATIONS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: ivory, deep violet and burnt orange; workshop recipe-catalogue illustration. Main scene: A large recipe board at a Kenshi crafting bench. A magnifying glass isolates the one matching sword blueprint; irrelevant recipe cards fade away and the matching cards gather together without gaps. A small crafting hammer and scroll identify the workshop setting. Search and filtering, not automated crafting.",
+            "referenced_image_paths": [],
+            "sha256": "5b1534555379ba5bcd62701243dfa6fc583bf96c163780ac6b54dba22107d208"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Organize-the-Crafting-Stations/nexus.png",
+          "sha256": "34de0bd639b37178313036144f5132f8d0752bdd47725f0422eff8c0d3648801",
+          "dimensions": [
+            1672,
+            940
+          ],
+          "bytes": 2772084,
+          "generation": {
+            "mod": "Organize-the-Crafting-Stations",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-c57fcd77-fb4b-4faf-8d66-b5a6e3e40580.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"ORGANIZE THE CRAFTING STATIONS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A large recipe board at a Kenshi crafting bench. A magnifying glass isolates the one matching sword blueprint; irrelevant recipe cards fade away and the matching cards gather together without gaps. A small crafting hammer and scroll identify the workshop setting. Search and filtering, not automated crafting.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Organize-the-Crafting-Stations/steam.png"
+            ],
+            "sha256": "34de0bd639b37178313036144f5132f8d0752bdd47725f0422eff8c0d3648801"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Organize-the-Trader",
+      "title": "ORGANIZE THE TRADER",
+      "mcm_badge": true,
+      "palette": "petrol teal, brushed copper and warm ivory; orderly merchant-catalogue print",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Organize-the-Trader/steam.png",
+          "sha256": "89264f22b36a71abace419c82791dac2dbb470d9bb40a57d3af69518b1a2fd36",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3387375,
+          "generation": {
+            "mod": "Organize-the-Trader",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f5840263-264e-4b7e-a24b-4a17ebf2789b.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ORGANIZE THE TRADER\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: petrol teal, brushed copper and warm ivory; orderly merchant-catalogue print. Main scene: A huge trader inventory board with different goods, magnifying-glass search selecting a repair kit, and ordered item columns beside a simple sort arrow. A small row of merchant coins plus a separate green/red transaction scale illustrate trader money and deal total. No player's money display. Search, sorting and finding goods dominate rather than a giant merchant face.",
+            "referenced_image_paths": [],
+            "sha256": "89264f22b36a71abace419c82791dac2dbb470d9bb40a57d3af69518b1a2fd36"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Organize-the-Trader/nexus.png",
+          "sha256": "c3172a43adac4c6f226530da7a626cc7f5700e05a3e612fe52ad38f32eadb9d6",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3300551,
+          "generation": {
+            "mod": "Organize-the-Trader",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f8fe2f35-a56f-4b45-9e6b-dae3924faa20.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"ORGANIZE THE TRADER\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A huge trader inventory board with different goods, magnifying-glass search selecting a repair kit, and ordered item columns beside a simple sort arrow. A small row of merchant coins plus a separate green/red transaction scale illustrate trader money and deal total. No player's money display. Search, sorting and finding goods dominate rather than a giant merchant face.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Organize-the-Trader/steam.png"
+            ],
+            "sha256": "c3172a43adac4c6f226530da7a626cc7f5700e05a3e612fe52ad38f32eadb9d6"
+          }
+        }
+      }
+    },
+    {
+      "mod": "PatientSelfAid",
+      "title": "PATIENT SELF AID",
+      "mcm_badge": true,
+      "palette": "Sage green, warm medical ivory, dark pine and restrained burgundy red. Vintage field-medicine illustrated poster, broad calm color blocks with hand-inked linework and paper texture.",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/PatientSelfAid/steam.png",
+          "sha256": "3cf971f802d3d201ae56a7a53f41d3253f2f528d86cf9c8e0a9a302cd98998ca",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3551251,
+          "generation": {
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4dc7df93-b8ca-4809-830c-d25bed972918.png",
+            "prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"PATIENT SELF AID\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Sage green, warm medical ivory, dark pine and restrained burgundy red. Vintage field-medicine illustrated poster, broad calm color blocks with hand-inked linework and paper texture. FEATURE-FIRST COMPOSITION: Close-up of one conscious battered Kenshi wanderer actively wrapping a clean bandage around their own injured forearm, self-treatment clearly readable. Their visible mechanical prosthetic leg and a small repair wrench beside the medical kit suggest support for robotic limbs. A large simple medical-cross emblem anchors the composition behind the arms. Desert camp is tiny and subordinate. No robot medic doing the bandaging for them; self-aid is the hero. Exact title \"PATIENT SELF AID\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+            "approved_prototype": true
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/PatientSelfAid/nexus.png",
+          "sha256": "53c79dc0893d6327c564945c925f6e2b4f70e7b4c8481b41de565e1c62acafa1",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3206411,
+          "generation": {
+            "mod": "PatientSelfAid",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-00a71ab7-5851-4474-aad0-7d0d8343a4af.png",
+            "prompt": "Create a NEW original WIDE 16:9 LANDSCAPE Kenshi mod cover, full bleed, about 1672x940. Exact large title \"PATIENT SELF AID\" in dark pine and burgundy across the upper left, small MCM badge under it. Sage green, warm ivory, pine ink and muted burgundy distressed field-medicine poster. A calm conscious traveller is resting safely at a sheltered desert medical camp, gently wrapping a CLEAN white bandage around their own forearm as ordinary first aid for an accidental scrape. The arm is intact, NO visible wound, NO blood, NO blade or weapon anywhere. Positive healthcare and recovery, not an injury happening. Clearly mechanical prosthetic leg at the knee and a closed repair kit nearby indicate biological characters can maintain prosthetics too. A large simple medical cross motif behind them. Make the act of bandaging and accessible medical supplies dominant and easy to understand at thumbnail size. Restrained Kenshi ruins on the distant horizon; detailed inked illustration, not photorealism. Only the title and MCM lettering; no slogans or extra text.",
+            "referenced_image_paths": [],
+            "sha256": "53c79dc0893d6327c564945c925f6e2b4f70e7b4c8481b41de565e1c62acafa1"
+          }
+        }
+      }
+    },
+    {
+      "mod": "QuickStartSelect",
+      "title": "QUICK START SELECT",
+      "mcm_badge": true,
+      "palette": "turquoise blue, ivory and punchy crimson; vintage travel-selection poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/QuickStartSelect/steam.png",
+          "sha256": "b00384187fd826d786ae2cefab61e84601c5cb3111d226cca5ddcb05d7d2f5f4",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3203755,
+          "generation": {
+            "mod": "QuickStartSelect",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b362d806-1730-46b6-9411-e971ff64fb95.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"QUICK START SELECT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: turquoise blue, ivory and punchy crimson; vintage travel-selection poster. Main scene: An opened game-start selection board with multiple large scenario cards and distinct human, hive and skeleton portraits. A magnifying glass and difficulty ladder help choose a starting scenario. One highlighted card expands into a large blank description sheet. It is choosing a NEW GAME START, not fast travel or an in-game recruitment menu.",
+            "referenced_image_paths": [],
+            "sha256": "b00384187fd826d786ae2cefab61e84601c5cb3111d226cca5ddcb05d7d2f5f4"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/QuickStartSelect/nexus.png",
+          "sha256": "0327a009a5ba1a6230ac8423e65782d66eb39a19eb56986d84e50b5a10cdf6da",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3183087,
+          "generation": {
+            "mod": "QuickStartSelect",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-927347b9-3a87-4a9c-b22f-defcadcba7ec.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"QUICK START SELECT\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: An opened game-start selection board with multiple large scenario cards and distinct human, hive and skeleton portraits. A magnifying glass and difficulty ladder help choose a starting scenario. One highlighted card expands into a large blank description sheet. It is choosing a NEW GAME START, not fast travel or an in-game recruitment menu.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/QuickStartSelect/steam.png"
+            ],
+            "sha256": "0327a009a5ba1a6230ac8423e65782d66eb39a19eb56986d84e50b5a10cdf6da"
+          }
+        }
+      }
+    },
+    {
+      "mod": "RangedDamageXp",
+      "title": "RANGED DAMAGE XP",
+      "mcm_badge": true,
+      "palette": "indigo, warm amber and chalk white; dynamic archery training woodcut",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/RangedDamageXp/steam.png",
+          "sha256": "143816df031607dee5086f6c74a2cd63ef33bcd6cb5a19b4e5e933cccd17c561",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2582532,
+          "generation": {
+            "mod": "RangedDamageXp",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-3bfc2d2b-e13c-4fd9-9ec8-bf528d237cb1.png",
+            "prompt": "Edit target: attached square RANGED DAMAGE XP cover. Add one small but clearly readable brass \"MCM\" plaque centered directly beneath the title, in the empty dark strip between the words DAMAGE XP and the feature illustration. MCM support must be visibly marked. Preserve EVERYTHING ELSE exactly: the correct spaced title, indigo/amber palette, armoured adult raider with metal impact spark, crossbowman, graph and eye/crossbow icons. No wooden dummies, no blood, no other text. True 1:1 square full bleed.",
+            "referenced_image_paths": [
+              "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-ec95a0b1-2ff0-455a-aff6-97aa3eedd9fc.png"
+            ],
+            "sha256": "143816df031607dee5086f6c74a2cd63ef33bcd6cb5a19b4e5e933cccd17c561"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/RangedDamageXp/nexus.png",
+          "sha256": "71da963573f7447bcc493c100875779e52a9cc3e14ad52fc63be4becaeb39ea5",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2899320,
+          "generation": {
+            "mod": "RangedDamageXp",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6d0c7359-8a58-416e-9658-0a3971c72ce3.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"RANGED DAMAGE XP\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A crossbow bolt strikes an armoured practice opponent with a small impact spark. A bold arrow connects the damage impact to a rising XP progress instrument with a crossbow icon and an eye icon. The real damage-to-experience connection is central. Kenshi crossbowman small at the left, no guns or sniper rifles.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square. Essential fidelity: the bolt target is an actual adult armoured Kenshi raider wearing metal armour, NOT any wooden training dummy, plank target or bullseye board. Small metal impact spark, no blood or gore. Keep a clear space between DAMAGE and XP in the exact title.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/RangedDamageXp/steam.png"
+            ],
+            "sha256": "71da963573f7447bcc493c100875779e52a9cc3e14ad52fc63be4becaeb39ea5"
+          }
+        }
+      }
+    },
+    {
+      "mod": "RecruitMarkers",
+      "title": "RECRUIT MARKERS",
+      "mcm_badge": true,
+      "palette": "Midnight plum, rich violet, pale lavender and bright gold with sharp ivory highlights. Dramatic graphic silhouette poster with clean iconography and limited comic crosshatching.",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/RecruitMarkers/steam.png",
+          "sha256": "4793ae016a7a2358f24e2eb5cdb70ca6747412e7d2c43373b458a7e90eaa3e57",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3150385,
+          "generation": {
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-92304319-7dc9-4c24-a9e0-e6cffe027229.png",
+            "prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"RECRUIT MARKERS\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Midnight plum, rich violet, pale lavender and bright gold with sharp ivory highlights. Dramatic graphic silhouette poster with clean iconography and limited comic crosshatching. FEATURE-FIRST COMPOSITION: The distinctive functionality is the hero: three clearly separated Kenshi NPC silhouettes in a town, each with a LARGE immediately legible marker above the head. One recruitable ronin has a handshake icon, one merchant has a coin-stack icon, and one actual patrol leader walking with two smaller followers has a gold five-point star. Make the three markers readable at 240px thumbnail size, not tiny decorative sparkles. No stars over solo passersby. Exact title \"RECRUIT MARKERS\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+            "approved_prototype": true
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/RecruitMarkers/nexus.png",
+          "sha256": "78afab85d005ab7a95b40f223e8e96c0e40ea44b1622ae7b3cc97e6bb53e2de8",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3140322,
+          "generation": {
+            "mod": "RecruitMarkers",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8a3881fc-14bb-4570-9725-77cdad8b64e1.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"RECRUIT MARKERS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: The distinctive functionality is the hero: three clearly separated Kenshi NPC silhouettes in a town, each with a LARGE immediately legible marker above the head. One recruitable ronin has a handshake icon, one merchant has a coin-stack icon, and one actual patrol leader walking with two smaller followers has a gold five-point star. Make the three markers readable at 240px thumbnail size, not tiny decorative sparkles. No stars over solo passersby.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "78afab85d005ab7a95b40f223e8e96c0e40ea44b1622ae7b3cc97e6bb53e2de8"
+          }
+        }
+      }
+    },
+    {
+      "mod": "SkillLevelUpInfo",
+      "title": "SKILL LEVEL UP INFO",
+      "mcm_badge": true,
+      "palette": "sky cyan, ivory, charcoal and antique gold; airy character-training poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/SkillLevelUpInfo/steam.png",
+          "sha256": "b99a7e8013b1a3e79169b1d618f2e0c325f1ddc8b5034ce63452975f5b1ab9f8",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2955561,
+          "generation": {
+            "mod": "SkillLevelUpInfo",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b2e2ac4e-c198-4f73-87dc-236f89fa3fc0.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"SKILL LEVEL UP INFO\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: sky cyan, ivory, charcoal and antique gold; airy character-training poster. Main scene: A wanderer trains beside a ruined wall. Large pale blue +1% and +2% skill-gain glyphs rise from around their head, with a separate gold double-chevron level-up icon above. A small bottom-corner character-panel inset has just two slim progress rows. Floating XP gains and level-up feedback are the main focus, not dozens of overhead HP bars.",
+            "referenced_image_paths": [],
+            "sha256": "b99a7e8013b1a3e79169b1d618f2e0c325f1ddc8b5034ce63452975f5b1ab9f8"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/SkillLevelUpInfo/nexus.png",
+          "sha256": "37470382005ad0324dc428bd0ca685efb6971789ae614497a229f0ca908cc89d",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2941027,
+          "generation": {
+            "mod": "SkillLevelUpInfo",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-854ce879-6a6e-41d1-802d-32da966e88c6.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"SKILL LEVEL UP INFO\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A wanderer trains beside a ruined wall. Large pale blue +1% and +2% skill-gain glyphs rise from around their head, with a separate gold double-chevron level-up icon above. A small bottom-corner character-panel inset has just two slim progress rows. Floating XP gains and level-up feedback are the main focus, not dozens of overhead HP bars.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/SkillLevelUpInfo/steam.png"
+            ],
+            "sha256": "37470382005ad0324dc428bd0ca685efb6971789ae614497a229f0ca908cc89d"
+          }
+        }
+      }
+    },
+    {
+      "mod": "StackSort",
+      "title": "STACK SORT",
+      "mcm_badge": true,
+      "palette": "Cool cobalt blue, chalk white and vivid lime accents. Bold industrial infographic poster with clean isometric inventory trays, large simple shapes and a few gritty ink details.",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/StackSort/steam.png",
+          "sha256": "bf72d41dc0d369d924173dbc580be457ac6c05bebc242cf34da032268dc08995",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3330016,
+          "generation": {
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-54f38dbe-67d9-4c15-a39b-1d2339519a13.png",
+            "prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"STACK SORT\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Cool cobalt blue, chalk white and vivid lime accents. Bold industrial infographic poster with clean isometric inventory trays, large simple shapes and a few gritty ink details. FEATURE-FIRST COMPOSITION: Make the main feature unmistakable: on the left, three identical loose bundles of crossbow bolts occupy separate grid slots among scattered bandages and repair kits; a huge curved lime arrow points to the right, where the same supplies are neatly merged into stacks and tightly arranged. The inventory grids and combining gesture dominate 65% of the picture. Small scavenger gloved hands organize them; no large mascot or landscape stealing attention. Exact title \"STACK SORT\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+            "approved_prototype": true
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/StackSort/nexus.png",
+          "sha256": "a8c55444fa5fa1bf6c7256bdfa58ae203663d7181237b89f675908ecf60c3841",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3243979,
+          "generation": {
+            "mod": "StackSort",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-2d47ea61-eca3-49a4-8f0a-43bd514f79da.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"STACK SORT\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: Make the main feature unmistakable: on the left, three identical loose bundles of crossbow bolts occupy separate grid slots among scattered bandages and repair kits; a huge curved lime arrow points to the right, where the same supplies are neatly merged into stacks and tightly arranged. The inventory grids and combining gesture dominate 65% of the picture. Small scavenger gloved hands organize them; no large mascot or landscape stealing attention.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "a8c55444fa5fa1bf6c7256bdfa58ae203663d7181237b89f675908ecf60c3841"
+          }
+        }
+      }
+    },
+    {
+      "mod": "StatColours",
+      "title": "STAT COLOURS",
+      "mcm_badge": true,
+      "palette": "cream, plum, emerald and brick red; typographic stats-ledger screenprint",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/StatColours/steam.png",
+          "sha256": "b4919056631b0f498ecb9e288df7fd20a4c6411c296e259c263a6417358a0ac4",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2993038,
+          "generation": {
+            "mod": "StatColours",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-2d6cfcb6-5017-45dd-a825-c1ed9f17dcee.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"STAT COLOURS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: cream, plum, emerald and brick red; typographic stats-ledger screenprint. Main scene: A very large skill-stat ledger with readable coloured numeric values: low muted red 12, green 90, purple 120. Distinct green (+8) and red (-2) modifiers beside shield and strength icons show equipment bonuses and penalties. Colour-by-value and modifier explanations dominate. No levelling magic or combat damage numbers.",
+            "referenced_image_paths": [],
+            "sha256": "b4919056631b0f498ecb9e288df7fd20a4c6411c296e259c263a6417358a0ac4"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/StatColours/nexus.png",
+          "sha256": "9057b58b746bf15979bc37ad2a945dad945e70b370e136440f9d7fe8d2df3a3d",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3091463,
+          "generation": {
+            "mod": "StatColours",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b313c700-36a2-47e3-88c8-c2460cda6db6.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"STAT COLOURS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A very large skill-stat ledger with readable coloured numeric values: low muted red 12, green 90, purple 120. Distinct green (+8) and red (-2) modifiers beside shield and strength icons show equipment bonuses and penalties. Colour-by-value and modifier explanations dominate. No levelling magic or combat damage numbers.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/StatColours/steam.png"
+            ],
+            "sha256": "9057b58b746bf15979bc37ad2a945dad945e70b370e136440f9d7fe8d2df3a3d"
+          }
+        }
+      }
+    },
+    {
+      "mod": "UITweaks",
+      "title": "UI TWEAKS",
+      "mcm_badge": true,
+      "palette": "near-black teal, warm ivory and burnished copper; clean technical editorial poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/UITweaks/steam.png",
+          "sha256": "a4eabfebcbf901c3bc4ae15668abf78ddf3f79a2549c8989dc4d16303ba05bfb",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2640087,
+          "generation": {
+            "mod": "UITweaks",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4aa95b9a-d197-4ab4-9145-6832d70a0f65.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"UI TWEAKS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: near-black teal, warm ivory and burnished copper; clean technical editorial poster. Main scene: A before-and-after collection of Kenshi UI panels: cramped overlapping queue rows on the left transform via a strong arrow into spacious clean rows and full-width framed progress bars on the right. A small strip of three squad portraits connected by exchange arrows suggests sequential trading. Interface readability and alignment are the dominant feature; no sci-fi operating system or invented in-world holograms.",
+            "sha256": "a4eabfebcbf901c3bc4ae15668abf78ddf3f79a2549c8989dc4d16303ba05bfb"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/UITweaks/nexus.png",
+          "sha256": "ce61a4ef7c3d2fbe663552287e801016c70b056a92304dce2dcf6e4a37c83e5c",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 2832038,
+          "generation": {
+            "mod": "UITweaks",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-1e3dc542-146c-454e-ad26-174293d02531.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"UI TWEAKS\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A before-and-after collection of Kenshi UI panels: cramped overlapping queue rows on the left transform via a strong arrow into spacious clean rows and full-width framed progress bars on the right. A small strip of three squad portraits connected by exchange arrows suggests sequential trading. Interface readability and alignment are the dominant feature; no sci-fi operating system or invented in-world holograms.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/UITweaks/steam.png"
+            ],
+            "sha256": "ce61a4ef7c3d2fbe663552287e801016c70b056a92304dce2dcf6e4a37c83e5c"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Vital-Read",
+      "title": "VITAL READ",
+      "mcm_badge": true,
+      "palette": "midnight navy, cream, emergency red and medical blue; crisp squad-status infographic",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Vital-Read/steam.png",
+          "sha256": "a54b645b43c5c8a17d25c263ebbc178c3e8dc1c56cee98757aee2fd01f9a11e7",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 2708202,
+          "generation": {
+            "mod": "Vital-Read",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f6cecdc8-000c-4337-a229-0a8f6886da0b.png",
+            "prompt": "Edit target: attached square VITAL READ poster. Keep all typography including MCM, four squad portrait cards, palette and composition. Correct ONLY the status badge on the fourth/rightmost portrait: that character is a SKELETON ROBOT resting on a repair bed, so its blue status badge must depict a clear WRENCH over a small bed symbol, NOT a medical plus/cross. The other three portrait status pictograms remain Zzz, hunger stomach and crutch/bandaged leg. This is a fictional game squad-status display, no injury is occurring. Do not add other words or alter people or backgrounds. True square full bleed.",
+            "referenced_image_paths": [
+              "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4eae135e-17fd-4263-a9e6-c35ec938dac0.png"
+            ],
+            "sha256": "a54b645b43c5c8a17d25c263ebbc178c3e8dc1c56cee98757aee2fd01f9a11e7"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Vital-Read/nexus.png",
+          "sha256": "577301b8d3d3829fbd3186ab6483454078a5defc753ea1aa917eaaa920574e76",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3088715,
+          "generation": {
+            "mod": "Vital-Read",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-16be7e46-5b9d-4fb1-96d0-6ce0cc566fe6.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"VITAL READ\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: Four gigantic squad portrait cards with unmistakable corner status pictograms: unconscious Zzz, hunger stomach, wounded leg crutch, repair-bed wrench or medical-bed blue plus. Kenshi characters are visible inside portraits. The status icons ON SQUAD PORTRAITS are the main concept, no floating bars above world NPCs.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square. Accuracy: the skeleton in the fourth portrait uses a BLUE WRENCH / repair-bed icon, never a medical plus intended for biological patients.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Vital-Read/steam.png"
+            ],
+            "sha256": "577301b8d3d3829fbd3186ab6483454078a5defc753ea1aa917eaaa920574e76"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Vital-Sense",
+      "title": "VITAL SENSE",
+      "mcm_badge": true,
+      "palette": "Bone white, charcoal black, vermilion red and muted turquoise. High-contrast woodcut-inspired graphic cover with an oversized spyglass/eye motif, bold negative space and sparse textured detail.",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Vital-Sense/steam.png",
+          "sha256": "739afa6624da030c8984ec7acdf2bbd089c9e0e38fd3ffb7c696c9ff2d5b2e04",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3456272,
+          "generation": {
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-c2382beb-ddc2-4261-88c3-08320bc22e4a.png",
+            "prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"VITAL SENSE\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Bone white, charcoal black, vermilion red and muted turquoise. High-contrast woodcut-inspired graphic cover with an oversized spyglass/eye motif, bold negative space and sparse textured detail. FEATURE-FIRST COMPOSITION: The spyglass inspection motif reveals three clearly readable Kenshi character states: an injured standing wanderer with a simple wounded-person pictogram, an unconscious or sleeping figure with a prone Zzz pictogram, and a bounty target with gold coin symbols. Make these status symbols LARGE and central. They are simple status/bounty ICONS ONLY: absolutely no overhead health bars, HP meters or progress bars. Background town is subtle. Exact title \"VITAL SENSE\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+            "approved_prototype": true
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Vital-Sense/nexus.png",
+          "sha256": "628a246bdcff3d1003242866852a44626f03143ab6a45a68fd9fc7ae144c9652",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3453822,
+          "generation": {
+            "mod": "Vital-Sense",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-3a5b7370-8612-49b6-8ea8-f0c6318091a5.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"VITAL SENSE\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: The spyglass inspection motif reveals three clearly readable Kenshi character states: an injured standing wanderer with a simple wounded-person pictogram, an unconscious or sleeping figure with a prone Zzz pictogram, and a bounty target with gold coin symbols. Make these status symbols LARGE and central. They are simple status/bounty ICONS ONLY: absolutely no overhead health bars, HP meters or progress bars. Background town is subtle.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "sha256": "628a246bdcff3d1003242866852a44626f03143ab6a45a68fd9fc7ae144c9652"
+          }
+        }
+      }
+    },
+    {
+      "mod": "Wall-B-Gone",
+      "title": "WALL-B-GONE",
+      "mcm_badge": true,
+      "palette": "stone grey, construction yellow, charcoal and cyan; demolition-and-salvage instruction print",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/Wall-B-Gone/steam.png",
+          "sha256": "735320180036a37902e89ba90798a26a7decf3d18957e72c678d3f0a1c2af5a2",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3193674,
+          "generation": {
+            "mod": "Wall-B-Gone",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-1a5dabb4-3a76-4645-bfc0-a93d3277d5e8.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"WALL-B-GONE\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: stone grey, construction yellow, charcoal and cyan; demolition-and-salvage instruction print. Main scene: An owned settlement wall section is outlined with dashed dismantle marks, its blocks neatly lifting away toward a refunded building-material crate. A large hammer/key-action emblem makes controlled dismantling clear. Small builder at the side. No explosions, enemy base demolition or destruction of occupied beds.",
+            "referenced_image_paths": [],
+            "sha256": "735320180036a37902e89ba90798a26a7decf3d18957e72c678d3f0a1c2af5a2"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/Wall-B-Gone/nexus.png",
+          "sha256": "8a0b27c8662d6d3996710b0fc25c79d5d06b53057224953da02de00ac65e94be",
+          "dimensions": [
+            1672,
+            940
+          ],
+          "bytes": 3171467,
+          "generation": {
+            "mod": "Wall-B-Gone",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-855d03eb-8d4e-4067-961e-e33db6c3a133.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"WALL-B-GONE\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: An owned settlement wall section is outlined with dashed dismantle marks, its blocks neatly lifting away toward a refunded building-material crate. A large hammer/key-action emblem makes controlled dismantling clear. Small builder at the side. No explosions, enemy base demolition or destruction of occupied beds.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/Wall-B-Gone/steam.png"
+            ],
+            "sha256": "8a0b27c8662d6d3996710b0fc25c79d5d06b53057224953da02de00ac65e94be"
+          }
+        }
+      }
+    },
+    {
+      "mod": "WantedMap",
+      "title": "WANTED MAP",
+      "mcm_badge": true,
+      "palette": "aged ivory, vermilion, sepia and black ink; bounty-hunter dossier/cartographic poster",
+      "assets": {
+        "steam": {
+          "image": "cover-series/2026-10-31-features/WantedMap/steam.png",
+          "sha256": "72ba871c2a147b743fd84c3990e690e36db6fce7c491fbe342af48d448ffdf10",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "bytes": 3640039,
+          "generation": {
+            "mod": "WantedMap",
+            "format": "steam",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-a33f93b1-af0c-450e-a1ee-44d75a4316f0.png",
+            "prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"WANTED MAP\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: aged ivory, vermilion, sepia and black ink; bounty-hunter dossier/cartographic poster. Main scene: A huge wanted poster with an illustrated outlaw portrait is pinned beside a Kenshi map. A bold red target pin and an orange approximate-area circle connect the wanted portrait to the map, with a small bounty coin stack. Tracking targets from carried wanted posters is unmistakable. No claim of psychic recruitment or generic custom map notes.",
+            "referenced_image_paths": [],
+            "sha256": "72ba871c2a147b743fd84c3990e690e36db6fce7c491fbe342af48d448ffdf10"
+          }
+        },
+        "nexus": {
+          "image": "cover-series/2026-10-31-features/WantedMap/nexus.png",
+          "sha256": "496cce3299f9554151903e90c89720f68a9e6ae7e4f2feebbd526538946b3467",
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 3729403,
+          "generation": {
+            "mod": "WantedMap",
+            "format": "nexus",
+            "source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-0e2ac05e-d394-4862-8d28-af217600cd4f.png",
+            "prompt": "Edit target: the attached square cover. Recompose it into a true WIDE 16:9 LANDSCAPE Nexus mod cover (about 1672x940), full bleed, no padding, no letterbox bars. Preserve the reference artwork language, exact distinctive palette, subjects and feature metaphor; expand and rearrange the illustration across the wider frame instead of cropping or stretching the square. EXACT title \"WANTED MAP\" stays very large and fully readable across the upper left/top quarter with generous safe margins, balanced on one or two lines. A small clearly readable MCM badge directly under the title. The main feature occupies at least 60% of the composition: A huge wanted poster with an illustrated outlaw portrait is pinned beside a Kenshi map. A bold red target pin and an orange approximate-area circle connect the wanted portrait to the map, with a small bounty coin stack. Tracking targets from carried wanted posters is unmistakable. No claim of psychic recruitment or generic custom map notes.. Keep all words to the title and the permitted MCM badge, no subtitles or slogans. This should clearly belong to the same pair as the attached square.",
+            "referenced_image_paths": [
+              "D:/DEV/Kenshi/workshop/cover-series/2026-10-31-features/WantedMap/steam.png"
+            ],
+            "sha256": "496cce3299f9554151903e90c89720f68a9e6ae7e4f2feebbd526538946b3467"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,598 +1,562 @@
 {
   "date": "2026-10-31",
   "tool": "built-in image_gen",
+  "series": "feature-first diverse palettes",
   "covers": [
     {
       "mod": "AIFixed",
       "title": "AI FIXED",
       "mcm_badge": true,
       "image": "steam-covers/AIFixed/000_LEOPARD_Steam_Cover.png",
-      "sha256": "5b44dba857deeb4d7330cb7600750efe0761ae628d46bb3160698e90c1225f17",
-      "bytes": 2959752,
+      "source_image": "images/AIFixed/000_LEOPARD_Cover.png",
+      "sha256": "e9324e353a43eb37549b4e17ed1fa18d211baa5292d4bbecb435f6a02d4a8382",
+      "bytes": 3335878,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/AIFixed/000_LEOPARD_Cover.png",
-      "source_sha256": "f58c02a5d7ffe53ceaa2ca7aba14e0507724f3eb7e0f0fd5d162e3567e1d28ff",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-2897d736-ecfd-4be1-8486-099b5bd2b07f.png",
-      "generation_prompt": "Edit target: the attached original AIFixed landscape cover. Create its NEW dedicated Steam Workshop cover, a true 1:1 SQUARE, 1024x1024, edge-to-edge illustration. Recompose the whole scene vertically within the square: the robot mechanic with crimson scarf and conical samurai helmet repairing the reclining robot, dusty Kenshi town and sunset. Preserve the exact mechanical mascot design and richly inked distressed ochre/rust comic-print style. The LARGE readable title \"AI FIXED\" occupies the upper 25% across the square, gold condensed block capitals on a black weathered brush banner; a small \"MCM\" metal plaque directly beneath it. Keep all text fully inside the frame with generous safe margins and readable in a 240px thumbnail. No padding, no black letterbox bands, no additional text. This is a recomposed square cover, not a landscape card inside a square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"AI FIXED\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: oxidized teal, ivory, brushed copper and graphite; mechanical medical schematic rendered as a worn inked field manual. Main scene: An injured Kenshi skeleton robot lies on an unmistakable powered repair bed, its mechanical leg being repaired by an ally. A second small inset silhouette shows an ally carrying a disabled robot toward that bed. The repair-bed-and-wrench idea is huge and dominant; robotic bodies, no human hospital surgery.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-219a584d-ab49-4529-a82d-5d24ad9b32e9.png"
     },
     {
       "mod": "AssignedWorkers",
       "title": "ASSIGNED WORKERS",
       "mcm_badge": true,
       "image": "steam-covers/AssignedWorkers/000_LEOPARD_Steam_Cover.png",
-      "sha256": "b51735a9aec7312e865b6cb3246c10b0dfa1a681ea1e855a88bc6a235fbbb08b",
-      "bytes": 3123752,
+      "source_image": "images/AssignedWorkers/000_LEOPARD_Cover.png",
+      "sha256": "e703092ce22d5d122b3ee591e62d76a63af4fe1f9a1a95609c855f6499d545dc",
+      "bytes": 2821953,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/AssignedWorkers/000_LEOPARD_Cover.png",
-      "source_sha256": "c591c9e6eb05a781eb4fa44df1bdeff21791950db2e7fa2f61a7118fd1355d58",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8b2e5467-1ab7-4a46-8c7f-e00815c1f931.png",
-      "generation_prompt": "Edit target: attached original AssignedWorkers cover. Create a NEW dedicated Steam Workshop cover: true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose its original scene for the square: robot foreman assigning workers beside machines, with a red lightning icon over one powered-off machine. Preserve the reference's mechanical round-eyed robot mascot, conical samurai helmet, crimson scarf, gritty inked crosshatching, weathered print texture and warm ochre/rust Kenshi sunset palette. Make exact title \"ASSIGNED WORKERS\" MUCH LARGER, gold condensed bold uppercase on a black brush banner spanning the upper 25-30% of the square. Break long titles naturally into two lines so letters stay big. Small \"MCM\" metal plaque directly below title. Generous safe margins around every letter. Scene fills the remaining square. No other words, no padding, no letterbox, no landscape card pasted into a square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ASSIGNED WORKERS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: construction amber, deep charcoal and electric cyan; bold industrial cutaway infographic. Main scene: A large mine/workshop machine with three physically working labourers. A magnified icon panel links three worker portraits directly to that machine using clear cyan connector lines, explaining who is assigned. A secondary switched-off machine carries one red lightning warning. The worker-to-machine assignment is the main visual, not a robot portrait.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-373e78e0-3e46-435b-8edd-3320cb42734a.png"
     },
     {
       "mod": "Auto-Pause-on-Load",
       "title": "AUTO-PAUSE ON LOAD",
       "mcm_badge": true,
       "image": "steam-covers/Auto-Pause-on-Load/000_LEOPARD_Steam_Cover.png",
-      "sha256": "ad03de33e3dde0ec8a7a3f2ccbccc499817ec4646612edd16ab9f78e83aa45d1",
-      "bytes": 3405649,
+      "source_image": "images/Auto-Pause-on-Load/000_LEOPARD_Cover.png",
+      "sha256": "0c92cc15be80d748fc7e67cf12df92a49491bcba5529bd1c62d1c44cdc0fd5c1",
+      "bytes": 3473468,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Auto-Pause-on-Load/000_LEOPARD_Cover.png",
-      "source_sha256": "395e167f4226132f725d2f8b9185d78d6650cf7a4e79a1099127056b505c23bc",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-ed5187ff-d575-4c15-9a05-2a57399ee5bc.png",
-      "generation_prompt": "Edit target: attached original Auto-Pause-on-Load cover. Create a NEW dedicated Steam Workshop cover: true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose its original scene for the square: robot pulling a large PAUSE lever while a travelling caravan freezes in mid-step. Preserve the reference's mechanical round-eyed robot mascot, conical samurai helmet, crimson scarf, gritty inked crosshatching, weathered print texture and warm ochre/rust Kenshi sunset palette. Make exact title \"AUTO-PAUSE ON LOAD\" MUCH LARGER, gold condensed bold uppercase on a black brush banner spanning the upper 25-30% of the square. Break long titles naturally into two lines so letters stay big. Small \"MCM\" metal plaque directly below title. Generous safe margins around every letter. Scene fills the remaining square. No other words, no padding, no letterbox, no landscape card pasted into a square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"AUTO-PAUSE ON LOAD\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: glacier blue, black ink, ivory and saffron; dramatic freeze-frame screenprint. Main scene: A huge bold PAUSE symbol made of two vertical brass bars overlays a caravan frozen mid-step. Windblown cloth and a falling canteen are stopped in mid-air. A small stack of save-file parchment sheets feeds an arrow into the pause symbol. Actual Kenshi ruins, no literal ice prison or magical frost spell.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-9c727e3b-0b39-467e-bbef-b5a9b7db9ea4.png"
     },
     {
       "mod": "BestMinimap",
       "title": "BEST MINIMAP",
       "mcm_badge": true,
       "image": "steam-covers/BestMinimap/000_LEOPARD_Steam_Cover.png",
-      "sha256": "32ae0c24a83b639dd3e35c61fdbcf43b63fa8019528d44ca23d9a7c27511cd75",
-      "bytes": 3403071,
+      "source_image": "images/BestMinimap/000_LEOPARD_Cover.png",
+      "sha256": "eb006041b7b8408425b24e376cf9c07e91ae3fab76e43955695fce1b69ea88fa",
+      "bytes": 3259475,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/BestMinimap/000_LEOPARD_Cover.png",
-      "source_sha256": "2391f087dd2c5873dae35d3fd211b4dff2134a22a3ef602673113d9c908dbb27",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-98f3f0ae-8519-4d92-b241-50d053906f99.png",
-      "generation_prompt": "Edit target: attached original BestMinimap cover. Create a NEW dedicated Steam Workshop cover: true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose its original scene for the square: robot studying a large round brass minimap with colored map markers and a camera-direction wedge. Preserve the reference's mechanical round-eyed robot mascot, conical samurai helmet, crimson scarf, gritty inked crosshatching, weathered print texture and warm ochre/rust Kenshi sunset palette. Make exact title \"BEST MINIMAP\" MUCH LARGER, gold condensed bold uppercase on a black brush banner spanning the upper 25-30% of the square. Break long titles naturally into two lines so letters stay big. Small \"MCM\" metal plaque directly below title. Generous safe margins around every letter. Scene fills the remaining square. No other words, no padding, no letterbox, no landscape card pasted into a square."
+      "generation_prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"BEST MINIMAP\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Deep midnight navy, luminous turquoise, glacier blue and crisp cream. Elegant cartographic adventure poster, etched terrain contour lines, striking circular composition, minimal warm colors. FEATURE-FIRST COMPOSITION: A LARGE detailed circular minimap is the unmistakable hero: Kenshi canyon terrain, discovered settlement symbols, colored nearby-character dots, a very clear triangular camera-direction arrow and dashed camera-range boundary. A small ruined desert outpost appears behind the rim for context. The map occupies most of the cover and reads instantly at thumbnail size. Brass compass edge is restrained, no large character. Exact title \"BEST MINIMAP\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-08c488a6-e0c8-4e2b-9a84-1529f3c82a0b.png"
     },
     {
       "mod": "BetterLooting",
       "title": "BETTER LOOTING",
       "mcm_badge": true,
       "image": "steam-covers/BetterLooting/000_LEOPARD_Steam_Cover.png",
-      "sha256": "78d076e237cd8c89a62369f2d571d6fcc28a412558815106255792e0b4b70dc7",
-      "bytes": 3172020,
+      "source_image": "images/BetterLooting/000_LEOPARD_Cover.png",
+      "sha256": "44fce48e309f635353bae2f23bbc975f5b26dbcaab65f1282ea614b4dc312166",
+      "bytes": 3362779,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/BetterLooting/000_LEOPARD_Cover.png",
-      "source_sha256": "fafd95ec83974103b87689aa826324fbf23946599a393959e8acc68de6215e78",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4ad7ef7d-ce5e-4268-9cb0-61090d6b2210.png",
-      "generation_prompt": "Edit target: attached original BetterLooting cover. Create a NEW dedicated Steam Workshop cover: true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose its original scene for the square: robot collecting useful loot into a scavenger backpack on a desert battlefield. Preserve the reference's mechanical round-eyed robot mascot, conical samurai helmet, crimson scarf, gritty inked crosshatching, weathered print texture and warm ochre/rust Kenshi sunset palette. Make exact title \"BETTER LOOTING\" MUCH LARGER, gold condensed bold uppercase on a black brush banner spanning the upper 25-30% of the square. Break long titles naturally into two lines so letters stay big. Small \"MCM\" metal plaque directly below title. Generous safe margins around every letter. Scene fills the remaining square. No other words, no padding, no letterbox, no landscape card pasted into a square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"BETTER LOOTING\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: olive drab, warm ivory, charcoal and vivid tangerine; tactile scavenger field-guide collage. Main scene: One scavenger kneels to pick up the nearest useful bandage and bolt bundle into an open loot bag. A short dotted route connects nearby desirable loot to the bag; distant worthless scrap is visually crossed out. A very large bag opening and selective item arrows occupy most of the scene; no magnetic superpower or money printing.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8fc9f09d-9e0e-45cf-86a0-f00f93abf197.png"
     },
     {
       "mod": "BuildModeGizmo",
       "title": "BUILD MODE GIZMO",
       "mcm_badge": true,
       "image": "steam-covers/BuildModeGizmo/000_LEOPARD_Steam_Cover.png",
-      "sha256": "dde8d8ce3cfaebbcf39c6d91618b55e5f0ee8af7ff65d44641280724fe25c867",
-      "bytes": 3193936,
+      "source_image": "images/BuildModeGizmo/000_LEOPARD_Cover.png",
+      "sha256": "46137978785aae42adb0f3bb1bd11882e5a4b8b83b3eb17276013f4f0399b92b",
+      "bytes": 3576831,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/BuildModeGizmo/000_LEOPARD_Cover.png",
-      "source_sha256": "3a1ea900a2a0a45715204b378d5d18413b11afdff3646bda06f5ef36566915ed",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-67046a52-7931-4be3-b7b1-c3edad800dc0.png",
-      "generation_prompt": "Edit target: attached original BuildModeGizmo cover. Create a NEW dedicated Steam Workshop cover: true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose its original scene for the square: robot adjusting a model building using colored translation and rotation arrows. Preserve the reference's mechanical round-eyed robot mascot, conical samurai helmet, crimson scarf, gritty inked crosshatching, weathered print texture and warm ochre/rust Kenshi sunset palette. Make exact title \"BUILD MODE GIZMO\" MUCH LARGER, gold condensed bold uppercase on a black brush banner spanning the upper 25-30% of the square. Break long titles naturally into two lines so letters stay big. Small \"MCM\" metal plaque directly below title. Generous safe margins around every letter. Scene fills the remaining square. No other words, no padding, no letterbox, no landscape card pasted into a square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"BUILD MODE GIZMO\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: deep slate, vivid cyan, fuchsia and off-white; architectural drafting print. Main scene: An unfinished Kenshi building foundation shown isometrically, surrounded by giant three-axis translation arrows and curved rotation handles. A builder's gloved hand adjusts the model. The move-and-rotate controls are the main subject and unmistakable even at thumbnail size; no fully built city being teleported.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-8eda4275-5e91-40e5-87b6-cc52e4a3605e.png"
     },
     {
       "mod": "Character Inspector",
       "title": "CHARACTER INSPECTOR",
       "mcm_badge": true,
       "image": "steam-covers/Character Inspector/000_LEOPARD_Steam_Cover.png",
-      "sha256": "1b09476caf674b59205fb47c993df06103a9dc77726bb1d25efa9c56c327c05a",
-      "bytes": 3368173,
+      "source_image": "images/Character Inspector/000_LEOPARD_Cover.png",
+      "sha256": "c95fefa59ae77dbf8a9acecde096a08a1286b29ef0a63c885fe1b9654883452a",
+      "bytes": 3381078,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Character Inspector/000_LEOPARD_Cover.png",
-      "source_sha256": "d199c387fe7fd4fda816711a30398664d9f6bf9873d6e6340f29e8c9743fdcca",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-d5240ed8-b6d5-44b6-8b56-8504c2070692.png",
-      "generation_prompt": "Edit target: attached original Character Inspector cover. Create a NEW dedicated Steam Workshop cover: true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose its original scene for the square: robot inspecting an armored mannequin with a magnifier and armor-coverage diagram. Preserve the reference's mechanical round-eyed robot mascot, conical samurai helmet, crimson scarf, gritty inked crosshatching, weathered print texture and warm ochre/rust Kenshi sunset palette. Make exact title \"CHARACTER INSPECTOR\" MUCH LARGER, gold condensed bold uppercase on a black brush banner spanning the upper 25-30% of the square. Break long titles naturally into two lines so letters stay big. Small \"MCM\" metal plaque directly below title. Generous safe margins around every letter. Scene fills the remaining square. No other words, no padding, no letterbox, no landscape card pasted into a square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"CHARACTER INSPECTOR\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: aged ivory, oxblood, brass and black ink; anatomical armour field manual. Main scene: A large neutral human mannequin silhouette broken into head, torso, arms and legs, with cutaway layers of leather, chain and plate on the chest. Bold circular coverage diagrams and shield symbols explain armour coverage. Kenshi armour on a table, no sci-fi x-ray or health bars over NPCs.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-9c7991f2-d694-424d-9fe0-b32dadace980.png"
     },
     {
       "mod": "Character-Highlight",
       "title": "CHARACTER HIGHLIGHT",
       "mcm_badge": true,
       "image": "steam-covers/Character-Highlight/000_LEOPARD_Steam_Cover.png",
-      "sha256": "4138f90c5903cdc33349c577013f8b0365963fd3d2bec24274d6db71eec5b4bf",
-      "bytes": 3541217,
+      "source_image": "images/Character-Highlight/000_LEOPARD_Cover.png",
+      "sha256": "0bb72d070a423a9ee50a1db57aef16ddc81263caa21cab44a376a8a4cce7f423",
+      "bytes": 2707153,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Character-Highlight/000_LEOPARD_Cover.png",
-      "source_sha256": "da97637c682f9e9e8faec1cb1fb779c933a395563fca6c0e530fa2404ffdae74",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-d6a9bbfc-68e9-4be9-bc9c-571661cd2524.png",
-      "generation_prompt": "Edit target: attached original Character-Highlight cover. Make its dedicated Steam Workshop artwork a true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose the original scene for a square; preserve its subjects, activity, feature illustration and exact mechanical robot mascot with round optical eyes, conical samurai helmet and red scarf. Retain richly inked crosshatching, distressed print texture, dusty Kenshi world and reference palette. Exact LARGE title \"CHARACTER HIGHLIGHT\" in gold bold condensed uppercase on a black weathered brush banner across the upper 25-30%. Break long names into two or three balanced lines rather than shrinking text. Small \"MCM\" metal plaque immediately beneath the title. Keep every letter inside safe margins, readable at 240px. Original scene fills remaining square. No other text or slogans, no padding, no letterbox, no pasted landscape card."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"CHARACTER HIGHLIGHT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: near-black navy with strongly separated emerald, scarlet, cyan and violet; night-time graphic stencil. Main scene: Five Kenshi wanderers in a dim settlement, their whole silhouettes clearly tinted in different relation colours. An enemy is red, ally green, player cyan, diplomat violet. One large spotlight-like comparison makes the highlight effect dominate. No HP bars or recruitment icons.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6082f16d-7100-4465-b69a-a65a835880e9.png"
     },
     {
       "mod": "Container-Highlight",
       "title": "CONTAINER HIGHLIGHT",
       "mcm_badge": true,
       "image": "steam-covers/Container-Highlight/000_LEOPARD_Steam_Cover.png",
-      "sha256": "ea181b42d8c57b3932f452471c77ceb04ce879ffc339ab973689594d5b005f16",
-      "bytes": 3219511,
+      "source_image": "images/Container-Highlight/000_LEOPARD_Cover.png",
+      "sha256": "03f0545697eebec5054cef5f51bb2d99810eae24ed2b3824478f9176a37f8a41",
+      "bytes": 3109500,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Container-Highlight/000_LEOPARD_Cover.png",
-      "source_sha256": "a7b5c24db584b7697423e4df094aeec94d4cdfe7984eebe408a8f961bb9aff49",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6d2ab782-785c-4ec1-b07f-9acc7fa863b6.png",
-      "generation_prompt": "Edit target: attached original Container-Highlight cover. Make its dedicated Steam Workshop artwork a true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose the original scene for a square; preserve its subjects, activity, feature illustration and exact mechanical robot mascot with round optical eyes, conical samurai helmet and red scarf. Retain richly inked crosshatching, distressed print texture, dusty Kenshi world and reference palette. Exact LARGE title \"CONTAINER HIGHLIGHT\" in gold bold condensed uppercase on a black weathered brush banner across the upper 25-30%. Break long names into two or three balanced lines rather than shrinking text. Small \"MCM\" metal plaque immediately beneath the title. Keep every letter inside safe margins, readable at 240px. Original scene fills remaining square. No other text or slogans, no padding, no letterbox, no pasted landscape card."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"CONTAINER HIGHLIGHT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: soot black, chalk white, acid yellow and turquoise; high-contrast salvage stencil. Main scene: A large lootable chest and two supply barrels amongst dim ruins. One chest is brightly outlined in turquoise with a hovering chest pictogram and an empty short label plate, while irrelevant background clutter stays subdued. Container detection dominates, no treasure map or automatic collection.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-36858cd7-0148-4b14-b68e-7e5465baae9e.png"
     },
     {
       "mod": "Dark UI Advanced",
       "title": "DARK UI ADVANCED",
       "mcm_badge": false,
       "image": "steam-covers/Dark UI Advanced/000_LEOPARD_Steam_Cover.png",
-      "sha256": "af52c2166f07e718c5307eac15c361e4c832ee1da137f3d22ae8deaaa01ef0d0",
-      "bytes": 3063935,
+      "source_image": "images/Dark UI Advanced/000_LEOPARD_Cover.png",
+      "sha256": "e1f59a4d8c4b192b0ddcc2bcdc5984eda86a877dc0ca2b00a18527086cd3f25b",
+      "bytes": 2744719,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Dark UI Advanced/000_LEOPARD_Cover.png",
-      "source_sha256": "c44102dea570e3a5a22ef9fd3f8876c524e368f7a86f464515d0987dc83588d3",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-03ed2ddc-59d4-4444-bf2f-91ccf0be85ca.png",
-      "generation_prompt": "Edit target: attached original Dark UI Advanced cover. Make its dedicated Steam Workshop artwork a true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose the original scene for a square; preserve its subjects, activity, feature illustration and exact mechanical robot mascot with round optical eyes, conical samurai helmet and red scarf. Retain richly inked crosshatching, distressed print texture, dusty Kenshi world and reference palette. Exact LARGE title \"DARK UI ADVANCED\" in gold bold condensed uppercase on a black weathered brush banner across the upper 25-30%. Break long names into two or three balanced lines rather than shrinking text. NO MCM plaque or text: this is a UI skin, not an MCM plugin. Preserve its blue night sky and moonlit lighting. Keep every letter inside safe margins, readable at 240px. Original scene fills remaining square. No other text or slogans, no padding, no letterbox, no pasted landscape card."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"DARK UI ADVANCED\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. NO MCM badge or MCM lettering: this mod is a pure interface skin. Palette and art direction: graphite, silver, black and icy violet; premium minimalist nocturnal interface illustration. Main scene: A bold before-and-after UI transformation: a small weathered parchment panel on the left becomes a large clean dark Kenshi inventory and character panel on the right, with neat grids and restrained silver controls. Moonlit ruin silhouettes frame the panels. No character mascot. NO MCM badge, NO MCM text; this is an interface skin.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-45f9452c-644c-4569-9054-0e2366d466f1.png"
     },
     {
       "mod": "Formations",
       "title": "FORMATIONS EXTENDED",
       "mcm_badge": true,
       "image": "steam-covers/Formations/000_LEOPARD_Steam_Cover.png",
-      "sha256": "c422c9a24858b01255b05740351c92c1c8889ece7f34d7fda9df3afa1881635e",
-      "bytes": 3555958,
+      "source_image": "images/Formations/000_LEOPARD_Cover.png",
+      "sha256": "f4021b6c084ac43da4baee120df96069dd769ddd0af5c9c833e2c60fd2d2927d",
+      "bytes": 3672130,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Formations/000_LEOPARD_Cover.png",
-      "source_sha256": "3dfdfc2abb3e227f01ea243bd790a8abc89f8f70869e419dbe60a1d57daf9ae6",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-7a337c12-33c0-4e95-9987-26a6218c97b6.png",
-      "generation_prompt": "Edit target: attached original Formations cover. Make its dedicated Steam Workshop artwork a true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose the original scene for a square; preserve its subjects, activity, feature illustration and exact mechanical robot mascot with round optical eyes, conical samurai helmet and red scarf. Retain richly inked crosshatching, distressed print texture, dusty Kenshi world and reference palette. Exact LARGE title \"FORMATIONS EXTENDED\" in gold bold condensed uppercase on a black weathered brush banner across the upper 25-30%. Break long names into two or three balanced lines rather than shrinking text. Small \"MCM\" metal plaque immediately beneath the title. Keep every letter inside safe margins, readable at 240px. Original scene fills remaining square. No other text or slogans, no padding, no letterbox, no pasted landscape card."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"FORMATIONS EXTENDED\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: sandstone ivory, military crimson and steel blue; tactical top-down map screenprint. Main scene: A large tactical overhead view of human Kenshi fighters arranged into a wedge, a disciplined line and a circle. Clearly spaced individual units, long formation arrows drawn on the ground and a small banner captain. Formations occupy most of the cover, no fantasy army or automatic combat spell.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-5097416e-4547-4355-be57-fff41630c820.png"
     },
     {
       "mod": "GearCompare",
       "title": "GEAR COMPARE ALT",
       "mcm_badge": true,
       "image": "steam-covers/GearCompare/000_LEOPARD_Steam_Cover.png",
-      "sha256": "b13db9a55d14e503b63f56d8d0e160e63fea3d0edd146fb24f9af9e37fa3b7b3",
-      "bytes": 3348919,
+      "source_image": "images/GearCompare/000_LEOPARD_Cover.png",
+      "sha256": "8677547a265f854c4b5b92af4b318c70288e8e2219640797c29e2f123d5c7db0",
+      "bytes": 3135041,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/GearCompare/000_LEOPARD_Cover.png",
-      "source_sha256": "0568deb43653e29fcd7f1dfe4a4f363e19f19981e923ba516422f43fa13e5872",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-7a482545-c0b9-42ae-aa82-d13b60261e43.png",
-      "generation_prompt": "Edit target: attached original GearCompare cover. Make its dedicated Steam Workshop artwork a true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose the original scene for a square; preserve its subjects, activity, feature illustration and exact mechanical robot mascot with round optical eyes, conical samurai helmet and red scarf. Retain richly inked crosshatching, distressed print texture, dusty Kenshi world and reference palette. Exact LARGE title \"GEAR COMPARE ALT\" in gold bold condensed uppercase on a black weathered brush banner across the upper 25-30%. Break long names into two or three balanced lines rather than shrinking text. Small \"MCM\" metal plaque immediately beneath the title. Keep every letter inside safe margins, readable at 240px. Original scene fills remaining square. No other text or slogans, no padding, no letterbox, no pasted landscape card."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"GEAR COMPARE ALT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: chalk ivory, ink navy, emerald and crimson; clean equipment comparison plate. Main scene: Two large Kenshi armoured vests side by side with a comparison arrow between them. Beneath, one property comparison is visibly green with an up arrow and another red with a down arrow; small shield/weight icons replace verbose labels. Worn versus new equipment is immediately clear. No magical stat upgrades.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-874f8849-761f-4cb0-ad41-7504ac77c94b.png"
     },
     {
       "mod": "Hidden-Faction-Relations",
       "title": "HIDDEN FACTION RELATIONS",
       "mcm_badge": true,
       "image": "steam-covers/Hidden-Faction-Relations/000_LEOPARD_Steam_Cover.png",
-      "sha256": "c017782471bd027729514767569eec6187400e996ecac17f487636920f7d10e9",
-      "bytes": 3297767,
+      "source_image": "images/Hidden-Faction-Relations/000_LEOPARD_Cover.png",
+      "sha256": "3a266e31e75dd4344604564adf4c0df7a519af222900a7052eee4f9ba7d2706e",
+      "bytes": 3306390,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Hidden-Faction-Relations/000_LEOPARD_Cover.png",
-      "source_sha256": "9fc968170b6b10811b4f44a2404fd86c89ef23a6c824612a9b70778ded11ccb5",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-d4ab9f7b-cd3f-48db-97be-98e928335d7f.png",
-      "generation_prompt": "Edit target: attached original Hidden-Faction-Relations cover. Make its dedicated Steam Workshop artwork a true 1:1 SQUARE, 1024x1024, full bleed. Fully recompose the original scene for a square; preserve its subjects, activity, feature illustration and exact mechanical robot mascot with round optical eyes, conical samurai helmet and red scarf. Retain richly inked crosshatching, distressed print texture, dusty Kenshi world and reference palette. Exact LARGE title \"HIDDEN FACTION RELATIONS\" in gold bold condensed uppercase on a black weathered brush banner across the upper 25-30%. Break long names into two or three balanced lines rather than shrinking text. Small \"MCM\" metal plaque immediately beneath the title. Keep every letter inside safe margins, readable at 240px. Original scene fills remaining square. No other text or slogans, no padding, no letterbox, no pasted landscape card."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"HIDDEN FACTION RELATIONS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: deep aubergine, bone white, poison green and muted scarlet; torn intelligence dossier. Main scene: An opened secret faction ledger, with black redaction strips being lifted by a magnifying glass to reveal linked faction emblems. Large green friendly and red hostile relation arrows connect the nodes; previously hidden faction nodes emerge from shadow. Distinct espionage dossier composition, not a map of bounty targets.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-74ad745c-fd6f-459b-9221-79cb2c8eb4f5.png"
     },
     {
       "mod": "ItemMarkers",
       "title": "ITEM MARKERS",
       "mcm_badge": true,
       "image": "steam-covers/ItemMarkers/000_LEOPARD_Steam_Cover.png",
-      "sha256": "7a989e0f21be469d4d6d2256390ac9954877ae6dba22d55cbdefe84cb887fb07",
-      "bytes": 3173532,
+      "source_image": "images/ItemMarkers/000_LEOPARD_Cover.png",
+      "sha256": "41d009aae83d9518c1bbefbaebca0e93bc817b150d5e7101a543cdfc73b31ecd",
+      "bytes": 2704308,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/ItemMarkers/000_LEOPARD_Cover.png",
-      "source_sha256": "5d374cf9f3a54303b62e94135030f115b01e821fbb787f152ef0458f0201faa9",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-781d5ec0-210e-49c9-b91f-a820915aefac.png",
-      "generation_prompt": "Edit target: attached original ItemMarkers landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"ITEM MARKERS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Edit target: attached square ITEM MARKERS cover. Keep its composition, typography, MCM badge, palette, inventory grid, armour, sword, blueprint, backpack, repair kit and helmet. Correct ONLY the feature badges so they match the real Kenshi plugin. EXACTLY ONE cyan star in the corner of the armour cell, EXACTLY ONE magenta star in the sword cell, EXACTLY ONE yellow star in the helmet cell. A single star uses its colour to indicate equipment grade: NEVER rows of two or three rating stars. The repair kit has NO quality star or coloured grade mark because kits do not have weapon/armour quality. Keep the red stolen-pouch badge on the backpack and the cyan learned-eye badge on the blueprint. No other badges. All title letters remain intact and every item unchanged. True 1:1 square full bleed.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6692c090-cecd-45eb-8ea9-24332f0010c2.png"
     },
     {
       "mod": "Job-B-Gone",
       "title": "JOB-B-GONE",
       "mcm_badge": true,
       "image": "steam-covers/Job-B-Gone/000_LEOPARD_Steam_Cover.png",
-      "sha256": "ddcb13a163368a4aab8a003cae8a12bcc4f90a9704e34039b19f0bcbe219b3c8",
-      "bytes": 3328676,
+      "source_image": "images/Job-B-Gone/000_LEOPARD_Cover.png",
+      "sha256": "e237a35611869b6744d6ecf8956ef52dc76e1f46026a1f3003fc1ee45250ca3a",
+      "bytes": 2799060,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Job-B-Gone/000_LEOPARD_Cover.png",
-      "source_sha256": "28d11c75478c4baa601098ddea52d8559506459265acd22e53ce1689336e08e1",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-1e323962-5c4e-4d0c-8811-b736c0c8cc01.png",
-      "generation_prompt": "Edit target: attached original Job-B-Gone landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"JOB-B-GONE\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"JOB-B-GONE\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: cream paper, bold vermilion and black; vintage bureaucratic cleanup poster. Main scene: A huge clipboard containing a three-card job queue, represented by mining pick, hauling crate and crafting hammer icons. A decisive red cancellation stroke removes the queue into a small trash symbol, leaving an adjacent empty tidy job panel. The removal of JOBS is clear, not workers abandoning their tools in a riot.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f754bc94-811f-49a8-840a-d35fbb1356da.png"
     },
     {
       "mod": "KenshiJobManagement",
       "title": "KENSHI JOB MANAGEMENT",
       "mcm_badge": true,
       "image": "steam-covers/KenshiJobManagement/000_LEOPARD_Steam_Cover.png",
-      "sha256": "6967227aa8f5561d8047eae83c7de6eef4a860a5ccbddcb3d15212dc74f2180b",
-      "bytes": 3486686,
+      "source_image": "images/KenshiJobManagement/000_LEOPARD_Cover.png",
+      "sha256": "476a919b3fe392c950e663175eae3e7e48663baa1ba1685997de607cde7d4544",
+      "bytes": 3049395,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/KenshiJobManagement/000_LEOPARD_Cover.png",
-      "source_sha256": "2baf6f7bb7c9ea5c6117c6e5b1879c690b89c4c136ef8e8699e553d59333be2a",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-87a1eff2-87bc-443d-8d7d-97cca36ef5ef.png",
-      "generation_prompt": "Edit target: attached original KenshiJobManagement landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"KENSHI JOB MANAGEMENT\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"KENSHI JOB MANAGEMENT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: blueprint navy, ivory and safety orange; tactile scheduling-board illustration. Main scene: Three squad portrait columns with movable job cards for mining, medical aid, hauling and engineering. A large gloved hand drags one card between priority positions, curved arrows show copying jobs between squad members. The multi-character job planner fills the scene, tiny Kenshi workshop behind.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b429a556-355e-412a-9c5b-7c715a2856a6.png"
     },
     {
       "mod": "KenshiRotate",
       "title": "ROTATE ITEMS",
       "mcm_badge": true,
       "image": "steam-covers/KenshiRotate/000_LEOPARD_Steam_Cover.png",
-      "sha256": "57705b5fb0ef234a3580fd67cbf6c14d1964a116f703219036a4838ee75dab94",
-      "bytes": 3224937,
+      "source_image": "images/KenshiRotate/000_LEOPARD_Cover.png",
+      "sha256": "f240cc417e2965e060e939e243d6d3bd8d3eb4b3057d5fe8dff84015aa402216",
+      "bytes": 2686392,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/KenshiRotate/000_LEOPARD_Cover.png",
-      "source_sha256": "554e6b83225f8482fde3602867fa679d48ebf11d93aacba6ccbc712b4b6fc778",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-ec73f187-c8fa-4c94-bf12-8974e3cc08af.png",
-      "generation_prompt": "Edit target: attached original KenshiRotate landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"ROTATE ITEMS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ROTATE ITEMS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: mint turquoise, coral red, slate black and cream; bold geometric inventory poster. Main scene: A long bundle of crossbow bolts is shown horizontally on one inventory grid, then vertically on another, connected by a giant curved 90-degree rotation arrow. The rotated bundle now fits into the narrow free column beside other items. Main idea is rotating item orientation, not stacking items or changing their quality.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-486ff4ba-dee5-45be-883e-77f305b3ade0.png"
     },
     {
       "mod": "KillCounter",
       "title": "KILL COUNTER",
       "mcm_badge": true,
       "image": "steam-covers/KillCounter/000_LEOPARD_Steam_Cover.png",
-      "sha256": "5fd445e30ce2002d247e8da519d8d44e277083257cdde53deff475559e945e99",
-      "bytes": 3335769,
+      "source_image": "images/KillCounter/000_LEOPARD_Cover.png",
+      "sha256": "3f5601cc5ae557f87c7e957334675916ea231e4c33cf0bcb76a1cbfac58544fc",
+      "bytes": 3383041,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/KillCounter/000_LEOPARD_Cover.png",
-      "source_sha256": "c583f635d9e3c62959d9cfd8bfe3878b66014a349ca6671b4948b36d48e418bb",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-7668d94b-4636-46cc-a941-7ee481bc682d.png",
-      "generation_prompt": "Edit target: attached original KillCounter landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"KILL COUNTER\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"KILL COUNTER\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: ink black, bone white and deep crimson; mechanical tally-counter war poster. Main scene: Three large mechanical tally counters with clear skull, knockout-stars and severed-arm pictograms, showing three different numbers. A subdued Kenshi skirmish silhouette is only a backdrop. Counters occupy two thirds of the image. No graphic gore close-up, no game balance buffs.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-e1871e9a-c527-4e98-b4ce-4ee2fa363260.png"
     },
     {
       "mod": "LiveXpBars",
       "title": "LIVE XP BARS",
       "mcm_badge": true,
       "image": "steam-covers/LiveXpBars/000_LEOPARD_Steam_Cover.png",
-      "sha256": "074babb77d51c4e2c533ee46ed9f5f8d4a4f6c60dbf42dd47de1d9ffcaef9805",
-      "bytes": 3388303,
+      "source_image": "images/LiveXpBars/000_LEOPARD_Cover.png",
+      "sha256": "6b3014f961afe7e07b871f25b2c5882fea65d52d286ea81b9274aea1537f4d10",
+      "bytes": 2385376,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/LiveXpBars/000_LEOPARD_Cover.png",
-      "source_sha256": "8a3b887ec04f93a58060ccfebf196cbb4a2f03ecf2c1255fcd4f901b96eaed06",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-da810a67-46e8-4be4-862d-3fd67ab1daf4.png",
-      "generation_prompt": "Edit target: attached original LiveXpBars landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"LIVE XP BARS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Edit target: attached square LIVE XP BARS cover. Preserve the complete poster, exact title and MCM, palette, character, three skill icons and level numbers 32, 18, 41. Correct ONLY the right-side numeric labels in the three-row progress panel: the real plugin shows percentage toward the next skill level, not raw experience totals. Replace \"2850 / 3600\" with \"79%\", \"620 / 1200\" with \"52%\", and \"4100 / 5000\" with \"82%\". Match each green bar fill approximately to its stated percentage. No raw XP fractions anywhere. Do not add any extra words. True 1:1 square, full bleed.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-51ad028a-10b8-4484-8b57-9feb73722cd5.png"
     },
     {
       "mod": "Loot-Scoot-Execute",
       "title": "LOOT SCOOT EXECUTE",
       "mcm_badge": true,
       "image": "steam-covers/Loot-Scoot-Execute/000_LEOPARD_Steam_Cover.png",
-      "sha256": "2618e3f14751bde4874f12ce387775065a7548cf2c41c294f1d0680abccf298c",
-      "bytes": 3326809,
+      "source_image": "images/Loot-Scoot-Execute/000_LEOPARD_Cover.png",
+      "sha256": "0734ca729c293efc2f3e5e0ee7a8313fc6f81b027d97975e6f6ba932eacb8241",
+      "bytes": 3101410,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Loot-Scoot-Execute/000_LEOPARD_Cover.png",
-      "source_sha256": "888d40ab51f93780da6b18a3d4ad863db494cbdbaa4fbf40709c8d514514220c",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-661ff395-8335-42af-a6b5-a3074e792a84.png",
-      "generation_prompt": "Edit target: attached original Loot-Scoot-Execute landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"LOOT SCOOT EXECUTE\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"LOOT SCOOT EXECUTE\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: oxblood, charcoal and ivory with a small gold accent; dark action woodcut. Main scene: A downed armoured enemy with small knockout stars lies intact in the foreground. A large blade-and-skull context-action emblem points to the downed target; a scavenger holding a small loot pouch moves toward the next nearby target along a short route. Clear execution/loot action, no graphic dismemberment, no hanging or torture.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-24f364da-3997-4107-ab56-161f0750c56b.png"
     },
     {
       "mod": "Map-markers",
       "title": "MAP MARKERS",
       "mcm_badge": true,
       "image": "steam-covers/Map-markers/000_LEOPARD_Steam_Cover.png",
-      "sha256": "beb121b3d2a1e1482bfc9961acc0aa1b53e4c1a00e05f5e80e4dbd407978f565",
-      "bytes": 3296211,
+      "source_image": "images/Map-markers/000_LEOPARD_Cover.png",
+      "sha256": "30025e7db26f93a145c3db3eb9493797fbad2a006eb5966f6f3bc9316c53ee94",
+      "bytes": 3438851,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Map-markers/000_LEOPARD_Cover.png",
-      "source_sha256": "275443dc73bf0f597fa37b95123e3c7c8d8967379dce7937cf9c30a5e9b55082",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-d839e14e-66a7-425b-a6f2-480c64b889dd.png",
-      "generation_prompt": "Edit target: attached original Map-markers landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"MAP MARKERS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"MAP MARKERS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: parchment white, turquoise and vivid scarlet; hand-drawn cartographer print. Main scene: A gigantic hand-drawn Kenshi world-map fragment with three custom coloured pins for ore, danger and a return location. A gloved hand uses a stylus to place a new pin; tiny blank note tags attached to pins. The player-created map notes dominate, no automatically tracked bounty portraits.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-e002436b-e46f-498b-9506-445870046033.png"
     },
     {
       "mod": "ModConfigMenu",
       "title": "MOD CONFIG MENU",
       "mcm_badge": true,
       "image": "steam-covers/ModConfigMenu/000_LEOPARD_Steam_Cover.png",
-      "sha256": "6f0dc77e7e41ccc8c08698e9af0649cbaf8e366b32d818a7bfa2f18c6e9173c4",
-      "bytes": 3775363,
+      "source_image": "images/ModConfigMenu/000_LEOPARD_Cover.png",
+      "sha256": "4f76003c7bfb83b5e541e9bb05c1d5fe8a401ef4a0df7cb2774db37ce9987948",
+      "bytes": 3342546,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "cover-concepts/2026-10-31-mcm-core/previous_landscape.png",
-      "source_sha256": "8e65443a5ded8d87062a0c19eb07c536b23568e66c04ab062e11b248b3225ec0",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b241df21-263e-4c41-b0e3-add5ab24aa64.png",
-      "generation_prompt": "Reference image: the attached original Mod Config Menu cover supplies the mechanical mascot and inked Kenshi style. Design a distinctly SPECIAL flagship Steam cover for the CORE of this entire mod ecosystem, not an ordinary plugin. True 1:1 square, 1024x1024, full bleed. Exact huge title \"MOD CONFIG MENU\" across the upper quarter in two balanced lines, embossed ivory-gold condensed capitals on a uniquely ornate black-and-brass nameplate. Central composition: a magnificent circular brass command console, large central cog medallion labeled \"MCM\", radiating real cables to many smaller modular control panels bearing clear pictograms (sword, backpack, compass, hammer, people, gear); several empty sockets suggest future third-party plugins. The familiar riveted round-eyed robot in conical samurai helmet and crimson scarf is the operator beside the console. His hand adjusts a master control. This is symbolic cover art for a mod-settings hub. Keep Kenshi's battered ancient machinery, hand-inked crosshatching and weathered screenprint grain. Distinct premium palette: luminous gold and ivory on deep charcoal with restrained turquoise indicator lights, warm distant desert ruins. Powerful central symmetry, fine engraved metallic frame, exceptional thumbnail legibility. No extra slogans, no version number, no modern neon computer UI, no letterbox or padding. Make the central MCM emblem and title immediately recognizable among the other warm orange covers."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"MOD CONFIG MENU\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: royal midnight blue, luminous ivory, polished gold and turquoise; prestigious flagship mechanical command-hub poster. Main scene: A magnificent central brass gear engraved MCM operates a physical modular control console. Thick elegant connector lines link it to distinct slider, checkbox, key-binding, colour-wheel and text-field modules, with a few empty sockets for future authors. The central hub is huge, brilliantly lit and unmistakably the core controlling every mod. Tiny Kenshi citadel silhouettes only at the edges. Premium symmetrical master-control identity, no ordinary sunset mascot scene.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-96282fa5-3530-4ecd-b9c8-bf49a96ea38d.png"
     },
     {
       "mod": "MultiXPMining",
       "title": "MULTI XP MINING",
       "mcm_badge": true,
       "image": "steam-covers/MultiXPMining/000_LEOPARD_Steam_Cover.png",
-      "sha256": "cda4f5d6ffad0c192a2edf7f58885701a69e9a6ddb6faedf4c12db46565f368a",
-      "bytes": 3555087,
+      "source_image": "images/MultiXPMining/000_LEOPARD_Cover.png",
+      "sha256": "e5cbfc6b9a3eeaab32437314a8182d919505731ea9c8db018857e02ac293e052",
+      "bytes": 3320867,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/MultiXPMining/000_LEOPARD_Cover.png",
-      "source_sha256": "178b7b639683cc1adbc08cbd8ce819450d6eaf14e035a61790884803a695260d",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-fd8e04ec-407e-48f3-885d-17cc25dd0f40.png",
-      "generation_prompt": "Edit target: attached original MultiXPMining landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"MULTI XP MINING\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"MULTI XP MINING\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: dark violet, sulphur yellow, graphite and icy lavender; powerful industrial training print. Main scene: A miner physically swings a pick into a vein beside separate coal, copper and iron ore piles. Three huge attribute icons - a flexed arm, a protective shield and a swift hand - each connect to a growing progress strip. Mining turns real work into Strength, Toughness and Dexterity training. No coins or income from nowhere.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b481a193-c0d4-49bf-900c-bbd1faf7b5b9.png"
     },
     {
       "mod": "Organize-the-Crafting-Stations",
       "title": "ORGANIZE THE CRAFTING STATIONS",
       "mcm_badge": true,
       "image": "steam-covers/Organize-the-Crafting-Stations/000_LEOPARD_Steam_Cover.png",
-      "sha256": "23a54783c3750f0abb4c1f1a718b46b93fd6b486cdcdb38166a90092b75979fa",
-      "bytes": 3514436,
+      "source_image": "images/Organize-the-Crafting-Stations/000_LEOPARD_Cover.png",
+      "sha256": "5b1534555379ba5bcd62701243dfa6fc583bf96c163780ac6b54dba22107d208",
+      "bytes": 2844011,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Organize-the-Crafting-Stations/000_LEOPARD_Cover.png",
-      "source_sha256": "647390db0803031cef81ef3ec32b646cc985f9fe9f55ff6118308d6e840000c3",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-554ff7ac-6f34-4192-8456-dbb5909943c9.png",
-      "generation_prompt": "Edit target: attached original Organize-the-Crafting-Stations landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"ORGANIZE THE CRAFTING STATIONS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ORGANIZE THE CRAFTING STATIONS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: ivory, deep violet and burnt orange; workshop recipe-catalogue illustration. Main scene: A large recipe board at a Kenshi crafting bench. A magnifying glass isolates the one matching sword blueprint; irrelevant recipe cards fade away and the matching cards gather together without gaps. A small crafting hammer and scroll identify the workshop setting. Search and filtering, not automated crafting.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-2abe524c-adac-47a6-8e0c-13404f9b3bac.png"
     },
     {
       "mod": "Organize-the-Trader",
       "title": "ORGANIZE THE TRADER",
       "mcm_badge": true,
       "image": "steam-covers/Organize-the-Trader/000_LEOPARD_Steam_Cover.png",
-      "sha256": "664b4c6425e3d4e1afc2cc0cb5e45fa1989c26d8e9ac58d1505ba92ca1cebef1",
-      "bytes": 3235214,
+      "source_image": "images/Organize-the-Trader/000_LEOPARD_Cover.png",
+      "sha256": "89264f22b36a71abace419c82791dac2dbb470d9bb40a57d3af69518b1a2fd36",
+      "bytes": 3387375,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Organize-the-Trader/000_LEOPARD_Cover.png",
-      "source_sha256": "d145c5e20390c59a32b4a8ca5789d23b63777ed5f75517130335781449f6ce6a",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b4417e81-ef30-4389-b176-2167e34d24fb.png",
-      "generation_prompt": "Edit target: attached original Organize-the-Trader landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"ORGANIZE THE TRADER\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"ORGANIZE THE TRADER\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: petrol teal, brushed copper and warm ivory; orderly merchant-catalogue print. Main scene: A huge trader inventory board with different goods, magnifying-glass search selecting a repair kit, and ordered item columns beside a simple sort arrow. A small row of merchant coins plus a separate green/red transaction scale illustrate trader money and deal total. No player's money display. Search, sorting and finding goods dominate rather than a giant merchant face.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f5840263-264e-4b7e-a24b-4a17ebf2789b.png"
     },
     {
       "mod": "PatientSelfAid",
       "title": "PATIENT SELF AID",
       "mcm_badge": true,
       "image": "steam-covers/PatientSelfAid/000_LEOPARD_Steam_Cover.png",
-      "sha256": "fb26e04049014ab16e6f5baffa3b3caa103ad6da58b1bb45945cf110cfae7542",
-      "bytes": 3405554,
+      "source_image": "images/PatientSelfAid/000_LEOPARD_Cover.png",
+      "sha256": "3cf971f802d3d201ae56a7a53f41d3253f2f528d86cf9c8e0a9a302cd98998ca",
+      "bytes": 3551251,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/PatientSelfAid/000_LEOPARD_Cover.png",
-      "source_sha256": "7e10f042ac742f5a51857d522002db41386417c573bd393e15a9ace38faa8ac4",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-a3a74c60-e604-4e3c-96e8-3dd4732d3a1b.png",
-      "generation_prompt": "Edit target: attached original PatientSelfAid landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"PATIENT SELF AID\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"PATIENT SELF AID\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Sage green, warm medical ivory, dark pine and restrained burgundy red. Vintage field-medicine illustrated poster, broad calm color blocks with hand-inked linework and paper texture. FEATURE-FIRST COMPOSITION: Close-up of one conscious battered Kenshi wanderer actively wrapping a clean bandage around their own injured forearm, self-treatment clearly readable. Their visible mechanical prosthetic leg and a small repair wrench beside the medical kit suggest support for robotic limbs. A large simple medical-cross emblem anchors the composition behind the arms. Desert camp is tiny and subordinate. No robot medic doing the bandaging for them; self-aid is the hero. Exact title \"PATIENT SELF AID\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4dc7df93-b8ca-4809-830c-d25bed972918.png"
     },
     {
       "mod": "QuickStartSelect",
       "title": "QUICK START SELECT",
       "mcm_badge": true,
       "image": "steam-covers/QuickStartSelect/000_LEOPARD_Steam_Cover.png",
-      "sha256": "bc7482e9356148cf990e1920840b1534c3a0445de969782895939c717d6c012c",
-      "bytes": 3515130,
+      "source_image": "images/QuickStartSelect/000_LEOPARD_Cover.png",
+      "sha256": "b00384187fd826d786ae2cefab61e84601c5cb3111d226cca5ddcb05d7d2f5f4",
+      "bytes": 3203755,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/QuickStartSelect/000_LEOPARD_Cover.png",
-      "source_sha256": "29ffd6ad48ab39f3fe438ef2ab0f3f90b0d6cd7a17ee01842eecbec14bbb6f7b",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-fc2824b9-9559-43b3-9055-9e179aa44071.png",
-      "generation_prompt": "Edit target: attached original QuickStartSelect landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"QUICK START SELECT\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"QUICK START SELECT\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: turquoise blue, ivory and punchy crimson; vintage travel-selection poster. Main scene: An opened game-start selection board with multiple large scenario cards and distinct human, hive and skeleton portraits. A magnifying glass and difficulty ladder help choose a starting scenario. One highlighted card expands into a large blank description sheet. It is choosing a NEW GAME START, not fast travel or an in-game recruitment menu.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b362d806-1730-46b6-9411-e971ff64fb95.png"
     },
     {
       "mod": "RangedDamageXp",
       "title": "RANGED DAMAGE XP",
       "mcm_badge": true,
       "image": "steam-covers/RangedDamageXp/000_LEOPARD_Steam_Cover.png",
-      "sha256": "39fac593920fede6172ef2c6985ba7284ad541275208a921799c774afec5c89e",
-      "bytes": 3207008,
+      "source_image": "images/RangedDamageXp/000_LEOPARD_Cover.png",
+      "sha256": "143816df031607dee5086f6c74a2cd63ef33bcd6cb5a19b4e5e933cccd17c561",
+      "bytes": 2582532,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/RangedDamageXp/000_LEOPARD_Cover.png",
-      "source_sha256": "b5b2d7203828ce571992b17f02b55a9838c0287890242b0c590807440ed6baaa",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-c7e3d250-dd2f-4577-94b7-435f00ad03ea.png",
-      "generation_prompt": "Edit target: attached original RangedDamageXp landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"RANGED DAMAGE XP\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Edit target: attached square RANGED DAMAGE XP cover. Add one small but clearly readable brass \"MCM\" plaque centered directly beneath the title, in the empty dark strip between the words DAMAGE XP and the feature illustration. MCM support must be visibly marked. Preserve EVERYTHING ELSE exactly: the correct spaced title, indigo/amber palette, armoured adult raider with metal impact spark, crossbowman, graph and eye/crossbow icons. No wooden dummies, no blood, no other text. True 1:1 square full bleed.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-3bfc2d2b-e13c-4fd9-9ec8-bf528d237cb1.png"
     },
     {
       "mod": "RecruitMarkers",
       "title": "RECRUIT MARKERS",
       "mcm_badge": true,
       "image": "steam-covers/RecruitMarkers/000_LEOPARD_Steam_Cover.png",
-      "sha256": "e2090bb6f178e4047df786b8417dccbafb0b7b34c0934aa5a2e2b9b7a8efe16f",
-      "bytes": 3365874,
+      "source_image": "images/RecruitMarkers/000_LEOPARD_Cover.png",
+      "sha256": "4793ae016a7a2358f24e2eb5cdb70ca6747412e7d2c43373b458a7e90eaa3e57",
+      "bytes": 3150385,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/RecruitMarkers/000_LEOPARD_Cover.png",
-      "source_sha256": "210a14aaf7661b4430e0317c6f6337956acc68dd9f4d10355d714a08bbd73039",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-df5fd90d-301b-4021-81c6-89b7a72c02d7.png",
-      "generation_prompt": "Edit target: attached original RecruitMarkers landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"RECRUIT MARKERS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"RECRUIT MARKERS\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Midnight plum, rich violet, pale lavender and bright gold with sharp ivory highlights. Dramatic graphic silhouette poster with clean iconography and limited comic crosshatching. FEATURE-FIRST COMPOSITION: The distinctive functionality is the hero: three clearly separated Kenshi NPC silhouettes in a town, each with a LARGE immediately legible marker above the head. One recruitable ronin has a handshake icon, one merchant has a coin-stack icon, and one actual patrol leader walking with two smaller followers has a gold five-point star. Make the three markers readable at 240px thumbnail size, not tiny decorative sparkles. No stars over solo passersby. Exact title \"RECRUIT MARKERS\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-92304319-7dc9-4c24-a9e0-e6cffe027229.png"
     },
     {
       "mod": "SkillLevelUpInfo",
       "title": "SKILL LEVEL UP INFO",
       "mcm_badge": true,
       "image": "steam-covers/SkillLevelUpInfo/000_LEOPARD_Steam_Cover.png",
-      "sha256": "10a6a86d15bba8d7309aa7fb72c6ab819dd253b7ad9bf2f7f19db9fdb713bed0",
-      "bytes": 3312302,
+      "source_image": "images/SkillLevelUpInfo/000_LEOPARD_Cover.png",
+      "sha256": "b99a7e8013b1a3e79169b1d618f2e0c325f1ddc8b5034ce63452975f5b1ab9f8",
+      "bytes": 2955561,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/SkillLevelUpInfo/000_LEOPARD_Cover.png",
-      "source_sha256": "478bcc91791ba804c3e6aa104cac02917ddb9c59cf08bbcc57b62f7f1a83ccfb",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-0f838e0a-9c1f-4273-82bd-54257aca2c1b.png",
-      "generation_prompt": "Edit target: attached original SkillLevelUpInfo landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"SKILL LEVEL UP INFO\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"SKILL LEVEL UP INFO\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: sky cyan, ivory, charcoal and antique gold; airy character-training poster. Main scene: A wanderer trains beside a ruined wall. Large pale blue +1% and +2% skill-gain glyphs rise from around their head, with a separate gold double-chevron level-up icon above. A small bottom-corner character-panel inset has just two slim progress rows. Floating XP gains and level-up feedback are the main focus, not dozens of overhead HP bars.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-b2e2ac4e-c198-4f73-87dc-236f89fa3fc0.png"
     },
     {
       "mod": "StackSort",
       "title": "STACK SORT",
       "mcm_badge": true,
       "image": "steam-covers/StackSort/000_LEOPARD_Steam_Cover.png",
-      "sha256": "16c4cfa4bb3cbe6983cecd61392901221dd74779b37e4d5b057dc85954bcd37f",
-      "bytes": 3305192,
+      "source_image": "images/StackSort/000_LEOPARD_Cover.png",
+      "sha256": "bf72d41dc0d369d924173dbc580be457ac6c05bebc242cf34da032268dc08995",
+      "bytes": 3330016,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/StackSort/000_LEOPARD_Cover.png",
-      "source_sha256": "15395ff2f2bae2320e55109f427a3314bc2aaca9f625ba13c71046aea5315543",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-6b3b59f5-32bc-4b67-aeaf-45f0d85f31e4.png",
-      "generation_prompt": "Edit target: attached original StackSort landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"STACK SORT\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"STACK SORT\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Cool cobalt blue, chalk white and vivid lime accents. Bold industrial infographic poster with clean isometric inventory trays, large simple shapes and a few gritty ink details. FEATURE-FIRST COMPOSITION: Make the main feature unmistakable: on the left, three identical loose bundles of crossbow bolts occupy separate grid slots among scattered bandages and repair kits; a huge curved lime arrow points to the right, where the same supplies are neatly merged into stacks and tightly arranged. The inventory grids and combining gesture dominate 65% of the picture. Small scavenger gloved hands organize them; no large mascot or landscape stealing attention. Exact title \"STACK SORT\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-54f38dbe-67d9-4c15-a39b-1d2339519a13.png"
     },
     {
       "mod": "StatColours",
       "title": "STAT COLOURS",
       "mcm_badge": true,
       "image": "steam-covers/StatColours/000_LEOPARD_Steam_Cover.png",
-      "sha256": "af65afab7f673b947bcac618f3a765f8c06a224fd93a2bceaf0ca35497cff02b",
-      "bytes": 3170058,
+      "source_image": "images/StatColours/000_LEOPARD_Cover.png",
+      "sha256": "b4919056631b0f498ecb9e288df7fd20a4c6411c296e259c263a6417358a0ac4",
+      "bytes": 2993038,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/StatColours/000_LEOPARD_Cover.png",
-      "source_sha256": "614e84ad953e903a9aaeb1ce9608df001f2ca41ce2c1eae96158347cf6342b1a",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-e067f57c-c92e-4128-850e-293bcc763cb3.png",
-      "generation_prompt": "Edit target: attached original StatColours landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"STAT COLOURS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"STAT COLOURS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: cream, plum, emerald and brick red; typographic stats-ledger screenprint. Main scene: A very large skill-stat ledger with readable coloured numeric values: low muted red 12, green 90, purple 120. Distinct green (+8) and red (-2) modifiers beside shield and strength icons show equipment bonuses and penalties. Colour-by-value and modifier explanations dominate. No levelling magic or combat damage numbers.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-2d6cfcb6-5017-45dd-a825-c1ed9f17dcee.png"
     },
     {
       "mod": "UITweaks",
       "title": "UI TWEAKS",
       "mcm_badge": true,
       "image": "steam-covers/UITweaks/000_LEOPARD_Steam_Cover.png",
-      "sha256": "7b5449c9840b323f67beb51a7ac19373eb54cbb38970916e913d604b26f8a940",
-      "bytes": 3444303,
+      "source_image": "images/UITweaks/000_LEOPARD_Cover.png",
+      "sha256": "a4eabfebcbf901c3bc4ae15668abf78ddf3f79a2549c8989dc4d16303ba05bfb",
+      "bytes": 2640087,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/UITweaks/000_LEOPARD_Cover.png",
-      "source_sha256": "21c1bb6caf680fd2863f7cf1faff3a21d2bbad10a194f8d50f72a1dc59cb1525",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-fb71e912-0568-4122-a6aa-34b85d98e09c.png",
-      "generation_prompt": "Edit target: attached original UITweaks landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"UI TWEAKS\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"UI TWEAKS\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: near-black teal, warm ivory and burnished copper; clean technical editorial poster. Main scene: A before-and-after collection of Kenshi UI panels: cramped overlapping queue rows on the left transform via a strong arrow into spacious clean rows and full-width framed progress bars on the right. A small strip of three squad portraits connected by exchange arrows suggests sequential trading. Interface readability and alignment are the dominant feature; no sci-fi operating system or invented in-world holograms.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-4aa95b9a-d197-4ab4-9145-6832d70a0f65.png"
     },
     {
       "mod": "Vital-Read",
       "title": "VITAL READ",
       "mcm_badge": true,
       "image": "steam-covers/Vital-Read/000_LEOPARD_Steam_Cover.png",
-      "sha256": "01a50c6fa5933abea621fc6e248f01bf3922ff63a0efe5bb07ff987b0d74baa1",
-      "bytes": 3359676,
+      "source_image": "images/Vital-Read/000_LEOPARD_Cover.png",
+      "sha256": "a54b645b43c5c8a17d25c263ebbc178c3e8dc1c56cee98757aee2fd01f9a11e7",
+      "bytes": 2708202,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Vital-Read/000_LEOPARD_Cover.png",
-      "source_sha256": "14efd3dd9286ca67a69898c160b9709a8bc3bbac9ccc21db1c8d9602ab4c8ec8",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f0fdeb2f-b689-46f9-92a3-db29616c18c0.png",
-      "generation_prompt": "Edit target: attached original Vital-Read landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"VITAL READ\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Edit target: attached square VITAL READ poster. Keep all typography including MCM, four squad portrait cards, palette and composition. Correct ONLY the status badge on the fourth/rightmost portrait: that character is a SKELETON ROBOT resting on a repair bed, so its blue status badge must depict a clear WRENCH over a small bed symbol, NOT a medical plus/cross. The other three portrait status pictograms remain Zzz, hunger stomach and crutch/bandaged leg. This is a fictional game squad-status display, no injury is occurring. Do not add other words or alter people or backgrounds. True square full bleed.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-f6cecdc8-000c-4337-a229-0a8f6886da0b.png"
     },
     {
       "mod": "Vital-Sense",
       "title": "VITAL SENSE",
       "mcm_badge": true,
       "image": "steam-covers/Vital-Sense/000_LEOPARD_Steam_Cover.png",
-      "sha256": "db24bef9fd25879bcc2edd0172fec38ff8ca65f1d4eb69af611d476405bed22d",
-      "bytes": 3301709,
+      "source_image": "images/Vital-Sense/000_LEOPARD_Cover.png",
+      "sha256": "739afa6624da030c8984ec7acdf2bbd089c9e0e38fd3ffb7c696c9ff2d5b2e04",
+      "bytes": 3456272,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Vital-Sense/000_LEOPARD_Cover.png",
-      "source_sha256": "212e3b65d6f80c143cd757736020f41bb3c1e610d50b8e6cfef5d8a026a9b3a0",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-d5aae49b-f606-4354-90ee-94a85b8062dd.png",
-      "generation_prompt": "Edit target: attached original Vital-Sense landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"VITAL SENSE\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square. IMPORTANT: Vital Sense only shows small status/bounty icons. Absolutely NO floating health bars or progress bars over characters. Preserve the existing simple injured/sleeping/bounty pictograms."
+      "generation_prompt": "Create a brand-new alternative promotional cover for the Kenshi mod \"VITAL SENSE\". A true 1:1 square, 1024x1024, full bleed. This is an exploratory alternative to an overly uniform ochre desert series: deliberately use this distinct palette and visual approach: Bone white, charcoal black, vermilion red and muted turquoise. High-contrast woodcut-inspired graphic cover with an oversized spyglass/eye motif, bold negative space and sparse textured detail. FEATURE-FIRST COMPOSITION: The spyglass inspection motif reveals three clearly readable Kenshi character states: an injured standing wanderer with a simple wounded-person pictogram, an unconscious or sleeping figure with a prone Zzz pictogram, and a bounty target with gold coin symbols. Make these status symbols LARGE and central. They are simple status/bounty ICONS ONLY: absolutely no overhead health bars, HP meters or progress bars. Background town is subtle. Exact title \"VITAL SENSE\" in large beautifully readable bold uppercase lettering, integrated into the upper 20-25% with generous margins, balancing the new graphic style. A small readable \"MCM\" badge directly below the title. The illustration must explain the feature in one glance. Preserve a grounded handmade Kenshi wasteland feeling, not glossy sci-fi. A single focal feature, strong hierarchy, large useful symbols, uncluttered thumbnail readability. No additional words, no slogans, no fake game screenshot, no black letterbox bands, no watermark. Do not default to an all-orange sunset or a giant recurring robot mascot.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-c2382beb-ddc2-4261-88c3-08320bc22e4a.png"
     },
     {
       "mod": "Wall-B-Gone",
       "title": "WALL-B-GONE",
       "mcm_badge": true,
       "image": "steam-covers/Wall-B-Gone/000_LEOPARD_Steam_Cover.png",
-      "sha256": "9855590c5fed4194fb94b7e94a74311a4b03be930ea5c9d1326d1ae8d5dd81f1",
-      "bytes": 3685591,
+      "source_image": "images/Wall-B-Gone/000_LEOPARD_Cover.png",
+      "sha256": "735320180036a37902e89ba90798a26a7decf3d18957e72c678d3f0a1c2af5a2",
+      "bytes": 3193674,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/Wall-B-Gone/000_LEOPARD_Cover.png",
-      "source_sha256": "3c8bc678e82b9793c1be15fecf30609442e273a68c636756e9b5b0b991e4024d",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-606c6146-f00a-4e7a-bc01-44a13d97dd62.png",
-      "generation_prompt": "Edit target: attached original Wall-B-Gone landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"WALL-B-GONE\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"WALL-B-GONE\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: stone grey, construction yellow, charcoal and cyan; demolition-and-salvage instruction print. Main scene: An owned settlement wall section is outlined with dashed dismantle marks, its blocks neatly lifting away toward a refunded building-material crate. A large hammer/key-action emblem makes controlled dismantling clear. Small builder at the side. No explosions, enemy base demolition or destruction of occupied beds.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-1a5dabb4-3a76-4645-bfc0-a93d3277d5e8.png"
     },
     {
       "mod": "WantedMap",
       "title": "WANTED MAP",
       "mcm_badge": true,
       "image": "steam-covers/WantedMap/000_LEOPARD_Steam_Cover.png",
-      "sha256": "facf65d51e805108f2748a1adb3abf7e810199837d421bb755aec0397b1c5a69",
-      "bytes": 3459385,
+      "source_image": "images/WantedMap/000_LEOPARD_Cover.png",
+      "sha256": "72ba871c2a147b743fd84c3990e690e36db6fce7c491fbe342af48d448ffdf10",
+      "bytes": 3640039,
       "dimensions": [
         1254,
         1254
       ],
-      "source_image": "images/WantedMap/000_LEOPARD_Cover.png",
-      "source_sha256": "57df193e66dde7c40630e681beb6e1a774459c3e35af5e4e41b064027ec7ca11",
-      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-dd6f95d1-26c2-4871-8c75-b8118a16279d.png",
-      "generation_prompt": "Edit target: attached original WantedMap landscape cover. Produce its dedicated Steam Workshop artwork as a true 1:1 SQUARE, 1024x1024, FULL BLEED. Recompose the whole original scene to fill the square. Preserve its actual subjects and feature illustration, mechanical round-eyed robot mascot, conical samurai helmet, red scarf, inked crosshatching, distressed screenprint texture and warm rust/ochre Kenshi palette. Exact LARGE title \"WANTED MAP\" in gold bold condensed capitals on a black weathered brush banner across the upper 25-30%. Use two or three balanced lines for long titles so the lettering is large at 240px. Small \"MCM\" metal plaque immediately under the title. Safe margins around all letters. Detailed scene below title fills the rest of the square. No added text, slogans, padding, letterbox bands or a landscape card within the square."
+      "generation_prompt": "Original Kenshi mod cover illustration in a bold hand-inked distressed screenprint/editorial style. Feature-first, readable as a 240px thumbnail. Restrained background, strong simple silhouettes and clear visual hierarchy. Not the old repeated orange sunset and giant robot mascot. NO slogans, subtitles, credits, watermarks or extra words. The only lettering is the EXACT mod title and, where appropriate, MCM. TRUE 1:1 SQUARE, full bleed, no borders or letterboxing. EXACT title \"WANTED MAP\" is HUGE across the top 25-30%, in two or three balanced lines when needed; generous safe margins. A small clearly readable MCM badge directly under the title. Palette and art direction: aged ivory, vermilion, sepia and black ink; bounty-hunter dossier/cartographic poster. Main scene: A huge wanted poster with an illustrated outlaw portrait is pinned beside a Kenshi map. A bold red target pin and an orange approximate-area circle connect the wanted portrait to the map, with a small bounty coin stack. Tracking targets from carried wanted posters is unmistakable. No claim of psychic recruitment or generic custom map notes.",
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-a33f93b1-af0c-450e-a1ee-44d75a4316f0.png"
     }
   ]
 }

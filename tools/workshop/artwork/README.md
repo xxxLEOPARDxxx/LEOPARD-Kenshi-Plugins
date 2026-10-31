@@ -28,3 +28,16 @@ The staged and remote evidence is saved under `workshop/steam-covers`.
 
 Code updates still follow Nexus first, Steam afterwards. Artwork does not
 increment a release version.
+
+The later feature-first revision replaces the shared ochre palette with
+distinct palettes and a large, accurate feature illustration per mod. Five
+user-approved square concepts are reused; every landscape companion is
+separately composed. `2026-10-31-feature-series.json` records the final 74
+assets and their actual generation inputs. `finalize_feature_series.py`
+validates all assets before copying them, archives the earlier series outside
+posting folders, and creates a paired gallery and a 37-image Nexus ZIP under
+`workshop/cover-series/2026-10-31-features/`. Nexus publication remains manual.
+
+Visual checks include single coloured equipment-grade stars (no kit grade),
+XP percentages, an actual ranged-damage target, the skeleton repair wrench,
+the MCM badge on supporting plugins and the no-MCM interface-skin exception.
