@@ -1,7 +1,7 @@
 {
   "date": "2026-10-31",
   "tool": "built-in image_gen",
-  "status": "74 assets visually reviewed and staged; Steam publication checked separately",
+  "status": "complete: 74 assets reviewed and staged; 37 exact Steam previews publicly verified; Nexus files ready for user upload",
   "rules": "37 public mods, DynamicFactions excluded. Diverse palettes, feature-first. Approved five squares reused; Dark UI Advanced no MCM; Vital Sense icons only.",
   "fidelity_review": [
     "Dark UI Advanced has no MCM badge",
@@ -1604,5 +1604,6 @@
         }
       }
     }
-  ]
+  ],
+  "steam_publication_verification": "2026-10-31-feature-remote-verification.json"
 }
