@@ -1,0 +1,10 @@
+{
+  "upstream_files_verified": 239,
+  "upstream_bytes": 440159146,
+  "upstream_mod_sha256": "5885fcbb1be335a75c3a0c8962722074434fcbd1ecf7fb8feecab1946e6479c8",
+  "ru_mod_sha256": "22a23238bf77347df3b3bdb8a246f4089e555c10677aed8155ed5dc9ed6661cb",
+  "nce_mod_sha256": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002",
+  "mods_cfg_unchanged": true,
+  "game_running_during_install": false,
+  "new_and_revised_fields_win_load_order": 70
+}

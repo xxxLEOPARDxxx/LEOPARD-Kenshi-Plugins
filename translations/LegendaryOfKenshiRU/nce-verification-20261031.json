@@ -1,0 +1,219 @@
+{
+  "targets": 40,
+  "changes": [
+    {
+      "id": "1534053-Newwworld Plus.mod",
+      "name": "Hiver Chain Shirt",
+      "before": {
+        "cut def bonus": -0.23494736850261688,
+        "cut into stun": 0.0
+      },
+      "after": {
+        "cut def bonus": -0.23494736850261688,
+        "cut into stun": 0.0
+      },
+      "new_record": false,
+      "name_before": "Hiver Chain Shirt",
+      "name_after": "Кольчуга Роев"
+    },
+    {
+      "id": "5131724-A_BossPlus.mod",
+      "name": "Exalted Ninja Suit",
+      "before": {
+        "cut def bonus": -0.17000000178813934,
+        "cut into stun": 0.0
+      },
+      "after": {
+        "cut def bonus": -0.164000004529953,
+        "cut into stun": 0.0
+      },
+      "new_record": false,
+      "name_before": "Высший костюм ниндзя",
+      "name_after": "Высший костюм ниндзя"
+    },
+    {
+      "id": "5131740-A_BossPlus.mod",
+      "name": "Golem Legplates",
+      "before": {
+        "cut def bonus": -0.05852631852030754,
+        "cut into stun": 0.0
+      },
+      "after": {
+        "cut def bonus": -0.06752631813287735,
+        "cut into stun": 0.0
+      },
+      "new_record": false,
+      "name_before": "Поножки голема",
+      "name_after": "Поножки голема"
+    },
+    {
+      "id": "5131764-A_BossPlus.mod",
+      "name": "General Eyegore's Samurai Boots [Not in use]",
+      "before": {
+        "cut def bonus": 0.05000000074505806,
+        "cut into stun": 0.0
+      },
+      "after": {
+        "cut def bonus": 0.05000000074505806,
+        "cut into stun": 0.0
+      },
+      "new_record": false,
+      "name_before": "Генеральские сапоги самурая",
+      "name_after": "Генеральские сапоги самурая [не используются]"
+    },
+    {
+      "id": "5131899-A_BossPlus.mod",
+      "name": "Blackened Chain Pants",
+      "before": {
+        "cut def bonus": -0.037105269730091095,
+        "cut into stun": 0.0
+      },
+      "after": {
+        "cut def bonus": -0.004736844450235367,
+        "cut into stun": 0.0
+      },
+      "new_record": false,
+      "name_before": "Чернёные поножки",
+      "name_after": "Чернёные поножки"
+    },
+    {
+      "id": "5132190-A_BossPlus.mod",
+      "name": "General's Vest",
+      "before": {
+        "cut def bonus": -0.04000000283122063,
+        "cut into stun": 0.0
+      },
+      "after": {
+        "cut def bonus": -0.03200000151991844,
+        "cut into stun": 0.0
+      },
+      "new_record": false,
+      "name_before": "Генеральская кольчуга",
+      "name_after": "Генеральская кольчуга"
+    },
+    {
+      "id": "5133102-Legendary of Kenshi.mod",
+      "name": "Empire Heavy Samurai Armour",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.040526315569877625,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Тяжёлые самурайские доспехи Империи"
+    },
+    {
+      "id": "5133104-Legendary of Kenshi.mod",
+      "name": "Hive Forged Armour",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.06797368824481964,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Кованые доспехи Улья"
+    },
+    {
+      "id": "5133105-Legendary of Kenshi.mod",
+      "name": "Hive Forged Legplate",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.09449999779462814,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Кованые поножки Улья"
+    },
+    {
+      "id": "5133106-Legendary of Kenshi.mod",
+      "name": "Hive Forged Helmet Type-P",
+      "before": {},
+      "after": {
+        "cut def bonus": 0.005476190242916346,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Кованый шлем Улья, тип P"
+    },
+    {
+      "id": "5133107-Legendary of Kenshi.mod",
+      "name": "Hive Forged Helmet Type-W",
+      "before": {},
+      "after": {
+        "cut def bonus": 0.005476190242916346,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Кованый шлем Улья, тип W"
+    },
+    {
+      "id": "5133113-Legendary of Kenshi.mod",
+      "name": "Hive Forged Heavy Armour",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.0047631594352424145,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Тяжёлые кованые доспехи Улья"
+    },
+    {
+      "id": "5133125-Legendary of Kenshi.mod",
+      "name": "Noble Commander Samurai Armour",
+      "before": {},
+      "after": {
+        "cut def bonus": 0.014236840419471264,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Самурайские доспехи знатного командира"
+    },
+    {
+      "id": "5133126-Legendary of Kenshi.mod",
+      "name": "Noble Commander Vest",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.04800000041723251,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Жилет знатного командира"
+    },
+    {
+      "id": "5133131-Legendary of Kenshi.mod",
+      "name": "Noble Commander Samurai Legplates",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.0047631594352424145,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Самурайские поножки знатного командира"
+    },
+    {
+      "id": "5133132-Legendary of Kenshi.mod",
+      "name": "Hive Queen Armour",
+      "before": {},
+      "after": {
+        "cut def bonus": -0.049973685294389725,
+        "cut into stun": 0.0
+      },
+      "new_record": true,
+      "name_before": null,
+      "name_after": "Доспехи королевы Улья"
+    }
+  ],
+  "rule_sha256": "b163f9edab78878a659c50d1fe207d232f067f7bf5929d2126fa09b8d82436c2",
+  "baseline_mismatch": [],
+  "source_layers_checked": 223,
+  "independent_review": "All 40 results recomputed with an algebraically simplified formula. 1523 original records byte-identical; 4 float updates, 2 name-only updates, 10 localized additions. No remaining findings."
+}

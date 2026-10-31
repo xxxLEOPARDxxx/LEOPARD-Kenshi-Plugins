@@ -1,0 +1,76 @@
+{
+  "english_records": 1891,
+  "overlay_records": 1102,
+  "translated_names": 638,
+  "translated_fields": 1326,
+  "previous_fields_preserved": 1263,
+  "new_fields": 63,
+  "revised_fields": 6,
+  "stale_anchors": 0,
+  "missing_player_strings": 0,
+  "gameplay_overrides": 0,
+  "intentional_internal_labels": [
+    {
+      "id": "GENERATION_TEMPLATE_CHARACTER",
+      "name": "GENERATION_TEMPLATE_CHARACTER"
+    },
+    {
+      "id": "1532951-__world reactions.mod",
+      "name": "Okran's Fist (override) half destroyed"
+    },
+    {
+      "id": "1532952-__world reactions.mod",
+      "name": "Okran's Fist (override) half destroyed"
+    },
+    {
+      "id": "1533314-__world reactions Shek.mod",
+      "name": "Admag (override) Seto"
+    },
+    {
+      "id": "1533587-__world reactions Slavers.mod",
+      "name": "Heft (override) malnourished"
+    },
+    {
+      "id": "1533590-__world reactions Slavers.mod",
+      "name": "Heft (override) malnourished 2"
+    },
+    {
+      "id": "1533591-__world reactions Slavers.mod",
+      "name": "Heft (override) malnourished 3"
+    },
+    {
+      "id": "5131575-A_BossPlus.mod",
+      "name": "FISTS- robo tinfist"
+    },
+    {
+      "id": "5131624-A_BossPlus.mod",
+      "name": "1testc"
+    },
+    {
+      "id": "5131658-A_BossPlus.mod",
+      "name": "1testa"
+    },
+    {
+      "id": "5131716-A_BossPlus.mod",
+      "name": "_spider type small bugbd"
+    },
+    {
+      "id": "5131825-A_BossPlus.mod",
+      "name": "1testb"
+    },
+    {
+      "id": "5131884-A_BossPlus.mod",
+      "name": "_gorillo king"
+    },
+    {
+      "id": "5131936-A_BossPlus.mod",
+      "name": "_dog type weapon dogmeat"
+    },
+    {
+      "id": "5132177-A_BossPlus.mod",
+      "name": "_robot spider type KC"
+    }
+  ],
+  "english_sha256": "5885fcbb1be335a75c3a0c8962722074434fcbd1ecf7fb8feecab1946e6479c8",
+  "overlay_sha256": "22a23238bf77347df3b3bdb8a246f4089e555c10677aed8155ed5dc9ed6661cb"
+}
