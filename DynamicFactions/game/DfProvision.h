@@ -25,6 +25,9 @@ struct DfProvision
     std::string lastItemName;
     std::vector<hand> failedShops;
     std::map<hand,unsigned long,DfWorkHandLess> cooldown;
+    // Failed food routes must yield even to equally urgent food peers; unlike
+    // optional purchase deferral, hunger cannot bypass this route failure.
+    std::map<hand,unsigned long,DfWorkHandLess> foodCooldown;
     DfMarketCache market;
     DfProvisionPlan plans[4];
     DfBudgetSnapshot plannedBudget;

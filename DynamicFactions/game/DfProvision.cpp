@@ -28,7 +28,11 @@ namespace
     }
     void Delay(DfProvision& rt,Character* c,unsigned long now)
     {
-        if(c!=NULL) rt.cooldown[c->getHandle()]=now+30000;
+        if(c!=NULL)
+        {
+            rt.cooldown[c->getHandle()]=now+30000;
+            if(rt.kind==DF_SUPPLY_FOOD)rt.foodCooldown[c->getHandle()]=now+30000;
+        }
         ClearRoute(rt,c);
     }
     bool ReadStock(Character* c,Faction* f,DfSupplyStock& stock)
@@ -98,10 +102,12 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
 {
     if(f==NULL || DfTransferFaulted() || people.empty() || people.size()>512) return;
     // Cooldowns are bounded by the current faction, including handle serials.
-    for(std::map<hand,unsigned long,DfWorkHandLess>::iterator it=rt.cooldown.begin();it!=rt.cooldown.end();)
+    std::map<hand,unsigned long,DfWorkHandLess>* waits[]={&rt.cooldown,&rt.foodCooldown};
+    for(int queue=0;queue<2;++queue)
+    for(std::map<hand,unsigned long,DfWorkHandLess>::iterator it=waits[queue]->begin();it!=waits[queue]->end();)
     {
         Character* const c=it->first.getCharacter();
-        if(c==NULL || c->getFaction()!=f || !Future(now,it->second))rt.cooldown.erase(it++);else ++it;
+        if(c==NULL || c->getFaction()!=f || !Future(now,it->second))waits[queue]->erase(it++);else ++it;
     }
     Character* actor=rt.member.isNull() ? NULL : rt.member.getCharacter();
     if(actor!=NULL && (actor->getFaction()!=f || actor==envoy || !DfEconomyAvailable(actor)))
@@ -121,7 +127,9 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
     {
         const DfSupplyKind next=NextKind(current);
         const int p=SupplyPriority(current,next,false);
-        if(p<priority)
+        const bool retryBlocked=(next==DF_SUPPLY_FOOD && rt.foodCooldown.find(actor->getHandle())!=rt.foodCooldown.end()) ||
+            (p!=0 && rt.cooldown.find(actor->getHandle())!=rt.cooldown.end());
+        if(p<priority && !retryBlocked)
         {
             // A traveller's own food can run low while seeking a bag or kit.
             ClearRoute(rt,actor);rt.member=actor->getHandle();rt.memberName=actor->getName();
@@ -144,7 +152,9 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
             continue;
         }
         const DfSupplyKind kind=NextKind(stock);const int p=SupplyPriority(stock,kind,false);
-        // A previous optional/unreachable trip cannot suppress urgent food.
+        // Urgent food bypasses optional failures, but a failed food route must
+        // briefly yield the single slot to another hungry member.
+        if(kind==DF_SUPPLY_FOOD && rt.foodCooldown.find(c->getHandle())!=rt.foodCooldown.end()) continue;
         if(p!=0 && rt.cooldown.find(c->getHandle())!=rt.cooldown.end()) continue;
         if(p<priority){best=c;bestStock=stock;bestKind=kind;priority=p;}
     }
@@ -273,7 +283,11 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
     {
         // One speculative optional arrival is enough. Return to work rather
         // than walking a chain of shops under the same unresolved budget.
-        if(rt.kind!=DF_SUPPLY_FOOD){ClearRoute(rt,actor);return;}
+        if(rt.kind!=DF_SUPPLY_FOOD)
+        {
+            if(status==DF_BUY_NO_ROOM)Delay(rt,actor,now);else ClearRoute(rt,actor);
+            return;
+        }
         if(rt.failedShops.size()<128)rt.failedShops.push_back(rt.trader);
         rt.trader=hand();
     }

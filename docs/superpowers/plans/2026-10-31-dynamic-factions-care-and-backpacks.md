@@ -70,13 +70,13 @@ installation. DF remains unpublished.
 - [x] Production-extracted adapters, core edge tests, startup binding, import
   audit, independent correctness/perf/lifetime review and full compatible build.
 - [x] Install with game closed, preserve personal INI/.mod and C8 backup.
-- [ ] Live physical medicine/bag purchase: seller goods decrease, buyer goods
+- [x] Live physical medicine/bag purchase: seller goods decrease, buyer goods
   increase, both wallets reconcile; native equip/consumption behave correctly.
-- [ ] Separate earned save/reload preserves money, charges, worn bag and cargo.
+- [x] Two independent loads of the completed earned save match money, charges, worn bag and cargo; in-flight save remains separate.
 - [ ] Measure native quote/stock traversal cost and long memory separately;
   tests/review alone do not prove the absence of leaks or an FPS cost.
 - [x] Bilingual README and honest evidence/remaining limits.
-- [ ] Meaningful commit/push of the verified local implementation.
+- [x] Meaningful commit/push of C9 implementation and earned-load evidence.
 
 Implementation decisions: quotes are learned only on real visits; all physical
 backing-pool identities are registered before capped offers. Pool aliases are
@@ -94,3 +94,21 @@ dynamic-factions-20261031/care-acceptance/C8-before-care.
 INI/.mod/defaults/loader config unchanged. DF-care-20261031 is an exact
 85-file SHA-verified copy of DF-food-earned-20261031; source untouched.
 Live acceptance is pending the user's next scene load, not assumed from tests.
+
+
+## 2026-11-01 current boundary — user-requested DF pause
+
+C9 live evidence supersedes the older pending text above: actual seller stock,
+both purses, the bought/equipped bag and completed earned save were observed.
+Two independent completed-save loads match3348cats/6actors/46semantic item
+records including charge bits. See docs/verification/2026-10-31-taunt-startup-df-reload.md.
+
+Final focused correction: failed urgent-food routes yield30s to hungry peers;
+optional NO_ROOM retries defer30s without blocking urgent food, including an
+active route switching back to gear. Production-extracted RED5 failures ->GREEN72,
+with serial/faction/world/timer-wrap cases. Total1523checks,132native imports,
+full21-translation-unit build and independent review pass. Actual new retry
+behavior, quantitative performance and interrupted-save acceptance remain open.
+DF is paused after installation by explicit user instruction; next active task
+is the4x4x8192global satellite map. Do not start lighting/equipment/loot/slavery
+features while paused and do not publish DF.

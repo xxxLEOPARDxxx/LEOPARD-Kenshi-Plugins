@@ -359,3 +359,44 @@ Price-only negative evidence lasts 600 seconds versus 120 seconds for stock.
 Urgent food bypasses these gates. All 1503 checks passed, including 52 route
 and 44 market cases; independent review cleared. The new trip policy still
 awaits in-game acceptance.
+
+
+C9: справедливость маршрута и пауза разработки, 01.11.2026
+
+Исправлены два подтверждённых дефекта реального планировщика: срочная еда
+больше не обходит отсрочку после неудачного пищевого маршрута и позволяет
+снабдить другого голодного участника; отсутствие места для аптечки/рюкзака
+даёт 30 секунд на возвращение к работе, а не снимает приказ каждые5секунд.
+Срочная еда по-прежнему обходит только отсрочку необязательного снаряжения.
+Переход текущего снабженца между потребностями учитывает ту же отсрочку.
+Обе таблицы содержат только полные hand, очищаются по serial, фракции,
+истечению срока и смене мира; никаких новых денежных/товарных операций нет.
+
+Проверено: 1276+72+37+35+44+20+39=1523 проверки, контракт сохранения и
+не-виртуальной привязки голода;132nativeимпорта; независимое ревью.
+Две загрузки DF-care-earned-20261031 восстановили3348катов,6участников и
+46совпадающих записей вещей по количеству, ресурсу, владельцу и экипировке.
+В последнем прогоне прежней DLL подтверждены ещё3продажи руды по93ката.
+Новая логика отсрочек проверена production-тестами, но ещё не принята вживую.
+Проверка длинной сессии/FPS и сохранения прямо во время сделки остаётся открытой.
+По просьбе пользователя разработка DF поставлена на паузу после этой правки;
+освещение, экипировка по стилю и мародёрство сейчас не добавлялись. DF не релиз.
+
+C9: fair route retries and development pause, 1 November 2026
+
+Failed food routes now yield to other hungry members even when food is urgent.
+Urgent food still bypasses optional-gear deferral. Optional medicine/backpack
+NO_ROOM failures give30seconds back to work instead of clearing orders every
+5seconds; an active worker switching needs respects the same delay. Both
+handle-only wait tables are pruned by complete identity, faction and expiry,
+and reset with the world. No new money/item transaction was introduced.
+
+1523checks pass (1276core,72supply,37inventory,35offers,44market,20bag,39session),
+plus save/lifecycle contracts, nonvirtual hunger binding and132native imports.
+Independent review cleared. Two loads of the same completed earned save match
+3348cats,6members and46semantic item records including quantities, remaining
+charges, owner and equipped state. The last old-DLL live run confirmed three
+more actual ore sales at93cats. New cooldown behavior is production-tested,
+not yet accepted live; long memory/FPS and in-flight save cases remain open.
+DF development is paused at the user's request after this fix. Lighting,
+style-based gear and looting have not been added. DF remains unpublished.

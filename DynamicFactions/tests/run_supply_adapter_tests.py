@@ -70,7 +70,13 @@ struct Character {
  Ogre::Vector3 getPosition(){return pos;}const hand& getHandle(){return id;}std::string getName(){return name;}
  void setDestination(const Ogre::Vector3&,bool){goal=MOVE_ON_FREE_WILL;++moves;}
 };
-Character* hand::getCharacter()const {std::map<int,Character*>::iterator it=actors.find(index);return it==actors.end()?NULL:it->second;}
+Character* hand::getCharacter()const {
+ std::map<int,Character*>::iterator it=actors.find(index);
+ if(it==actors.end())return NULL;
+ const hand& actual=it->second->id;
+ return type==actual.type && container==actual.container && containerSerial==actual.containerSerial &&
+     index==actual.index && serial==actual.serial ? it->second : NULL;
+}
 bool fault=false;int buyMode=0,buyCalls=0,errors=0,depth=0,originalCalls=0;
 void ErrorLog(const char*){++errors;}void DebugLog(const std::string&){}
 bool DfTransferFaulted(){return fault;}bool DfTransferBusy(){return depth!=0;}
@@ -120,6 +126,9 @@ bool BuySupply(Character* member,Character* trader,Faction* f,DfSupplyKind kind,
  if(kind==DF_SUPPLY_FOOD)return BuyFood(member,trader,f,budget.committed,paid,name,status);
  ++buyCalls;if(buyMode==1)RaiseException(EXCEPTION_ACCESS_VIOLATION,0,0,NULL);
  if(!DfPlanSupplySpend(budget,trader->price,kind).Allowed()){status=DF_BUY_NO_MONEY;return true;}
+ // Native BuyOtherSupplyFromStock reports NO_ROOM when its ranked fit fails.
+ // Model only this native inventory boundary; route/cooldown policy stays production code.
+ if(member->noRoom){status=DF_BUY_NO_ROOM;return true;}
  paid=trader->price;f->factionOwnerships->money-=paid;name="Supply";status=DF_BUY_OK;
  if(kind==DF_SUPPLY_FIRSTAID)member->firstAid+=150;else if(kind==DF_SUPPLY_REPAIR)member->repair+=500;else ++member->bags;
  return true;}
@@ -273,6 +282,101 @@ DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,1,9,2200,false);CHECK(for
 Character replacement(61,&faction,"Replacement");replacement.food=1;replacement.bags=0;replacement.wearing=false;
 savers[0]=&replacement;DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,1,9,2300,false);CHECK(forecastCalls==5);
 forecastReserve=0;
+// A failed FOOD route must yield to another equally urgent member, not merely
+// clear and immediately reclaim the single route through the urgency bypass.
+Character urgentA(80,&faction,"Urgent unreachable"),urgentB(81,&faction,"Urgent beside shop");
+urgentA.food=urgentB.food=0;urgentA.hunger=urgentB.hunger=1.2f;
+urgentA.pos=Ogre::Vector3();cheap.pos=Ogre::Vector3(10000,0,0);urgentB.pos=cheap.pos;
+std::vector<Character*> urgentGroup;urgentGroup.push_back(&urgentA);urgentGroup.push_back(&urgentB);
+std::vector<DfTrader> urgentShops(1);urgentShops[0].who=cheap.id;
+cheap.price=100;cheap.noRoom=false;wallet.money=10000;DfProvision urgentFair;
+DfProvisionStep(s,urgentFair,&faction,urgentGroup,urgentShops,NULL,0,10,1000,false);
+CHECK(urgentFair.member.index==urgentA.id.index && urgentB.food==0);
+for(unsigned long tick=6000;tick<=181000;tick+=5000)
+{
+ urgentA.pos.x+=100;cheap.pos.x+=200;urgentB.pos=cheap.pos;
+ DfProvisionStep(s,urgentFair,&faction,urgentGroup,urgentShops,NULL,0,10,tick,false);
+}
+CHECK(urgentFair.member.isNull());
+DfProvisionStep(s,urgentFair,&faction,urgentGroup,urgentShops,NULL,0,10,186000,false);
+CHECK(urgentB.food>0 && urgentA.food==0);
+// A failed food route is deferred, not permanently banned after the next peer.
+urgentB.food=1;urgentA.pos=cheap.pos;
+DfProvisionStep(s,urgentFair,&faction,urgentGroup,urgentShops,NULL,0,10,191000,false);
+DfProvisionStep(s,urgentFair,&faction,urgentGroup,urgentShops,NULL,0,10,216000,false);
+CHECK(urgentA.food>0);
+
+// A known affordable optional purchase with no inventory fit must return the
+// worker to real work, then defer the identical retry instead of clearing that
+// work again every5s. Exercise both medicine and first-backpack purchases.
+for(int optional=0;optional<2;++optional)
+{
+ Character fullWorker(90+optional,&faction,optional ? "Full backpack buyer" : "Full aid buyer");
+ fullWorker.food=1;fullWorker.firstAid=optional ? 150.0f : 0.0f;
+ fullWorker.bags=optional ? 0 : 1;fullWorker.wearing=!optional;fullWorker.noRoom=true;
+ fullWorker.pos=Ogre::Vector3();cheap.pos=fullWorker.pos;cheap.price=100;
+ std::vector<Character*> fullGroup(1,&fullWorker);std::vector<DfTrader> fullShops(1);fullShops[0].who=cheap.id;
+ wallet.money=10000;forecastKnown=true;DfProvision fullRoute;fullRoute.market.knownPrices[cheap.id.index]=100;
+ const int beforeAttempt=buyCalls;
+ DfProvisionStep(s,fullRoute,&faction,fullGroup,fullShops,NULL,0,11,1000,false);
+ CHECK(fullRoute.member.isNull() && buyCalls==beforeAttempt+1 && wallet.money==10000);
+ // Labour has resumed its native mining/hauling goal between economic ticks.
+ fullWorker.goal=OPERATE_MACHINERY;const int resumedClears=fullWorker.clears;
+ DfProvisionStep(s,fullRoute,&faction,fullGroup,fullShops,NULL,0,11,6000,false);
+ CHECK(buyCalls==beforeAttempt+1 && fullWorker.clears==resumedClears && fullRoute.member.isNull());
+ // The optional fit deferral must still permit urgent food for this same actor.
+ fullWorker.noRoom=false;fullWorker.food=0;fullWorker.hunger=1.2f;
+ const int beforeUrgent=buyCalls;
+ DfProvisionStep(s,fullRoute,&faction,fullGroup,fullShops,NULL,0,11,11000,false);
+ CHECK(buyCalls==beforeUrgent+1 && fullWorker.food>0 && fullRoute.kind==DF_SUPPLY_FOOD);
+ fullWorker.food=1;
+ const int afterUrgent=buyCalls;
+ DfProvisionStep(s,fullRoute,&faction,fullGroup,fullShops,NULL,0,11,16000,false);
+ CHECK(buyCalls==afterUrgent && (optional ? fullWorker.bags==0 : fullWorker.firstAid==0));
+ // A bounded retry window expires; improved fit may then buy the real supply.
+ DfProvisionStep(s,fullRoute,&faction,fullGroup,fullShops,NULL,0,11,301000,false);
+ CHECK(optional ? fullWorker.bags==1 : fullWorker.firstAid==150);
+}
+// The two retry caches share native handle lifetime and DWORD clock behavior.
+// A deadline spanning GetTickCount wrap blocks briefly, then permits food again.
+Character wrapped(110,&faction,"Wrapped deadline");wrapped.food=0;wrapped.hunger=1.2f;
+wrapped.pos=Ogre::Vector3();cheap.pos=wrapped.pos;cheap.price=100;wallet.money=10000;
+std::vector<Character*> lifecyclePeople(1,&wrapped);DfProvision wrapRoute;
+const unsigned long nearWrap=0xffffff00UL;
+wrapRoute.member=wrapped.id;wrapRoute.kind=DF_SUPPLY_FOOD;wrapRoute.startedAt=nearWrap-180000UL;
+DfProvisionStep(s,wrapRoute,&faction,lifecyclePeople,urgentShops,NULL,0,12,nearWrap,false);
+const int beforeWrapRetry=buyCalls;
+DfProvisionStep(s,wrapRoute,&faction,lifecyclePeople,urgentShops,NULL,0,12,nearWrap+5000UL,false);
+CHECK(wrapRoute.member.isNull() && buyCalls==beforeWrapRetry && wrapped.food==0);
+DfProvisionStep(s,wrapRoute,&faction,lifecyclePeople,urgentShops,NULL,0,12,nearWrap+30000UL,false);
+CHECK(buyCalls==beforeWrapRetry+1 && wrapped.food>0 && wrapRoute.cooldown.empty() && wrapRoute.foodCooldown.empty());
+
+// Reusing an object index with a new serial must not inherit the old actor's wait.
+Character previousMember(111,&faction,"Old serial");DfProvision recycled;
+recycled.cooldown[previousMember.id]=31000;recycled.foodCooldown[previousMember.id]=31000;
+Character replacementMember(111,&faction,"New serial");replacementMember.id.serial=previousMember.id.serial+1;
+replacementMember.food=0;replacementMember.hunger=1.2f;replacementMember.pos=cheap.pos;
+lifecyclePeople[0]=&replacementMember;
+DfProvisionStep(s,recycled,&faction,lifecyclePeople,urgentShops,NULL,0,12,6000,false);
+CHECK(replacementMember.food>0 && recycled.cooldown.empty() && recycled.foodCooldown.empty());
+
+// Entries for a still-resolvable character who left the faction are pruned too.
+Character departed(112,&faction,"Departed");DfProvision departure;
+departure.cooldown[departed.id]=31000;departure.foodCooldown[departed.id]=31000;departed.f=&foreign;
+replacementMember.food=1;
+DfProvisionStep(s,departure,&faction,lifecyclePeople,urgentShops,NULL,0,12,6000,false);
+CHECK(departure.cooldown.empty() && departure.foodCooldown.empty());
+
+// World/load reset constructs a new ephemeral runtime; old food waits must not
+// delay the same physical actor after that reset or recreate a saved purchase.
+Character afterLoad(113,&faction,"After load");afterLoad.food=0;afterLoad.hunger=1.2f;afterLoad.pos=cheap.pos;
+DfProvision reloaded;reloaded.cooldown[afterLoad.id]=31000;reloaded.foodCooldown[afterLoad.id]=31000;
+lifecyclePeople[0]=&afterLoad;const int beforeLoad=buyCalls;
+DfProvisionStep(s,reloaded,&faction,lifecyclePeople,urgentShops,NULL,0,12,6000,false);
+CHECK(buyCalls==beforeLoad && afterLoad.food==0);
+reloaded=DfProvision();
+DfProvisionStep(s,reloaded,&faction,lifecyclePeople,urgentShops,NULL,0,12,11000,false);
+CHECK(buyCalls==beforeLoad+1 && afterLoad.food>0);
 std::printf("%d supply adapter checks, %d failed\n",checks,failed);return failed;
 }
 '''
