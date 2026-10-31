@@ -120,12 +120,13 @@
     ]
   },
   "Character Inspector": {
-    "version": "1",
-    "ru": [
-      "Добавлены MCM-переключатели осмотра и кнопки инвентаря, английский/русский/китайский интерфейс; старое назначение открытия больше не используется. Убраны повторные поиски и лишние перестановки кнопок, кэш очищается при закрытии окон, осмотр закрывается при удалении персонажа."
-    ],
+    "version": "2",
+    "published_version": "1",
     "en": [
-      "Added MCM controls for the inspector and inventory button with English, Russian and Chinese text; the obsolete open binding is no longer used. Repeated button searches and unnecessary layout changes were removed, cached controls are cleared on close, and inspection closes when its character is destroyed."
+      "[b]Correct environmental protection above 100%.[/b] High combined acid, dust, burning, gas and rain protection no longer falls to a misleading 2%. Full protection is displayed as 100%, retaining the existing effective-protection limit."
+    ],
+    "ru": [
+      "[b]Правильная защита от среды выше 100%.[/b] Высокая суммарная защита от кислоты, пыли, опаления, газа и дождя больше не превращается в ошибочные 2%. Полная защита показывается как 100%, с сохранением прежнего предела отображения."
     ]
   },
   "KenshiRotate": {
