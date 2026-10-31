@@ -1,40 +1,30 @@
-# Обложки Kenshi
+# Publication artwork
 
-Пользователь 30.10.2026 утвердил серию по первым Stack Sort и Skill Level Up
-Info и поручил создать обложки для всех публикуемых плагинов/форков, заменив
-старые обложки Emkej. В комплекте 38 модов: release catalog плюс Dynamic
-Factions (пока разработка). Манифест содержит точные промпты и SHA256 файлов.
+Nexus uses landscape `workshop/images/<Mod>/000_LEOPARD_Cover.png`.
+Steam uses a separately composed square
+`workshop/steam-covers/<Mod>/000_LEOPARD_Steam_Cover.png`.
+`build.py` selects the square only for Steam's primary preview; gameplay
+screenshots and Nexus artwork retain their original paths. A non-square
+override fails preparation instead of silently publishing the wrong format.
 
-## Утверждённое оформление
+The 2026-10-31 series contains 37 published mods. Dynamic Factions is excluded.
+Titles are larger for Workshop thumbnails. Dark UI Advanced has no MCM badge.
+Vital Sense depicts status icons, never overhead health bars. Mod Config Menu
+has a distinctive central command-hub design, including a matching landscape
+Nexus companion requested by the user. Its earlier landscape is archived
+outside the posting folders.
 
-- Оригинальный пустынный комикс, потёртый золотистый заголовок на чёрной
-  кистевой плашке; собственный механический персонаж с ржавой конической
-  шляпой, оптическими глазами и красным шарфом. Отдельный сюжет по функции.
-- Читаемая табличка MCM под заголовком у поддерживающих плагинов.
-  **Dark UI Advanced — обычный интерфейсный мод, без таблички MCM.**
-- Функции сверять с актуальным модом; не добавлять рекламой выдуманные
-  элементы. В частности, Vital Sense показывает отдельные значки состояний
-  и награды, **не полосы здоровья**. Ошибочная иллюстрация исправлена.
-- Это иллюстрированные обложки, а не поддельные игровые скриншоты.
-  Upstream-иллюстрации не использовались как изображения-входы генератора.
-  Старые обложки перенесены в резерв, игровые скриншоты сохранены.
+Images were created with the built-in ImageGen tool. JSON manifests retain
+the exact prompts, references, output paths, dimensions and SHA-256 hashes.
+The scripts copy original generated pixels; staging only performs the
+existing JPEG compression needed for Steam's preview-size limit.
 
-## Размещение
+`prepare_steam_squares.py` stages preview files without rebuilding content or
+changing item metadata. Publish with `steam_upload.py preview <Mod ...>`;
+never use content upload or refresh for artwork-only changes. Run
+`verify_steam_squares.py baseline` before publication and `verify` afterwards
+to check exact CDN bytes, square dimensions and unchanged non-preview fields.
+The staged and remote evidence is saved under `workshop/steam-covers`.
 
-Рабочие PNG: `D:/DEV/Kenshi/workshop/images/<Mod>/000_LEOPARD_Cover.png`.
-Имя ставит обложку первой в штатном release builder. Стандартный
-`build.prepare_image` подготовил отдельные Steam preview (<1000 KiB) и галереи,
-не меняя PNG. После отдельного поручения пользователя прямоугольные превью
-загружены на 37 страниц Steam; remote API и точный SHA256 всех 37 картинок
-проверены. Существующие DLL и номера выпусков этими загрузками не менялись.
-Stack Sort v1 опубликован отдельно: Nexus2262, Steam3830285370.
-
-Следующее поручение пользователя: после исправлений модов создать отдельные
-квадратные Steam-обложки с более крупными заголовками и перезагрузить их.
-Прямоугольные Nexus-оригиналы сохранить. Dynamic Factions остаётся локальной
-разработкой и в Steam/Nexus не публикуется.
-
-Локальный просмотр, промпты, манифест, прежние обложки и резерв превью:
-`D:/DEV/Kenshi/workshop/cover-concepts/2026-10-30/`.
-Использовался встроенный image_gen, не API/CLI. При выпуске сохраняется
-обычный порядок: Nexus пользователем, затем Steam по полученным ссылкам.
+Code updates still follow Nexus first, Steam afterwards. Artwork does not
+increment a release version.

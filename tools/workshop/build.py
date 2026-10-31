@@ -296,6 +296,18 @@ def readme_to_bbcode(text, drop, overrides=None):
 MAX_IMG = 1000 * 1024
 
 
+def steam_preview_source(mod, landscape_source):
+    """Dedicated Steam artwork never replaces the original Nexus/gallery file."""
+    from PIL import Image
+    square = os.path.join(HERE, "steam-covers", mod, "000_LEOPARD_Steam_Cover.png")
+    if not os.path.isfile(square):
+        return landscape_source
+    with Image.open(square) as image:
+        if image.width != image.height:
+            raise ValueError("Steam preview override must be square: " + square)
+    return square
+
+
 def prepare_image(src, target_noext):
     """Скопировать картинку; тяжёлую - ужать. Возвращает имя файла."""
     from PIL import Image
@@ -504,7 +516,10 @@ def build(item):
             for ext in (".png", ".jpg"):        # прежнее превью другого формата
                 if os.path.exists(target + ext):
                     os.remove(target + ext)
-        name = prepare_image(os.path.join(HERE, "images", mod, f), target)
+        image_source = os.path.join(HERE, "images", mod, f)
+        if k == 0:
+            image_source = steam_preview_source(mod, image_source)
+        name = prepare_image(image_source, target)
         if k > 0:
             out_names.append(name)
     imgs = ([imgs[0]] + out_names) if imgs else [None]

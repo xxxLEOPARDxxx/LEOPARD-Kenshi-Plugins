@@ -455,20 +455,25 @@
       "title": "MOD CONFIG MENU",
       "mcm_badge": true,
       "image": "images/ModConfigMenu/000_LEOPARD_Cover.png",
-      "sha256": "8e65443a5ded8d87062a0c19eb07c536b23568e66c04ab062e11b248b3225ec0",
-      "bytes": 3357533,
+      "sha256": "4bea90c867cd7894fbef02fceb213795b00d885ed99e583e48da1a236e2e1fab",
+      "bytes": 3508371,
       "dimensions": [
         1672,
-        941
+        940
       ],
       "generation_prompt": "Use case: ads-marketing. Create one original landscape 16:9 illustrated Kenshi mod cover for an approved cohesive series. Original artwork, never reproduce an existing cover or screenshot. Style: gritty hand-inked wasteland adventure comic, finely detailed crosshatching, weathered screen-print grain, warm sandy ochre sunset, rusty iron, dusty brown, muted crimson scarf accents, strong dark contours, clear readable silhouettes, high-end illustrated poster composition. Recurring original mascot: charming mechanical skeleton robot with a riveted angular metal face, round optical eyes, broad rusted samurai straw-shaped helmet and dark red scarf, patched scavenger armour; entirely mechanical, not a human skull. Large distressed golden-ochre uppercase title on a rough black brush-stroke banner across the upper left, keep ALL title lettering fully visible, correct spelling, very readable in a small thumbnail. Avoid covering faces or the feature demonstration. Exact title text: \"MOD CONFIG MENU\". Add one small engraved MCM badge beneath the title. Scene: A robot tinkerer operates a central brass and dark iron control panel with orderly toggles, sliders, keycap symbols and several plugin gear emblems. Other small workshop machines are connected to this one useful settings console. No other slogans, no speech bubbles, no author names, no version numbers, no watermark, no fake game UI, no modern firearms. Depict only the named feature with an original composition. Finished full-bleed polished wide cover, not a collage or multiple separate covers.\nMANDATORY TYPE LOCKUP: Directly beneath the big title there MUST be a clearly readable small rectangular riveted brass plaque containing the exact three uppercase letters MCM. The MCM plaque is required for every cover in this collection. Do not substitute a gear, compass, pictogram or blank ornament for the MCM letters. Keep only the exact mod title and MCM as lettering.",
-      "edit_prompts": [],
+      "edit_prompts": [
+        "Edit target: the attached square flagship Mod Config Menu cover. Create its matching NEXUS cover in a WIDE 16:9 LANDSCAPE aspect ratio, 1536x864, full bleed. Recompose everything naturally across the wide canvas; preserve this exact distinctive flagship visual identity: ornate black-and-brass nameplate with huge exact gold title \"MOD CONFIG MENU\", central circular cog medallion labeled \"MCM\", many modular pictogram control panels connected with cables, several future empty sockets, turquoise indicator lights, the familiar round-eyed mechanical robot with conical samurai hat and crimson scarf operating the master console, Kenshi desert ruins. Place the bold nameplate in upper-left/upper-center, the large control hub across the lower-middle and the robot at right, balancing the composition. Maintain engraved gold/ivory premium details, black/rust/ochre hand-inked screenprint texture, warm distant wasteland. Every title letter fully visible, strong thumbnail legibility. This is the rectangular companion to the square Steam flagship cover. NO square image pasted inside a rectangle, no padding, no letterboxing, no added words or slogans."
+      ],
       "visual_review": "title, badge and feature depiction checked",
       "development_only": false,
       "prepared_preview": "ModConfigMenu/preview.jpg",
       "prepared_bytes": 742459,
       "prepared_sha256": "e82c9b3358f8bfe5647baad70945ae3ed52094f780f5d4995aa9387e8c28fd14",
-      "prepared_gameplay_images": 10
+      "prepared_gameplay_images": 10,
+      "generated_source": "C:\\Users\\User\\.codex\\generated_images\\01a1884e-9173-7592-977a-11e639d2241a\\exec-ce5b7b9d-e4b8-4199-9848-300c70954ead.png",
+      "edit_reference": "steam-covers/ModConfigMenu/000_LEOPARD_Steam_Cover.png",
+      "updated": "2026-10-31"
     },
     {
       "mod": "MultiXPMining",
