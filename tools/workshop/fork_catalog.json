@@ -876,15 +876,15 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "6",
+    "version": "7",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
         "Найденные вещи плотно укладываются в начало сетки; меньше повторных проверок и перестройки при продажах.",
         "Поиск и сортировка размещены в нижнем ряду, их ширина настраивается; исправлены переводы, выравнивание и обрезание списка.",
-        "Добавлен отключаемый итог сделки по центру верхней строки; деньги торговца показаны слева.",
+        "Добавлен отключаемый итог сделки по центру верхней строки; деньги торговца показаны слева, деньги игрока - справа.",
         "[b]Читаемые пресеты и поиск.[/b] Панели учитывают полные переведённые подписи и текущий игровой шрифт; в узком окне переходят на отдельные строки. Поля и кнопки выровнены по высоте.",
-        "[b]Верхняя строка торговли.[/b] Деньги торговца показаны слева, отключаемый итог сделки — по центру; формат сумм соответствует игре.",
+        "[b]Верхняя строка торговли.[/b] Деньги торговца показаны слева, деньги игрока - справа, отключаемый итог сделки - по центру; формат сумм соответствует игре.",
         "[b]Устойчивое изменение размеров.[/b] Место для панелей возвращается после расширения окна, закрытия и отключения; лишние измерения и обновления неизменного текста сокращены.",
         "[b]Совместимость.[/b] Исправлена привязка обычного окна торговца для GOG; проверено по файлам игры, без заявления об игровой проверке GOG. Обновлены русский, английский и китайский интерфейс и подсказки."
       ],
@@ -894,7 +894,7 @@
         "Search and sorting share the bottom row with adjustable widths; translations, list alignment and clipping were corrected.",
         "Added an optional deal balance in the centre of the header, with trader money on the left.",
         "[b]Readable presets and search.[/b] Controls account for full translated captions and the active game font, moving to separate rows in narrow windows. Fields and buttons share a consistent height.",
-        "[b]Trade header.[/b] Trader money appears on the left and the optional deal balance in the centre, using the game's money formatting.",
+        "[b]Trade header.[/b] Trader money appears on the left, player money on the right and the optional deal balance in the centre, using the game's money formatting.",
         "[b]Stable resizing.[/b] Space reserved for controls is restored after widening, closing or disabling the window; repeated measurements and unchanged text updates are reduced.",
         "[b]Compatibility.[/b] Corrected the normal trader-window binding for GOG and checked it against game files; GOG runtime acceptance is not claimed. Updated Russian, English and Chinese interface text and help."
       ]
@@ -952,6 +952,16 @@
           "[b]Trade header.[/b] Trader money appears on the left and the optional deal balance in the centre, using the game's money formatting.",
           "[b]Stable resizing.[/b] Space reserved for controls is restored after widening, closing or disabling the window; repeated measurements and unchanged text updates are reduced.",
           "[b]Compatibility.[/b] Corrected the normal trader-window binding for GOG and checked it against game files; GOG runtime acceptance is not claimed. Updated Russian, English and Chinese interface text and help."
+        ]
+      },
+      "7": {
+        "ru": [
+          "[b]Деньги игрока справа.[/b] Возвращена общая сумма игрока в правый край верхней строки; деньги торговца остаются слева, а отключаемый итог сделки - по центру. Сумма обновляется при изменении кошелька.",
+          "[b]Оформление и узкие окна.[/b] Сохранены подложка и шрифт текущего интерфейса, цвета дохода/расхода и перенос длинных сумм без наложения. Чужой выбранный персонаж не меняет показанный кошелёк."
+        ],
+        "en": [
+          "[b]Player money on the right.[/b] Restored the player's shared wallet at the right edge of the trade header; merchant money remains on the left and the optional deal balance in the centre. The amount updates when the wallet changes.",
+          "[b]Themes and narrow windows.[/b] Preserved the active interface background and font, gain/cost colours and overlap-free wrapping of long amounts. Inspecting an NPC does not switch the displayed wallet."
         ]
       }
     },

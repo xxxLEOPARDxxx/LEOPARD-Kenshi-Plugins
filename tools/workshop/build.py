@@ -123,7 +123,7 @@ ITEMS = [
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT for state and bounty markers over visible characters - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Organize-the-Trader", title="Organize the Trader (MCM fork) (QoL)", nexus=2212, version="6",
+    dict(mod="Organize-the-Trader", title="Organize the Trader (MCM fork) (QoL)", nexus=2212, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Search and sorting in the trader window - a fork of Emkej8's mod with settings "
             "in Mod Config Menu."),
