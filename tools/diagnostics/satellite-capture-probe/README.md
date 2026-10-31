@@ -24,7 +24,35 @@ handling and tracked-camera/node cleanup remain unchanged.
 The extracted production helper first failed the already-attached regression (RED), then
 passed11 attachment/ownership/partial-failure checks (GREEN). The scoped build runs these in
 addition to13 prior policy checks, source contracts and the actual PE startup/import audit.
-This corrects the observed setup failure; it is not a claim that mode0 rendering has succeeded.
+This corrected the observed setup failure. Subsequent live controls produced images as
+recorded below; this does not establish a complete atlas or correct world lighting.
+
+## Live controls, 2026-11-01
+
+The installed attachment-corrected DLL (SHA256 `d8db85d1a8d4d7864b7a96cfbd92e8f124752b60e83e599396f3183095cf4a42`)
+produced all five modes in a paused Hub scene, process31268,
+startUTC2026-10-31T22:19:51.2039120Z. Raw BMPs, file hashes and filtered log are private
+evidence under game/_codex_work/global-satellite-20261101/controls-31268/manifest.json.
+
+- Mode0 contains Hub buildings and terrain; the earlier attachment exception is gone.
+- Mode1 is an incorrect clone: GBuffer has101 encoded colors versus4367 in selected mode0,
+  with different depth and missing buildings. This is not just HDR tint.
+- Mode2/3 have byte-identical GBuffer0 BMPs (SHA256 `90b771b154ae8ce243ec72c9e87e1cbe0d199bcca915488a0521f37e797b5219`)
+  but different final lighting: channel mean absolute difference38.276/16.504/10.864 of255.
+  Mode3 temporarily binds the independent camera to Renderer::camera; mode2 does not.
+- Mode3/4 visually share top-down geometry, with small nonzero final differences
+  (mean absolute0.199/0.133/0.124). Correct shadows/fog/water remain unproven.
+- After mode4, the global map and original perspective background remain visible.
+  This does not prove quantitative FPS, long-memory, save/load or unloaded-world coverage.
+
+Next diagnostic build: manual-request-only pose/matrix telemetry, no corrective pose refresh.
+Node convertWorldToLocalPosition/Orientation read cached derived transforms, which the SDK
+does not guarantee immediately after createChildSceneNode. Mode1 copies at creation, while
+orthographic Aim repeats in the compositor callback. NodeSample records cached/local parent
+data before copying; after-clone, before-aim and pre-shot record view/projection, culling/LOD
+camera identity and nonfinite-entry count. No Node *Updated getter is called, since it could
+hide the baseline. Native review confirms camera getters update only camera caches. No new
+long-lived ownership or frame-wide scan is added. Installation/live matrix evidence pending.
 
 This is a feasibility experiment for the requested global 4×4 atlas of 8192-square tiles and a native dynamic layer. It does not implement that full feature and does not generate any map art automatically. Source, build products, diagnostics and tests stay in this private directory. No global-map viewer/shared source files were changed during this spike.
 

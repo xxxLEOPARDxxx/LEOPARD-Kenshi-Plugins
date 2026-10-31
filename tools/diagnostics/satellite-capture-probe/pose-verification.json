@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-31T22:40:16.557715+00:00",
+  "dll_sha256": "67a2fcb75095c55b3fedc1013871f669e39e86379bc02583519c79a026449c8c",
+  "bytes": 88576,
+  "status": "Built and reviewed; not installed. Matrix evidence pending.",
+  "checks": {
+    "policy": 13,
+    "production_attachment": 11,
+    "native_imports": 62,
+    "source_contracts": "passed",
+    "diff_check": "passed"
+  },
+  "changes": [
+    "Manual-request-only parent cached transforms and camera pose/view/projection telemetry",
+    "No Node Updated getters; no corrective clone behavior change",
+    "Nonfinite matrix entry counter; before-aim and pre-shot stages distinct"
+  ],
+  "review": "global_satellite_research: no ownership/cache-baseline blocker; nonfinite caveat corrected",
+  "sources": {
+    "CaptureProbe.cpp": "de1703c025585738f8108691c9d2200cf59d30096998120149f6f01e5ab9e7e7",
+    "ProbePolicy.h": "191b9386f97c44639ee7b701423d9c0f7ed3c719b18912e77a96fe8e283aa7ac",
+    "OwnedCameraAttachment.h": "d44ef54bbc926641ed7083ee276066a15ea491391d8ddc756d14523e64629d7a"
+  }
+}

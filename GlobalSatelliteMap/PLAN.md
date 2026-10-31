@@ -40,7 +40,7 @@ the main camera and its node, and leaves all destruction to existing tracked
 cleanup. RED reproduced the existing-parent failure; GREEN11attachment tests,
 13projection/cleanup checks and55native imports. Corrected81408-byte DLL
 SHA256d8db85d1a8d4d7864b7a96cfbd92e8f124752b60e83e599396f3183095cf4a42
-was installed with the game closed. First successful mode0 capture is pending.
+was installed with the game closed. All five control modes subsequently produced BMPs.
 No shader/game data file or native save was edited.
 
 Next: same paused camera with global map open, mode0 then1 (control geometry),
@@ -50,3 +50,23 @@ to8192, acquiring render-only remote geometry or claiming illumination solved.
 The native deferred shaders reconstruct perspective radial depth; plain
 PT_ORTHOGRAPHIC still does not establish correct lighting. Existing root/distant
 render geometry does not establish complete unloaded/player/modded structures.
+
+### Control evidence obtained, 2026-11-01
+
+All five modes were captured in process31268/startUTC2026-10-31T22:19:51.2039120Z.
+Mode0 shows Hub buildings/terrain. Mode1's geometry differs from its supposed main-camera
+clone (GBuffer101 versus4367 colors and different depth). Mode2/3 share byte-identical
+GBuffer0 but markedly different final illumination; mode3/4 top-down images are close.
+This narrows the next work to camera transform-cache timing and native camera-dependent
+lighting, rather than assuming an independent camera cannot render geometry.
+
+Private evidence manifest and filtered log are in
+game/_codex_work/global-satellite-20261101/controls-31268. Raw images are diagnostic,
+not release art or completed8K tiles. Ordinary map/background view was visible afterward;
+full state restoration/performance and remote-world coverage remain open.
+
+Next candidate adds bounded per-request parent cache, camera pose, actual view/projection,
+cull/LOD and nonfinite-entry telemetry at clone/before-aim/pre-shot. It deliberately does
+not refresh the new node before baseline: actual Ogre convertWorldToLocal reads cached
+parent data directly. After this measurement, select one corrective transform experiment.
+The perspective radial-depth lighting limitation remains independent of this clone defect.

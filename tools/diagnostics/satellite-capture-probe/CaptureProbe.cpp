@@ -4,6 +4,7 @@
 #include <wincrypt.h>
 #include <cstdio>
 #include <cstring>
+#include <float.h>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -213,6 +214,79 @@ bool Supported(Ogre::Camera *c)
 {
     return c && !c->isCustomViewMatrixEnabled() && !c->isCustomProjectionMatrixEnabled() &&
            !c->isReflected() && !c->isWindowSet() && !c->isCustomNearClipPlaneEnabled();
+}
+// Manual-request telemetry only. Do not call Node's *Updated getters here:
+// refreshing the new node before the baseline would hide the suspected stale cache.
+void NodeSample(const char *stage, Ogre::SceneNode *node)
+{
+    if (!node)
+        return;
+    const Ogre::Vector3 local = node->getPosition(), cached = node->_getDerivedPosition(),
+                        scale = node->_getDerivedScale();
+    const Ogre::Quaternion localQ = node->getOrientation(), cachedQ = node->_getDerivedOrientation();
+    std::ostringstream s;
+    s.precision(9);
+    s << "node sample " << stage << " node=" << node << " parent=" << node->getParent()
+      << " local=" << local.x << ',' << local.y << ',' << local.z
+      << " cached=" << cached.x << ',' << cached.y << ',' << cached.z
+      << " localQ=" << localQ.w << ',' << localQ.x << ',' << localQ.y << ',' << localQ.z
+      << " cachedQ=" << cachedQ.w << ',' << cachedQ.x << ',' << cachedQ.y << ',' << cachedQ.z
+      << " cachedScale=" << scale.x << ',' << scale.y << ',' << scale.z;
+    Log(s.str());
+}
+void CameraSample(const char *stage, const char *label, Ogre::Camera *c,
+                  const Ogre::Matrix4 &view, const Ogre::Matrix4 &projection)
+{
+    const Ogre::Vector3 local = c->getPosition(), derived = c->getDerivedPosition();
+    const Ogre::Quaternion q = c->getDerivedOrientation();
+    std::ostringstream s;
+    s.precision(9);
+    s << "camera sample " << stage << ' ' << label << " camera=" << c
+      << " parent=" << c->getParentSceneNode()
+      << " local=" << local.x << ',' << local.y << ',' << local.z
+      << " derived=" << derived.x << ',' << derived.y << ',' << derived.z
+      << " derivedQ=" << q.w << ',' << q.x << ',' << q.y << ',' << q.z
+      << " near/far=" << c->getNearClipDistance() << ',' << c->getFarClipDistance()
+      << " fov/aspect=" << c->getFOVy().valueRadians() << ',' << c->getAspectRatio()
+      << " cull=" << c->getCullingFrustum() << " lod=" << c->getLodCamera() << " view=";
+    for (unsigned row = 0; row < 4; ++row)
+        for (unsigned col = 0; col < 4; ++col)
+            s << view[row][col] << ',';
+    s << " projection=";
+    for (unsigned row = 0; row < 4; ++row)
+        for (unsigned col = 0; col < 4; ++col)
+            s << projection[row][col] << ',';
+    Log(s.str());
+}
+void CameraPairSample(const char *stage, Ogre::Camera *mainCamera, Ogre::Camera *owned)
+{
+    NodeSample(stage, owned->getParentSceneNode());
+    const Ogre::Matrix4 mainView = mainCamera->getViewMatrix(true),
+                        ownView = owned->getViewMatrix(true),
+                        mainProjection = mainCamera->getProjectionMatrix(),
+                        ownProjection = owned->getProjectionMatrix();
+    double viewDelta = 0, projectionDelta = 0;
+    unsigned nonFinite = 0;
+    for (unsigned row = 0; row < 4; ++row)
+        for (unsigned col = 0; col < 4; ++col)
+        {
+            if (!_finite(mainView[row][col]) || !_finite(ownView[row][col]) ||
+                !_finite(mainProjection[row][col]) || !_finite(ownProjection[row][col]))
+                ++nonFinite;
+            else
+            {
+                viewDelta = (std::max)(viewDelta, std::fabs(double(mainView[row][col]) - ownView[row][col]));
+                projectionDelta = (std::max)(projectionDelta,
+                    std::fabs(double(mainProjection[row][col]) - ownProjection[row][col]));
+            }
+        }
+    CameraSample(stage, "main", mainCamera, mainView, mainProjection);
+    CameraSample(stage, "owned", owned, ownView, ownProjection);
+    std::ostringstream s;
+    s.precision(9);
+    s << "camera pair " << stage << " max view delta=" << viewDelta
+      << " projection delta=" << projectionDelta << " nonfinite entries=" << nonFinite;
+    Log(s.str());
 }
 struct CameraScope
 {
@@ -501,11 +575,13 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                 exposure.Apply();
                 proxy.Apply();
                 Ogre::Camera *cam = (mode == 0 || mode == 4) ? renderer->camera : own;
+                CameraPairSample("before-aim", renderer->camera, own);
                 cam->setAutoAspectRatio(false);
                 if (mode >= 2)
                     Aim(cam);
                 if (mode == 3)
                     renderer->camera = own;
+                CameraPairSample("pre-shot", camera.binding, own);
                 if (!shot)
                     throw std::runtime_error("probe workspace unavailable");
                 std::ostringstream terrainBefore;
@@ -668,6 +744,7 @@ void Update(MapScreen *map)
         ownNodeId = ownNode->getId();
         if(!ProbeOwnership::AttachOwnedCamera(own,c,ownNode))
             throw std::runtime_error("owned camera attachment refused");
+        NodeSample("before-clone", ownNode);
         own->setPosition(ownNode->convertWorldToLocalPosition(c->getDerivedPosition()));
         own->setOrientation(ownNode->convertWorldToLocalOrientation(c->getDerivedOrientation()));
         own->setOrthoWindow(c->getOrthoWindowWidth(), c->getOrthoWindowHeight());
@@ -681,6 +758,7 @@ void Update(MapScreen *map)
         own->setUseRenderingDistance(c->getUseRenderingDistance());
         own->setUseMinPixelSize(c->getUseMinPixelSize());
         own->setAutoAspectRatio(false);
+        CameraPairSample("after-clone", c, own);
         target = Ogre::TextureManager::getSingleton().createManual(
             "LEOPARD_PrivateCaptureTarget", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
             Ogre::TEX_TYPE_2D, Side, Side, 1, 0, Ogre::PF_A8R8G8B8, Ogre::TU_RENDERTARGET);
