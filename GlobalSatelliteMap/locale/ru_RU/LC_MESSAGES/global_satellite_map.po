@@ -1,0 +1,29 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GlobalSatelliteMap development\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Satellite view is unavailable: genuine captures for this saved world are missing or invalid. The normal map remains visible."
+msgstr "Спутниковый вид недоступен: настоящие снимки этого сохранения отсутствуют или не прошли проверку. Обычная карта остаётся видимой."
+
+msgid "Development prototype: displays verified static captures on the global map. Native dynamic lighting and unloaded buildings are still under development."
+msgstr "Прототип разработки: показывает проверенные статические снимки на глобальной карте. Живое освещение и выгруженные здания ещё в разработке."
+
+msgid "Global map"
+msgstr "Глобальная карта"
+
+msgid "Satellite view"
+msgstr "Спутниковый вид"
+
+msgid "Optional global-map layer. Requires genuine captures for this saved world; the minimap keeps its existing map source."
+msgstr "Дополнительный слой глобальной карты. Нужны настоящие снимки этого сохранения; источник изображения миникарты не меняется."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."
+msgstr "Записывать подробную диагностику в RE_Kenshi_log.txt. Ошибки записываются всегда."
