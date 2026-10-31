@@ -114,7 +114,13 @@
     "Organize-the-Trader": {
       "nexus": 2212,
       "workshop_id": 3813852189,
-      "version": "6"
+      "version": "7",
+      "content_manifest": "5485947977971037979",
+      "dll_sha256": "b8d38620aba81d82e32464be5c3f6da46544923ddfc4cdd9e69e2b82100a4346",
+      "preview_sha256": "fd283f3ea5b362fff3ef97b8d8331aef3da2b25b48b8d746e55fe64a973f6382",
+      "archive_sha256": "0ad54d6a76b9ca371aeb791e7ec0d39498f9a472bd36fb9261413fa31b260047",
+      "published_utc": "2026-10-31T23:33:55.937439+00:00",
+      "bilingual_change_note_sha256": "1290b45e5f0a44618a959d85042893ad01584b2a0bc3f4f61ff02fb6b7fb4a29"
     },
     "Vital-Read": {
       "nexus": 2213,
