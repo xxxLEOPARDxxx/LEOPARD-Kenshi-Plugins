@@ -54,6 +54,7 @@
 #include "OwnedCameraAttachment.h"
 #include "OwnedCameraPose.h"
 #include "PositionShader.h"
+#include "SunShader.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -86,6 +87,16 @@ const char *PositionMaterialName = "LEOPARD_PrivateCapturePositionMaterial";
 const char *PositionVertexName = "LEOPARD_PrivateCapturePositionVertex";
 const char *PositionFragmentName = "LEOPARD_PrivateCapturePositionFragment";
 const char *PositionTargetName = "LEOPARD_PrivateCapturePositionTarget";
+Ogre::TexturePtr sunTarget;
+Ogre::MaterialPtr sunMaterial;
+Ogre::HighLevelGpuProgramPtr sunFragment;
+Ogre::CompositorWorkspace *sunWorkspace = NULL;
+bool sunDefinitionsReady = false, sunDefinitionsFailed = false;
+const char *SunNodeName = "LEOPARD_PrivateCaptureSunNode";
+const char *SunWorkspaceName = "LEOPARD_PrivateCaptureSunWorkspace";
+const char *SunMaterialName = "LEOPARD_PrivateCaptureSunMaterial";
+const char *SunFragmentName = "LEOPARD_PrivateCaptureSunFragment";
+const char *SunTargetName = "LEOPARD_PrivateCaptureSunTarget";
 Ogre::CompositorWorkspaceListener *previous = NULL;
 Ogre::CompositorWorkspaceListener *ourListener = NULL;
 std::vector<hand> handles;
@@ -561,11 +572,15 @@ void PreparePositionPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *
     positionVertex->setParameter("entry_point", "main_vs");
     positionVertex->setParameter("target", "vs_4_0");
     positionVertex->load();
+    if (!positionVertex->isSupported() || positionVertex->hasCompileError())
+        throw std::runtime_error("private position vertex shader unsupported");
     positionFragment = programs.createProgram(PositionFragmentName, group, "hlsl", Ogre::GPT_FRAGMENT_PROGRAM);
     positionFragment->setSource(PositionShaderSource);
     positionFragment->setParameter("entry_point", "main_ps");
     positionFragment->setParameter("target", "ps_4_0");
     positionFragment->load();
+    if (!positionFragment->isSupported() || positionFragment->hasCompileError())
+        throw std::runtime_error("private position fragment shader unsupported");
     positionMaterial = materials.create(PositionMaterialName, group);
     positionMaterial->removeAllTechniques();
     Ogre::Pass *pass = positionMaterial->createTechnique()->createPass();
@@ -630,6 +645,148 @@ void InspectPositionPass(Ogre::Camera *camera, const std::vector<float> &depth)
       << " max radial error metres=" << maxRadialError;
     Log(s.str());
 }
+Ogre::Vector4 SharedVector(const char *set, const char *name, unsigned count)
+{
+    Ogre::GpuSharedParametersPtr p = Ogre::GpuProgramManager::getSingleton().getSharedParameters(set);
+    const Ogre::GpuConstantDefinition &d = p->getConstantDefinition(name);
+    if (d.arraySize != 1 || d.constType != (count == 3 ? Ogre::GCT_FLOAT3 : Ogre::GCT_FLOAT4))
+        throw std::runtime_error("sun shared parameter type mismatch");
+    const float *v = static_cast<const Ogre::GpuSharedParameters *>(p.get())->getFloatPointer(d.physicalIndex);
+    Ogre::Vector4 result(0,0,0,0);
+    for (unsigned i=0;i<count;++i)
+    {
+        if (!_finite(v[i])) throw std::runtime_error("sun shared parameter nonfinite");
+        result[i] = v[i];
+    }
+    return result;
+}
+Ogre::Vector3 AsVector3(const Ogre::Vector4 &v) { return Ogre::Vector3(v.x,v.y,v.z); }
+void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene,
+                    Ogre::Camera *camera, const Ogre::CompositorChannel &gb)
+{
+    if (manager != positionDefinitionOwner || sunDefinitionsFailed)
+        throw std::runtime_error("sun definition ownership incomplete; restart diagnostic");
+    if (!sunDefinitionsReady)
+    {
+        if (manager->hasNodeDefinition(Ogre::IdString(SunNodeName)) ||
+            manager->hasWorkspaceDefinition(Ogre::IdString(SunWorkspaceName)))
+            throw std::runtime_error("private sun definition name collision");
+        sunDefinitionsFailed = true;
+        Ogre::CompositorNodeDef *node = manager->addNodeDefinition(SunNodeName);
+        node->addTextureSourceName("rt_output",0,Ogre::TextureDefinitionBase::TEXTURE_INPUT);
+        node->setNumTargetPass(1);
+        Ogre::CompositorTargetDef *rt = node->addTargetPass("rt_output");
+        rt->setNumPasses(1);
+        Ogre::CompositorPassQuadDef *quad =
+            static_cast<Ogre::CompositorPassQuadDef *>(rt->addPass(Ogre::PASS_QUAD));
+        quad->mUseQuad = true;
+        quad->mMaterialName = SunMaterialName;
+        manager->addWorkspaceDefinition(Ogre::IdString(SunWorkspaceName))->connectOutput(Ogre::IdString(SunNodeName),0);
+        sunDefinitionsReady = true;
+        sunDefinitionsFailed = false;
+    }
+    Ogre::MaterialManager &materials = Ogre::MaterialManager::getSingleton();
+    Ogre::HighLevelGpuProgramManager &programs = Ogre::HighLevelGpuProgramManager::getSingleton();
+    Ogre::TextureManager &textures = Ogre::TextureManager::getSingleton();
+    if (materials.resourceExists(SunMaterialName) || programs.resourceExists(SunFragmentName) ||
+        textures.resourceExists(SunTargetName))
+        throw std::runtime_error("private sun resource name collision");
+    Ogre::MaterialPtr source = materials.getByName("Main_Lighting_NoShadow");
+    if (source.isNull()) throw std::runtime_error("native no-shadow material missing");
+    sunFragment = programs.createProgram(SunFragmentName,
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,"hlsl",Ogre::GPT_FRAGMENT_PROGRAM);
+    sunFragment->setSource(SunShaderSource);
+    sunFragment->setParameter("entry_point","main_ps");
+    sunFragment->setParameter("target","ps_4_0");
+    sunFragment->setParameter("enable_backwards_compatibility","true");
+    sunFragment->setParameter("preprocessor_defines","DX11=1");
+    sunFragment->load();
+    if (!sunFragment->isSupported() || sunFragment->hasCompileError())
+        throw std::runtime_error("private sun fragment shader unsupported");
+    // Clone only resource configuration. Read installed native ambient/IBL textures;
+    // replace every GPU parameter binding and all compositor texture bindings privately.
+    sunMaterial = source->clone(SunMaterialName);
+    if (sunMaterial->getNumTechniques()!=1 || sunMaterial->getTechnique(0)->getNumPasses()!=1)
+        throw std::runtime_error("unexpected native no-shadow material structure");
+    Ogre::Pass *pass = sunMaterial->getTechnique(0)->getPass(0);
+    if (pass->getNumTextureUnitStates()!=6)
+        throw std::runtime_error("unexpected native no-shadow texture layout");
+    pass->setLightingEnabled(false);
+    pass->setDepthCheckEnabled(false);
+    pass->setDepthWriteEnabled(false);
+    pass->setVertexProgram(PositionVertexName);
+    pass->setFragmentProgram(SunFragmentName);
+    for (unsigned i=0;i<3;++i)
+    {
+        Ogre::TextureUnitState *unit = pass->getTextureUnitState(i);
+        unit->setContentType(Ogre::TextureUnitState::CONTENT_NAMED);
+        unit->setTexture(gb.textures[i]);
+        unit->setTextureFiltering(Ogre::TFO_NONE);
+    }
+    sunMaterial->load();
+    sunTarget = textures.createManual(SunTargetName,
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,Ogre::TEX_TYPE_2D,
+        Side,Side,1,0,Ogre::PF_FLOAT32_RGBA,Ogre::TU_RENDERTARGET);
+    sunWorkspace = manager->addWorkspace(scene,sunTarget->getBuffer()->getRenderTarget(),camera,
+        Ogre::IdString(SunWorkspaceName),false);
+}
+void InspectSunPass(Ogre::Camera *camera, const std::string &prefix)
+{
+    if (!sunWorkspace || sunMaterial.isNull()) throw std::runtime_error("sun workspace missing");
+    Ogre::GpuProgramParametersSharedPtr p = sunMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+    Ogre::Quaternion basis = camera->getDerivedOrientation();
+    basis.normalise();
+    const Ogre::Vector3 reference = AsVector3(SharedVector("SharedDeferredParams","camera",3));
+    const Ogre::Vector3 delta = camera->getDerivedPosition()-reference;
+    const Ogre::Vector3 direction = AsVector3(SharedVector("SharedSkyParams","sunDirection",3));
+    if (direction.squaredLength()<1e-8f) throw std::runtime_error("sun direction invalid");
+    const Ogre::Vector4 sun = SharedVector("SharedSkyParams","sunColour",4),
+                        world = SharedVector("AmbientParams","worldSize",4);
+    const Ogre::Vector3 offset = AsVector3(SharedVector("SharedWaterParams","worldOffset",3));
+    p->clearAutoConstants();
+    p->removeAllSharedParameters();
+    p->setNamedConstant("captureWindow",Ogre::Vector4(camera->getOrthoWindowWidth(),camera->getOrthoWindowHeight(),camera->getFarClipDistance(),float(Side)));
+    p->setNamedConstant("captureRight",basis.xAxis());
+    p->setNamedConstant("captureUp",basis.yAxis());
+    p->setNamedConstant("captureBack",basis.zAxis());
+    p->setNamedConstant("captureCameraDelta",delta);
+    p->setNamedConstant("sunDirection",direction);
+    p->setNamedConstant("sunColour",sun);
+    p->setNamedConstant("envColour",SharedVector("AmbientParams","envColour",4));
+    p->setNamedConstant("ambientParams",SharedVector("AmbientParams","ambientParams",4));
+    p->setNamedConstant("worldSize",world);
+    p->setNamedConstant("worldOffset",offset);
+    std::ostringstream state;
+    state.precision(9);
+    state << "private sun snapshot reference="<<reference.x<<','<<reference.y<<','<<reference.z
+          <<" capture delta="<<delta.x<<','<<delta.y<<','<<delta.z
+          <<" worldOffset="<<offset.x<<','<<offset.y<<','<<offset.z
+          <<" worldSize="<<world.x<<','<<world.y<<','<<world.z<<','<<world.w
+          <<" sunDirection="<<direction.x<<','<<direction.y<<','<<direction.z
+          <<" sunColour="<<sun.x<<','<<sun.y<<','<<sun.z<<','<<sun.w;
+    Log(state.str());
+    sunWorkspace->_update();
+    std::vector<float> pixels(Side*Side*4);
+    Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_RGBA,&pixels[0]);
+    sunTarget->getBuffer()->blitToMemory(box);
+    unsigned valid=0,nonfinite=0;double total=0,maximum=0;
+    for (unsigned i=0;i<Side*Side;++i)
+    {
+        const float *v=&pixels[i*4];
+        if (!_finite(v[0])||!_finite(v[1])||!_finite(v[2])||!_finite(v[3])) {++nonfinite;continue;}
+        if (v[3]<.5f) continue;
+        ++valid;
+        const double luminance=.2126*v[0]+.7152*v[1]+.0722*v[2];
+        total+=luminance;maximum=(std::max)(maximum,luminance);
+    }
+    std::ostringstream s;s.precision(9);
+    s<<"private sun linear HDR valid="<<valid<<" nonfinite="<<nonfinite
+     <<" mean luminance="<<(valid?total/valid:0)<<" max luminance="<<maximum
+     <<"; no shadows/fog/local lights/water or tonemapping";
+    Log(s.str());
+    if (nonfinite) throw std::runtime_error("private sun nonfinite output; no BMP saved");
+    Save(sunTarget,prefix+"_sun_noShadow_linear_clamped");
+}
 void Drop()
 {
     if (!OnMain())
@@ -637,7 +794,7 @@ void Drop()
     Renderer *current = au ? au->render : NULL;
     Ogre::CompositorManager2 *manager =
         current && current->root ? current->root->getCompositorManager2() : NULL;
-    if (!ProbePolicy::SafeAuxiliaryCleanup(positionWorkspace != NULL, positionDefinitionOwner, manager))
+    if (!ProbePolicy::SafeAuxiliaryCleanup(positionWorkspace != NULL || sunWorkspace != NULL, positionDefinitionOwner, manager))
     {
         // An unknown manager is not proof that the workspace/its raw Pass* died.
         // Retain this single bounded resource set until process exit; no more shots.
@@ -663,6 +820,20 @@ void Drop()
     // Preserve forwarding if an external listener wrapped ours in the intervening frame.
     if (detached)
         previous = NULL;
+    if (manager && ManagerAccess::Contains(manager, sunWorkspace)) manager->removeWorkspace(sunWorkspace);
+    sunWorkspace=NULL;
+    if (!sunMaterial.isNull())
+    {
+        Ogre::MaterialManager::getSingleton().remove(SunMaterialName);sunMaterial.setNull();
+    }
+    if (!sunTarget.isNull())
+    {
+        Ogre::TextureManager::getSingleton().remove(SunTargetName);sunTarget.setNull();
+    }
+    if (!sunFragment.isNull())
+    {
+        Ogre::HighLevelGpuProgramManager::getSingleton().remove(SunFragmentName);sunFragment.setNull();
+    }
     if (manager && ManagerAccess::Contains(manager, positionWorkspace))
         manager->removeWorkspace(positionWorkspace);
     positionWorkspace = NULL;
@@ -823,7 +994,10 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                    << " max=" << maxDepth;
                 Log(ds.str());
                 if (mode >= 2)
+                {
                     InspectPositionPass(cam, depth);
+                    InspectSunPass(cam,prefix.str());
+                }
                 Log("one-shot diagnostic saved; GBuffer0 is encoded YCoCg, not player artwork");
             }
             catch (const std::exception &e)
@@ -959,6 +1133,7 @@ void Update(MapScreen *map)
                     throw std::runtime_error("position pass requires three GBuffer surfaces");
                 PreparePositionPass(renderer->root->getCompositorManager2(), renderer->scene,
                                     cam, gb.textures[2]);
+                PrepareSunPass(renderer->root->getCompositorManager2(),renderer->scene,cam,gb);
             }
         }
         gameWorkspace = renderer->workspace;

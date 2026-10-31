@@ -88,3 +88,11 @@ One fixed definition pair; request-only work; no shared game shaders/providers a
 Unknown auxiliary workspace ownership retains the bounded resource set and disables further
 requests. Next acceptance is actual game shader compilation/reprojection/readback; this
 alone still cannot prove depth Y orientation or sun/shadow/fog/water correctness.
+
+Actual mode3 position pass succeeded in the game:262144 valid,0invalid/nonfinite,maxNDC0,
+max radial residual0.000370985419m. Native sun/ambient next candidate reuses installed PBR
+includes and native no-shadow texture configuration, explicit capture basis/parallel view
+direction and private frozen shared values. Ambient UV accounts for the camera already
+baked into native worldSize.zw;45actual-HLSL reference-camera cases and an omitted-delta
+mutant cover this offset. Its separate linear HDR target/BMP is diagnostic, with no shadows,
+fog, local lights, water or tone mapping. Runtime compilation/reference telemetry comes next.

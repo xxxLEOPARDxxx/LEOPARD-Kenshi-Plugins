@@ -114,6 +114,38 @@ resource set, disable requests and require process restart rather than freeing a
 still referenced by another workspace. Production policy regressions cover this path.
 All scans, allocations/readbacks and logs are explicit-request-only, not normal-frame work.
 
+Position-only runtime acceptance: DLL `d6e8bf679497398f261dd048c8d73932f0e9f43a95a1cb6dd1d34e96f4e027c0`
+in process20484/startUTC2026-10-31T23:19:01.2682270Z, mode3/cell-51,3 produced262144 valid,
+0invalid/0nonfinite, maximum NDC error0, maximum radial error0.000370985419m. This confirms
+real game shader compilation and float-target readback/algebra, not all geometry conventions.
+
+## Private sun/ambient candidate (not runtime accepted)
+
+SunProbe.hlsl reuses the installed game's constants/GBuffer/PBR includes; those assets are
+not copied into this repository. It reconstructs orthographic view position, uses explicit
+camera right/up/back axes and a constant surface-to-camera direction. It retains native
+metalness, gloss, emissive/translucency and sun/environment equations. The private material
+clones configuration from Main_Lighting_NoShadow: slots0..2 become explicit named private
+GBuffer references,3ambientmap/4irradiance/5specularity retain that source's configuration.
+This is not proof of active RTW/CSM runtime texture identity or arbitrary shader-mod support.
+
+SharedSkyParams, AmbientParams, SharedWaterParams and SharedDeferredParams are read through
+const access after the geometry shot. Values are frozen into private shader parameters,
+with no automatic or shared subscriptions. Native shared values/materials/programs are not
+written. Matching native code stores a reference camera and bakes its X/Z into worldSize.zw;
+therefore relativeWorld uses capturePosition-referenceCamera+captureBasis*viewPosition before
+the stock ambient-map UV equation. This avoids double-counting reference-camera position.
+The45 additional actual-HLSL WARP cases compare against independent global UV targets;
+omitting camera delta in a test-only mutant fails all45 cases. Real sun PS compiles as SM4.
+
+One additional fixed definition pair and per-request private material/fragment/FP32 target
+are owned by the same manager guard. Sun workspace is removed before its resources and the
+shared private position vertex program. Output logs the shared reference, camera delta,
+world offset/size, sun direction/colour and linear HDR mean/max/nonfinite statistics. The
+extra BMP is explicitly labelled noShadow_linear_clamped: it is a diagnostic conversion,
+not a tonemapped finished map. There are no shadows, fog, local lights or water in this pass.
+All16x8K geometry, day/night/shadow/water correctness and performance remain unfinished.
+
 This is a feasibility experiment for the requested global 4×4 atlas of 8192-square tiles and a native dynamic layer. It does not implement that full feature and does not generate any map art automatically. Source, build products, diagnostics and tests stay in this private directory. No global-map viewer/shared source files were changed during this spike.
 
 `SatelliteCaptureProbe.dll` attaches only the native map update observer after matching the actual RE executable SHA-256 `504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e`, loaded PE timestamp/image size, and three native code windows. Normal KenshiLib exports install the observer; raw RVA function calls are absent. The byte profile also guards the DistantTown evidence against a different game build. Other plugins may cause a guard refusal if they modify these checked functions.

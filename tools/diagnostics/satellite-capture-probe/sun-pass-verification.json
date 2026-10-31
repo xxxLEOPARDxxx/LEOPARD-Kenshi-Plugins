@@ -1,0 +1,40 @@
+{
+  "utc": "2026-10-31T23:44:43.579658+00:00",
+  "dll_sha256": "608024b4d248d85e60418c3c9b9f4248b026d14995ae650795a56bdab98a35d0",
+  "bytes": 126976,
+  "status": "Built and independently reviewed; not installed/runtime tested",
+  "checks": {
+    "position_HLSL_WARP": 33,
+    "reference_camera_HLSL_WARP": 45,
+    "policy": 17,
+    "attachment": 11,
+    "pose": 13,
+    "native_imports": 112,
+    "actual_SM4_shaders": "compiled",
+    "source_contracts": "passed"
+  },
+  "red_reference_mutant": "omitting camera delta failed all45 GPU cases",
+  "review": "global_satellite_research source/math/texture configuration/cleanup clear; active RTW/CSM texture identity not claimed",
+  "sources": {
+    "tools/diagnostics/satellite-capture-probe/CaptureProbe.cpp": "897bec5e194a91645e20d5a7cb46c2f82a2ce60d06c91cdc241793830cb39e7a",
+    "tools/diagnostics/satellite-capture-probe/embed_position_shader.py": "016209853007957f31e680e584eae08ea02e6aaedbc282b50732d1055c5d4257",
+    "GlobalSatelliteMap/shaders/OrthographicPosition.hlsl": "266fa7e479d04f01ddda33a804cdd7bccf3651692d788d9c758a2506b7d13f59",
+    "GlobalSatelliteMap/shaders/SunProbe.hlsl": "249c7b3dd7794bf7a9bcfb1709f3f29f381be9daca8f87dcf95c3292092d6259",
+    "GlobalSatelliteMap/tests/orthographic_position_cs.hlsl": "313e263f485e721e90c563efca8fcba6b5fb84e18d1bb85fb9a35c878bfb3124",
+    "GlobalSatelliteMap/tests/orthographic_position_warp.cpp": "375f75f423365919a709d11065130daa46b745aeca078ed0ee9d2056bff16053",
+    "GlobalSatelliteMap/tests/run_shader_tests.ps1": "ad029c921183f8c186aca512503d8b0b359213dc77e5895467b13c4a3e017bbf"
+  },
+  "installed_native_dependencies": {
+    "data/materials/common/constants.hlsl": "724c4b4f370ce4fa6a14d16e3cf7b2a82c076f8ff623110fd1d8ab25ab920530",
+    "data/materials/deferred/gbuffer.hlsl": "d6a525658f224379269369c9adaa928fc82a72285aed5cffb21d077df4c9c943",
+    "data/materials/common/lightingFunctions.hlsl": "51dd7cec6f898b3a79352067dbfbe586c1d364967154609ed821667d22966f9f",
+    "data/materials/deferred/deferred.material": "bb2bbc16a7cb70c619e34903924477d22431a1aa9e1f8a185350896a7562c143",
+    "data/materials/common/common.program": "85c10a97ad80b8cc3d74db2c23da673a1f61453bb5e37481dc9d364eb1143183"
+  },
+  "limits": [
+    "Sun/ambient/emissive only; no shadows/fog/local lights/water",
+    "Uses source NoShadow texture configuration, not proved runtime RTW/CSM identity",
+    "Linear-clamped BMP is diagnostic; HDR statistics govern brightness",
+    "No world-atlas/FPS/long-memory acceptance"
+  ]
+}

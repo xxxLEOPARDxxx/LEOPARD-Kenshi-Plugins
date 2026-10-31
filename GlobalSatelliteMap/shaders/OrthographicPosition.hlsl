@@ -18,4 +18,13 @@ bool SatelliteOrthographicPosition(float2 lateral, float radialDistance, out flo
     viewPosition = float3(lateral, -sqrt(max(0.0f, forwardSquared)));
     return true;
 }
+float3 SatelliteReferenceRelativePosition(float3 viewPosition, float3 captureCameraDelta,
+                                        float3 right, float3 up, float3 back)
+{
+    return captureCameraDelta + right * viewPosition.x + up * viewPosition.y + back * viewPosition.z;
+}
+float2 SatelliteAmbientUV(float3 relativeWorld, float3 worldOffset, float4 worldSize)
+{
+    return (relativeWorld.xz + worldOffset.xz) * worldSize.xy + worldSize.zw;
+}
 #endif

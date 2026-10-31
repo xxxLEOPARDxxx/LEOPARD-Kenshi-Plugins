@@ -2,7 +2,7 @@
   "utc": "2026-10-31T23:16:25.517167+00:00",
   "dll_sha256": "d6e8bf679497398f261dd048c8d73932f0e9f43a95a1cb6dd1d34e96f4e027c0",
   "bytes": 105984,
-  "status": "Built/reviewed candidate, NOT installed or game validated",
+  "status": "Installed and runtime shader-position check passed; full renderer incomplete",
   "checks": {
     "actual_hlsl_WARP_cases": 33,
     "policy": 17,
@@ -33,5 +33,31 @@
     "GlobalSatelliteMap/shaders/PositionProbe.hlsl": "25b9717a6b49ff6ad5dac71b1c0734c1c0e1f387b253697b6d5df718966a6481",
     "GlobalSatelliteMap/tests/orthographic_position_warp.cpp": "7a6674ac0bd0820639ebd2e99bc4a61bbbcb394faa91d6d09977a2484d1ac120",
     "GlobalSatelliteMap/tests/run_shader_tests.ps1": "2ae29d62a727ca4c79aa6be6d93ad67d54e7bc38aa7a51d3aa519719b84451c9"
+  },
+  "runtime": {
+    "pid": 20484,
+    "start_utc": "2026-10-31T23:19:01.2682270Z",
+    "dll_sha256": "d6e8bf679497398f261dd048c8d73932f0e9f43a95a1cb6dd1d34e96f4e027c0",
+    "mode": 3,
+    "cell": [
+      -51,
+      3
+    ],
+    "valid": 262144,
+    "invalid": 0,
+    "nonfinite": 0,
+    "max_ndc_error": 0,
+    "max_radial_error_metres": 0.000370985419,
+    "images": [
+      {
+        "name": "probe_20484_54604656_1_mode3_final.bmp",
+        "sha256": "2ba23d9645052071a3f53101c8ac2a718ab582fc917807afbadc86c51380f0b2"
+      },
+      {
+        "name": "probe_20484_54604656_1_mode3_gbuffer0_raw.bmp",
+        "sha256": "c1903ec43c0b1c6559cf23519f5c182e4dece9d9b92e2eb8842cb02071bd172c"
+      }
+    ],
+    "acceptance": "GPU shader compilation/readback and algebra only; native geometry/Y conventions and lighting not fully accepted"
   }
 }

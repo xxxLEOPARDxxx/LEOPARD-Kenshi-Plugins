@@ -31,7 +31,8 @@ int main(int argc,char**argv)
 {
     try
     {
-        if(argc!=2)throw std::runtime_error("expected compiled shader path");
+        if(argc!=2 && argc!=3)throw std::runtime_error("expected compiled shader path [reference]");
+        const bool referenceTest=argc==3;
         std::ifstream file(argv[1],std::ios::binary|std::ios::ate);
         if(!file)throw std::runtime_error("shader unavailable");
         std::streamoff bytes=file.tellg();
@@ -39,6 +40,20 @@ int main(int argc,char**argv)
         file.seekg(0);std::vector<char> code(size_t(bytes),0);file.read(&code[0],bytes);
         if(!file)throw std::runtime_error("shader truncated");
         std::vector<Case> cases;
+        if(referenceTest)
+        {
+            for(int ref=-2;ref<=2;++ref)for(int x=-1;x<=1;++x)for(int y=-1;y<=1;++y)
+            {
+                Case a={};a.input.v[0]=float(x*25600);a.input.v[1]=float(y*25600);
+                a.input.v[2]=-4000;a.input.v[3]=float(ref*10000);
+                // Independent double-precision global target, without snapshot offsets.
+                a.x=.7+(-51712.0+a.input.v[0])*1e-5;
+                a.y=.4-(3584.0-a.input.v[1])*1e-5;
+                a.z=-(ref*2500+1000);a.valid=true;cases.push_back(a);
+            }
+        }
+        else
+        {
         for(int x=-1;x<=1;++x)for(int y=-1;y<=1;++y)
         {
             Point(cases,x*512.0,y*512.0,4000,10000);
@@ -62,6 +77,7 @@ int main(int argc,char**argv)
         grazing.input.v[1]=120000;grazing.input.v[2]=24000;grazing.input.v[3]=12000;
         cases.push_back(grazing);
         Invalid(cases,float(std::sqrt(720000000.0-1400.0)/120000.0),120000,24000,12000);
+        }
         std::vector<Four> input(cases.size());
         for(size_t i=0;i<cases.size();++i)input[i]=cases[i].input;
         Com<ID3D11Device> device;Com<ID3D11DeviceContext> context;
@@ -91,13 +107,15 @@ int main(int argc,char**argv)
         {
             const Case&a=cases[i];const Four&r=result[i];
             bool ok=(r.v[3]>.5f)==a.valid;
-            if(a.valid)ok=ok&&std::fabs(r.v[0]-a.x)<.003&&std::fabs(r.v[1]-a.y)<.003&&std::fabs(r.v[2]-a.z)<.1;
+            const double xyTolerance=referenceTest?1e-5:.003;
+            if(a.valid)ok=ok&&std::fabs(r.v[0]-a.x)<xyTolerance&&std::fabs(r.v[1]-a.y)<xyTolerance&&std::fabs(r.v[2]-a.z)<.1;
             else ok=ok&&r.v[0]==0&&r.v[1]==0&&r.v[2]==0;
             if(!ok){++failures;std::cerr<<"FAIL case"<<i<<" got "<<r.v[0]<<','<<r.v[1]<<','<<r.v[2]<<','<<r.v[3]<<'\n';}
         }
         context->Unmap(staging.p,0);context->ClearState();
         if(failures){std::cerr<<failures<<" shader failures\n";return 1;}
-        std::cout<<cases.size()<<" actual HLSL orthographic-position cases passed on isolated D3D11 WARP\n";
+        std::cout<<cases.size()<<" actual HLSL "<<(referenceTest?"reference-camera":"orthographic-position")
+                 <<" cases passed on isolated D3D11 WARP\n";
         return 0;
     }
     catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 2;}
