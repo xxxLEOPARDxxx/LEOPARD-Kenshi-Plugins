@@ -71,7 +71,7 @@ ITEMS = [
             "characters nearby, discovered towns, attack alerts, Map-markers and "
             "WantedMap marks, camera range; right click to send the selected, "
             "double click to move the camera."),
-    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="11",
+    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="12",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='Interface fixes for queues, descriptions, squad panels and tooltips, plus fewer redundant name-label and status-bar updates. Works with vanilla and modded interfaces.'),
     dict(mod="PatientSelfAid", title="Patient Self Aid (QoL)", nexus=2193, version="4",

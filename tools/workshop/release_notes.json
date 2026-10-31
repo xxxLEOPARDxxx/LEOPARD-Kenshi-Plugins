@@ -38,15 +38,15 @@
     ]
   },
   "UITweaks": {
-    "version": "11",
-    "published_version": "10",
+    "version": "12",
+    "published_version": "11",
     "ru": [
-      "[b]Совместимость с Organize the Trader.[/b] UI Tweaks сохраняет его верхнюю строку: деньги торговца слева, итог сделки по центру. Центрирование обычной денежной панели больше не перекрывает эту разметку.",
-      "[b]Прежние настройки сохранены.[/b] Отдельная новая настройка не нужна; штатные денежные панели и остальные доработки интерфейса продолжают работать как раньше."
+      "[b]Последовательный обмен между персонажами.[/b] Пока открыт обмен с одним союзником, можно выбрать «Обмен» у другого через ПКМ по портрету. Если расстояние велико, персонаж штатно подбегает и открывает нужный инвентарь.",
+      "[b]Защита от кликов сквозь инвентарь сохранена.[/b] Нажатия в окне инвентаря или рюкзака не отправляют персонажа в точку под окном. Приказы через портреты, их меню и карту остаются доступны."
     ],
     "en": [
-      "[b]Organize the Trader compatibility.[/b] UI Tweaks preserves its header with trader money on the left and the deal in the centre. Normal money-panel centring no longer overrides that layout.",
-      "[b]Existing settings retained.[/b] No additional switch is needed; native money panels and the other interface improvements keep their previous behaviour."
+      "[b]Sequential squad trading.[/b] While trading with one squad member, right-click another portrait and choose Trade. When out of range, the character approaches normally and opens the requested inventory.",
+      "[b]Inventory click-through protection retained.[/b] Presses inside inventory and backpack windows cannot send the character to the ground beneath them. Portraits, their context menus and map commands remain available."
     ]
   },
   "ModConfigMenu": {

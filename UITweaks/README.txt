@@ -1,6 +1,30 @@
 UI Tweaks — доработки интерфейса, которых не сделать разметкой
 
-ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 11 (30.10.2026)
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 12 (31.10.2026)
+
+  * Последовательный обмен с союзниками через ПКМ по портрету работает
+    при уже открытом обмене. Штатный подход к далёкой цели сохранён.
+  * Защита от клика сквозь инвентарь и отдельный рюкзак сохранена.
+    Портреты, их меню и карта больше не считаются окнами инвентаря.
+  * Проверка принадлежности виджета выполняется только на новом ПКМ.
+    До 64 родителей собираются один раз на стеке; ссылки не кэшируются.
+    Существующая защёлка старого клика и пять хуков приказов не изменены.
+  * Новых настроек и переводных строк нет. Личные INI сохраняются.
+    Для загрузки заменённой DLL перезапустите игру.
+
+VERSION 12 CHANGES (31 OCTOBER 2026)
+
+  * Sequential squad trading through portrait RMB/Trade works while an
+    earlier exchange remains open. Native out-of-range approach is retained.
+  * Inventory and detached-backpack click-through protection remains active.
+    Portraits, their context menus and the map are not inventory windows.
+  * Window ancestry is checked only on a fresh RMB press. At most 64 parents
+    are collected once on the stack, with no retained widget references.
+    The existing stale-click latch and five order hooks are unchanged.
+  * No additional settings or translated strings; personal INI is preserved.
+    Restart the game to load the replacement DLL.
+
+ИСТОРИЯ: ВЕРСИЯ 11 (30.10.2026)
 
   * Совместимость с новой верхней строкой Organize the Trader:
     деньги торговца остаются слева, итог сделки — по центру.

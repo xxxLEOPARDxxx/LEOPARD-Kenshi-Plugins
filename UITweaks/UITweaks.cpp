@@ -3070,7 +3070,7 @@ namespace
     // курсор над миром). Остальные пути приказа перехватываем тоже.
     //
     // Правило: если ПКМ нажата над окном инвентаря (открыто окно
-    // инвентаря или торговли, у курсора фокус мыши MyGUI), это нажатие
+    // инвентаря или торговли, фокус мыши MyGUI внутри этого окна), это нажатие
     // «чужое» - приказы игрока отбрасываются, пока ПКМ не нажмут снова
     // над миром. Нажатие ловим по переходу кнопки из отпущенной в нажатую
     // - каждый кадр и в самих хуках (если игра отдаст приказ раньше
@@ -3093,8 +3093,33 @@ namespace
         MyGUI::Widget* const focus = input != NULL ? input->getMouseFocusWidget() : NULL;
         if (focus == NULL)
             return false;
-        where = focus->getName();
-        return true;
+
+        // Портреты, их контекстное меню и карта остаются обычными командами,
+        // даже если рядом открыта торговля. Родителей собираем один раз на
+        // новое нажатие, не обходя содержимое окон и не сохраняя указатели.
+        MyGUI::Widget* ancestors[64];
+        size_t count = 0;
+        for (MyGUI::Widget* widget = focus; widget != NULL && count < 64; widget = widget->getParent())
+            ancestors[count++] = widget;
+
+        for (auto it = gui->inventoryWindowsOpen.begin(); it != gui->inventoryWindowsOpen.end(); ++it)
+        {
+            InventoryGUI* const inventory = it->second;
+            if (inventory == NULL)
+                continue;
+            MyGUI::Widget* const window = inventory->win;
+            InventoryGUI* const child = inventory->childInventory;
+            MyGUI::Widget* const bagWindow = child != NULL ? child->win : NULL;
+            for (size_t i = 0; i < count; ++i)
+            {
+                if (ancestors[i] == window || ancestors[i] == bagWindow)
+                {
+                    where = focus->getName();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     void TrackRightButton()
