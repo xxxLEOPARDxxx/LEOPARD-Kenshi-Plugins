@@ -32,5 +32,9 @@ int main()
           "installed perspective reconstruction cannot preserve orthographic X");
     Check(std::fabs(NativeReconstructedX(0, 4000, 10000)) < 1e-12,
           "perspective model centre masks mismatch");
-    std::cout << "13 fixed-grid/projection/cleanup checks passed\n";
+    Check(SafeAuxiliaryCleanup(true,&owned,&owned),"owned auxiliary same manager cleanup");
+    Check(!SafeAuxiliaryCleanup(true,&owned,&other),"different live manager must retain auxiliary resources");
+    Check(!SafeAuxiliaryCleanup(true,&owned,NULL),"unknown manager must retain auxiliary resources");
+    Check(SafeAuxiliaryCleanup(false,&owned,NULL),"no auxiliary workspace needs no manager proof");
+    std::cout << "17 fixed-grid/projection/cleanup checks passed\n";
 }

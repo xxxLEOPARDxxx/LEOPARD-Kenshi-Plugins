@@ -3,6 +3,10 @@
 #include <cstddef>
 namespace ProbePolicy
 {
+inline bool SafeAuxiliaryCleanup(bool hasWorkspace, const void *owner, const void *current)
+{
+    return !hasWorkspace || (owner && owner == current);
+}
 template <class T> inline bool Contains(const T *const *items, std::size_t count, const T *value)
 {
     for (std::size_t i = 0; i < count; ++i)

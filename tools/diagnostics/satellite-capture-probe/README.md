@@ -82,6 +82,38 @@ terrain and buildings. Exact matrix equality is not claimed (camera quaternion r
 remains); this confirms removal of the spurious floating-origin shift only. Orthographic
 lighting, shadows/fog/water and full-world coverage remain separate unfinished stages.
 
+## Isolated position-only shader pass (candidate; not live accepted)
+
+For orthographic modes2/3/4 the next build also runs one private512-square fullscreen quad
+over the captured radial-depth texture. It uses the tested original helper at
+GlobalSatelliteMap/shaders/OrthographicPosition.hlsl, embedded together with PositionProbe.hlsl
+at build time. No game shader/material file, native MainLight provider or shared parameter
+set is modified. The depth texture is explicitly CONTENT_NAMED; programs, material and
+PF_FLOAT32_RGBA target are private. Native final BMP lighting remains unchanged.
+
+The function retains per-pixel lateral offsets and solves forward distance from radial
+depth, using Ogre's negative-Z view direction. Invalid/nonfinite/overflowing samples return
+zero and an invalid flag. A conservative relative float-rounding allowance covers near
+grazing subtraction; large-offset grazing depth is inherently ill-conditioned, so this
+does not establish0.1m accuracy for arbitrary surfaces near the camera plane. The WARP
+fixtures establish sampled4000m-forward cases and explicit tolerance boundaries.
+
+Build runs actual HLSL on an isolated D3D11 WARP device (33cases), and compiles both real
+probe vertex/pixel entry points as SM4. The initial perspective reconstruction failed23
+cases before correction. At runtime the private output is read back as float4 and compared
+with the current projection/depth: valid/invalid/nonfinite counts, maximum NDC reprojection
+and radial error. Those checks establish algebra/pipeline execution only: native image Y
+orientation, real geometry correspondence and all lighting still require live evidence.
+
+One fixed private node/workspace definition pair is reused for the manager lifetime,
+because matching Ogre exposes no singular definition-removal API. No per-shot definition
+growth is permitted. A partial definition failure disables this diagnostic until restart.
+The auxiliary workspace is removed before its material, programs, target or camera. If
+manager identity changes while it is tracked, ownership is unknown: keep this one bounded
+resource set, disable requests and require process restart rather than freeing a raw Pass
+still referenced by another workspace. Production policy regressions cover this path.
+All scans, allocations/readbacks and logs are explicit-request-only, not normal-frame work.
+
 This is a feasibility experiment for the requested global 4×4 atlas of 8192-square tiles and a native dynamic layer. It does not implement that full feature and does not generate any map art automatically. Source, build products, diagnostics and tests stay in this private directory. No global-map viewer/shared source files were changed during this spike.
 
 `SatelliteCaptureProbe.dll` attaches only the native map update observer after matching the actual RE executable SHA-256 `504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e`, loaded PE timestamp/image size, and three native code windows. Normal KenshiLib exports install the observer; raw RVA function calls are absent. The byte profile also guards the DistantTown evidence against a different game build. Other plugins may cause a guard refusal if they modify these checked functions.

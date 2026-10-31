@@ -1,0 +1,37 @@
+{
+  "utc": "2026-10-31T23:16:25.517167+00:00",
+  "dll_sha256": "d6e8bf679497398f261dd048c8d73932f0e9f43a95a1cb6dd1d34e96f4e027c0",
+  "bytes": 105984,
+  "status": "Built/reviewed candidate, NOT installed or game validated",
+  "checks": {
+    "actual_hlsl_WARP_cases": 33,
+    "policy": 17,
+    "attachment": 11,
+    "pose": 13,
+    "native_imports": 95,
+    "real_SM4_vs_ps": "compiled",
+    "source_contracts": "passed",
+    "diff_check": "passed"
+  },
+  "red": {
+    "perspective_shader": "23 real WARP cases failed",
+    "cleanup_ownership": "different live manager must retain auxiliary resources failed"
+  },
+  "review": "global_satellite_research final clear; manager mismatch retention corrected",
+  "limits": [
+    "Position-only diagnostic, no game lighting correction yet",
+    "NDC/radial residual does not prove native depth Y convention",
+    "Near-grazing large-offset radial depth is ill-conditioned",
+    "Fixed one-pair definitions retained for manager lifetime",
+    "Unknown workspace owner retains one bounded resource set and disables requests"
+  ],
+  "sources": {
+    "tools/diagnostics/satellite-capture-probe/CaptureProbe.cpp": "1bde134d81d492efb5a28e717dfc69560cd3b4d8d5f23f6613d1ad6924d1606d",
+    "tools/diagnostics/satellite-capture-probe/ProbePolicy.h": "7d8e394672e5067eba8d136ae26bc8f57511e8d01c643f1a757e6a64cbcc171b",
+    "tools/diagnostics/satellite-capture-probe/embed_position_shader.py": "084a2b3b76c31b72a3aa40d1ed14a3afbe63e070f58fa3cb95c18b7b53048a35",
+    "GlobalSatelliteMap/shaders/OrthographicPosition.hlsl": "bd97a92cc6ba08171450358b252d9ec62e52008e10313fb6388f233fb75d99cc",
+    "GlobalSatelliteMap/shaders/PositionProbe.hlsl": "25b9717a6b49ff6ad5dac71b1c0734c1c0e1f387b253697b6d5df718966a6481",
+    "GlobalSatelliteMap/tests/orthographic_position_warp.cpp": "7a6674ac0bd0820639ebd2e99bc4a61bbbcb394faa91d6d09977a2484d1ac120",
+    "GlobalSatelliteMap/tests/run_shader_tests.ps1": "2ae29d62a727ca4c79aa6be6d93ad67d54e7bc38aa7a51d3aa519719b84451c9"
+  }
+}

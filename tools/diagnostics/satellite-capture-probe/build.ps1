@@ -7,7 +7,11 @@ $kl='D:/DEV/Kenshi/KenshiLib-src/Include'
 $boost='D:/DEV/Kenshi/deps/boost_1_60_0'
 $out=Join-Path $PSScriptRoot 'build'
 New-Item -ItemType Directory -Force $out | Out-Null
-$env:INCLUDE="$vc/include;$sdk/Include;$kl;$kl/ogre;$boost;D:/DEV/Kenshi/ours/shared;$PSScriptRoot"
+& "$repo/GlobalSatelliteMap/tests/run_shader_tests.ps1"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/embed_position_shader.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+$env:INCLUDE="$vc/include;$sdk/Include;$kl;$kl/ogre;$boost;D:/DEV/Kenshi/ours/shared;$PSScriptRoot;$out"
 $env:LIB="$vc/lib/amd64;$sdk/Lib/x64;D:/DEV/Kenshi/deps/KenshiLib/Libraries;$boost/stage/lib"
 $env:PATH="$vc/bin/amd64;$env:PATH"
 & "$vc/bin/amd64/cl.exe" /nologo /c /EHsc /MD /O2 /GS- /GL /W3 /D NDEBUG /D WIN32 /D _WINDOWS /D _USRDLL /D UNICODE /D _UNICODE "/Fo$out/CaptureProbe.obj" "$PSScriptRoot/CaptureProbe.cpp"

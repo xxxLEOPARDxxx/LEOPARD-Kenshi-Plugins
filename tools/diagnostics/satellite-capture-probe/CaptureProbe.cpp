@@ -21,6 +21,14 @@
 #include <OgreRenderTexture.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreGpuProgramParams.h>
+#include <OgreHighLevelGpuProgramManager.h>
+#include <OgreHighLevelGpuProgram.h>
+#include <OgreMaterialManager.h>
+#include <OgreMaterial.h>
+#include <OgreTechnique.h>
+#include <OgrePass.h>
+#include <OgreTextureUnitState.h>
+#include <Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h>
 #include <Compositor/OgreCompositorManager2.h>
 #include <Compositor/OgreCompositorWorkspace.h>
 #include <Compositor/OgreCompositorWorkspaceDef.h>
@@ -45,6 +53,7 @@
 #include "ProbePolicy.h"
 #include "OwnedCameraAttachment.h"
 #include "OwnedCameraPose.h"
+#include "PositionShader.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -64,6 +73,19 @@ Ogre::SceneNode *ownNode = NULL;
 Ogre::SceneManager *shotScene = NULL;
 Ogre::IdType ownNodeId = 0;
 Ogre::TexturePtr target;
+Ogre::TexturePtr positionTarget;
+Ogre::MaterialPtr positionMaterial;
+Ogre::HighLevelGpuProgramPtr positionVertex, positionFragment;
+Ogre::CompositorWorkspace *positionWorkspace = NULL;
+Ogre::CompositorManager2 *positionDefinitionOwner = NULL;
+bool positionNodeDefined = false, positionWorkspaceDefined = false;
+bool positionDefinitionsFailed = false;
+const char *PositionNodeName = "LEOPARD_PrivateCapturePositionNode";
+const char *PositionWorkspaceName = "LEOPARD_PrivateCapturePositionWorkspace";
+const char *PositionMaterialName = "LEOPARD_PrivateCapturePositionMaterial";
+const char *PositionVertexName = "LEOPARD_PrivateCapturePositionVertex";
+const char *PositionFragmentName = "LEOPARD_PrivateCapturePositionFragment";
+const char *PositionTargetName = "LEOPARD_PrivateCapturePositionTarget";
 Ogre::CompositorWorkspaceListener *previous = NULL;
 Ogre::CompositorWorkspaceListener *ourListener = NULL;
 std::vector<hand> handles;
@@ -493,6 +515,121 @@ void Save(const Ogre::TexturePtr &texture, const std::string &name)
     s << name << " black pixels=" << dark << "/" << px.size();
     Log(s.str());
 }
+void PreparePositionPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene,
+                         Ogre::Camera *camera, const Ogre::TexturePtr &depth)
+{
+    if (camera->getProjectionType() != Ogre::PT_ORTHOGRAPHIC)
+        throw std::runtime_error("position pass requires orthographic camera");
+    if (positionDefinitionOwner && positionDefinitionOwner != manager)
+        throw std::runtime_error("position definition manager changed; restart diagnostic");
+    if (positionDefinitionsFailed)
+        throw std::runtime_error("partial position definition refused; restart diagnostic");
+    if (!positionDefinitionOwner)
+    {
+        if (manager->hasNodeDefinition(Ogre::IdString(PositionNodeName)) ||
+            manager->hasWorkspaceDefinition(Ogre::IdString(PositionWorkspaceName)))
+            throw std::runtime_error("private position definition name collision");
+        positionDefinitionOwner = manager;
+        positionDefinitionsFailed = true;
+        Ogre::CompositorNodeDef *node = manager->addNodeDefinition(PositionNodeName);
+        node->addTextureSourceName("rt_output", 0, Ogre::TextureDefinitionBase::TEXTURE_INPUT);
+        node->setNumTargetPass(1);
+        Ogre::CompositorTargetDef *rt = node->addTargetPass("rt_output");
+        rt->setNumPasses(1);
+        Ogre::CompositorPassQuadDef *quad =
+            static_cast<Ogre::CompositorPassQuadDef *>(rt->addPass(Ogre::PASS_QUAD));
+        quad->mUseQuad = true;
+        quad->mMaterialName = PositionMaterialName;
+        positionNodeDefined = true;
+        Ogre::CompositorWorkspaceDef *workspace =
+            manager->addWorkspaceDefinition(Ogre::IdString(PositionWorkspaceName));
+        workspace->connectOutput(Ogre::IdString(PositionNodeName), 0);
+        positionWorkspaceDefined = true;
+        positionDefinitionsFailed = false;
+    }
+    if (!positionNodeDefined || !positionWorkspaceDefined)
+        throw std::runtime_error("position definition incomplete");
+    Ogre::HighLevelGpuProgramManager &programs = Ogre::HighLevelGpuProgramManager::getSingleton();
+    Ogre::MaterialManager &materials = Ogre::MaterialManager::getSingleton();
+    Ogre::TextureManager &textures = Ogre::TextureManager::getSingleton();
+    if (programs.resourceExists(PositionVertexName) || programs.resourceExists(PositionFragmentName) ||
+        materials.resourceExists(PositionMaterialName) || textures.resourceExists(PositionTargetName))
+        throw std::runtime_error("private position resource name collision");
+    const Ogre::String &group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+    positionVertex = programs.createProgram(PositionVertexName, group, "hlsl", Ogre::GPT_VERTEX_PROGRAM);
+    positionVertex->setSource(PositionShaderSource);
+    positionVertex->setParameter("entry_point", "main_vs");
+    positionVertex->setParameter("target", "vs_4_0");
+    positionVertex->load();
+    positionFragment = programs.createProgram(PositionFragmentName, group, "hlsl", Ogre::GPT_FRAGMENT_PROGRAM);
+    positionFragment->setSource(PositionShaderSource);
+    positionFragment->setParameter("entry_point", "main_ps");
+    positionFragment->setParameter("target", "ps_4_0");
+    positionFragment->load();
+    positionMaterial = materials.create(PositionMaterialName, group);
+    positionMaterial->removeAllTechniques();
+    Ogre::Pass *pass = positionMaterial->createTechnique()->createPass();
+    pass->setLightingEnabled(false);
+    pass->setDepthCheckEnabled(false);
+    pass->setDepthWriteEnabled(false);
+    pass->setCullingMode(Ogre::CULL_NONE);
+    pass->setSceneBlending(Ogre::SBT_REPLACE);
+    pass->setVertexProgram(PositionVertexName);
+    pass->setFragmentProgram(PositionFragmentName);
+    Ogre::GpuProgramParametersSharedPtr parameters = positionFragment->createParameters();
+    parameters->setNamedConstant("captureWindow", Ogre::Vector4(camera->getOrthoWindowWidth(),
+        camera->getOrthoWindowHeight(), camera->getFarClipDistance(), float(Side)));
+    pass->setFragmentProgramParameters(parameters);
+    Ogre::TextureUnitState *unit = pass->createTextureUnitState();
+    unit->setContentType(Ogre::TextureUnitState::CONTENT_NAMED);
+    unit->setTexture(depth);
+    unit->setTextureFiltering(Ogre::TFO_NONE);
+    unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+    positionMaterial->load();
+    positionTarget = textures.createManual(PositionTargetName, group, Ogre::TEX_TYPE_2D,
+        Side, Side, 1, 0, Ogre::PF_FLOAT32_RGBA, Ogre::TU_RENDERTARGET);
+    positionWorkspace = manager->addWorkspace(scene, positionTarget->getBuffer()->getRenderTarget(),
+        camera, Ogre::IdString(PositionWorkspaceName), false);
+}
+void InspectPositionPass(Ogre::Camera *camera, const std::vector<float> &depth)
+{
+    if (!positionWorkspace || positionTarget.isNull())
+        throw std::runtime_error("private position workspace missing");
+    positionWorkspace->_update();
+    std::vector<float> pixels(Side * Side * 4);
+    Ogre::PixelBox box(Side, Side, 1, Ogre::PF_FLOAT32_RGBA, &pixels[0]);
+    positionTarget->getBuffer()->blitToMemory(box);
+    const Ogre::Matrix4 projection = camera->getProjectionMatrix();
+    unsigned valid = 0, invalid = 0, nonfinite = 0;
+    double maxNdc = 0, maxRadialError = 0;
+    for (unsigned y = 0; y < Side; ++y)
+        for (unsigned x = 0; x < Side; ++x)
+        {
+            const unsigned index = y * Side + x;
+            const float *p = &pixels[index * 4];
+            if (!_finite(p[0]) || !_finite(p[1]) || !_finite(p[2]) || !_finite(p[3]))
+            { ++nonfinite; continue; }
+            if (p[3] < 0.5f) { ++invalid; continue; }
+            ++valid;
+            double clip[4] = {0,0,0,0};
+            for (unsigned row = 0; row < 4; ++row)
+                clip[row] = projection[row][0]*double(p[0]) + projection[row][1]*double(p[1]) +
+                            projection[row][2]*double(p[2]) + projection[row][3];
+            if (!_finite(clip[3]) || std::fabs(clip[3]) < 1e-12)
+            { ++nonfinite; continue; }
+            maxNdc = (std::max)(maxNdc, std::fabs(clip[0]/clip[3] - ((x+0.5)*2/Side-1)));
+            maxNdc = (std::max)(maxNdc, std::fabs(clip[1]/clip[3] - (1-(y+0.5)*2/Side)));
+            const double radius = std::sqrt(double(p[0])*p[0]+double(p[1])*p[1]+double(p[2])*p[2]);
+            maxRadialError = (std::max)(maxRadialError,
+                std::fabs(radius-double(depth[index])*camera->getFarClipDistance()));
+        }
+    std::ostringstream s;
+    s.precision(9);
+    s << "private ortho position valid=" << valid << " invalid=" << invalid
+      << " nonfinite=" << nonfinite << " max NDC reprojection error=" << maxNdc
+      << " max radial error metres=" << maxRadialError;
+    Log(s.str());
+}
 void Drop()
 {
     if (!OnMain())
@@ -500,6 +637,16 @@ void Drop()
     Renderer *current = au ? au->render : NULL;
     Ogre::CompositorManager2 *manager =
         current && current->root ? current->root->getCompositorManager2() : NULL;
+    if (!ProbePolicy::SafeAuxiliaryCleanup(positionWorkspace != NULL, positionDefinitionOwner, manager))
+    {
+        // An unknown manager is not proof that the workspace/its raw Pass* died.
+        // Retain this single bounded resource set until process exit; no more shots.
+        pending = false;
+        cleanup = false;
+        chainSafe = false;
+        Log("auxiliary workspace ownership unknown; resources retained, restart diagnostic");
+        return;
+    }
     bool detached = false;
     if (manager && ManagerAccess::Contains(manager, gameWorkspace) &&
         gameWorkspace->getListener() == ourListener)
@@ -516,6 +663,29 @@ void Drop()
     // Preserve forwarding if an external listener wrapped ours in the intervening frame.
     if (detached)
         previous = NULL;
+    if (manager && ManagerAccess::Contains(manager, positionWorkspace))
+        manager->removeWorkspace(positionWorkspace);
+    positionWorkspace = NULL;
+    if (!positionMaterial.isNull())
+    {
+        Ogre::MaterialManager::getSingleton().remove(PositionMaterialName);
+        positionMaterial.setNull();
+    }
+    if (!positionTarget.isNull())
+    {
+        Ogre::TextureManager::getSingleton().remove(PositionTargetName);
+        positionTarget.setNull();
+    }
+    if (!positionVertex.isNull())
+    {
+        Ogre::HighLevelGpuProgramManager::getSingleton().remove(PositionVertexName);
+        positionVertex.setNull();
+    }
+    if (!positionFragment.isNull())
+    {
+        Ogre::HighLevelGpuProgramManager::getSingleton().remove(PositionFragmentName);
+        positionFragment.setNull();
+    }
     if (manager && ManagerAccess::Contains(manager, shot))
         manager->removeWorkspace(shot);
     shot = NULL;
@@ -652,6 +822,8 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                 ds << "GBuffer radial depth pixels=" << positive << " min=" << minDepth
                    << " max=" << maxDepth;
                 Log(ds.str());
+                if (mode >= 2)
+                    InspectPositionPass(cam, depth);
                 Log("one-shot diagnostic saved; GBuffer0 is encoded YCoCg, not player artwork");
             }
             catch (const std::exception &e)
@@ -780,6 +952,14 @@ void Update(MapScreen *map)
             shot = renderer->root->getCompositorManager2()->addWorkspace(
                 renderer->scene, target->getBuffer()->getRenderTarget(), cam,
                 DefinitionAccess::Name(def), false);
+            if (mode >= 2)
+            {
+                const Ogre::CompositorChannel &gb = shot->getGlobalTexture("global_gbuffer");
+                if (gb.textures.size() != 3)
+                    throw std::runtime_error("position pass requires three GBuffer surfaces");
+                PreparePositionPass(renderer->root->getCompositorManager2(), renderer->scene,
+                                    cam, gb.textures[2]);
+            }
         }
         gameWorkspace = renderer->workspace;
         previous = gameWorkspace->getListener();

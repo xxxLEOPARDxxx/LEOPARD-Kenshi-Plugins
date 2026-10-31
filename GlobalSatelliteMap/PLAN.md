@@ -80,3 +80,11 @@ refusal tests pass. Live check subsequently confirmed stable parent cache and ca
 view delta0.0927734 instead of50057.6874, about1.24mm positional difference and a visible
 Hub image from the cloned camera. Exact matrix equality is not claimed. Next: private
 orthographic depth reconstruction and image-based/native-lighting validation.
+
+Position reconstruction stage: original HLSL helper plus real SM4 quad is tested in isolated
+D3D11 WARP (33cases; initial perspective formula failed23). The candidate capture probe
+embeds it and runs an explicitly named private512FP32RGBA pass over its own GBuffer depth.
+One fixed definition pair; request-only work; no shared game shaders/providers altered.
+Unknown auxiliary workspace ownership retains the bounded resource set and disables further
+requests. Next acceptance is actual game shader compilation/reprojection/readback; this
+alone still cannot prove depth Y orientation or sun/shadow/fog/water correctness.
