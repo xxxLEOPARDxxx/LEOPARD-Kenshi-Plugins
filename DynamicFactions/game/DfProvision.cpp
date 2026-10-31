@@ -54,6 +54,39 @@ namespace
         }
         return best;
     }
+    const DfBudgetSnapshot& PlannedBudget(DfProvision& rt,Faction* f,
+        const std::vector<Character*>& people,int committed,unsigned long now)
+    {
+        const int money=f->factionOwnerships!=NULL ? f->factionOwnerships->money : -1;
+        if(!rt.probeValid || rt.probedAt!=now)
+        {
+            // At most512 existing handle getters once per faction step, never
+            // per candidate/shop. Keep only a serial-aware numeric fingerprint.
+            // A same-sized replacement roster must invalidate the reserve too.
+            unsigned __int64 roster=14695981039346656037ULL;
+            for(size_t i=0;i<people.size();++i)
+            {
+                if(people[i]==NULL){roster=(roster^0xffffffffU)*1099511628211ULL;continue;}
+                const hand& h=people[i]->getHandle();
+                const unsigned int fields[5]={static_cast<unsigned int>(h.type),h.container,h.containerSerial,h.index,h.serial};
+                for(int k=0;k<5;++k)roster=(roster^fields[k])*1099511628211ULL;
+            }
+            rt.probedRoster=roster;rt.probedAt=now;rt.probeValid=true;
+        }
+        // One shared timed forecast, not one per member or per proposed shop.
+        // Unknown/partial results are cached too. Real price observations and
+        // treasury/commitment changes invalidate the snapshot immediately.
+        if(!rt.plannedValid || now-rt.plannedAt>=5000 || rt.plannedBudget.money!=money ||
+            rt.plannedBudget.committed!=committed || rt.plannedMembers!=people.size() ||
+            rt.plannedRoster!=rt.probedRoster ||
+            rt.plannedRevision!=rt.market.revision)
+        {
+            DfForecastSupplies(f,people,rt.market,committed,now,rt.plannedBudget);
+            rt.plannedAt=now;rt.plannedRevision=rt.market.revision;
+            rt.plannedMembers=people.size();rt.plannedRoster=rt.probedRoster;rt.plannedValid=true;
+        }
+        return rt.plannedBudget;
+    }
 }
 
 bool DfProvisionOwns(const DfProvision& rt,Character* actor)
@@ -103,8 +136,7 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
     for(size_t k=0;k<count;++k)
     {
         Character* const c=people[rt.scanCursor%people.size()];++rt.scanCursor;
-        if(c==NULL || c==actor || c==envoy || !DfEconomyAvailable(c) ||
-            rt.cooldown.find(c->getHandle())!=rt.cooldown.end()) continue;
+        if(c==NULL || c==actor || c==envoy || !DfEconomyAvailable(c)) continue;
         DfSupplyStock stock;
         if(!ReadStock(c,f,stock))
         {
@@ -112,12 +144,28 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
             continue;
         }
         const DfSupplyKind kind=NextKind(stock);const int p=SupplyPriority(stock,kind,false);
+        // A previous optional/unreachable trip cannot suppress urgent food.
+        if(p!=0 && rt.cooldown.find(c->getHandle())!=rt.cooldown.end()) continue;
         if(p<priority){best=c;bestStock=stock;bestKind=kind;priority=p;}
+    }
+    Character* plannedTrader=NULL;bool discovering=false;bool bestLight=true;
+    if(best!=NULL && bestKind!=DF_SUPPLY_FOOD && !(bestKind==DF_SUPPLY_BACKPACK && bestStock.ownedBags>0))
+    {
+        bestLight=DfLightBagRole(best);
+        const DfBudgetSnapshot& budget=PlannedBudget(rt,f,people,committed,now);
+        DfProvisionPlan& plan=rt.plans[bestKind];const std::vector<hand> noFailures;
+        plannedTrader=DfChooseSupplyTrader(best,bestKind,bestLight,traders,rt.market,noFailures,now,
+            &budget,!Future(now,plan.discoverAfter),&plan.discoveryCursor,&discovering);
+        // Do not claim a worker or clear genuine work orders for a purchase
+        // already ruled out by actual cash, reserve or observed shop prices.
+        if(plannedTrader==NULL)best=NULL;
     }
     if(best!=NULL)
     {
         ClearRoute(rt,actor);actor=best;current=bestStock;rt.kind=bestKind;
-        rt.member=actor->getHandle();rt.memberName=actor->getName();rt.light=DfLightBagRole(actor);
+        rt.member=actor->getHandle();rt.memberName=actor->getName();rt.light=plannedTrader!=NULL ? bestLight : DfLightBagRole(actor);
+        if(plannedTrader!=NULL)rt.trader=plannedTrader->getHandle();
+        if(discovering)rt.plans[rt.kind].discoverAfter=now+300000;
         rt.progressPosition=actor->getPosition();rt.progressAt=now;rt.startedAt=now;
         const int goal=DfGoalOf(actor);
         if(goal==OPERATE_MACHINERY || goal==MOVE_ON_FREE_WILL) DfClearOrders(actor);
@@ -135,10 +183,22 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
         Delay(rt,actor,now);return;
     }
     Character* trader=rt.trader.isNull() ? NULL : rt.trader.getCharacter();
+    if(rt.kind!=DF_SUPPLY_FOOD && trader!=NULL &&
+        DfKnownSupplyBlocked(rt.market,rt.trader,rt.kind,rt.light,PlannedBudget(rt,f,people,committed,now),now))
+    {ClearRoute(rt,actor);return;}
     if(trader==NULL || trader->isDead() || trader->isUnconcious() || trader->isInCombatMode(true,true))
     {
-        trader=DfChooseSupplyTrader(actor,rt.kind,rt.light,traders,rt.market,rt.failedShops,now);
-        if(trader==NULL) {Delay(rt,actor,now);return;}
+        if(rt.kind==DF_SUPPLY_FOOD)
+            trader=DfChooseSupplyTrader(actor,rt.kind,rt.light,traders,rt.market,rt.failedShops,now);
+        else
+        {
+            const DfBudgetSnapshot& budget=PlannedBudget(rt,f,people,committed,now);
+            DfProvisionPlan& plan=rt.plans[rt.kind];discovering=false;
+            trader=DfChooseSupplyTrader(actor,rt.kind,rt.light,traders,rt.market,rt.failedShops,now,
+                &budget,!Future(now,plan.discoverAfter),&plan.discoveryCursor,&discovering);
+            if(trader!=NULL && discovering)plan.discoverAfter=now+300000;
+        }
+        if(trader==NULL) {if(rt.kind==DF_SUPPLY_FOOD)Delay(rt,actor,now);else ClearRoute(rt,actor);return;}
         rt.trader=trader->getHandle();
     }
     const Ogre::Vector3 destination=trader->getPosition();
@@ -160,7 +220,8 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
     rt.progressAt=now;rt.progressPosition=actor->getPosition();
     DfBudgetSnapshot budget;budget.committed=committed;
     budget.money=f->factionOwnerships!=NULL ? f->factionOwnerships->money : -1;
-    const bool forecast=rt.kind==DF_SUPPLY_FOOD ? false : DfForecastSupplies(f,people,rt.market,committed,now,budget);
+    if(rt.kind!=DF_SUPPLY_FOOD)budget=PlannedBudget(rt,f,people,committed,now);
+    const bool forecast=budget.forecastKnown;
     int paid=0;rt.lastItemName.clear();DfBuyStatus status=DF_BUY_INVALID;
     std::vector<DfSupplyQuote> observed;
     const bool ok=DfBuySupply(actor,trader,f,rt.kind,rt.light,budget,paid,rt.lastItemName,observed,&status);
@@ -202,14 +263,17 @@ void DfProvisionStep(DfFactionState& s,DfProvision& rt,Faction* f,
     {Delay(rt,actor,now);return;}
     if(ok && status==DF_BUY_NO_MONEY && rt.kind!=DF_SUPPLY_FOOD && !forecast)
     {
-        // This physical visit may have supplied the missing price knowledge.
-        // Wait until the next step before buying; never replay the transaction.
-        DfBudgetSnapshot refreshed;
-        if(DfForecastSupplies(f,people,rt.market,committed,now,refreshed)) return;
+        // The visit may resolve price knowledge on the next planning step.
+        // Otherwise give the worker back to work; the per-kind discovery gate
+        // prevents replaying the same unknown-budget failure with each member.
+        ClearRoute(rt,actor);return;
     }
     if(status==DF_BUY_NO_FOOD || status==DF_BUY_INVALID || status==DF_BUY_PLAYER_TRADING ||
        status==DF_BUY_NO_MONEY || status==DF_BUY_NO_ROOM)
     {
+        // One speculative optional arrival is enough. Return to work rather
+        // than walking a chain of shops under the same unresolved budget.
+        if(rt.kind!=DF_SUPPLY_FOOD){ClearRoute(rt,actor);return;}
         if(rt.failedShops.size()<128)rt.failedShops.push_back(rt.trader);
         rt.trader=hand();
     }

@@ -23,8 +23,8 @@ labour = (root / 'game/DfLabour.cpp').read_text(encoding='utf-8-sig')
 mine = (root / 'game/DfMine.cpp').read_text(encoding='utf-8-sig')
 hunger = (root / 'game/DfHunger.cpp').read_text(encoding='utf-8-sig')
 state = (root / 'game/DfProvision.h').read_text(encoding='utf-8-sig')
-start = state.index('struct DfProvision\n')
-end = state.index('\n};', start) + len('\n};')
+start = state.index('struct DfProvisionPlan\n') if 'struct DfProvisionPlan\n' in state else state.index('struct DfProvision\n')
+end = state.index('\n};', state.index('struct DfProvision\n')) + len('\n};')
 code = r'''
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -89,13 +89,14 @@ bool BuyFood(Character*,Character*,Faction*,int,int&,std::string&,DfBuyStatus&);
 bool DfBuyFood(Character*,Character*,Faction*,int,int&,std::string&,DfBuyStatus*);
 bool Food(Character* c,Faction* f,float& rate,float& hunger,float& stock)
 {rate=c->rate;hunger=c->hunger;stock=c->food;return c->f==f && !c->dead;}
-struct DfMarketCache{};bool forecastKnown=true;int remembered=0;
+struct DfMarketCache{std::map<int,int> knownPrices;unsigned long revision;DfMarketCache():revision(0){}};bool forecastKnown=true;int remembered=0,forecastCalls=0,forecastReserve=0;
 bool DfReadSupplyStock(Character* c,DfSupplyStock& s){s=DfSupplyStock();s.known=true;s.robot=c->race.robot;s.robotLimbs=c->robotLimbs;s.animal=c->animal;s.foodRate=c->rate;s.hunger=c->hunger;s.food=c->food;s.firstAid=c->firstAid;s.repair=c->repair;s.ownedBags=c->bags;s.wearingBag=c->wearing;return true;}
 bool DfLightBagRole(Character*){return true;}
 bool DfEquipOwnedBag(Character* c,bool,bool& equipped){equipped=c->wearing=c->equipWorks;return true;}
-bool DfForecastSupplies(Faction* f,const std::vector<Character*>&,const DfMarketCache&,int committed,unsigned long,DfBudgetSnapshot& b){b=DfBudgetSnapshot();b.money=f->factionOwnerships->money;b.committed=committed;b.forecastKnown=forecastKnown;return forecastKnown;}
-void DfRememberShop(DfMarketCache&,const hand&,const std::vector<DfSupplyQuote>&,unsigned long){++remembered;}
-Character* DfChooseSupplyTrader(Character* c,DfSupplyKind,bool,const std::vector<DfTrader>& shops,const DfMarketCache&,const std::vector<hand>& failed,unsigned long){Character* best=NULL;float distance=0;for(size_t i=0;i<shops.size();++i){Character* t=shops[i].who.getCharacter();bool skip=false;for(size_t k=0;k<failed.size();++k)if(failed[k].index==shops[i].who.index)skip=true;if(!t || skip)continue;float d=c->pos.squaredDistance(t->pos);if(!best || d<distance){best=t;distance=d;}}return best;}
+bool DfForecastSupplies(Faction* f,const std::vector<Character*>&,const DfMarketCache&,int committed,unsigned long,DfBudgetSnapshot& b){++forecastCalls;b=DfBudgetSnapshot();b.money=f->factionOwnerships->money;b.committed=committed;b.emergencyBuffer=forecastReserve;b.forecastKnown=forecastKnown;return forecastKnown;}
+bool DfKnownSupplyBlocked(const DfMarketCache& m,const hand& t,DfSupplyKind k,bool,const DfBudgetSnapshot& b,unsigned long){std::map<int,int>::const_iterator p=m.knownPrices.find(t.index);return p!=m.knownPrices.end() && (p->second>b.money-b.committed || (b.forecastKnown && !DfPlanSupplySpend(b,p->second,k).Allowed()));}
+void DfRememberShop(DfMarketCache& m,const hand& t,const std::vector<DfSupplyQuote>& offers,unsigned long){++remembered;++m.revision;if(!offers.empty() && offers[0].price>0)m.knownPrices[t.index]=offers[0].price;}
+Character* DfChooseSupplyTrader(Character* c,DfSupplyKind kind,bool,const std::vector<DfTrader>& shops,const DfMarketCache& market,const std::vector<hand>& failed,unsigned long,const DfBudgetSnapshot* budget=NULL,bool allowUnknown=true,size_t* cursor=NULL,bool* discovery=NULL){Character* best=NULL;float distance=0;bool chosenUnknown=false;for(size_t i=0;i<shops.size();++i){Character* t=shops[i].who.getCharacter();bool skip=false;for(size_t k=0;k<failed.size();++k)if(failed[k].index==shops[i].who.index)skip=true;if(!t || skip)continue;bool unknown=false;if(budget && kind!=DF_SUPPLY_FOOD){std::map<int,int>::const_iterator price=market.knownPrices.find(t->id.index);unknown=price==market.knownPrices.end() || !budget->forecastKnown;if(price!=market.knownPrices.end() && (price->second>budget->money-budget->committed || (budget->forecastKnown && !DfPlanSupplySpend(*budget,price->second,kind).Allowed())))continue;if(unknown && !allowUnknown)continue;}float d=c->pos.squaredDistance(t->pos);if(!best || d<distance){best=t;distance=d;chosenUnknown=unknown;}}if(discovery)*discovery=chosenUnknown;if(cursor && best && chosenUnknown)++*cursor;return best;}
 bool BuySupply(Character*,Character*,Faction*,DfSupplyKind,bool,const DfBudgetSnapshot&,int&,std::string&,std::vector<DfSupplyQuote>&,DfBuyStatus&);
 '''
 code += state[start:end] + '\n'
@@ -124,7 +125,7 @@ bool BuySupply(Character* member,Character* trader,Faction* f,DfSupplyKind kind,
  return true;}
 '''
 for signature in ('bool Same(', 'bool Future(', 'void ClearRoute(', 'void Delay(',
-                  'bool ReadStock(', 'int SupplyPriority(', 'DfSupplyKind NextKind(', 'bool DfProvisionOwns(', 'void DfProvisionStep('):
+                  'bool ReadStock(', 'int SupplyPriority(', 'DfSupplyKind NextKind(', 'const DfBudgetSnapshot& PlannedBudget(', 'bool DfProvisionOwns(', 'void DfProvisionStep('):
     code += function(provision, signature) + '\n'
 code += r'''
 struct DfLabour{DfProvision provision;int carried,revenue;DfLabour():carried(0),revenue(0){}};
@@ -233,6 +234,45 @@ CHECK(ownFood.kind==DF_SUPPLY_BACKPACK);
 gearWalker.food=0;gearWalker.hunger=1.2f;
 DfProvisionStep(s,ownFood,&faction,oneWalker,distant,NULL,0,8,6000,false);
 CHECK(ownFood.kind==DF_SUPPLY_FOOD && gearWalker.bags==0);
+// Known unaffordable bags must not claim a worker or clear real work orders.
+Character saver(60,&faction,"Saver");saver.food=1;saver.bags=0;saver.wearing=false;
+std::vector<Character*> savers(1,&saver);std::vector<DfTrader> bagShops(1);bagShops[0].who=cheap.id;
+cheap.price=5000;cheap.pos=Ogre::Vector3(1000,0,0);wallet.money=3348;forecastReserve=2631;
+DfProvision saving;saving.market.knownPrices[cheap.id.index]=5000;int oldClears=saver.clears;oldCalls=buyCalls;
+DfProvisionStep(s,saving,&faction,savers,bagShops,NULL,0,9,1000,false);
+CHECK(saving.member.isNull() && saver.clears==oldClears && saver.moves==0 && buyCalls==oldCalls);
+// Gross cash is insufficient evidence: food/medical/operating reserve remains protected.
+wallet.money=6000;DfProvision protectedBag;protectedBag.market.knownPrices[cheap.id.index]=5000;
+DfProvisionStep(s,protectedBag,&faction,savers,bagShops,NULL,0,9,2000,false);
+CHECK(protectedBag.member.isNull() && saver.clears==oldClears && saver.moves==0);
+// A real wallet increase invalidates the cached plan and permits an affordable trip.
+wallet.money=10000;DfProvisionStep(s,saving,&faction,savers,bagShops,NULL,0,9,3000,false);
+CHECK(saving.member.index==saver.id.index && saver.moves==1);
+// Unknown/partial forecasts permit one real discovery, not repeated workers.
+forecastKnown=false;DfProvision probing;probing.market.knownPrices[cheap.id.index]=5000;saver.goal=87;
+DfProvisionStep(s,probing,&faction,savers,bagShops,NULL,0,9,1000,false);
+CHECK(probing.member.index==saver.id.index);
+DfProvisionStep(s,probing,&faction,savers,bagShops,NULL,0,9,181000,false);
+CHECK(probing.member.isNull());
+DfProvisionStep(s,probing,&faction,savers,bagShops,NULL,0,9,216000,false);
+CHECK(probing.member.isNull());
+// Urgent food bypasses optional planning deferral and the old worker cooldown.
+saver.food=0;saver.hunger=1.2f;cheap.price=100;cheap.pos=saver.pos;oldCalls=buyCalls;wallet.money=100;
+probing.cooldown[saver.id]=250000;
+DfProvisionStep(s,probing,&faction,savers,bagShops,NULL,0,9,220000,false);
+CHECK(buyCalls==oldCalls+1 && probing.kind==DF_SUPPLY_FOOD && wallet.money==0);
+forecastKnown=true;forecastReserve=0;
+// Forecast work is shared across candidate/arrival checks and cached for5s.
+saver.food=1;saver.hunger=3;saver.goal=87;wallet.money=3348;forecastReserve=2631;
+DfProvision cached;cached.market.knownPrices[cheap.id.index]=5000;forecastCalls=0;
+for(unsigned long now=1000;now<2000;now+=50)DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,0,9,now,false);
+CHECK(forecastCalls==1);
+wallet.money=3349;DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,0,9,2000,false);CHECK(forecastCalls==2);
+++cached.market.revision;DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,0,9,2100,false);CHECK(forecastCalls==3);
+DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,1,9,2200,false);CHECK(forecastCalls==4);
+Character replacement(61,&faction,"Replacement");replacement.food=1;replacement.bags=0;replacement.wearing=false;
+savers[0]=&replacement;DfProvisionStep(s,cached,&faction,savers,bagShops,NULL,1,9,2300,false);CHECK(forecastCalls==5);
+forecastReserve=0;
 std::printf("%d supply adapter checks, %d failed\n",checks,failed);return failed;
 }
 '''

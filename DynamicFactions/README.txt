@@ -322,3 +322,40 @@ C9 live acceptance is still OPEN: real purchases/equip, both purses and a
 separate earned-save reload must be compared. Long FPS/memory runs and a
 skeleton faction remain untested. Source tests/review do not prove the absence
 of all leaks.
+
+
+C9 - игровая сверка и уточнение походов, 31.10.2026
+
+Подтверждены три покупки аптечек за 882 ката: запас лавки 93 -> 90,
+кошелёк 53981 -> 54863. Модовый рюкзак за 5000 физически надет на Санку;
+он исчез из настоящего склада, общий кошелёк продавцов вырос 25000 -> 30000.
+Весь сеанс: 9304 + 558 от руды - 882 аптечки - 632 еда - 5000 рюкзак = 3348,
+как в завершённом автосохранении. Подготовлена точная копия из 89 файлов
+DF-care-earned-20261031; повторная загрузка ещё ожидается.
+
+Журнал выявил повторные необязательные походы за известным дорогим рюкзаком.
+Теперь цена и резерв проверяются до отмены работы. Общий прогноз на 5 секунд
+пересчитывается при изменении денег, обязательств, состава или рынка.
+Пробное посещение неизвестной лавки ограничено отдельно для вида припасов;
+неудачный дополнительный визит возвращает работника. Отрицательные сведения
+о цене живут 600 секунд, запасы - 120; срочная еда обходит эти ограничения.
+Пройдено 1503 проверки, включая 52 маршрута и 44 рынка. Независимое ревью
+прошло; новая логика походов ещё требует игровой проверки.
+
+C9 live reconciliation and optional-trip correction, 31 October 2026
+
+Three real first-aid purchases cost 882 cats: shop stock 93 -> 90 and purse
+53981 -> 54863. A modded 5000-cat bag was observed worn by Sanka, left the
+actual stock and increased the shared seller purse from 25000 to 30000.
+Session 9304 + 558 ore - 882 aid - 632 food - 5000 bag = 3348 matches the
+completed autosave. An exact 89-file DF-care-earned-20261031 copy is ready;
+its earned reload remains pending.
+
+Logs exposed repeat optional trips for a known unaffordable bag. Price/reserve
+preflight now precedes worker/order changes; a shared 5-second forecast is
+invalidated by money, commitments, roster and market changes. Per-kind
+physical discovery trials are limited; failed optional visits return to work.
+Price-only negative evidence lasts 600 seconds versus 120 seconds for stock.
+Urgent food bypasses these gates. All 1503 checks passed, including 52 route
+and 44 market cases; independent review cleared. The new trip policy still
+awaits in-game acceptance.

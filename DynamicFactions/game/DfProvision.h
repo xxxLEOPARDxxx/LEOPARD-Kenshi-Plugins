@@ -11,6 +11,12 @@
 class Character;
 class Faction;
 
+struct DfProvisionPlan
+{
+    size_t discoveryCursor;
+    unsigned long discoverAfter;
+    DfProvisionPlan():discoveryCursor(0),discoverAfter(0){}
+};
 struct DfProvision
 {
     hand member;
@@ -20,6 +26,13 @@ struct DfProvision
     std::vector<hand> failedShops;
     std::map<hand,unsigned long,DfWorkHandLess> cooldown;
     DfMarketCache market;
+    DfProvisionPlan plans[4];
+    DfBudgetSnapshot plannedBudget;
+    unsigned long plannedAt,plannedRevision;
+    unsigned long probedAt;
+    unsigned __int64 plannedRoster,probedRoster;
+    size_t plannedMembers;
+    bool plannedValid,probeValid;
     DfSupplyKind kind;
     bool light;
     size_t scanCursor;
@@ -30,7 +43,7 @@ struct DfProvision
     bool moving;
     bool warnedUnreadable;
     int spent;
-    DfProvision():kind(DF_SUPPLY_FOOD),light(true),scanCursor(0),progressAt(0),startedAt(0),progressPosition(0,0,0),destination(0,0,0),
+    DfProvision():plannedAt(0),plannedRevision(0),probedAt(0),plannedRoster(0),probedRoster(0),plannedMembers(0),plannedValid(false),probeValid(false),kind(DF_SUPPLY_FOOD),light(true),scanCursor(0),progressAt(0),startedAt(0),progressPosition(0,0,0),destination(0,0,0),
         moving(false),warnedUnreadable(false),spent(0) {}
 };
 

@@ -8,7 +8,7 @@ def function(signature):
  while depth:
   depth+=(text[end]=='{')-(text[end]=='}');end+=1
  return text[start:end]
-state=(root/'game/DfMarket.h').read_text(encoding='utf-8-sig');state=state[state.index('struct DfKnownShop'):state.index('void DfRememberShop')]
+state=(root/'game/DfMarket.h').read_text(encoding='utf-8-sig');state=state[state.index('struct DfKnownPrices'):state.index('void DfRememberShop')]
 code=r'''
 #include <map>
 #include <string>
@@ -19,7 +19,7 @@ code=r'''
 #include <cstdio>
 #include "core/DfOffer.h"
 struct Character;std::map<int,Character*> actors;
-struct hand{int type,container,containerSerial,index,serial;hand(int i=0):type(1),container(0),containerSerial(0),index(i),serial(1){}Character* getCharacter()const{return actors[index];}};
+struct hand{int type,container,containerSerial,index,serial;hand(int i=0):type(1),container(0),containerSerial(0),index(i),serial(1){}bool isNull()const{return index==0;}Character* getCharacter()const{return actors[index];}};
 struct DfWorkHandLess{bool operator()(const hand& a,const hand& b)const{return a.index<b.index || (a.index==b.index && a.serial<b.serial);}};
 namespace Ogre{struct Vector3{float x;Vector3(float a=0):x(a){}float squaredDistance(const Vector3& b)const{float d=x-b.x;return d*d;}};}
 struct GameData{std::string id;GameData(const char* s="food"):id(s){}};GameData item;
@@ -36,7 +36,7 @@ struct LARGE_INTEGER{__int64 QuadPart;};long long clockStep=1,clockNow=0;
 bool QueryPerformanceFrequency(LARGE_INTEGER* p){p->QuadPart=1000000;return true;}
 bool QueryPerformanceCounter(LARGE_INTEGER* p){p->QuadPart=(clockNow+=clockStep);return true;}
 '''+state
-for signature in ('bool SameShop(', 'const DfKnownShop* KnownShop(', 'bool CanUseFood(', 'bool WithinForecast(', 'int CheapestDeficit(', 'bool ForecastSupplies(', 'void DfRememberShop(', 'Character* ChooseSupplyTrader('):code+=function(signature)+'\n'
+for signature in ('bool SameShop(', 'const DfKnownShop* ObservedShop(', 'const DfKnownShop* KnownShop(', 'bool EligibleQuote(', 'bool ObservedPriceBlocks(', 'bool KnownSupplyBlocked(', 'bool CanUseFood(', 'bool WithinForecast(', 'int CheapestDeficit(', 'bool ForecastSupplies(', 'void DfRememberShop(', 'Character* ChooseSupplyTrader('):code+=function(signature)+'\n'
 code+='\n#define DfChooseSupplyTrader ChooseSupplyTrader\n'
 code+=r'''
 int checks=0,failed=0;
@@ -69,6 +69,57 @@ int main(){Ownerships wallet(10000);Faction f={&wallet};Character member(1,&f),n
  DfRememberShop(market,nearby.id,exhausted,1002);CHECK(!ForecastSupplies(&f,people,market,0,1002,b));
  people.pop_back();member.stock.repair=500;CHECK(ForecastSupplies(&f,people,market,0,1000,b));CHECK(b.medicalDeficitCost==0);
  clockStep=5000;CHECK(!ForecastSupplies(&f,people,market,0,1000,b));CHECK(!b.forecastKnown);clockStep=1;
+ // Planned trips use actual observed prices and protect the real reserve.
+ DfMarketCache gear;DfSupplyQuote bag;bag.kind=DF_SUPPLY_BACKPACK;bag.sid="bag";bag.price=5000;bag.quantity=1;bag.amount=1;bag.bag.cells=24;bag.pool.index=555;
+ std::vector<DfSupplyQuote> bags(1,bag);DfRememberShop(gear,nearby.id,bags,1000);
+ std::vector<DfTrader> onlyKnown(1);onlyKnown[0].who=nearby.id;
+ b=DfBudgetSnapshot();b.forecastKnown=true;b.money=3348;b.emergencyBuffer=2631;size_t cursor=0;bool discovery=false;
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,1000,&b,true,&cursor,&discovery)==NULL);
+ b.money=6000;CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,1000,&b,true,&cursor,&discovery)==NULL);
+ b.money=8000;CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,1000,&b,false,&cursor,&discovery)==&nearby && !discovery);
+ b.money=3348;CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,traders,gear,failedShops,1000,&b,true,&cursor,&discovery)==&bar && discovery);
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,traders,gear,failedShops,1000,&b,false,&cursor,&discovery)==NULL);
+ // Unknown shops are physically explored in a fair bounded round-robin,
+ // including a farther potentially cheaper shop, rather than nearest forever.
+ Character farShop(70,&f,2000);std::vector<DfTrader> unknown(2);unknown[0].who=bar.id;unknown[1].who=farShop.id;cursor=0;
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,unknown,gear,failedShops,1000,&b,true,&cursor,&discovery)==&bar);
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,unknown,gear,failedShops,1000,&b,true,&cursor,&discovery)==&farShop);
+ // An incomplete forecast permits discovery but cannot retry it every worker.
+ b.forecastKnown=false;b.money=10000;
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,1000,&b,true,&cursor,&discovery)==&nearby && discovery);
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,1000,&b,false,&cursor,&discovery)==NULL);
+ b.money=3348;CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,1000,&b,true,&cursor,&discovery)==NULL);
+ // Finite stock expires at120s, but600s price-only negative evidence cannot
+ // become an endlessly rediscovered5000-cat bag merely because stock expired.
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,121001,&b,true,&cursor,&discovery)==NULL);
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,onlyKnown,gear,failedShops,601001,&b,true,&cursor,&discovery)==&nearby && discovery);
+ // Real observations of shared and even empty pools preserve price-only
+ // evidence without duplicating their quantities in the forecast.
+ DfRememberShop(gear,bar.id,bags,1010);
+ CHECK(gear.shops[0].offers.size()==1 && gear.shops[0].offers[0].quantity==0);
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,traders,gear,failedShops,121011,&b,true,&cursor,&discovery)==NULL);
+ DfSupplyQuote pool;pool.pool=bag.pool;std::vector<DfSupplyQuote> poolOnly(1,pool);
+ DfRememberShop(gear,bar.id,poolOnly,1020);DfRememberShop(gear,farShop.id,poolOnly,1030);
+ CHECK(gear.shops[2].prices.price[4]==5000 && gear.shops[2].prices.quotedAt[4]==1010);
+ traders.push_back(DfTrader());traders.back().who=farShop.id;
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,traders,gear,failedShops,121031,&b,true,&cursor,&discovery)==NULL);
+ // A later real cheaper quote can permit the trip, including its reserve.
+ bags[0].price=500;DfRememberShop(gear,farShop.id,bags,1040);b.forecastKnown=true;
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_BACKPACK,true,traders,gear,failedShops,1040,&b,false,&cursor,&discovery)==&farShop && !discovery);
+ CHECK(gear.revision==5);
+ // Planned medical supplies can use their own reserve, while food and the
+ // operating buffer remain protected by the unchanged production policy.
+ DfMarketCache aidMarket;DfSupplyQuote aid;aid.kind=DF_SUPPLY_FIRSTAID;aid.sid="aid";aid.price=294;aid.quantity=3;aid.amount=150;aid.pool.index=556;
+ std::vector<DfSupplyQuote> aidQuotes(1,aid);DfRememberShop(aidMarket,nearby.id,aidQuotes,1000);
+ b=DfBudgetSnapshot();b.money=3470;b.foodDeficitCost=510;b.medicalDeficitCost=882;b.emergencyBuffer=1000;b.forecastKnown=true;
+ CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_FIRSTAID,true,onlyKnown,aidMarket,failedShops,1000,&b,false,&cursor,&discovery)==&nearby);
+ b.money=1510;CHECK(DfChooseSupplyTrader(&member,DF_SUPPLY_FIRSTAID,true,onlyKnown,aidMarket,failedShops,1000,&b,false,&cursor,&discovery)==NULL);
+ // An old price from a different backing pool cannot migrate through a newly
+ // shared empty pool merely because both pools belonged to the same NPC.
+ DfMarketCache unrelated;std::vector<DfSupplyQuote> oldBag(1,bag);DfRememberShop(unrelated,nearby.id,oldBag,1000);
+ DfSupplyQuote otherPool;otherPool.pool.index=999;std::vector<DfSupplyQuote> otherEmpty(1,otherPool);
+ DfRememberShop(unrelated,nearby.id,otherEmpty,1010);DfRememberShop(unrelated,bar.id,otherEmpty,1020);
+ CHECK(unrelated.shops[1].prices.price[4]==0);
  for(int i=4;i<44;++i){Character* extra=new Character(i,&f);DfRememberShop(market,extra->id,empty,1000+i);}
  CHECK(market.shops.size()==32);
  printf("%d market checks, %d failed\n",checks,failed);return failed;}
