@@ -1,0 +1,56 @@
+{
+  "tool": "built-in image_gen",
+  "intent": "new original illustrations; reference series style only",
+  "prompt_record": "Prompt briefs retained here after session compaction; not a verbatim tool transcript.",
+  "assets": [
+    {
+      "mod": "TauntExpansion",
+      "platform": "Nexus",
+      "path": "D:\\DEV\\Kenshi\\workshop\\images\\TauntExpansion\\000_LEOPARD_Cover.png",
+      "sha256": "b7a5a6cdb780b875dd2783c7b51f454158d20d356f824be14d4c36370f14040f",
+      "bytes": 3279697,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "prompt_brief": "Original Kenshi cover in bold distressed comic / inked screenprint style, crimson, ivory and black. Huge exact title TAUNT EXPANSION and small MCM badge. Armoured skeleton samurai provokes a group of bandits; attention arrow makes the mechanic clear. No extra slogans or invented UI. Wide 16:9 composition."
+    },
+    {
+      "mod": "TauntExpansion",
+      "platform": "Steam",
+      "path": "D:\\DEV\\Kenshi\\workshop\\steam-covers\\TauntExpansion\\000_LEOPARD_Steam_Cover.png",
+      "sha256": "c2edf1ffb638aaa0fc726a99c178e70bdbdf599048a09ff4586e62aa9c4b0052",
+      "bytes": 3316137,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "prompt_brief": "Original Kenshi cover in bold distressed comic / inked screenprint style, crimson, ivory and black. Huge exact title TAUNT EXPANSION and small MCM badge. Armoured skeleton samurai provokes a group of bandits; attention arrow makes the mechanic clear. No extra slogans or invented UI. True square full bleed; title readable as a small Steam thumbnail."
+    },
+    {
+      "mod": "GatePushGuard",
+      "platform": "Nexus",
+      "path": "D:\\DEV\\Kenshi\\workshop\\images\\GatePushGuard\\000_LEOPARD_Cover.png",
+      "sha256": "adee7a158e14bf0cae350e32bd12357f2dcc20068663a60357777c9e5246b45d",
+      "bytes": 3197741,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "prompt_brief": "Original Kenshi cover in bold distressed comic / inked screenprint style, teal, ivory, steel and safety yellow. Huge exact title GATE PUSH GUARD and small MCM badge. Physical closed steel settlement gate holds a pushing crowd outside; Shek guard and repairer inside, arrow ends at a red X. No magic forcefield or invented UI. Wide 16:9 composition."
+    },
+    {
+      "mod": "GatePushGuard",
+      "platform": "Steam",
+      "path": "D:\\DEV\\Kenshi\\workshop\\steam-covers\\GatePushGuard\\000_LEOPARD_Steam_Cover.png",
+      "sha256": "6843cfd53669e069a388a0db1d3140d89c68ff7bef7723445de41cf0d18d8b46",
+      "bytes": 3365160,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "prompt_brief": "Original Kenshi cover in bold distressed comic / inked screenprint style, teal, ivory, steel and safety yellow. Huge exact title GATE PUSH GUARD and small MCM badge. Physical closed steel settlement gate holds a pushing crowd outside; Shek guard and repairer inside, arrow ends at a red X. No magic forcefield or invented UI. True square full bleed; title readable as a small Steam thumbnail."
+    }
+  ],
+  "publication": "local preparation only; no Nexus/Steam IDs yet"
+}

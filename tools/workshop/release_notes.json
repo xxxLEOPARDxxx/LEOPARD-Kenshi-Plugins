@@ -228,19 +228,21 @@
   },
   "TauntExpansion": {
     "version": "1",
-    "published_version": "0",
     "en": [
-      "Optional live MCM settings.",
-      "English, Russian and Simplified Chinese interface.",
-      "Consistent Taunt strength during simultaneous target evaluations.",
-      "Original package defaults preserved."
+      "[b]First MCM fork.[/b] Preserve tata / Tata-Gari's Taunt and retarget mechanics with the original package defaults of 5 and 2.",
+      "[b]Optional live settings.[/b] Add a Taunt Expansion page in Mod Config Menu with English, Russian and Simplified Chinese labels and tooltips. All settings, including enabled state, apply immediately.",
+      "[b]Reliable startup and settings.[/b] Preserve RE_Kenshi's required startup entry and initialize the settings lock before callbacks, including early settings access or failed gameplay initialization.",
+      "[b]Consistent strength and bounded diagnostics.[/b] Preserve the correct bonus across simultaneous and nested target evaluations. Add a detailed-log master switch that is off by default; keep errors unconditional and diagnostic history bounded.",
+      "[b]Defensive compatibility checks.[/b] Verify the complete unique Taunt instruction and original +2 bonus before patching; safely preserve code lifetime on failures and shutdown. Add production-code, binary import/signature and locale checks. Runtime game verification is tracked separately."
     ],
     "ru": [
-      "Необязательные настройки MCM с применением во время игры.",
-      "Русский, английский и китайский интерфейс.",
-      "Стабильная сила провокации при одновременном выборе целей.",
-      "Сохранены значения поставки оригинала."
-    ]
+      "[b]Первый MCM-форк.[/b] Сохранены механика провокации и дополнительного усиления смены цели tata / Tata-Gari со стандартными множителями поставки 5 и 2.",
+      "[b]Необязательные настройки во время игры.[/b] Добавлена страница Taunt Expansion в Mod Config Menu с русскими, английскими и китайскими подписями и подсказками. Все настройки, включая включение механики, применяются сразу.",
+      "[b]Надёжный запуск и настройки.[/b] Сохранена требуемая RE_Kenshi точка запуска; блокировка настроек создаётся до callbacks, включая раннее открытие настроек и ошибки инициализации механики.",
+      "[b]Стабильная сила и ограниченная диагностика.[/b] Исправлено сохранение бонуса при одновременных и вложенных вычислениях цели. Добавлен выключенный по умолчанию общий подробный журнал; ошибки записываются всегда, история диагностики ограничена.",
+      "[b]Защитные проверки совместимости.[/b] Перед изменением кода проверяются полная уникальная инструкция провокации и обычный бонус +2; безопасно сохраняется срок жизни кода при ошибках и завершении. Добавлены проверки production-кода, импортов, сигнатуры и переводов. Игровая проверка учитывается отдельно."
+    ],
+    "published_version": "0"
   },
   "GatePushGuard": {
     "version": "1",
