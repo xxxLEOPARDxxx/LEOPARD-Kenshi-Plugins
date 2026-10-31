@@ -225,5 +225,35 @@
       "[b]Правильный язык из Steam Workshop.[/b] Страница MCM и игровые подписи строя используют язык игры, даже если плагин установлен вне локальной папки mods.",
       "[b]Обычный запуск и RE_Kenshi.[/b] Оба расположения EXE находят настройки игры; личные настройки и строй в сохранениях не меняются."
     ]
+  },
+  "TauntExpansion": {
+    "version": "1",
+    "published_version": "0",
+    "en": [
+      "Optional live MCM settings.",
+      "English, Russian and Simplified Chinese interface.",
+      "Consistent Taunt strength during simultaneous target evaluations.",
+      "Original package defaults preserved."
+    ],
+    "ru": [
+      "Необязательные настройки MCM с применением во время игры.",
+      "Русский, английский и китайский интерфейс.",
+      "Стабильная сила провокации при одновременном выборе целей.",
+      "Сохранены значения поставки оригинала."
+    ]
+  },
+  "GatePushGuard": {
+    "version": "1",
+    "published_version": "0",
+    "en": [
+      "New independently authored protection for observed outside-to-inside crowd-push crossings through closed player-owned gates and doors.",
+      "Continuous closed-state history, actual finite door-leaf bounds and conservative exclusions prevent proximity or gate closure from moving existing occupants.",
+      "Optional live MCM settings, standalone defaults, English/Russian/Simplified Chinese interface and detailed logging off by default."
+    ],
+    "ru": [
+      "Новая самостоятельно написанная защита от замеченного проталкивания снаружи внутрь через закрытые ворота и двери игрока.",
+      "Непрерывная история закрытого состояния, конечные границы самой створки и осторожные исключения: близость к двери и закрытие ворот не перемещают находящихся внутри.",
+      "Необязательные настройки MCM с применением сразу, отдельные настройки без MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию."
+    ]
   }
 }

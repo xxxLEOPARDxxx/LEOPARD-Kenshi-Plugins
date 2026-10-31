@@ -1295,5 +1295,60 @@
         "Splitting stacks or changing contents is respected on the next sort without reopening the window."
       ]
     }
+  },
+  "TauntExpansion": {
+    "name": "Taunt Expansion",
+    "author": "tata / Tata-Gari",
+    "original_url": "https://steamcommunity.com/workshop/filedetails/?id=3771499164",
+    "source_url": "https://github.com/Tata-Gari/RE_Kenshi_Plugins_Source",
+    "source_note": {
+      "ru": "Исходники автора доступны в репозитории; исходная ревизия указана в ORIGIN.md.",
+      "en": "Original source is available in the repository; the pinned revision is recorded in ORIGIN.md."
+    },
+    "version": "1",
+    "changes": {
+      "en": [
+        "Optional live MCM settings.",
+        "English, Russian and Simplified Chinese interface.",
+        "Consistent Taunt strength during simultaneous target evaluations.",
+        "Original package defaults preserved."
+      ],
+      "ru": [
+        "Необязательные настройки MCM с применением во время игры.",
+        "Русский, английский и китайский интерфейс.",
+        "Стабильная сила провокации при одновременном выборе целей.",
+        "Сохранены значения поставки оригинала."
+      ]
+    },
+    "player_changes": {
+      "en": [
+        "Optional live MCM settings.",
+        "English, Russian and Simplified Chinese interface.",
+        "Consistent Taunt strength during simultaneous target evaluations.",
+        "Original package defaults preserved."
+      ],
+      "ru": [
+        "Необязательные настройки MCM с применением во время игры.",
+        "Русский, английский и китайский интерфейс.",
+        "Стабильная сила провокации при одновременном выборе целей.",
+        "Сохранены значения поставки оригинала."
+      ]
+    },
+    "history": {
+      "1": {
+        "en": [
+          "Optional live MCM settings.",
+          "English, Russian and Simplified Chinese interface.",
+          "Consistent Taunt strength during simultaneous target evaluations.",
+          "Original package defaults preserved."
+        ],
+        "ru": [
+          "Необязательные настройки MCM с применением во время игры.",
+          "Русский, английский и китайский интерфейс.",
+          "Стабильная сила провокации при одновременном выборе целей.",
+          "Сохранены значения поставки оригинала."
+        ]
+      }
+    }
   }
 }

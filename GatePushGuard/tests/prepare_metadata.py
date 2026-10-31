@@ -1,0 +1,17 @@
+"""Write local integration handoff; no shared catalog or publication changes."""
+import hashlib,json,pathlib
+root=pathlib.Path(__file__).resolve().parents[1]
+build=pathlib.Path(r'D:\DEV\Kenshi\build\GatePushGuard')
+audit=json.loads(pathlib.Path(r'D:\DEV\Kenshi\build\GatePushGuard-native\native-audit.json').read_text(encoding='utf-8'))
+dll=build/'GatePushGuard.dll';assert hashlib.sha256(dll.read_bytes()).hexdigest()==audit['plugin_sha256']
+output=root/'release';output.mkdir(exist_ok=True)
+notes={
+ 'en':['New independently authored protection for observed outside-to-inside crowd-push crossings through closed player-owned gates and doors.','Continuous closed-state history, actual finite door-leaf bounds and conservative exclusions prevent proximity or gate closure from moving existing occupants.','Optional live MCM settings, standalone defaults, English/Russian/Simplified Chinese interface and detailed logging off by default.'],
+ 'ru':['Новая самостоятельно написанная защита от замеченного проталкивания снаружи внутрь через закрытые ворота и двери игрока.','Непрерывная история закрытого состояния, конечные границы самой створки и осторожные исключения: близость к двери и закрытие ворот не перемещают находящихся внутри.','Необязательные настройки MCM с применением сразу, отдельные настройки без MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию.']}
+summary={k:audit[k] for k in ('image','sha256','kenshilib_sha256','plugin_sha256','mcm_export_verified','plugin_exports','native_import_count','imports_missing','bindings')}
+summary.update(dll_bytes=dll.stat().st_size,status='PASS offline executable/binding audit and independent source/native-contract review; actual leaf asset coverage, live behavior/FPS/memory require game acceptance')
+(output/'binary_audit.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+metadata=dict(mod_id='GatePushGuard',name='Gate Push Guard',version='1',kind='own_independently_authored_analogue',author='LEOPARD',source_directory=str(root),source_url='https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins/tree/main/GatePushGuard',dll_path=str(dll),source_locales='locale/<language>/LC_MESSAGES/gate_push_guard.po',runtime_locales=str(build/'locale'/'<language>'/'LC_MESSAGES'/'gate_push_guard.mo'),languages=['en_GB','ru_RU','zh_CN'],mcm_id='GatePushGuard',mcm_title='Gate Push Guard',mcm_settings=2,mcm_restart_settings=[],detailed_log_last=True,detailed_log_default=False,inspiration_author='requizm',inspiration_url='https://steamcommunity.com/sharedfiles/filedetails/?id=3730136323',inspiration_source='not supplied with installed original; no public source found; no original code/DLL incorporated',offline_binary_audit=summary,player_changes=notes,publication='not created; Nexus user upload first; no Steam publication before user link',runtime_validation='Independent source/offline native-contract review passed. Live gate/door asset coverage, engineer/turret/carry/KO/load/pause behavior, sustained crowd pressure, vanilla/modded MCM skins, CPU/FPS and sustained memory measurements pending.')
+(output/'integration_metadata.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+(output/'release_notes.json').write_text(json.dumps(dict(version='1',changes=notes),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print('GatePushGuard integration metadata and bilingual v1 notes prepared; no shared files changed')

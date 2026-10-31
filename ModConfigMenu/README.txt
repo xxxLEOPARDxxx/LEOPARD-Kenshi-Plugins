@@ -122,29 +122,31 @@ MCM. Слева — список модов, у которых есть наст
 
 Любой плагин RE_Kenshi, который экспортирует настройки для MCM.
 
-Наши плагины: AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map.
+Наши плагины: AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gate Push Guard, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map.
 
 Наши форки Emkej8: Auto Pause on Load, Container Highlight, Hidden Faction Relations, Job-B-Gone, Loot-Scoot-Execute, Map-markers, Organize the Crafting Stations, Organize the Inventory, Organize the Trader, Vital Read, Vital Sense, Wall-B-Gone.
 
-Наши форки других авторов: Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004).
+Наши форки других авторов: Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004), Taunt Expansion (tata / Tata-Gari).
 
 В список входят подготовленные и отключённые сборки. Dynamic Factions
 продолжает разрабатываться; Organize the Inventory — локальная сборка.
-Stack Sort и полный XP Info проходят игровую проверку. Плагины
-устанавливаются отдельно; без MCM читают свои настройки из файлов.
+Taunt Expansion и Gate Push Guard подготовлены и ожидают игровой приёмки.
+Global Satellite Map - локальный прототип отдельного слоя глобальной карты.
+Плагины устанавливаются отдельно; без MCM читают настройки из файлов.
 
 SUPPORTED PLUGINS
 
-Our plugins: AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map.
+Our plugins: AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gate Push Guard, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map.
 
 Our Emkej8 forks: Auto Pause on Load, Container Highlight, Hidden Faction Relations, Job-B-Gone, Loot-Scoot-Execute, Map-markers, Organize the Crafting Stations, Organize the Inventory, Organize the Trader, Vital Read, Vital Sense, Wall-B-Gone.
 
-Our forks of other authors: Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004).
+Our forks of other authors: Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004), Taunt Expansion (tata / Tata-Gari).
 
 Includes prepared and disabled builds. Dynamic Factions remains in
-development; Organize the Inventory is a local build. Stack Sort and full
-XP Info await in-game acceptance. Install plugins separately; without MCM
-they read their own configuration files.
+development; Organize the Inventory is a local build. Taunt Expansion and
+Gate Push Guard are prepared and await in-game acceptance. Global Satellite
+Map is a local prototype of a separate world-map layer. Install plugins
+separately; without MCM they read their own configuration files.
 
 
 ДЛЯ АВТОРОВ ПЛАГИНОВ

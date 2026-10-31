@@ -1,0 +1,23 @@
+[h2]WHAT IT DOES[/h2]
+
+Helps prevent crowd pressure from pushing characters from outside to inside through closed player-owned gates and doors. Applies to your characters, allies and NPCs.
+
+[list]
+[*][b]Observed crossings.[/b] Tracks movement across the actual door opening while the door stays closed. A confirmed crossing returns the character to its last observed outside position.
+[*][b]Existing occupants.[/b] Closing a gate starts fresh observation. Characters already inside can remain inside and leave normally.
+[*][b]Normal activity.[/b] Carried, unconscious, seated, turret-using and other occupied characters are excluded. Loading and teleports clear movement history.
+[/list]
+
+[h2]CONTROLS AND SETTINGS[/h2]
+
+Works automatically while enabled. With Mod Config Menu installed, open Options > MCM > Gate Push Guard. Enabled and Detailed log apply during play. Without MCM, use GatePushGuard.ini. Detailed logging is off by default; errors are always recorded.
+
+[h2]COMPATIBILITY[/h2]
+
+Use this instead of the original Gate Push Fix; enable one crowd-push protection plugin. Works with vanilla and modified interface skins. It addresses observed crossings of closed player-owned doors, rather than replacing the game's collision and pathfinding systems.
+
+[h2]AUTHORSHIP[/h2]
+
+Independently written by LEOPARD. Thank you to [b]requizm[/b] for the idea and original [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3730136323]Gate Push Fix[/url]. Its source was not provided with the original package or found in the author's public links; no original code or DLL is included here.
+
+[b]Our source code:[/b] [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins/tree/main/GatePushGuard]Gate Push Guard source[/url]. GPL-3.0-or-later.

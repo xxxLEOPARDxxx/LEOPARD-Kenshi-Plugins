@@ -42,10 +42,10 @@ def supported_section(lang):
     other=', '.join(e['name']+' ('+e['author']+')' for e in entries if e['group']=='other_fork')
     if lang=='ru':
         rows=['[b]Наши плагины:[/b] '+names('own',True)+'.','[b]Наши форки Emkej8:[/b] '+names('emkej_fork')+'.','[b]Наши форки других авторов:[/b] '+other+'.']
-        tail='У самого Mod Config Menu есть страница настроек. В список входят подготовленные и отключённые сборки; Organize the Inventory пока собран локально. Dynamic Factions поддерживает MCM, но ещё разрабатывается. XP Overhaul (Asur) — отдельная локальная сборка. Эти моды устанавливаются отдельно.'
+        tail='У самого Mod Config Menu есть страница настроек. В список входят подготовленные и отключённые сборки; Organize the Inventory пока собран локально. Dynamic Factions поддерживает MCM, но ещё разрабатывается. Global Satellite Map - локальный прототип спутникового слоя глобальной карты. XP Overhaul (Asur) - отдельная локальная сборка. Эти моды устанавливаются отдельно.'
         return section('ПОДДЕРЖИВАЕМЫЕ ПЛАГИНЫ И ФОРКИ',bullets(rows)+'\n\n'+tail)
     rows=['[b]Our plugins:[/b] '+names('own',True)+'.','[b]Our Emkej8 forks:[/b] '+names('emkej_fork')+'.','[b]Our forks of other authors:[/b] '+other+'.']
-    tail='Mod Config Menu also has its own settings page. The list includes prepared and disabled builds; Organize the Inventory is currently a local build. Dynamic Factions supports MCM but remains in development. XP Overhaul (Asur) is a separate local build. These mods are installed separately.'
+    tail='Mod Config Menu also has its own settings page. The list includes prepared and disabled builds; Organize the Inventory is currently a local build. Dynamic Factions supports MCM but remains in development. Global Satellite Map is a local prototype for a satellite world-map layer. XP Overhaul (Asur) is a separate local build. These mods are installed separately.'
     return section('SUPPORTED PLUGINS AND FORKS',bullets(rows)+'\n\n'+tail)
 
 def apply_sections(table,items):

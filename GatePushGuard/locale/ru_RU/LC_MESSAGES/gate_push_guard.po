@@ -1,0 +1,24 @@
+# Gate Push Guard, independently authored by LEOPARD. GPL-3.0-or-later.
+msgid ""
+msgstr "Language: ru_RU\nContent-Type: text/plain; charset=UTF-8\nMIME-Version: 1.0\n"
+
+msgid "Stops observed crowd-push entry through closed player gates and doors. Independently authored; use instead of Gate Push Fix."
+msgstr "Препятствует замеченному проталкиванию внутрь через закрытые ворота и двери игрока. Самостоятельная разработка; используется вместо Gate Push Fix."
+
+msgid "Protection"
+msgstr "Защита"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Return a character only after an observed outside-to-inside crossing through a continuously closed player door. Existing occupants and gate closure are never enough to move anyone."
+msgstr "Возвращает персонажа только после замеченного прохода снаружи внутрь через непрерывно закрытую дверь игрока. Само закрытие ворот и нахождение внутри не вызывают перемещение."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Log recognized door geometry and corrected crossings in RE_Kenshi_log.txt. Errors are always logged."
+msgstr "Записывает распознанную геометрию дверей и исправленные проходы в RE_Kenshi_log.txt. Ошибки записываются всегда."

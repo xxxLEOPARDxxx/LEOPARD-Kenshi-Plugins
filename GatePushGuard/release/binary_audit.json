@@ -1,0 +1,152 @@
+{
+  "image": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\Kenshi_x64.exe",
+  "sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
+  "kenshilib_sha256": "5b6240622d06801dc39896e385efb834b8e1fe2fcdf86067d071ae7a04f6c83b",
+  "plugin_sha256": "663eca69da2b838eef333159099a04c0324b4846e9bb65fdffb8a3a8e7f61402",
+  "mcm_export_verified": true,
+  "plugin_exports": [
+    "?startPlugin@@YAXXZ",
+    "MCM_Describe"
+  ],
+  "native_import_count": 33,
+  "imports_missing": [],
+  "bindings": [
+    {
+      "name": "?resetGame@GameWorld@@QEAAXXZ",
+      "rva": "0x36ca40",
+      "slot": 3588
+    },
+    {
+      "name": "?isPaused@GameWorld@@QEBA_NXZ",
+      "rva": "0xdedc0",
+      "slot": 3628
+    },
+    {
+      "name": "?isLoadingFromASaveGame@GameWorld@@QEAA_NXZ",
+      "rva": "0x785310",
+      "slot": 3633
+    },
+    {
+      "name": "?_NV_mainLoop_GPUSensitiveStuff@GameWorld@@QEAAXM@Z",
+      "rva": "0x787e70",
+      "slot": 3649
+    },
+    {
+      "name": "?_NV_onBuildingLoaded@DoorStuff@@QEAAXXZ",
+      "rva": "0x297200",
+      "slot": 2870
+    },
+    {
+      "name": "?setDoorState@DoorStuff@@QEAAXW4DoorState@@@Z",
+      "rva": "0x298fc0",
+      "slot": 2879
+    },
+    {
+      "name": "?_NV_update@DoorStuff@@QEAAXXZ",
+      "rva": "0x298ff0",
+      "slot": 2885
+    },
+    {
+      "name": "?getDoorPosition@DoorStuff@@QEBAAEBVVector3@Ogre@@XZ",
+      "rva": "0x332810",
+      "slot": 2886
+    },
+    {
+      "name": "?getDoorPosOutside@DoorStuff@@QEBAAEBVVector3@Ogre@@XZ",
+      "rva": "0x2969f0",
+      "slot": 2887
+    },
+    {
+      "name": "?getCurrentLocale@LocaleManager@@QEBAPEAVLocaleInfo@@XZ",
+      "rva": "0x174bc0",
+      "slot": 4649
+    },
+    {
+      "name": "?getDoorPosInside@DoorStuff@@QEBAAEBVVector3@Ogre@@XZ",
+      "rva": "0x338630",
+      "slot": 2889
+    },
+    {
+      "name": "?newGame@SaveFileSystem@@QEAAXXZ",
+      "rva": "0x470d00",
+      "slot": 6167
+    },
+    {
+      "name": "?loadGame@SaveFileSystem@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+      "rva": "0x474340",
+      "slot": 6168
+    },
+    {
+      "name": "?isRagdoll@Character@@QEBA_NXZ",
+      "rva": "0x7d08a0",
+      "slot": 1740
+    },
+    {
+      "name": "?_NV_isUnconcious@Character@@QEBA_NXZ",
+      "rva": "0x5c9380",
+      "slot": 1748
+    },
+    {
+      "name": "?teleport@Character@@QEAAXAEBVVector3@Ogre@@@Z",
+      "rva": "0x5c9bf0",
+      "slot": 1767
+    },
+    {
+      "name": "?teleport@Character@@QEAAXAEBVVector3@Ogre@@AEBVQuaternion@3@@Z",
+      "rva": "0x5c7a50",
+      "slot": 1766
+    },
+    {
+      "name": "?isDead@Character@@QEBA_NXZ",
+      "rva": "0x620b20",
+      "slot": 1859
+    },
+    {
+      "name": "?isBeingCarried@Character@@QEBA_NXZ",
+      "rva": "0x14aa60",
+      "slot": 1860
+    },
+    {
+      "name": "??0hand@@QEAA@IIW4itemType@@II@Z",
+      "rva": "0xccff0",
+      "slot": 3809
+    },
+    {
+      "name": "??Bhand@@QEBA_NXZ",
+      "rva": "0x64540",
+      "slot": 3818
+    },
+    {
+      "name": "?getCharacter@hand@@QEBAPEAVCharacter@@XZ",
+      "rva": "0x7974f0",
+      "slot": 3819
+    },
+    {
+      "name": "?getBuilding@hand@@QEBAPEAVBuilding@@XZ",
+      "rva": "0x791d70",
+      "slot": 3822
+    },
+    {
+      "name": "?_NV_update@CharMovement@@QEAAXM@Z",
+      "rva": "0x65f510",
+      "slot": 2093
+    },
+    {
+      "name": "?isTrackingAnimationMode@CharMovement@@QEBA_NXZ",
+      "rva": "0x595af0",
+      "slot": 2130
+    },
+    {
+      "name": "?getCharacter@CharMovement@@QEAAPEAVCharacter@@XZ",
+      "rva": "0x2ae030",
+      "slot": 2135
+    },
+    {
+      "name": "?getInstance@LocaleManager@@SAPEAV1@XZ",
+      "rva": "0x120560",
+      "slot": 4645
+    }
+  ],
+  "dll_bytes": 120832,
+  "status": "PASS offline executable/binding audit and independent source/native-contract review; actual leaf asset coverage, live behavior/FPS/memory require game acceptance"
+}

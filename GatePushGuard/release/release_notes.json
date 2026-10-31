@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "changes": {
+    "en": [
+      "New independently authored protection for observed outside-to-inside crowd-push crossings through closed player-owned gates and doors.",
+      "Continuous closed-state history, actual finite door-leaf bounds and conservative exclusions prevent proximity or gate closure from moving existing occupants.",
+      "Optional live MCM settings, standalone defaults, English/Russian/Simplified Chinese interface and detailed logging off by default."
+    ],
+    "ru": [
+      "Новая самостоятельно написанная защита от замеченного проталкивания снаружи внутрь через закрытые ворота и двери игрока.",
+      "Непрерывная история закрытого состояния, конечные границы самой створки и осторожные исключения: близость к двери и закрытие ворот не перемещают находящихся внутри.",
+      "Необязательные настройки MCM с применением сразу, отдельные настройки без MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию."
+    ]
+  }
+}
