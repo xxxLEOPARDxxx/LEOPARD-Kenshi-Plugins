@@ -212,5 +212,17 @@
       "Removed the ongoing maximum-distance observation scan and periodic writes. New settings apply immediately. English, Russian and Chinese translations updated.",
       "Russian in-game tooltips use supported hyphens; compiled-translation checks prevent unsupported typographic dashes returning."
     ]
+  },
+  "Formations": {
+    "version": "2",
+    "published_version": "1",
+    "en": [
+      "[b]Correct language from Steam Workshop.[/b] The MCM page and in-game formation readout now follow the game language even when the plugin is installed outside the local mods folder.",
+      "[b]Normal and RE_Kenshi launches.[/b] Both executable locations find the same game settings; personal settings and formations stored in saves remain unchanged."
+    ],
+    "ru": [
+      "[b]Правильный язык из Steam Workshop.[/b] Страница MCM и игровые подписи строя используют язык игры, даже если плагин установлен вне локальной папки mods.",
+      "[b]Обычный запуск и RE_Kenshi.[/b] Оба расположения EXE находят настройки игры; личные настройки и строй в сохранениях не меняются."
+    ]
   }
 }

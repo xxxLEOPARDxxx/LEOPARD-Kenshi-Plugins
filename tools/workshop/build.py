@@ -185,7 +185,7 @@ ITEMS = [
             "neutrals, diplomats. A heavily optimised fork of BFrizzleFoShizzle's mod with "
             "settings in Mod Config Menu."),
     # Форк Formations от Slinkysalmon03 (исходники шли с модом в Мастерской, GPLv3) - 17.10.2026.
-    dict(mod="Formations", title="Formations Extended (MCM fork) (QoL)", nexus=2235, version="1",
+    dict(mod="Formations", title="Formations Extended (MCM fork) (QoL)", nexus=2235, version="2",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Bannerlord-style squad formations: drag a shape, march in order, and keep a formation "
             "while following the leader - 13 follow shapes, a shape of its own for every squad. A fork of "

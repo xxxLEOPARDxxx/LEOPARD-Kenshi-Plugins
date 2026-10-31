@@ -305,7 +305,7 @@
       "ru": "Автор приложил исходники к оригинальному моду в Steam Workshop; отдельный публичный репозиторий не подтверждён.",
       "en": "The author shipped source code with the original Steam Workshop mod; no separate public repository has been verified."
     },
-    "version": "1",
+    "version": "2",
     "changes": {
       "ru": [
         "Добавлен строй при следовании с 13 доступными фигурами: 3 игровых и 10 новых; выбор каждого отряда хранится с сохранением.",
@@ -325,6 +325,16 @@
         ],
         "en": [
           "Added follow formations with 13 offered shapes (3 native and 10 new), per-squad selection saved with the game, and 11 drag shapes (4 original and 7 new). Added an arbitrary modifier key, optional Hold after forming up, and English/Russian/Chinese MCM settings."
+        ]
+      },
+      "2": {
+        "ru": [
+          "[b]Правильный язык из Steam Workshop.[/b] Страница MCM и игровые подписи строя используют язык игры, даже если плагин установлен вне локальной папки mods.",
+          "[b]Обычный запуск и RE_Kenshi.[/b] Оба расположения EXE находят настройки игры; личные настройки и строй в сохранениях не меняются."
+        ],
+        "en": [
+          "[b]Correct language from Steam Workshop.[/b] The MCM page and in-game formation readout now follow the game language even when the plugin is installed outside the local mods folder.",
+          "[b]Normal and RE_Kenshi launches.[/b] Both executable locations find the same game settings; personal settings and formations stored in saves remain unchanged."
         ]
       }
     },
