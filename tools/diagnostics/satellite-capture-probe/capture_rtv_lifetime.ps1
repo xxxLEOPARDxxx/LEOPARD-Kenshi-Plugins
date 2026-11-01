@@ -49,12 +49,15 @@ try {
             $lineStart=$text.LastIndexOf("`n",$index)+1
             $section=$text.Substring($lineStart)
         }
-        if($section -match 'quarantined|retaining resources|cleanup unverified|budget exceeded|did not stabilize|capture refused|context changed|RTV.*refused'){throw $section}
+        if($section -match 'quarantined|retaining resources|retained until process exit|cleanup refused|cleanup unverified|budget exceeded|did not stabilize|capture refused|context changed|RTV.*refused|geography.*refused'){throw $section}
         $success=$section.Contains('owned RTV lifetime proof complete; creation debts=6')
     } while(!$success -and ([DateTime]::UtcNow-$began).TotalSeconds -lt $TimeoutSeconds)
     if(!$success){throw 'Timeout before owned RTV cleanup proof'}
     if($section.Contains('private painted arrays loaded:4pairs core2,2; RGBA full-chain;')){
         $scope='private single-biome/four-pair painted Terrain reference, generated full mip chains; not complete map'
+    }
+    if($section.Contains('geography pools loaded:15SIDs 92DDS 39ordered layouts')){
+        $scope='private 15-biome geographic Terrain reference, primary1,1, zero distortion/fade; not complete map'
     }
     if(([regex]::Matches($section,'owned RTV creation debt released slot=')).Count -ne 6){throw 'Not exactly six creation-reference releases'}
     if(([regex]::Matches($section,'kernel-joined; omitted HANDLE close repaired')).Count -ne 1){throw 'Missing unique worker close'}
