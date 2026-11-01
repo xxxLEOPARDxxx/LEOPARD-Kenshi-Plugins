@@ -164,6 +164,7 @@ namespace
             return;
         g_enabled = GetPrivateProfileIntA(SECTION, "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA(SECTION, "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
         g_compact = ReadIniString("Layout", "wide") == "compact";
         g_sort = ReadIniString("Sort", "az") == "difficulty" ? SORT_DIFFICULTY : SORT_AZ;
         g_sortDesc = GetPrivateProfileIntA(SECTION, "SortDesc", 0, ini.c_str()) != 0;

@@ -178,6 +178,7 @@ namespace
 
         g_enabled = GetPrivateProfileIntA("GearCompare", "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA("GearCompare", "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
         g_showTotal = GetPrivateProfileIntA("GearCompare", "ShowTotal", 0, ini.c_str()) != 0;
         g_compareEmpty = GetPrivateProfileIntA("GearCompare", "CompareEmptySlot", 0, ini.c_str()) != 0;
         g_craftCompare = GetPrivateProfileIntA("GearCompare", "CraftCompare", 1, ini.c_str()) != 0;

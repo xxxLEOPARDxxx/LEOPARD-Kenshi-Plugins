@@ -485,6 +485,7 @@ namespace
         g_colourPercent =
             GetPrivateProfileIntA("Bars", "ColourPercent", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA("Bars", "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
         g_useGameTheme = GetPrivateProfileIntA("Colours", "UseGameTheme", 1, ini.c_str()) != 0;
 
         g_hold = ReadFloat(ini, "HoldSeconds", 3.0f);

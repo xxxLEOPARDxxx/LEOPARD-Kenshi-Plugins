@@ -99,3 +99,8 @@ QuickStartSelect.ini — ваши настройки: обновление мо�
 ИЗМЕНЕНИЯ 16.10.2026
 
 - Список предысторий открывается с начала, выбрана первая строка. Раньше выбирался старт, который сейчас у окна игры (currentStart), и список прокручивался к нему - в середину (жалобы игроков). Игре выбранный старт передаётся только при «Начать», как и раньше.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

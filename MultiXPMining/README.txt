@@ -1,4 +1,4 @@
-﻿MULTI XP MINING - универсальная добыча с MCM
+MULTI XP MINING - универсальная добыча с MCM
 
 [Nexus — our release / наша версия](https://www.nexusmods.com/kenshi/mods/2258)
 
@@ -161,3 +161,8 @@ Debug=1 включает ограниченные сводки; Debug=0 по у�
 после запроса - страница MCM ещё не была перестроена.
 Повторный щелчок по уже выбранному источнику повторяет запрос обновления
 его параметров, если предыдущее обращение попало на пересоздание окна.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

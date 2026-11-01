@@ -194,6 +194,7 @@ namespace
         g_maxDistance = static_cast<float>(ReadInt(ini, "MaxDistance", 150, 20, 5000));
         g_maxMarkers = ReadInt(ini, "MaxMarkers", 64, 8, kPoolMax);
         g_debug = ReadBool(ini, "Debug", false);
+        KLocLog::SetEnabled(g_debug);
         HideAll();                      // размер и цвет - при следующем кадре
     }
 

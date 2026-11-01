@@ -93,6 +93,7 @@ void Settings()
     std::string ini = Ini();
     enabled = !hookFailure && GetPrivateProfileIntA(ID, "Enabled", 0, ini.c_str()) != 0;
     debug = GetPrivateProfileIntA(ID, "Debug", 0, ini.c_str()) != 0;
+    KLocLog::SetEnabled(debug);
     InterlockedIncrement(&GSM::generation);
 }
 void Diagnostic(const std::string &s)

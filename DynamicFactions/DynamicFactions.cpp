@@ -101,6 +101,7 @@ namespace
         const char* const section = "DynamicFactions";
         g_enabled = GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
         g_debug = GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
         DfHireSetDebug(g_debug);
         g_workEnabled = GetPrivateProfileIntA(section, "Work", 1, ini.c_str()) != 0;
         g_mineRadius = GetPrivateProfileIntA(section, "MineRadius", 3000, ini.c_str());

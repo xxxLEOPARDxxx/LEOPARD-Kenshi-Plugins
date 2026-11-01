@@ -411,6 +411,7 @@ namespace
         g_maxSource = ReadInt(ini, "MaxSourceSize", 4096, 512, 8192);
         g_swapRB = ReadBool(ini, "SwapRedBlue", false);
         g_debug = ReadBool(ini, "Debug", false);
+        KLocLog::SetEnabled(g_debug);
         Invalidate();
     }
 

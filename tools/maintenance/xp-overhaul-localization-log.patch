@@ -1,0 +1,23 @@
+--- a/XP_Overhaul/XP_Overhaul.cpp
++++ b/XP_Overhaul/XP_Overhaul.cpp
+@@ -1,3 +1,4 @@
++#include <LocalizationLog.h>
+ #define NOMINMAX
+ #define WIN32_LEAN_AND_MEAN
+ 
+@@ -762,6 +763,7 @@
+ 
+ static void LoadConfig()
+ {
++    KLocLog::FollowConfiguration localeLog(g_config.debugLog);
+     g_config = XpOverhaulConfig();
+     ResetRuntimeOverrides();
+ 
+@@ -3016,6 +3018,7 @@
+ 
+     int __cdecl SetLogging(void*, int value, char* err, unsigned size)
+     {
++        KLocLog::FollowConfiguration localeLog(g_config.debugLog);
+         const bool previousDebug = g_config.debugLog;
+         const bool previousDeltas = g_config.logStatDeltas;
+         g_config.debugLog = value != 0;

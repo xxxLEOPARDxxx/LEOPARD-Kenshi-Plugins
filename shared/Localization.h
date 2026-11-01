@@ -42,6 +42,7 @@
 #pragma warning(pop)
 
 #include <Debug.h>
+#include <LocalizationLog.h>
 
 #include <cstdio>
 #include <cstring>
@@ -437,9 +438,17 @@ namespace KLoc
     inline bool LoadDomain(const std::string& localeBase, const std::string& localeId)
     {
         const std::string stem = Join(Join(Join(localeBase, localeId), "LC_MESSAGES"), KLOC_DOMAIN);
-        if (FileExists(stem + ".mo") && LoadMo(stem + ".mo"))
-            return true;
-        return FileExists(stem + ".po") && LoadPo(stem + ".po");
+        if (FileExists(stem + ".mo"))
+        {
+            if (LoadMo(stem + ".mo")) return true;
+            ErrorLog(KLOC_DOMAIN ": cannot load translation " + stem + ".mo");
+        }
+        if (FileExists(stem + ".po"))
+        {
+            if (LoadPo(stem + ".po")) return true;
+            ErrorLog(KLOC_DOMAIN ": cannot load translation " + stem + ".po");
+        }
+        return false;
     }
 
     inline void Reload()
@@ -451,7 +460,7 @@ namespace KLoc
         if (localeBase.empty())
         {
             LoadedLocaleId() = localeId;
-            DebugLog(KLOC_DOMAIN ": locale folder not found, staying English");
+            ErrorLog(KLOC_DOMAIN ": locale folder not found, staying English");
             return;
         }
 
@@ -472,7 +481,7 @@ namespace KLoc
         char message[256];
         sprintf_s(message, KLOC_DOMAIN ": locale id='%s', strings loaded=%d",
             localeId.empty() ? "<empty>" : localeId.c_str(), (int)Catalog().size());
-        DebugLog(message);
+        KLocLog::SetSummary(message);
     }
 
     // Словарь загружается ОДИН раз за сессию и больше не перестраивается.
@@ -558,7 +567,7 @@ inline const char* TrFmt(const char* english)
         sprintf_s(message,
             KLOC_DOMAIN ": format mismatch in translation of \"%.160s\", using English",
             english);
-        DebugLog(message);
+        ErrorLog(message);
         return english;
     }
     return it->second.c_str();

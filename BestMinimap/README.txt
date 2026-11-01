@@ -1,4 +1,4 @@
-﻿BEST MINIMAP (QoL)
+BEST MINIMAP (QoL)
 
 Миникарта в углу экрана. Требуется RE_Kenshi.
 
@@ -148,3 +148,8 @@ arrow size is copied into draw commands. Dotted and solid circles are capped at
 Legacy CameraArrowSize=0 is migrated once to the actual previous pixel size,
 so the displayed value can be reduced. Russian in-game text uses ASCII hyphens;
 typographic dashes are unsupported by the game font.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

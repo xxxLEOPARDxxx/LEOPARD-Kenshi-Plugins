@@ -181,6 +181,7 @@ namespace
         g_allInventories = GetPrivateProfileIntA(sec, "AllInventories", 0, ini.c_str()) != 0;
         g_deadHours = GetPrivateProfileIntA(sec, "DeadMarkerHours", 24, ini.c_str());
         g_debug = GetPrivateProfileIntA(sec, "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
 
         // Служебные слова, которые не считаются общим словом в имени
         // («король», «лидер»...). Язык любой - строка в ini в UTF-8.

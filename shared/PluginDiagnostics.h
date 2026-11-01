@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <PluginSettings.h>
 #include <Debug.h>
+#include <LocalizationLog.h>
 #include <string>
 
 // One shared switch per DLL, including all of its translation units.
@@ -13,6 +14,7 @@ namespace PluginDiagnostics
     inline void Configure(const char* section, const std::string& path)
     {
         InterlockedExchange(&Flag(), PluginSettings::Bool(section, "Debug", false, path) ? 1 : 0);
+        KLocLog::SetEnabled(Enabled());
     }
     inline void Write(const std::string& message) { if (Enabled()) DebugLog(message); }
 }

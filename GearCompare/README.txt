@@ -125,3 +125,8 @@ GearCompare.ini — ваши настройки: обновление мода �
 ИЗМЕНЕНИЯ 15.10.2026
 
 - Производительность: панель не раскладывается заново каждый кадр (setCoord только при смене места), пара «с чем сравнивать» ищется при смене вещи или владельца и раз в 300 мс. FPS при сравнении падал почти вдвое.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

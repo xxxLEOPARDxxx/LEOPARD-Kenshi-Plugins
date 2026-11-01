@@ -118,3 +118,8 @@ manual cancellation and return to work with your actual races/beds.
 
 Автор / author: LEOPARD. Основа / foundation: RE_Kenshi/KenshiLib.
 Локализация / localization: общий Localization.h Asur; en_GB/ru_RU/zh_CN.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

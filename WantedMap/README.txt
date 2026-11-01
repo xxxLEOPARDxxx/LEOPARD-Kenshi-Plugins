@@ -130,3 +130,8 @@ WantedMap.ini — ваши настройки: обновление мода е�
 - Метки для других плагинов: экспорт WantedMap_GetMarkers (shared/WantedMapApi.h).
   Его берёт миникарта Best Minimap - цели WantedMap видны и на ней. Отдаётся то
   же, что нарисовано на большой карте.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

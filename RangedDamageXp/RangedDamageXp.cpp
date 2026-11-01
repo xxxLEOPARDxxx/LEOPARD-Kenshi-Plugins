@@ -73,7 +73,7 @@ namespace
     bool  g_turrets = true;           // турели качают навык «Турели»
     bool  g_allies = false;           // опыт за попадания по своим
     bool  g_downed = false;           // опыт за лежачих (без сознания)
-    bool  g_debug = true;             // строка в журнал на каждое попадание
+    bool  g_debug = false;             // строка в журнал на каждое попадание
 
     std::string IniFileName()
     {
@@ -128,7 +128,8 @@ namespace
         g_turrets = ReadBool(ini, "Turrets", g_turrets);
         g_allies = ReadBool(ini, "Allies", g_allies);
         g_downed = ReadBool(ini, "DownedTargets", g_downed);
-        g_debug = ReadBool(ini, "Debug", g_debug);
+        g_debug = ReadBool(ini, "Debug", false);
+        KLocLog::SetEnabled(g_debug);
 
         if (g_xpPerDamage < 0.0f) g_xpPerDamage = 0.0f;
         if (g_maxPerHit < 0.0f) g_maxPerHit = 0.0f;

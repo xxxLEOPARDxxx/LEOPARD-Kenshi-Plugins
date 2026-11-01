@@ -347,6 +347,7 @@ namespace
         }
         g_debug =
             GetPrivateProfileIntA("Tweaks", "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
 
         if (g_rowHeight < 0)
             g_rowHeight = 0;

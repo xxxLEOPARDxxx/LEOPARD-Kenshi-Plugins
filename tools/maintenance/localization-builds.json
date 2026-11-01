@@ -1,0 +1,207 @@
+[
+  {
+    "name": "AIFixed",
+    "source": "D:\\DEV\\Kenshi\\ours\\AIFixed"
+  },
+  {
+    "name": "AssignedWorkers",
+    "source": "D:\\DEV\\Kenshi\\ours\\AssignedWorkers"
+  },
+  {
+    "name": "BestMinimap",
+    "source": "D:\\DEV\\Kenshi\\ours\\BestMinimap"
+  },
+  {
+    "name": "BuildModeGizmo",
+    "source": "D:\\DEV\\Kenshi\\ours\\BuildModeGizmo"
+  },
+  {
+    "name": "DynamicFactions",
+    "source": "D:\\DEV\\Kenshi\\ours\\DynamicFactions",
+    "subdirs": [
+      "core",
+      "game",
+      "ui"
+    ]
+  },
+  {
+    "name": "GatePushGuard",
+    "source": "D:\\DEV\\Kenshi\\ours\\GatePushGuard"
+  },
+  {
+    "name": "GearCompare",
+    "source": "D:\\DEV\\Kenshi\\ours\\GearCompare"
+  },
+  {
+    "name": "GlobalSatelliteMap",
+    "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap"
+  },
+  {
+    "name": "ItemMarkers",
+    "source": "D:\\DEV\\Kenshi\\ours\\ItemMarkers"
+  },
+  {
+    "name": "LiveXpBars",
+    "source": "D:\\DEV\\Kenshi\\ours\\LiveXpBars"
+  },
+  {
+    "name": "ModConfigMenu",
+    "source": "D:\\DEV\\Kenshi\\ours\\ModConfigMenu"
+  },
+  {
+    "name": "MultiXPMining",
+    "source": "D:\\DEV\\Kenshi\\ours\\MultiXPMining"
+  },
+  {
+    "name": "PatientSelfAid",
+    "source": "D:\\DEV\\Kenshi\\ours\\PatientSelfAid"
+  },
+  {
+    "name": "QuickStartSelect",
+    "source": "D:\\DEV\\Kenshi\\ours\\QuickStartSelect"
+  },
+  {
+    "name": "RangedDamageXp",
+    "source": "D:\\DEV\\Kenshi\\ours\\RangedDamageXp"
+  },
+  {
+    "name": "RecruitMarkers",
+    "source": "D:\\DEV\\Kenshi\\ours\\RecruitMarkers"
+  },
+  {
+    "name": "SkillLevelUpInfo",
+    "source": "D:\\DEV\\Kenshi\\ours\\SkillLevelUpInfo"
+  },
+  {
+    "name": "StatColours",
+    "source": "D:\\DEV\\Kenshi\\ours\\StatColours"
+  },
+  {
+    "name": "UITweaks",
+    "source": "D:\\DEV\\Kenshi\\ours\\UITweaks"
+  },
+  {
+    "name": "WantedMap",
+    "source": "D:\\DEV\\Kenshi\\ours\\WantedMap"
+  },
+  {
+    "name": "Container-Highlight",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Container-Highlight",
+    "project": true
+  },
+  {
+    "name": "Vital-Sense",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Vital-Sense",
+    "project": true
+  },
+  {
+    "name": "Vital-Read",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Vital-Read",
+    "project": true
+  },
+  {
+    "name": "Job-B-Gone",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Job-B-Gone",
+    "project": true
+  },
+  {
+    "name": "Organize-the-Trader",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Trader",
+    "project": true
+  },
+  {
+    "name": "Organize-the-Inventory",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Inventory",
+    "project": true
+  },
+  {
+    "name": "Organize-the-Crafting-Stations",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Organize-the-Crafting-Stations",
+    "project": true
+  },
+  {
+    "name": "Auto-Pause-on-Load",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Auto-Pause-on-Load",
+    "project": true
+  },
+  {
+    "name": "Loot-Scoot-Execute",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Loot-Scoot-Execute",
+    "project": true
+  },
+  {
+    "name": "Wall-B-Gone",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Wall-B-Gone",
+    "project": true
+  },
+  {
+    "name": "Hidden-Faction-Relations",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Hidden-Faction-Relations",
+    "project": true
+  },
+  {
+    "name": "Map-markers",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Map-markers",
+    "project": true
+  },
+  {
+    "name": "KenshiJobManagement",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KenshiJobManagement",
+    "project": true
+  },
+  {
+    "name": "CharacterHighlight",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\Character-Highlight",
+    "project": true
+  },
+  {
+    "name": "CharacterInspector",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\CharacterInspector\\src",
+    "project": false
+  },
+  {
+    "name": "BetterLooting",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\BetterLooting\\Source",
+    "project": false
+  },
+  {
+    "name": "KillCounter",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KillCounter",
+    "project": false
+  },
+  {
+    "name": "KenshiRotate",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KenshiRotate\\src",
+    "project": false
+  },
+  {
+    "name": "TauntExpansion",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\TauntExpansion",
+    "project": false
+  },
+  {
+    "name": "StackSort",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\StackSort",
+    "subdirs": [
+      "src/common",
+      "src/packer",
+      "src/plugin",
+      "src/ui",
+      "src/worker"
+    ],
+    "include": [
+      "src/common",
+      "src/packer",
+      "src/plugin",
+      "src/ui",
+      "src/worker"
+    ],
+    "define": [
+      "STACKSORT_ENABLE_ROTATION"
+    ]
+  },
+  {
+    "name": "XP_Overhaul",
+    "source": "D:\\DEV\\Kenshi\\forks\\XP_Overhaul-src\\XP_Overhaul"
+  }
+]

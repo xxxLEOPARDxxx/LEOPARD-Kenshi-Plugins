@@ -3008,6 +3008,7 @@ static void __cdecl McmSelfReload()
 {
     const std::string ini = ModuleDir() + "ModConfigMenu.ini";
     g_debug = GetPrivateProfileIntA("ModConfigMenu", "Debug", 0, ini.c_str()) != 0;
+    KLocLog::SetEnabled(g_debug);
 }
 
 extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
@@ -3025,6 +3026,7 @@ __declspec(dllexport) void startPlugin()
     // ini игрока - см. shared/IniDefaults.h (11.10.2026).
     const std::string ini = IniDefaults::Prepare(ModuleDir() + "ModConfigMenu.ini");
     g_debug = GetPrivateProfileIntA("ModConfigMenu", "Debug", 0, ini.c_str()) != 0;
+    KLocLog::SetEnabled(g_debug);
 
     InstallWheelRouting();
     InstallMouseCapture();

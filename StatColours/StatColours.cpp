@@ -502,6 +502,7 @@ namespace
         }
         g_debug = (GetPrivateProfileIntA("Debug", "Debug", 0,
                                          ini.c_str()) != 0);
+        KLocLog::SetEnabled(g_debug);
         CacheColours();
         g_useGameTheme = GetPrivateProfileIntA("Colours", "UseGameTheme", 1, ini.c_str()) != 0;
     }

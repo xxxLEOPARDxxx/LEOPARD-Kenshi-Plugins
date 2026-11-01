@@ -168,3 +168,8 @@ StatColours.ini — ваши настройки: обновление мода �
 - Защита без оружия в руках: итог брался из getMeleeDefence(true), а он у безоружного отдаёт защиту в рукопашной (от боевых искусств). Голый персонаж с защитой 48 и боевыми искусствами 0 показывал «(-49) 48». Теперь getMeleeDefence_melee(true) - так же, как атака (getMeleeAttack_melee).
 - Строка «Боевая стойка» в разборе защиты: getMeleeDefence_melee(true) - (false). Скобка её и так включала, а разбор нет - со включённым «Блоком» строки не складывались в скобку. Стойка входит в ключ кэша разбора.
 - В подсказках MCM и в ini скобка - просто «поправка» (не «от снаряжения»), в подсказке стороны скобок перечислено, что в неё входит. Каталоги en/ru/zh обновлены.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

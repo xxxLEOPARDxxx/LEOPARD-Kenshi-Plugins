@@ -170,6 +170,7 @@ namespace
         GetPrivateProfileStringA("ItemMarkers", "HoldKey", "NONE", key, sizeof(key), ini.c_str());
         g_holdKey = HoldKey::Parse(key);
         g_debug = ReadInt(ini, "Debug", 0, 0, 1) != 0;
+        KLocLog::SetEnabled(g_debug);
         RefreshAll();                   // из MCM - перерисовать открытые иконки
     }
 

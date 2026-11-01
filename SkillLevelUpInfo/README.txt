@@ -1,4 +1,4 @@
-﻿SKILL LEVEL UP INFO / XP INFO PARITY
+SKILL LEVEL UP INFO / XP INFO PARITY
 
 Original / Оригинал: XP Info - experience gain notifications, semper1dem
 (Steam: Alexander). Thanks to the original author for this feature design.
@@ -294,3 +294,8 @@ to eliminate Native progress-row churn or prove runtime FPS/memory performance.
 персонажа: контекст больше не сбрасывается из-за этой ошибки. Внешний вид полос
 не меняется. Нативные пересоздания строк и итоговые FPS/память требуют отдельного
 игрового замера.
+
+
+Localization diagnostics / Журнал локализации (2026-11-01)
+Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
+Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.

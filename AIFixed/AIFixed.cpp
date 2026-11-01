@@ -140,6 +140,7 @@ namespace
             g_selfRepairWear = 100;
         g_debug =
             GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
+        KLocLog::SetEnabled(g_debug);
     }
 
 
