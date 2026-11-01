@@ -115,8 +115,6 @@ and other plugins/autosaves were not disabled. No attribution or leak-free claim
 Batching avoids the observed ~200MB per16 from repeated full scene recreation;
 bounded shader reuse alone did not remove that growth.
 
-## Outstanding
-
 ## Native estimate underflow at2048 (first trial refused)
 
 PID28788/start03:39:27.6007385Z, c78a1e7/DLL9fbae335, actual2048primary1,1,
@@ -139,12 +137,45 @@ conservative16M bound, persistent invalid telemetry expires, all other excess
 values still refuse. Readiness resets and requires three subsequent ordinary
 stable samples.9 new real production-policy cases cover this observed fixture
 and refusal boundaries; old code fails the fixture. Full370 checks/116imports,
-independent review clear. Actual recovery must still be observed after install.
+independent review clear. Actual recovery is documented below.
+
+## Live2048 recovery and budget refusal
+
+PID28960/start03:49:12.6735080Z, source58a749f,
+DLLd3a326adc65b99bfa241ed94a91008492b224f014d020685bf6e4377fa656ae3.
+Tokens205/305 captured primary1,1 at2048/alt16000 in4004/2770ms. Repeat step10
+and11 actually returned the exact pending underflow with visible1672/1743 and
+unbuilt924/1017; subsequent valid samples recovered and completed. Both raw
+GBuffer AND raw Sun pixel arrays were identical. Exposed images differ by at
+most one8-bit level (20316 pixels), consistent with separately snapshotted live
+adaptation. Native terrain peaks752310656/751752224B; position all4194304valid,
+nonfinite0 and radial residual~.004m. All3BMPs exactly2048x2048/16777270B.
+
+Token306 attempted a16-cell2048 batch and saved five cells, then its next region
+crossed the existing1GiB native geometry limit (1090440256B). It refused, joined
+and closed the worker, removed the private scene and balanced all named resource
+counts. No completed16-cell atlas was claimed. The attempted UI map-close test
+arrived AFTER this budget refusal, so map-close cancellation is NOT live-proven.
+Token405 afterwards successfully captured primary1,1 again (2987ms), proving
+reusability after the partial/budget cleanup. Token505 at altitude20000 also
+completed (2739ms), nativepeak736281792B, all position pixels finite.
+
+Five requests total: nine saved cells, five joined/closed workers and five scene
+cleanups; texture1957652437/material10766708/highProgram926733 stayed balanced
+and only three cached named programs persisted. Evidence isolated-2048-28960-*
+and isolated-2048-28960-proof.json. Process private idle later8842121216B after
+these captures vs initial game~7.7GB: allocator/driver/native retention remains
+unresolved. Balanced named resources are not a leak-free or FPS claim.
+
+Normal game close verified; ONLY the exact private probe line was removed from
+mods.cfg, preserving every other byte. Its request API and preview are disabled,
+raster reset512; installed diagnostic files/evidence retained. Backup and final
+log are in clean-shutdown. DF/public plugins were not developed/published here.
 
 ## Remaining work
 
 Further allocator/cache isolation and refinement/seams need proof before heavier
-rendering. Then prove native exposure, unloaded/player/modded building
+rendering. Native exposure is live-proven as a diagnostic only. Complete unloaded/player/modded building
 proxies, water/shadows/fog, interactive global-map integration and dynamic day/night
 refresh. The512 diagnostics must not be advertised as the requested finished map.
 BestMinimap is unchanged. No satellite/DF public package or publication was made.

@@ -484,4 +484,14 @@ publishes vertices before its index count. The private warmup now waits only on
 that exact underflow during unfinished builds, preserving all original caps and
 adding conservative visible*8572<=16M for fixed patch64. Three valid samples are
 still required; no output from invalid telemetry.370 checks/116imports and
-independent review pass. Recovery is pending live proof, not assumed.
+independent review pass. Recovery was observed live in PID28960/source58a749f:
+two2048 captures at16000m matched raw GBuffer and Sun exactly; exposed BMPs
+differ by<=1level from live adaptation. The repeat contained two real pending
+underflow samples followed by valid stable output. All4194304 position pixels
+were finite. Nativepeak~752MB. A16-cell2048 batch saved five then refused the
+unchanged1GiB geometry budget; the next standalone capture succeeded after its
+cleanup. Altitude20000 also completed. Nine saved cells across five requests,
+all five workers joined/closed, five scenes removed and named resources balanced.
+Whole-process retention remains open (~8.84GB idle after this run); no zero-leak
+or FPS acceptance claim. Private probe was disabled and game closed after proof.
+Details/evidence: docs/verification/2026-11-01-satellite-isolated-live.md.

@@ -165,3 +165,11 @@ This is a staged refinement/resource experiment, not final8K. Native viewport
 height increases LOD metric, so keep detail(8,8,0) unchanged for comparison.
 Compare geometry/nativepeak/output vs512, repeat cleanup, then assess a primary
 boundary with overlap before choosing the final large-target/budget strategy.
+
+2048 proof58a749f is now accepted for standalone cells (including actual transient
+index-count recovery); repeated raw surfaces are identical. The16-cell batch
+hits its1GiB native limit after five cells and cleans up. Do not increase the
+limit blindly. Next design must recycle native geometry between primary cells
+while retaining bounded render resources, investigate process-memory retention,
+then measure adjacent world samples/LOD morph seams. Final8192 targets remain
+disabled. At checkpoint the game is closed/private probe disabled, source pushed.
