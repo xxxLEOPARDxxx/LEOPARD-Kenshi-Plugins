@@ -26,8 +26,9 @@ assert total==45799579 and total<128*1024*1024
 source=(here/'PrivatePaintedReference.h').read_text()
 assert source.index('PrivateBiomeReference::Hash(encoded)!=input.sha256')<source.index('image.load(stream,"png")')
 assert source.index('ImageShape(kind,')<source.index('createManual(Name(kind)')
-assert 'textures[kind]->getNumMipmaps()!=0' in source and 'textures[kind]->getFormat()!=first.getFormat()' in source
-assert source.index('if(!write(textures[kind]')<source.index('finish(textures[kind]')<source.index('uncertain=false;',source.index('finish(textures[kind]'))
+# GPU descriptor/filtering and native completion ordering are exercised by the
+# compiled production seams in run_gpu_mip_tests/run_painted_mip_tests, rather
+# than requiring the obsolete mip0 native array-writer implementation text.
 assert 'setMaterialCallbacks' not in source and 'ManualResourceLoader' not in source
 assert 'remove(ProgramName())' in source and 'cache.Owns(0,program.get())' in source
-print('8 actual RGBA PNG identities/alpha,45799579encoded bytes; private decode/upload source ordering passed')
+print('8 actual RGBA PNG identities/alpha,45799579encoded bytes; pre-allocation decode ordering passed')

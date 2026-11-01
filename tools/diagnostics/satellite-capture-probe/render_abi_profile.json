@@ -168,6 +168,18 @@
         "code": "8b 91 d0 00 00 00 83 fa 02 0f 94 c0 c3 cc cc cc 8b 41 18 c3 cc cc cc cc"
       },
       {
+        "key": "PrivateResourceCreator",
+        "name": "?getCreator@Resource@Ogre@@UEAAPEAVResourceManager@2@XZ",
+        "rva": "666d0",
+        "code": "48 8b 41 58 c3 cc cc cc cc cc cc cc cc cc cc cc 48 8d 81 88 00 00 00 c3"
+      },
+      {
+        "key": "PrivateResourceNotifyLoaded",
+        "name": "?_notifyResourceLoaded@ResourceManager@Ogre@@UEAAXPEAVResource@2@@Z",
+        "rva": "293f30",
+        "code": "40 53 48 83 ec 20 48 8b 02 48 8b d9 48 8b ca ff 90 a0 00 00 00 48 8d 8b"
+      },
+      {
         "key": "PrivateResourceSetLoaded",
         "name": "?setToLoaded@Resource@Ogre@@UEAAXXZ",
         "rva": "66740",
@@ -317,6 +329,10 @@
     "rtt_getter_rva": "4c6e0",
     "windows": [
       {
+        "rva": "247a0",
+        "code": "48 8b 81 08 02 00 00 c3 cc cc cc cc cc cc cc cc 48 8b 81 e8 01 00 00 c3"
+      },
+      {
         "rva": "4c410",
         "code": "40 55 56 57 48 8d ac 24 10 ff ff ff 48 81 ec f0 01 00 00 48 c7 44 24 48"
       },
@@ -367,6 +383,7 @@
     ],
     "rtt_destructor_rva": "4ca80",
     "texture_vtable_rva": "7ce08",
-    "texture_array_upload_rva": "4cae0"
+    "texture_array_upload_rva": "4cae0",
+    "texture_srv_getter_rva": "247a0"
   }
 }

@@ -69,6 +69,7 @@
 #include "RasterPolicy.h"
 #include "OwnedRtvDebt.h"
 #include "../../../GlobalSatelliteMap/TextureArrayPolicy.h"
+#include "../../../GlobalSatelliteMap/GpuMipUpload.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace

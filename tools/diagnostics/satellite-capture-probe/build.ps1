@@ -9,6 +9,10 @@ $out=Join-Path $PSScriptRoot 'build'
 New-Item -ItemType Directory -Force $out | Out-Null
 & $python "$PSScriptRoot/verify_render_abi.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$repo/GlobalSatelliteMap/tests/run_gpu_mip_tests.ps1"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$PSScriptRoot/run_painted_mip_tests.ps1"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$repo/GlobalSatelliteMap/tests/run_shader_tests.ps1"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/embed_position_shader.py"

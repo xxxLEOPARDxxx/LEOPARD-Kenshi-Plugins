@@ -2,15 +2,58 @@
 #include "PrivatePaintedInputs.h"
 #include "PaintedShader.h"
 #include "../../../GlobalSatelliteMap/PaintedMapPolicy.h"
+#include "PaintedMipPolicy.h"
 struct PrivatePaintedReference
 {
-    struct Images {Ogre::Image image[4];std::vector<BYTE> encoded[4];};
+    struct Images {Ogre::Image image[4];std::vector<BYTE> encoded[4];SatelliteGpuMip::Layer layers[4];};
     Images *images[2];Ogre::TexturePtr textures[2];Ogre::HighLevelGpuProgramPtr program;
     ProbePolicy::FixedProgramCache cache;bool uncertain;
     PrivatePaintedReference():uncertain(false){images[0]=images[1]=NULL;}
     static const char *Name(unsigned kind)
     {return kind?"LEOPARD_PrivatePaintedColour":"LEOPARD_PrivatePaintedOverlay";}
     static const char *ProgramName(){return "LEOPARD_PrivatePaintedFragment";}
+    struct UploadOperations
+    {
+        typedef ID3D11ShaderResourceView* (__fastcall *BorrowedSrv)(Ogre::Texture*);
+        typedef Ogre::ResourceManager* (__fastcall *Creator)(Ogre::Resource*);
+        typedef void (__fastcall *NotifyLoaded)(Ogre::ResourceManager*,Ogre::Resource*);
+        Ogre::Texture *texture;Images &sources;unsigned kind;PaintedMipPolicy::Plan plan;
+        ID3D11ShaderResourceView *view;Ogre::ResourceManager *creator;
+        Creator getCreator;NotifyLoaded notify;PrivateBiomeReference::IsLoaded loaded;
+        PrivateBiomeReference::SetLoaded finish;
+        UploadOperations(Ogre::Texture *owned,Images &input,unsigned index,const PaintedMipPolicy::Plan &shape):
+            texture(owned),sources(input),kind(index),plan(shape),view(NULL),creator(NULL)
+        {
+            getCreator=reinterpret_cast<Creator>(AbiExport(nativeApi.ogre,PrivateResourceCreatorName,PrivateResourceCreatorRva));
+            notify=reinterpret_cast<NotifyLoaded>(AbiExport(nativeApi.ogre,PrivateResourceNotifyLoadedName,PrivateResourceNotifyLoadedRva));
+            loaded=reinterpret_cast<PrivateBiomeReference::IsLoaded>(AbiExport(nativeApi.ogre,PrivateResourceLoadedName,PrivateResourceLoadedRva));
+            finish=reinterpret_cast<PrivateBiomeReference::SetLoaded>(AbiExport(nativeApi.ogre,PrivateResourceSetLoadedName,PrivateResourceSetLoadedRva));
+        }
+        bool Preflight()
+        {
+            Ogre::Image &first=sources.image[0];
+            if(!OnMain()||!RenderAbiMatches()||!texture||!IsPrivateArrayTexture(texture)||
+                texture->getName()!=Name(kind)||texture->getTextureType()!=Ogre::TEX_TYPE_2D_ARRAY||
+                texture->getDepth()!=4||texture->getWidth()!=first.getWidth()||texture->getHeight()!=first.getHeight()||
+                texture->getNumMipmaps()!=plan.additionalMips||texture->getFormat()!=first.getFormat()||loaded(texture))return false;
+            creator=getCreator(texture);
+            if(creator!=static_cast<Ogre::ResourceManager*>(&Ogre::TextureManager::getSingleton()))return false;
+            // Guarded nonvirtual native getter; never use the incompatible SDK
+            // D3D11Texture layout or Texture::getCustomAttribute (native no-op).
+            BorrowedSrv getter=reinterpret_cast<BorrowedSrv>(reinterpret_cast<BYTE*>(nativeApi.d3d11)+PrivateArraySrvGetterRva);
+            view=getter(texture);
+            return view!=NULL; // Borrowed only, scoped to this operations object.
+        }
+        bool Upload()
+        {
+            return SUCCEEDED(SatelliteGpuMip::UploadFourLayerMipChain(view,
+                static_cast<UINT>(sources.image[0].getWidth()),static_cast<UINT>(sources.image[0].getHeight()),
+                plan.levels,static_cast<DXGI_FORMAT>(plan.dxgiFormat),sources.layers));
+        }
+        void Notify(){notify(creator,texture);}
+        void SetLoaded(){finish(texture);}
+        bool Loaded(){return loaded(texture);}
+    };
     static void Read(const PrivatePaintedInput &input,const std::string &gameRoot,std::vector<BYTE> &encoded,size_t &total)
     {
         if(!SatelliteTextureArray::AddBytes(total,input.bytes))throw std::runtime_error("private painted input byte budget refused");
@@ -50,7 +93,7 @@ struct PrivatePaintedReference
         if(!OnMain()||!owner||uncertain||images[0]||images[1]||!textures[0].isNull()||!textures[1].isNull()||!program.isNull())
             throw std::runtime_error("private painted reference context/ownership refused");
         PrepareProgram(owner);
-        size_t encodedBytes=0,decodedBytes=0;
+        size_t encodedBytes=0,decodedBytes=0,gpuBytes=0;PaintedMipPolicy::Plan plans[2];
         for(unsigned kind=0;kind<2;++kind)
         {
             if(Ogre::TextureManager::getSingleton().resourceExists(Name(kind)))throw std::runtime_error("private painted texture-name collision");
@@ -68,34 +111,41 @@ struct PrivatePaintedReference
                    !SatelliteTextureArray::AddBytes(decodedBytes,image.getSize())||
                    (layer&&image.getFormat()!=images[kind]->image[0].getFormat()))
                     throw std::runtime_error("private painted decoded RGBA shape/format/byte budget refused");
+                const Ogre::PixelBox pixels=image.getPixelBox(0,0);
+                if(!pixels.data||pixels.data!=image.getData()||pixels.left||pixels.top||pixels.front||
+                   pixels.right!=image.getWidth()||pixels.bottom!=image.getHeight()||pixels.back!=1||
+                   pixels.rowPitch!=image.getWidth()||pixels.slicePitch!=image.getWidth()*image.getHeight()||
+                   pixels.format!=image.getFormat())
+                    throw std::runtime_error("private painted mip0 contiguous pixel layout refused");
+                images[kind]->layers[layer].data=pixels.data;images[kind]->layers[layer].bytes=image.getSize();
             }
+            const Ogre::Image &first=images[kind]->image[0];
+            if(!PaintedMipPolicy::Select(kind,first.getWidth(),first.getHeight(),first.getFormat(),plans[kind]))
+                throw std::runtime_error("private painted full-mip plan refused");
         }
-        // Validate both complete CPU arrays before either GPU allocation. Each
-        // mip0 layer is uploaded unchanged: no alpha stripping or pixel conversion.
+        if(!PaintedMipPolicy::Budget(plans,gpuBytes))throw std::runtime_error("private painted full-chain GPU budget refused before allocation");
+        {std::ostringstream message;message<<"private painted full-mip preflight: levels=11/12 layers=4/4 gpuTexelBytes="<<gpuBytes
+            <<" cap="<<PaintedMipPolicy::GpuLimit<<"; manager size is base-level accounting only";Log(message.str());}
+        // Both complete CPU arrays and the explicit full-chain GPU budget are
+        // validated before either GPU array allocation. Upload mip0 unchanged;
+        // GenerateMips once per full-array SRV, then one credit + Loaded state.
         for(unsigned kind=0;kind<2;++kind)
         {
             Ogre::Image &first=images[kind]->image[0];uncertain=true;
             textures[kind]=Ogre::TextureManager::getSingleton().createManual(Name(kind),"Landscape",Ogre::TEX_TYPE_2D_ARRAY,
-                first.getWidth(),first.getHeight(),4,0,first.getFormat(),0x15,NULL);
+                first.getWidth(),first.getHeight(),4,plans[kind].additionalMips,first.getFormat(),0x15,NULL);
             if(textures[kind].isNull())throw std::runtime_error("private painted array constructor returned null");
             uncertain=false;
-            if(!OnMain()||!RenderAbiMatches()||!IsPrivateArrayTexture(textures[kind].getPointer())||
-                textures[kind]->getTextureType()!=Ogre::TEX_TYPE_2D_ARRAY||textures[kind]->getDepth()!=4||
-                textures[kind]->getWidth()!=first.getWidth()||textures[kind]->getHeight()!=first.getHeight()||
-                textures[kind]->getNumMipmaps()!=0||textures[kind]->getFormat()!=first.getFormat())
-                throw std::runtime_error("private painted GPU array shape/format differs");
-            PrivateBiomeReference::WriteArray write=reinterpret_cast<PrivateBiomeReference::WriteArray>(reinterpret_cast<BYTE*>(nativeApi.d3d11)+PrivateArrayUploadRva);
-            PrivateBiomeReference::IsLoaded loaded=reinterpret_cast<PrivateBiomeReference::IsLoaded>(AbiExport(nativeApi.ogre,PrivateResourceLoadedName,PrivateResourceLoadedRva));
-            PrivateBiomeReference::SetLoaded finish=reinterpret_cast<PrivateBiomeReference::SetLoaded>(AbiExport(nativeApi.ogre,PrivateResourceSetLoadedName,PrivateResourceSetLoadedRva));
-            if(loaded(textures[kind].getPointer()))throw std::runtime_error("private painted array loaded before upload");
-            uncertain=true;
-            if(!write(textures[kind].getPointer(),images[kind]->image,4))throw std::runtime_error("private painted array upload/accounting unverified");
-            finish(textures[kind].getPointer());
-            if(!loaded(textures[kind].getPointer()))throw std::runtime_error("private painted Loaded state unverified");
-            uncertain=false;
+            UploadOperations operations(textures[kind].getPointer(),*images[kind],kind,plans[kind]);
+            if(!PaintedMipPolicy::CompleteUpload(operations,uncertain))
+                throw std::runtime_error("private painted full-mip upload/native completion unverified");
+            std::ostringstream message;message<<"private painted full-mip submitted: kind="<<kind<<" levels="<<plans[kind].levels
+                <<" DXGI="<<plans[kind].dxgiFormat<<" gpuTexelBytes="<<plans[kind].gpuBytes
+                <<" creator=TextureManager notify=1 Loaded=1; native pixel equivalence pending";Log(message.str());
         }
         for(unsigned kind=0;kind<2;++kind){delete images[kind];images[kind]=NULL;}
-        std::ostringstream message;message<<"private painted arrays loaded:4pairs core2,2; RGBA mip0; sourceBytes="<<encodedBytes<<" decodedBytes="<<decodedBytes;Log(message.str());
+        std::ostringstream message;message<<"private painted arrays loaded:4pairs core2,2; RGBA full-chain; sourceBytes="<<encodedBytes
+            <<" decodedBytes="<<decodedBytes<<" gpuTexelBytes="<<gpuBytes;Log(message.str());
     }
     void Program(const Ogre::MaterialPtr &material)
     {

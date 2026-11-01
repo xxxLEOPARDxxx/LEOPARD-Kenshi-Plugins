@@ -32,12 +32,18 @@ for key,module in profile.items():
         assert struct.unpack_from('<Q',pe.data,pe.offset(vtable))[0] == base+destructor
         texture_vtable = int(module['texture_vtable_rva'],16)
         array_upload = int(module['texture_array_upload_rva'],16)
+        texture_srv_getter = int(module['texture_srv_getter_rva'],16)
         assert struct.unpack_from('<Q',pe.data,pe.offset(texture_vtable)+0x2d8)[0] == base+array_upload
+        # Hidden nonvirtual accessor is profiled code, never a guessed C++ SDK
+        # field getter. Only the COM view it returns is borrowed by our code.
+        assert pe.data[pe.offset(texture_srv_getter):pe.offset(texture_srv_getter)+8] == bytes.fromhex('488b8108020000c3')
+        assert any(int(w['rva'],16)==texture_srv_getter for w in module['windows'])
         lines += [f'static const DWORD PrivateRttVtableRva = 0x{vtable:x};',
                   f'static const DWORD PrivateRttGetterRva = 0x{getter:x};',
                   f'static const DWORD PrivateRttDestructorRva = 0x{destructor:x};',
                   f'static const DWORD PrivateArrayTextureVtableRva = 0x{texture_vtable:x};',
-                  f'static const DWORD PrivateArrayUploadRva = 0x{array_upload:x};']
+                  f'static const DWORD PrivateArrayUploadRva = 0x{array_upload:x};',
+                  f'static const DWORD PrivateArraySrvGetterRva = 0x{texture_srv_getter:x};']
     checks = list(module['windows'])
     for entry in module['exports']:
         assert exports.get(entry['name']) == (int(entry['rva'],16),False), f'export mismatch {entry}'

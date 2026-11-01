@@ -629,8 +629,14 @@ cell1,1 and standalone512 diagnostics. It reads exactly eight hash-guarded PNGs
 from native painted tiles2,2 through3,3. Four RGBA1024 overlays and four RGBA2048
 colour maps remain unchanged, including alpha. Encoded45799579bytes, decoded
 80MiB; each encoded/decoded aggregate caps128MiB. Two private arrays contain
-four layers each and exactly one mip: native minification mip chains are not
-accepted by this input experiment. This requires a later mip-complete stage.
+four layers each. The current local candidate creates native full chains:
+11levels for1024 overlays,12levels for2048 colour. Unchanged mip0 bytes are
+uploaded through the standard D3D11 immediate context; GenerateMips runs once
+per array. Exact resource/full-SRV descriptors and format support are required.
+PF12 maps to DXGI87/BGRA8 and PF13 to DXGI28/RGBA8, without conversion.
+The explicit full-chain budget is111848096texel bytes (106.666656MiB) under the
+existing128MiB cap, excluding native objects/driver allocations. Ogre manager
+getSize accounting describes base levels and cannot measure this GPU budget.
 
 Native patches at quadtree depth0–2 can cross painted boundaries, so center-based
 material callbacks are unsuitable. One private fragment program selects the
@@ -643,12 +649,20 @@ only when opt-in shader reuse is enabled, without cross-request smart pointers.
 
 All CPU images are checked before GPU allocation; both groups are held together,
 129685659 encoded+decoded bytes in this exact fixture, plus object/codec overhead.
-Direct array upload retains
-the proven state/accounting completion. Private Terrain/material die before
+Both input groups and the full-chain budget are checked before either GPU array
+allocation. Direct GPU upload uses the profile-guarded borrowed SRV getter,
+then the resource's actual TextureManager creator is notified exactly once and
+setToLoaded completes state without another credit. Source images remain held
+through both uploads. A partially submitted or credited failure retains one
+bounded quarantine and is never retried. Private Terrain/material die before
 painted arrays; unverified ownership quarantines one bounded set. Native runtime
 colour/repeat accounting now pass two512 trials: texture2201047008 and
 material13132148 bytes return exactly before/after each request, six RTVs reach0.
 Four fixed cached programs stabilize after the first request. Raw GBuffer and
 linear-clamped Sun BMP pixels are identical; exposed preview differs by at most
-one level in351pixels. Actual painted colours are present, but one biome and
-one-mip painted inputs are deliberately incomplete. See verification report.
+one level in351pixels. These are historical mip0 results from the installed
+ad5d1a7 candidate, not runtime acceptance of the new full-chain candidate.
+Full-chain WARP and native completion seam checks pass locally; no full-chain
+DLL has been installed or requested in game by this change. Native PNG/slice
+pixel comparison and repeat resource/memory measurements remain pending; see
+full-mip-verification.md. One biome still does not represent final geography.
