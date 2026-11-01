@@ -142,3 +142,12 @@ This avoids paying gigabytes for a coarse/incomplete scene. Unloaded town proxie
 detailed biome materials, full sun/shadows/fog/water and runtime day/night refresh
 remain independent unfinished requirements; do not publish a static preview as
 that complete feature. BestMinimap remains unchanged; DF remains paused.
+
+### Unattended native proof checkpoint
+The isolated Terrain construction/world bounds/guards/worker teardown and actual
+512 primary-cell experiment above are now implemented and live-verified. See
+`docs/verification/2026-11-01-satellite-isolated-live.md`:60 captures plus clean
+autosave abort, two identical16-cell surface grids, explicit native HANDLE repair,
+and17 fresh-material accounting-balanced captures. Whole-process memory acceptance
+is still OPEN. Shader reuse is an opt-in next A/B, not a demonstrated memory fix.
+Do not allocate final8K targets by simply increasing the diagnostic Side constant.

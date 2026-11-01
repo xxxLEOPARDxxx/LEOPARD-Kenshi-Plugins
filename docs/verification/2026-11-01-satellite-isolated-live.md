@@ -1,0 +1,107 @@
+# Satellite global map: unattended native-terrain acceptance
+
+Scope: private tooling, not a public plugin release. DF development remains paused.
+The requested final map is4x4 primary cells, each8192x8192. The evidence below is
+512x512 per primary cell, genuine native Terrain, not a completed8K atlas.
+
+## Reproducible whole-world terrain
+
+Canonical source: `tools/diagnostics/satellite-capture-probe`.
+Installed Ogre SHA256: `7d3888d21398647519f10a89b1f300d8606f761ad159e6021a797b1b9b3df5f6`.
+Terrain SHA256: `53afd1e4faf35020556d33f57007d51c2a9d2330b630e39a67161ee850b7a239`.
+Native world width294912m; each primary cell73728m. A fresh private SceneManager,
+Terrain, TIFF stream and camera render genuine installed DistantTerrain material.
+No shared ZoneMap callback, forced NPC zone activation or actor movement is used.
+
+Root loaded `SAT-render-proof-20261101` normally through CUA, without import/reset,
+and kept the game paused with the map open. Named DF/SAT source slots were not
+manually overwritten. Native autosaving continued normally.
+
+PID30032/startUTC2026-11-01T01:55:26.3274481Z, source8d4ebf2, installedDLL
+`502fac6be5d4c4ca4e5a92ca01f20116ead0a2e762528958ab81203951923c18`:
+
+-60 successful primary-cell captures and one clean abort when native autosave
+  became busy. All61 requests logged worker kernel join, corrected HANDLE close
+  and Terrain destruction before its borrowed camera/SceneManager.
+-Two complete4x4 primary-grid passes at altitude16000m. All16 corresponding raw
+  GBuffer BMP pairs were byte-identical. This is repeatable coarse surface data;
+  it does not establish final geometric refinement or building coverage.
+-262144 valid reconstructed positions per512 capture, no NaN/Inf; radial residual
+  about0.004m for this much larger framing. This is an algebra/readback check,
+  not a universal world-space accuracy guarantee.
+-The former native +1thread HANDLE per fresh Terrain no longer occurred. Process
+  totals fluctuated with game/plugins/save activity; those totals are not an
+  exact census of only the diagnostic's resources.
+
+Evidence under the installed game's `_codex_work/global-satellite-20261101`:
+`isolated-native-worker-fixed-30032` (final log,61/61 cleanup counts,10repeat
+metrics, read-only VAD inventories), `isolated-grid-30032` (first16 cells and
+labelled diagnostic plot), `isolated-grid-repeat-30032` (second16 and byte
+comparison), `isolated-grid-fourth-30032` (later16-cell memory pass).
+
+## Memory is not accepted yet
+
+After a later16-cell pass, read-only VirtualQueryEx reported +217567232 committed
+private bytes; mapped/image totals were unchanged. Some burst allocation returned
+during idle, while another retained trend remained. No source-level proportional
+collection was found; native ownership paths for scene pools, Terrain buffers,
+workspace textures and readback staging were independently checked. Their release
+paths do not prove that CRT/driver committed memory returns immediately.
+
+PID35284/startUTC2026-11-01T02:24:23.6256228Z, source44084ac, installedDLL
+`825bed9f121fd343f2421c392bb57e9d99ef4722aeca8126555cf103c419a121`:
+
+-Warmup +two16-cell GBuffer-only passes, then one16-cell full Position/Sun pass.
+-After every Drop: private scene absent, nine named private resources absent,
+  one active game workspace. Texture bytes1957652437 and high-program bytes914017
+  returned to constant values; low-program reported bytes0.
+-Idle private memory grew roughly75MB,70MB,218MB respectively. The full path
+  contributes more retention, but this ordered test is not a randomized causal
+  proof. Compiler heaps, persistent native depth/input-layout caches and general
+  allocator retention remain candidates; no global cleanup is attempted.
+
+The current diagnostic's explicit GPU colour targets cost48bytes/pixel:12MiB
+at512,3GiB at8192, excluding native depth/staging/driver buffers. Overlapping CPU
+depth, floating Sun data and conversion/readback would add significant memory.
+Changing a single Side constant is therefore not an acceptable final8K design.
+The final path needs bounded sampling/staging and reusable render resources.
+
+Evidence: `isolated-AB-35284`, `isolated-AB-35284-warmup`,
+`isolated-AB-35284-geometry1`, `isolated-AB-35284-geometry2`,
+`isolated-AB-35284-full1`.
+
+## Native material accounting defect: fixed in private copies
+
+Resource telemetry exposed a distinct deterministic error: MaterialManager bytes
+decreased13198 per GBuffer-only request and18995 per full request. Native
+Material::clone156800 invokes assignment156420, copying Resource loading stateD0
+and sizeE0 without a manager load credit. Later unload debits the copied size.
+copyDetailsTo1569C0 invokes the same assignment and is not a safe replacement.
+Unchecked native subtraction can eventually wrap unsigned accounting.
+
+Both private copies now create cleanup-owned fresh materials, then use exact
+Technique assignment3729E0 to copy configuration only. Parent identity is checked
+before/after; receive/transparency-shadow flags use exact accessors. Neither
+Resource metadata nor the manager counter is manually patched. No engine-wide
+fix is applied to unrelated game materials.
+
+PID28204/startUTC2026-11-01T02:38:21.0755222Z, source3950a8e, installedDLL
+`c1b2af60d316c251bbd58b549480ab45d2889770dd4dcd08834f2e416f44de75`:
+
+-17 full captures succeeded, including every primary cell.
+-All17 before/after MaterialManager values were exactly10767332.
+-All17 cleanups joined/closed their worker and restored scene0/names0/workspaces1.
+-All16 raw GBuffer images matched the earlier pre-fix grid byte-for-byte.
+-Actual private-byte retention still remained. Correct accounting is not a claim
+  that all memory/FPS issues are fixed.
+
+Evidence: `isolated-material-fixed-28204`, `isolated-material-fixed-28204-warmup`,
+`isolated-material-fixed-28204-grid` (accounting proof and image comparison).
+
+## Remaining feature work
+
+Bounded program reuse and allocator/cache isolation precede heavier rendering.
+Then prove refinement/seams and native exposure, unloaded/player/modded building
+proxies, water/shadows/fog, interactive global-map integration and dynamic day/night
+refresh. The512 diagnostics must not be advertised as the requested finished map.
+BestMinimap is unchanged. No satellite/DF public package or publication was made.
