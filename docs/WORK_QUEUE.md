@@ -6,8 +6,9 @@ not a public release announcement. Latest instructions override historical notes
 1. **Global satellite map — ACTIVE, unfinished.** Deliver an optional working
    GLOBAL map layer,4x4 primary tiles at8192²; preserve BestMinimap's current map.
    Current proof covers private near-terrain layers and four native painted
-   pairs in one512 cell with balanced resource counters; it is not a finished
-   game feature. Complete geographically correct biome mixing/mips, geometry boundaries, building/model
+   pairs with full mip chains in one512 cell and balanced resource counters;
+   see verification/2026-11-01-satellite-painted-full-mips.md. It is not a finished
+   game feature. Complete geographically correct biome mixing, geometry boundaries, building/model
    coverage, water/shadows/day-night and viewer integration. User authorized
    autonomous launch/load/input when away. Latest clarification2026-11-01:
    while the user writes at the PC, do not launch/focus/switch windows; ask the
@@ -36,16 +37,21 @@ not a public release announcement. Latest instructions override historical notes
    Detailed task: docs/superpowers/specs/2026-11-01-save-previews-backlog.md.
    The screenshot includes HUD, minimap and character panels; exclude only
    save/load/pause menus and their backdrop, not the entire interface. Use the
-   actual native game target, never a desktop/menu screenshot. The preview and
-   missing-image row align to the full dialog width; preserve image aspect ratio
-   and cap height to available space. Hide the panel before genuine selection.
+   actual native game target, never a desktop/menu screenshot. The preview spans
+   the dialog width; preserve image aspect ratio and cap height to available
+   space. Hide the entire panel before selection or when no image exists.
+   Latest user refinement: show existing-slot previews in SAVE as well as LOAD;
+   raise the dialog once on opening, never jump on selection or crop the image.
+   New snapshots use filtered1600x900 lossless PNG; legacy640 JPEG stays readable.
+   MCM height100..160%, default120%, applies on next opening; list must grow too.
    Auto/quicksave preserve the visible HUD too. Existing saves without image
    remain usable; only confirmed successful saves receive a new preview.
-5. **Container Highlight maintenance — candidate ready2026-11-01.** Confirmed
+5. **Container Highlight maintenance — installed2026-11-01.** Confirmed
    stale-model restoration retry fault addressed in fork commit9101ad8. Earlier
    fixes covered other paths; the player's exact freeze remains unverified.
-   48 extracted production checks and independent review pass. Install after
-   checking game closure; runtime travel/interior/Alt/save-load acceptance pending.
+   48 extracted production checks and independent review pass. Installed matching
+   ba4ce0f candidate; PID13024 startup confirmed. Runtime travel/interior/Alt/save-load
+   acceptance remains pending; do not claim the player's exact incident cured.
 6. **Organize the Trader unsupported locale — audit closed2026-11-01.** English
    fallback passes for current and v7 loaders with packaged catalogs, including
    German variants. No production defect/new language added. User accepts this

@@ -53,6 +53,9 @@ try {
         $success=$section.Contains('owned RTV lifetime proof complete; creation debts=6')
     } while(!$success -and ([DateTime]::UtcNow-$began).TotalSeconds -lt $TimeoutSeconds)
     if(!$success){throw 'Timeout before owned RTV cleanup proof'}
+    if($section.Contains('private painted arrays loaded:4pairs core2,2; RGBA full-chain;')){
+        $scope='private single-biome/four-pair painted Terrain reference, generated full mip chains; not complete map'
+    }
     if(([regex]::Matches($section,'owned RTV creation debt released slot=')).Count -ne 6){throw 'Not exactly six creation-reference releases'}
     if(([regex]::Matches($section,'kernel-joined; omitted HANDLE close repaired')).Count -ne 1){throw 'Missing unique worker close'}
     $prefix=[regex]::Match($section,('(isolated_terrain_'+$ProbeProcessId+'_\d+_\d+)_gbuffer_raw')).Groups[1].Value
