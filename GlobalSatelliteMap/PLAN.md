@@ -251,3 +251,22 @@ launch/load/close while writing their article. Do not focus their windows.
 Next: independently owned near-biome material inputs; global ZoneMap callbacks
 must not mutate gameplay terrain. Then detailed geometry, buildings/LODs,
 lighting and optional global-map integration. DF remains paused.
+
+### 2026-11-01 private painted near-material checkpoint
+
+The single-biome reference now loads real near layers and four native painted
+pairs in one73728m cell. Native coarse patch bounds disprove center-based paint
+selection; private fragment-level array sampling handles all four pairs instead.
+Two512 requests in PID31500 pass exact texture/material accounting, six RTVrefs0,
+finite readbacks and identical raw GBuffer/linear-clamped Sun BMP pixels.
+Only exposed preview differs<=1level in351pixels. Source ad5d1a7, verification
+report docs/verification/2026-11-01-satellite-painted-reference.md. No public release.
+
+Next: geographically correct biome selection/blend maps and mip-complete inputs,
+then geometry/LOD seams, water/buildings/LODs/native lighting and global viewer.
+One Okran biome still covers the entire test cell, painted arrays have one mip,
+and exposure preview is deliberately not final display tonemapping. These are
+explicit limits; do not present the coloured512 picture as a finished global map.
+Current probe installed eb159be9e... Side512/PaintedMapsReference1/Request0,
+game user-loaded paused/map. Check process before asking close/load; no focus
+changes while user at PC. User says article finished; no new UI-control grant.
