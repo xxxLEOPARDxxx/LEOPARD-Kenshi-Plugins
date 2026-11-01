@@ -1,5 +1,13 @@
 # Save preview refinement, 2026-11-01
 
+Root delivery checkpoint: independently rebuilt candidate328192B,
+SHA256`b6a0589ba8d888062c907c3586e49d8a50c8fba39b85e0269aa37b82ac659d8d`,
+installed with all3 matching MO files after user closure. Personal UITweaks.ini
+hash unchanged. Backup:
+game/_codex_work/ui-save-previews-20261101/before-save-png-height-refinement.
+User acceptance of this new PNG/Save-menu/height refinement is pending. The
+previous full-width candidate7076 was already accepted, before these addenda.
+
 Authorized scope: UITweaks only. No installation, game control or publication by
 this task. The parent authorized a scoped commit after independent review.
 Skill-only design approval gates are explicitly waived.
