@@ -1,0 +1,47 @@
+{
+  "upstream": {
+    "path": "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\Driftmetal Remnants\\Driftmetal Remnants.mod",
+    "sha256": "390c27ec9861cfa9a022c2168b42551a04be3dd784983f81bcd5fd4a56ea1060",
+    "size": 539032,
+    "records": 917,
+    "header": {
+      "author": "Para_Werke",
+      "description": "Driftmetal: Remnants\r\n\r\n[h1]Driftmetal Remnants (V2.1)[/h1]\r\n\r\n[i]once the backbone of interplanetary commerce, the offshore gas fields fell with the First Empire hundreds of years ago. But time can't wash away everything, especially if it was made to last...[/i]\r\n\r\nHello! This mod initially started by just me porting over one or two 3D models from personal projects, but was fleshed out into a decently sized asset collection centered around remnants of an industrial offshore complex of the First Empire. The goal is not to just add random stuff, but to also give a lore tie-in as well as to add new gameplay systems and dialogue. All models and textures have been handcrafted and optimized for Kenshi to ensure this mod runs well.\r\n\r\n[b]Small update (\"V2.1\"), mainly to iron out some quirks and adjust the K-Unit model. Please ask for permission if you wanna use assets from this mod in your own project! The \"Driftmetal All Tech\" research has been removed now, it was available for a couple months and hopefully did its job.[/b]\r\n\r\n[b]This mod adds: [/b]\r\n[list]\r\n[*] 2 new Skeleton Subraces (Worker Drones and K-Units)\r\n[*] 3 new \"Crossbows\" (Gas rifle, Heavy bolting rifle, Custom Gauss Rifle)\r\n[*] 3 new Melee Weapons (Crowbar, Pipe Wrench, Combat Spate)\r\n[*] 7 new backpacks (Two variants of pressure converters, two variants of a \"toolcase\", strapped containers, tactical Backpack, Improvised Pressure Converter)\r\n[*] A new \"Animal\" (Walker Haulers, the robotic equivalent to bulls)\r\n[*] 3 new backpacks for these haulers\r\n[*] 4 new buildings and tech surrounding the extraction and usage of natural gas\r\n[*] new armor, replacement limbs, new dialogue, quest items, new game starts, etc... - Check the V2 Discussion thread for more Info!\r\n[/list]\r\n\r\n\r\n[u]Worker Drones and K-Units:[/u]\r\nWorker drones were the backbone of autonomous industrial operations on the rough seas of Kenshi, completely encased in protective layers of plastic fabric to withstand the weather, waters and work hazards found on the rigs. Once just autonomous systems, drifting on the oceans for hundreds of years made the few remaining units self-aware.\r\nTheir original purpose translates directly into Kenshi, being fast labourers with resistance to all  forms of weather effects. While they might be well protected against environmental hazard, they are not as sturdy as the Skeletons found on the mainland, meaning their HP-Pool is smaller. However, due to their smaller and more flexible \"head\", they can wear headgear. They can be occasionnaly found at bars all over Kenshi.\r\n\r\nK-Units, or Control Units, were \"the middle management\" of the extraction rigs, tasked with coordination of worker drones and ensuring the safety of company assets under all circumstances. Their expensive frame made out of synthetic fibers and lightweight plastics as well as complete consciousness means only a few were produced, although the promise of citizenship after serving on the rigs for decades at least meant no wages had to be paid. In-game, they are an upgrade over the worker drones, featuring higher perception and an innate understanding of ranged combat. The single unit you can currently play comes washed up with their old service jacket, as well as a self-made gauss rifle that beats out conventional oldworld bows through slightly enhanced stats.\r\n\r\n[u]Walker Haulers:[/u]\r\nWalker haulers were, as their name suggests, used to transport all kinds of goods around rigs, from raw materials and fluids, to work equipment, to drones themselves. Their heavy frame and robust, but simple autonomous routine means they rarely break down, although without the cargo holds specifically tailored to their frame, they are not worth much. Stat-wise, they are a direct upgrade of domesticated bulls, featuring a much larger HP pool, higher attack values that are especially effective against unarmored targets, as well as the ability to slowly self-repair. It is suspected that most of them never made it to the shores, but you might find a few of them if you are lucky - although you might need to fix them up first.\r\n\r\n[u]Gas Rifles / Gas Extraction:[/u]\r\nOnce nothing more than mere tools used to expand and maintain the vast array of rigs, gas-pressurized rifles can now be used to defend your newfound freedom. While the traditional gas rifle is a slight upgrade over the Spring Bat at the cost of ammo you have to craft yourself, the heavy bolting rifle brings a new approach to ranged gameplay.\r\nWhile they can be used to demolish even highly armored groups of enemies easily, they are limited directly by the unwieldy canisters they use to generate the necessary pressure. You need to use pressure converters, a new kind of backpack, which are the only reasonable way to carry ammo. Through this balancing decision, players will have to decide which targets are worth engaging, and plan their expeditions accordingly.\r\n\r\nFor you to make use of these new \"crossbows\", you will have to set up fracking towers, which slowly generate natural gas, and store it in a gas silo tank. This gas can then be pressurized into fitting canisters at a gas canister crafting bench, and be stored in a gas ammo chest. Currently, you can research gas extraction normally at tech level 4, but will need to find the blueprint for the crafting process on a specific walker hauler.\r\n\r\n[u]Armor & Backpacks:[/u]\r\nAside from pressure converters, this mod also adds 3 different backpacks that fit the theme. One of them is a \"toolcase\" slung over the shoulder, which has two variants (one for each shoulder). All backpacks can be crafted once you find their blueprint.\r\n\r\n[u]Game Starts:[/u]\r\nFor now, there are four new starts. One is the classic \"Remnants start\", leaving you stranded with a K-Unit and a few drones. Try to make the best out of it! The other one is a general showcase of all items inside this mod. Added in V2 is a lone K-Unit start as well as a \"High Tide\" start, giving you a small army of Drones, K-Units and Walkers right from the start!\r\n\r\n[u]Spoilers:[/u]\r\ncheck the discussion topic \"Spoilers\" for walker locations, tech, secret items, etc.\r\n\r\nAlso:\r\n[i]Are there compability patches for big overhauls?[/i]\r\nYes for Universal Wasteland Expansion, and you do need it for its animations.\r\nYes for Kenshi: Genesis, and same as above, you will need it for the animation sets.\r\nother overhauls: I have not tested other overhauls. Since my mod is mostly disconnected from worldstates, they should be compatible if you place mine under the overhaul in the load order.\r\n\r\n[b]Check my workshop page for patches i made. There is also an alternate color scheme patch.[/b]\r\n\r\n[b]Check out the discussions if you have further questions. Enjoy![/b]\r\n",
+      "dependencies": "gamedata.base,Newwworld.mod,rebirth.mod,Dialogue.mod",
+      "references": "",
+      "tail_hex": "f904000000000000000074040000",
+      "start": 6828,
+      "v": 17
+    }
+  },
+  "installed_ru": {
+    "path": "D:\\DEV\\Kenshi\\backup\\20261101-driftmetal\\installed-merged-ru\\Driftmetal Remnants RU.mod",
+    "sha256": "1860c2da20ff00a593ff41f5247ea8f60dcabfe6c1616bdbe0a048a57e5e0ea7",
+    "size": 578515,
+    "records": 897,
+    "header": {
+      "author": "",
+      "description": "Оригинал не требуется.\r\n\r\nПеревод ради перевода.\r\n\r\nУдалил только игровые и тестовые старты, никогда не видел в них смысла, отдельные моды на игровые старты делают тоже самое.\r\n\r\nОцените автора:\r\nhttps://steamcommunity.com/sharedfiles/filedetails/?id=2882658082\r\n\r\nTranslation for the sake of translation.",
+      "dependencies": "gamedata.base,Newwworld.mod,rebirth.mod,Dialogue.mod",
+      "references": "",
+      "tail_hex": "3800000000000000000009000000",
+      "start": 555,
+      "v": 17
+    }
+  },
+  "animation_patch": {
+    "path": "D:\\DEV\\Kenshi\\backup\\20261101-driftmetal\\installed-animation-patch\\Driftmetal Remnants Anim Patch.mod",
+    "sha256": "bcbd6a2affe45b3f8494f224e1bb96ea03b57cced31f5f0250c3139000986ba6",
+    "size": 1733,
+    "records": 3,
+    "header": {
+      "author": "",
+      "description": "",
+      "dependencies": "Driftmetal Remnants RU.mod",
+      "references": "AnimationOverhaul.mod,DigCombatAnimation.mod,Great Anims Mod.mod,GROUNDED2 Combat Animations.mod,Immersive non-combat animations.mod,More Combat Animation.mod",
+      "tail_hex": "0200000000000000000009000000",
+      "start": 230,
+      "v": 17
+    }
+  }
+}

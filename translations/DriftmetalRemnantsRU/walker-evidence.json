@@ -1,0 +1,5764 @@
+{
+  "walkers": [
+    {
+      "number": 40,
+      "record": {
+        "type": 76,
+        "id": 0,
+        "name": "Walker 40",
+        "string_id": "35-Driftmetal Remnants.mod",
+        "change": 14208,
+        "bool": [
+          [
+            "assigns bounties",
+            0
+          ],
+          [
+            "unique",
+            1
+          ]
+        ],
+        "float": [
+          [
+            "faction importance",
+            0.0
+          ],
+          [
+            "HP mult",
+            1.0
+          ],
+          [
+            "lifespan",
+            40.0
+          ],
+          [
+            "scale max",
+            1.100000023841858
+          ],
+          [
+            "scale min",
+            1.100000023841858
+          ],
+          [
+            "smell blood",
+            0.0
+          ],
+          [
+            "smell eggs",
+            0.0
+          ],
+          [
+            "turn rate",
+            30.0
+          ]
+        ],
+        "int": [
+          [
+            "animal strength",
+            50
+          ],
+          [
+            "attack type",
+            11
+          ],
+          [
+            "bounty amount",
+            0
+          ],
+          [
+            "bounty amount fuzz",
+            0
+          ],
+          [
+            "bounty chance",
+            0
+          ],
+          [
+            "combat stats",
+            40
+          ],
+          [
+            "female chance",
+            0
+          ],
+          [
+            "inventory h",
+            8
+          ],
+          [
+            "inventory w",
+            4
+          ],
+          [
+            "ranged stats",
+            0
+          ],
+          [
+            "stats randomise",
+            3
+          ],
+          [
+            "stealth stats",
+            0
+          ],
+          [
+            "strength",
+            0
+          ],
+          [
+            "unarmed stats",
+            0
+          ]
+        ],
+        "str": [],
+        "file": [],
+        "refs": [
+          [
+            "animations",
+            [
+              [
+                "2861-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "3989-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "3990-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "42068-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "4024-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "4023-gamedata.base",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "backpack",
+            [
+              [
+                "29-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "faction",
+            [
+              [
+                "413-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "inventory",
+            [
+              [
+                "698-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "695-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "696-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "697-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "709-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "708-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "688-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "707-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "710-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "733-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "race",
+            [
+              [
+                "28-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "weapon",
+            [
+              [
+                "46990-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "weapon level",
+            [
+              [
+                "917-gamedata.base",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "incoming": [
+        {
+          "sid": "15-Driftmetal Remnants.mod",
+          "name": "start - Remnants Test",
+          "type": "SQUAD_TEMPLATE",
+          "category": "animals",
+          "value": [
+            1,
+            1,
+            100
+          ]
+        },
+        {
+          "sid": "412-Driftmetal Remnants.mod",
+          "name": "Walkertownrecruit1",
+          "type": "SQUAD_TEMPLATE",
+          "category": "animals",
+          "value": [
+            1,
+            1,
+            100
+          ]
+        }
+      ],
+      "squad_records": [
+        {
+          "type": 52,
+          "id": 0,
+          "name": "start - Remnants Test",
+          "string_id": "15-Driftmetal Remnants.mod",
+          "change": 18768,
+          "bool": [
+            [
+              "building ruined",
+              0
+            ],
+            [
+              "buys illegal",
+              0
+            ],
+            [
+              "buys stolen",
+              0
+            ],
+            [
+              "dont multiply",
+              1
+            ],
+            [
+              "is trader",
+              0
+            ],
+            [
+              "malnourished",
+              0
+            ],
+            [
+              "patrol approaches towns",
+              1
+            ],
+            [
+              "public beds",
+              0
+            ],
+            [
+              "public day",
+              1
+            ],
+            [
+              "public night",
+              0
+            ],
+            [
+              "regenerates",
+              0
+            ],
+            [
+              "roaming military",
+              0
+            ],
+            [
+              "sell home",
+              0
+            ]
+          ],
+          "float": [
+            [
+              "animal age random",
+              0.0
+            ],
+            [
+              "blood smell mult",
+              0.0
+            ],
+            [
+              "buy mult",
+              1.0
+            ],
+            [
+              "vendors refresh time",
+              24.0
+            ]
+          ],
+          "int": [
+            [
+              "bed usage cost",
+              100
+            ],
+            [
+              "building designation",
+              0
+            ],
+            [
+              "crossbow levels",
+              5
+            ],
+            [
+              "force speed",
+              4
+            ],
+            [
+              "gear artifacts base value",
+              0
+            ],
+            [
+              "initial door state",
+              0
+            ],
+            [
+              "item artifacts base value",
+              0
+            ],
+            [
+              "num random chars",
+              0
+            ],
+            [
+              "num random chars max",
+              0
+            ],
+            [
+              "robotics levels",
+              5
+            ],
+            [
+              "vendor money",
+              0
+            ],
+            [
+              "vendors fill total amount",
+              15
+            ]
+          ],
+          "str": [
+            [
+              "building name",
+              ""
+            ],
+            [
+              "layout exterior",
+              ""
+            ],
+            [
+              "layout interior",
+              ""
+            ]
+          ],
+          "file": [],
+          "refs": [
+            [
+              "animals",
+              [
+                [
+                  "43-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ],
+                [
+                  "44-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ],
+                [
+                  "35-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ]
+              ]
+            ],
+            [
+              "squad",
+              [
+                [
+                  "621-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "619-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "626-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "625-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "672-Driftmetal Remnants.mod",
+                  5,
+                  0,
+                  0
+                ],
+                [
+                  "723-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "632-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "631-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "725-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "726-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "727-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ]
+              ]
+            ]
+          ],
+          "inst": []
+        },
+        {
+          "type": 52,
+          "id": 0,
+          "name": "Walkertownrecruit1",
+          "string_id": "412-Driftmetal Remnants.mod",
+          "change": 19072,
+          "bool": [
+            [
+              "building ruined",
+              0
+            ],
+            [
+              "buys illegal",
+              0
+            ],
+            [
+              "buys stolen",
+              0
+            ],
+            [
+              "dont multiply",
+              1
+            ],
+            [
+              "is trader",
+              0
+            ],
+            [
+              "malnourished",
+              0
+            ],
+            [
+              "patrol approaches towns",
+              1
+            ],
+            [
+              "public beds",
+              0
+            ],
+            [
+              "public day",
+              1
+            ],
+            [
+              "public night",
+              0
+            ],
+            [
+              "regenerates",
+              0
+            ],
+            [
+              "roaming military",
+              0
+            ],
+            [
+              "sell home",
+              0
+            ]
+          ],
+          "float": [
+            [
+              "animal age random",
+              0.0
+            ],
+            [
+              "blood smell mult",
+              0.0
+            ],
+            [
+              "buy mult",
+              1.0
+            ],
+            [
+              "vendors refresh time",
+              24.0
+            ]
+          ],
+          "int": [
+            [
+              "bed usage cost",
+              100
+            ],
+            [
+              "building designation",
+              0
+            ],
+            [
+              "crossbow levels",
+              4
+            ],
+            [
+              "force speed",
+              3
+            ],
+            [
+              "gear artifacts base value",
+              0
+            ],
+            [
+              "initial door state",
+              0
+            ],
+            [
+              "item artifacts base value",
+              0
+            ],
+            [
+              "num random chars",
+              0
+            ],
+            [
+              "num random chars max",
+              0
+            ],
+            [
+              "robotics levels",
+              4
+            ],
+            [
+              "vendor money",
+              0
+            ],
+            [
+              "vendors fill total amount",
+              0
+            ]
+          ],
+          "str": [
+            [
+              "building name",
+              ""
+            ],
+            [
+              "layout exterior",
+              ""
+            ],
+            [
+              "layout interior",
+              ""
+            ]
+          ],
+          "file": [],
+          "refs": [
+            [
+              "AI packages",
+              [
+                [
+                  "3382-gamedata.base",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ],
+            [
+              "animals",
+              [
+                [
+                  "35-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ]
+              ]
+            ],
+            [
+              "dialog animal",
+              [
+                [
+                  "414-Driftmetal Remnants.mod",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ],
+            [
+              "faction",
+              [
+                [
+                  "413-Driftmetal Remnants.mod",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ]
+          ],
+          "inst": []
+        }
+      ],
+      "squad_incoming": {
+        "15-Driftmetal Remnants.mod": [
+          {
+            "sid": "14-Driftmetal Remnants.mod",
+            "name": "Driftmetal Remnants Showcase V2",
+            "type": "NEW_GAME_STARTOFF",
+            "category": "squad",
+            "value": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "412-Driftmetal Remnants.mod": [
+          {
+            "sid": "18022-Newwworld.mod",
+            "name": "Mongrel",
+            "type": "TOWN",
+            "category": "bar squads",
+            "value": [
+              1,
+              100,
+              0
+            ]
+          }
+        ]
+      },
+      "dialogue_package": {
+        "type": 73,
+        "id": 0,
+        "name": "walkerdialogue",
+        "string_id": "414-Driftmetal Remnants.mod",
+        "change": 19600,
+        "bool": [],
+        "float": [],
+        "int": [],
+        "str": [
+          [
+            "tag",
+            ""
+          ]
+        ],
+        "file": [],
+        "refs": [
+          [
+            "dialogs",
+            [
+              [
+                "397-Driftmetal Remnants.mod",
+                1,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "item_condition": {
+        "type": 19,
+        "id": 0,
+        "name": "DIALOGUE_LINE",
+        "string_id": "408-Driftmetal Remnants.mod",
+        "change": 5136,
+        "bool": [],
+        "float": [
+          [
+            "chance permanent",
+            100.0
+          ],
+          [
+            "chance temporary",
+            100.0
+          ]
+        ],
+        "int": [
+          [
+            "repetition limit",
+            0
+          ],
+          [
+            "score bonus",
+            0
+          ],
+          [
+            "speaker",
+            1
+          ],
+          [
+            "target is type",
+            0
+          ]
+        ],
+        "str": [
+          [
+            "text0",
+            "We can patch this up... [Specialized CPU]"
+          ]
+        ],
+        "file": [],
+        "refs": [
+          [
+            "lines",
+            [
+              [
+                "409-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "target has item",
+            [
+              [
+                "428-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "join_effect": {
+        "type": 31,
+        "id": 0,
+        "name": "DIALOG_ACTION",
+        "string_id": "411-Driftmetal Remnants.mod",
+        "change": 4112,
+        "bool": [],
+        "float": [],
+        "int": [
+          [
+            "action name",
+            18
+          ]
+        ],
+        "str": [],
+        "file": [],
+        "refs": [],
+        "inst": []
+      },
+      "item_sid": "428-Driftmetal Remnants.mod"
+    },
+    {
+      "number": 22,
+      "record": {
+        "type": 76,
+        "id": 0,
+        "name": "Walker 22",
+        "string_id": "43-Driftmetal Remnants.mod",
+        "change": 19216,
+        "bool": [
+          [
+            "assigns bounties",
+            0
+          ],
+          [
+            "unique",
+            1
+          ]
+        ],
+        "float": [
+          [
+            "faction importance",
+            0.0
+          ],
+          [
+            "HP mult",
+            1.0
+          ],
+          [
+            "lifespan",
+            40.0
+          ],
+          [
+            "scale max",
+            1.100000023841858
+          ],
+          [
+            "scale min",
+            1.100000023841858
+          ],
+          [
+            "smell blood",
+            0.0
+          ],
+          [
+            "smell eggs",
+            0.0
+          ],
+          [
+            "turn rate",
+            30.0
+          ]
+        ],
+        "int": [
+          [
+            "animal strength",
+            50
+          ],
+          [
+            "attack type",
+            11
+          ],
+          [
+            "bounty amount",
+            0
+          ],
+          [
+            "bounty amount fuzz",
+            0
+          ],
+          [
+            "bounty chance",
+            0
+          ],
+          [
+            "combat stats",
+            50
+          ],
+          [
+            "female chance",
+            0
+          ],
+          [
+            "inventory h",
+            8
+          ],
+          [
+            "inventory w",
+            4
+          ],
+          [
+            "ranged stats",
+            0
+          ],
+          [
+            "stats randomise",
+            3
+          ],
+          [
+            "stealth stats",
+            0
+          ],
+          [
+            "strength",
+            0
+          ],
+          [
+            "unarmed stats",
+            0
+          ]
+        ],
+        "str": [],
+        "file": [],
+        "refs": [
+          [
+            "animations",
+            [
+              [
+                "2861-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "3989-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "3990-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "42068-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "4024-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "4023-gamedata.base",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "backpack",
+            [
+              [
+                "31-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "faction",
+            [
+              [
+                "413-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "inventory",
+            [
+              [
+                "718-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "717-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "716-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "715-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "689-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "691-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "690-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "714-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "713-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "712-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "711-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "734-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "1115-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "1118-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "1117-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "1116-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "1127-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "race",
+            [
+              [
+                "28-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "weapon",
+            [
+              [
+                "46990-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "weapon level",
+            [
+              [
+                "917-gamedata.base",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "incoming": [
+        {
+          "sid": "15-Driftmetal Remnants.mod",
+          "name": "start - Remnants Test",
+          "type": "SQUAD_TEMPLATE",
+          "category": "animals",
+          "value": [
+            1,
+            1,
+            100
+          ]
+        },
+        {
+          "sid": "422-Driftmetal Remnants.mod",
+          "name": "Walkertownrecruit2",
+          "type": "SQUAD_TEMPLATE",
+          "category": "animals",
+          "value": [
+            1,
+            1,
+            100
+          ]
+        }
+      ],
+      "squad_records": [
+        {
+          "type": 52,
+          "id": 0,
+          "name": "start - Remnants Test",
+          "string_id": "15-Driftmetal Remnants.mod",
+          "change": 18768,
+          "bool": [
+            [
+              "building ruined",
+              0
+            ],
+            [
+              "buys illegal",
+              0
+            ],
+            [
+              "buys stolen",
+              0
+            ],
+            [
+              "dont multiply",
+              1
+            ],
+            [
+              "is trader",
+              0
+            ],
+            [
+              "malnourished",
+              0
+            ],
+            [
+              "patrol approaches towns",
+              1
+            ],
+            [
+              "public beds",
+              0
+            ],
+            [
+              "public day",
+              1
+            ],
+            [
+              "public night",
+              0
+            ],
+            [
+              "regenerates",
+              0
+            ],
+            [
+              "roaming military",
+              0
+            ],
+            [
+              "sell home",
+              0
+            ]
+          ],
+          "float": [
+            [
+              "animal age random",
+              0.0
+            ],
+            [
+              "blood smell mult",
+              0.0
+            ],
+            [
+              "buy mult",
+              1.0
+            ],
+            [
+              "vendors refresh time",
+              24.0
+            ]
+          ],
+          "int": [
+            [
+              "bed usage cost",
+              100
+            ],
+            [
+              "building designation",
+              0
+            ],
+            [
+              "crossbow levels",
+              5
+            ],
+            [
+              "force speed",
+              4
+            ],
+            [
+              "gear artifacts base value",
+              0
+            ],
+            [
+              "initial door state",
+              0
+            ],
+            [
+              "item artifacts base value",
+              0
+            ],
+            [
+              "num random chars",
+              0
+            ],
+            [
+              "num random chars max",
+              0
+            ],
+            [
+              "robotics levels",
+              5
+            ],
+            [
+              "vendor money",
+              0
+            ],
+            [
+              "vendors fill total amount",
+              15
+            ]
+          ],
+          "str": [
+            [
+              "building name",
+              ""
+            ],
+            [
+              "layout exterior",
+              ""
+            ],
+            [
+              "layout interior",
+              ""
+            ]
+          ],
+          "file": [],
+          "refs": [
+            [
+              "animals",
+              [
+                [
+                  "43-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ],
+                [
+                  "44-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ],
+                [
+                  "35-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ]
+              ]
+            ],
+            [
+              "squad",
+              [
+                [
+                  "621-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "619-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "626-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "625-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "672-Driftmetal Remnants.mod",
+                  5,
+                  0,
+                  0
+                ],
+                [
+                  "723-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "632-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "631-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "725-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "726-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "727-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ]
+              ]
+            ]
+          ],
+          "inst": []
+        },
+        {
+          "type": 52,
+          "id": 0,
+          "name": "Walkertownrecruit2",
+          "string_id": "422-Driftmetal Remnants.mod",
+          "change": 6944,
+          "bool": [
+            [
+              "building ruined",
+              0
+            ],
+            [
+              "buys illegal",
+              0
+            ],
+            [
+              "buys stolen",
+              0
+            ],
+            [
+              "dont multiply",
+              1
+            ],
+            [
+              "is trader",
+              0
+            ],
+            [
+              "malnourished",
+              0
+            ],
+            [
+              "patrol approaches towns",
+              1
+            ],
+            [
+              "public beds",
+              0
+            ],
+            [
+              "public day",
+              1
+            ],
+            [
+              "public night",
+              0
+            ],
+            [
+              "regenerates",
+              0
+            ],
+            [
+              "roaming military",
+              0
+            ],
+            [
+              "sell home",
+              0
+            ]
+          ],
+          "float": [
+            [
+              "animal age random",
+              0.0
+            ],
+            [
+              "blood smell mult",
+              0.0
+            ],
+            [
+              "buy mult",
+              1.0
+            ],
+            [
+              "vendors refresh time",
+              24.0
+            ]
+          ],
+          "int": [
+            [
+              "bed usage cost",
+              100
+            ],
+            [
+              "building designation",
+              0
+            ],
+            [
+              "crossbow levels",
+              5
+            ],
+            [
+              "force speed",
+              3
+            ],
+            [
+              "gear artifacts base value",
+              0
+            ],
+            [
+              "initial door state",
+              0
+            ],
+            [
+              "item artifacts base value",
+              0
+            ],
+            [
+              "num random chars",
+              0
+            ],
+            [
+              "num random chars max",
+              0
+            ],
+            [
+              "robotics levels",
+              5
+            ],
+            [
+              "vendor money",
+              0
+            ],
+            [
+              "vendors fill total amount",
+              0
+            ]
+          ],
+          "str": [
+            [
+              "building name",
+              ""
+            ],
+            [
+              "layout exterior",
+              ""
+            ],
+            [
+              "layout interior",
+              ""
+            ]
+          ],
+          "file": [],
+          "refs": [
+            [
+              "AI packages",
+              [
+                [
+                  "3382-gamedata.base",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ],
+            [
+              "animals",
+              [
+                [
+                  "43-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ]
+              ]
+            ],
+            [
+              "dialog animal",
+              [
+                [
+                  "484-Driftmetal Remnants.mod",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ],
+            [
+              "faction",
+              [
+                [
+                  "413-Driftmetal Remnants.mod",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ]
+          ],
+          "inst": []
+        }
+      ],
+      "squad_incoming": {
+        "15-Driftmetal Remnants.mod": [
+          {
+            "sid": "14-Driftmetal Remnants.mod",
+            "name": "Driftmetal Remnants Showcase V2",
+            "type": "NEW_GAME_STARTOFF",
+            "category": "squad",
+            "value": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "422-Driftmetal Remnants.mod": [
+          {
+            "sid": "49386-rebirth.mod",
+            "name": "World's End",
+            "type": "TOWN",
+            "category": "bar squads",
+            "value": [
+              1,
+              100,
+              0
+            ]
+          }
+        ]
+      },
+      "dialogue_package": {
+        "type": 73,
+        "id": 0,
+        "name": "walkerdialogue2",
+        "string_id": "484-Driftmetal Remnants.mod",
+        "change": 19600,
+        "bool": [],
+        "float": [],
+        "int": [],
+        "str": [
+          [
+            "tag",
+            ""
+          ]
+        ],
+        "file": [],
+        "refs": [
+          [
+            "dialogs",
+            [
+              [
+                "431-Driftmetal Remnants.mod",
+                1,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "item_condition": {
+        "type": 19,
+        "id": 0,
+        "name": "DIALOGUE_LINE copy",
+        "string_id": "443-Driftmetal Remnants.mod",
+        "change": 6944,
+        "bool": [],
+        "float": [
+          [
+            "chance permanent",
+            100.0
+          ],
+          [
+            "chance temporary",
+            100.0
+          ]
+        ],
+        "int": [
+          [
+            "repetition limit",
+            0
+          ],
+          [
+            "score bonus",
+            0
+          ],
+          [
+            "speaker",
+            1
+          ],
+          [
+            "target is type",
+            0
+          ]
+        ],
+        "str": [
+          [
+            "text0",
+            "Let's hope this works... [Recharging Battery Stack]"
+          ]
+        ],
+        "file": [],
+        "refs": [
+          [
+            "lines",
+            [
+              [
+                "444-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "target has item",
+            [
+              [
+                "429-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "join_effect": {
+        "type": 31,
+        "id": 0,
+        "name": "DIALOG_ACTION copy",
+        "string_id": "445-Driftmetal Remnants.mod",
+        "change": 5152,
+        "bool": [],
+        "float": [],
+        "int": [
+          [
+            "action name",
+            18
+          ]
+        ],
+        "str": [],
+        "file": [],
+        "refs": [],
+        "inst": []
+      },
+      "item_sid": "429-Driftmetal Remnants.mod"
+    },
+    {
+      "number": 87,
+      "record": {
+        "type": 76,
+        "id": 0,
+        "name": "Walker 87",
+        "string_id": "44-Driftmetal Remnants.mod",
+        "change": 14432,
+        "bool": [
+          [
+            "assigns bounties",
+            0
+          ],
+          [
+            "unique",
+            1
+          ]
+        ],
+        "float": [
+          [
+            "faction importance",
+            0.0
+          ],
+          [
+            "HP mult",
+            1.0
+          ],
+          [
+            "lifespan",
+            40.0
+          ],
+          [
+            "scale max",
+            1.100000023841858
+          ],
+          [
+            "scale min",
+            1.100000023841858
+          ],
+          [
+            "smell blood",
+            0.0
+          ],
+          [
+            "smell eggs",
+            0.0
+          ],
+          [
+            "turn rate",
+            30.0
+          ]
+        ],
+        "int": [
+          [
+            "animal strength",
+            50
+          ],
+          [
+            "attack type",
+            11
+          ],
+          [
+            "bounty amount",
+            0
+          ],
+          [
+            "bounty amount fuzz",
+            0
+          ],
+          [
+            "bounty chance",
+            0
+          ],
+          [
+            "combat stats",
+            40
+          ],
+          [
+            "female chance",
+            0
+          ],
+          [
+            "inventory h",
+            8
+          ],
+          [
+            "inventory w",
+            4
+          ],
+          [
+            "ranged stats",
+            0
+          ],
+          [
+            "stats randomise",
+            3
+          ],
+          [
+            "stealth stats",
+            0
+          ],
+          [
+            "strength",
+            0
+          ],
+          [
+            "unarmed stats",
+            0
+          ]
+        ],
+        "str": [],
+        "file": [],
+        "refs": [
+          [
+            "animations",
+            [
+              [
+                "2861-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "3989-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "3990-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "42068-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "4024-gamedata.base",
+                0,
+                0,
+                0
+              ],
+              [
+                "4023-gamedata.base",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "backpack",
+            [
+              [
+                "32-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "faction",
+            [
+              [
+                "413-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "inventory",
+            [
+              [
+                "694-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "693-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "692-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "687-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "699-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "700-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "701-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "702-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "705-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "703-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "704-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "706-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ],
+              [
+                "735-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "race",
+            [
+              [
+                "28-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "weapon",
+            [
+              [
+                "46990-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "weapon level",
+            [
+              [
+                "917-gamedata.base",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "incoming": [
+        {
+          "sid": "15-Driftmetal Remnants.mod",
+          "name": "start - Remnants Test",
+          "type": "SQUAD_TEMPLATE",
+          "category": "animals",
+          "value": [
+            1,
+            1,
+            100
+          ]
+        },
+        {
+          "sid": "423-Driftmetal Remnants.mod",
+          "name": "Walkertownrecruit3",
+          "type": "SQUAD_TEMPLATE",
+          "category": "animals",
+          "value": [
+            1,
+            1,
+            100
+          ]
+        }
+      ],
+      "squad_records": [
+        {
+          "type": 52,
+          "id": 0,
+          "name": "start - Remnants Test",
+          "string_id": "15-Driftmetal Remnants.mod",
+          "change": 18768,
+          "bool": [
+            [
+              "building ruined",
+              0
+            ],
+            [
+              "buys illegal",
+              0
+            ],
+            [
+              "buys stolen",
+              0
+            ],
+            [
+              "dont multiply",
+              1
+            ],
+            [
+              "is trader",
+              0
+            ],
+            [
+              "malnourished",
+              0
+            ],
+            [
+              "patrol approaches towns",
+              1
+            ],
+            [
+              "public beds",
+              0
+            ],
+            [
+              "public day",
+              1
+            ],
+            [
+              "public night",
+              0
+            ],
+            [
+              "regenerates",
+              0
+            ],
+            [
+              "roaming military",
+              0
+            ],
+            [
+              "sell home",
+              0
+            ]
+          ],
+          "float": [
+            [
+              "animal age random",
+              0.0
+            ],
+            [
+              "blood smell mult",
+              0.0
+            ],
+            [
+              "buy mult",
+              1.0
+            ],
+            [
+              "vendors refresh time",
+              24.0
+            ]
+          ],
+          "int": [
+            [
+              "bed usage cost",
+              100
+            ],
+            [
+              "building designation",
+              0
+            ],
+            [
+              "crossbow levels",
+              5
+            ],
+            [
+              "force speed",
+              4
+            ],
+            [
+              "gear artifacts base value",
+              0
+            ],
+            [
+              "initial door state",
+              0
+            ],
+            [
+              "item artifacts base value",
+              0
+            ],
+            [
+              "num random chars",
+              0
+            ],
+            [
+              "num random chars max",
+              0
+            ],
+            [
+              "robotics levels",
+              5
+            ],
+            [
+              "vendor money",
+              0
+            ],
+            [
+              "vendors fill total amount",
+              15
+            ]
+          ],
+          "str": [
+            [
+              "building name",
+              ""
+            ],
+            [
+              "layout exterior",
+              ""
+            ],
+            [
+              "layout interior",
+              ""
+            ]
+          ],
+          "file": [],
+          "refs": [
+            [
+              "animals",
+              [
+                [
+                  "43-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ],
+                [
+                  "44-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ],
+                [
+                  "35-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ]
+              ]
+            ],
+            [
+              "squad",
+              [
+                [
+                  "621-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "619-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "626-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "625-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "672-Driftmetal Remnants.mod",
+                  5,
+                  0,
+                  0
+                ],
+                [
+                  "723-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "632-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "631-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "725-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "726-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  "727-Driftmetal Remnants.mod",
+                  1,
+                  0,
+                  0
+                ]
+              ]
+            ]
+          ],
+          "inst": []
+        },
+        {
+          "type": 52,
+          "id": 0,
+          "name": "Walkertownrecruit3",
+          "string_id": "423-Driftmetal Remnants.mod",
+          "change": 14144,
+          "bool": [
+            [
+              "building ruined",
+              0
+            ],
+            [
+              "buys illegal",
+              0
+            ],
+            [
+              "buys stolen",
+              0
+            ],
+            [
+              "dont multiply",
+              1
+            ],
+            [
+              "is trader",
+              0
+            ],
+            [
+              "malnourished",
+              0
+            ],
+            [
+              "patrol approaches towns",
+              1
+            ],
+            [
+              "public beds",
+              0
+            ],
+            [
+              "public day",
+              1
+            ],
+            [
+              "public night",
+              0
+            ],
+            [
+              "regenerates",
+              0
+            ],
+            [
+              "roaming military",
+              0
+            ],
+            [
+              "sell home",
+              0
+            ]
+          ],
+          "float": [
+            [
+              "animal age random",
+              0.0
+            ],
+            [
+              "blood smell mult",
+              0.0
+            ],
+            [
+              "buy mult",
+              1.0
+            ],
+            [
+              "vendors refresh time",
+              24.0
+            ]
+          ],
+          "int": [
+            [
+              "bed usage cost",
+              100
+            ],
+            [
+              "building designation",
+              0
+            ],
+            [
+              "crossbow levels",
+              5
+            ],
+            [
+              "force speed",
+              3
+            ],
+            [
+              "gear artifacts base value",
+              0
+            ],
+            [
+              "initial door state",
+              0
+            ],
+            [
+              "item artifacts base value",
+              0
+            ],
+            [
+              "num random chars",
+              0
+            ],
+            [
+              "num random chars max",
+              0
+            ],
+            [
+              "robotics levels",
+              5
+            ],
+            [
+              "vendor money",
+              0
+            ],
+            [
+              "vendors fill total amount",
+              0
+            ]
+          ],
+          "str": [
+            [
+              "building name",
+              ""
+            ],
+            [
+              "layout exterior",
+              ""
+            ],
+            [
+              "layout interior",
+              ""
+            ]
+          ],
+          "file": [],
+          "refs": [
+            [
+              "AI packages",
+              [
+                [
+                  "3382-gamedata.base",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ],
+            [
+              "animals",
+              [
+                [
+                  "44-Driftmetal Remnants.mod",
+                  1,
+                  1,
+                  100
+                ]
+              ]
+            ],
+            [
+              "dialog animal",
+              [
+                [
+                  "485-Driftmetal Remnants.mod",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ],
+            [
+              "faction",
+              [
+                [
+                  "413-Driftmetal Remnants.mod",
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            ]
+          ],
+          "inst": []
+        }
+      ],
+      "squad_incoming": {
+        "15-Driftmetal Remnants.mod": [
+          {
+            "sid": "14-Driftmetal Remnants.mod",
+            "name": "Driftmetal Remnants Showcase V2",
+            "type": "NEW_GAME_STARTOFF",
+            "category": "squad",
+            "value": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "423-Driftmetal Remnants.mod": [
+          {
+            "sid": "52210-Newwworld.mod",
+            "name": "Black Desert City",
+            "type": "TOWN",
+            "category": "bar squads",
+            "value": [
+              1,
+              100,
+              0
+            ]
+          }
+        ]
+      },
+      "dialogue_package": {
+        "type": 73,
+        "id": 0,
+        "name": "walkerdialogue3",
+        "string_id": "485-Driftmetal Remnants.mod",
+        "change": 19600,
+        "bool": [],
+        "float": [],
+        "int": [],
+        "str": [
+          [
+            "tag",
+            ""
+          ]
+        ],
+        "file": [],
+        "refs": [
+          [
+            "dialogs",
+            [
+              [
+                "447-Driftmetal Remnants.mod",
+                1,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "item_condition": {
+        "type": 19,
+        "id": 0,
+        "name": "DIALOGUE_LINE",
+        "string_id": "478-Driftmetal Remnants.mod",
+        "change": 6496,
+        "bool": [],
+        "float": [
+          [
+            "chance permanent",
+            100.0
+          ],
+          [
+            "chance temporary",
+            100.0
+          ]
+        ],
+        "int": [
+          [
+            "repetition limit",
+            0
+          ],
+          [
+            "score bonus",
+            0
+          ],
+          [
+            "speaker",
+            1
+          ],
+          [
+            "target is type",
+            0
+          ]
+        ],
+        "str": [
+          [
+            "text0",
+            "where was that thing again? [ Ever-Blue Skies AuthCard ]"
+          ]
+        ],
+        "file": [],
+        "refs": [
+          [
+            "lines",
+            [
+              [
+                "480-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "target has item",
+            [
+              [
+                "430-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "join_effect": {
+        "type": 31,
+        "id": 0,
+        "name": "DIALOG_ACTION",
+        "string_id": "481-Driftmetal Remnants.mod",
+        "change": 5360,
+        "bool": [],
+        "float": [],
+        "int": [
+          [
+            "action name",
+            18
+          ]
+        ],
+        "str": [],
+        "file": [],
+        "refs": [],
+        "inst": []
+      },
+      "item_sid": "430-Driftmetal Remnants.mod"
+    }
+  ],
+  "research": [
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Gas extraction research",
+      "string_id": "79-Driftmetal Remnants.mod",
+      "change": 12144,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          4
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Industry"
+        ],
+        [
+          "description",
+          "Enables the extraction and storage of natural gas."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable buildings",
+          [
+            [
+              "56-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "62-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Gas Tools Research",
+      "string_id": "80-Driftmetal Remnants.mod",
+      "change": 11440,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          4
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Enables the production of Gas-powered Rifles, the gas cartridge crafting bench as well as gas ammo storage."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "blueprint item",
+          [
+            [
+              "426-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "enable buildings",
+          [
+            [
+              "67-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "75-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "enable crossbow",
+          [
+            [
+              "49-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "enable item",
+          [
+            [
+              "69-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "70-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "requirements",
+          [
+            [
+              "79-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Pressure Converter Research",
+      "string_id": "424-Driftmetal Remnants.mod",
+      "change": 11440,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          5
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Enables the production of Pressure Converters and the Heavy Bolting Rifle."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "blueprint item",
+          [
+            [
+              "426-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "enable backpack",
+          [
+            [
+              "36-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "37-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "540-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "enable crossbow",
+          [
+            [
+              "45-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "requirements",
+          [
+            [
+              "79-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "80-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Oldworld Backpacks Research",
+      "string_id": "425-Driftmetal Remnants.mod",
+      "change": 12144,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          4
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Enables the production of backpacks worn by old-world remnants"
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable backpack",
+          [
+            [
+              "38-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "542-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "K Unit Prosthetics",
+      "string_id": "427-Driftmetal Remnants.mod",
+      "change": 20000,
+      "bool": [
+        [
+          "blueprint only",
+          0
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          5
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Crafting"
+        ],
+        [
+          "description",
+          "Enables the Production of replacement limbs for K-Units. Depending on the craftsmanship of their creator, these could function just as factory-new replacements, providing substantial bonuses to the user."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable robotics",
+          [
+            [
+              "17-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "18-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "19-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "20-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "requirements",
+          [
+            [
+              "1533521-rebirth.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "1533520-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "V2limbsresearch",
+      "string_id": "503-Driftmetal Remnants.mod",
+      "change": 12144,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          5
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Crafting"
+        ],
+        [
+          "description",
+          "Enables the Production of replacement limbs for B-Units. Depending on the craftsmanship of their creator, these could function just as factory-new replacements, providing substantial bonuses to the user."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable robotics",
+          [
+            [
+              "496-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "497-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "498-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "499-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "requirements",
+          [
+            [
+              "1533521-rebirth.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "1533520-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Utility tools",
+      "string_id": "653-Driftmetal Remnants.mod",
+      "change": 11440,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          2
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          5
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Detailed Blueprints describing the production process of different utility tools originally used on the offshore rigs."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable weapon type",
+          [
+            [
+              "507-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "506-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "508-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Worker Drone Upgrades",
+      "string_id": "658-Driftmetal Remnants.mod",
+      "change": 11440,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          5
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          5
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Crafting"
+        ],
+        [
+          "description",
+          "Enables the production of worker drone utility vests, as well as extended sensory arrays."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable armour",
+          [
+            [
+              "536-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "534-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Riot Armor Research",
+      "string_id": "659-Driftmetal Remnants.mod",
+      "change": 11488,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          5
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          8
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Enables the production of Riot Armor."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable armour",
+          [
+            [
+              "512-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "516-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "517-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "513-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "545-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "514-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "546-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "515-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "547-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "524-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "548-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "549-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "550-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "527-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "529-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Hazmat Gear Research",
+      "string_id": "660-Driftmetal Remnants.mod",
+      "change": 19200,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          4
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          8
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Crafting"
+        ],
+        [
+          "description",
+          "Enables the production of Hazmat Suits and Oldworld Gas Masks."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable armour",
+          [
+            [
+              "583-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "588-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "600-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "614-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "615-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "616-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "580-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "591-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "603-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "637-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "639-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "640-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "577-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "586-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "597-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "606-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "594-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "609-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "531-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "663-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "1125-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Oldworld Tactical Backpacks Research",
+      "string_id": "661-Driftmetal Remnants.mod",
+      "change": 12144,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          4
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Enables the production of backpacks with tactical value."
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable backpack",
+          [
+            [
+              "543-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "39-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "40-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    },
+    {
+      "type": 21,
+      "id": 0,
+      "name": "Oldworld Service Jackets Research",
+      "string_id": "1114-Driftmetal Remnants.mod",
+      "change": 18384,
+      "bool": [
+        [
+          "blueprint only",
+          1
+        ],
+        [
+          "is level upgrade",
+          0
+        ]
+      ],
+      "float": [
+        [
+          "production mult",
+          1.0
+        ],
+        [
+          "repeat mult",
+          1.0
+        ]
+      ],
+      "int": [
+        [
+          "level",
+          4
+        ],
+        [
+          "money",
+          0
+        ],
+        [
+          "power capacity increase",
+          0
+        ],
+        [
+          "power increase",
+          0
+        ],
+        [
+          "repeats",
+          0
+        ],
+        [
+          "time",
+          2
+        ]
+      ],
+      "str": [
+        [
+          "category",
+          "Smithing"
+        ],
+        [
+          "description",
+          "Enables the production of Service Jackets worn by old-world remnants"
+        ]
+      ],
+      "file": [],
+      "refs": [
+        [
+          "enable armour",
+          [
+            [
+              "1106-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "1108-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "1107-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      "inst": []
+    }
+  ],
+  "items": [
+    {
+      "record": {
+        "type": 4,
+        "id": 0,
+        "name": "Specialized CPU",
+        "string_id": "428-Driftmetal Remnants.mod",
+        "change": 13264,
+        "bool": [
+          [
+            "artifact",
+            0
+          ],
+          [
+            "auto icon image",
+            0
+          ],
+          [
+            "food crop",
+            0
+          ],
+          [
+            "has collision",
+            1
+          ],
+          [
+            "trade item",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "charges",
+            1.0
+          ],
+          [
+            "icon offset H",
+            0.7599999904632568
+          ],
+          [
+            "icon offset pitch",
+            90.0
+          ],
+          [
+            "icon offset roll",
+            0.0
+          ],
+          [
+            "icon offset V",
+            0.0
+          ],
+          [
+            "icon offset yaw",
+            90.0
+          ],
+          [
+            "icon zoom",
+            1.5499999523162842
+          ],
+          [
+            "profitability",
+            0.20000000298023224
+          ],
+          [
+            "quality",
+            1.0
+          ],
+          [
+            "weight kg",
+            1.0
+          ]
+        ],
+        "int": [
+          [
+            "inventory footprint height",
+            3
+          ],
+          [
+            "inventory footprint width",
+            3
+          ],
+          [
+            "inventory sound",
+            11
+          ],
+          [
+            "item function",
+            0
+          ],
+          [
+            "persistent",
+            0
+          ],
+          [
+            "production time",
+            4
+          ],
+          [
+            "slot",
+            7
+          ],
+          [
+            "stackable",
+            1
+          ],
+          [
+            "value",
+            100000
+          ]
+        ],
+        "str": [
+          [
+            "description",
+            "A specialized CPU unit for Walkers, needed to calculate weight distribution, priority goals, and pathfinding. Worth quite a bit, but you have a feeling you might want to hang on to it."
+          ]
+        ],
+        "file": [
+          [
+            "ground mesh",
+            ""
+          ],
+          [
+            "icon",
+            ".\\data\\items\\icons\\CPU Unit.png"
+          ],
+          [
+            "mesh",
+            ".\\data\\items\\meshes\\Item_CPU_Unit.mesh"
+          ],
+          [
+            "physics file",
+            ".\\data\\items\\meshes\\Item_Generic.xml"
+          ]
+        ],
+        "refs": [
+          [
+            "material",
+            [
+              [
+                "5263-lanterns_otto.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "incoming": [
+        {
+          "sid": "56146-rebirth.mod",
+          "name": "Bookshop",
+          "type": "SQUAD_TEMPLATE",
+          "category": "special items",
+          "value": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "64855-rebirth.mod",
+          "name": "spider factory",
+          "type": "SQUAD_TEMPLATE",
+          "category": "special items",
+          "value": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "408-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE",
+          "type": "DIALOGUE_LINE",
+          "category": "target has item",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "686-Driftmetal Remnants.mod",
+          "name": "WalkerCPUonly",
+          "type": "VENDOR_LIST",
+          "category": "items",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "record": {
+        "type": 4,
+        "id": 0,
+        "name": "Recharging Battery Stack",
+        "string_id": "429-Driftmetal Remnants.mod",
+        "change": 5456,
+        "bool": [
+          [
+            "artifact",
+            0
+          ],
+          [
+            "auto icon image",
+            0
+          ],
+          [
+            "food crop",
+            0
+          ],
+          [
+            "has collision",
+            1
+          ],
+          [
+            "trade item",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "charges",
+            1.0
+          ],
+          [
+            "icon offset H",
+            0.0
+          ],
+          [
+            "icon offset pitch",
+            90.0
+          ],
+          [
+            "icon offset roll",
+            0.0
+          ],
+          [
+            "icon offset V",
+            0.0
+          ],
+          [
+            "icon offset yaw",
+            90.0
+          ],
+          [
+            "icon zoom",
+            1.3200000524520874
+          ],
+          [
+            "profitability",
+            0.20000000298023224
+          ],
+          [
+            "quality",
+            1.0
+          ],
+          [
+            "weight kg",
+            1.0
+          ]
+        ],
+        "int": [
+          [
+            "inventory footprint height",
+            2
+          ],
+          [
+            "inventory footprint width",
+            6
+          ],
+          [
+            "inventory sound",
+            14
+          ],
+          [
+            "item function",
+            0
+          ],
+          [
+            "persistent",
+            0
+          ],
+          [
+            "production time",
+            4
+          ],
+          [
+            "slot",
+            7
+          ],
+          [
+            "stackable",
+            1
+          ],
+          [
+            "value",
+            10000
+          ]
+        ],
+        "str": [
+          [
+            "description",
+            "A heavy battery stack designed to oldworld standards, able to recharge itself through long-lost mechanics. Useless in this world, but could help to power up heavy machinery, such as Walkers. "
+          ]
+        ],
+        "file": [
+          [
+            "ground mesh",
+            ""
+          ],
+          [
+            "icon",
+            ".\\data\\items\\icons\\Power Core.png"
+          ],
+          [
+            "mesh",
+            ".\\data\\items\\meshes\\Item_Power_Core.mesh"
+          ],
+          [
+            "physics file",
+            ".\\data\\items\\meshes\\Item_Generic.xml"
+          ]
+        ],
+        "refs": [
+          [
+            "material",
+            [
+              [
+                "5263-lanterns_otto.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "incoming": [
+        {
+          "sid": "443-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE copy",
+          "type": "DIALOGUE_LINE",
+          "category": "target has item",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "486-Driftmetal Remnants.mod",
+          "name": "oldworld battery spawn",
+          "type": "VENDOR_LIST",
+          "category": "items",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "record": {
+        "type": 4,
+        "id": 0,
+        "name": "Ever-Blue Sky AuthCard",
+        "string_id": "430-Driftmetal Remnants.mod",
+        "change": 13776,
+        "bool": [
+          [
+            "artifact",
+            0
+          ],
+          [
+            "auto icon image",
+            0
+          ],
+          [
+            "food crop",
+            0
+          ],
+          [
+            "has collision",
+            1
+          ],
+          [
+            "trade item",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "charges",
+            1.0
+          ],
+          [
+            "icon offset H",
+            0.0
+          ],
+          [
+            "icon offset pitch",
+            0.0
+          ],
+          [
+            "icon offset roll",
+            0.0
+          ],
+          [
+            "icon offset V",
+            -8.0
+          ],
+          [
+            "icon offset yaw",
+            90.0
+          ],
+          [
+            "icon zoom",
+            2.700000047683716
+          ],
+          [
+            "profitability",
+            0.20000000298023224
+          ],
+          [
+            "quality",
+            1.0
+          ],
+          [
+            "weight kg",
+            0.0
+          ]
+        ],
+        "int": [
+          [
+            "inventory footprint height",
+            1
+          ],
+          [
+            "inventory footprint width",
+            1
+          ],
+          [
+            "inventory sound",
+            18
+          ],
+          [
+            "item function",
+            0
+          ],
+          [
+            "persistent",
+            0
+          ],
+          [
+            "production time",
+            4
+          ],
+          [
+            "slot",
+            7
+          ],
+          [
+            "stackable",
+            1
+          ],
+          [
+            "value",
+            100
+          ]
+        ],
+        "str": [
+          [
+            "description",
+            "Authentication card based on RFID technology to allow the user higher access levels for Ever-Blue Sky (TM) integrated Co-Bot scheduling processes. At least that is what it says on the back of the card. Could come in handy, better keep it around."
+          ]
+        ],
+        "file": [
+          [
+            "ground mesh",
+            ""
+          ],
+          [
+            "icon",
+            ".\\data\\items\\icons\\Letter.png"
+          ],
+          [
+            "mesh",
+            ".\\data\\items\\meshes\\Item_Parchment.mesh"
+          ],
+          [
+            "physics file",
+            ".\\data\\items\\meshes\\Item_Generic.xml"
+          ]
+        ],
+        "refs": [
+          [
+            "material",
+            [
+              [
+                "5263-lanterns_otto.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": []
+      },
+      "incoming": [
+        {
+          "sid": "62981-Dialogue.mod",
+          "name": "Savant",
+          "type": "CHARACTER",
+          "category": "inventory",
+          "value": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "478-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE",
+          "type": "DIALOGUE_LINE",
+          "category": "target has item",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "685-Driftmetal Remnants.mod",
+          "name": "workshop empty Authcard",
+          "type": "SQUAD_TEMPLATE",
+          "category": "special items",
+          "value": [
+            1,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "retired_B_incoming_old": [
+    {
+      "sid": "2167-gamedata.base",
+      "name": "Cap",
+      "type": "ARMOUR",
+      "category": "races",
+      "value": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "sid": "2164-gamedata.base",
+      "name": "Wool Hat",
+      "type": "ARMOUR",
+      "category": "races",
+      "value": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "sid": "42903-rebirth.mod",
+      "name": "Skeleton",
+      "type": "RACE_GROUP",
+      "category": "races",
+      "value": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "sid": "1130-Driftmetal Remnants.mod",
+      "name": "K-291",
+      "type": "CHARACTER",
+      "category": "race",
+      "value": [
+        100,
+        0,
+        0
+      ]
+    },
+    {
+      "sid": "502-Driftmetal Remnants.mod",
+      "name": "V2",
+      "type": "CHARACTER",
+      "category": "race",
+      "value": [
+        100,
+        0,
+        0
+      ]
+    },
+    {
+      "sid": "538-Driftmetal Remnants.mod",
+      "name": "Внешняя система охлаждения",
+      "type": "ARMOUR",
+      "category": "races",
+      "value": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "sid": "534-Driftmetal Remnants.mod",
+      "name": "Универсальный жилет",
+      "type": "ARMOUR",
+      "category": "races",
+      "value": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "retired_B_incoming_new": [],
+  "humanoid_races": [
+    {
+      "sid": "10-Driftmetal Remnants.mod",
+      "name": "K-Unit",
+      "incoming": [
+        {
+          "sid": "2167-gamedata.base",
+          "name": "Cap",
+          "type": "ARMOUR",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "2164-gamedata.base",
+          "name": "Wool Hat",
+          "type": "ARMOUR",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "42903-rebirth.mod",
+          "name": "Skeleton",
+          "type": "RACE_GROUP",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "22-Driftmetal Remnants.mod",
+          "name": "Remnantslimbs",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "97-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE copy",
+          "type": "DIALOGUE_LINE",
+          "category": "my subrace",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "183-Driftmetal Remnants.mod",
+          "name": "kunit weak",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "491-Driftmetal Remnants.mod",
+          "name": "V2bot",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "493-Driftmetal Remnants.mod",
+          "name": "V2botweak",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "511-Driftmetal Remnants.mod",
+          "name": "V2observertest",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "534-Driftmetal Remnants.mod",
+          "name": "Utility Vest",
+          "type": "ARMOUR",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "538-Driftmetal Remnants.mod",
+          "name": "External Cooling System",
+          "type": "ARMOUR",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "647-Driftmetal Remnants.mod",
+          "name": "V2botstrong",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "668-Driftmetal Remnants.mod",
+          "name": "/KUNIT/",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "680-Driftmetal Remnants.mod",
+          "name": " /KUNIT/",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "684-Driftmetal Remnants.mod",
+          "name": "K-280E",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "727-Driftmetal Remnants.mod",
+          "name": "K-280EF",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "868-Driftmetal Remnants.mod",
+          "name": "K-204",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        }
+      ],
+      "refs": [
+        [
+          "AI Goals",
+          [
+            [
+              "958-gamedata.base",
+              0,
+              100,
+              0
+            ],
+            [
+              "96153-rebirth.mod",
+              4,
+              100,
+              0
+            ]
+          ]
+        ],
+        [
+          "combat anatomy",
+          [
+            [
+              "31-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "28-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "30-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "32-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "100-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "29-gamedata.quack",
+              60,
+              125,
+              0
+            ],
+            [
+              "101-gamedata.quack",
+              140,
+              125,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv1",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv100",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads female",
+          [
+            [
+              "12-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads male",
+          [
+            [
+              "12-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "sid": "11-Driftmetal Remnants.mod",
+      "name": "Worker Drone",
+      "incoming": [
+        {
+          "sid": "42903-rebirth.mod",
+          "name": "Skeleton",
+          "type": "RACE_GROUP",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "16-Driftmetal Remnants.mod",
+          "name": "randomtestdude",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "26-Driftmetal Remnants.mod",
+          "name": "droneworker weak",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "41-Driftmetal Remnants.mod",
+          "name": "drone3",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "42-Driftmetal Remnants.mod",
+          "name": "drone4",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "96-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE copy",
+          "type": "DIALOGUE_LINE",
+          "category": "my subrace",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "260-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE copy copy",
+          "type": "DIALOGUE_LINE",
+          "category": "my subrace",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "358-Driftmetal Remnants.mod",
+          "name": "DIALOGUE_LINE copy copy",
+          "type": "DIALOGUE_LINE",
+          "category": "my subrace",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "531-Driftmetal Remnants.mod",
+          "name": "Oldworld Gas Mask",
+          "type": "ARMOUR",
+          "category": "races exclude",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "534-Driftmetal Remnants.mod",
+          "name": "Utility Vest",
+          "type": "ARMOUR",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "536-Driftmetal Remnants.mod",
+          "name": "Extended Sensory Array",
+          "type": "ARMOUR",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "670-Driftmetal Remnants.mod",
+          "name": "Remnants",
+          "type": "FACTION",
+          "category": "races",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "672-Driftmetal Remnants.mod",
+          "name": "/WDRONE/",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "681-Driftmetal Remnants.mod",
+          "name": " /WDRONE/",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1124-Driftmetal Remnants.mod",
+          "name": "  /WDRONE/",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        }
+      ],
+      "refs": [
+        [
+          "AI Goals",
+          [
+            [
+              "958-gamedata.base",
+              0,
+              100,
+              0
+            ],
+            [
+              "96153-rebirth.mod",
+              4,
+              100,
+              0
+            ]
+          ]
+        ],
+        [
+          "combat anatomy",
+          [
+            [
+              "31-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "28-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "30-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "32-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "100-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "29-gamedata.quack",
+              60,
+              125,
+              0
+            ],
+            [
+              "101-gamedata.quack",
+              140,
+              125,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv1",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv100",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads female",
+          [
+            [
+              "13-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads male",
+          [
+            [
+              "13-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "sid": "28-Driftmetal Remnants.mod",
+      "name": "Walker",
+      "incoming": [
+        {
+          "sid": "29-Driftmetal Remnants.mod",
+          "name": "Silo Tank",
+          "type": "CONTAINER",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "31-Driftmetal Remnants.mod",
+          "name": "Mixed Container Array",
+          "type": "CONTAINER",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "32-Driftmetal Remnants.mod",
+          "name": "Segmented Containers",
+          "type": "CONTAINER",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "35-Driftmetal Remnants.mod",
+          "name": "Walker 40",
+          "type": "ANIMAL_CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "43-Driftmetal Remnants.mod",
+          "name": "Walker 22",
+          "type": "ANIMAL_CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "44-Driftmetal Remnants.mod",
+          "name": "Walker 87",
+          "type": "ANIMAL_CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "677-Driftmetal Remnants.mod",
+          "name": "Walker 11",
+          "type": "ANIMAL_CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "678-Driftmetal Remnants.mod",
+          "name": "Walker 104",
+          "type": "ANIMAL_CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "679-Driftmetal Remnants.mod",
+          "name": "Walker 56",
+          "type": "ANIMAL_CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        }
+      ],
+      "refs": [
+        [
+          "ambient sound",
+          [
+            [
+              "96139-sfx.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "backpacks",
+          [
+            [
+              "29-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "31-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "32-Driftmetal Remnants.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "combat anatomy",
+          [
+            [
+              "31-gamedata.quack",
+              20,
+              200,
+              0
+            ],
+            [
+              "30-gamedata.quack",
+              20,
+              200,
+              0
+            ],
+            [
+              "32-gamedata.quack",
+              100,
+              300,
+              0
+            ],
+            [
+              "100-gamedata.quack",
+              100,
+              300,
+              0
+            ],
+            [
+              "101-gamedata.quack",
+              100,
+              300,
+              0
+            ],
+            [
+              "4019-gamedata.base",
+              100,
+              200,
+              0
+            ],
+            [
+              "4018-gamedata.base",
+              100,
+              200,
+              0
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "sid": "1131-Driftmetal Remnants.mod",
+      "name": "E-Unit",
+      "incoming": [],
+      "refs": [
+        [
+          "AI Goals",
+          [
+            [
+              "958-gamedata.base",
+              0,
+              100,
+              0
+            ],
+            [
+              "96153-rebirth.mod",
+              4,
+              100,
+              0
+            ]
+          ]
+        ],
+        [
+          "combat anatomy",
+          [
+            [
+              "31-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "28-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "30-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "32-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "100-gamedata.quack",
+              140,
+              125,
+              0
+            ],
+            [
+              "29-gamedata.quack",
+              60,
+              125,
+              0
+            ],
+            [
+              "101-gamedata.quack",
+              140,
+              125,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv1",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv100",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads female",
+          [
+            [
+              "12-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads male",
+          [
+            [
+              "12-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "sid": "1135-Driftmetal Remnants.mod",
+      "name": "KX-Unit",
+      "incoming": [
+        {
+          "sid": "42903-rebirth.mod",
+          "name": "Skeleton",
+          "type": "RACE_GROUP",
+          "category": "races",
+          "value": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1139-Driftmetal Remnants.mod",
+          "name": "K-244",
+          "type": "CHARACTER",
+          "category": "race",
+          "value": [
+            100,
+            0,
+            0
+          ]
+        }
+      ],
+      "refs": [
+        [
+          "AI Goals",
+          [
+            [
+              "958-gamedata.base",
+              0,
+              100,
+              0
+            ],
+            [
+              "96153-rebirth.mod",
+              4,
+              100,
+              0
+            ]
+          ]
+        ],
+        [
+          "animation files",
+          [
+            [
+              "14-CBT Leisure Objects and Furniture.mod",
+              0,
+              0,
+              0
+            ],
+            [
+              "1535143-More Combat Animation.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "combat anatomy",
+          [
+            [
+              "31-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "28-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "30-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "32-gamedata.quack",
+              80,
+              125,
+              0
+            ],
+            [
+              "100-gamedata.quack",
+              130,
+              125,
+              0
+            ],
+            [
+              "29-gamedata.quack",
+              60,
+              125,
+              0
+            ],
+            [
+              "101-gamedata.quack",
+              140,
+              125,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv1",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "fists lv100",
+          [
+            [
+              "53668-rebirth.mod",
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads female",
+          [
+            [
+              "1136-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "heads male",
+          [
+            [
+              "1136-Driftmetal Remnants.mod",
+              100,
+              0,
+              0
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}

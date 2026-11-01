@@ -1,0 +1,2177 @@
+{
+  "race_edits": [
+    {
+      "mod": "Driftmetal Remnants Anim Patch.mod",
+      "record": {
+        "instances": 498,
+        "type": 7,
+        "id": 0,
+        "name": "B - дрон",
+        "string_id": "492-Driftmetal Remnants.mod",
+        "change": 33,
+        "bool": [],
+        "float": [],
+        "int": [],
+        "vec3": [],
+        "vec4": [],
+        "str": [],
+        "file": [],
+        "refs": [
+          [
+            "animation files",
+            [
+              [
+                "1535098-AnimationOverhaul.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "1535113-AnimationOverhaul.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-DigCombatAnimation.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-Great Anims Mod.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-GROUNDED Attack Animations.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "5008497-Ladylike sitting poses.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "5007285-Immersive non-combat animations.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "1535143-More Combat Animation.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 728
+      }
+    },
+    {
+      "mod": "Driftmetal Remnants Anim Patch.mod",
+      "record": {
+        "instances": 497,
+        "type": 7,
+        "id": 0,
+        "name": "K - дрон",
+        "string_id": "10-Driftmetal Remnants.mod",
+        "change": 33,
+        "bool": [],
+        "float": [],
+        "int": [],
+        "vec3": [],
+        "vec4": [],
+        "str": [],
+        "file": [],
+        "refs": [
+          [
+            "animation files",
+            [
+              [
+                "1535098-AnimationOverhaul.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "1535113-AnimationOverhaul.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-DigCombatAnimation.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-Great Anims Mod.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-GROUNDED Attack Animations.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "5008497-Ladylike sitting poses.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "5007285-Immersive non-combat animations.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "1535143-More Combat Animation.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 1225
+      }
+    },
+    {
+      "mod": "Driftmetal Remnants Anim Patch.mod",
+      "record": {
+        "instances": 508,
+        "type": 7,
+        "id": 0,
+        "name": "Рабочий дрон",
+        "string_id": "11-Driftmetal Remnants.mod",
+        "change": 33,
+        "bool": [],
+        "float": [],
+        "int": [],
+        "vec3": [],
+        "vec4": [],
+        "str": [],
+        "file": [],
+        "refs": [
+          [
+            "animation files",
+            [
+              [
+                "1535098-AnimationOverhaul.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "1535113-AnimationOverhaul.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-DigCombatAnimation.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-Great Anims Mod.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "10-GROUNDED Attack Animations.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "5008497-Ladylike sitting poses.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "5007285-Immersive non-combat animations.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "1535143-More Combat Animation.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 1733
+      }
+    },
+    {
+      "mod": "Driftmetal Remnants RU.mod",
+      "record": {
+        "instances": 4281,
+        "type": 7,
+        "id": 0,
+        "name": "B - дрон",
+        "string_id": "492-Driftmetal Remnants.mod",
+        "change": 864,
+        "bool": [
+          [
+            "barefoot",
+            0
+          ],
+          [
+            "cant enter buildings",
+            0
+          ],
+          [
+            "carriable",
+            1
+          ],
+          [
+            "gigantic",
+            0
+          ],
+          [
+            "is robot",
+            1
+          ],
+          [
+            "no hats",
+            0
+          ],
+          [
+            "no shirts",
+            1
+          ],
+          [
+            "no shoes",
+            1
+          ],
+          [
+            "playable",
+            1
+          ],
+          [
+            "self healing",
+            0
+          ],
+          [
+            "single gender",
+            1
+          ],
+          [
+            "swims",
+            1
+          ],
+          [
+            "vampiric",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "bleed rate",
+            0.10000000149011612
+          ],
+          [
+            "blood vertical",
+            0.15000000596046448
+          ],
+          [
+            "bulk max female",
+            500.0
+          ],
+          [
+            "bulk max male",
+            500.0
+          ],
+          [
+            "bulk min female",
+            -500.0
+          ],
+          [
+            "bulk min male",
+            -500.0
+          ],
+          [
+            "combat move speed mult",
+            1.0
+          ],
+          [
+            "dexterity",
+            1.0
+          ],
+          [
+            "heal rate",
+            2.0
+          ],
+          [
+            "hull size X",
+            5.0
+          ],
+          [
+            "hull size Y",
+            17.0
+          ],
+          [
+            "hull size Z",
+            5.0
+          ],
+          [
+            "hunger rate",
+            0.0
+          ],
+          [
+            "max blood",
+            100.0
+          ],
+          [
+            "min blood",
+            100.0
+          ],
+          [
+            "pathfind acceleration",
+            20.0
+          ],
+          [
+            "pathfind footprint radius",
+            4.0
+          ],
+          [
+            "portrait distance",
+            10.0
+          ],
+          [
+            "portrait offset x",
+            0.0
+          ],
+          [
+            "portrait offset y",
+            0.5
+          ],
+          [
+            "portrait offset z",
+            0.0
+          ],
+          [
+            "strength",
+            1.0
+          ],
+          [
+            "swim offset",
+            1.0
+          ],
+          [
+            "swim speed mult",
+            1.0
+          ],
+          [
+            "vision range mult",
+            1.0
+          ],
+          [
+            "walk speed",
+            15.0
+          ],
+          [
+            "water avoidance",
+            6.0
+          ]
+        ],
+        "int": [
+          [
+            "blood colour",
+            3547416
+          ],
+          [
+            "blood horizontal",
+            1
+          ],
+          [
+            "buy value",
+            400
+          ],
+          [
+            "extra attack slots",
+            0
+          ],
+          [
+            "heal stat",
+            6
+          ],
+          [
+            "morph num",
+            5
+          ],
+          [
+            "sounds",
+            3
+          ],
+          [
+            "speed max skill",
+            120
+          ],
+          [
+            "speed min skill",
+            70
+          ],
+          [
+            "stats bad0",
+            3
+          ],
+          [
+            "stats bad1",
+            9
+          ],
+          [
+            "stats bad2",
+            12
+          ],
+          [
+            "stats good0",
+            27
+          ],
+          [
+            "stats good1",
+            6
+          ],
+          [
+            "stats good2",
+            22
+          ],
+          [
+            "weather immunity0",
+            1
+          ],
+          [
+            "weather immunity1",
+            2
+          ],
+          [
+            "weather immunity2",
+            3
+          ],
+          [
+            "weather immunity3",
+            4
+          ]
+        ],
+        "vec3": [],
+        "vec4": [],
+        "str": [
+          [
+            "carry bone",
+            ""
+          ],
+          [
+            "description",
+            "K-дроны использовались для управления автономным персоналом на глубоководных морских буровых установках на месте и координации всего процесса добычи. Их легкая рама в сочетании с дорогостоящими датчиками позволяла им быстро перемещаться и с легкостью контролировать всю буровую установку и ее агрегаты, а при необходимости защищать ее от вторжений. Однако то, что они были полностью разумны, означало, что их личные требования снижали прибыль компании, поэтому использовались лишь немногие из них, часто обещавшие в конечном итоге гражданство в обмен на какой-либо товар."
+          ],
+          [
+            "filenames prefix",
+            "stick"
+          ]
+        ],
+        "file": [
+          [
+            "attachment points",
+            ".\\data\\ragdoll\\attachments-weapons.phs"
+          ],
+          [
+            "body mask female",
+            ".\\data\\character\\skins\\robot\\robot_mask2_HI.dds"
+          ],
+          [
+            "body mask male",
+            "./mods/Driftmetal Remnants - RU/mask_bodyhead2x2.dds"
+          ],
+          [
+            "body texture female",
+            ".\\data\\character\\skins\\robot\\robot_diffuse.dds"
+          ],
+          [
+            "body texture male",
+            "./mods/Driftmetal Remnants - RU/V2/appendages2_diff.dds"
+          ],
+          [
+            "editor limits",
+            ".\\data\\editor\\editor_data_human.xml"
+          ],
+          [
+            "female carry ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_2.phs"
+          ],
+          [
+            "female mesh",
+            ".\\data\\character\\meshes\\robot\\robot.mesh"
+          ],
+          [
+            "female ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_5.phs"
+          ],
+          [
+            "male carry ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_2.phs"
+          ],
+          [
+            "male mesh",
+            "./mods/Driftmetal Remnants - RU/V2/V3_1observer.mesh"
+          ],
+          [
+            "male ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_5.phs"
+          ],
+          [
+            "nm female",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm female skinny",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm female strong",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm male",
+            "./mods/Driftmetal Remnants - RU/V2/appendages_norm.dds"
+          ],
+          [
+            "nm male skinny",
+            "./mods/Driftmetal Remnants - RU/V2/appendages_norm.dds"
+          ],
+          [
+            "nm male strong",
+            "./mods/Driftmetal Remnants - RU/V2/appendages_norm.dds"
+          ],
+          [
+            "part map female",
+            ".\\data\\character\\skins\\masks\\robot_mask.png"
+          ],
+          [
+            "part map male",
+            "./mods/Driftmetal Remnants - RU/mask_bodyhead2x2.dds"
+          ]
+        ],
+        "refs": [
+          [
+            "AI Goals",
+            [
+              [
+                "958-gamedata.base",
+                0,
+                100,
+                0
+              ],
+              [
+                "96153-rebirth.mod",
+                4,
+                100,
+                0
+              ]
+            ]
+          ],
+          [
+            "combat anatomy",
+            [
+              [
+                "31-gamedata.quack",
+                80,
+                120,
+                0
+              ],
+              [
+                "28-gamedata.quack",
+                80,
+                120,
+                0
+              ],
+              [
+                "30-gamedata.quack",
+                80,
+                120,
+                0
+              ],
+              [
+                "32-gamedata.quack",
+                80,
+                120,
+                0
+              ],
+              [
+                "100-gamedata.quack",
+                140,
+                120,
+                0
+              ],
+              [
+                "29-gamedata.quack",
+                40,
+                120,
+                0
+              ],
+              [
+                "101-gamedata.quack",
+                140,
+                120,
+                0
+              ]
+            ]
+          ],
+          [
+            "fists lv1",
+            [
+              [
+                "53668-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "fists lv100",
+            [
+              [
+                "53668-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "heads female",
+            [
+              [
+                "494-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "heads male",
+            [
+              [
+                "494-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 221049
+      }
+    },
+    {
+      "mod": "Driftmetal Remnants RU.mod",
+      "record": {
+        "instances": 4278,
+        "type": 7,
+        "id": 0,
+        "name": "K - дрон",
+        "string_id": "10-Driftmetal Remnants.mod",
+        "change": 864,
+        "bool": [
+          [
+            "barefoot",
+            0
+          ],
+          [
+            "cant enter buildings",
+            0
+          ],
+          [
+            "carriable",
+            1
+          ],
+          [
+            "gigantic",
+            0
+          ],
+          [
+            "is robot",
+            1
+          ],
+          [
+            "no hats",
+            0
+          ],
+          [
+            "no shirts",
+            1
+          ],
+          [
+            "no shoes",
+            1
+          ],
+          [
+            "playable",
+            1
+          ],
+          [
+            "self healing",
+            0
+          ],
+          [
+            "single gender",
+            1
+          ],
+          [
+            "swims",
+            1
+          ],
+          [
+            "vampiric",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "bleed rate",
+            0.10000000149011612
+          ],
+          [
+            "blood vertical",
+            0.15000000596046448
+          ],
+          [
+            "bulk max female",
+            500.0
+          ],
+          [
+            "bulk max male",
+            500.0
+          ],
+          [
+            "bulk min female",
+            -500.0
+          ],
+          [
+            "bulk min male",
+            -500.0
+          ],
+          [
+            "combat move speed mult",
+            1.0
+          ],
+          [
+            "dexterity",
+            1.0
+          ],
+          [
+            "heal rate",
+            2.0
+          ],
+          [
+            "hull size X",
+            5.0
+          ],
+          [
+            "hull size Y",
+            17.0
+          ],
+          [
+            "hull size Z",
+            5.0
+          ],
+          [
+            "hunger rate",
+            0.0
+          ],
+          [
+            "max blood",
+            100.0
+          ],
+          [
+            "min blood",
+            100.0
+          ],
+          [
+            "pathfind acceleration",
+            20.0
+          ],
+          [
+            "pathfind footprint radius",
+            4.0
+          ],
+          [
+            "portrait distance",
+            10.0
+          ],
+          [
+            "portrait offset x",
+            0.0
+          ],
+          [
+            "portrait offset y",
+            0.5
+          ],
+          [
+            "portrait offset z",
+            0.0
+          ],
+          [
+            "strength",
+            1.0
+          ],
+          [
+            "swim offset",
+            1.0
+          ],
+          [
+            "swim speed mult",
+            1.0
+          ],
+          [
+            "vision range mult",
+            1.25
+          ],
+          [
+            "walk speed",
+            15.0
+          ],
+          [
+            "water avoidance",
+            6.0
+          ]
+        ],
+        "int": [
+          [
+            "blood colour",
+            3547416
+          ],
+          [
+            "blood horizontal",
+            1
+          ],
+          [
+            "buy value",
+            400
+          ],
+          [
+            "extra attack slots",
+            0
+          ],
+          [
+            "heal stat",
+            6
+          ],
+          [
+            "morph num",
+            5
+          ],
+          [
+            "sounds",
+            3
+          ],
+          [
+            "speed max skill",
+            120
+          ],
+          [
+            "speed min skill",
+            70
+          ],
+          [
+            "stats bad0",
+            3
+          ],
+          [
+            "stats bad1",
+            9
+          ],
+          [
+            "stats bad2",
+            12
+          ],
+          [
+            "stats good0",
+            16
+          ],
+          [
+            "stats good1",
+            6
+          ],
+          [
+            "stats good2",
+            35
+          ],
+          [
+            "weather immunity0",
+            1
+          ],
+          [
+            "weather immunity1",
+            2
+          ],
+          [
+            "weather immunity2",
+            3
+          ],
+          [
+            "weather immunity3",
+            4
+          ]
+        ],
+        "vec3": [],
+        "vec4": [],
+        "str": [
+          [
+            "carry bone",
+            ""
+          ],
+          [
+            "description",
+            "K-дроны использовались для управления автономным персоналом на глубоководных морских буровых установках на месте и координации всего процесса добычи. Их легкая рама в сочетании с дорогостоящими датчиками позволяла им быстро перемещаться и с легкостью контролировать всю буровую установку и ее агрегаты, а при необходимости защищать ее от вторжений. Однако то, что они были полностью разумны, означало, что их личные требования снижали прибыль компании, поэтому использовались лишь немногие из них, часто обещавшие в конечном итоге гражданство в обмен на какой-либо товар."
+          ],
+          [
+            "filenames prefix",
+            "stick"
+          ]
+        ],
+        "file": [
+          [
+            "attachment points",
+            ".\\data\\ragdoll\\attachments-weapons.phs"
+          ],
+          [
+            "body mask female",
+            ".\\data\\character\\skins\\robot\\robot_mask2_HI.dds"
+          ],
+          [
+            "body mask male",
+            "./mods/Driftmetal Remnants - RU/mask_bodyhead2x2.dds"
+          ],
+          [
+            "body texture female",
+            ".\\data\\character\\skins\\robot\\robot_diffuse.dds"
+          ],
+          [
+            "body texture male",
+            "./mods/Driftmetal Remnants - RU/V2/appendages2_diff.dds"
+          ],
+          [
+            "editor limits",
+            ".\\data\\editor\\editor_data_human.xml"
+          ],
+          [
+            "female carry ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_2.phs"
+          ],
+          [
+            "female mesh",
+            ".\\data\\character\\meshes\\robot\\robot.mesh"
+          ],
+          [
+            "female ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_5.phs"
+          ],
+          [
+            "male carry ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_2.phs"
+          ],
+          [
+            "male mesh",
+            "./mods/Driftmetal Remnants - RU/V2/V3_1observer.mesh"
+          ],
+          [
+            "male ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_5.phs"
+          ],
+          [
+            "nm female",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm female skinny",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm female strong",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm male",
+            "./mods/Driftmetal Remnants - RU/V2/appendages_norm.dds"
+          ],
+          [
+            "nm male skinny",
+            "./mods/Driftmetal Remnants - RU/V2/appendages_norm.dds"
+          ],
+          [
+            "nm male strong",
+            "./mods/Driftmetal Remnants - RU/V2/appendages_norm.dds"
+          ],
+          [
+            "part map female",
+            ".\\data\\character\\skins\\masks\\robot_mask.png"
+          ],
+          [
+            "part map male",
+            "./mods/Driftmetal Remnants - RU/mask_bodyhead2x2.dds"
+          ]
+        ],
+        "refs": [
+          [
+            "AI Goals",
+            [
+              [
+                "958-gamedata.base",
+                0,
+                100,
+                0
+              ],
+              [
+                "96153-rebirth.mod",
+                4,
+                100,
+                0
+              ]
+            ]
+          ],
+          [
+            "combat anatomy",
+            [
+              [
+                "31-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "28-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "30-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "32-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "100-gamedata.quack",
+                140,
+                125,
+                0
+              ],
+              [
+                "29-gamedata.quack",
+                60,
+                125,
+                0
+              ],
+              [
+                "101-gamedata.quack",
+                140,
+                125,
+                0
+              ]
+            ]
+          ],
+          [
+            "fists lv1",
+            [
+              [
+                "53668-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "fists lv100",
+            [
+              [
+                "53668-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "heads female",
+            [
+              [
+                "12-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "heads male",
+            [
+              [
+                "12-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 225327
+      }
+    },
+    {
+      "mod": "Driftmetal Remnants RU.mod",
+      "record": {
+        "instances": 3238,
+        "type": 7,
+        "id": 0,
+        "name": "Ходок",
+        "string_id": "28-Driftmetal Remnants.mod",
+        "change": 864,
+        "bool": [
+          [
+            "barefoot",
+            0
+          ],
+          [
+            "cant enter buildings",
+            1
+          ],
+          [
+            "carriable",
+            1
+          ],
+          [
+            "gigantic",
+            0
+          ],
+          [
+            "is robot",
+            1
+          ],
+          [
+            "no hats",
+            0
+          ],
+          [
+            "no shirts",
+            0
+          ],
+          [
+            "no shoes",
+            0
+          ],
+          [
+            "playable",
+            0
+          ],
+          [
+            "self healing",
+            1
+          ],
+          [
+            "single gender",
+            1
+          ],
+          [
+            "swims",
+            1
+          ],
+          [
+            "vampiric",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "bleed rate",
+            1.0
+          ],
+          [
+            "blood vertical",
+            0.05000000074505806
+          ],
+          [
+            "bulk max female",
+            500.0
+          ],
+          [
+            "bulk max male",
+            500.0
+          ],
+          [
+            "bulk min female",
+            -500.0
+          ],
+          [
+            "bulk min male",
+            -500.0
+          ],
+          [
+            "combat move speed mult",
+            0.6000000238418579
+          ],
+          [
+            "dexterity",
+            1.0
+          ],
+          [
+            "heal rate",
+            1.5
+          ],
+          [
+            "hull size X",
+            15.0
+          ],
+          [
+            "hull size Y",
+            20.0
+          ],
+          [
+            "hull size Z",
+            15.0
+          ],
+          [
+            "hunger rate",
+            0.0
+          ],
+          [
+            "max blood",
+            200.0
+          ],
+          [
+            "min blood",
+            75.0
+          ],
+          [
+            "pathfind acceleration",
+            4.0
+          ],
+          [
+            "pathfind footprint radius",
+            7.0
+          ],
+          [
+            "portrait distance",
+            20.0
+          ],
+          [
+            "portrait offset x",
+            0.0
+          ],
+          [
+            "portrait offset y",
+            0.5
+          ],
+          [
+            "portrait offset z",
+            5.0
+          ],
+          [
+            "strength",
+            1.2000000476837158
+          ],
+          [
+            "swim offset",
+            -5.0
+          ],
+          [
+            "swim speed mult",
+            1.5
+          ],
+          [
+            "vision range mult",
+            1.0
+          ],
+          [
+            "walk speed",
+            13.0
+          ],
+          [
+            "water avoidance",
+            8.0
+          ]
+        ],
+        "int": [
+          [
+            "blood colour",
+            3547416
+          ],
+          [
+            "blood horizontal",
+            1
+          ],
+          [
+            "buy value",
+            100
+          ],
+          [
+            "extra attack slots",
+            1
+          ],
+          [
+            "heal stat",
+            6
+          ],
+          [
+            "morph num",
+            5
+          ],
+          [
+            "sounds",
+            12
+          ],
+          [
+            "speed max skill",
+            60
+          ],
+          [
+            "speed min skill",
+            60
+          ],
+          [
+            "stats bad0",
+            0
+          ],
+          [
+            "stats good0",
+            0
+          ],
+          [
+            "weather immunity0",
+            1
+          ],
+          [
+            "weather immunity1",
+            2
+          ],
+          [
+            "weather immunity2",
+            4
+          ],
+          [
+            "weather immunity3",
+            5
+          ]
+        ],
+        "vec3": [],
+        "vec4": [],
+        "str": [
+          [
+            "carry bone",
+            ""
+          ],
+          [
+            "description",
+            "Ходоки использовались для быстрой транспортировки большого количества предметов и материалов по обширным морским буровым установкам. Минимальное использование каких-либо передовых технологий в сочетании с прочной конструкцией позволяет им работать практически вечно, не выходя из строя, даже в условиях постоянной нагрузки и всевозможных экологических опасностей."
+          ],
+          [
+            "filenames prefix",
+            ""
+          ]
+        ],
+        "file": [
+          [
+            "attachment points",
+            ""
+          ],
+          [
+            "body mask female",
+            ""
+          ],
+          [
+            "body mask male",
+            ""
+          ],
+          [
+            "body texture female",
+            ".\\mods\\Driftmetal Remnants\\walker\\textures\\walker_diff.dds"
+          ],
+          [
+            "body texture male",
+            "./mods/Driftmetal Remnants - RU/walker/textures/walker_orange_diff.dds"
+          ],
+          [
+            "editor limits",
+            ""
+          ],
+          [
+            "female carry ragdoll",
+            ""
+          ],
+          [
+            "female mesh",
+            ".\\mods\\Driftmetal Remnants\\walker\\walker.mesh"
+          ],
+          [
+            "female ragdoll",
+            ".\\data\\animal\\ragdoll\\bull.phs"
+          ],
+          [
+            "male carry ragdoll",
+            ""
+          ],
+          [
+            "male mesh",
+            "./mods/Driftmetal Remnants - RU/walker/walkerrot.mesh"
+          ],
+          [
+            "male ragdoll",
+            ".\\data\\animal\\ragdoll\\bull.phs"
+          ],
+          [
+            "nm female",
+            ".\\mods\\Driftmetal Remnants\\walker\\textures\\walker_norm.dds"
+          ],
+          [
+            "nm female skinny",
+            ""
+          ],
+          [
+            "nm female strong",
+            ""
+          ],
+          [
+            "nm male",
+            "./mods/Driftmetal Remnants - RU/walker/textures/walker_orange_norm.dds"
+          ],
+          [
+            "nm male skinny",
+            ""
+          ],
+          [
+            "nm male strong",
+            ""
+          ],
+          [
+            "part map female",
+            ""
+          ],
+          [
+            "part map male",
+            ""
+          ]
+        ],
+        "refs": [
+          [
+            "ambient sound",
+            [
+              [
+                "96139-sfx.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "backpacks",
+            [
+              [
+                "29-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "31-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ],
+              [
+                "32-Driftmetal Remnants.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "combat anatomy",
+            [
+              [
+                "31-gamedata.quack",
+                20,
+                200,
+                0
+              ],
+              [
+                "30-gamedata.quack",
+                20,
+                200,
+                0
+              ],
+              [
+                "32-gamedata.quack",
+                100,
+                300,
+                0
+              ],
+              [
+                "100-gamedata.quack",
+                100,
+                300,
+                0
+              ],
+              [
+                "101-gamedata.quack",
+                100,
+                300,
+                0
+              ],
+              [
+                "4019-gamedata.base",
+                100,
+                200,
+                0
+              ],
+              [
+                "4018-gamedata.base",
+                100,
+                200,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 228565
+      }
+    },
+    {
+      "mod": "Driftmetal Remnants RU.mod",
+      "record": {
+        "instances": 4489,
+        "type": 7,
+        "id": 0,
+        "name": "Рабочий дрон",
+        "string_id": "11-Driftmetal Remnants.mod",
+        "change": 864,
+        "bool": [
+          [
+            "barefoot",
+            0
+          ],
+          [
+            "cant enter buildings",
+            0
+          ],
+          [
+            "carriable",
+            1
+          ],
+          [
+            "gigantic",
+            0
+          ],
+          [
+            "is robot",
+            1
+          ],
+          [
+            "no hats",
+            0
+          ],
+          [
+            "no shirts",
+            1
+          ],
+          [
+            "no shoes",
+            1
+          ],
+          [
+            "playable",
+            1
+          ],
+          [
+            "self healing",
+            0
+          ],
+          [
+            "single gender",
+            1
+          ],
+          [
+            "swims",
+            1
+          ],
+          [
+            "vampiric",
+            0
+          ]
+        ],
+        "float": [
+          [
+            "bleed rate",
+            0.10000000149011612
+          ],
+          [
+            "blood vertical",
+            0.15000000596046448
+          ],
+          [
+            "bulk max female",
+            500.0
+          ],
+          [
+            "bulk max male",
+            500.0
+          ],
+          [
+            "bulk min female",
+            -500.0
+          ],
+          [
+            "bulk min male",
+            -500.0
+          ],
+          [
+            "combat move speed mult",
+            1.0
+          ],
+          [
+            "dexterity",
+            1.0
+          ],
+          [
+            "heal rate",
+            2.0
+          ],
+          [
+            "hull size X",
+            5.0
+          ],
+          [
+            "hull size Y",
+            17.0
+          ],
+          [
+            "hull size Z",
+            5.0
+          ],
+          [
+            "hunger rate",
+            0.0
+          ],
+          [
+            "max blood",
+            100.0
+          ],
+          [
+            "min blood",
+            100.0
+          ],
+          [
+            "pathfind acceleration",
+            20.0
+          ],
+          [
+            "pathfind footprint radius",
+            4.0
+          ],
+          [
+            "portrait distance",
+            10.0
+          ],
+          [
+            "portrait offset x",
+            0.0
+          ],
+          [
+            "portrait offset y",
+            0.5
+          ],
+          [
+            "portrait offset z",
+            0.0
+          ],
+          [
+            "strength",
+            1.0
+          ],
+          [
+            "swim offset",
+            1.0
+          ],
+          [
+            "swim speed mult",
+            1.0
+          ],
+          [
+            "vision range mult",
+            1.0
+          ],
+          [
+            "walk speed",
+            15.0
+          ],
+          [
+            "water avoidance",
+            6.0
+          ]
+        ],
+        "int": [
+          [
+            "blood colour",
+            3547416
+          ],
+          [
+            "blood horizontal",
+            1
+          ],
+          [
+            "buy value",
+            400
+          ],
+          [
+            "extra attack slots",
+            0
+          ],
+          [
+            "heal stat",
+            6
+          ],
+          [
+            "morph num",
+            5
+          ],
+          [
+            "sounds",
+            3
+          ],
+          [
+            "speed max skill",
+            120
+          ],
+          [
+            "speed min skill",
+            70
+          ],
+          [
+            "stats bad0",
+            9
+          ],
+          [
+            "stats bad1",
+            22
+          ],
+          [
+            "stats bad2",
+            10
+          ],
+          [
+            "stats good0",
+            5
+          ],
+          [
+            "stats good1",
+            3
+          ],
+          [
+            "stats good2",
+            6
+          ],
+          [
+            "weather immunity0",
+            1
+          ],
+          [
+            "weather immunity1",
+            2
+          ],
+          [
+            "weather immunity2",
+            3
+          ],
+          [
+            "weather immunity3",
+            4
+          ]
+        ],
+        "vec3": [],
+        "vec4": [],
+        "str": [
+          [
+            "carry bone",
+            ""
+          ],
+          [
+            "description",
+            "Простые, но гибкие автономные дроны, используемые для тяжелой работы на морских буровых установках. Их легкий корпус, а также кислото- и водостойкая пластиковая оболочка обеспечивают экономичное решение для борьбы с атмосферными воздействиями и повреждениями, вызванными тяжелыми условиями работы. Такая конструкция позволила им выжить в течение сотен лет плавания в бурных морях, где оставшиеся в живых со временем обрели самосознание. Хотя они, возможно, и менее выносливы по сравнению со скелетами, найденными на материке, их иммунитет к любым погодным условиям в сочетании с невероятными трудовыми навыками делают их очень адаптивными."
+          ],
+          [
+            "filenames prefix",
+            "stick"
+          ]
+        ],
+        "file": [
+          [
+            "attachment points",
+            ".\\data\\ragdoll\\attachments-weapons.phs"
+          ],
+          [
+            "body mask female",
+            ".\\data\\character\\skins\\robot\\robot_mask2_HI.dds"
+          ],
+          [
+            "body mask male",
+            "./mods/Driftmetal Remnants - RU/mask_bodyhead2x2.dds"
+          ],
+          [
+            "body texture female",
+            ".\\data\\character\\skins\\robot\\robot_diffuse.dds"
+          ],
+          [
+            "body texture male",
+            "./mods/Driftmetal Remnants - RU/worker/tex/workerdrone_decals_diff.dds"
+          ],
+          [
+            "editor limits",
+            ".\\data\\editor\\editor_data_human.xml"
+          ],
+          [
+            "female carry ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_2.phs"
+          ],
+          [
+            "female mesh",
+            ".\\data\\character\\meshes\\robot\\robot.mesh"
+          ],
+          [
+            "female ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_5.phs"
+          ],
+          [
+            "male carry ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_2.phs"
+          ],
+          [
+            "male mesh",
+            "./mods/Driftmetal Remnants - RU/worker/workerdrone_tweaked.mesh"
+          ],
+          [
+            "male ragdoll",
+            ".\\data\\ragdoll\\hu_m_ragdoll_5.phs"
+          ],
+          [
+            "nm female",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm female skinny",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm female strong",
+            ".\\data\\character\\skins\\robot\\Robot_normal.dds"
+          ],
+          [
+            "nm male",
+            "./mods/Driftmetal Remnants - RU/worker/tex/workerdrone_decals_norm.dds"
+          ],
+          [
+            "nm male skinny",
+            "./mods/Driftmetal Remnants - RU/worker/tex/workerdrone_decals_norm.dds"
+          ],
+          [
+            "nm male strong",
+            "./mods/Driftmetal Remnants - RU/worker/tex/workerdrone_decals_norm.dds"
+          ],
+          [
+            "part map female",
+            ".\\data\\character\\skins\\masks\\robot_mask.png"
+          ],
+          [
+            "part map male",
+            "./mods/Driftmetal Remnants - RU/mask_bodyhead2x2.dds"
+          ]
+        ],
+        "refs": [
+          [
+            "AI Goals",
+            [
+              [
+                "958-gamedata.base",
+                0,
+                100,
+                0
+              ],
+              [
+                "96153-rebirth.mod",
+                4,
+                100,
+                0
+              ]
+            ]
+          ],
+          [
+            "combat anatomy",
+            [
+              [
+                "31-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "28-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "30-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "32-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "100-gamedata.quack",
+                80,
+                125,
+                0
+              ],
+              [
+                "29-gamedata.quack",
+                60,
+                125,
+                0
+              ],
+              [
+                "101-gamedata.quack",
+                140,
+                125,
+                0
+              ]
+            ]
+          ],
+          [
+            "fists lv1",
+            [
+              [
+                "53668-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "fists lv100",
+            [
+              [
+                "53668-rebirth.mod",
+                0,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "heads female",
+            [
+              [
+                "13-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ],
+          [
+            "heads male",
+            [
+              [
+                "13-Driftmetal Remnants.mod",
+                100,
+                0,
+                0
+              ]
+            ]
+          ]
+        ],
+        "inst": [],
+        "_end": 233054
+      }
+    }
+  ],
+  "animation_targets": {
+    "1535098-AnimationOverhaul.mod": [
+      {
+        "mod": "AnimationOverhaul.mod",
+        "name": "AOM_Animations",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\AnimationOverhaul\\character\\meshes\\female_skeleton\\AOM_ANIMATION_female.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\AnimationOverhaul\\character\\meshes\\male_skeleton\\AOM_ANIMATION_male.skeleton"
+          ]
+        ]
+      }
+    ],
+    "1535113-AnimationOverhaul.mod": [
+      {
+        "mod": "AnimationOverhaul.mod",
+        "name": "AOM_Animations2",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\AnimationOverhaul\\character\\meshes\\female_skeleton\\AOM_ANIMATIONV2_female.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\AnimationOverhaul\\character\\meshes\\male_skeleton\\AOM_ANIMATIONV2_male.skeleton"
+          ]
+        ]
+      }
+    ],
+    "10-DigCombatAnimation.mod": [
+      {
+        "mod": "DigCombatAnimation.mod",
+        "name": "DigsCombat",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\DigCombatAnimation\\character\\meshes\\female_skeleton\\CombatAnimFemale.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\DigCombatAnimation\\character\\meshes\\male_skeleton\\CombatAnimMALE.skeleton"
+          ]
+        ]
+      }
+    ],
+    "10-Great Anims Mod.mod": [
+      {
+        "mod": "Great Anims Mod.mod",
+        "name": "Great Animations",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\Great Anims Mod\\character\\meshes\\female_skeleton\\FEMALE_Great_animation_mod.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\Great Anims Mod\\character\\meshes\\male_skeleton\\MALE_Great_animation_mod.skeleton"
+          ]
+        ]
+      }
+    ],
+    "10-GROUNDED Attack Animations.mod": [
+      {
+        "mod": "GROUNDED2 Combat Animations.mod",
+        "name": "GROUNDED Attack Animations",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            "./mods/GROUNDED Attack Animations/character/meshes/female_skeleton/GROUNDED_Attack_Female.skeleton"
+          ],
+          [
+            "male animation",
+            "./mods/GROUNDED Attack Animations/character/meshes/male_skeleton/GROUNDED_Attack_Male.skeleton"
+          ]
+        ]
+      }
+    ],
+    "5008497-Ladylike sitting poses.mod": [
+      {
+        "mod": "Immersive non-combat animations.mod",
+        "name": "IN-CA Idle Set 1",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\Immersive non-combat animations\\character\\female animations set 1 v10.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\Immersive non-combat animations\\character\\male Animations set 1 v7.skeleton"
+          ]
+        ]
+      }
+    ],
+    "5007285-Immersive non-combat animations.mod": [
+      {
+        "mod": "Immersive non-combat animations.mod",
+        "name": "IN-CA Idle Set 2",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\Immersive non-combat animations\\character\\female animations set 2 v3.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\Immersive non-combat animations\\character\\male animations set 2 v5.skeleton"
+          ]
+        ]
+      }
+    ],
+    "1535143-More Combat Animation.mod": [
+      {
+        "mod": "More Combat Animation.mod",
+        "name": "MCA_animation(Must not merge. )",
+        "type": 112,
+        "files": [
+          [
+            "female animation",
+            ".\\mods\\More Combat Animation\\character\\meshes\\female_skeleton\\COMBAT_animation_female.skeleton"
+          ],
+          [
+            "male animation",
+            ".\\mods\\More Combat Animation\\character\\meshes\\male_skeleton\\COMBAT_animation_male.skeleton"
+          ]
+        ]
+      }
+    ]
+  },
+  "quest_sources": []
+}

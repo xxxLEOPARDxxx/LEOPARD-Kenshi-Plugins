@@ -1,0 +1,941 @@
+{
+  "79-Driftmetal Remnants.mod": {
+    "name": "Gas extraction research",
+    "int": {
+      "level": 4,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable buildings": [
+        {
+          "sid": "56-Driftmetal Remnants.mod",
+          "name": "Gas Fracking tower",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "62-Driftmetal Remnants.mod",
+          "name": "Storage: Natural Gas",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "80-Driftmetal Remnants.mod": {
+    "name": "Gas Tools Research",
+    "int": {
+      "level": 4,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "blueprint item": [
+        {
+          "sid": "426-Driftmetal Remnants.mod",
+          "name": "Blueprints (Remnants)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "enable buildings": [
+        {
+          "sid": "67-Driftmetal Remnants.mod",
+          "name": "Gas Cartridge Crafting Bench",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "75-Driftmetal Remnants.mod",
+          "name": "Storage: gas cartridges",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "enable crossbow": [
+        {
+          "sid": "49-Driftmetal Remnants.mod",
+          "name": "Gas-powered Rifle",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "enable item": [
+        {
+          "sid": "69-Driftmetal Remnants.mod",
+          "name": "Gas Cartridges",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "70-Driftmetal Remnants.mod",
+          "name": "Pressurized Gas Canister",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "sid": "79-Driftmetal Remnants.mod",
+          "name": "Gas extraction research",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "424-Driftmetal Remnants.mod": {
+    "name": "Pressure Converter Research",
+    "int": {
+      "level": 5,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "blueprint item": [
+        {
+          "sid": "426-Driftmetal Remnants.mod",
+          "name": "Blueprints (Remnants)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "enable backpack": [
+        {
+          "sid": "36-Driftmetal Remnants.mod",
+          "name": "Pressure Converter",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "37-Driftmetal Remnants.mod",
+          "name": "Pressure Converter (Alternate)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "540-Driftmetal Remnants.mod",
+          "name": "Improvised Pressure Converter",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "enable crossbow": [
+        {
+          "sid": "45-Driftmetal Remnants.mod",
+          "name": "Heavy Bolting Rifle",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "sid": "79-Driftmetal Remnants.mod",
+          "name": "Gas extraction research",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "80-Driftmetal Remnants.mod",
+          "name": "Gas Tools Research",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "425-Driftmetal Remnants.mod": {
+    "name": "Oldworld Backpacks Research",
+    "int": {
+      "level": 4,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable backpack": [
+        {
+          "sid": "38-Driftmetal Remnants.mod",
+          "name": "Strapped Equipment",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "542-Driftmetal Remnants.mod",
+          "name": "Improvised Pressure Converter (Items)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "427-Driftmetal Remnants.mod": {
+    "name": "K Unit Prosthetics",
+    "int": {
+      "level": 5,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 0,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable robotics": [
+        {
+          "sid": "17-Driftmetal Remnants.mod",
+          "name": "K Unit Arm (left)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "18-Driftmetal Remnants.mod",
+          "name": "K unit Arm (right)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "19-Driftmetal Remnants.mod",
+          "name": "K unit Leg (left)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "20-Driftmetal Remnants.mod",
+          "name": "K unit Leg (right)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "sid": "1533521-rebirth.mod",
+          "name": "Skeleton Arms",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1533520-rebirth.mod",
+          "name": "Skeleton Legs",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "503-Driftmetal Remnants.mod": {
+    "name": "V2limbsresearch",
+    "int": {
+      "level": 5,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable robotics": [
+        {
+          "sid": "496-Driftmetal Remnants.mod",
+          "name": "V2armleft",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "497-Driftmetal Remnants.mod",
+          "name": "v2armright",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "498-Driftmetal Remnants.mod",
+          "name": "v2legleft",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "499-Driftmetal Remnants.mod",
+          "name": "v2legright",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "sid": "1533521-rebirth.mod",
+          "name": "Skeleton Arms",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1533520-rebirth.mod",
+          "name": "Skeleton Legs",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "653-Driftmetal Remnants.mod": {
+    "name": "Utility tools",
+    "int": {
+      "level": 2,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 5
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable weapon type": [
+        {
+          "sid": "507-Driftmetal Remnants.mod",
+          "name": "Crowbar",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "506-Driftmetal Remnants.mod",
+          "name": "Pipe Wrench",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "508-Driftmetal Remnants.mod",
+          "name": "Spate",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "658-Driftmetal Remnants.mod": {
+    "name": "Worker Drone Upgrades",
+    "int": {
+      "level": 5,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 5
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable armour": [
+        {
+          "sid": "536-Driftmetal Remnants.mod",
+          "name": "Extended Sensory Array",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "534-Driftmetal Remnants.mod",
+          "name": "Utility Vest",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "659-Driftmetal Remnants.mod": {
+    "name": "Riot Armor Research",
+    "int": {
+      "level": 5,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 8
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable armour": [
+        {
+          "sid": "512-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Lower)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "516-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Lower) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "517-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Lower) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "513-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Upper)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "545-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Upper) - NG",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "514-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Upper) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "546-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Upper) F1 - NG",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "515-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Upper) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "547-Driftmetal Remnants.mod",
+          "name": "Riot Armour (Upper) F2 - NG",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "524-Driftmetal Remnants.mod",
+          "name": "Riot Helmet",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "548-Driftmetal Remnants.mod",
+          "name": "Riot Helmet (Visor up)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "549-Driftmetal Remnants.mod",
+          "name": "Riot Helmet (Visor up) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "550-Driftmetal Remnants.mod",
+          "name": "Riot Helmet (Visor up) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "527-Driftmetal Remnants.mod",
+          "name": "Riot Helmet F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "529-Driftmetal Remnants.mod",
+          "name": "Riot Helmet F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "660-Driftmetal Remnants.mod": {
+    "name": "Hazmat Gear Research",
+    "int": {
+      "level": 4,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 8
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable armour": [
+        {
+          "sid": "583-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood down)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "588-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood down) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "600-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood down) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "614-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood down) NG",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "615-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood down) NG F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "616-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood down) NG F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "580-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood up)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "591-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood up) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "603-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood up) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "637-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "639-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "640-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit (Hood) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "577-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit Pants ",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "586-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit Pants (Alt)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "597-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit Pants (Alt) F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "606-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit Pants (Alt) F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "594-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit Pants F1",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "609-Driftmetal Remnants.mod",
+          "name": "Hazmat Suit Pants F2",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "531-Driftmetal Remnants.mod",
+          "name": "Oldworld Gas Mask",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "663-Driftmetal Remnants.mod",
+          "name": "Oldworld Gas Mask (Belt)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1125-Driftmetal Remnants.mod",
+          "name": "Reinforced Rubber Boots",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "661-Driftmetal Remnants.mod": {
+    "name": "Oldworld Tactical Backpacks Research",
+    "int": {
+      "level": 4,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable backpack": [
+        {
+          "sid": "543-Driftmetal Remnants.mod",
+          "name": "Tactical Backpack",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "39-Driftmetal Remnants.mod",
+          "name": "Tool Case ",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "40-Driftmetal Remnants.mod",
+          "name": "Tool Case (Alternate)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "1114-Driftmetal Remnants.mod": {
+    "name": "Oldworld Service Jackets Research",
+    "int": {
+      "level": 4,
+      "money": 0,
+      "power capacity increase": 0,
+      "power increase": 0,
+      "repeats": 0,
+      "time": 2
+    },
+    "bool": {
+      "blueprint only": 1,
+      "is level upgrade": 0
+    },
+    "refs": {
+      "enable armour": [
+        {
+          "sid": "1106-Driftmetal Remnants.mod",
+          "name": "Service Jacket ",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1108-Driftmetal Remnants.mod",
+          "name": "Service Jacket (F1)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "sid": "1107-Driftmetal Remnants.mod",
+          "name": "Service Jacket (F2)",
+          "values": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "path": "artifacts\\Driftmetal-Remnants-merged-RU-20261101.zip",
+    "files": 257,
+    "size": 359411654,
+    "sha256": "066df9b4dfaad43b1afb63db31dd4c297cb403c6fc1fbb5344e97d5cf19d56f8",
+    "crc_verified": true,
+    "contents_verified": true
+  },
+  {
+    "path": "artifacts\\Driftmetal-Remnants-separate-RU-20261101.zip",
+    "files": 3,
+    "size": 83565,
+    "sha256": "8cbf980b6d3927aaea93f364e1fc6786f839222948e1ed4092bede92aeb4fc7d",
+    "crc_verified": true,
+    "contents_verified": true
+  },
+  {
+    "path": "artifacts\\Driftmetal-Remnants-compatibility-RU-20261101.zip",
+    "files": 3,
+    "size": 10908,
+    "sha256": "b297803e2236a38690cee2f15ea5cf85e69d4c5d50f3f400363c8fc6cfb8e136",
+    "crc_verified": true,
+    "contents_verified": true
+  }
+]

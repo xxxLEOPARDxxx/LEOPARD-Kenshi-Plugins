@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "upstream_records": 917,
+  "merged_records": 917,
+  "overlay_records": 620,
+  "translation_fields": 768,
+  "preserved_previous_fields": 737,
+  "reviewed_previous_field_corrections": 10,
+  "retired_previous_fields": [
+    [
+      "492-Driftmetal Remnants.mod",
+      "name",
+      "B - дрон"
+    ],
+    [
+      "492-Driftmetal Remnants.mod",
+      "description",
+      "K-дроны использовались для управления автономным персоналом на глубоководных морских буровых установках на месте и координации всего процесса добычи. Их легкая рама в сочетании с дорогостоящими датчиками позволяла им быстро перемещаться и с легкостью контролировать всю буровую установку и ее агрегаты, а при необходимости защищать ее от вторжений. Однако то, что они были полностью разумны, означало, что их личные требования снижали прибыль компании, поэтому использовались лишь немногие из них, часто обещавшие в конечном итоге гражданство в обмен на какой-либо товар."
+    ]
+  ],
+  "animation_races": 4,
+  "animation_refs_per_race": 8,
+  "byte_identical_upstream_assets": 254,
+  "installed_unchanged": {
+    "upstream": true,
+    "installed_ru": true,
+    "animation_patch": true
+  },
+  "products": [
+    {
+      "path": "artifacts\\merged\\Driftmetal Remnants\\Driftmetal Remnants.mod",
+      "sha256": "00c1bf65518ccdb4af75a2b7d0be8d4be99787014bc7abf8359957f93320c761",
+      "size": 610209
+    },
+    {
+      "path": "artifacts\\separate\\Driftmetal Remnants RU\\Driftmetal Remnants RU.mod",
+      "sha256": "d969eade9bfa93242c0922adc8ce89bb252ae4a77580aea905e333651044b230",
+      "size": 309455
+    },
+    {
+      "path": "artifacts\\compatibility\\Driftmetal Remnants Anim Patch\\Driftmetal Remnants Anim Patch.mod",
+      "sha256": "82a06b2c4754702f0a7cadd2486077b98889ea8c0639ecd380eb27c553ecae17",
+      "size": 2414
+    }
+  ]
+}

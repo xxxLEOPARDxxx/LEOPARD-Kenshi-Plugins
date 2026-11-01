@@ -1,0 +1,25 @@
+{
+  "products": [
+    {
+      "path": "artifacts\\merged\\Driftmetal Remnants\\Driftmetal Remnants.mod",
+      "sha256": "00c1bf65518ccdb4af75a2b7d0be8d4be99787014bc7abf8359957f93320c761",
+      "size": 610209
+    },
+    {
+      "path": "artifacts\\separate\\Driftmetal Remnants RU\\Driftmetal Remnants RU.mod",
+      "sha256": "d969eade9bfa93242c0922adc8ce89bb252ae4a77580aea905e333651044b230",
+      "size": 309455
+    },
+    {
+      "path": "artifacts\\compatibility\\Driftmetal Remnants Anim Patch\\Driftmetal Remnants Anim Patch.mod",
+      "sha256": "82a06b2c4754702f0a7cadd2486077b98889ea8c0639ecd380eb27c553ecae17",
+      "size": 2414
+    }
+  ],
+  "upstream_records": 917,
+  "overlay_records": 620,
+  "fields": 768,
+  "preserved_fields": 747,
+  "revisions": 31,
+  "animation_races": 4
+}

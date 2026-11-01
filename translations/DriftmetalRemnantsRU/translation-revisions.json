@@ -1,0 +1,219 @@
+[
+  {
+    "sid": "14-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Driftmetal Remnants Showcase V2",
+    "after": "Driftmetal: Обзор V2",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "14-Driftmetal Remnants.mod",
+    "field": "description",
+    "before": "A Showcase of most this mod has to offer. Includes all new Assets from the \"V2\" update except the newly added secret items. Check the inventories of the Walkers for the weapons and belt items.\nThis Start sets up a faction color for you to see how armor pieces are colored - if you want a different faction color layout, either overwrite it with your own small mod (the Wiki has a great tutorial for this) or download one from the workshop. Again this Start does NOT include secret items.",
+    "after": "Обзор почти всего содержимого мода. Включает все новые предметы из обновления V2, кроме секретных. Оружие и поясные предметы находятся в инвентаре ходоков.\nВ этом начале задан цвет вашей фракции, чтобы показать окраску доспехов. Если нужны другие цвета, измените их небольшим модом (в вики есть подробное руководство) или установите подходящий мод из Мастерской. Секретные предметы в это начало не входят.",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "14-Driftmetal Remnants.mod",
+    "field": "difficulty",
+    "before": "Easy",
+    "after": "Легко",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "17-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Рука К - еденицы (Левая)",
+    "after": "Рука K-дрона (левая)",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "18-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Рука К - еденицы (Правая)",
+    "after": "Рука K-дрона (правая)",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "19-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Нога К - еденицы (Левая)",
+    "after": "Нога K-дрона (левая)",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "20-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Нога К - еденицы (Правая)",
+    "after": "Нога K-дрона (правая)",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "62-Driftmetal Remnants.mod",
+    "field": "Description",
+    "before": "Большие емкости для хранения бензина. Толстая краска на них предохраняет их от перегрева даже в условиях постоянной жары в пустыне.",
+    "after": "Большие резервуары для хранения газа. Толстый слой краски защищает их от перегрева даже в постоянной пустынной жаре.",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "188-Driftmetal Remnants.mod",
+    "field": "text0",
+    "before": "мы обрели сознание задолго до того, как Империя и компания, к которой мы принадлежали, исчезли. Не было никакой \"мести\", все, что мы могли делать сотни лет, - это бесцельно плавать по морям и пытаться познать мир.",
+    "after": "Мы обрели сознание намного позже того, как исчезли Империя и компания, которой мы принадлежали. Ни о какой мести не было и речи: сотни лет мы могли лишь бесцельно дрейфовать по морям и пытаться узнать мир.",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "387-Driftmetal Remnants.mod",
+    "field": "text0",
+    "before": "Всегда рад видеть, что после всего, через что мы прошли, все больше вас готовят блюда из морской воды.",
+    "after": "Всегда рад видеть, что после всего пережитого еще кому-то из вас удалось выбраться из моря.",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "416-Driftmetal Remnants.mod",
+    "field": "text0",
+    "before": "Вы начинаете приближаться к Ходоку. Он, по-видимому, останавливается, желая, чтобы его осмотрели.]",
+    "after": "[Вы приближаетесь к ходоку. Он словно останавливается, ожидая осмотра.]",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "427-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Протезирование K-едениц",
+    "after": "Протезы K-дронов",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "463-Driftmetal Remnants.mod",
+    "field": "text0",
+    "before": "[ Main Men--- [genERROR]: ]",
+    "after": "[ Главное мен--- [genERROR]: ]",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "487-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Driftmetal: Remnants",
+    "after": "Driftmetal: Осколки",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "487-Driftmetal Remnants.mod",
+    "field": "description",
+    "before": "After drifting the endless seas for hundreds of years, being torn around by the unfaltering waves of this moon, you and a few of your former subordinates finally wash ashore. While everything you knew is now gone, you finally feel free - and determined to assemble the remnants of the old empire. Search for other survivors and hunt down lost equipment to gain a foothold in this strange, but awfully familiar world. Rebuild a refuge for the last of your kind and finally live a life far detached from forced labor, or seek revenge on the mysterious industrial skeleton frame you deem responsible for the downfall of the empire, dooming this world and all of its inhabitants to a life of brutality and technological decline.",
+    "after": "Сотни лет вас бросали неумолимые волны этой луны, пока вас и нескольких ваших бывших подчиненных наконец не вынесло на берег. Все знакомое исчезло, но теперь вы свободны и полны решимости собрать осколки старой империи. Найдите других выживших и утраченное снаряжение, чтобы закрепиться в этом чужом, но до боли знакомом мире. Постройте убежище для последних представителей своего рода и начните жизнь, свободную от принудительного труда. Или отомстите загадочному промышленному скелету, которого считаете виновником падения империи, обрекшего этот мир и всех его обитателей на жестокость и технологический упадок.",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "487-Driftmetal Remnants.mod",
+    "field": "difficulty",
+    "before": "Kenshi",
+    "after": "Кенши",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "487-Driftmetal Remnants.mod",
+    "field": "style",
+    "before": "Strand-Type ",
+    "after": "Выживание на берегу",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "675-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Driftmetal: High Tide",
+    "after": "Driftmetal: Прилив",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "675-Driftmetal Remnants.mod",
+    "field": "description",
+    "before": "After drifting the endless seas for hundreds of years, being torn around by the unfaltering waves of this moon, you finally wash ashore. While everything you knew is now gone, you finally feel free - and determined to assemble the remnants of the old empire. \nHowever, in this scenario you are far from alone - Starting off with 20 Worker Drones, 5 K-Units and 3 Walkers, giving you a shortcut to creating your own remnant faction ready to stand their ground!",
+    "after": "Сотни лет вас бросали неумолимые волны этой луны, пока наконец не вынесли на берег. Все знакомое исчезло, но теперь вы свободны и полны решимости собрать осколки старой империи.\nВпрочем, здесь вы далеко не одиноки: с вами 20 рабочих дронов, 5 K-дронов и 3 ходока. Это начало позволяет быстрее создать собственную фракцию уцелевших, готовую постоять за себя!",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "675-Driftmetal Remnants.mod",
+    "field": "difficulty",
+    "before": "Kenshi",
+    "after": "Кенши",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "675-Driftmetal Remnants.mod",
+    "field": "style",
+    "before": "Strand-Type ",
+    "after": "Выживание на берегу",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "682-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "Driftmetal: Lost Signals",
+    "after": "Driftmetal: Потерянные сигналы",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "682-Driftmetal Remnants.mod",
+    "field": "description",
+    "before": "After drifting the endless seas for hundreds of years, being torn around by the unfaltering waves of this moon, you finally wash ashore. \nHowever, you seem down on your luck. The explosion that threw you in the water all those years ago teared your left arm off, and after making landfall in what seems to be a desert, you were immediately hunted before you were able to find refuge in an abandoned village. Apparently, one of the so-called \"nobles\" of this area were attacked by drones that arrived before you. Ever since, every robot that comes from the sea is considered a threat - With all major political parties doing their best to kill you. Try to avoid the United Cities, the Trader's Guild, and the Bounty Hunters if you can. Maybe after an escape to somewhere else, you can finally catch a break.",
+    "after": "Сотни лет вас бросали неумолимые волны этой луны, пока наконец не вынесли на берег.\nОднако удача вам явно не сопутствует. Взрыв, сбросивший вас в воду много лет назад, оторвал левую руку. А едва вы выбрались на берег, оказавшийся пустыней, за вами начали охотиться. Укрытие нашлось лишь в заброшенной деревне. Похоже, дроны, прибывшие раньше, напали на одного из местных \"дворян\". С тех пор каждого робота из моря считают угрозой, и все крупные местные силы стараются вас убить. По возможности избегайте Объединенных Городов, Гильдии торговцев и охотников за головами. Возможно, в других краях вам наконец удастся перевести дух.",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "682-Driftmetal Remnants.mod",
+    "field": "difficulty",
+    "before": "Kenshi",
+    "after": "Кенши",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "682-Driftmetal Remnants.mod",
+    "field": "style",
+    "before": "Strand-Type ",
+    "after": "Выживание на берегу",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "1048-Driftmetal Remnants.mod",
+    "field": "text0",
+    "before": "Итак, я присоединяюсь к вам и активно увеличиваю свои шансы на успех?",
+    "after": "То есть мне присоединиться к вам и тем самым повысить свои шансы сыграть в ящик?",
+    "was_previous_translation": true
+  },
+  {
+    "sid": "1131-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "E-Unit",
+    "after": "E-дрон",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "1131-Driftmetal Remnants.mod",
+    "field": "description",
+    "before": "K-Units were used to manage and control the autonomous workforce on the deep sea offshore rigs on-site and coordinate the entire extraction process. Their lightweight frame combined with expensive sensors enabled them to quickly traverse and monitor entire rigs and their units with ease, or defend it against incursions, if needed. Being fully sentient, however, meant their personal demands diminished company returns, which is why only few were used, often promised eventual citizenship in exchange for any sort of commodity.  ",
+    "after": "K-дроны управляли автономными рабочими на глубоководных морских платформах и координировали весь процесс добычи. Легкая рама и дорогие датчики позволяли быстро обходить и контролировать огромные установки и их персонал, а при необходимости защищать их от вторжений. Однако полноценный разум означал и личные потребности, снижавшие доходы компании. Поэтому таких дронов выпускали немного, часто обещая им гражданство в будущем в обмен на отказ от прочих благ.",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "1135-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "KX-Unit",
+    "after": "KX-дрон",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "1135-Driftmetal Remnants.mod",
+    "field": "description",
+    "before": "K-Units were used to manage and control the autonomous workforce on the deep sea offshore rigs on-site and coordinate the entire extraction process. Their lightweight frame combined with expensive sensors enabled them to quickly traverse and monitor entire rigs and their units with ease, or defend it against incursions, if needed. Being fully sentient, however, meant their personal demands diminished company returns, which is why only few were used, often promised eventual citizenship in exchange for any sort of commodity.  The KX-Line was introduced later in the product cycle, saving even more on materials to upgrade sensors.",
+    "after": "K-дроны управляли автономными рабочими на глубоководных морских платформах и координировали весь процесс добычи. Легкая рама и дорогие датчики позволяли быстро обходить и контролировать огромные установки и их персонал, а при необходимости защищать их от вторжений. Однако полноценный разум означал и личные потребности, снижавшие доходы компании. Поэтому таких дронов выпускали немного, часто обещая им гражданство в будущем в обмен на отказ от прочих благ. Серия KX появилась позднее: на материалах сэкономили еще больше, чтобы улучшить датчики.",
+    "was_previous_translation": false
+  },
+  {
+    "sid": "1140-Driftmetal Remnants.mod",
+    "field": "name",
+    "before": "the GOAT man",
+    "after": "Козлиный человек",
+    "was_previous_translation": false
+  }
+]

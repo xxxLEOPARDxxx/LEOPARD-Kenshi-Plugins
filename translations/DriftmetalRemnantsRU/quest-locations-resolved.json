@@ -1,0 +1,51 @@
+{
+  "685-Driftmetal Remnants.mod": [
+    {
+      "sid": "62796-rebirth.mod",
+      "name": "Dead Workshop",
+      "category": "residents",
+      "values": [
+        1,
+        3,
+        0
+      ]
+    }
+  ],
+  "56146-rebirth.mod": [
+    {
+      "sid": "55656-rebirth.mod",
+      "name": "Black Scratch",
+      "category": "residents",
+      "values": [
+        1,
+        4,
+        0
+      ]
+    }
+  ],
+  "486-Driftmetal Remnants.mod": [
+    {
+      "sid": "49940-rebirth.mod",
+      "name": "-nest armoury ruin",
+      "category": "loot spawn",
+      "values": [
+        1,
+        1,
+        0
+      ]
+    }
+  ],
+  "64855-rebirth.mod": [
+    {
+      "sid": "62846-rebirth.mod",
+      "name": "Spider Factory",
+      "category": "residents",
+      "values": [
+        1,
+        2,
+        0
+      ]
+    }
+  ],
+  "686-Driftmetal Remnants.mod": []
+}
