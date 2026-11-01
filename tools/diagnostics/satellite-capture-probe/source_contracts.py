@@ -89,3 +89,14 @@ print('Private material copies preserve fresh Resource loading/accounting metada
 assert 'ReusePrivateShaders",0' in source and 'programCache.Inspect' in source
 assert 'programCache.Owns' in source and 'PreparePrivateProgram' in source
 print('Opt-in shader cache has fixed identities and no cross-request smart pointers')
+assert '"RecycleTerrainBetweenCells",0' in source
+recycle=experiment[experiment.index('void RecycleNativeTerrain('):experiment.index('void Begin(')]
+rc=re.sub(r'\s+','',recycle)
+assert rc.index('clear(geometry,false)')<rc.index('DestroyNativeTerrain()')<rc.index('camera->setPosition')<rc.index('CreateNativeTerrain()')<rc.index('recycle.Ready()')
+assert 'owned==main' in recycle and 'PrivateGroupClearName' in recycle
+assert 'RenderQueueClearName' not in source+experiment
+assert 'if(recycle.pending)returnfalse;' in ec
+assert 'root=NULL;active=false;recycle.Abort();' in ec
+assert 'recycle.Abort();restorationSafe=false;active=false;throw;' in ec
+assert 'if(!recycle.Next())camera->setPosition' in ec
+print('Deferred private Terrain recycle preserves camera/queue/resource and abort-latch ordering')

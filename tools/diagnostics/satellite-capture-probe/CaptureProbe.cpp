@@ -28,6 +28,7 @@
 #include <OgreTechnique.h>
 #include <OgrePass.h>
 #include <OgreTextureUnitState.h>
+#include <OgreRenderQueue.h>
 #include <Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h>
 #include <Compositor/OgreCompositorManager2.h>
 #include <Compositor/OgreCompositorWorkspace.h>
@@ -1408,6 +1409,16 @@ void Update(MapScreen *map)
             Drop();
             return;
         }
+        if(terrainExperiment.recycle.pending)
+        {
+            SaveFileSystem *fs=SaveFileSystem::getSingleton();
+            if(inside||!terrainExperiment.active||!restorationSafe||!chainSafe||!LoadedGuard()||!RenderAbiMatches()||
+               !map||!map->getVisible()||!au||au->render!=renderer||!renderer||renderer->workspace!=gameWorkspace||
+               ou!=requestedWorld||!renderer->root||terrainExperiment.root!=renderer->root||!fs||fs->busy())
+                throw std::runtime_error("deferred private Terrain recycle context changed");
+            terrainExperiment.RecycleNativeTerrain(renderer->root);
+            return;
+        }
         DWORD pid = 0;
         GetWindowThreadProcessId(GetForegroundWindow(), &pid);
         bool down = pid == GetCurrentProcessId() && (GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
@@ -1455,7 +1466,8 @@ void Update(MapScreen *map)
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif",
                 geometryOnlyRequest,
-                GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0);
+                GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0,
+                GetPrivateProfileIntA("Probe","RecycleTerrainBetweenCells",0,ini.c_str())!=0);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }

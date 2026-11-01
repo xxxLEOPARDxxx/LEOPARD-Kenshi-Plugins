@@ -173,3 +173,21 @@ limit blindly. Next design must recycle native geometry between primary cells
 while retaining bounded render resources, investigate process-memory retention,
 then measure adjacent world samples/LOD morph seams. Final8192 targets remain
 disabled. At checkpoint the game is closed/private probe disabled, source pushed.
+
+### Next bounded experiment: recycle Terrain, retain render surfaces
+
+Opt-in RecycleTerrainBetweenCells, default off, only for the fixed16-cell batch.
+Keep one private Scene/camera/GBuffer/Position/Sun workspaces/materials/programs.
+After saving each cell, defer the next-cell transition to MapScreen::Update
+outside compositor iteration. Stop/join and destroy only the owned Terrain,
+then move only the private camera and create a fresh native Terrain/stream with
+the same owned material/height source. Reset warmup; preserve total120s deadline
+and native1GiB/16M limits. Do not use RenderQueue::clear: its native implementation
+walks ALL SceneManagers and would touch main state. Independently audit private
+queue-group/renderable lifetime before accepting this design.
+
+Validate reusable worker helper with actual Win32 threads and exact source
+cleanup ordering; review significant code independently, build/import/profile
+contracts, then live2048 grid with memory observations. If accepted, compare
+fresh-cell reference surfaces and budget/context-failure recovery. Final8K,
+seams/material detail and global map integration remain separate work.

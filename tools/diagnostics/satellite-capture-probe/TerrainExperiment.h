@@ -52,7 +52,9 @@ struct TerrainExperiment
     unsigned __int64 peakNativeMemory;
     int primaryX,primaryZ;
     DWORD started,lastStep;
+    std::string heightSource;
     bool active,geometryOnly,definitionsReady,definitionsFailed;
+    TerrainExperimentPolicy::RecycleState recycle;
     TerrainExperiment():root(NULL),scene(NULL),terrain(NULL),camera(NULL),workspace(NULL),definitionOwner(NULL),
         peakNativeMemory(0),primaryX(0),primaryZ(0),started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false){}
     void Define(Ogre::CompositorManager2 *manager)
@@ -82,11 +84,94 @@ struct TerrainExperiment
         def->connectOutput(nodeId,0);
         definitionsReady=true;definitionsFailed=false;
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest)
+    void CreateNativeTerrain()
+    {
+        if(terrain||!root||!scene||!camera||material.isNull())
+            throw std::runtime_error("private native Terrain factory context incomplete");
+        Ogre::MovableObject *object=api.createObject(scene,"Terrain",api.memory(scene,Ogre::SCENE_STATIC),NULL);
+        if(!object||object==au->terrain)throw std::runtime_error("fresh Terrain aliases main Terrain");
+        terrain=static_cast<Terrain*>(object);
+        if(!NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener))
+            throw std::runtime_error("fresh private terrain type differs");
+        if(!object->getParentNode())scene->getRootSceneNode(Ogre::SCENE_STATIC)->attachObject(object);
+        object->setRenderQueueGroup(25);
+        api.scale(terrain,294912,9800);api.patch(terrain,64);
+        api.detail(terrain,8,8,0);api.limits(terrain,32,8);
+        api.material(terrain,material->getName());
+        if(!api.stream(terrain,heightSource))throw std::runtime_error("private fullmap stream failed");
+    }
+    void DestroyNativeTerrain()
+    {
+        try
+        {
+        // Terrain owns a FrameListener/worker and may borrow camera: join/destroy FIRST.
+        if(terrain)
+        {
+            NativeTerrainCache::WorkerState before,after;
+            if(!ReadOwnedTerrainWorker(terrain,before))throw std::runtime_error("private worker ownership unavailable");
+            const bool hasWorker=before.handle!=NULL;
+            if(hasWorker)
+            {
+                if(!worker.Adopt(before.handle,before.id)||!ReadOwnedTerrainWorker(terrain,after)||
+                   before.landscape!=after.landscape||before.handle!=after.handle||before.id!=after.id||before.request!=after.request)
+                    throw std::runtime_error("private worker kernel identity changed; retaining resources");
+                // Native running byte starts at0 BEFORE scheduling; a kernel join
+                // is necessary even during partial-construction error cleanup.
+                if(!worker.StopAndJoin(before.request,5000))
+                    throw std::runtime_error("private worker did not terminate; retaining resources");
+            }
+            api.destroyObject(scene,terrain);terrain=NULL;
+            if(hasWorker)
+            {
+                bool closed=false;
+                if(!worker.Complete(closed))throw std::runtime_error("private native worker handle cleanup unverified");
+                Log(closed?"private native worker kernel-joined; omitted HANDLE close repaired":"private native worker kernel-joined; native HANDLE already released");
+            }
+        }
+        }
+        catch(...)
+        {
+            // A failed native join/destruction/handle completion is not permission
+            // to create another Terrain or free its borrowed camera/workspaces.
+            recycle.Abort();restorationSafe=false;active=false;throw;
+        }
+    }
+    void RecycleNativeTerrain(Ogre::Root *current)
+    {
+        if(!active||!recycle.enabled||!recycle.pending||!terrain||!scene||!camera||
+           !TerrainExperimentPolicy::CanDestroy(root,current)||!RenderAbiMatches()||
+           !au||!au->render||scene==au->render->scene||camera==au->render->camera)
+            throw std::runtime_error("private Terrain recycle ownership incomplete");
+        if(batch.Expired(GetTickCount()))throw std::runtime_error("private primary-grid batch total deadline exceeded");
+        typedef Ogre::RenderQueue *(__fastcall *Queue)(Ogre::SceneManager*);
+        typedef Ogre::RenderQueueGroup *(__fastcall *Group)(Ogre::RenderQueue*,unsigned char);
+        typedef void (__fastcall *Clear)(Ogre::RenderQueueGroup*,bool);
+        Queue queue=reinterpret_cast<Queue>(AbiExport(nativeApi.ogre,PrivateRenderQueueName,PrivateRenderQueueRva));
+        Group group=reinterpret_cast<Group>(AbiExport(nativeApi.ogre,PrivateQueueGroupName,PrivateQueueGroupRva));
+        Clear clear=reinterpret_cast<Clear>(AbiExport(nativeApi.ogre,PrivateGroupClearName,PrivateGroupClearRva));
+        Ogre::RenderQueue *owned=queue(scene),*main=queue(au->render->scene);
+        if(!owned||owned==main)throw std::runtime_error("private render queue aliases main scene");
+        Ogre::RenderQueueGroup *geometry=group(owned,25);
+        if(!geometry)throw std::runtime_error("private geometry queue missing");
+        // Native RenderQueue::clear clears ALL scenes. Only this group's pointer
+        // collections are cleared here, while private material/Pass remain alive.
+        clear(geometry,false);
+        DestroyNativeTerrain();
+        camera->setPosition(float(region.x),float(region.altitude),float(region.z));
+        CreateNativeTerrain();
+        started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();
+        recycle.Ready();
+        std::ostringstream message;
+        message<<"private native Terrain recycled x="<<primaryX<<" z="<<primaryZ
+               <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
+        Log(message.str());
+    }
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
         batch.Begin(gridRequest,GetTickCount());
+        heightSource=heightPath;recycle.Start(recycleRequest,gridRequest);
         if(batch.enabled&&!batch.Cell(tileX,tileZ))throw std::runtime_error("private grid cursor refused");
         if(!TerrainExperimentPolicy::PrimaryCell(tileX,tileZ,altitude,region))
             throw std::runtime_error("private terrain primary cell/altitude refused");
@@ -121,17 +206,7 @@ struct TerrainExperiment
         fp->setNamedConstant("worldOffset",Ogre::Vector3::ZERO);
         fp->setNamedConstant("map",Ogre::Vector4(-147456,-147456,1.0f/294912,1.0f/294912));
         material->load();
-        Ogre::MovableObject *object=api.createObject(scene,"Terrain",api.memory(scene,Ogre::SCENE_STATIC),NULL);
-        if(!object||object==au->terrain)throw std::runtime_error("fresh Terrain aliases main Terrain");
-        terrain=static_cast<Terrain*>(object);
-        if(!NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener))
-            throw std::runtime_error("fresh private terrain type differs");
-        if(!object->getParentNode())scene->getRootSceneNode(Ogre::SCENE_STATIC)->attachObject(object);
-        object->setRenderQueueGroup(25);
-        api.scale(terrain,294912,9800);api.patch(terrain,64);
-        api.detail(terrain,8,8,0);api.limits(terrain,32,8);
-        api.material(terrain,materialName);
-        if(!api.stream(terrain,heightPath))throw std::runtime_error("private fullmap stream failed");
+        CreateNativeTerrain();
         Ogre::CompositorManager2 *manager=root->getCompositorManager2();Define(manager);
         output=Ogre::TextureManager::getSingleton().createManual("LEOPARD_PrivateTerrainOutput",
             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,Ogre::TEX_TYPE_2D,Side,Side,1,0,Ogre::PF_A8R8G8B8,Ogre::TU_RENDERTARGET);
@@ -156,7 +231,7 @@ struct TerrainExperiment
         dimensions<<"isolated native Terrain ready; one 73728m primary cell,"<<Side<<" output; no simulation zones activated";
         Log(dimensions.str());
         Log(geometryOnly?"private Terrain A/B mode: GBuffer only; no Position/Sun programs or readback":"private Terrain A/B mode: full Position/Sun diagnostics");
-        if(batch.enabled)Log("private primary-grid batch started:16cells,oneTerrain,120s total deadline");
+        if(batch.enabled)Log(recycle.enabled?"private primary-grid batch started:16cells,Terrain recycled between cells,oneScene,120s total deadline":"private primary-grid batch started:16cells,oneTerrain,120s total deadline");
     }
     // Return false while bounded native stream/build work remains. Root calls only at
     // the main compositor boundary; native Root advances this Terrain's own worker.
@@ -164,6 +239,7 @@ struct TerrainExperiment
     {
         DWORD now=GetTickCount();
         if(batch.Expired(now))throw std::runtime_error("private primary-grid batch total deadline exceeded");
+        if(recycle.pending)return false;
         if(static_cast<DWORD>(now-lastStep)<100)return false;
         lastStep=now;
         workspace->_update();
@@ -191,7 +267,7 @@ struct TerrainExperiment
             throw std::runtime_error("private primary-grid cursor invalid");
         // Normal native camera notification/FrameListener updates drive selection.
         // No Landscape cache writes, shared ZoneMap callback or game camera movement.
-        camera->setPosition(float(region.x),float(region.altitude),float(region.z));
+        if(!recycle.Next())camera->setPosition(float(region.x),float(region.altitude),float(region.z));
         started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();
         std::ostringstream next;next<<"private primary-grid advanced x="<<primaryX<<" z="<<primaryZ
           <<" batchIndex="<<batch.index<<" nativePeak="<<peakNativeMemory;Log(next.str());return true;
@@ -203,36 +279,13 @@ struct TerrainExperiment
             throw std::runtime_error("private Terrain root ownership unknown; retaining resources");
         Ogre::CompositorManager2 *manager=root->getCompositorManager2();
         if(workspace){manager->removeWorkspace(workspace);workspace=NULL;}
-        // Terrain owns a FrameListener/worker and may borrow camera: join/destroy FIRST.
-        if(terrain)
-        {
-            NativeTerrainCache::WorkerState before,after;
-            if(!ReadOwnedTerrainWorker(terrain,before))throw std::runtime_error("private worker ownership unavailable");
-            const bool hasWorker=before.handle!=NULL;
-            if(hasWorker)
-            {
-                if(!worker.Adopt(before.handle,before.id)||!ReadOwnedTerrainWorker(terrain,after)||
-                   before.landscape!=after.landscape||before.handle!=after.handle||before.id!=after.id||before.request!=after.request)
-                    throw std::runtime_error("private worker kernel identity changed; retaining resources");
-                // Native running byte starts at0 BEFORE scheduling; a kernel join
-                // is necessary even during partial-construction error cleanup.
-                if(!worker.StopAndJoin(before.request,5000))
-                    throw std::runtime_error("private worker did not terminate; retaining resources");
-            }
-            api.destroyObject(scene,terrain);terrain=NULL;
-            if(hasWorker)
-            {
-                bool closed=false;
-                if(!worker.Complete(closed))throw std::runtime_error("private native worker handle cleanup unverified");
-                Log(closed?"private native worker kernel-joined; omitted HANDLE close repaired":"private native worker kernel-joined; native HANDLE already released");
-            }
-        }
+        DestroyNativeTerrain();
         if(camera){scene->destroyCamera(camera);camera=NULL;}
         if(scene){api.destroyScene(root,scene);scene=NULL;}
         if(!material.isNull())
         {Ogre::MaterialManager::getSingleton().remove(material->getName());material.setNull();}
         if(!output.isNull())
         {Ogre::TextureManager::getSingleton().remove(output->getName());output.setNull();}
-        root=NULL;active=false;Log("isolated Terrain destroyed before its camera and scene");
+        root=NULL;active=false;recycle.Abort();Log("isolated Terrain destroyed before its camera and scene");
     }
 } terrainExperiment;

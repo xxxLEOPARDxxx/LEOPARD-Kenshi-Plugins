@@ -2,6 +2,16 @@
 namespace TerrainExperimentPolicy
 {
 struct Region {double x,z,span,altitude;};
+struct RecycleState
+{
+    bool enabled,pending;
+    RecycleState():enabled(false),pending(false){}
+    void Start(bool requested,bool batch){enabled=requested&&batch;pending=false;}
+    bool Next(){pending=enabled;return pending;}
+    void Ready(){pending=false;}
+    // Scheduling state only. Resource ownership remains in TerrainExperiment.
+    void Abort(){enabled=false;pending=false;}
+};
 struct GridBatch
 {
     bool enabled;unsigned index;unsigned long started;

@@ -41,6 +41,20 @@ int main()
         DWORD flags=0;Check(GetHandleInformation(replacement,&flags)!=0,"replacement object remains valid");
         CloseHandle(replacement);CloseHandle(event);
     }
+    {
+        NativeWorkerHandle reusable;
+        for(unsigned cell=0;cell<16;++cell)
+        {
+            bool closed=false;volatile BYTE flag=1;DWORD tid=0;
+            HANDLE event=CreateEvent(NULL,TRUE,FALSE,NULL);
+            HANDLE thread=CreateThread(NULL,0,WaitForEvent,event,0,&tid);
+            Check(event&&thread&&reusable.Adopt(thread,tid),"same private worker helper adopts each fresh cell thread");
+            SetEvent(event);
+            Check(reusable.StopAndJoin(&flag,2000),"every recycled-cell worker kernel-joined");
+            Check(reusable.Complete(closed)&&closed,"recycled helper closes then resets ownership for next cell");
+            CloseHandle(event);
+        }
+    }
     GetProcessHandleCount(GetCurrentProcess(),&after);
     Check(before==after,"no test worker/event/duplicate/native handles leak");
     std::cout<<checks<<" production Win32 worker identity/join/handle checks passed\n";

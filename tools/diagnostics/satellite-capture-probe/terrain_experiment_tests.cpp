@@ -63,5 +63,17 @@ int main()
     Check(!batch.Expired(0x80UL)&&batch.Expired(119872UL),"batch deadline unsigned clock wrap");
     batch.Begin(false,0);
     Check(!batch.Cell(bx,bz)&&!batch.Advance()&&!batch.Expired(120000),"single-cell mode unchanged");
+    RecycleState recycle;
+    recycle.Start(true,true);
+    Check(recycle.Next()&&recycle.pending,"completed batch cell defers recycle");
+    recycle.Abort();
+    Check(!recycle.pending&&!recycle.enabled,"clean abort clears deferred latch and returns idle");
+    recycle.Start(true,true);
+    Check(recycle.Next(),"new request can recycle after clean abort");
+    recycle.Ready();Check(!recycle.pending&&recycle.enabled,"fresh Terrain resumes same batch");
+    recycle.Next();recycle.Abort();
+    Check(!recycle.pending,"quarantine clears scheduling latch without claiming resources freed");
+    recycle.Start(true,false);Check(!recycle.Next(),"single-cell request never recycles");
+    recycle.Start(false,true);Check(!recycle.Next(),"default-off batch behavior unchanged");
     std::cout<<checks<<" production isolated-terrain policy checks passed\n";
 }

@@ -495,3 +495,21 @@ all five workers joined/closed, five scenes removed and named resources balanced
 Whole-process retention remains open (~8.84GB idle after this run); no zero-leak
 or FPS acceptance claim. Private probe was disabled and game closed after proof.
 Details/evidence: docs/verification/2026-11-01-satellite-isolated-live.md.
+
+### Recycle native geometry, retain render surfaces (candidate)
+RecycleTerrainBetweenCells=1 is explicit/default0 and applies only to the fixed
+16-cell batch. One Scene/camera/GBuffer/Position/Sun/resource set stays alive;
+after each saved cell, Update (outside compositor iteration) clears ONLY its
+private geometry queue25, joins/destroys the old native Terrain, then moves only
+the private camera and creates a fresh native Terrain/stream. The old camera
+does not move while deferred, preventing next-cell loading in the old cache.
+Each cell resets warmup; total120s and existing native budgets remain unchanged.
+
+Native RenderQueue.clear walks ALL scenes and is forbidden here. Exact-profile
+RenderQueueGroup.clear(false) is used, with private/main queue identity refusal.
+Failed native cleanup retains the one bounded resource set and disables future
+requests; full/unsafe abort clears the scheduling latch to prevent an error loop.
+425 checks include16 successive actual Win32 thread/helper lifecycles,7 new
+production deferred-state cases and an empty-Abort mutant that fails. Independent
+review clear after correcting the abort latch. Runtime coverage/memory acceptance
+still require new512 then2048 evidence; this is not a final8K mode.
