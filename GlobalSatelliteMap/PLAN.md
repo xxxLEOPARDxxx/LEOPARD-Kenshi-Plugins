@@ -2,6 +2,35 @@
 
 The requested feature is an optional satellite view on the GLOBAL map. BestMinimap keeps its existing map source. The target atlas is exactly 4 x 4 tiles, each 8192 x 8192 (32768 squared logical pixels).
 
+## User clarification: dynamic lights and optional render layers,2026-11-01
+
+Dynamic illumination includes real torches, carried lanterns, installed lamps
+and similar native/modded sources. Their position, colour, intensity, effective
+range and on/off state must affect the map as the world changes. A fixed daytime
+atlas or periodically tinted screenshot does not satisfy this requirement.
+
+Provide MCM groups with separate toggles for sun/day-night lighting, ambient
+illumination, local lights, shadows, city/building models and their distant LODs.
+Other expensive render layers (e.g.water/vegetation) should be independently
+controllable as those layers are implemented. Changes should apply live where
+the renderer supports it; mark restart only if it is truly required. Three UI
+languages, Debug last/defaultoff and native/custom UI skin compatibility apply.
+
+Architecture: retain4×4×8192 atlas coverage, separate static geometry/material
+data from dynamic lighting/model updates. Do not rerender all16highres tiles
+for every lantern movement or time tick. Dirty regions/visible-map updates and
+bounded source caches require measured work/memory budgets; no per-frame
+whole-world character/object scan or activation of all simulation zones.
+
+Acceptance must include night/day transition, moving lantern, torch/lamp
+on/off (including fuel/power where native state applies), modded light source,
+loaded/unloaded town geometry, user-built changes and save/load invalidation.
+For unloaded regions, first establish the actual render-only geometry and light
+state sources; do not invent a state or present a remembered screenshot as a
+current native light. Test options independently and in combination, including
+turning a layer off without leaving lights, geometry or resources behind.
+Report FPS/memory and update latency separately from offline capture success.
+
 ## First coherent stage
 
 1. Extract C++03 policy into `SatellitePolicy.h`: strict bounded manifest parsing, half-open tile edges, visible-tile selection, mip choice and aggregate memory budget. Test this production header with VC10 before integrating UI.

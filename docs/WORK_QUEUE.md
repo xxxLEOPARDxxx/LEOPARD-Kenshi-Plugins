@@ -5,13 +5,20 @@ not a public release announcement. Latest instructions override historical notes
 
 1. **Global satellite map — ACTIVE, unfinished.** Deliver an optional working
    GLOBAL map layer,4x4 primary tiles at8192²; preserve BestMinimap's current map.
-   Current proof covers isolated distant Terrain, not a finished game feature.
-   Resolve resource retention, real materials/geometry boundaries, building/model
+   Current proof covers private near-terrain layers and four native painted
+   pairs in one512 cell with balanced resource counters; it is not a finished
+   game feature. Complete geographically correct biome mixing/mips, geometry boundaries, building/model
    coverage, water/shadows/day-night and viewer integration. User authorized
    autonomous launch/load/input when away. Latest clarification2026-11-01:
    while the user writes at the PC, do not launch/focus/switch windows; ask the
    user to prepare game scenes, then use file requests/read-only telemetry in
    the background. Preserve personal settings and use test saves.
+   User clarification2026-11-01: dynamic lighting includes actual torches,
+   lanterns and similar local sources, not only sun/day-night. MCM must offer
+   separate switches for lighting components, city models and other render layers;
+   see GlobalSatelliteMap/PLAN.md. Full atlas rerender on every lamp change is
+   not an acceptable update strategy. Article finished; still check process and
+   avoid taking window focus without a new instruction.
 2. **KEO MCM fork — AFTER satellite.** New user request explicitly authorizes
    a fork under MCM, bug fixes and improvements. This supersedes the historical
    local-only KEO intent. Before implementation read current upstream source,
@@ -21,6 +28,13 @@ not a public release announcement. Latest instructions override historical notes
    normal three-language, debug-last, release/credit and Nexus→Steam rules.
 3. **Dynamic Factions — PAUSED by user.** Preserve current work and plans;
    resume when requested, after the satellite priority. No publication.
+4. **Save screenshot previews — DEFERRED, requested2026-11-01.** Capture the
+   game window/frame when a save succeeds; display its preview below the save
+   list when selecting that slot, both from the main menu and during play.
+   User reference screenshots16:56:51/16:57:14 show placement. Plugin not chosen;
+   decide between a UI Tweaks feature and a dedicated module when work starts.
+   Detailed task: docs/superpowers/specs/2026-11-01-save-previews-backlog.md.
+   Record now only; do not start implementing ahead of the active satellite task.
 
 ## Maintenance completed in this continuation
 
