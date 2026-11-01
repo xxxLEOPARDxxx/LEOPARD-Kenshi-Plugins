@@ -1,7 +1,38 @@
 Save preview candidate, 1 November 2026
 ======================================
 
-Current correction candidate
+Latest full-width correction candidate
+--------------------------------------
+
+DLL325120 bytes, SHA256
+`7076f4725d20f2aa6fc6120a0e50922119c381f76df941d2ad1c9e72c01e7d52`.
+User accepted the previous HUD correction in game, then requested the image
+span the save dialog rather than remain640px wide. Display now upscales to the
+dialog width, preserving aspect and limiting height to available space. A
+height-limited/portrait image remains centered without cropping. The missing
+image row uses the same full width. Stored JPEG bounds640x360 remain unchanged.
+New regression first failed against the old placement, then passes with34policy
+checks. Complete preview suites, native geometry and108RMB checks pass; independent
+narrow review CLEAR. This candidate is built, not yet installed at this checkpoint.
+
+Live acceptance of preceding950ad322 candidate
+---------------------------------------------
+
+User screenshots20:38:53/20:39:00 show HUD/minimap and character panels included,
+save/pause menus excluded, and a selected old slot's missing-image message.
+User explicitly reported the behavior works; the outstanding feedback was width.
+Read-only sidecar validation confirms:
+
+* `UI Tweaks Test Screen`:77254bytes,640x360,77214-byte JPEG, native quick.save
+  timestamp/size match; SHA5314c94f870a921b2fd8b7983eb00121020e7042755e28b1a822f675b2705ab2.
+* `autosave1`:78416bytes,640x360,78376-byte JPEG, matching revision;
+  SHA6195d27d73ac42caf7454183feafbbd54ca49e62ef39e1e1d5b2eb8d77997cbd.
+
+Evidence JSON is ignored `tests/_generated/live-hud-preview-evidence.json`.
+No user save was modified by inspection. Quicksave, main-menu live appearance,
+all skins/scales and long-run FPS/memory are not proved by these two sidecars.
+
+Previous HUD correction candidate (historical geometry)
 ----------------------------
 
 DLL: `D:/DEV/Kenshi/build/UITweaks/UITweaks.dll`, 325632 bytes.

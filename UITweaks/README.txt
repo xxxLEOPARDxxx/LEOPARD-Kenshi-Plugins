@@ -5,7 +5,7 @@ UI Tweaks — доработки интерфейса, которых не сд�
   * Снимки сохранений: игра с HUD, мини-картой и панелями персонажей,
     без меню сохранения/загрузки, меню паузы и его затемнения. Предпросмотр
     выбранного слота под окном загрузки в главном меню и в игре.
-    Рамка точно подогнана под снимок; до выбора сейва она скрыта.
+    Рамка идёт по ширине окна загрузки; до выбора сейва она скрыта.
   * Ручные сохранения, перезапись, quicksave и autosave используют реальный
     каталог слота. Снимок обновляется только при успешной записи. Старым
     сейвам изображение не требуется; вместо него показана пустая область.
@@ -25,7 +25,8 @@ VERSION 12 CHANGES (31 OCTOBER–1 NOVEMBER 2026)
   * Saved game screenshots include the HUD, minimap and character panels,
     excluding save/load and pause menus with their backdrop. Selecting a slot
     shows its preview below Load Game, in the main menu and in game. The frame
-    fits the image without cropping or distortion; it stays hidden before selection.
+    spans the Load Game window; the image keeps its proportions without cropping.
+    The frame stays hidden before selection.
   * Manual saves, overwrites, quicksaves and autosaves use the actual slot
     directory. A preview is committed only after a successful save. Old saves
     need no image and show a clear empty state.
@@ -221,7 +222,7 @@ VERSION 10 CHANGES (30 OCTOBER 2026)
    загружаются как обычно; подпись — «Нет снимка сохранения».
    До выбора строки рамка скрыта, в том числе при автоматически подсвеченной
    первой строке. Нажатие на эту строку тоже показывает снимок. Пропорции
-   сохраняются без обрезки: размер рамки равен снимку с небольшими полями.
+   сохраняются без обрезки: рамка и снимок растягиваются по ширине окна загрузки.
    Если места мало, снимок и рамка уменьшаются, окно загрузки сдвигается вверх;
    список, кнопки и правая панель остаются штатными.
    SavePreviews (1), MCM «Сохранённые игры», действует сразу.

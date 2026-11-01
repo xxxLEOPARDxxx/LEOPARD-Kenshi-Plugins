@@ -39,12 +39,18 @@ namespace SavePreviewPolicy
         if(maxW<=12||maxH<=12)return p;
         if(hasImage)
         {
-            const Size s=Fit(imageW,imageH,maxW-12,maxH-12);
+            if(!imageW||!imageH)return p;
+            // Storage stays bounded at 640x360. Display may scale up to the
+            // dialog width; a short viewport caps height without cropping.
+            const double scale=(std::min)(double(maxW-12)/imageW,double(maxH-12)/imageH);
+            const Size s((std::max)(1U,unsigned(imageW*scale)),
+                         (std::max)(1U,unsigned(imageH*scale)));
             if(!s.width||!s.height)return p;
-            p.panel.width=int(s.width)+12;p.panel.height=int(s.height)+12;
-            p.image.x=p.image.y=6;p.image.width=s.width;p.image.height=s.height;
+            p.panel.width=maxW;p.panel.height=int(s.height)+12;
+            p.image.x=(p.panel.width-int(s.width))/2;p.image.y=6;
+            p.image.width=s.width;p.image.height=s.height;
         }
-        else {p.panel.width=(std::min)(maxW,320);p.panel.height=(std::min)(maxH,48);}
+        else {p.panel.width=maxW;p.panel.height=(std::min)(maxH,48);}
         p.dialogX=(std::max)(8,(std::min)(x,viewW-width-8));
         p.dialogY=(std::max)(8,(std::min)(y,viewH-height-4-p.panel.height-8));
         p.panel.x=(std::max)(8,(std::min)(p.dialogX+(width-p.panel.width)/2,viewW-p.panel.width-8));

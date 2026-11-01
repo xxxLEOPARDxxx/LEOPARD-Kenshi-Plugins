@@ -28,13 +28,28 @@ not a public release announcement. Latest instructions override historical notes
    normal three-language, debug-last, release/credit and Nexus→Steam rules.
 3. **Dynamic Factions — PAUSED by user.** Preserve current work and plans;
    resume when requested, after the satellite priority. No publication.
-4. **Save screenshot previews — DEFERRED, requested2026-11-01.** Capture the
+4. **Save screenshot previews — ACTIVE IN PARALLEL, requested2026-11-01.** Capture the
    game window/frame when a save succeeds; display its preview below the save
    list when selecting that slot, both from the main menu and during play.
-   User reference screenshots16:56:51/16:57:14 show placement. Plugin not chosen;
-   decide between a UI Tweaks feature and a dedicated module when work starts.
+   User reference screenshots16:56:51/16:57:14 show placement. Latest user
+   instruction fixes the module: **UI Tweaks**, implemented alongside satellite.
    Detailed task: docs/superpowers/specs/2026-11-01-save-previews-backlog.md.
-   Record now only; do not start implementing ahead of the active satellite task.
+   The screenshot includes HUD, minimap and character panels; exclude only
+   save/load/pause menus and their backdrop, not the entire interface. Use the
+   actual native game target, never a desktop/menu screenshot. The preview and
+   missing-image row align to the full dialog width; preserve image aspect ratio
+   and cap height to available space. Hide the panel before genuine selection.
+   Auto/quicksave preserve the visible HUD too. Existing saves without image
+   remain usable; only confirmed successful saves receive a new preview.
+5. **Container Highlight maintenance — candidate ready2026-11-01.** Confirmed
+   stale-model restoration retry fault addressed in fork commit9101ad8. Earlier
+   fixes covered other paths; the player's exact freeze remains unverified.
+   48 extracted production checks and independent review pass. Install after
+   checking game closure; runtime travel/interior/Alt/save-load acceptance pending.
+6. **Organize the Trader unsupported locale — audit closed2026-11-01.** English
+   fallback passes for current and v7 loaders with packaged catalogs, including
+   German variants. No production defect/new language added. User accepts this
+   result; reopen only with concrete symptoms or logs.
 
 ## Maintenance completed in this continuation
 
