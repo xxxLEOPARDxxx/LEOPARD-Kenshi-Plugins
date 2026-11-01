@@ -260,3 +260,35 @@ not overwritten or freed. Five new regression checks cover these cases; the full
 build now passes216 checks and111 import resolutions. Native LOD selection/build
 caches remain nontransactional; this is a diagnostic of the resident scene, not
 the architecture for full-world rendering. See the separate terrain audit.
+
+## Isolated native Terrain experiment (default off; private tooling)
+IsolatedTerrain=1 opts a request into a fresh SceneManager/Terrain/stream/Landscape,
+using genuine installed DistantTerrain/distant.dds and the global fullmap.tif.
+PrimaryX/PrimaryZ select0..3 on the exact294912-unit world; one cell is73728m.
+Altitude is bounded10000..30000 (12000 default); output stays512 for this proof.
+This is not a16x8K renderer. Own scene positions are absolute; only the private
+material removes shared worldOffset and sets the native map extent. The main
+scene, main Terrain, detailed ZoneMap callbacks and NPC simulation are not used.
+The sun pass's reference-camera correction is retained with private worldOffset0.
+
+A fixed private global GBuffer definition has three native surfaces and no game
+custom-light/GUI passes. Rendering progresses at most10Hz at the main compositor
+boundary, within60seconds/600samples. Native build limits32/8; observed native
+memory1GiB, patches131072, triangles16million and drawables65536 refuse excess.
+These are observed-work budgets, not hard reservations inside the native worker.
+Stable nonzero counters on3samples permit a diagnostic readback; they do not
+prove correct refinement, missing buildings or final coverage. A timeout writes
+no success output. Save/load, map closure, world/Root change abort and clean up.
+
+Normal and partial cleanup remove private shader workspaces before their resources,
+then the private GBuffer workspace, fresh Terrain (including FrameListener/worker)
+BEFORE its borrowed camera and SceneManager. Never copy Terrain or its callbacks.
+An ownership failure retains one bounded resource set and disables further work.
+The private material clone has independent GPU params; native programs/assets and
+shared parameter sets stay unchanged. Explicit getDebugInfo adapter matches actual
+member aggregate ABI (this,out -> out), with exact export/code profile checks.
+
+21 production policy cases cover primary-cell edges/world coverage/9m final pixels,
+altitude/refinement readiness/deadline/counter budgets/unsigned clock wrap/owner
+identity. Full237-check build and116 real import resolutions pass. Actual native
+geometry rendering/lifetime/performance still requires root's controlled game run.

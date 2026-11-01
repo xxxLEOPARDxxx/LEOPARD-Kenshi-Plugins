@@ -27,7 +27,7 @@ assert 'if(!au||au->terrain!=terrain||!ReadTerrainBlood(terrain,after)' in compa
 assert '!NativeTerrainCache::BloodMatches(blood,after,mainCamera)||!WriteTerrainCache(terrain,state)' in compact
 assert 'unsafe borrowed camera at cleanup' in source
 assert 'Terrain helper must already borrow main LOD camera' in source
-assert compact.index('constructionrestorationfailed') < compact.index('gameWorkspace=renderer->workspace;')
+assert compact.index('constructionrestorationfailed') < compact.rindex('gameWorkspace=renderer->workspace;')
 assert 'EnableRequestFile",0' in source and 'existing token latched without replay' in source
 assert 'main/probe GBuffer aliasing refused' in source
 assert '(GetAsyncKeyState' in compact and 'press=down&&!keyHeld' in compact
@@ -58,3 +58,14 @@ for name in ('GlobalSatelliteMap', 'SatelliteCaptureProbe'):
     else:
         raise AssertionError(f'historical broken DLL was accepted: {bad}')
 print(f'Actual PE startup contract passed; {rejected} historical C-startup DLLs rejected')
+
+experiment=(p/'TerrainExperiment.h').read_text()
+ec=re.sub(r'\s+','',experiment)
+assert 'api.createObject(scene,"Terrain",api.memory(scene,Ogre::SCENE_STATIC),NULL)' in ec
+assert 'api.scale(terrain,294912,9800)' in ec and 'api.limits(terrain,32,8)' in ec
+assert ec.index('api.destroyObject(scene,terrain)') < ec.index('scene->destroyCamera(camera)') < ec.index('api.destroyScene(root,scene)')
+assert 'setMaterialCallbacks' not in experiment and 'new Terrain' not in experiment
+assert 'activation' not in experiment and 'loadGame' not in experiment
+assert 'IsolatedTerrain",0' in source and 'terrainExperiment.root' in source
+assert 'typedefTerrainExperimentPolicy::Stats*(__fastcall*Info)(constTerrain*,TerrainExperimentPolicy::Stats*)' in ec
+print('Private native Terrain ownership/aggregate ABI/default-off contracts passed')

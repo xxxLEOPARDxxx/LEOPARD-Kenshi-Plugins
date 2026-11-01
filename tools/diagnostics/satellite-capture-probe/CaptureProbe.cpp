@@ -37,6 +37,8 @@
 #include <Compositor/OgreCompositorNodeDef.h>
 #include <Compositor/OgreCompositorChannel.h>
 #include <Compositor/Pass/PassScene/OgreCompositorPassScene.h>
+#include <Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h>
+#include <Compositor/Pass/PassClear/OgreCompositorPassClearDef.h>
 #include <kenshi/Globals.h>
 #include <kenshi/KingOfRenderThread.h>
 #include <kenshi/Renderer.h>
@@ -57,6 +59,7 @@
 #include "SunShader.h"
 #include "NativeTerrainCache.h"
 #include "RenderAbiProfile.h"
+#include "TerrainExperimentPolicy.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -870,7 +873,7 @@ void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene
     sunWorkspace = manager->addWorkspace(scene,sunTarget->getBuffer()->getRenderTarget(),camera,
         Ogre::IdString(SunWorkspaceName),false);
 }
-void InspectSunPass(Ogre::Camera *camera, const std::string &prefix)
+void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absoluteWorld=false)
 {
     if (!sunWorkspace || sunMaterial.isNull()) throw std::runtime_error("sun workspace missing");
     Ogre::GpuProgramParametersSharedPtr p = sunMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
@@ -882,7 +885,7 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix)
     if (direction.squaredLength()<1e-8f) throw std::runtime_error("sun direction invalid");
     const Ogre::Vector4 sun = SharedVector("SharedSkyParams","sunColour",4),
                         world = SharedVector("AmbientParams","worldSize",4);
-    const Ogre::Vector3 offset = AsVector3(SharedVector("SharedWaterParams","worldOffset",3));
+    const Ogre::Vector3 offset = absoluteWorld ? Ogre::Vector3::ZERO : AsVector3(SharedVector("SharedWaterParams","worldOffset",3));
     p->clearAutoConstants();
     p->removeAllSharedParameters();
     p->setNamedConstant("captureWindow",Ogre::Vector4(camera->getOrthoWindowWidth(),camera->getOrthoWindowHeight(),camera->getFarClipDistance(),float(Side)));
@@ -943,6 +946,7 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix)
     if (nonfinite) throw std::runtime_error("private sun nonfinite output; no BMP saved");
     Save(sunTarget,prefix+"_sun_noShadow_linear_clamped");
 }
+#include "TerrainExperiment.h"
 void Drop()
 {
     if (!OnMain())
@@ -1028,6 +1032,15 @@ void Drop()
     if (manager && ManagerAccess::Contains(manager, shot))
         manager->removeWorkspace(shot);
     shot = NULL;
+    if(terrainExperiment.root)
+    {
+        try{terrainExperiment.Destroy(current?current->root:NULL);}
+        catch(...)
+        {
+            restorationSafe=false;chainSafe=false;pending=false;cleanup=false;
+            ErrorLog("SatelliteCaptureProbe: private Terrain cleanup refused; retained until process exit");return;
+        }
+    }
     if (current && current->scene == shotScene)
     {
         if (own && shotScene->findCameraNoThrow("LEOPARD_PrivateCaptureCamera") == own)
@@ -1068,6 +1081,37 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
     virtual void workspacePreUpdate(Ogre::CompositorWorkspace *w)
     {
         Ogre::CompositorWorkspaceListener *next = previous;
+        if(terrainExperiment.active && !inside)
+        {
+            inside=true;
+            try
+            {
+                SaveFileSystem *fs=SaveFileSystem::getSingleton();
+                if(!OnMain()||!restorationSafe||!chainSafe||!LoadedGuard()||!RenderAbiMatches()||
+                   !au||!au->render||au->render!=renderer||ou!=requestedWorld||renderer->workspace!=w||
+                   renderer->root!=terrainExperiment.root||!fs||fs->busy())
+                    throw std::runtime_error("isolated Terrain context changed");
+                if(terrainExperiment.Step())
+                {
+                    const Ogre::CompositorChannel &gb=terrainExperiment.workspace->getGlobalTexture("global_gbuffer");
+                    if(gb.textures.size()!=3)throw std::runtime_error("private Terrain GBuffer structure differs");
+                    std::vector<float> depth(Side*Side);
+                    Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_R,&depth[0]);
+                    gb.textures[2]->getBuffer()->blitToMemory(box);
+                    std::ostringstream prefix;prefix<<"isolated_terrain_"<<GetCurrentProcessId()<<'_'<<GetTickCount()<<'_'<<++serial;
+                    Save(gb.textures[0],prefix.str()+"_gbuffer_raw");
+                    InspectPositionPass(terrainExperiment.camera,depth);
+                    InspectSunPass(terrainExperiment.camera,prefix.str(),true);
+                    Log("isolated primary-cell diagnostic saved; distant terrain only, not complete atlas");
+                    terrainExperiment.active=false;cleanup=true;
+                }
+            }
+            catch(const std::exception &e)
+            {terrainExperiment.active=false;cleanup=true;ErrorLog(std::string("SatelliteCaptureProbe: ")+e.what());}
+            catch(...)
+            {terrainExperiment.active=false;cleanup=true;ErrorLog("SatelliteCaptureProbe: isolated Terrain experiment failed");}
+            inside=false;
+        }
         if (pending && !inside)
         {
             pending = false;
@@ -1195,12 +1239,14 @@ void Update(MapScreen *map)
             EnumWindows(FindWindowThread, 0);
         if (!OnMain())
             return;
-        if (pending && (!au || au->render != renderer || !renderer ||
+        if ((pending || terrainExperiment.active) && (!au || au->render != renderer || !renderer ||
                         renderer->workspace != gameWorkspace || ou != requestedWorld))
         {
             pending = false;
             cleanup = true;
         }
+        if(terrainExperiment.active && (!map||!map->getVisible()))
+        {terrainExperiment.active=false;cleanup=true;}
         if (cleanup)
         {
             Drop();
@@ -1224,7 +1270,7 @@ void Update(MapScreen *map)
             }
             if(!wasArmed)Log("opt-in request file armed; existing token latched without replay");
         }
-        if (!press || pending || !map || !map->getVisible() || !chainSafe)
+        if (!press || pending || terrainExperiment.root || !map || !map->getVisible() || !chainSafe)
             return;
         if (!profileOK || !LoadedGuard() || !au || !au->render || !ou)
             throw std::runtime_error("guard/native world unavailable");
@@ -1237,6 +1283,20 @@ void Update(MapScreen *map)
             !Supported(renderer->camera))
             throw std::runtime_error("unsupported main camera state");
         std::string ini = Folder() + "SatelliteCaptureProbe.ini";
+        if(GetPrivateProfileIntA("Probe","IsolatedTerrain",0,ini.c_str())==1)
+        {
+            char executable[MAX_PATH]={0};DWORD n=GetModuleFileNameA(NULL,executable,MAX_PATH);
+            if(!n||n>=MAX_PATH)throw std::runtime_error("terrain input path unavailable");
+            std::string base(executable,n);base=base.substr(0,base.find_last_of("/\\"));
+            if(base.size()>=9 && _stricmp(base.substr(base.size()-9).c_str(),"RE_Kenshi")==0)
+                base=base.substr(0,base.find_last_of("/\\"));
+            terrainExperiment.Begin(renderer->root,
+                GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
+                GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
+                GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif");
+            gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
+            requestedWorld=ou;gameWorkspace->setListener(&listener);return;
+        }
         mode = GetPrivateProfileIntA("Probe", "Mode", 0, ini.c_str());
         cx = GetPrivateProfileIntA("Probe", "CellX", 0, ini.c_str());
         cz = GetPrivateProfileIntA("Probe", "CellZ", 0, ini.c_str());

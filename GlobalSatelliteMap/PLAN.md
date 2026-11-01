@@ -104,3 +104,41 @@ explicit modern t0..5/s3..5, reflection contracts and64GPU decoder cases (+28fai
 mutant). A bounded manual-only source override permits future HLSL iterations without DLL
 replacement; generated override must pass compile/reflection checks before copying. Next:
 repeat colour capture with corrected bindings, then native HDR/tone mapping and shadows.
+
+## Isolated terrain experiment — continuation ruling, 2026-11-01
+
+Use systematic-debugging, writing-plans and executing-plans techniques without
+skill-only approval gates, per the user's persistent override and unattended
+computer authorization. Reuse the current diagnostic checkout; no public release.
+The exact native audit is docs/verification/2026-11-01-satellite-terrain-audit.md.
+
+- [x] Prove current native ABI exports, cache178/180 and persistent helper ownership.
+  Preserve real four-shot evidence; correct colours now live, far resident terrain
+  remains coarse. Main Terrain selection/build caches are not transactional.
+- [ ] Add a separate private Terrain experiment, not an expansion of main-Terrain
+  cache snapshots. Files: TerrainExperiment.h, TerrainExperimentPolicy.h,
+  terrain_experiment_tests.cpp, exact additional ABI entries. A fresh SceneManager
+  owns fresh Terrain/stream/Landscape and camera. Do not copy Terrain, use shared
+  detailed-material callbacks, activate zones, move actors or write saves.
+- [ ] Fixed native full-world bounds +/-147456; primary cells73728. Diagnostic
+  output512² first, camera altitude12000 (then16000 comparison), far120000.
+  Keep floating-origin conversion consistent with native material worldOffset.
+  Use genuine DistantTerrain, an isolated three-surface GBuffer and existing
+  private sun/position passes. Default disabled and one explicit INI token/cell.
+- [ ] Cap warmup at60s/600frames, per-frame builds32/8, memory/patch/triangle
+  budgets. Require stable nonzero geometry under deadline; never label a timeout
+  complete. Abort on save/load/world/manager/context change; no background retry.
+- [ ] Destroy workspaces before materials/textures and Terrain before its borrowed
+  camera, then SceneManager. A failed identity guard retains one bounded resource
+  set and disables the diagnostic. Test production ownership/stability policy,
+  allocation failure paths, clock wrap and primary-cell boundaries.
+- [ ] Build/profile/import/source contracts, independent review, install with game
+  closed. Root uses CUA to launch/load SAT-render-proof; no user action needed.
+- [ ] Capture one large primary cell, two altitudes and repeat cleanup. Archive
+  actual counters/images/memory; assess LOD/material shortcomings honestly.
+
+Ruling: postpone8192 allocation until isolated512 coverage and lifetime pass.
+This avoids paying gigabytes for a coarse/incomplete scene. Unloaded town proxies,
+detailed biome materials, full sun/shadows/fog/water and runtime day/night refresh
+remain independent unfinished requirements; do not publish a static preview as
+that complete feature. BestMinimap remains unchanged; DF remains paused.
