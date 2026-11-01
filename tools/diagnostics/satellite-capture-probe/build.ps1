@@ -67,5 +67,11 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/biome_selection_tests.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/texture_array_tests.exe" "/Fo$out/texture_array_tests.obj" "$repo/GlobalSatelliteMap/tests/texture_array_tests.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/texture_array_tests.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/test_biome_reference_inputs.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

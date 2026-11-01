@@ -335,8 +335,26 @@
       {
         "rva": "4cab0",
         "code": "48 8b 5c 24 30 48 83 c4 20 5f c3 cc cc cc cc cc 48 8d 05 71 06 03 00 48"
+      },
+      {
+        "rva": "4cae0",
+        "code": "40 55 56 57 41 54 41 55 41 56 41 57 48 81 ec a0 00 00 00 48 c7 44 24 40"
+      },
+      {
+        "rva": "4cb60",
+        "code": "63 cd 48 c1 e1 06 49 03 ce 4d 8b cd 45 33 c0 48 8d 54 24 48 ff 15 ee 57"
+      },
+      {
+        "rva": "4cc1a",
+        "code": "48 83 7e 58 00 74 10 48 8b 4e 58 48 8b 01 48 8b d6 ff 90 c8 00 00 00 b0"
+      },
+      {
+        "rva": "4cc45",
+        "code": "9c 24 f0 00 00 00 48 81 c4 a0 00 00 00 41 5f 41 5e 41 5d 41 5c 5f 5e 5d"
       }
     ],
-    "rtt_destructor_rva": "4ca80"
+    "rtt_destructor_rva": "4ca80",
+    "texture_vtable_rva": "7ce08",
+    "texture_array_upload_rva": "4cae0"
   }
 }

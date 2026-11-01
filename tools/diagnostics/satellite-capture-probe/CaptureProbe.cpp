@@ -18,6 +18,8 @@
 #include <OgreEntity.h>
 #include <OgreTextureManager.h>
 #include <OgreHardwarePixelBuffer.h>
+#include <OgreImage.h>
+#include <OgreDataStream.h>
 #include <OgreRenderTexture.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreGpuProgramParams.h>
@@ -66,6 +68,7 @@
 #include "ExposurePolicy.h"
 #include "RasterPolicy.h"
 #include "OwnedRtvDebt.h"
+#include "../../../GlobalSatelliteMap/TextureArrayPolicy.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -1163,6 +1166,7 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
         Save(sunTarget,prefix+"_sun_noShadow_native_exposure");
     }
 }
+#include "PrivateBiomeReference.h"
 #include "TerrainExperiment.h"
 // Explicit exported calls avoid stale SDK inline fields. Diagnostic snapshots only;
 // manager-reported bytes exclude native/driver caches. Never evict game resources.
@@ -1184,6 +1188,8 @@ void LogResourceTelemetry(const char *phase)
         unsigned names=0;
         names+=textures.resourceExists(PositionTargetName);names+=textures.resourceExists(SunTargetName);
         names+=textures.resourceExists("LEOPARD_PrivateTerrainOutput");
+        names+=textures.resourceExists("LEOPARD_PrivateBiomeReferenceDiffuse");
+        names+=textures.resourceExists("LEOPARD_PrivateBiomeReferenceNormals");
         names+=materials.resourceExists(PositionMaterialName);names+=materials.resourceExists(SunMaterialName);
         names+=materials.resourceExists("LEOPARD_PrivateTerrainMaterial");
         names+=high.resourceExists(PositionVertexName);names+=high.resourceExists(PositionFragmentName);names+=high.resourceExists(SunFragmentName);
@@ -1578,13 +1584,16 @@ void Update(MapScreen *map)
             if(!geometryOnlyRequest)
                 isolatedLighting=ReadLightingSnapshot(GetPrivateProfileIntA("Probe","NativeExposurePreview",0,ini.c_str())!=0,renderer->workspace);
             if(!rtvDebt.Begin())throw std::runtime_error("owned RTV request still active/quarantined");
+            char biomeSid[256]={0};
+            if(GetPrivateProfileIntA("Probe","BiomeMaterialReference",0,ini.c_str())==1)
+                GetPrivateProfileStringA("Probe","ReferenceBiomeSID","5611-Newwworld.mod",biomeSid,sizeof(biomeSid),ini.c_str());
             terrainExperiment.Begin(renderer->root,
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif",
                 geometryOnlyRequest,
                 GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0,
-                GetPrivateProfileIntA("Probe","RecycleTerrainBetweenCells",0,ini.c_str())!=0);
+                GetPrivateProfileIntA("Probe","RecycleTerrainBetweenCells",0,ini.c_str())!=0,biomeSid);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }

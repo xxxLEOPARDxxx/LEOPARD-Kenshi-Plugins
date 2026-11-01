@@ -30,9 +30,14 @@ for key,module in profile.items():
         base = struct.unpack_from('<Q',pe.data,pe.opt+24)[0]
         assert struct.unpack_from('<Q',pe.data,pe.offset(vtable)+0x90)[0] == base+getter
         assert struct.unpack_from('<Q',pe.data,pe.offset(vtable))[0] == base+destructor
+        texture_vtable = int(module['texture_vtable_rva'],16)
+        array_upload = int(module['texture_array_upload_rva'],16)
+        assert struct.unpack_from('<Q',pe.data,pe.offset(texture_vtable)+0x2d8)[0] == base+array_upload
         lines += [f'static const DWORD PrivateRttVtableRva = 0x{vtable:x};',
                   f'static const DWORD PrivateRttGetterRva = 0x{getter:x};',
-                  f'static const DWORD PrivateRttDestructorRva = 0x{destructor:x};']
+                  f'static const DWORD PrivateRttDestructorRva = 0x{destructor:x};',
+                  f'static const DWORD PrivateArrayTextureVtableRva = 0x{texture_vtable:x};',
+                  f'static const DWORD PrivateArrayUploadRva = 0x{array_upload:x};']
     checks = list(module['windows'])
     for entry in module['exports']:
         assert exports.get(entry['name']) == (int(entry['rva'],16),False), f'export mismatch {entry}'

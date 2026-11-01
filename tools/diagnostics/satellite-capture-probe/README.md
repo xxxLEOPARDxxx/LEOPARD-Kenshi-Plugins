@@ -584,3 +584,28 @@ AllowBackgroundFileRequests defaults0; opt-in1 permits an explicit file token
 with an open map/valid idle context while Kenshi is in the background. Keyboard
 requests remain foreground-only. capture_rtv_lifetime.ps1 verifies PID/start,
 six releases, one worker close, three images and cancels its token on every exit.
+
+### Single-biome material reference (private candidate, default off)
+
+BiomeMaterialReference=1 is restricted to standalone512/full diagnostics, with
+no grid/recycle/high-raster control. ReferenceBiomeSID currently must equal the
+profiled5611-Newwworld.mod. It samples twelve actual installed2048² DDS images:
+six diffuse DXT5 layers and six normal DXT1 layers. Exact file size/SHA is checked
+on the same bounded bytes before decoding; unknown/updated sources are refused.
+Encoded and decoded totals each cap128MiB; this fixture uses~50MiB each.
+
+Native Texture::_loadImages is a cube-face loader and does NOT upload array
+layers. The reference uses the independently audited D3D11Texture virtual
+writeTextureArray slot2D8 (vtable7CE08, override4CAE0), guarded by disk/loaded
+module and code windows. Follow native createTextureArray: type5/depth6,
+sourceMips-3, usage0x15, direct upload outside Resource::load to avoid a duplicate
+resource-manager credit. CPU images/streams are not retained by the native upload.
+The64-byte Image and96-byte MemoryDataStream ABI are checked against native code.
+
+Only a fresh private Terrain material receives the arrays and copied biome
+parameters. Shared GPU parameter objects are not edited. The reference deliberately
+uses neutral painted overlays/colour, no biome mixing, no cliff distortion, dry
+water parameters and no orbital distance fade. It is a material/ownership proof,
+not accepted final map imagery. Existing modes retain their previous material.
+Runtime colour/resource-accounting and repeated cleanup proof remain pending
+until the candidate is installed and exercised.

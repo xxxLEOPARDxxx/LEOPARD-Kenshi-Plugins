@@ -169,10 +169,12 @@ struct TerrainExperiment
                <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
         Log(message.str());
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest)
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
+        if(!referenceBiome.empty()&&(Side!=512||geometryOnlyRequest||gridRequest||recycleRequest||diagnosticRaster.resolutionOnly))
+            throw std::runtime_error("single-biome material reference requires standalone512 full diagnostics");
         if(diagnosticRaster.resolutionOnly)
         {
             MEMORYSTATUSEX memory={sizeof(MEMORYSTATUSEX)};
@@ -207,16 +209,26 @@ struct TerrainExperiment
         Ogre::MaterialManager &materials=Ogre::MaterialManager::getSingleton();
         const char *materialName="LEOPARD_PrivateTerrainMaterial";
         if(materials.resourceExists(materialName))throw std::runtime_error("private terrain material collision");
-        Ogre::MaterialPtr original=materials.getByName("DistantTerrain");
+        Ogre::MaterialPtr original=materials.getByName(referenceBiome.empty()?"DistantTerrain":"Terrain");
         if(original.isNull())throw std::runtime_error("native distant terrain material absent");
         material=materials.create(materialName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         CopyPrivateTechniqueConfiguration(original,material);
         if(material->getNumTechniques()!=1||material->getTechnique(0)->getNumPasses()!=1)
             throw std::runtime_error("native distant terrain material structure differs");
-        Ogre::GpuProgramParametersSharedPtr fp=material->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-        fp->removeAllSharedParameters();
-        fp->setNamedConstant("worldOffset",Ogre::Vector3::ZERO);
-        fp->setNamedConstant("map",Ogre::Vector4(-147456,-147456,1.0f/294912,1.0f/294912));
+        if(referenceBiome.empty())
+        {
+            Ogre::GpuProgramParametersSharedPtr fp=material->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+            fp->removeAllSharedParameters();
+            fp->setNamedConstant("worldOffset",Ogre::Vector3::ZERO);
+            fp->setNamedConstant("map",Ogre::Vector4(-147456,-147456,1.0f/294912,1.0f/294912));
+        }
+        else
+        {
+            GameData *data=ou->gamedata.getData(referenceBiome);
+            if(!data||data->stringID!=referenceBiome)throw std::runtime_error("private biome record lookup differs");
+            const std::string gameRoot=heightPath.substr(0,heightPath.size()-std::string("/data/newland/land/fullmap.tif").size());
+            BiomeReference().Begin(data,gameRoot);BiomeReference().Configure(data,material);
+        }
         material->load();
         CreateNativeTerrain();
         Ogre::CompositorManager2 *manager=root->getCompositorManager2();Define(manager);
@@ -310,6 +322,7 @@ struct TerrainExperiment
         if(scene){api.destroyScene(root,scene);scene=NULL;}
         if(!material.isNull())
         {Ogre::MaterialManager::getSingleton().remove(material->getName());material.setNull();}
+        BiomeReference().Destroy();
         if(!output.isNull())
         {Ogre::TextureManager::getSingleton().remove(output->getName());output.setNull();}
         root=NULL;active=false;recycle.Abort();Log("isolated Terrain destroyed before its camera and scene");
