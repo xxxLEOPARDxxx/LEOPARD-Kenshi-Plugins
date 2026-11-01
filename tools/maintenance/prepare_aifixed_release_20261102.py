@@ -35,7 +35,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 NOTES={
  'version':'2','published_version':'1',
  'en':[
-  '[b]A modular AI collection.[/b] AI Fixed combines our robotic-repair fixes with selected GateFix and SleepFix adaptations by Basusu. Each module can be configured separately; new sleep, robotic-health and gate assistance are off by default.',
+  '[b]A modular AI collection.[/b] AI Fixed combines our robotic-repair fixes with selected GateFix and SleepFix adaptations by Basusu. Each module can be configured separately; new sleep, robotic-health and gate assistance are off by default. Original SleepFix and GateFix are not required.',
   '[b]Rest and robotic care.[/b] Optional automatic sleep treats bandaged biological wounds. Powered repair beds handle robotic health and wear, including prosthetics. Food takes priority when hunger affects the character.',
   '[b]Nearby suitable beds.[/b] A configurable search radius, ownership and free-bed checks keep automatic rest nearby. Your faction beds are used by default; allied beds can be allowed.',
   '[b]Manual orders take priority.[/b] Travel, Stop and queued orders interrupt our rest. Completed rest releases the character to existing jobs. Continuing healing is not cut short by a fixed total timer; pausing does not consume rest or gate waiting time.',
@@ -44,7 +44,7 @@ NOTES={
   '[b]A clean update.[/b] English, Russian and Simplified Chinese use one compiled catalog each. Personal settings and saved games are preserved. Thank you, Basusu, for the original mods and open sources.'
  ],
  'ru':[
-  '[b]Модульный сборник исправлений ИИ.[/b] AI Fixed объединяет наши исправления ремонта робочастей и адаптации GateFix и SleepFix автора Basusu. Модули настраиваются отдельно; новые сон, ремонт здоровья робочастей и помощь у ворот по умолчанию выключены.',
+  '[b]Модульный сборник исправлений ИИ.[/b] AI Fixed объединяет наши исправления ремонта робочастей и адаптации GateFix и SleepFix автора Basusu. Модули настраиваются отдельно; новые сон, ремонт здоровья робочастей и помощь у ворот по умолчанию выключены. Оригинальные SleepFix и GateFix устанавливать не нужно.',
   '[b]Отдых и уход за робочастями.[/b] Необязательный автоматический сон помогает лечить перевязанные живые раны. Ремкровати с питанием восстанавливают здоровье и износ робочастей, включая протезы. При влиянии голода на персонажа еда получает приоритет.',
   '[b]Подходящие кровати рядом.[/b] Настраиваемый радиус, проверка собственности и свободного места ограничивают поиск отдыха ближайшими подходящими кроватями. По умолчанию используются кровати своей фракции; союзные можно разрешить.',
   '[b]Ручные приказы важнее.[/b] Движение, Stop и очередь приказов прерывают наш отдых. После восстановления персонаж возвращается к прежним работам. Продолжающееся лечение не обрывается общим лимитом времени; пауза не расходует ожидание отдыха и ворот.',
@@ -80,7 +80,7 @@ GPLv3; LICENSE and UPSTREAM.md are included.
 
 [h2]COMPATIBILITY[/h2]
 
-Do not enable the same mechanics in the original GateFix/SleepFix alongside this collection. Gate Push Guard handles a separate anti-push problem. Other AI mods, custom beds and races may change the result. Manual orders and gate actions take priority; cancelling passage assistance may leave a gate open or unlocked. Food availability and a usable path are still required.
+Original SleepFix and GateFix are not required: their adapted functions are included in AI Fixed. Do not enable the same mechanics in the originals alongside this collection. Gate Push Guard handles a separate anti-push problem. Other AI mods, custom beds and races may change the result. Manual orders and gate actions take priority; cancelling passage assistance may leave a gate open or unlocked. Food availability and a usable path are still required.
 ''',
  'ru':'''[h2]ЧТО ДЕЛАЕТ[/h2]
 
@@ -108,7 +108,7 @@ GPLv3; LICENSE и UPSTREAM.md включены.
 
 [h2]СОВМЕСТИМОСТЬ[/h2]
 
-Не включайте одинаковые механики оригинальных GateFix/SleepFix одновременно с этим сборником. Gate Push Guard решает отдельную задачу защиты от выталкивания. Другие моды на ИИ, нестандартные кровати и расы могут менять результат. Ручные приказы и действия у ворот важнее; отмена помощи может оставить ворота открытыми или отпертыми. Доступная еда и свободный путь по-прежнему необходимы.
+Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed. Не включайте одинаковые механики оригиналов одновременно с этим сборником. Gate Push Guard решает отдельную задачу защиты от выталкивания. Другие моды на ИИ, нестандартные кровати и расы могут менять результат. Ручные приказы и действия у ворот важнее; отмена помощи может оставить ворота открытыми или отпертыми. Доступная еда и свободный путь по-прежнему необходимы.
 '''}
 
 

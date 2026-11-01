@@ -10,7 +10,7 @@
   "zip_changes_from_description_regeneration": 0,
   "AIFixed_refreshed_version": "2",
   "AIFixed_dll_sha256": "686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23",
-  "AIFixed_archive_sha256": "ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962",
+  "AIFixed_archive_sha256": "d1fb63b1106e4695b6d33ea41af182ec2f8a2985dc5cdbd29955033ee965e28b",
   "AIFixed_runtime": {
     "status": "PASS: candidate startup; user accepted percentage wording; installed RU catalog inspected",
     "gameplay_verified": false,
@@ -888,21 +888,22 @@
       "descriptions": {
         "en": {
           "path": "D:\\DEV\\Kenshi\\workshop\\AIFixed\\description_en.txt",
-          "sha256": "7e45e5eea21f9cfa04b0b410c0431c38a90099df4de347674cf8700a5418b94a",
-          "bytes": 2978
+          "sha256": "635899aac86b2b3d916199cd93b44f5a08b5cc8f0793487002e3e9f9e6a0ae37",
+          "bytes": 3027
         },
         "ru": {
           "path": "D:\\DEV\\Kenshi\\workshop\\AIFixed\\description_ru.txt",
-          "sha256": "d43f897b5066adce1f70f7690e8d7bf32053177698af1f3e85cf173126c598bf",
-          "bytes": 4850
+          "sha256": "f7695995c0f65a825716a0a61f38e97f76d109bfc559475ca9c1338ec5ef25d9",
+          "bytes": 4971
         },
         "nexus": {
           "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed_description.txt",
-          "sha256": "797e6a0f648fec5428948009d99b30abeba7c7bb94c71603fcab87e4ec6fc406",
-          "bytes": 7760
+          "sha256": "65d35833de05625017fa38e5ffa1b97cf0e0b3a967285105509dddeec7b5d24a",
+          "bytes": 7996
         }
       }
     }
   ],
-  "runtime_evidence_updated_at_utc": "2026-11-01T22:46:09.275741+00:00"
+  "runtime_evidence_updated_at_utc": "2026-11-01T22:46:09.275741+00:00",
+  "originals_not_required_verified_at_utc": "2026-11-01T22:56:48.968847+00:00"
 }

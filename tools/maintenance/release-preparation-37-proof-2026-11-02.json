@@ -1,5 +1,5 @@
 {
-  "verified_at_utc": "2026-11-01T22:47:03.612424+00:00",
+  "verified_at_utc": "2026-11-01T22:58:54.669125+00:00",
   "status": "37 local Nexus-ready artifact candidates; AI startup/UI acceptance verified as recorded; gameplay unverified; not uploaded",
   "prepared": 37,
   "AIFixed_public_baseline": {
@@ -20,13 +20,13 @@
     "package": "AIFixed",
     "candidate_version": "2",
     "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed-2.zip",
-    "archive_bytes": 109820,
-    "archive_sha256": "ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962",
+    "archive_bytes": 109850,
+    "archive_sha256": "d1fb63b1106e4695b6d33ea41af182ec2f8a2985dc5cdbd29955033ee965e28b",
     "dll_sha256": "686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23",
     "files": 10,
     "steam_description_bytes": {
-      "en": 2945,
-      "ru": 4817
+      "en": 3027,
+      "ru": 4971
     },
     "languages": [
       "en_GB",
@@ -764,13 +764,13 @@
       "package": "AIFixed",
       "candidate_version": "2",
       "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed-2.zip",
-      "archive_bytes": 109820,
-      "archive_sha256": "ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962",
+      "archive_bytes": 109850,
+      "archive_sha256": "d1fb63b1106e4695b6d33ea41af182ec2f8a2985dc5cdbd29955033ee965e28b",
       "dll_sha256": "686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23",
       "files": 10,
       "steam_description_bytes": {
-        "en": 2945,
-        "ru": 4817
+        "en": 3027,
+        "ru": 4971
       },
       "languages": [
         "en_GB",

@@ -130,6 +130,8 @@ def main():
                 readme=z.read('AIFixed/README.txt').decode('utf-8-sig')
                 assert readme.count('Prepared release 2 / Подготовленный выпуск 2')==1
                 assert 'VERSION 1 CHANGES' in readme and 'ИСТОРИЯ: ВЕРСИЯ 1' in readme
+                for lang in ('en','ru'):
+                    for line in notes['AIFixed'][lang]:assert re.sub(r'\[/?b\]','',line) in readme
                 defaults=z.read('AIFixed/AIFixed.defaults.ini').decode('utf-8-sig');ini=configparser.ConfigParser();ini.read_string(defaults)
                 keys=ini['AIFixed'];assert len(keys)==18
                 assert all(keys.getint(k)==0 for k in ('AutoSleep','RepairHealth','GatePassage','Debug'))

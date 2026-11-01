@@ -428,3 +428,26 @@ Current evidence is the root `before-basusu-integration/startup-smoke.json` plus
 `before-percent-clarification/installed-catalog.json`. The release proof archives
 this record by hash and keeps the historical3d0b5800 record separate. Neither
 startup/UI check establishes new automatic-module gameplay or FPS/memory proof.
+
+## Gate Push Guard source compatibility review
+
+Root and an independent reviewer examined both current implementations. No
+direct conflict was found. AI Fixed issues normal OPEN_DOOR orders and resumes
+movement only at doorOpenAmount>=.9. Gate Push Guard's Closed predicate requires
+DOORSTATE_CLOSED with amount0..001; opening invalidates its observation epoch,
+and its scan checks the actual Closed state again immediately before correction.
+Normal animated updates invalidate observations even when an open/close call
+bypasses setDoorState. Closure alone does not count as a new actor crossing.
+
+Four lifecycle/world targets are shared; both wrappers call their saved original
+once and hold no cross-plugin lock across it. The remaining hooks have separate
+targets. AI Fixed hooks none of the five teleport/getter targets whose native
+prefixes Gate Push Guard verifies. Native prefixes and KenshiLib's hook-ID chain
+implementation were inspected read-only. Neither plugin's original-mod conflict
+check disables the other: GateFix.dll and GatePushFix.dll are different originals.
+
+This is source/native-contract evidence, not a live test of both load orders or
+crowd pressure. Third-party teleport detours and unsupported executable profiles
+remain separate Gate Push Guard fail-closed cases. No executable change follows
+from this compatibility review. The release guide and current v2 note explicitly
+state that original SleepFix/GateFix are not dependencies of AI Fixed.

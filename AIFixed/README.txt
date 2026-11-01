@@ -21,7 +21,7 @@ Prepared release 2 / Подготовленный выпуск 2 (2026-11-02)
 
 English
 
-- A modular AI collection. AI Fixed combines our robotic-repair fixes with selected GateFix and SleepFix adaptations by Basusu. Each module can be configured separately; new sleep, robotic-health and gate assistance are off by default.
+- A modular AI collection. AI Fixed combines our robotic-repair fixes with selected GateFix and SleepFix adaptations by Basusu. Each module can be configured separately; new sleep, robotic-health and gate assistance are off by default. Original SleepFix and GateFix are not required.
 - Rest and robotic care. Optional automatic sleep treats bandaged biological wounds. Powered repair beds handle robotic health and wear, including prosthetics. Food takes priority when hunger affects the character.
 - Nearby suitable beds. A configurable search radius, ownership and free-bed checks keep automatic rest nearby. Your faction beds are used by default; allied beds can be allowed.
 - Manual orders take priority. Travel, Stop and queued orders interrupt our rest. Completed rest releases the character to existing jobs. Continuing healing is not cut short by a fixed total timer; pausing does not consume rest or gate waiting time.
@@ -31,7 +31,7 @@ English
 
 Русский
 
-- Модульный сборник исправлений ИИ. AI Fixed объединяет наши исправления ремонта робочастей и адаптации GateFix и SleepFix автора Basusu. Модули настраиваются отдельно; новые сон, ремонт здоровья робочастей и помощь у ворот по умолчанию выключены.
+- Модульный сборник исправлений ИИ. AI Fixed объединяет наши исправления ремонта робочастей и адаптации GateFix и SleepFix автора Basusu. Модули настраиваются отдельно; новые сон, ремонт здоровья робочастей и помощь у ворот по умолчанию выключены. Оригинальные SleepFix и GateFix устанавливать не нужно.
 - Отдых и уход за робочастями. Необязательный автоматический сон помогает лечить перевязанные живые раны. Ремкровати с питанием восстанавливают здоровье и износ робочастей, включая протезы. При влиянии голода на персонажа еда получает приоритет.
 - Подходящие кровати рядом. Настраиваемый радиус, проверка собственности и свободного места ограничивают поиск отдыха ближайшими подходящими кроватями. По умолчанию используются кровати своей фракции; союзные можно разрешить.
 - Ручные приказы важнее. Движение, Stop и очередь приказов прерывают наш отдых. После восстановления персонаж возвращается к прежним работам. Продолжающееся лечение не обрывается общим лимитом времени; пауза не расходует ожидание отдыха и ворот.
