@@ -286,6 +286,16 @@ bool WriteTerrainCache(Terrain *terrain,const NativeTerrainCache::State &state)
     }
     __except(EXCEPTION_EXECUTE_HANDLER){return false;}
 }
+bool ReadTerrainBlood(Terrain *terrain,NativeTerrainCache::BloodState &state)
+{
+    if(!RenderAbiMatches())return false;
+    __try
+    {
+        return NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener) &&
+               NativeTerrainCache::ReadBlood(terrain,state);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
 BOOL CALLBACK FindWindowThread(HWND w, LPARAM)
 {
     DWORD pid = 0;
@@ -491,12 +501,16 @@ struct TerrainCameraScope
 {
     Terrain *terrain;
     NativeTerrainCache::State state;
+    NativeTerrainCache::BloodState blood;
+    const Ogre::Camera *mainCamera;
     TerrainCameraScope()
-        : terrain(au ? au->terrain : NULL)
+        : terrain(au ? au->terrain : NULL),mainCamera(au && au->render && au->render->camera ? au->render->camera->getLodCamera() : NULL)
     {
         std::memset(&state,0,sizeof(state));
         if(terrain && !ReadTerrainCache(terrain,state))
             throw std::runtime_error("Terrain instance/layout guard failed; capture refused");
+        if(!terrain || !ReadTerrainBlood(terrain,blood) || !NativeTerrainCache::BloodMatches(blood,blood,mainCamera))
+            throw std::runtime_error("Terrain helper must already borrow main LOD camera; capture refused");
     }
     ~TerrainCameraScope()
     {
@@ -504,11 +518,14 @@ struct TerrainCameraScope
         // Restore the known camera cache without depending on a subsequent successful main pass.
         if (terrain)
         {
-            if(!au || au->terrain!=terrain || !WriteTerrainCache(terrain,state))
+            NativeTerrainCache::BloodState after;
+            if(!au || au->terrain!=terrain || !ReadTerrainBlood(terrain,after) ||
+               !NativeTerrainCache::BloodMatches(blood,after,mainCamera) || !WriteTerrainCache(terrain,state))
             {
                 restorationSafe=false;chainSafe=false;
                 ErrorLog("SatelliteCaptureProbe: Terrain restore guard failed; resources retained; restart diagnostic");
             }
+            else Log("Terrain cache restored; helper identity and borrowed main LOD camera verified");
         }
     }
 };
@@ -933,6 +950,13 @@ void Drop()
     if(!restorationSafe)
     {
         pending=false;cleanup=false;chainSafe=false;
+        return;
+    }
+    NativeTerrainCache::BloodState blood;
+    if(own && (!au || !ReadTerrainBlood(au->terrain,blood) || blood.camera==own))
+    {
+        restorationSafe=false;chainSafe=false;pending=false;cleanup=false;
+        ErrorLog("SatelliteCaptureProbe: unsafe borrowed camera at cleanup; resources retained");
         return;
     }
     Renderer *current = au ? au->render : NULL;

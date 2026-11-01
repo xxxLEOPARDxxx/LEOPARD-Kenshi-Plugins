@@ -23,7 +23,10 @@ assert 'NativeTerrainCache::Matches' in source and 'restorationSafe=false;chainS
 assert 'gameWorkspace->getListener()==ourListener' in compact
 assert 'ManagerAccess::Contains(manager,shot)' in compact
 assert 'if(!restorationSafe||!chainSafe||!OnMain()||!LoadedGuard()' in compact
-assert 'if(!au||au->terrain!=terrain||!WriteTerrainCache(terrain,state))' in compact
+assert 'if(!au||au->terrain!=terrain||!ReadTerrainBlood(terrain,after)' in compact
+assert '!NativeTerrainCache::BloodMatches(blood,after,mainCamera)||!WriteTerrainCache(terrain,state)' in compact
+assert 'unsafe borrowed camera at cleanup' in source
+assert 'Terrain helper must already borrow main LOD camera' in source
 assert compact.index('constructionrestorationfailed') < compact.index('gameWorkspace=renderer->workspace;')
 assert 'EnableRequestFile",0' in source and 'existing token latched without replay' in source
 assert 'main/probe GBuffer aliasing refused' in source

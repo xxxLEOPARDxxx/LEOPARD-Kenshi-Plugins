@@ -9,7 +9,7 @@ void Check(bool ok,const char *message)
 int main()
 {
     using namespace NativeTerrainCache;
-    unsigned char terrain[0x1a0],original[sizeof(terrain)];
+    unsigned char terrain[0x300],original[sizeof(terrain)],bloodObject[0x78]={0};
     std::memset(terrain,0xa5,sizeof(terrain));
     const void *primary=reinterpret_cast<const void*>(0x11111110),
                *listener=reinterpret_cast<const void*>(0x22222220),
@@ -17,6 +17,16 @@ int main()
     float position[3]={1,2,3};
     std::memcpy(terrain,&primary,8);std::memcpy(terrain+0x170,&listener,8);
     std::memcpy(terrain+0x178,&camera,8);std::memcpy(terrain+0x180,position,12);
+    const void *bloodPointer=bloodObject;
+    std::memcpy(terrain+0x2f0,&bloodPointer,8);std::memcpy(bloodObject,&camera,8);
+    BloodState blood;
+    Check(ReadBlood(terrain,blood)&&blood.object==bloodObject&&blood.camera==camera,"native blood camera borrowed pointer");
+    Check(BloodMatches(blood,blood,camera),"existing main-camera helper accepted");
+    Check(!BloodMatches(blood,blood,primary),"helper borrowing another camera refused");
+    BloodState missing={NULL,NULL};
+    Check(!BloodMatches(missing,missing,camera),"uninitialized helper refused before native allocation");
+    BloodState replaced=blood;replaced.object=primary;
+    Check(!BloodMatches(blood,replaced,camera),"changed helper identity refused");
     std::memcpy(original,terrain,sizeof(terrain));
     Check(Matches(terrain,primary,listener),"exact terrain vtable tags");
     Check(!Matches(terrain,listener,primary),"wrong terrain type refused");

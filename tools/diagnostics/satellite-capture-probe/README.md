@@ -247,3 +247,16 @@ cache checks;111 native imports resolve. Independent review caught and corrected
 Terrain identity loss and post-restoration arming paths. Live colour acceptance
 still requires a fresh game after installing this candidate. This is not the
 finished global 16x8192 atlas or complete day/night/shadow/water renderer.
+
+### Persistent native camera helper guard
+Native TerrainCamera also owns a persistent borrowed Camera pointer. Existing
+helpers keep their original camera; a missing helper can be allocated during a
+capture and borrow the temporary camera. The diagnostic now refuses construction
+unless the guarded Terrain+2f0 descriptor already exists and borrows the main LOD
+camera. Scope exit verifies the same descriptor/pointer before178/180 restoration;
+cleanup checks again before any owned-camera destruction. A missing/retargeted
+helper retains the single resource set and disables requests. Native fields are
+not overwritten or freed. Five new regression checks cover these cases; the full
+build now passes216 checks and111 import resolutions. Native LOD selection/build
+caches remain nontransactional; this is a diagnostic of the resident scene, not
+the architecture for full-world rendering. See the separate terrain audit.
