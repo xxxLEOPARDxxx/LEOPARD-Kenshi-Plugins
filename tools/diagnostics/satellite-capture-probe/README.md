@@ -687,3 +687,10 @@ separately. `audit_geography_boundaries.py` reruns the65536fine-center and
 in a local candidate with15 packed SID heights, native signed vertex cosine
 and shared gradients before fragment selection. Fade remains zero; independent
 review and game acceptance are still required. See geography-cliff-verification.md.
+
+The optional `[Probe] GeographicNativeFade=0` remains default-off and is read
+once per geographic request. Enabling it supplies literal native ground RGB and
+distance-fade coefficients for the same15 biome rows; shader/resources/caps stay
+unchanged. At the16000m orbital camera this strongly fades base detail, before
+roads/cliffs are composed. The local candidate has offline evidence only; see
+[geography-native-fade-verification.md](geography-native-fade-verification.md).

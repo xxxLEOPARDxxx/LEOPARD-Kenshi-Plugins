@@ -1606,7 +1606,8 @@ void Update(MapScreen *map)
                 GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0,
                 GetPrivateProfileIntA("Probe","RecycleTerrainBetweenCells",0,ini.c_str())!=0,biomeSid,
                 GetPrivateProfileIntA("Probe","PaintedMapsReference",0,ini.c_str())==1,
-                GetPrivateProfileIntA("Probe","GeographicBiomes",0,ini.c_str())==1);
+                GetPrivateProfileIntA("Probe","GeographicBiomes",0,ini.c_str())==1,
+                GetPrivateProfileIntA("Probe","GeographicNativeFade",0,ini.c_str())==1);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }

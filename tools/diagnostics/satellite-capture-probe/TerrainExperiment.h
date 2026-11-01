@@ -169,7 +169,7 @@ struct TerrainExperiment
                <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
         Log(message.str());
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome,bool paintedRequest,bool geographicRequest)
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome,bool paintedRequest,bool geographicRequest,bool nativeFadeRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
@@ -231,7 +231,7 @@ struct TerrainExperiment
             GameData *data=ou->gamedata.getData(referenceBiome);
             if(!data||data->stringID!=referenceBiome)throw std::runtime_error("private biome record lookup differs");
             const std::string gameRoot=heightPath.substr(0,heightPath.size()-std::string("/data/newland/land/fullmap.tif").size());
-            if(geographic)GeographyReference().Begin(gameRoot,root->getCompositorManager2());else BiomeReference().Begin(data,gameRoot);
+            if(geographic)GeographyReference().Begin(gameRoot,root->getCompositorManager2(),nativeFadeRequest);else BiomeReference().Begin(data,gameRoot);
             if(paintedRequest)
             {
                 PaintedReference().Begin(gameRoot,root->getCompositorManager2());

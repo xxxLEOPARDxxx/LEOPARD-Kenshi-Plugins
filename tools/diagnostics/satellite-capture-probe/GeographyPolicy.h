@@ -19,6 +19,23 @@ inline bool Distortion(float wavelength,float amplitude,float (&out)[4])
     if(!_finite(frequency)||!_finite(scaled))return false;
     out[0]=frequency;out[1]=scaled;out[2]=out[3]=0;return true;
 }
+inline bool NativeFadeParameters(unsigned argb,float distance,float (&out)[4])
+{
+    if(!_finite(distance))return false;
+    const float coefficient=distance>0?1.0f/distance:distance;
+    if(!_finite(coefficient))return false;
+    const float scale=1.0f/255.0f;
+    const float values[4]={float((argb>>16)&255u)*scale,float((argb>>8)&255u)*scale,float(argb&255u)*scale,coefficient};
+    std::memcpy(out,values,sizeof(values));return true;
+}
+template<class Integers,class Floats> bool FadeRow(bool enabled,const Integers& integers,const Floats& floats,float (&out)[4])
+{
+    if(!enabled){std::memset(out,0,sizeof(out));return true;}
+    typename Integers::const_iterator colour=integers.find("ground colour");
+    typename Floats::const_iterator distance=floats.find("fade distance");
+    if(colour==integers.end()||distance==floats.end())return false;
+    return NativeFadeParameters(static_cast<unsigned>(colour->second),distance->second,out);
+}
 inline unsigned U32(const unsigned char* p){unsigned v;std::memcpy(&v,p,4);return v;}
 inline bool Dds(const void* input,size_t bytes,unsigned format,Mip (&out)[9])
 {

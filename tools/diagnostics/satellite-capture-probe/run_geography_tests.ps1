@@ -34,4 +34,6 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_geography_mutations.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$PSScriptRoot/run_geography_effects_tests.ps1"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$PSScriptRoot/run_geography_fade_tests.ps1"
 exit $LASTEXITCODE

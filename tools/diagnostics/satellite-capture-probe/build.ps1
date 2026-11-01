@@ -34,6 +34,8 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_geography_effects_reflection.py" "$out/GeographyVertex.cso" "$out/GeographyTerrain.cso"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/test_geography_fade_source.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $fxc /nologo /T ps_4_0 /E main_fs /O3 /Gec /D DX11=1 "/Fo$out/PaintedTerrain.cso" "$out/PaintedTerrain.hlsl"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_painted_shader.py" "$out/PaintedTerrain.cso"

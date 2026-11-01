@@ -42,7 +42,7 @@ struct PrivateGeography
         SatelliteGeography::Mip mips[9];
         if(f.format&&!SatelliteGeography::Dds(&bytes[0],bytes.size(),f.format,mips))throw std::runtime_error("geography strict DDS shape/layout refused");
     }
-    void Parameters(const std::string& root)
+    void Parameters(const std::string& root,bool nativeFadeRequest)
     {
         GameData* records[15];static const char* roles[]={"base","slope","vertical","grass","dirt","road"};
         static const char* keys[10][4]={{"tiling X 1","tiling Y 1","tiling X 2","tiling Y 2"},{"tiling X 0","tiling Y 0","tiling X grass","tiling Y grass"},
@@ -67,6 +67,11 @@ struct PrivateGeography
             for(unsigned row=0;row<10;++row)for(unsigned c=0;c<4;++c)
                 if(keys[row][c])parameters[b*60+row*4+c]=PrivateBiomeReference::Float(data,keys[row][c])*((row>=3&&row<=5)?0.01f:1.0f);
             parameters[b*60+40]=PrivateBiomeReference::Float(data,"brightness fix");
+            // Native fade row: this exact adapter is extracted by route tests.
+            float fade[4];if(!SatelliteGeography::FadeRow(nativeFadeRequest,data->idata,data->fdata,fade))
+                throw std::runtime_error("geography native fade fields/derived coefficient refused before allocation");
+            std::memcpy(parameters+b*60+28,fade,sizeof(fade));
+            // Native fade row end.
             float values[4];if(!SatelliteGeography::Distortion(PrivateBiomeReference::Float(data,"distort wavelength"),PrivateBiomeReference::Float(data,"distort amplitude"),values))
                 throw std::runtime_error("geography nonfinite derived distortion refused before allocation");
             std::memcpy(distortion+b*4,values,sizeof(values));
@@ -154,14 +159,14 @@ struct PrivateGeography
             ErrorLog(s.str());
         }
     };
-    void Begin(const std::string& root,Ogre::CompositorManager2* owner)
+    void Begin(const std::string& root,Ogre::CompositorManager2* owner,bool nativeFadeRequest)
     {
         if(uncertain||active||!OnMain()||!LoadedGuard()||!RenderAbiMatches())throw std::runtime_error("geography context/quarantine refused");
         for(unsigned b=0;b<5;++b)if(!textures[b].isNull()||Ogre::TextureManager::getSingleton().resourceExists(Name(b)))throw std::runtime_error("geography name/ownership collision");
         MEMORYSTATUSEX memory={sizeof(MEMORYSTATUSEX)};
         if(!GlobalMemoryStatusEx(&memory)||memory.ullAvailPhys<2*SatelliteGeography::GpuLimit||memory.ullAvailPageFile<2*SatelliteGeography::GpuLimit||
             !SatelliteGeography::Combined(0,64ULL*1024*1024))throw std::runtime_error("geography host/combined budget refused before allocation");
-        Parameters(root);
+        Parameters(root,nativeFadeRequest);
         unsigned expectedLayers[3]={0,0,0};
         for(unsigned f=0;f<92;++f)
         {
@@ -209,7 +214,7 @@ struct PrivateGeography
             if(vertexProgram->hasCompileError()||!vertexProgram->isSupported())throw std::runtime_error("geography vertex shader compilation failed");
             if(reusePrivateShaders&&!cache.Record(owner,1,vertexProgram.get(),GeographyVertexSource))throw std::runtime_error("geography vertex shader cache refused");
         }
-        active=true;Log("geography pools loaded:15SIDs 92DDS 39ordered layouts 3banks levels9; DDSgpuBytes=385874496; native per-SID vertex distortion; zero-fade isolation");
+        active=true;Log(std::string("geography pools loaded:15SIDs 92DDS 39ordered layouts 3banks levels9; DDSgpuBytes=385874496; native per-SID vertex distortion; ")+(nativeFadeRequest?"native-fade=1 literal actual-camera distance":"native-fade=0 zero-fade isolation"));
     }
     void Bind(const Ogre::MaterialPtr& material)
     {
