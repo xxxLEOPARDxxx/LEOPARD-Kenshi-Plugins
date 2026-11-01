@@ -1,6 +1,7 @@
 #pragma once
 #include <stddef.h>
 #include <cstring>
+#include <float.h>
 namespace SatelliteGeography
 {
 static const size_t CpuLimit=128u*1024u*1024u;
@@ -11,6 +12,13 @@ struct Mip {const void* data;size_t bytes;};
 // levels. Request11 total so the returned resource has the intended9 levels.
 // This compensates native creation, without changing upload shape or budget.
 inline unsigned RequestedCompressedAdditionalMips(){return 10;}
+inline bool Distortion(float wavelength,float amplitude,float (&out)[4])
+{
+    if(!_finite(wavelength)||!_finite(amplitude))return false;
+    const float frequency=wavelength>0?1.0f/wavelength:0.0f,scaled=amplitude*.01f;
+    if(!_finite(frequency)||!_finite(scaled))return false;
+    out[0]=frequency;out[1]=scaled;out[2]=out[3]=0;return true;
+}
 inline unsigned U32(const unsigned char* p){unsigned v;std::memcpy(&v,p,4);return v;}
 inline bool Dds(const void* input,size_t bytes,unsigned format,Mip (&out)[9])
 {

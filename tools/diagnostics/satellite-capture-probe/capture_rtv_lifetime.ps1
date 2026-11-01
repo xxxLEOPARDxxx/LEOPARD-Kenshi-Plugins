@@ -59,6 +59,9 @@ try {
     if($section.Contains('geography pools loaded:15SIDs 92DDS 39ordered layouts')){
         $scope='private 15-biome geographic Terrain reference, primary1,1, zero distortion/fade; not complete map'
     }
+    if($section.Contains('native per-SID vertex distortion; zero-fade isolation')){
+        $scope='private 15-biome geographic Terrain reference, primary1,1, native vertex cliff distortion, zero fade; not complete map'
+    }
     if(([regex]::Matches($section,'owned RTV creation debt released slot=')).Count -ne 6){throw 'Not exactly six creation-reference releases'}
     if(([regex]::Matches($section,'kernel-joined; omitted HANDLE close repaired')).Count -ne 1){throw 'Missing unique worker close'}
     $prefix=[regex]::Match($section,('(isolated_terrain_'+$ProbeProcessId+'_\d+_\d+)_gbuffer_raw')).Groups[1].Value

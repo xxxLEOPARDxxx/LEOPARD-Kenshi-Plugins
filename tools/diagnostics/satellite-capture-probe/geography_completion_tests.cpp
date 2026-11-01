@@ -28,6 +28,9 @@ int main()
 {
     using SatelliteGeography::CompleteBank;
     Check(SatelliteGeography::RequestedCompressedAdditionalMips()==10,"native BC request compensates two discarded levels for actual9");
+    {float v[4];Check(SatelliteGeography::Distortion(1200,-4,v)&&v[0]==1.0f/1200&&v[1]==-.04f,"signed native distortion scale");
+     Check(SatelliteGeography::Distortion(0,3,v)&&v[0]==0&&v[1]==.03f,"zero wavelength retains signed constant offset amplitude");
+     Check(!SatelliteGeography::Distortion(1e-44f,3,v)&&v[0]==0&&v[1]==.03f,"nonfinite derived frequency refuses without changing record");}
     {bool u=false;Boundary b(u);Check(CompleteBank(b,u),"complete production bank");Check(!u&&b.order==123456&&b.credits==1&&b.finishes==1,"one credit and Loaded after all layers");
      b.available=false;Check(!CompleteBank(b,u)&&b.creates==1&&b.credits==1,"existing owned bank second attempt refused");}
     {bool u=false;Boundary b(u);b.available=false;Check(!CompleteBank(b,u)&&!u&&!b.creates,"name/ownership collision before allocation");}

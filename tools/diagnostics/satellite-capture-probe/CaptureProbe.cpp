@@ -1203,6 +1203,7 @@ void LogResourceTelemetry(const char *phase)
         names+=high.resourceExists(PositionVertexName);names+=high.resourceExists(PositionFragmentName);names+=high.resourceExists(SunFragmentName);
         names+=high.resourceExists(PrivatePaintedReference::ProgramName());
         names+=high.resourceExists(PrivateGeography::ProgramName());
+        names+=high.resourceExists(PrivateGeography::VertexName());
         std::ostringstream s;s<<"resource telemetry "<<phase
           <<" scene="<<has(au->render->root,"LEOPARD_PrivateTerrainScene")<<" privateNames="<<names
           <<" workspaces="<<workspaces(au->render->root->getCompositorManager2())

@@ -678,3 +678,12 @@ This first trial keeps distortion/fade disabled and dry conditions. It has only
 been built and tested offline; no game geography acceptance is claimed.
 See [geography-verification.md](geography-verification.md) for exact candidate,
 resource bounds, WARP evidence and remaining acceptance work.
+
+The next bounded effects step is documented in
+[geography-effects-plan.md](geography-effects-plan.md): owned fixed-SID vertex
+cliff heights and shared fragment derivatives, with native fade considered
+separately. `audit_geography_boundaries.py` reruns the65536fine-center and
+3584coarse-boundary input-weight comparison. The cliff step is now implemented
+in a local candidate with15 packed SID heights, native signed vertex cosine
+and shared gradients before fragment selection. Fade remains zero; independent
+review and game acceptance are still required. See geography-cliff-verification.md.

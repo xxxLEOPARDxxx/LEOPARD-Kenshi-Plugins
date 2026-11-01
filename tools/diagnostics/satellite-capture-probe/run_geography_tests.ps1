@@ -32,4 +32,6 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/geography_bank_warp.exe" "$out/geography_bank.cso"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_geography_mutations.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$PSScriptRoot/run_geography_effects_tests.ps1"
 exit $LASTEXITCODE

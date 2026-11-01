@@ -22,12 +22,13 @@ bool ReadGeographicCell(unsigned index,void* (&ids)[5],BYTE (&tree)[2048],unsign
 }
 struct PrivateGeography
 {
-    Ogre::TexturePtr textures[5];Ogre::HighLevelGpuProgramPtr program;ProbePolicy::FixedProgramCache cache;
-    bool uncertain,active;float parameters[900];
-    PrivateGeography():uncertain(false),active(false){std::memset(parameters,0,sizeof(parameters));}
+    Ogre::TexturePtr textures[5];Ogre::HighLevelGpuProgramPtr program,vertexProgram;ProbePolicy::FixedProgramCache cache;
+    bool uncertain,active;float parameters[900],distortion[60];
+    PrivateGeography():uncertain(false),active(false){std::memset(parameters,0,sizeof(parameters));std::memset(distortion,0,sizeof(distortion));}
     static const char* Name(unsigned bank)
     {static const char* names[]={"LEOPARD_GeographyDiffuse0","LEOPARD_GeographyDiffuse1","LEOPARD_GeographyNormal","LEOPARD_GeographyBlend","LEOPARD_GeographySelector"};return names[bank];}
     static const char* ProgramName(){return "LEOPARD_GeographyFragment";}
+    static const char* VertexName(){return "LEOPARD_GeographyVertex";}
     static void Read(const GeoFile& f,const std::string& root,std::vector<BYTE>& bytes)
     {
         if(!f.bytes||f.bytes>SatelliteGeography::CpuLimit)throw std::runtime_error("geography source CPU bound refused");
@@ -66,6 +67,9 @@ struct PrivateGeography
             for(unsigned row=0;row<10;++row)for(unsigned c=0;c<4;++c)
                 if(keys[row][c])parameters[b*60+row*4+c]=PrivateBiomeReference::Float(data,keys[row][c])*((row>=3&&row<=5)?0.01f:1.0f);
             parameters[b*60+40]=PrivateBiomeReference::Float(data,"brightness fix");
+            float values[4];if(!SatelliteGeography::Distortion(PrivateBiomeReference::Float(data,"distort wavelength"),PrivateBiomeReference::Float(data,"distort amplitude"),values))
+                throw std::runtime_error("geography nonfinite derived distortion refused before allocation");
+            std::memcpy(distortion+b*4,values,sizeof(values));
             for(unsigned role=0;role<6;++role){parameters[b*60+44+role]=float(GeoBiomes[b].diffuse[role]);parameters[b*60+52+role]=float(GeoBiomes[b].normal[role]);}
         }
         for(unsigned c=0;c<64;++c)
@@ -193,12 +197,25 @@ struct PrivateGeography
             if(program->hasCompileError()||!program->isSupported())throw std::runtime_error("geography shader compilation failed");
             if(reusePrivateShaders&&!cache.Record(owner,0,program.get(),GeographyShaderSource))throw std::runtime_error("geography shader cache refused");
         }
-        active=true;Log("geography pools loaded:15SIDs 92DDS 39ordered layouts 3banks levels9; DDSgpuBytes=385874496; zero-distortion/fade isolation");
+        existing.setNull();if(manager.resourceExists(VertexName()))existing=manager.getByName(VertexName());
+        choice=reusePrivateShaders?cache.Inspect(owner,1,existing.get(),GeographyVertexSource):
+            (existing.isNull()?ProbePolicy::FixedProgramCache::Create:ProbePolicy::FixedProgramCache::Refuse);
+        if(choice==ProbePolicy::FixedProgramCache::Refuse)throw std::runtime_error("geography vertex shader identity refused");
+        if(choice==ProbePolicy::FixedProgramCache::Reuse)vertexProgram=existing;
+        else
+        {
+            vertexProgram=manager.createProgram(VertexName(),"Landscape","hlsl",Ogre::GPT_VERTEX_PROGRAM);vertexProgram->setSource(GeographyVertexSource);
+            vertexProgram->setParameter("entry_point","main_vs");vertexProgram->setParameter("target","vs_4_0");vertexProgram->setParameter("enable_backwards_compatibility","true");vertexProgram->setParameter("preprocessor_defines","TEXTURED=1");vertexProgram->load();
+            if(vertexProgram->hasCompileError()||!vertexProgram->isSupported())throw std::runtime_error("geography vertex shader compilation failed");
+            if(reusePrivateShaders&&!cache.Record(owner,1,vertexProgram.get(),GeographyVertexSource))throw std::runtime_error("geography vertex shader cache refused");
+        }
+        active=true;Log("geography pools loaded:15SIDs 92DDS 39ordered layouts 3banks levels9; DDSgpuBytes=385874496; native per-SID vertex distortion; zero-fade isolation");
     }
     void Bind(const Ogre::MaterialPtr& material)
     {
         Ogre::Pass* pass=material->getTechnique(0)->getPass(0);
-        if(!active||program.isNull()||pass->getNumTextureUnitStates()!=5)throw std::runtime_error("geography binding state refused");
+        if(!active||program.isNull()||vertexProgram.isNull()||pass->getNumTextureUnitStates()!=5)throw std::runtime_error("geography binding state refused");
+        pass->setVertexProgram(VertexName());
         pass->setFragmentProgram(ProgramName());pass->getTextureUnitState(0)->setTexture(textures[0]);pass->getTextureUnitState(1)->setTexture(textures[2]);
         for(unsigned kind=0;kind<2;++kind)
         {
@@ -209,8 +226,10 @@ struct PrivateGeography
         pass->getTextureUnitState(0)->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
         pass->getTextureUnitState(4)->setContentType(Ogre::TextureUnitState::CONTENT_NAMED);pass->getTextureUnitState(4)->setTextureName("nothing.dds");pass->getTextureUnitState(4)->setTextureFiltering(Ogre::TFO_NONE);
         for(unsigned t=5;t<8;++t){Ogre::TextureUnitState* unit=pass->createTextureUnitState();unit->setTexture(textures[t==5?3:t==6?4:1]);unit->setTextureFiltering(t==6?Ogre::TFO_NONE:Ogre::TFO_TRILINEAR);}
-        Ogre::GpuProgramParametersSharedPtr vp=pass->getVertexProgramParameters();vp->setNamedConstant("biomeData",Ogre::Vector4(-147456,-147456,147456,147456));
-        vp->setNamedConstant("overlayData",Ogre::Vector4(-147456,-147456,147456,147456));vp->setNamedConstant("distortion0",Ogre::Vector4::ZERO);vp->setNamedConstant("distortion1",Ogre::Vector4::ZERO);
+        Ogre::GpuProgramParametersSharedPtr vp=pass->getVertexProgramParameters();vp->removeAllSharedParameters();
+        vp->setNamedAutoConstant("worldViewProjMatrix",Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);vp->setNamedAutoConstant("worldMatrix",Ogre::GpuProgramParameters::ACT_WORLD_MATRIX);
+        vp->setNamedAutoConstant("morph",Ogre::GpuProgramParameters::ACT_CUSTOM,10);vp->setNamedConstant("geoDistortion",distortion,15,4);
+        vp->setNamedConstant("biomeData",Ogre::Vector4(-147456,-147456,147456,147456));vp->setNamedConstant("overlayData",Ogre::Vector4(-147456,-147456,147456,147456));
         Ogre::GpuProgramParametersSharedPtr fp=pass->getFragmentProgramParameters();fp->removeAllSharedParameters();fp->setNamedConstant("satBiome",parameters,225,4);
         fp->setNamedAutoConstant("viewport",Ogre::GpuProgramParameters::ACT_VIEWPORT_SIZE);fp->setNamedAutoConstant("cameraPos",Ogre::GpuProgramParameters::ACT_CAMERA_POSITION);fp->setNamedAutoConstant("farClip",Ogre::GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
         fp->setNamedConstant("paintedTileBase",Ogre::Vector4(-73728,-73728,0,0));fp->setNamedConstant("waterHeightRel",-100000.0f);fp->setNamedConstant("wetness",0.0f);
@@ -222,6 +241,7 @@ struct PrivateGeography
         for(unsigned b=0;b<5;++b)if(!textures[b].isNull())
         {Ogre::TextureManager::getSingleton().remove(Name(b));if(nativeApi.useCount(&textures[b])!=1)throw std::runtime_error("geography texture still borrowed");textures[b].setNull();}
         if(!program.isNull()){if(!cache.Owns(0,program.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(ProgramName());program.setNull();}
+        if(!vertexProgram.isNull()){if(!cache.Owns(1,vertexProgram.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(VertexName());vertexProgram.setNull();}
         active=false;
     }
 };

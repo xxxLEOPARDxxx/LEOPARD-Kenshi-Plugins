@@ -30,6 +30,10 @@ $fxc='C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe'
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_geography_shader.py" "$out/GeographyTerrain.cso"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $fxc /nologo /T vs_4_0 /E main_vs /O3 /Gec /D TEXTURED=1 "/Fo$out/GeographyVertex.cso" "$out/GeographyVertex.hlsl"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/test_geography_effects_reflection.py" "$out/GeographyVertex.cso" "$out/GeographyTerrain.cso"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $fxc /nologo /T ps_4_0 /E main_fs /O3 /Gec /D DX11=1 "/Fo$out/PaintedTerrain.cso" "$out/PaintedTerrain.hlsl"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_painted_shader.py" "$out/PaintedTerrain.cso"
