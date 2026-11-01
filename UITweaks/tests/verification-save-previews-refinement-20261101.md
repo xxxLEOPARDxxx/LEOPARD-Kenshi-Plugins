@@ -5,8 +5,13 @@ SHA256`b6a0589ba8d888062c907c3586e49d8a50c8fba39b85e0269aa37b82ac659d8d`,
 installed with all3 matching MO files after user closure. Personal UITweaks.ini
 hash unchanged. Backup:
 game/_codex_work/ui-save-previews-20261101/before-save-png-height-refinement.
-User acceptance of this new PNG/Save-menu/height refinement is pending. The
-previous full-width candidate7076 was already accepted, before these addenda.
+User accepted this PNG/Save-menu/height refinement in game. Read-only validation
+of the new UI Tweaks Test Screen sidecar confirms1600x900 PNG,2111535-byte
+payload/2111575-byte complete file, valid native quick.save size/timestamp and
+SHA256`da4eb5baf151b5a395f84d17ce0386bb0407ab26413ccce7c6df19416f3a7af6`.
+Evidence:ignored tests/_generated/live-refined-png-evidence.json. No save was
+modified by inspection. The previous full-width candidate7076 was accepted
+before these addenda. This acceptance is not a long-run FPS/memory measurement.
 
 Authorized scope: UITweaks only. No installation, game control or publication by
 this task. The parent authorized a scoped commit after independent review.

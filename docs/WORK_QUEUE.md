@@ -29,7 +29,7 @@ not a public release announcement. Latest instructions override historical notes
    normal three-language, debug-last, release/credit and Nexus→Steam rules.
 3. **Dynamic Factions — PAUSED by user.** Preserve current work and plans;
    resume when requested, after the satellite priority. No publication.
-4. **Save screenshot previews — ACTIVE IN PARALLEL, requested2026-11-01.** Capture the
+4. **Save screenshot previews — IMPLEMENTED/USER ACCEPTED2026-11-01.** Capture the
    game window/frame when a save succeeds; display its preview below the save
    list when selecting that slot, both from the main menu and during play.
    User reference screenshots16:56:51/16:57:14 show placement. Latest user
@@ -46,6 +46,10 @@ not a public release announcement. Latest instructions override historical notes
    MCM height100..160%, default120%, applies on next opening; list must grow too.
    Auto/quicksave preserve the visible HUD too. Existing saves without image
    remain usable; only confirmed successful saves receive a new preview.
+   Installed b6a0589 candidate328192B; actual accepted test sidecar1600x900 PNG
+   matches its native save revision. Full automated/native-geometry review passes;
+   long-run performance measurement remains separate. Prepare the next public
+   release once, relative to the recorded published baseline12, not repeated bumps.
 5. **Container Highlight maintenance — installed2026-11-01.** Confirmed
    stale-model restoration retry fault addressed in fork commit9101ad8. Earlier
    fixes covered other paths; the player's exact freeze remains unverified.
