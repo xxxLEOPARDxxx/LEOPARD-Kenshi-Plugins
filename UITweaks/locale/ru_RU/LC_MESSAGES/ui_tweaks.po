@@ -11,11 +11,17 @@ msgstr "Сохранённые игры"
 msgid "Save screenshots"
 msgstr "Снимки сохранений"
 
+msgid "Save/load window height, %"
+msgstr "Высота окна сохранения/загрузки, %"
+
+msgid "Height of the save and load windows relative to the game's original size. A taller list shows more saves. Limited by the screen and preview space. Applies when the window is next opened; 100 keeps the original height."
+msgstr "Высота окон сохранения и загрузки относительно исходного размера игры. Более высокий список вмещает больше сейвов. Ограничивается экраном и местом под снимок. Применяется при следующем открытии окна; 100 сохраняет исходную высоту."
+
 msgid "No preview available"
 msgstr "Нет снимка сохранения"
 
-msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."
-msgstr "При успешном сохранении делает снимок игры с HUD, без меню сохранения, загрузки и паузы. Выберите сейв, чтобы увидеть его снимок под окном загрузки. Поддерживает ручные, быстрые и автоматические сохранения; старые сейвы загружаются и без изображения."
+msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Works with manual saves, quicksaves and autosaves; slots without an image show no preview."
+msgstr "При успешном сохранении делает снимок игры с HUD, без меню сохранения, загрузки и паузы. Выберите существующий слот в меню сохранения или загрузки, чтобы увидеть снимок под окном. Поддерживает ручные, быстрые и автоматические сохранения; у слотов без изображения предпросмотр скрыт."
 
 msgid "Interface tweaks"
 msgstr "Правки интерфейса"

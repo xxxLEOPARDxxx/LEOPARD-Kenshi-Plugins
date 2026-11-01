@@ -11,11 +11,17 @@ msgstr "存档"
 msgid "Save screenshots"
 msgstr "存档截图"
 
+msgid "Save/load window height, %"
+msgstr "保存/载入窗口高度，%"
+
+msgid "Height of the save and load windows relative to the game's original size. A taller list shows more saves. Limited by the screen and preview space. Applies when the window is next opened; 100 keeps the original height."
+msgstr "保存和载入窗口相对于游戏原始尺寸的高度。加高列表可显示更多存档，受屏幕和预览空间限制。下次打开窗口时生效；100保持原始高度。"
+
 msgid "No preview available"
 msgstr "暂无预览图"
 
-msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."
-msgstr "保存成功时截取包含HUD的游戏画面，排除保存、载入和暂停菜单。选择存档后，其截图显示在载入窗口下方。支持手动保存、快速保存和自动保存；没有截图的旧存档仍可正常载入。"
+msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Works with manual saves, quicksaves and autosaves; slots without an image show no preview."
+msgstr "保存成功时截取包含HUD的游戏画面，排除保存、载入和暂停菜单。在保存或载入菜单中选择已有存档，截图会显示在窗口下方。支持手动保存、快速保存和自动保存；没有截图的存档不显示预览。"
 
 msgid "Interface tweaks"
 msgstr "界面调整"

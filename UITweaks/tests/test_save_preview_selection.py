@@ -2,11 +2,11 @@ from pathlib import Path
 import subprocess,os,re
 here=Path(__file__).resolve().parent;source=(here.parent/'SavePreviews.h').read_text(encoding='utf-8')
 def function(name):
-    m=re.search(r'^    static void '+name+r'\(',source,re.M);assert m,name
+    m=re.search(r'^    static (?:void|LoadSaveWindow\*) '+name+r'\(',source,re.M);assert m,name
     a=m.start();end=source.index('{',a)+1;depth=1
     while depth:depth+=(source[end]=='{')-(source[end]=='}');end+=1
     return source[a:end]
-code='\n'.join(function(n)for n in ['ActivateSelection','ListChanged','MouseActivated','Show','Info'])
+code='\n'.join(function(n)for n in ['CurrentMenu','ActivateSelection','ListChanged','MouseActivated','Show','ShowSave','Info'])
 out=here/'_generated';out.mkdir(exist_ok=True)
 cpp=out/'actual_preview_selection.cpp';cpp.write_text((here/'save_preview_selection_fixture.cpp').read_text(encoding='utf-8').replace('// EXTRACT_SELECTION',code),encoding='utf-8')
 vc=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');sdk=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')

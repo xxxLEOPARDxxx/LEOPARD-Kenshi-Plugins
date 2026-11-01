@@ -1,4 +1,9 @@
 $ErrorActionPreference='Stop'
+$python='C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
+foreach($language in @('en_GB','ru_RU','zh_CN')) {
+    & $python "$PSScriptRoot/../../tools/po2mo.py" "$PSScriptRoot/../locale/$language/LC_MESSAGES/ui_tweaks.po"
+    if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+}
 $vc='C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC'
 $sdk='C:/Program Files/Microsoft SDKs/Windows/v7.1'
 $out=Join-Path $PSScriptRoot '_generated'
@@ -12,7 +17,7 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/save_preview_codec_test.exe" "/Fo$out/save_preview_codec_test.obj" "$PSScriptRoot/save_preview_codec_test.cpp" oleaut32.lib
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
-& "$out/save_preview_codec_test.exe"
+& "$out/save_preview_codec_test.exe" "$PSScriptRoot/fixtures/legacy-preview.jpg"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/save_preview_gpu_test.exe" "/Fo$out/save_preview_gpu_test.obj" "$PSScriptRoot/save_preview_gpu_test.cpp"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
@@ -29,4 +34,8 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_capture.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_text.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_height.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_dialog_height.py"
 exit $LASTEXITCODE

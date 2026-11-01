@@ -3,7 +3,9 @@ from pathlib import Path
 import gettext,json,xml.etree.ElementTree as ET
 here=Path(__file__).resolve().parent;mod=here.parent
 keys=['Saved games','Save screenshots','No preview available',
-      'Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image.']
+      'Save/load window height, %',
+      "Height of the save and load windows relative to the game's original size. A taller list shows more saves. Limited by the screen and preview space. Applies when the window is next opened; 100 keeps the original height.",
+      'Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Works with manual saves, quicksaves and autosaves; slots without an image show no preview.']
 for language in ('en_GB','ru_RU','zh_CN'):
     with (mod/'locale'/language/'LC_MESSAGES/ui_tweaks.mo').open('rb') as f:catalog=gettext.GNUTranslations(f)
     for key in keys:
@@ -33,4 +35,4 @@ for name,overrides in [('vanilla',{}),('Dark UI Advanced',resources(game/'mods/D
                   'font':props['FontName'],'text_colour':props['TextColour'],'frame_size':frame.attrib['size']}
 out=here/'_generated';out.mkdir(exist_ok=True)
 (out/'save-preview-skin-contract.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
-print('PASS preview text: 12 compiled translations; vanilla + Dark XML frame/font/text-area/palette inheritance')
+print(f'PASS preview text: {len(keys)*3} compiled translations; vanilla + Dark XML frame/font/text-area/palette inheritance')

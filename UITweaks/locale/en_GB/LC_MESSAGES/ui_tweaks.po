@@ -11,11 +11,17 @@ msgstr "Saved games"
 msgid "Save screenshots"
 msgstr "Save screenshots"
 
+msgid "Save/load window height, %"
+msgstr "Save/load window height, %"
+
+msgid "Height of the save and load windows relative to the game's original size. A taller list shows more saves. Limited by the screen and preview space. Applies when the window is next opened; 100 keeps the original height."
+msgstr "Height of the save and load windows relative to the game's original size. A taller list shows more saves. Limited by the screen and preview space. Applies when the window is next opened; 100 keeps the original height."
+
 msgid "No preview available"
 msgstr "No preview available"
 
-msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."
-msgstr "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."
+msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Works with manual saves, quicksaves and autosaves; slots without an image show no preview."
+msgstr "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Works with manual saves, quicksaves and autosaves; slots without an image show no preview."
 
 msgid "Interface tweaks"
 msgstr "Interface tweaks"

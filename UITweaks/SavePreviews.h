@@ -70,11 +70,11 @@ namespace UITSavePreviews
     static std::vector<unsigned char> thumbnail;
     static unsigned thumbW=0,thumbH=0;
     static Writer* writer=NULL;
-    static PreviewWidgetRef root,panel,image,label,saveList;
+    static PreviewWidgetRef root,panel,image,saveList,sizedRoots[2];
+    static SavePreviewPolicy::DialogHeightState dialogHeights[2];
+    static int dialogHeightPercent=120;
     static MyGUI::ITexture* texture=NULL;
     static std::string selectedPath;
-    static MyGUI::IntPoint originalPosition;
-    static bool moved=false;
     static SavePreviewCodec::Header displayedRevision={};
     static bool displayed=false;
     static bool refreshSelection=false;
@@ -135,7 +135,7 @@ namespace UITSavePreviews
             std::vector<unsigned char> jpeg;
             if(InterlockedCompareExchange(&job->cancelled,0,0))return 0;
             if(!SavePreviewCodec::Encode(job->pixels,job->header.width,job->header.height,jpeg))
-            {job->error="JPEG encoding failed";return 0;}
+            {job->error="PNG encoding failed";return 0;}
             job->header.encodedBytes=(DWORD)jpeg.size();
             const std::string temp=job->path+"/uitweaks-preview.tmp",dest=job->path+"/uitweaks-preview.bin";
             HANDLE file=CreateFileW(SavePreviewCodec::Wide(temp).c_str(),GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -189,19 +189,18 @@ namespace UITSavePreviews
     static void Hide()
     {
         if(panel.get())panel.get()->setVisible(false);
-        if(moved&&root.get())root.get()->setPosition(originalPosition);
-        moved=false;selectedPath.clear();displayed=selectionActive=false;ClearTexture();
+        selectedPath.clear();displayed=selectionActive=false;ClearTexture();
     }
-    static void Configure(bool value,bool diagnostic)
-    {debug=diagnostic;value=value&&(!initialized||installed);if(enabled&&!value)Cancel();if(!enabled&&value)refreshSelection=true;enabled=value;if(!enabled)Hide();}
+    static void Configure(bool value,bool diagnostic,int heightPercent=120)
+    {dialogHeightPercent=(std::max)(100,(std::min)(160,heightPercent));debug=diagnostic;value=value&&(!initialized||installed);if(enabled&&!value)Cancel();if(!enabled&&value)refreshSelection=true;enabled=value;if(!enabled)Hide();}
     static void LoadPreview(const std::string& path)
     {
         SavePreviewCodec::Header revision={};
         if(path==selectedPath&&displayed&&SavePreviewCodec::Stamp(path,revision)&&SavePreviewCodec::SameRevision(revision,displayedRevision))return;
         ClearTexture();selectedPath=path;
         displayed=false;
-        if(!label.get()||!image.get())return;
-        MyGUI::TextBox* text=label.get()->castType<MyGUI::TextBox>();text->setCaption(Tr("No preview available"));text->setVisible(true);
+        if(panel.get())panel.get()->setVisible(false);
+        if(!image.get())return;
         if(path.empty())return;
         SavePreviewCodec::Header header={};std::vector<unsigned char> rgba;std::string error;
         if(!SavePreviewCodec::Read(path,header,rgba,&error)){if(!error.empty())ErrorLog("UITweaks: "+error+" ("+path+")");return;}
@@ -219,7 +218,6 @@ namespace UITSavePreviews
             const Ogre::PixelBox pixels(header.width,header.height,1,Ogre::PF_BYTE_RGBA,&rgba[0]);
             native->getBuffer()->blitFromMemory(pixels);
             image.get()->castType<MyGUI::ImageBox>()->setImageTexture(texture->getName());
-            text->setVisible(false);
             displayedRevision=header;displayed=true;
         }
         catch(...){ClearTexture();ErrorLog("UITweaks: cannot create save preview texture");}
@@ -230,15 +228,48 @@ namespace UITSavePreviews
         if(root.get()!=menu->mMainWidget)
         {
             Hide();if(panel.get())MyGUI::Gui::getInstance().destroyWidget(panel.get());
-            panel.reset();image.reset();label.reset();root.set(menu->mMainWidget);
+            panel.reset();image.reset();root.set(menu->mMainWidget);
         }
         if(panel.get())return;
-        originalPosition=root.get()->getPosition();moved=false;
         MyGUI::Widget* p=MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>("Kenshi_FloatingPanelSkin",MyGUI::IntCoord(0,0,1,1),MyGUI::Align::Default,"Window","UITweaks_SavePreviewPanel");
         panel.set(p);p->setNeedMouseFocus(false);p->setNeedKeyFocus(false);
         MyGUI::ImageBox* i=p->createWidget<MyGUI::ImageBox>("ImageBox",MyGUI::IntCoord(0,0,1,1),MyGUI::Align::Default);image.set(i);i->setNeedMouseFocus(false);
-        MyGUI::TextBox* l=p->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(8,8,1,1),MyGUI::Align::Default);label.set(l);
-        l->setTextAlign(MyGUI::Align::Center);l->setNeedMouseFocus(false);l->setCaption(Tr("No preview available"));p->setVisible(false);
+        p->setVisible(false);
+    }
+    // Installed native RTTI verifies both derived menu bases are at offset 0.
+    static LoadSaveWindow* CurrentMenu()
+    {
+        SaveManager* sm=SaveManager::getSingleton();if(!sm||!root.get())return NULL;
+        LoadSaveWindow* load=reinterpret_cast<LoadSaveWindow*>(sm->loadMenu);
+        LoadSaveWindow* save=reinterpret_cast<LoadSaveWindow*>(sm->saveMenu);
+        if(load&&load->mMainWidget==root.get())return load;
+        if(save&&save->mMainWidget==root.get())return save;
+        return NULL;
+    }
+    static void AnchorMenu(LoadSaveWindow* menu)
+    {
+        if(!menu||!menu->mMainWidget)return;
+        const MyGUI::IntSize view=MyGUI::RenderManager::getInstance().getViewSize();
+        const MyGUI::IntCoord r=menu->mMainWidget->getAbsoluteCoord();
+        const SavePreviewPolicy::Point anchor=SavePreviewPolicy::AnchorPreviewDialog(r.left,r.top,r.width,r.height,view.width,view.height,enabled);
+        if(anchor.y!=r.top)menu->mMainWidget->setPosition(menu->mMainWidget->getLeft(),menu->mMainWidget->getTop()+anchor.y-r.top);
+    }
+    static void SizeMenu(LoadSaveWindow* menu,bool saveDialog=false)
+    {
+        if(!menu||!menu->mMainWidget)return;
+        MyGUI::Widget* widget=menu->mMainWidget;
+        const unsigned slot=saveDialog?1:0;
+        SavePreviewPolicy::DialogHeightState& dialogHeight=dialogHeights[slot];
+        const MyGUI::IntSize view=MyGUI::RenderManager::getInstance().getViewSize();
+        const int height=dialogHeight.Next(widget->getHeight(),sizedRoots[slot].get()==widget,
+            dialogHeightPercent,widget->getWidth(),view.width,view.height,enabled);
+        sizedRoots[slot].set(widget);
+        if(height==widget->getHeight())return;
+        // Verified vanilla and Dark layouts: the direct GamesList child uses
+        // vertical stretch, so native resize expands its actual row viewport.
+        if(!menu->list||menu->list->getParent()!=widget||!menu->list->getAlign().isVStretch())
+        {dialogHeight.last=widget->getHeight();ErrorLog("UITweaks: save list cannot safely follow the configured dialog height");return;}
+        widget->setSize(widget->getWidth(),height);
     }
     static void Tick()
     {
@@ -252,8 +283,7 @@ namespace UITSavePreviews
         if(!selectionActive){if(panel.get()->getVisible())Hide();return;}
         if(refreshSelection)
         {
-            refreshSelection=false;SaveManager* sm=SaveManager::getSingleton();
-            LoadSaveWindow* menu=sm?reinterpret_cast<LoadSaveWindow*>(sm->loadMenu):NULL;
+            refreshSelection=false;LoadSaveWindow* menu=CurrentMenu();
             if(menu&&menu->mMainWidget==root.get()&&menu->list)
             {
                 const size_t index=menu->list->getIndexSelected();
@@ -266,13 +296,9 @@ namespace UITSavePreviews
             texture?texture->getWidth():0,texture?texture->getHeight():0,texture!=NULL);
         const SavePreviewPolicy::Rect& box=position.panel;
         if(box.height<32){panel.get()->setVisible(false);return;}
-        if(r.top!=position.dialogY||r.left!=position.dialogX)
-        {if(!moved){originalPosition=root.get()->getPosition();moved=true;}root.get()->setPosition(root.get()->getLeft()+position.dialogX-r.left,root.get()->getTop()+position.dialogY-r.top);}
         const MyGUI::IntCoord panelCoord(box.x,box.y,box.width,box.height);
         if(panel.get()->getCoord()!=panelCoord)panel.get()->setCoord(panelCoord);
         if(!panel.get()->getVisible())panel.get()->setVisible(true);
-        const MyGUI::IntCoord labelCoord(8,8,(std::max)(1,box.width-16),(std::max)(1,box.height-16));
-        if(label.get()&&label.get()->getCoord()!=labelCoord)label.get()->setCoord(labelCoord);
         if(texture&&image.get())
         {
             const MyGUI::IntCoord imageCoord(position.image.x,position.image.y,position.image.width,position.image.height);
@@ -298,10 +324,9 @@ namespace UITSavePreviews
             std::vector<unsigned char> full(size_t(w)*h*4);
             Ogre::PixelBox box(w,h,1,Ogre::PF_BYTE_BGRA,&full[0]);
             renderer->window->copyContentsToMemory(box,Ogre::RenderTarget::FB_BACK);
-            SavePreviewPolicy::Size size=SavePreviewPolicy::Fit(w,h,640,360);thumbW=size.width;thumbH=size.height;
-            thumbnail.resize(size_t(thumbW)*thumbH*3);
-            for(unsigned y=0;y<thumbH;++y)for(unsigned x=0;x<thumbW;++x)
-            {size_t src=(size_t(y)*h/thumbH*w+size_t(x)*w/thumbW)*4,dst=(size_t(y)*thumbW+x)*3;memcpy(&thumbnail[dst],&full[src],3);}
+            SavePreviewPolicy::Size size=SavePreviewPolicy::Fit(w,h,SavePreviewPolicy::MaxWidth,SavePreviewPolicy::MaxHeight);
+            thumbW=size.width;thumbH=size.height;
+            if(!SavePreviewCodec::ResizeBgra(full,w,h,thumbW,thumbH,thumbnail))throw std::runtime_error("save preview filtering failed");
     }
     static void SafePreGui(void* target)
     {
@@ -390,6 +415,7 @@ namespace UITSavePreviews
     static void (*originalLoad)(SaveFileSystem*,const std::string&)=NULL;
     static void (*originalNew)(SaveFileSystem*)=NULL;
     static void (*originalShow)(SaveManager*)=NULL;
+    static void (*originalShowSave)(SaveManager*)=NULL;
     static void (*originalInfo)(LoadSaveWindow*,size_t)=NULL;
     static void (*originalShutdown)(void*)=NULL;
     static void (*originalGuiShutdown)(ForgottenGUI*)=NULL;
@@ -429,7 +455,7 @@ namespace UITSavePreviews
     static void ActivateSelection()
     {
         if(!enabled||!root.get()||!saveList.get()||!root.get()->getVisible()||!root.get()->getInheritedVisible())return;
-        SaveManager* sm=SaveManager::getSingleton();LoadSaveWindow* menu=sm?reinterpret_cast<LoadSaveWindow*>(sm->loadMenu):NULL;
+        LoadSaveWindow* menu=CurrentMenu();
         if(!menu||menu->mMainWidget!=root.get()||menu->list!=saveList.get())return;
         const size_t index=menu->list->getIndexSelected();
         if(index>=menu->games.size()){Hide();return;}
@@ -454,10 +480,10 @@ namespace UITSavePreviews
     static void Show(SaveManager* self)
     {
         Hide();
-        originalShow(self);if(!enabled)return;
+        originalShow(self);
         try
         {
-            LoadSaveWindow* menu=reinterpret_cast<LoadSaveWindow*>(self->loadMenu);EnsurePanel(menu);
+            LoadSaveWindow* menu=reinterpret_cast<LoadSaveWindow*>(self->loadMenu);SizeMenu(menu);AnchorMenu(menu);if(!enabled)return;EnsurePanel(menu);
             if(menu&&menu->list)
             {
                 saveList.set(menu->list);menu->list->eventListChangePosition+=MyGUI::newDelegate(&ListChanged);
@@ -467,11 +493,26 @@ namespace UITSavePreviews
         }
         catch(...){enabled=false;Cancel();ErrorLog("UITweaks: cannot create load-game preview; previews disabled");}
     }
+    static void ShowSave(SaveManager* self)
+    {
+        Hide();originalShowSave(self);
+        try
+        {
+            LoadSaveWindow* menu=reinterpret_cast<LoadSaveWindow*>(self->saveMenu);SizeMenu(menu,true);AnchorMenu(menu);if(!enabled)return;EnsurePanel(menu);
+            if(menu&&menu->list)
+            {
+                saveList.set(menu->list);menu->list->eventListChangePosition+=MyGUI::newDelegate(&ListChanged);
+                unsigned visited=0;SubscribeColumns(menu->list,visited,0);
+            }
+            Tick();
+        }
+        catch(...){enabled=false;Cancel();ErrorLog("UITweaks: cannot create save-game preview; previews disabled");}
+    }
     static void Info(LoadSaveWindow* self,size_t index)
     {
         originalInfo(self,index);
         SaveManager* sm=SaveManager::getSingleton();
-        if(!enabled||!selectionActive||!sm||reinterpret_cast<LoadSaveWindow*>(sm->loadMenu)!=self)return;
+        if(!enabled||!selectionActive||!sm||CurrentMenu()!=self)return;
         try
         {
             EnsurePanel(self);
@@ -491,7 +532,7 @@ namespace UITSavePreviews
             if(StopWriter(*writer,5000)){delete writer;writer=NULL;}
             else ErrorLog("UITweaks: preview writer shutdown timed out; one isolated cancelled job retained until process exit");
         }
-        texture=NULL;root.reset();panel.reset();image.reset();label.reset();saveList.reset();selectionActive=false;
+        texture=NULL;root.reset();panel.reset();image.reset();saveList.reset();sizedRoots[0].reset();sizedRoots[1].reset();selectionActive=false;
         originalShutdown(self);
     }
     static void GuiShutdown(ForgottenGUI* self)
@@ -501,8 +542,8 @@ namespace UITSavePreviews
         // our children, texture and unlink registrations before that happens.
         ClearTexture();
         if(panel.get())MyGUI::Gui::getInstance().destroyWidget(panel.get());
-        root.release();panel.release();image.release();label.release();saveList.release();
-        selectedPath.clear();moved=displayed=false;
+        root.release();panel.release();image.release();saveList.release();sizedRoots[0].release();sizedRoots[1].release();
+        selectedPath.clear();displayed=false;
         originalGuiShutdown(self);
     }
     static void Initialize(bool drawingHook)
@@ -524,6 +565,7 @@ namespace UITSavePreviews
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),Load,&originalLoad)==KenshiLib::SUCCESS&&
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),New,&originalNew)==KenshiLib::SUCCESS&&
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveManager::showLoad),Show,&originalShow)==KenshiLib::SUCCESS&&
+            KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveManager::showSave),ShowSave,&originalShowSave)==KenshiLib::SUCCESS&&
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&LoadSaveWindow::updateInfo),Info,&originalInfo)==KenshiLib::SUCCESS;
         if(!installed){enabled=false;ErrorLog("UITweaks: save preview hooks unavailable; previews disabled");}
     }

@@ -12,6 +12,7 @@ names=livedis.export_names();md=capstone.Cs(capstone.CS_ARCH_X86,capstone.CS_MOD
 patterns={'sfs-save':('saveGame@SaveFileSystem',0x800),'sfs-sync':('sync@SaveFileSystem',0x500),
           'load-info':('updateInfo@LoadSaveWindow',0x1200),'load-select':('selectGame@LoadSaveWindow',0x100),
           'save-request':('save@SaveManager',0x140),'load-show':('showLoad@SaveManager',0x100),
+          'save-show':('showSave@SaveManager',0x100),
           'save-info':('loadInfo@SaveManager',0x350),
           'gui-shutdown':('shutDown@ForgottenGUI',0x400),
           'renderer-shutdown':('shutDown@Renderer',0x150),

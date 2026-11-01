@@ -161,6 +161,7 @@ namespace
     bool g_randomName = true;        // кнопка случайного имени в редакторе персонажа
     bool g_skipSameMoves = true;     // не пересобирать слой, если виджет «сдвинули» на то же место
     bool g_savePreviews = true;
+    int g_saveDialogHeightPercent = 120;
     // Клавиша иконки (09.10.2026, просьба тестеров; задержку убрали):
     // иконка - пока зажата; NONE - просто по наведению.
     HoldKey::Key g_craftIconKey;
@@ -293,6 +294,7 @@ namespace
         fputs("RandomName=1\n", f);
         fputs("SkipSameMoves=1\n", f);
         fputs("SavePreviews=1\n", f);
+        fputs("SaveDialogHeightPercent=120\n", f);
         fputs("Debug=0\n", f);
 
         fclose(f);
@@ -345,6 +347,8 @@ namespace
             GetPrivateProfileIntA("Tweaks", "SkipSameMoves", 1, ini.c_str()) != 0;
         g_savePreviews =
             GetPrivateProfileIntA("Tweaks", "SavePreviews", 1, ini.c_str()) != 0;
+        g_saveDialogHeightPercent=(std::max)(100,(std::min)(160,
+            (int)GetPrivateProfileIntA("Tweaks", "SaveDialogHeightPercent", 120, ini.c_str())));
         {
             char key[64] = {};
             GetPrivateProfileStringA("Tweaks", "CraftIconKey", "ALT", key, sizeof(key), ini.c_str());
@@ -353,7 +357,7 @@ namespace
         g_debug =
             GetPrivateProfileIntA("Tweaks", "Debug", 0, ini.c_str()) != 0;
         KLocLog::SetEnabled(g_debug);
-        UITSavePreviews::Configure(g_enabled && g_savePreviews, g_debug);
+        UITSavePreviews::Configure(g_enabled && g_savePreviews, g_debug, g_saveDialogHeightPercent);
 
         if (g_rowHeight < 0)
             g_rowHeight = 0;
@@ -3738,7 +3742,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Performance"));
     api->toggle(api, "Tweaks", "SkipSameMoves", Tr("Skip unchanged UI geometry"), Tr("Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."), 1, 0);
     api->section(api, Tr("Saved games"));
-    api->toggle(api, "Tweaks", "SavePreviews", Tr("Save screenshots"), Tr("Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."), 1, 0);
+    api->integer(api, "Tweaks", "SaveDialogHeightPercent", Tr("Save/load window height, %"), Tr("Height of the save and load windows relative to the game's original size. A taller list shows more saves. Limited by the screen and preview space. Applies when the window is next opened; 100 keeps the original height."), 120, 100, 160, 0);
+    api->toggle(api, "Tweaks", "SavePreviews", Tr("Save screenshots"), Tr("Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Works with manual saves, quicksaves and autosaves; slots without an image show no preview."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }

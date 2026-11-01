@@ -18,4 +18,4 @@ vc=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');sdk=Path('C:/P
 env=os.environ.copy();env['INCLUDE']=f'{vc}/include;{sdk}/Include';env['LIB']=f'{vc}/lib/amd64;{sdk}/Lib/x64';env['PATH']=f'{vc}/bin/amd64;'+env['PATH']
 exe=out/'actual_preview_writer.exe'
 subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3',str(cpp),'/Fe'+str(exe),'/Fo'+str(out/'actual_preview_writer.obj')],env=env,check=True)
-subprocess.run([str(exe),str(out/'owned-save-fixture')],env=env,check=True)
+subprocess.run([str(exe),str(out/'owned-save-fixture'),str(here/'fixtures/legacy-preview.jpg')],env=env,check=True)

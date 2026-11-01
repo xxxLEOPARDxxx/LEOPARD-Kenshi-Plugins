@@ -79,12 +79,10 @@ namespace SavePreviewCodec
         Com<IPropertyBag2> properties;Com<IStream> stream;
         if(FAILED(CoCreateInstance(CLSID_WICImagingFactory,NULL,CLSCTX_INPROC_SERVER,IID_IWICImagingFactory,(void**)factory.Out()))||
            FAILED(CreateStreamOnHGlobal(NULL,TRUE,stream.Out()))||
-           FAILED(factory->CreateEncoder(GUID_ContainerFormatJpeg,NULL,encoder.Out()))||
+           FAILED(factory->CreateEncoder(GUID_ContainerFormatPng,NULL,encoder.Out()))||
            FAILED(encoder->Initialize(stream,WICBitmapEncoderNoCache))||
            FAILED(encoder->CreateNewFrame(frame.Out(),properties.Out())))return false;
-        PROPBAG2 option={};option.pstrName=L"ImageQuality";VARIANT quality;VariantInit(&quality);
-        quality.vt=VT_R4;quality.fltVal=0.8f;
-        if(FAILED(properties->Write(1,&option,&quality))||FAILED(frame->Initialize(properties))||
+        if(FAILED(frame->Initialize(properties))||
            FAILED(frame->SetSize(w,h)))return false;
         WICPixelFormatGUID format=GUID_WICPixelFormat24bppBGR;
         if(FAILED(frame->SetPixelFormat(&format))||!IsEqualGUID(format,GUID_WICPixelFormat24bppBGR)||
@@ -95,6 +93,26 @@ namespace SavePreviewCodec
         result.resize(stat.cbSize.LowPart);LARGE_INTEGER zero={};ULONG read=0;
         return SUCCEEDED(stream->Seek(zero,STREAM_SEEK_SET,NULL))&&
             SUCCEEDED(stream->Read(&result[0],(ULONG)result.size(),&read))&&read==result.size();
+    }
+    inline bool ResizeBgra(const std::vector<unsigned char>& bgra,unsigned w,unsigned h,
+        unsigned targetW,unsigned targetH,std::vector<unsigned char>& result)
+    {
+        if(!SavePreviewPolicy::AllowedReadback(w,h)||bgra.size()!=size_t(w)*h*4||
+           !SavePreviewPolicy::ValidDimensions(targetW,targetH)||targetW>w||targetH>h)return false;
+        Apartment apartment;if(!apartment.Ready())return false;
+        Com<IWICImagingFactory> factory;Com<IWICBitmap> bitmap;Com<IWICBitmapScaler> scaler;
+        Com<IWICFormatConverter> converter;
+        if(FAILED(CoCreateInstance(CLSID_WICImagingFactory,NULL,CLSCTX_INPROC_SERVER,IID_IWICImagingFactory,(void**)factory.Out()))||
+           // Backbuffer alpha is not image transparency. BGRx preserves its
+           // RGB even when unused alpha bytes are zero, before Fant filtering.
+           FAILED(factory->CreateBitmapFromMemory(w,h,GUID_WICPixelFormat32bppBGR,w*4,(UINT)bgra.size(),const_cast<BYTE*>(&bgra[0]),bitmap.Out()))||
+           FAILED(factory->CreateBitmapScaler(scaler.Out()))||
+           FAILED(scaler->Initialize(bitmap,targetW,targetH,WICBitmapInterpolationModeFant))||
+           FAILED(factory->CreateFormatConverter(converter.Out()))||
+           FAILED(converter->Initialize(scaler,GUID_WICPixelFormat24bppBGR,WICBitmapDitherTypeNone,NULL,0,WICBitmapPaletteTypeCustom)))return false;
+        std::vector<unsigned char> filtered(size_t(targetW)*targetH*3);
+        if(FAILED(converter->CopyPixels(NULL,targetW*3,(UINT)filtered.size(),&filtered[0])))return false;
+        result.swap(filtered);return true;
     }
     inline bool Decode(const unsigned char* bytes,unsigned count,unsigned width,unsigned height,std::vector<unsigned char>& rgba)
     {
@@ -124,10 +142,10 @@ namespace SavePreviewCodec
         if(!ok&&error)*error="invalid save preview format";
         Header current={};ok=ok&&Stamp(directory,current)&&SameRevision(header,current);
         std::vector<unsigned char> bytes;
-        if(ok){bytes.resize(header.encodedBytes);ok=ReadFile(file,&bytes[0],header.encodedBytes,&n,NULL)&&n==header.encodedBytes;if(!ok&&error)*error="cannot read preview JPEG";}
+        if(ok){bytes.resize(header.encodedBytes);ok=ReadFile(file,&bytes[0],header.encodedBytes,&n,NULL)&&n==header.encodedBytes;if(!ok&&error)*error="cannot read preview image";}
         if(!ok)return false;
         ok=Decode(&bytes[0],(unsigned)bytes.size(),header.width,header.height,rgba);
-        if(!ok&&error)*error="invalid save preview JPEG";
+        if(!ok&&error)*error="invalid save preview image";
         return ok;
     }
 }

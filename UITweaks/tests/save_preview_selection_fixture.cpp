@@ -12,21 +12,23 @@ namespace MyGUI
 }
 struct SaveInfo{std::string location,name;SaveInfo(const char*l,const char*n):location(l),name(n){}};
 struct LoadSaveWindow{MyGUI::Widget*mMainWidget;MyGUI::MultiListBox*list;std::vector<SaveInfo>games;};
-struct SaveManager{LoadSaveWindow*loadMenu;static SaveManager*getSingleton();};
+struct SaveManager{LoadSaveWindow*loadMenu,*saveMenu;static SaveManager*getSingleton();};
 static SaveManager manager;SaveManager*SaveManager::getSingleton(){return &manager;}
 struct Ref{MyGUI::Widget*p;Ref():p(NULL){}MyGUI::Widget*get(){return p;}void set(MyGUI::Widget*w){p=w;}};
 static Ref root,saveList;static bool enabled=true,selectionActive=false;
-static unsigned draws=0,nativeShows=0,nativeInfos=0,subscriptions=0;static std::string selectedPath;
+static unsigned draws=0,nativeShows=0,nativeInfos=0,subscriptions=0,anchors=0;static std::string selectedPath;
 static void Hide(){selectionActive=false;selectedPath.clear();}
 static void Cancel(){}static void ErrorLog(const std::string&){}
 static void EnsurePanel(LoadSaveWindow*m){root.set(m->mMainWidget);}
+static void AnchorMenu(LoadSaveWindow*){++anchors;}
+static void SizeMenu(LoadSaveWindow*,bool=false){}
 static void LoadPreview(const std::string&p){selectedPath=p;}
 static std::string FullPath(const std::string&p){return p;}
 static void Tick(){if(selectionActive)++draws;}
 static void SubscribeColumns(MyGUI::Widget*,unsigned&,unsigned){++subscriptions;}
 static void NativeShow(SaveManager*){++nativeShows;}
 static void NativeInfo(LoadSaveWindow*,size_t){++nativeInfos;}
-static void (*originalShow)(SaveManager*)=NativeShow;static void (*originalInfo)(LoadSaveWindow*,size_t)=NativeInfo;
+static void (*originalShow)(SaveManager*)=NativeShow;static void (*originalShowSave)(SaveManager*)=NativeShow;static void (*originalInfo)(LoadSaveWindow*,size_t)=NativeInfo;
 // EXTRACT_SELECTION
 static unsigned checks=0;
 #define CHECK(x)do{++checks;if(!(x)){std::printf("FAIL line %u: %s\n",__LINE__,#x);return 1;}}while(0)
@@ -44,5 +46,13 @@ int main()
     root.set(NULL);MouseActivated(NULL,0);CHECK(!selectionActive&&selectedPath.empty()); // menu already destroyed by earlier callback
     root.set(&window);window.visible=false;MouseActivated(NULL,0);CHECK(!selectionActive);window.visible=true;
     enabled=false;MouseActivated(NULL,0);CHECK(!selectionActive);enabled=true;
+    MyGUI::Widget saveWindow;MyGUI::MultiListBox saveSlots;LoadSaveWindow saveMenu;
+    saveMenu.mMainWidget=&saveWindow;saveMenu.list=&saveSlots;saveMenu.games.push_back(SaveInfo("E:/save-root","existing"));manager.saveMenu=&saveMenu;
+    unsigned anchorBefore=anchors;ShowSave(&manager);CHECK(!selectionActive&&selectedPath.empty()&&anchors==anchorBefore+1);
+    MouseActivated(NULL,0);
+    CHECK(selectionActive&&selectedPath=="E:/save-root/existing");
+    Info(&saveMenu,0);CHECK(selectedPath=="E:/save-root/existing");
+    CHECK(anchors==anchorBefore+1); // changing/refreshing rows never reanchors the dialog
+    saveSlots.index=saveMenu.games.size();MouseActivated(NULL,0);CHECK(!selectionActive&&selectedPath.empty()); // new slot is not an existing game
     std::printf("PASS actual save preview selection adapters: %u checks; initial/default/same-row/different-root/deletion\n",checks);return 0;
 }

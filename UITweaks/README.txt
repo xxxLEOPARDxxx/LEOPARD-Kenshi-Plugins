@@ -4,11 +4,17 @@ UI Tweaks — доработки интерфейса, которых не сд�
 
   * Снимки сохранений: игра с HUD, мини-картой и панелями персонажей,
     без меню сохранения/загрузки, меню паузы и его затемнения. Предпросмотр
-    выбранного слота под окном загрузки в главном меню и в игре.
-    Рамка идёт по ширине окна загрузки; до выбора сейва она скрыта.
+    выбранного существующего слота под окном сохранения или загрузки.
+    Окно сразу открывается выше, оставляя место под снимок; смена строки
+    не сдвигает его. Рамка идёт по ширине окна, снимок не обрезается.
   * Ручные сохранения, перезапись, quicksave и autosave используют реальный
     каталог слота. Снимок обновляется только при успешной записи. Старым
-    сейвам изображение не требуется; вместо него показана пустая область.
+    сейвам изображение не требуется; без снимка рамка полностью скрыта.
+  * Новые снимки заметно чётче: до 1600×900, с качественным уменьшением
+    и без потерь при сжатии. Старые снимки по-прежнему поддерживаются.
+  * Высота окон сохранения и загрузки настраивается в MCM: по умолчанию
+    120% исходной, чтобы в списке помещалось больше строк. Изменение
+    применяется при следующем открытии и учитывает место под снимок.
   * Последовательный обмен с союзниками через ПКМ по портрету работает
     при уже открытом обмене. Штатный подход к далёкой цели сохранён.
   * Защита от клика сквозь инвентарь и отдельный рюкзак сохранена.
@@ -17,19 +23,24 @@ UI Tweaks — доработки интерфейса, которых не сд�
     До 64 родителей собираются один раз на стеке; ссылки не кэшируются.
     Существующая защёлка старого клика и пять хуков приказов не изменены.
   * SavePreviews в MCM включён по умолчанию и применяется сразу.
-    Настройка и пустое состояние переведены на RU/EN/ZH. Личные INI сохраняются.
+    Настройка переведена на RU/EN/ZH. Личные INI сохраняются.
     Для загрузки заменённой DLL перезапустите игру.
 
 VERSION 12 CHANGES (31 OCTOBER–1 NOVEMBER 2026)
 
   * Saved game screenshots include the HUD, minimap and character panels,
     excluding save/load and pause menus with their backdrop. Selecting a slot
-    shows its preview below Load Game, in the main menu and in game. The frame
-    spans the Load Game window; the image keeps its proportions without cropping.
-    The frame stays hidden before selection.
+    shows its preview below Save Game or Load Game. The dialog opens higher
+    immediately to reserve preview space and stays put when changing rows.
+    The frame spans the dialog; the image keeps its proportions without cropping.
   * Manual saves, overwrites, quicksaves and autosaves use the actual slot
     directory. A preview is committed only after a successful save. Old saves
-    need no image and show a clear empty state.
+    need no image; the preview and its frame stay hidden when no image is available.
+  * New screenshots are clearer: up to 1600×900, with filtered resizing and
+    lossless compression. Previously captured previews remain compatible.
+  * Save/load window height is configurable in MCM, defaulting to 120% of
+    the original height to show more rows. Changes apply on the next opening
+    and respect the available screen and preview space.
   * Sequential squad trading through portrait RMB/Trade works while an
     earlier exchange remains open. Native out-of-range approach is retained.
   * Inventory and detached-backpack click-through protection remains active.
@@ -38,7 +49,7 @@ VERSION 12 CHANGES (31 OCTOBER–1 NOVEMBER 2026)
     are collected once on the stack, with no retained widget references.
     The existing stale-click latch and five order hooks are unchanged.
   * SavePreviews in MCM is on by default and changes immediately.
-    Its setting and empty state are available in RU/EN/ZH; personal INI is preserved.
+    Its setting is available in RU/EN/ZH; personal INI is preserved.
     Restart the game to load the replacement DLL.
 
 ИСТОРИЯ: ВЕРСИЯ 11 (30.10.2026)
@@ -216,16 +227,22 @@ VERSION 10 CHANGES (30 OCTOBER 2026)
    При успешном сохранении сохраняется кадр игры с HUD, мини-картой и
    панелями персонажей. Меню сохранения/загрузки, меню паузы и его затемнение
    в снимок не входят. Переключения окон и захвата рабочего стола нет.
-   При выборе слота его снимок появляется под окном загрузки, в главном
-   меню и в уже загруженной игре. Поддерживаются ручные сохранения,
+   При выборе существующего слота его снимок появляется под окном сохранения
+   или загрузки, в главном меню и в уже загруженной игре. Поддерживаются ручные сохранения,
    перезапись, quicksave и сменяемые autosave. Старые сейвы без снимка
-   загружаются как обычно; подпись — «Нет снимка сохранения».
+   загружаются как обычно; без изображения рамка полностью скрыта.
    До выбора строки рамка скрыта, в том числе при автоматически подсвеченной
    первой строке. Нажатие на эту строку тоже показывает снимок. Пропорции
-   сохраняются без обрезки: рамка и снимок растягиваются по ширине окна загрузки.
-   Если места мало, снимок и рамка уменьшаются, окно загрузки сдвигается вверх;
+   сохраняются без обрезки: рамка растягивается по ширине окна.
+   Окно сразу при открытии поднимается выше, оставляя место под снимок,
+   и не сдвигается при выборе другой строки. При нехватке высоты снимок
+   уменьшается без обрезки и располагается по центру рамки;
    список, кнопки и правая панель остаются штатными.
    SavePreviews (1), MCM «Сохранённые игры», действует сразу.
+   «Высота окна сохранения/загрузки, %» — 100–160, по умолчанию 120;
+   применяется при следующем открытии окна. 100 возвращает исходную высоту.
+   Увеличивается сам список сейвов; размер не накапливается при повторных
+   открытиях. Ограничения экрана и места под снимок учитываются автоматически.
 
 
 С КАКИМ ИНТЕРФЕЙСОМ РАБОТАЕТ
@@ -261,19 +278,28 @@ VERSION 10 CHANGES (30 OCTOBER 2026)
 каждый кадр. Читается только выбранный файл; в памяти — одна GPU-миниатюра.
 Захват — один раз на принятый запрос сохранения, не более 8 294 400 пикселей
 (бюджет 3840×2160). Кадры большего размера пропускаются с записью ошибки.
-На CPU снимок уменьшается до 640×360 без растяжения; один фоновый поток
-кодирует JPEG и записывает файл, очередь не растёт. Подробности — ниже.
+На CPU снимок уменьшается до 1600×900 без растяжения, с фильтрацией WIC Fant;
+один фоновый поток кодирует PNG без потерь и записывает файл, очередь не растёт.
+Подробности — ниже.
 
 SAVE PREVIEWS / ТЕХНИЧЕСКИЙ СПРАВОЧНИК
 
   SavePreviews=1: live MCM toggle, no restart flag. The preview appears below
-  the existing Load Game dialog in both contexts. Native controls remain in
-  their existing layout; only the dialog position may move to fit the preview.
-  Its frame and empty-state text inherit the installed XML skins and colours.
+  the existing Save Game or Load Game dialog. Native controls retain their layout.
+  The dialog is raised once when opened to reserve preview space; row changes
+  never move it. User dragging is respected. The frame inherits the XML skin.
+  Missing/invalid previews have no visible frame or placeholder.
+  SaveDialogHeightPercent=120 (range 100..160) expands the native window and
+  its vertically stretched GamesList. It applies at the next opening, including
+  when screenshots are disabled. Separate weak-root base-size records for Save
+  and Load prevent repeated or alternating opens from compounding the size.
+  Height is capped by the viewport and reserved preview space; 100 restores the
+  native base height. No game restart is required for this setting.
 
   uitweaks-preview.bin is an optional, separately owned file inside the exact
-  save directory. It contains a 40-byte versioned header and a JPEG (80% quality,
-  at most 256 KiB). The header binds the image to quick.save's size and last-write
+  save directory. It contains a 40-byte versioned header and a lossless PNG (up to
+  1600x900, at most 6 MiB). Old version-1 JPEG sidecars remain readable. The header
+  binds the image to quick.save's size and last-write
   time. A stale image after an overwrite is ignored. Copying the complete save
   with preserved quick.save timestamps carries the preview; a missing image does
   not affect loading. External edits deliberately preserving both size and time

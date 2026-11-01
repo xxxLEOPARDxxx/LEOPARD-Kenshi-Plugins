@@ -54,3 +54,11 @@ two-pass HUD path, post-GUI single-pass path, readback failure, backup refusal,
 load cancellation and nested RTT passthrough. Driver calls are represented by
 a scoped boundary in this sequencing fixture; the actual GPU class has its own
 independent WARP test. These checks do not replace the new in-game acceptance.
+
+The refinement suite also covers filtered 1600x900 lossless PNGs, legacy JPEG
+sidecars, unchanged-good-file behavior on encode failure, empty-state hiding,
+both Save/Load selection, and stable opening geometry. `test_save_preview_height.py`
+extracts the real bounded per-menu height adapter. `test_save_preview_dialog_height.py`
+loads the installed MyGUI DLL and verifies actual native child viewport growth
+against all four installed vanilla/Dark Save/Load XML layouts. The height setting
+is applied on menu opening and never compounds between Save and Load roots.
