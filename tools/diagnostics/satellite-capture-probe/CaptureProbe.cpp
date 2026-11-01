@@ -60,6 +60,7 @@
 #include "NativeTerrainCache.h"
 #include "RenderAbiProfile.h"
 #include "TerrainExperimentPolicy.h"
+#include "NativeWorkerHandle.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -296,6 +297,16 @@ bool ReadTerrainBlood(Terrain *terrain,NativeTerrainCache::BloodState &state)
     {
         return NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener) &&
                NativeTerrainCache::ReadBlood(terrain,state);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
+bool ReadOwnedTerrainWorker(Terrain *terrain,NativeTerrainCache::WorkerState &state)
+{
+    if(!terrain||!au||terrain==au->terrain||!RenderAbiMatches())return false;
+    __try
+    {
+        return NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener)&&
+            NativeTerrainCache::ReadWorker(terrain,state);
     }
     __except(EXCEPTION_EXECUTE_HANDLER){return false;}
 }

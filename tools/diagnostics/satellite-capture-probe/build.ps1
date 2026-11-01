@@ -47,5 +47,9 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/terrain_experiment_tests.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/worker_handle_tests.exe" "/Fo$out/worker_handle_tests.obj" "$PSScriptRoot/worker_handle_tests.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/worker_handle_tests.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

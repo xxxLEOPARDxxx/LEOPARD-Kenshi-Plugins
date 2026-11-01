@@ -8,6 +8,20 @@ const std::size_t CameraOffset=0x178;
 const std::size_t PositionOffset=0x180;
 struct State { const void *camera; float position[3]; };
 struct BloodState { const void *object,*camera; };
+struct WorkerState {void *landscape,*handle;unsigned long id;volatile unsigned char *request;};
+inline bool ReadWorker(const void *object,WorkerState &out)
+{
+    std::memset(&out,0,sizeof(out));
+    if(!object)return false;
+    const unsigned char *bytes=static_cast<const unsigned char*>(object);
+    std::memcpy(&out.landscape,bytes+0x1c0,sizeof(out.landscape));
+    if(!out.landscape)return false;
+    unsigned char *land=static_cast<unsigned char*>(out.landscape);
+    std::memcpy(&out.handle,land+0x178,sizeof(out.handle));
+    // Native ctor initializes HANDLE, but not TID. Never inspect TID without a worker.
+    if(out.handle)std::memcpy(&out.id,land+0x180,sizeof(out.id));
+    out.request=land+0x188;return true;
+}
 inline bool ReadBlood(const void *object,BloodState &out)
 {
     out.object=NULL;out.camera=NULL;

@@ -292,3 +292,36 @@ member aggregate ABI (this,out -> out), with exact export/code profile checks.
 altitude/refinement readiness/deadline/counter budgets/unsigned clock wrap/owner
 identity. Full237-check build and116 real import resolutions pass. Actual native
 geometry rendering/lifetime/performance still requires root's controlled game run.
+
+## Native private-worker teardown correction
+Seven live factory captures exposed a native terminated-thread HANDLE leak (+1
+per creation). Native startE4C2 stores HANDLE at Landscape178/TID180; close23D0
+signals request188 and polls running170. Wrapper/callback destructors never close
+HANDLE. Running starts0 until the thread is scheduled, so native close alone also
+permits a partial-construction late-start race. Request188 is set1 before start;
+the worker never resets it and checks it before TIFF work.
+
+Only our fresh private Terrain uses a cleanup adapter. Under the exact module,
+vtable and owned-object guards, it reads that worker descriptor, duplicates and
+validates its kernel thread handle/process/ID, atomically signals only request188,
+and waits up to5s for kernel termination BEFORE native Terrain destruction. On
+uncertainty/timeout it retains resources and disables the diagnostic. After native
+destruction, CompareObjectHandles verifies actual object identity before repairing
+the omitted native HANDLE close; a closed/reused other object is not touched.
+The duplicate is then closed. No process handle enumeration, TerminateThread,
+main-Terrain modification or native global patch is used. This private diagnostic
+requires Windows10+ CompareObjectHandles; public mod platform support is unchanged.
+
+Microsoft documents direct object comparison at
+https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-compareobjecthandles
+and limits thread-ID validity to thread lifetime at
+https://learn.microsoft.com/en-us/windows/win32/procthread/thread-handles-and-identifiers .
+We do not infer future identity from a terminated thread ID.
+
+19 actual Win32 fixture checks cover kernel join, delayed completion, one-byte
+canaries, wrong type/ID, no duplicate allocation on repeated adoption, actual
+CloseHandle, double completion and upstream close with an actually reused event
+slot. Total fixture handle count returns to baseline. An omitted-close mutant
+fails on GetHandleInformation. Three raw native-layout checks avoid reading the
+uninitialized TID when HANDLE is null. Full259 checks/116 game+Ogre imports pass;
+repeat game HANDLE/memory behavior must still be measured after installation.

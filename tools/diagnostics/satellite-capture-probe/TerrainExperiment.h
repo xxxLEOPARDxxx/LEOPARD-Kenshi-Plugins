@@ -37,6 +37,7 @@ struct TerrainExperimentApi
 struct TerrainExperiment
 {
     TerrainExperimentApi api;
+    NativeWorkerHandle worker;
     Ogre::Root *root;
     Ogre::SceneManager *scene;
     Terrain *terrain;
@@ -168,7 +169,29 @@ struct TerrainExperiment
         Ogre::CompositorManager2 *manager=root->getCompositorManager2();
         if(workspace){manager->removeWorkspace(workspace);workspace=NULL;}
         // Terrain owns a FrameListener/worker and may borrow camera: join/destroy FIRST.
-        if(terrain){api.destroyObject(scene,terrain);terrain=NULL;}
+        if(terrain)
+        {
+            NativeTerrainCache::WorkerState before,after;
+            if(!ReadOwnedTerrainWorker(terrain,before))throw std::runtime_error("private worker ownership unavailable");
+            const bool hasWorker=before.handle!=NULL;
+            if(hasWorker)
+            {
+                if(!worker.Adopt(before.handle,before.id)||!ReadOwnedTerrainWorker(terrain,after)||
+                   before.landscape!=after.landscape||before.handle!=after.handle||before.id!=after.id||before.request!=after.request)
+                    throw std::runtime_error("private worker kernel identity changed; retaining resources");
+                // Native running byte starts at0 BEFORE scheduling; a kernel join
+                // is necessary even during partial-construction error cleanup.
+                if(!worker.StopAndJoin(before.request,5000))
+                    throw std::runtime_error("private worker did not terminate; retaining resources");
+            }
+            api.destroyObject(scene,terrain);terrain=NULL;
+            if(hasWorker)
+            {
+                bool closed=false;
+                if(!worker.Complete(closed))throw std::runtime_error("private native worker handle cleanup unverified");
+                Log(closed?"private native worker kernel-joined; omitted HANDLE close repaired":"private native worker kernel-joined; native HANDLE already released");
+            }
+        }
         if(camera){scene->destroyCamera(camera);camera=NULL;}
         if(scene){api.destroyScene(root,scene);scene=NULL;}
         if(!material.isNull())

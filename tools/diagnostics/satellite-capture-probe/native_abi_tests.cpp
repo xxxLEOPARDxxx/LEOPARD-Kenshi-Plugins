@@ -27,6 +27,16 @@ int main()
     Check(!BloodMatches(missing,missing,camera),"uninitialized helper refused before native allocation");
     BloodState replaced=blood;replaced.object=primary;
     Check(!BloodMatches(blood,replaced,camera),"changed helper identity refused");
+    unsigned char landscape[0x190];std::memset(landscape,0xCD,sizeof(landscape));
+    const void *landPointer=landscape,*nullHandle=NULL;
+    std::memcpy(terrain+0x1c0,&landPointer,8);std::memcpy(landscape+0x178,&nullHandle,8);
+    WorkerState worker;
+    Check(ReadWorker(terrain,worker)&&!worker.handle&&!worker.id,"no worker does not read uninitialized native TID");
+    unsigned long threadId=123;
+    std::memcpy(landscape+0x178,&camera,8);std::memcpy(landscape+0x180,&threadId,4);
+    Check(ReadWorker(terrain,worker)&&worker.handle==camera&&worker.id==123,"exact private worker HANDLE and TID offsets");
+    Check(worker.landscape==landscape&&worker.request==landscape+0x188,"stop byte points only inside owned Landscape");
+    std::memcpy(original,terrain,sizeof(terrain));
     std::memcpy(original,terrain,sizeof(terrain));
     Check(Matches(terrain,primary,listener),"exact terrain vtable tags");
     Check(!Matches(terrain,listener,primary),"wrong terrain type refused");
