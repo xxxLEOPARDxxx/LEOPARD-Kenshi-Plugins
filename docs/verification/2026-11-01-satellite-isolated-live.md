@@ -117,6 +117,32 @@ bounded shader reuse alone did not remove that growth.
 
 ## Outstanding
 
+## Native estimate underflow at2048 (first trial refused)
+
+PID28788/start03:39:27.6007385Z, c78a1e7/DLL9fbae335, actual2048primary1,1,
+token105. Native step10: memory132005248,patches841,visible56,ogre649,unbuilt41,
+triangles18446744073709551614. Existing guard stopped capture without output,
+joined/closed the worker, destroyed the private scene and balanced materials.
+Evidence isolated-2048-28788-first/failure.log.txt. This is not an8K acceptance.
+
+Independent exact-native audit confirms getDebugInfo14BEB..14C00 estimates
+visibleCount*FIRSTvisibleGeometry.indexCount-2, not an exact sum of drawn
+triangles. Worker47A0 publishes Patch.vertexD8 at5A16 before indexbuilder5AA0
+writes Patch.indexCountD0 at5C68 (8572 for patch64). Native readiness35F0 tests
+vertexD8 only. Selection can therefore expose a geometry with indexCount0,
+producing exactly UINT64_MAX-1 during unfinished construction. Aggregate48B ABI
+remains correct. No game function/counter is patched.
+
+Private readiness now waits ONLY for this exact value when visible>0 and
+unbuilt>0. Memory/patch/object budgets always apply; visible*8572 has its own
+conservative16M bound, persistent invalid telemetry expires, all other excess
+values still refuse. Readiness resets and requires three subsequent ordinary
+stable samples.9 new real production-policy cases cover this observed fixture
+and refusal boundaries; old code fails the fixture. Full370 checks/116imports,
+independent review clear. Actual recovery must still be observed after install.
+
+## Remaining work
+
 Further allocator/cache isolation and refinement/seams need proof before heavier
 rendering. Then prove native exposure, unloaded/player/modded building
 proxies, water/shadows/fog, interactive global-map integration and dynamic day/night

@@ -477,3 +477,11 @@ refinement at the unchanged(8,8,0) detail threshold. Existing1GiB/16Mtriangle
 observation limits remain, and may refuse a finer capture. Do not lift those
 limits automatically or market2048 as final8K.361 checks include10 raster-bound
 cases; actual2048 runtime/resource proof follows separately.
+
+First2048 trial refused a native transient estimate: visible56 with unbuilt41
+returned uint64(0)-2, not a real enormous geometry count. Native patch readiness
+publishes vertices before its index count. The private warmup now waits only on
+that exact underflow during unfinished builds, preserving all original caps and
+adding conservative visible*8572<=16M for fixed patch64. Three valid samples are
+still required; no output from invalid telemetry.370 checks/116imports and
+independent review pass. Recovery is pending live proof, not assumed.
