@@ -3,7 +3,7 @@ from pathlib import Path
 import gettext,json,xml.etree.ElementTree as ET
 here=Path(__file__).resolve().parent;mod=here.parent
 keys=['Saved games','Save screenshots','No preview available',
-      'Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview.']
+      'Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image.']
 for language in ('en_GB','ru_RU','zh_CN'):
     with (mod/'locale'/language/'LC_MESSAGES/ui_tweaks.mo').open('rb') as f:catalog=gettext.GNUTranslations(f)
     for key in keys:

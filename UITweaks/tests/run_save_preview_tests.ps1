@@ -14,9 +14,19 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/save_preview_codec_test.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/save_preview_gpu_test.exe" "/Fo$out/save_preview_gpu_test.obj" "$PSScriptRoot/save_preview_gpu_test.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/save_preview_gpu_test.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_writer.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_lifecycle.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_alpha.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_selection.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_capture.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & 'C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' "$PSScriptRoot/test_save_preview_text.py"
 exit $LASTEXITCODE

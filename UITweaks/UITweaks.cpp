@@ -1859,7 +1859,7 @@ namespace
         if (g_enabled && g_progressPad > 0 && g_statsPanel.get() != NULL)
             SafeRestyleStatsPanel();
 
-        g_origRenderToTarget(thisptr, target, update);
+        UITSavePreviews::DrawGui(thisptr, target, update, g_origRenderToTarget);
     }
 
 
@@ -3738,7 +3738,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, Tr("Performance"));
     api->toggle(api, "Tweaks", "SkipSameMoves", Tr("Skip unchanged UI geometry"), Tr("Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."), 1, 0);
     api->section(api, Tr("Saved games"));
-    api->toggle(api, "Tweaks", "SavePreviews", Tr("Save screenshots"), Tr("Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."), 1, 0);
+    api->toggle(api, "Tweaks", "SavePreviews", Tr("Save screenshots"), Tr("Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }

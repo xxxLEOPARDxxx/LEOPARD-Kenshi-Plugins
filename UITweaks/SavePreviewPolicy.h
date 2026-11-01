@@ -31,14 +31,23 @@ namespace SavePreviewPolicy
         bool Ready()const{return active&&captured&&complete;}
     };
     struct Rect {int x,y,width,height;};
-    inline Rect PlaceBelow(int x,int y,int width,int height,int viewW,int viewH,double aspect)
+    struct Placement {Rect panel,image;int dialogX,dialogY;};
+    inline Placement PlacePreview(int x,int y,int width,int height,int viewW,int viewH,unsigned imageW,unsigned imageH,bool hasImage)
     {
-        Rect r={0,0,0,0};if(viewW<=16||viewH<=16||width<=0||height<=0||aspect<=0)return r;
-        r.width=(std::min)(width,viewW-16);r.height=(std::min)(int(r.width/aspect),viewH/2);
-        r.x=(std::max)(8,(std::min)(x,viewW-r.width-8));
-        // Caller moves only the load dialog upwards if needed; its own children remain intact.
-        r.y=(std::max)(8,(std::min)(y+height+4,viewH-r.height-8));
-        if(r.y<height+8){r.y=(std::min)(height+8,viewH-8);r.height=(std::max)(0,viewH-r.y-8);}
-        return r;
+        Placement p={};if(viewW<=28||viewH<=28||width<=12||height<=0)return p;
+        const int maxW=(std::min)(width,viewW-16),maxH=(std::min)(viewH/2,viewH-height-20);
+        if(maxW<=12||maxH<=12)return p;
+        if(hasImage)
+        {
+            const Size s=Fit(imageW,imageH,maxW-12,maxH-12);
+            if(!s.width||!s.height)return p;
+            p.panel.width=int(s.width)+12;p.panel.height=int(s.height)+12;
+            p.image.x=p.image.y=6;p.image.width=s.width;p.image.height=s.height;
+        }
+        else {p.panel.width=(std::min)(maxW,320);p.panel.height=(std::min)(maxH,48);}
+        p.dialogX=(std::max)(8,(std::min)(x,viewW-width-8));
+        p.dialogY=(std::max)(8,(std::min)(y,viewH-height-4-p.panel.height-8));
+        p.panel.x=(std::max)(8,(std::min)(p.dialogX+(width-p.panel.width)/2,viewW-p.panel.width-8));
+        p.panel.y=p.dialogY+height+4;return p;
     }
 }

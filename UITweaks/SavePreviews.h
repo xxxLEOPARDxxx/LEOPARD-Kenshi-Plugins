@@ -5,11 +5,14 @@
 #include <kenshi/SaveManager.h>
 #include <kenshi/gui/LoadSaveWindow.h>
 #include <mygui/MyGUI_MultiListBox.h>
+#include <mygui/MyGUI_ListBox.h>
 #include <OgreRenderWindow.h>
 #include <OgrePixelFormat.h>
 #include <OgrePixelBox.h>
 #include <OgreHardwarePixelBuffer.h>
 #include "SavePreviewCodec.h"
+#include "SavePreviewGpu.h"
+#include "SavePreviewAlpha.h"
 #include <stddef.h>
 
 // Verified against installed KenshiLib 0.5 and live Steam 1.0.65 native code.
@@ -67,7 +70,7 @@ namespace UITSavePreviews
     static std::vector<unsigned char> thumbnail;
     static unsigned thumbW=0,thumbH=0;
     static Writer* writer=NULL;
-    static PreviewWidgetRef root,panel,image,label;
+    static PreviewWidgetRef root,panel,image,label,saveList;
     static MyGUI::ITexture* texture=NULL;
     static std::string selectedPath;
     static MyGUI::IntPoint originalPosition;
@@ -75,6 +78,26 @@ namespace UITSavePreviews
     static SavePreviewCodec::Header displayedRevision={};
     static bool displayed=false;
     static bool refreshSelection=false;
+    static bool selectionActive=false;
+    __declspec(thread) static bool inCapture=false;
+    typedef SavePreviewAlpha<MyGUI::Widget,PreviewWidgetRef> AlphaMask;
+    __declspec(thread) static AlphaMask* activeAlpha=NULL;
+    __declspec(thread) static MyGUI::Widget* settingAlpha=NULL;
+    static void (*originalAlpha)(MyGUI::Widget*)=NULL;
+    struct SettingAlpha
+    {
+        MyGUI::Widget* previous;explicit SettingAlpha(MyGUI::Widget* w):previous(settingAlpha){settingAlpha=w;}
+        ~SettingAlpha(){settingAlpha=previous;}
+    };
+    static void AlphaUpdate(MyGUI::Widget* self)
+    {
+        if(activeAlpha&&self!=settingAlpha)
+        {
+            activeAlpha->Remember(self);
+            if(self->getAlpha()!=0){SettingAlpha scope(self);self->setAlpha(0);return;}
+        }
+        originalAlpha(self);
+    }
 
     static bool OnMain()
     {
@@ -167,7 +190,7 @@ namespace UITSavePreviews
     {
         if(panel.get())panel.get()->setVisible(false);
         if(moved&&root.get())root.get()->setPosition(originalPosition);
-        moved=false;selectedPath.clear();displayed=false;ClearTexture();
+        moved=false;selectedPath.clear();displayed=selectionActive=false;ClearTexture();
     }
     static void Configure(bool value,bool diagnostic)
     {debug=diagnostic;value=value&&(!initialized||installed);if(enabled&&!value)Cancel();if(!enabled&&value)refreshSelection=true;enabled=value;if(!enabled)Hide();}
@@ -223,9 +246,10 @@ namespace UITSavePreviews
         ReapWriter();
         if(pending.active&&GetTickCount()-started>60000){Cancel();ErrorLog("UITweaks: save preview timed out");}
         if(pending.active&&(!enabled||ou!=world||!au||au->render!=renderer))Cancel();
-        if(!enabled||!root.get()||!root.get()->getInheritedVisible())
+        if(!enabled||!root.get()||!root.get()->getVisible()||!root.get()->getInheritedVisible())
         {if(panel.get()&&panel.get()->getVisible())Hide();return;}
         if(!panel.get())return;
+        if(!selectionActive){if(panel.get()->getVisible())Hide();return;}
         if(refreshSelection)
         {
             refreshSelection=false;SaveManager* sm=SaveManager::getSingleton();
@@ -238,11 +262,12 @@ namespace UITSavePreviews
         }
         const MyGUI::IntSize view=MyGUI::RenderManager::getInstance().getViewSize();
         const MyGUI::IntCoord r=root.get()->getAbsoluteCoord();
-        const SavePreviewPolicy::Rect box=SavePreviewPolicy::PlaceBelow(r.left,r.top,r.width,r.height,view.width,view.height,16.0/9.0);
+        const SavePreviewPolicy::Placement position=SavePreviewPolicy::PlacePreview(r.left,r.top,r.width,r.height,view.width,view.height,
+            texture?texture->getWidth():0,texture?texture->getHeight():0,texture!=NULL);
+        const SavePreviewPolicy::Rect& box=position.panel;
         if(box.height<32){panel.get()->setVisible(false);return;}
-        const int desiredTop=box.y-r.height-4;
-        if(r.top>desiredTop||r.left!=box.x)
-        {if(!moved){originalPosition=root.get()->getPosition();moved=true;}root.get()->setPosition(root.get()->getLeft()+box.x-r.left,root.get()->getTop()+(std::min)(0,desiredTop-r.top));}
+        if(r.top!=position.dialogY||r.left!=position.dialogX)
+        {if(!moved){originalPosition=root.get()->getPosition();moved=true;}root.get()->setPosition(root.get()->getLeft()+position.dialogX-r.left,root.get()->getTop()+position.dialogY-r.top);}
         const MyGUI::IntCoord panelCoord(box.x,box.y,box.width,box.height);
         if(panel.get()->getCoord()!=panelCoord)panel.get()->setCoord(panelCoord);
         if(!panel.get()->getVisible())panel.get()->setVisible(true);
@@ -250,27 +275,26 @@ namespace UITSavePreviews
         if(label.get()&&label.get()->getCoord()!=labelCoord)label.get()->setCoord(labelCoord);
         if(texture&&image.get())
         {
-            SavePreviewPolicy::Size size=SavePreviewPolicy::Fit(texture->getWidth(),texture->getHeight(),(std::max)(1,box.width-12),(std::max)(1,box.height-12));
-            const MyGUI::IntCoord imageCoord((box.width-int(size.width))/2,(box.height-int(size.height))/2,size.width,size.height);
+            const MyGUI::IntCoord imageCoord(position.image.x,position.image.y,position.image.width,position.image.height);
             if(image.get()->getCoord()!=imageCoord)image.get()->setCoord(imageCoord);
         }
         Submit();
     }
-    static void PreGui(void* target)
+    static bool MainTarget(void* target)
     {
-        if(!OnMain())return;
-        if(!writer&&!pending.active&&!root.get()&&!(panel.get()&&panel.get()->getVisible()))return;
-        // Offscreen GUI RTTs use a different IRenderTarget. Only the backend's
-        // own render target corresponds to the game's main compositor GUI pass.
         MyGUI::IRenderTarget* main=dynamic_cast<MyGUI::IRenderTarget*>(MyGUI::RenderManager::getInstancePtr());
-        if(!main||target!=main)return;
-        Tick(); // Main menu does not run every in-game ForgottenGUI update.
-        if(!enabled||!pending.active||pending.captured)return;
-        if(ou!=world||!au||au->render!=renderer||au->titleScreen||!renderer||!renderer->window){Cancel();return;}
-        try
-        {
+        return main&&target==main;
+    }
+    static void RequireCapture(unsigned ticket)
+    {
+        if(!pending.active||pending.serial!=ticket||!renderer||!renderer->window||ou!=world||!au||au->render!=renderer||au->titleScreen)
+            throw std::runtime_error("save preview capture invalidated");
+    }
+    static void CapturePixels(unsigned ticket)
+    {
+            RequireCapture(ticket);
             unsigned w=renderer->window->getWidth(),h=renderer->window->getHeight();
-            if(!SavePreviewPolicy::AllowedReadback(w,h)){Cancel();ErrorLog("UITweaks: save preview readback exceeds 3840x2160 pixel budget");return;}
+            if(!SavePreviewPolicy::AllowedReadback(w,h))throw std::runtime_error("save preview readback exceeds pixel budget");
             std::vector<unsigned char> full(size_t(w)*h*4);
             Ogre::PixelBox box(w,h,1,Ogre::PF_BYTE_BGRA,&full[0]);
             renderer->window->copyContentsToMemory(box,Ogre::RenderTarget::FB_BACK);
@@ -278,14 +302,87 @@ namespace UITSavePreviews
             thumbnail.resize(size_t(thumbW)*thumbH*3);
             for(unsigned y=0;y<thumbH;++y)for(unsigned x=0;x<thumbW;++x)
             {size_t src=(size_t(y)*h/thumbH*w+size_t(x)*w/thumbW)*4,dst=(size_t(y)*thumbW+x)*3;memcpy(&thumbnail[dst],&full[src],3);}
-            pending.Captured();if(debug)DebugLog("UITweaks: clean pre-interface save scene captured");Submit();
-        }
-        catch(...){Cancel();ErrorLog("UITweaks: game backbuffer capture failed");}
     }
     static void SafePreGui(void* target)
     {
-        try{PreGui(target);}
+        try{if(!inCapture&&OnMain()&&MainTarget(target))Tick();}
         catch(...){Cancel();enabled=false;ErrorLog("UITweaks: save preview interface update failed; previews disabled");}
+    }
+    static void AddModal(std::vector<MyGUI::Widget*>& roots,MyGUI::Widget* w)
+    {
+        if(!w||!w->getVisible()||!w->getInheritedVisible())return; // Alpha-independent children can remain visible at root alpha0.
+        if(std::find(roots.begin(),roots.end(),w)==roots.end())roots.push_back(w);
+        if(roots.size()>8)throw std::runtime_error("save preview modal root budget exceeded");
+    }
+    static void FindPauseRoot(MyGUI::Widget* w,MyGUI::Widget* top,std::vector<MyGUI::Widget*>& roots,unsigned& visited,unsigned depth)
+    {
+        if(++visited>4096||depth>64)throw std::runtime_error("save preview modal search budget exceeded");
+        const std::string& name=w->getName();static const std::string suffix="MainMenuPopupPanel";
+        if(name.size()>=suffix.size()&&name.compare(name.size()-suffix.size(),suffix.size(),suffix)==0)AddModal(roots,top);
+        const size_t count=w->getChildCount();for(size_t i=0;i<count;++i)FindPauseRoot(w->getChildAt(i),top,roots,visited,depth+1);
+    }
+    typedef void (*DrawFunction)(void*,void*,bool);
+    static void DrawGui(void* self,void* target,bool update,DrawFunction original)
+    {
+        if(inCapture||!enabled||!pending.active||pending.captured||!OnMain()||!MainTarget(target)){original(self,target,update);return;}
+        if(ou!=world||!au||au->render!=renderer||au->titleScreen||!renderer||!renderer->window){Cancel();original(self,target,update);return;}
+        struct CaptureScope{CaptureScope(){inCapture=true;}~CaptureScope(){inCapture=false;}} captureScope;
+        const unsigned ticket=pending.serial;
+        bool presented=false,normalCompleted=false;
+        const char* stage="modal discovery";
+        try
+        {
+            std::vector<MyGUI::Widget*> roots;roots.reserve(8);SaveManager* sm=SaveManager::getSingleton();
+            if(sm)
+            {
+                LoadSaveWindow* menus[]={reinterpret_cast<LoadSaveWindow*>(sm->saveMenu),reinterpret_cast<LoadSaveWindow*>(sm->loadMenu),sm->importMenu};
+                for(unsigned i=0;i<3;++i)if(menus[i])AddModal(roots,menus[i]->mMainWidget);
+            }
+            AddModal(roots,panel.get());unsigned visited=0;
+            MyGUI::EnumeratorWidgetPtr widgets=MyGUI::Gui::getInstance().getEnumerator();
+            while(widgets.next())if(widgets.current()->getVisible()&&widgets.current()->getInheritedVisible())FindPauseRoot(widgets.current(),widgets.current(),roots,visited,0);
+            if(roots.empty())
+            {stage="normal GUI";presented=true;original(self,target,update);normalCompleted=true;stage="HUD readback";CapturePixels(ticket);}
+            else
+            {
+                struct ModalRefs
+                {
+                    struct Entry{PreviewWidgetRef ref;~Entry(){ref.release();}}entries[8];
+                    explicit ModalRefs(const std::vector<MyGUI::Widget*>& roots)
+                    {for(size_t i=0;i<roots.size();++i)entries[i].ref.set(roots[i]);}
+                } liveRoots(roots);
+                SavePreviewGpu::SceneBackup backup;ID3D11Texture2D* borrowed=NULL;
+                stage="GPU scene backup";
+                renderer->window->getCustomAttribute("ID3D11Texture2D",&borrowed);
+                if(!backup.Begin(borrowed))throw std::runtime_error("save preview main scene backup refused");
+                RequireCapture(ticket);
+                AlphaMask mask;
+                stage="modal alpha preparation";
+                struct ActiveScope
+                {
+                    AlphaMask* previous;explicit ActiveScope(AlphaMask* m):previous(activeAlpha){activeAlpha=m;}
+                    ~ActiveScope(){activeAlpha=previous;}
+                };
+                {ActiveScope active(&mask);for(size_t i=0;i<roots.size();++i){MyGUI::Widget* w=liveRoots.entries[i].ref.get();if(w)w->setInheritsAlpha(w->getInheritsAlpha());}}
+                stage="isolated HUD draw";original(self,target,true); // only modal draw alpha masked
+                stage="HUD readback";
+                CapturePixels(ticket);
+                stage="scene restoration";
+                const bool alphaRestored=mask.Restore(),sceneRestored=backup.Restore();
+                if(!alphaRestored||!sceneRestored)throw std::runtime_error("save preview scene restoration failed");
+                stage="normal GUI";presented=true;original(self,target,true);normalCompleted=true; // no masked frame is presented
+            }
+            stage="writer submission";RequireCapture(ticket);pending.Captured();if(debug)DebugLog("UITweaks: HUD save preview captured without save/load/pause menus");Submit();
+        }
+        catch(...)
+        {
+            const bool cancelled=!pending.active||pending.serial!=ticket;
+            if(pending.serial==ticket)Cancel();else thumbnail.clear();
+            if(!cancelled)ErrorLog(std::string("UITweaks: HUD save preview failed at ")+stage+"; optional image skipped");
+            else if(debug)DebugLog("UITweaks: HUD save preview cancelled");
+            if(presented&&!normalCompleted)throw; // preserve genuine normal GUI failures
+            if(!presented){presented=true;original(self,target,true);}
+        }
     }
 
     static bool (*originalSave)(SaveFileSystem*,const std::string&)=NULL;
@@ -329,6 +426,31 @@ namespace UITSavePreviews
     }
     static void Load(SaveFileSystem* self,const std::string& path){Cancel();Hide();originalLoad(self,path);}
     static void New(SaveFileSystem* self){Cancel();Hide();originalNew(self);}
+    static void ActivateSelection()
+    {
+        if(!enabled||!root.get()||!saveList.get()||!root.get()->getVisible()||!root.get()->getInheritedVisible())return;
+        SaveManager* sm=SaveManager::getSingleton();LoadSaveWindow* menu=sm?reinterpret_cast<LoadSaveWindow*>(sm->loadMenu):NULL;
+        if(!menu||menu->mMainWidget!=root.get()||menu->list!=saveList.get())return;
+        const size_t index=menu->list->getIndexSelected();
+        if(index>=menu->games.size()){Hide();return;}
+        selectionActive=true;const SaveInfo& info=menu->games[index];
+        LoadPreview(FullPath(info.location+"/"+info.name));Tick();
+    }
+    static void ListChanged(MyGUI::MultiListBox*,size_t){try{ActivateSelection();}catch(...){Hide();ErrorLog("UITweaks: save preview selection failed");}}
+    static void MouseActivated(MyGUI::ListBox*,size_t){try{ActivateSelection();}catch(...){Hide();ErrorLog("UITweaks: save preview activation failed");}}
+    static void ListKey(MyGUI::Widget*,MyGUI::KeyCode key,MyGUI::Char)
+    {
+        if(key==MyGUI::KeyCode::ArrowUp||key==MyGUI::KeyCode::ArrowDown||key==MyGUI::KeyCode::Home||key==MyGUI::KeyCode::End||
+           key==MyGUI::KeyCode::PageUp||key==MyGUI::KeyCode::PageDown)
+            try{ActivateSelection();}catch(...){Hide();ErrorLog("UITweaks: save preview keyboard selection failed");}
+    }
+    static void SubscribeColumns(MyGUI::Widget* node,unsigned& visited,unsigned depth)
+    {
+        if(++visited>512||depth>32)throw std::runtime_error("save preview list subtree budget exceeded");
+        MyGUI::ListBox* list=node->castType<MyGUI::ListBox>(false);
+        if(list){list->eventListMouseItemActivate+=MyGUI::newDelegate(&MouseActivated);list->eventKeyButtonPressed+=MyGUI::newDelegate(&ListKey);}
+        const size_t count=node->getChildCount();for(size_t i=0;i<count;++i)SubscribeColumns(node->getChildAt(i),visited,depth+1);
+    }
     static void Show(SaveManager* self)
     {
         Hide();
@@ -338,9 +460,8 @@ namespace UITSavePreviews
             LoadSaveWindow* menu=reinterpret_cast<LoadSaveWindow*>(self->loadMenu);EnsurePanel(menu);
             if(menu&&menu->list)
             {
-                const size_t index=menu->list->getIndexSelected();
-                if(index<menu->games.size())LoadPreview(FullPath(menu->games[index].location+"/"+menu->games[index].name));
-                else LoadPreview("");
+                saveList.set(menu->list);menu->list->eventListChangePosition+=MyGUI::newDelegate(&ListChanged);
+                unsigned visited=0;SubscribeColumns(menu->list,visited,0);
             }
             Tick();
         }
@@ -350,11 +471,11 @@ namespace UITSavePreviews
     {
         originalInfo(self,index);
         SaveManager* sm=SaveManager::getSingleton();
-        if(!enabled||!sm||reinterpret_cast<LoadSaveWindow*>(sm->loadMenu)!=self)return;
+        if(!enabled||!selectionActive||!sm||reinterpret_cast<LoadSaveWindow*>(sm->loadMenu)!=self)return;
         try
         {
             EnsurePanel(self);
-            if(index>=self->games.size()){LoadPreview("");return;}
+            if(index>=self->games.size()){Hide();return;}
             const SaveInfo& info=self->games[index];
             LoadPreview(FullPath(info.location+"/"+info.name));Tick();
         }
@@ -370,7 +491,7 @@ namespace UITSavePreviews
             if(StopWriter(*writer,5000)){delete writer;writer=NULL;}
             else ErrorLog("UITweaks: preview writer shutdown timed out; one isolated cancelled job retained until process exit");
         }
-        texture=NULL;root.reset();panel.reset();image.reset();label.reset();
+        texture=NULL;root.reset();panel.reset();image.reset();label.reset();saveList.reset();selectionActive=false;
         originalShutdown(self);
     }
     static void GuiShutdown(ForgottenGUI* self)
@@ -380,7 +501,7 @@ namespace UITSavePreviews
         // our children, texture and unlink registrations before that happens.
         ClearTexture();
         if(panel.get())MyGUI::Gui::getInstance().destroyWidget(panel.get());
-        root.release();panel.release();image.release();label.release();
+        root.release();panel.release();image.release();label.release();saveList.release();
         selectedPath.clear();moved=displayed=false;
         originalGuiShutdown(self);
     }
@@ -392,8 +513,11 @@ namespace UITSavePreviews
         initialized=true;
         if(!drawingHook){enabled=false;ErrorLog("UITweaks: interface capture hook unavailable; save previews disabled");return;}
         HMODULE ogre=GetModuleHandleA("OgreMain_x64.dll");
+        HMODULE mygui=GetModuleHandleA("MyGUIEngine_x64.dll");
+        void* alpha=mygui?reinterpret_cast<void*>(GetProcAddress(mygui,"?_updateAlpha@Widget@MyGUI@@AEAAXXZ")):NULL;
         void* shutdown=ogre?reinterpret_cast<void*>(GetProcAddress(ogre,"?shutdown@Root@Ogre@@QEAAXXZ")):NULL;
-        installed=shutdown&&KenshiLib::AddHook(shutdown,Shutdown,reinterpret_cast<void**>(&originalShutdown))==KenshiLib::SUCCESS&&
+        installed=alpha&&KenshiLib::AddHook(alpha,AlphaUpdate,reinterpret_cast<void**>(&originalAlpha))==KenshiLib::SUCCESS&&
+            shutdown&&KenshiLib::AddHook(shutdown,Shutdown,reinterpret_cast<void**>(&originalShutdown))==KenshiLib::SUCCESS&&
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::shutDown),GuiShutdown,&originalGuiShutdown)==KenshiLib::SUCCESS&&
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::saveGame),Save,&originalSave)==KenshiLib::SUCCESS&&
             KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::sync),Sync,&originalSync)==KenshiLib::SUCCESS&&

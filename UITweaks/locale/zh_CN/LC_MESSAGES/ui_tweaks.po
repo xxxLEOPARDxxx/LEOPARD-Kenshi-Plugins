@@ -14,8 +14,8 @@ msgstr "存档截图"
 msgid "No preview available"
 msgstr "暂无预览图"
 
-msgid "Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."
-msgstr "保存成功时截取游戏场景，并在载入游戏窗口的存档列表下方显示。支持手动保存、快速保存和自动保存。没有预览图的旧存档仍可正常载入。"
+msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."
+msgstr "保存成功时截取包含HUD的游戏画面，排除保存、载入和暂停菜单。选择存档后，其截图显示在载入窗口下方。支持手动保存、快速保存和自动保存；没有截图的旧存档仍可正常载入。"
 
 msgid "Interface tweaks"
 msgstr "界面调整"

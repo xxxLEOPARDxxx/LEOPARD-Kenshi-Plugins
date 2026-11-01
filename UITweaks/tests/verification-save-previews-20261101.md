@@ -1,6 +1,84 @@
 Save preview candidate, 1 November 2026
 ======================================
 
+Current correction candidate
+----------------------------
+
+DLL: `D:/DEV/Kenshi/build/UITweaks/UITweaks.dll`, 325632 bytes.
+SHA-256: `950ad322cc61c5d429ef73261780cff5d83fec82857c060a4ee49398cda75a19`.
+Clean build and all 148 native imports resolve (KenshiLib 54/Ogre 14/MyGUI 80).
+
+User live feedback corrected the required screenshot: HUD/minimap/character
+panels must be included; only save/load and pause menus/backdrop are excluded.
+The original candidate below instead excluded all MyGUI. Its actual sidecar in
+`UI Tweaks Test Screen` was inspected read-only: 640x360, 69975-byte JPEG payload,
+70015 bytes total. The user's screenshot also demonstrated excessive frame
+padding and a visible empty frame before selection. These are corrected here:
+
+* The panel is image size plus 6px per edge, preserving aspect ratio without
+  upscaling/cropping. A 640x360 image has a 652x372 panel. An old selected save
+  gets a compact 48px message; before user selection the panel stays hidden.
+* Input delegates are attached after native show: MultiListBox change and child
+  ListBox mouse activation handle different rows and the already-highlighted
+  first row. Keyboard navigation also opts in. Native default updateInfo does
+  not activate a preview. Weak root/list references guard menu destruction.
+  Both own and inherited visibility must hold. The installed getters expose
+  these separately: native top-level inherited visibility remains true while
+  its own visibility is false. Corrected fixtures reproduced the old behavior
+  RED (hidden popup forced a double pass; hidden load root accepted activation)
+  and passed GREEN after the gate correction.
+* With no modal, the normal full GUI renders once and then the game backbuffer
+  is read. With modals, a one-save same-desc D3D11 texture backs up the clean
+  scene; only modal subtree draw alpha is zeroed for an extra HUD pass, then one
+  readback is taken. Exact alphas and clean scene pixels are restored before the
+  normal full GUI is presented. No visibility/focus or previous-Present buffer
+  shortcut is used. Native alpha traversal includes private skin children and
+  InheritsAlpha=false descendants, avoiding a broad layer skip that would omit
+  BestMinimap on the Window layer above the pause backdrop's Main layer.
+* Temporary GPU resources are COM-owned, at most 64MiB including samples.
+  Public native window attributes return borrowed Texture2D/RTV; the capture
+  scopes AddRef retained objects. CopyResource temporarily unbinds and restores
+  OM RT/DS bindings without calling Ogre during the unbound interval. No private
+  D3D offsets, extra shader, continuously cached frames or worker rendering.
+* Modal lookup is limited to 4096 nodes/64 depth per accepted save; alpha state
+  is limited to 1024 weak references, roots to eight. Scope unwind restores
+  alpha, references and GPU state; TLS guards exclude nested RTT captures.
+  Save ticket/world/renderer checks run before readback and before submission.
+
+Read-only installed binary audit additionally verified:
+`Widget::_updateAlpha` implementation 0x1bc6f0 recurses through the exported thunk
+for ordinary children (0x1bc753) and skin children (0x1bc778). The unchanged
+setInheritsAlpha setter triggers that traversal without visibility/focus changes.
+D3D11RenderWindowHwnd getCustomAttribute at 0x46d50 delegates to 0x43d40, supporting
+borrowed ID3D11RenderTargetView (0x43e64) and ID3D11Texture2D (0x43ebf). Installed
+ListBox::_activateItem 0x118ee0 emits mouse activation even for an unchanged row;
+MultiListBox change maps back to face indices before emitting its public event.
+
+Depth contents are not backed up, so the extra GUI pass required a separate
+native check. Read-only installed backend IRenderTarget::begin resolves to
+executable RVA 0xa76fe0. At 0xa770a2 it sets R9D=3 (LESS_EQUAL), at 0xa770a8
+R8D=0, at 0xa770ab EDX=0, then at 0xa770ad calls RenderSystem vtable+0x250:
+_setDepthBufferParams(false,false,LESS_EQUAL). Actual D3D11 depth params at
+0x33310 call the write setter at 0x33380, which normalizes DL and writes the
+depth-write field at +0x5e8; false is D3D11_DEPTH_WRITE_MASK_ZERO. This confirms
+that HUD passes do not write depth in the installed backend. Copy scopes leave
+the native state cache unchanged and restore all saved OM RT/DS bindings.
+
+New checks: 31 placement/policy, 15 WIC, 21 real WARP GPU restore (including DSV bindings), 27 writer,
+30 lifecycle, 1045 alpha (including 1025-node budget rollback values), 10 selection,
+16 extracted capture ordering/cancellation/nested RTT; 12 translations and
+vanilla/Dark XML inheritance pass. The new candidate still requires live HUD,
+menu exclusion, focus/flicker, selection/layout, quick/autosave, FPS and retention
+acceptance. The following first-candidate record is historical, not current HUD
+behavior or proof that this correction has been accepted in game.
+
+Independent final review of hash 950ad322...75a19: CLOSED/CLEAR. Reviewer repeated
+all current preview suites, RMB108, native geometry, 148-import audit and final
+size/hash verification, and independently checked visibility and depth behavior.
+
+Original candidate record
+--------------------------
+
 Candidate: `D:/DEV/Kenshi/build/UITweaks/UITweaks.dll`, 311296 bytes.
 SHA-256: `a4b6b4c2f9d6be0ee8ad79f83c895bd30be2dcac362a7eb4f87229f9dbfe4486`.
 Clean VC10/SDK7.1 build. Exact RE_Kenshi startup and MCM exports verified.

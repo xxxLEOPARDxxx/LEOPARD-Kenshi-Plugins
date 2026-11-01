@@ -42,3 +42,15 @@ the MyGUI backend and render window. It never launches the game, injects calls,
 writes process memory or controls windows. Its output is ignored in `_generated`.
 Runtime scene/skin/save acceptance and actual FPS/retention measurements are
 separate from these isolated boundary checks.
+
+HUD correction tests (same unreleased v12): `save_preview_gpu_test.cpp` uses an
+actual WARP D3D11 device to verify scene pixel and OM binding restoration, including
+scope unwind and unsupported descriptors. Alpha tests compile the current hook
+and real production transaction; normal/skin alpha opt-outs, deleted widgets,
+1024-entry capacity rollback and guard unwind are exercised. Selection adapters
+cover no default preview and a click on the already-highlighted first row.
+Capture-order fixtures extract DrawGui and its modal/root helpers; they check the
+two-pass HUD path, post-GUI single-pass path, readback failure, backup refusal,
+load cancellation and nested RTT passthrough. Driver calls are represented by
+a scoped boundary in this sequencing fixture; the actual GPU class has its own
+independent WARP test. These checks do not replace the new in-game acceptance.

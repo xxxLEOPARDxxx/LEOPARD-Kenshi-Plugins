@@ -14,8 +14,8 @@ msgstr "Снимки сохранений"
 msgid "No preview available"
 msgstr "Нет снимка сохранения"
 
-msgid "Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."
-msgstr "При успешном сохранении делает снимок игровой сцены и показывает его под списком в окне загрузки. Работает с ручными, быстрыми и автоматическими сохранениями. Старые сейвы загружаются и без снимка."
+msgid "Capture the game with its HUD when a save succeeds, excluding save/load and pause menus. Select a save to see its screenshot below Load Game. Works with manual saves, quicksaves and autosaves; old saves remain loadable without an image."
+msgstr "При успешном сохранении делает снимок игры с HUD, без меню сохранения, загрузки и паузы. Выберите сейв, чтобы увидеть его снимок под окном загрузки. Поддерживает ручные, быстрые и автоматические сохранения; старые сейвы загружаются и без изображения."
 
 msgid "Interface tweaks"
 msgstr "Правки интерфейса"

@@ -2,9 +2,10 @@ UI Tweaks — доработки интерфейса, которых не сд�
 
 ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 12 (31.10–01.11.2026)
 
-  * Снимки сохранений: кадр игровой сцены без интерфейса, рабочего стола
-    и окна сохранения. Предпросмотр выбранного слота под окном загрузки
-    в главном меню и в игре; пропорции изображения сохраняются.
+  * Снимки сохранений: игра с HUD, мини-картой и панелями персонажей,
+    без меню сохранения/загрузки, меню паузы и его затемнения. Предпросмотр
+    выбранного слота под окном загрузки в главном меню и в игре.
+    Рамка точно подогнана под снимок; до выбора сейва она скрыта.
   * Ручные сохранения, перезапись, quicksave и autosave используют реальный
     каталог слота. Снимок обновляется только при успешной записи. Старым
     сейвам изображение не требуется; вместо него показана пустая область.
@@ -21,9 +22,10 @@ UI Tweaks — доработки интерфейса, которых не сд�
 
 VERSION 12 CHANGES (31 OCTOBER–1 NOVEMBER 2026)
 
-  * Saved game screenshots show the game scene without the interface,
-    desktop or save dialog. Selecting a slot shows its preview below the
-    Load Game window, in the main menu and in game, with its aspect ratio intact.
+  * Saved game screenshots include the HUD, minimap and character panels,
+    excluding save/load and pause menus with their backdrop. Selecting a slot
+    shows its preview below Load Game, in the main menu and in game. The frame
+    fits the image without cropping or distortion; it stays hidden before selection.
   * Manual saves, overwrites, quicksaves and autosaves use the actual slot
     directory. A preview is committed only after a successful save. Old saves
     need no image and show a clear empty state.
@@ -210,14 +212,18 @@ VERSION 10 CHANGES (30 OCTOBER 2026)
    такой вызов, когда место то же. SkipSameMoves (1), действует сразу.
 
 11. Снимки сохранений.
-   При успешном сохранении сохраняется кадр игровой сцены, снятый перед
-   отрисовкой интерфейса: окно сохранения и прочие панели в кадр не входят.
+   При успешном сохранении сохраняется кадр игры с HUD, мини-картой и
+   панелями персонажей. Меню сохранения/загрузки, меню паузы и его затемнение
+   в снимок не входят. Переключения окон и захвата рабочего стола нет.
    При выборе слота его снимок появляется под окном загрузки, в главном
    меню и в уже загруженной игре. Поддерживаются ручные сохранения,
    перезапись, quicksave и сменяемые autosave. Старые сейвы без снимка
    загружаются как обычно; подпись — «Нет снимка сохранения».
-   Пропорции сохраняются. Если места снизу мало, окно загрузки сдвигается
-   вверх; его список, кнопки и правая панель остаются штатными.
+   До выбора строки рамка скрыта, в том числе при автоматически подсвеченной
+   первой строке. Нажатие на эту строку тоже показывает снимок. Пропорции
+   сохраняются без обрезки: размер рамки равен снимку с небольшими полями.
+   Если места мало, снимок и рамка уменьшаются, окно загрузки сдвигается вверх;
+   список, кнопки и правая панель остаются штатными.
    SavePreviews (1), MCM «Сохранённые игры», действует сразу.
 
 
@@ -272,9 +278,18 @@ SAVE PREVIEWS / ТЕХНИЧЕСКИЙ СПРАВОЧНИК
   not affect loading. External edits deliberately preserving both size and time
   cannot be detected by this lightweight revision stamp.
 
-  Capture reads the game's native backbuffer before MyGUI draws, never the
-  desktop. Only the backend's main IRenderTarget is accepted; GUI RTTs and title
-  screens are excluded. SaveFileSystem::saveGame only accepts the request: commit
+  Capture reads the current game's backbuffer after HUD drawing, never the
+  desktop or undefined old swapchain contents. Only the backend's main
+  IRenderTarget is accepted; GUI RTTs and title screens are excluded.
+  With no menu open, a single normal GUI pass is captured. If a save/load/pause
+  modal is visible, one bounded private GPU scene backup precedes an extra HUD
+  draw with only modal draw alpha masked. Native alpha traversal includes
+  private skin children and InheritsAlpha=false descendants. Exact own alphas,
+  GPU scene pixels and OM render-target bindings are restored before the normal
+  full GUI pass for presentation. Widget visibility and input focus are untouched;
+  no masked frame is presented. The backup exists for one accepted save only,
+  capped at 64 MiB including sample count; no continuous image cache is kept.
+  SaveFileSystem::saveGame only accepts the request: commit
   additionally requires COMPLETE and an empty failedToCopyError, inspected before
   native sync clears it, and the same actual save path. Load/new game, disabling
   the option and world/renderer changes invalidate pending work.
