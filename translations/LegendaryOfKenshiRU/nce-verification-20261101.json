@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-01",
+  "upstream_before_sha256": "5885fcbb1be335a75c3a0c8962722074434fcbd1ecf7fb8feecab1946e6479c8",
+  "upstream_current_sha256": "c9e757bc334688ce01724b0cf3e58ec4f8ab6ae6361255cb2fbc23cac6a04ca3",
+  "armour_before": 90,
+  "armour_current": 90,
+  "armour_changed": 0,
+  "nce_installed_sha256": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002",
+  "regenerated_identical": true,
+  "installed_file_replaced": false,
+  "scope": "All LoK ARMOUR records unchanged from the verified 2026-10-31 NCE baseline; author performance update needs no NCE data change."
+}

@@ -52,6 +52,11 @@
 
 ## Установка и совместимость локальной сборки
 
+Повторная проверка01.11.2026 после обновления LoK с исправлением FPS: все записи
+брони совпадают с уже проверенной базой31.10. Повторно созданный NCE-патч побайтно
+совпадает с установленным, поэтому замена не требуется. Подробности и хеши:
+`nce-verification-20261101.json`. Это проверка NCE, не новый выпуск перевода.
+
 Порядок в `data/mods.cfg`:
 
 ```text
@@ -104,6 +109,11 @@ python lok_ru_overlay.py check "lok/Legendary of Kenshi RU.mod"
 ---
 
 ## English release note
+
+NCE rechecked2026-11-01 after the author's FPS update: all90 LoK ARMOUR records
+are identical to the verified October31 baseline. Regenerating the candidate
+produces the exact installed patch bytes; replacement is unnecessary. Evidence:
+`nce-verification-20261101.json`. This check is not a new translation release.
 
 Russian translation updated for the downloaded October 30 Legendary of Kenshi
 release, including the October 18 additions absent from the installed baseline.
