@@ -1,0 +1,53 @@
+{
+  "reason": "User confirmed all affected public plugins need a release containing the detailed-log fix; 2026-11-01.",
+  "policy": "Prepare after current satellite work; verify each actual published version, increment once per release, user uploads Nexus first, then agent updates Steam. Do not overwrite published ZIPs under existing version numbers.",
+  "packages": [
+    "AIFixed",
+    "AssignedWorkers",
+    "BestMinimap",
+    "BuildModeGizmo",
+    "GatePushGuard",
+    "GearCompare",
+    "ItemMarkers",
+    "LiveXpBars",
+    "ModConfigMenu",
+    "MultiXPMining",
+    "PatientSelfAid",
+    "QuickStartSelect",
+    "RangedDamageXp",
+    "RecruitMarkers",
+    "SkillLevelUpInfo",
+    "StatColours",
+    "UITweaks",
+    "WantedMap",
+    "Container-Highlight",
+    "Vital-Sense",
+    "Vital-Read",
+    "Job-B-Gone",
+    "Organize-the-Trader",
+    "Organize-the-Inventory",
+    "Organize-the-Crafting-Stations",
+    "Auto-Pause-on-Load",
+    "Loot-Scoot-Execute",
+    "Wall-B-Gone",
+    "Hidden-Faction-Relations",
+    "Map-markers",
+    "KenshiJobManagement",
+    "CharacterHighlight",
+    "CharacterInspector",
+    "BetterLooting",
+    "KillCounter",
+    "KenshiRotate",
+    "TauntExpansion",
+    "StackSort"
+  ],
+  "excluded": {
+    "DynamicFactions": "private development, paused",
+    "GlobalSatelliteMap": "private development, not installed",
+    "XP_Overhaul": "local noncanonical compatibility build, no public release authorization/catalog package"
+  },
+  "not_installed": [
+    "Organize-the-Inventory"
+  ],
+  "status": "source fixes built and installed where present; public packages still pending"
+}

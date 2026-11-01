@@ -8,7 +8,10 @@ not a public release announcement. Latest instructions override historical notes
    Current proof covers isolated distant Terrain, not a finished game feature.
    Resolve resource retention, real materials/geometry boundaries, building/model
    coverage, water/shadows/day-night and viewer integration. User authorized
-   autonomous launch/load/input; use test saves, preserve personal settings.
+   autonomous launch/load/input when away. Latest clarification2026-11-01:
+   while the user writes at the PC, do not launch/focus/switch windows; ask the
+   user to prepare game scenes, then use file requests/read-only telemetry in
+   the background. Preserve personal settings and use test saves.
 2. **KEO MCM fork — AFTER satellite.** New user request explicitly authorizes
    a fork under MCM, bug fixes and improvements. This supersedes the historical
    local-only KEO intent. Before implementation read current upstream source,
@@ -32,3 +35,8 @@ not a public release announcement. Latest instructions override historical notes
 A diagnostic render or screenshot is not completion of the satellite feature.
 Completion requires an actual optional layer in the global map, user controls,
 full requested geometry/lighting coverage and measured stability/performance.
+
+
+## Deferred release batch: detailed localization logs (user, 2026-11-01)
+
+After current satellite work, prepare releases for all 38 affected public packages. Exact list and exclusions: tools/maintenance/localization-release-queue.json. Verify actual published versions, then increment once per package; prepare ZIP/CRC/EN-RU notes and current README. Debug implementation details stay out of player descriptions. Nexus is uploaded by the user first; Steam follows. OTI is not installed locally: stage its package without enabling/installing the mod. DF/global map are private, XP_Overhaul is a local compatibility build. Current public ZIPs have not yet been rebuilt and must not be mistaken for the new DLLs.
