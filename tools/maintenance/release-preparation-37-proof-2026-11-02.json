@@ -1,6 +1,6 @@
 {
-  "verified_at_utc": "2026-11-01T22:24:35.902188+00:00",
-  "status": "37 local Nexus-ready artifact candidates; AI load/MCM/RU startup verified; gameplay unverified; not uploaded",
+  "verified_at_utc": "2026-11-01T22:47:03.612424+00:00",
+  "status": "37 local Nexus-ready artifact candidates; AI startup/UI acceptance verified as recorded; gameplay unverified; not uploaded",
   "prepared": 37,
   "AIFixed_public_baseline": {
     "checked_at_utc": "2026-11-01T22:17:18.147253+00:00",
@@ -20,13 +20,13 @@
     "package": "AIFixed",
     "candidate_version": "2",
     "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed-2.zip",
-    "archive_bytes": 109685,
-    "archive_sha256": "5c0dd2736d0aa8006291fb57e9b479eec368a146450690b2684790b97331336f",
-    "dll_sha256": "3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8",
+    "archive_bytes": 109820,
+    "archive_sha256": "ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962",
+    "dll_sha256": "686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23",
     "files": 10,
     "steam_description_bytes": {
-      "en": 3059,
-      "ru": 4943
+      "en": 2945,
+      "ru": 4817
     },
     "languages": [
       "en_GB",
@@ -36,14 +36,35 @@
     "status": "local artifact verified; no publication"
   },
   "AIFixed_startup": {
-    "status": "PASS: loaded candidate, installed hooks, MCM page and 42-message RU catalog only",
+    "status": "PASS: candidate startup; user accepted percentage wording; installed RU catalog inspected",
     "gameplay_verified": false,
     "fps_memory_measured": false,
-    "evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
-    "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
-    "evidence_utc": "2026-11-01T22:21:44.8514203Z",
-    "observed_process_id": 15696,
-    "new_automatic_modules_gameplay_verified": false
+    "logged_mcm_page": false,
+    "logged_ru_catalog_summary": false,
+    "installed_ru_catalog": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\AIFixed\\locale\\ru_RU\\LC_MESSAGES\\ai_fixed.mo",
+      "sha256": "731848996004d117f345a7bbf08c61ca318ae96888e0ea361e44df141f65cf24",
+      "messages": 42,
+      "evidence_kind": "installed_file_inspection"
+    },
+    "evidence_kind": "startup_user_confirmation_and_catalog_inspection",
+    "user_confirmation": "Сделал, проценты норм теперь объясняются",
+    "summary": "The exact loaded candidate and startup hooks are verified. The user explicitly accepted the percentage wording; the installed RU catalog file has 42 messages. Current MCM-page/42-string log traces are not claimed.",
+    "evidence": "D:\\DEV\\Kenshi\\build\\ReleaseMaintenance20261102\\aifixed-startup-686e5a2073045bc0-2bc5bb4df9b52c39.json",
+    "source_evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
+    "evidence_sha256": "2bc5bb4df9b52c395f1e3ba6a7edf13caada8e9d09b725f7d4967f00e2c26d43",
+    "evidence_utc": "2026-11-01T22:42:56.3926690Z",
+    "observed_process_id": 29328,
+    "new_automatic_modules_gameplay_verified": false,
+    "historical_candidate_smoke": [
+      {
+        "candidate_sha256": "3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8",
+        "evidence": "D:\\DEV\\Kenshi\\build\\ReleaseMaintenance20261102\\aifixed-startup-3d0b58002aa920f0-a9c042fd90e5a0e2.json",
+        "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
+        "evidence_utc": "2026-11-01T22:21:44.8514203Z",
+        "scope": "Historical load/MCM/RU smoke of a different candidate; not current-candidate runtime proof"
+      }
+    ]
   },
   "existing_36_archives_unchanged": true,
   "published_ledger_unchanged": true,
@@ -53,7 +74,7 @@
     "verified_at_utc": "2026-11-01T22:06:43.733687+00:00",
     "scope": "34 installed DLLs unchanged before authorized VS/AI installation; not rerun, weakened or claimed current here"
   },
-  "canonical_workshop_sync_files": 20,
+  "canonical_workshop_sync_files": 21,
   "packages": [
     {
       "package": "AssignedWorkers",
@@ -64,8 +85,8 @@
       "dll_sha256": "73e18b627455a0fc4c86f8952552e4ad16d141ccf399e301edde47b29ffc6007",
       "files": 10,
       "steam_description_bytes": {
-        "en": 2408,
-        "ru": 3944
+        "en": 2409,
+        "ru": 3945
       },
       "languages": [
         "en_GB",
@@ -83,8 +104,8 @@
       "dll_sha256": "6e66445da4eef4194d0f7fef08e63f82c38d8eda8687c700df89c185bdc8842d",
       "files": 8,
       "steam_description_bytes": {
-        "en": 3030,
-        "ru": 4636
+        "en": 3031,
+        "ru": 4637
       },
       "languages": [
         "en_GB",
@@ -102,8 +123,8 @@
       "dll_sha256": "39b6f50a9c17caa72fb8f0e684ed53d260796c21784689f0f464d67c21251508",
       "files": 8,
       "steam_description_bytes": {
-        "en": 2160,
-        "ru": 3365
+        "en": 2161,
+        "ru": 3366
       },
       "languages": [
         "en_GB",
@@ -121,8 +142,8 @@
       "dll_sha256": "3131b00ca5317ba2ec5773eb2f53954191b787ee932916190cd3bcbb66b10d95",
       "files": 10,
       "steam_description_bytes": {
-        "en": 2151,
-        "ru": 3284
+        "en": 2013,
+        "ru": 3134
       },
       "languages": [
         "en_GB",
@@ -140,8 +161,8 @@
       "dll_sha256": "77b90e5d6218e6fe91b32ba4ac31c8ebe337fca4309c6d2e1cb4185311a8131d",
       "files": 9,
       "steam_description_bytes": {
-        "en": 3149,
-        "ru": 4793
+        "en": 3150,
+        "ru": 4794
       },
       "languages": [
         "en_GB",
@@ -159,8 +180,8 @@
       "dll_sha256": "af35084fd1399a52c40e9be5790010249ac4f75a087b00f7ac6bcff960fe8642",
       "files": 17,
       "steam_description_bytes": {
-        "en": 2593,
-        "ru": 3925
+        "en": 2594,
+        "ru": 3926
       },
       "languages": [
         "en_GB",
@@ -178,8 +199,8 @@
       "dll_sha256": "c1ee699d644f400949a65e95929d539bf64d2cbb1986e5a4dd80628527504677",
       "files": 8,
       "steam_description_bytes": {
-        "en": 2194,
-        "ru": 3403
+        "en": 2195,
+        "ru": 3404
       },
       "languages": [
         "en_GB",
@@ -216,8 +237,8 @@
       "dll_sha256": "b27aaccc3c0b9cb0b2b905caf05b542593147195846d121fec3d9490a4fb7aab",
       "files": 11,
       "steam_description_bytes": {
-        "en": 2338,
-        "ru": 4093
+        "en": 2339,
+        "ru": 4094
       },
       "languages": [
         "en_GB",
@@ -235,8 +256,8 @@
       "dll_sha256": "5a12721a82dbf61242a291af45687b41943615417ee62df1a74f8117566d4dd6",
       "files": 8,
       "steam_description_bytes": {
-        "en": 2064,
-        "ru": 3178
+        "en": 2065,
+        "ru": 3179
       },
       "languages": [
         "en_GB",
@@ -254,8 +275,8 @@
       "dll_sha256": "e71f36ae299eb429e1eb5d7a1b2fc0e57fbe1caa67e8a0cc6eebd7fe6e9a5a62",
       "files": 8,
       "steam_description_bytes": {
-        "en": 2311,
-        "ru": 3430
+        "en": 2312,
+        "ru": 3431
       },
       "languages": [
         "en_GB",
@@ -273,8 +294,8 @@
       "dll_sha256": "2e0eb141cd0952acd6910e6890dc3d488649c2136408ac476ec120a4075d1d1e",
       "files": 8,
       "steam_description_bytes": {
-        "en": 1567,
-        "ru": 2280
+        "en": 1568,
+        "ru": 2281
       },
       "languages": [
         "en_GB",
@@ -292,8 +313,8 @@
       "dll_sha256": "3a3408258d23ec43d46a0e82797fcc40cd31e9d42f567892dca72edafa7105c8",
       "files": 11,
       "steam_description_bytes": {
-        "en": 2302,
-        "ru": 3541
+        "en": 2303,
+        "ru": 3542
       },
       "languages": [
         "en_GB",
@@ -311,8 +332,8 @@
       "dll_sha256": "a5edf23e1998bd59b7f48b3cc731a8bdbde8f3452497049b51956e727752f6dd",
       "files": 9,
       "steam_description_bytes": {
-        "en": 2668,
-        "ru": 4573
+        "en": 2558,
+        "ru": 4451
       },
       "languages": [
         "en_GB",
@@ -330,8 +351,8 @@
       "dll_sha256": "eda129e1843d1fe09b5550c82d269b1a18ba2166849c18284e82a5fd2d6e5a30",
       "files": 8,
       "steam_description_bytes": {
-        "en": 2451,
-        "ru": 3733
+        "en": 2452,
+        "ru": 3734
       },
       "languages": [
         "en_GB",
@@ -349,8 +370,8 @@
       "dll_sha256": "b6a0589ba8d888062c907c3586e49d8a50c8fba39b85e0269aa37b82ac659d8d",
       "files": 8,
       "steam_description_bytes": {
-        "en": 3637,
-        "ru": 5879
+        "en": 3638,
+        "ru": 5880
       },
       "languages": [
         "en_GB",
@@ -368,8 +389,8 @@
       "dll_sha256": "08ceed9e62d6b1357ee57e9c35b9f9626d12a15c56e8fc5a610f4e04062a3d18",
       "files": 11,
       "steam_description_bytes": {
-        "en": 2227,
-        "ru": 3507
+        "en": 2228,
+        "ru": 3508
       },
       "languages": [
         "en_GB",
@@ -387,8 +408,8 @@
       "dll_sha256": "ba4ce0f870584f8b293f189f394bc507de5ddc5e8864d5a66403ce5133cf97ef",
       "files": 12,
       "steam_description_bytes": {
-        "en": 1868,
-        "ru": 2803
+        "en": 1869,
+        "ru": 2804
       },
       "languages": [
         "en_GB",
@@ -406,8 +427,8 @@
       "dll_sha256": "cbc895107ec0e4cc5b6a42b53f946ca450d1311cea15c80a2a09caf8ed506ad3",
       "files": 19,
       "steam_description_bytes": {
-        "en": 2310,
-        "ru": 3582
+        "en": 2311,
+        "ru": 3583
       },
       "languages": [
         "en_GB",
@@ -425,8 +446,8 @@
       "dll_sha256": "be8e463390ae28c6f71bba49561da79499d29b42500d78a1f87d9fc3dc513bd3",
       "files": 16,
       "steam_description_bytes": {
-        "en": 1868,
-        "ru": 2839
+        "en": 1869,
+        "ru": 2840
       },
       "languages": [
         "en_GB",
@@ -444,8 +465,8 @@
       "dll_sha256": "ad97f0074edb2a9e4839fbbaa0f85bfbf842dbaad1d2a131dbe78bf8ff17c139",
       "files": 9,
       "steam_description_bytes": {
-        "en": 1834,
-        "ru": 2732
+        "en": 1835,
+        "ru": 2733
       },
       "languages": [
         "en_GB",
@@ -463,8 +484,8 @@
       "dll_sha256": "934b97ac2a6d904bceb5a2f3f33f370afe95b95364bb388e985da34b05cc1cc8",
       "files": 9,
       "steam_description_bytes": {
-        "en": 3182,
-        "ru": 5173
+        "en": 3183,
+        "ru": 5174
       },
       "languages": [
         "en_GB",
@@ -482,8 +503,8 @@
       "dll_sha256": "f8436d4c410688704b7911e55fc4462537007e87c9a93913a2520f3501b7c363",
       "files": 9,
       "steam_description_bytes": {
-        "en": 1819,
-        "ru": 2582
+        "en": 1820,
+        "ru": 2583
       },
       "languages": [
         "en_GB",
@@ -501,8 +522,8 @@
       "dll_sha256": "7494a907bfc1dfa74a8d3744d5abd08a0cd8285561317e7cbd3e0f2453250086",
       "files": 9,
       "steam_description_bytes": {
-        "en": 1752,
-        "ru": 2632
+        "en": 1753,
+        "ru": 2633
       },
       "languages": [
         "en_GB",
@@ -520,8 +541,8 @@
       "dll_sha256": "c86b7795b9553e686fbe25b0210e42575ff1aa16237f8ac923548d42600eb2a8",
       "files": 14,
       "steam_description_bytes": {
-        "en": 2032,
-        "ru": 3055
+        "en": 2033,
+        "ru": 3056
       },
       "languages": [
         "en_GB",
@@ -539,8 +560,8 @@
       "dll_sha256": "34dbae2f8ae4ae2bb5405625f7c03d0bdde92f6b3ec4f203196c5b5e1a555e56",
       "files": 9,
       "steam_description_bytes": {
-        "en": 2077,
-        "ru": 3161
+        "en": 2078,
+        "ru": 3162
       },
       "languages": [
         "en_GB",
@@ -558,8 +579,8 @@
       "dll_sha256": "459b8899ede55575f6991ccf4aff6d5f5152939c47dc739b9ff4a4ca64a00ef5",
       "files": 9,
       "steam_description_bytes": {
-        "en": 1603,
-        "ru": 2326
+        "en": 1604,
+        "ru": 2327
       },
       "languages": [
         "en_GB",
@@ -577,8 +598,8 @@
       "dll_sha256": "85028bd01adaac533f4de0bc7e13589bb9586501454a60afbc7186719914bd80",
       "files": 9,
       "steam_description_bytes": {
-        "en": 1741,
-        "ru": 2557
+        "en": 1742,
+        "ru": 2558
       },
       "languages": [
         "en_GB",
@@ -596,8 +617,8 @@
       "dll_sha256": "58ec70720f02a5af5bc101e63c1b9d5aed21e1e9c0be287103d67d2dff3ac64d",
       "files": 33,
       "steam_description_bytes": {
-        "en": 2703,
-        "ru": 4060
+        "en": 2704,
+        "ru": 4061
       },
       "languages": [
         "en_GB",
@@ -615,8 +636,8 @@
       "dll_sha256": "51d5c1f5d9ce02c2f48b50acef1a53999c3827710967bc81c70410e0c9c22f85",
       "files": 9,
       "steam_description_bytes": {
-        "en": 2541,
-        "ru": 3823
+        "en": 2542,
+        "ru": 3824
       },
       "languages": [
         "en_GB",
@@ -634,8 +655,8 @@
       "dll_sha256": "8a4a33eaa911e6809ddd1fe3b084d60d86fbec93f1b60bc42a0a464d64346ca4",
       "files": 48,
       "steam_description_bytes": {
-        "en": 2274,
-        "ru": 3579
+        "en": 2275,
+        "ru": 3580
       },
       "languages": [
         "en_GB",
@@ -653,8 +674,8 @@
       "dll_sha256": "11efb667483b5937f7a44fb9436148dd2792bcfc7e761c6e5ce07ad06fe99ca2",
       "files": 8,
       "steam_description_bytes": {
-        "en": 3428,
-        "ru": 5683
+        "en": 3429,
+        "ru": 5684
       },
       "languages": [
         "en_GB",
@@ -672,8 +693,8 @@
       "dll_sha256": "792c5b15ad6767dbd98e610adce1f1f64b65f701a93f131038f7b26efc55f727",
       "files": 9,
       "steam_description_bytes": {
-        "en": 2229,
-        "ru": 3686
+        "en": 2230,
+        "ru": 3687
       },
       "languages": [
         "en_GB",
@@ -691,8 +712,8 @@
       "dll_sha256": "117061950e27d9ac586515dedc5517ad6c75c4ecf78fb340bfcc5c6bc934815a",
       "files": 10,
       "steam_description_bytes": {
-        "en": 2530,
-        "ru": 4240
+        "en": 2531,
+        "ru": 4241
       },
       "languages": [
         "en_GB",
@@ -710,8 +731,8 @@
       "dll_sha256": "f51ec7db872780cf9e7d542cdc2c03497d4a9f40268fe4e784ca17e50bd4ae96",
       "files": 11,
       "steam_description_bytes": {
-        "en": 3274,
-        "ru": 5137
+        "en": 3275,
+        "ru": 5138
       },
       "languages": [
         "en_GB",
@@ -729,8 +750,8 @@
       "dll_sha256": "35fc2b168db724d6371b0c0cf9d8cab06f13b5fa277b1f3a64d3d44a194805a9",
       "files": 11,
       "steam_description_bytes": {
-        "en": 3537,
-        "ru": 5824
+        "en": 3538,
+        "ru": 5825
       },
       "languages": [
         "en_GB",
@@ -743,13 +764,13 @@
       "package": "AIFixed",
       "candidate_version": "2",
       "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed-2.zip",
-      "archive_bytes": 109685,
-      "archive_sha256": "5c0dd2736d0aa8006291fb57e9b479eec368a146450690b2684790b97331336f",
-      "dll_sha256": "3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8",
+      "archive_bytes": 109820,
+      "archive_sha256": "ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962",
+      "dll_sha256": "686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23",
       "files": 10,
       "steam_description_bytes": {
-        "en": 3059,
-        "ru": 4943
+        "en": 2945,
+        "ru": 4817
       },
       "languages": [
         "en_GB",

@@ -1,6 +1,6 @@
 # 37 local plugin candidates, 2026-11-02
 
-37 local archive payloads and descriptions pass verification. Nothing was uploaded. Root evidence verifies AI Fixed 2 loading, installed hooks, its MCM page and the 42-message RU catalog. Automatic-module gameplay, food/job/path cooperation, FPS and long-term memory are unverified.
+37 local archive payloads and descriptions pass verification. Nothing was uploaded. The exact loaded candidate and startup hooks are verified. The user explicitly accepted the percentage wording; the installed RU catalog file has 42 messages. Current MCM-page/42-string log traces are not claimed. Automatic-module gameplay, food/job/path cooperation, FPS and long-term memory are unverified.
 
 AI Fixed 2 adds the reviewed GateFix/SleepFix adaptations with independent settings, explicit Basusu thanks/original Steam/source links and GPL provenance. New modules are off by default. The public guides describe player behavior; the README and changelog retain the full reference.
 
@@ -44,6 +44,6 @@ The existing 36 candidate versions and ZIP hashes are unchanged. The publication
 | KenshiRotate | 2 | 89376 | `869565a821fcd0e74931630717d9c9fe690b9c14b62b05032066924fd1402cdb` |
 | TauntExpansion | 2 | 74329 | `9d21c186786a8a01ec518becc79c7fcad81e8c77901720593e1f6390ecf99d00` |
 | StackSort | 3 | 235435 | `bce8179c463712e1560c8caf14d793c96d5e756d3d584a22ab16b256ae802bb8` |
-| AIFixed | 2 | 109685 | `5c0dd2736d0aa8006291fb57e9b479eec368a146450690b2684790b97331336f` |
+| AIFixed | 2 | 109820 | `ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962` |
 
 Publication order remains user Nexus upload first, then Steam only after the supplied Nexus links. Source/offline AI review: 342 checks, native clock audit and 210-import audit passed; these are not gameplay/FPS proof.

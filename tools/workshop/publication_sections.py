@@ -5,6 +5,28 @@ import re
 
 HERE=Path(__file__).resolve().parent
 
+OUR_REPOSITORY_URL=re.compile(r'https?://(?:www\.)?github\.com/xxxLEOPARDxxx(?:/[^\]\s]*)?',re.I)
+
+
+def public_source_links(mod,text):
+    """Our repositories live in MCM only; keep upstream credits and licences."""
+    if mod=='ModConfigMenu':return text
+    lines=[]
+    for line in text.splitlines():
+        if not OUR_REPOSITORY_URL.search(line):
+            lines.append(line);continue
+        urls=re.findall(r'\[url=([^\]]+)\]',line,re.I)
+        if any(not OUR_REPOSITORY_URL.fullmatch(url) for url in urls):
+            raise ValueError('Mixed original/our source-link line needs explicit cleanup: '+mod)
+        # Remove the whole labelled source line, retaining a licence suffix.
+        # Existing sources use one own-source line, separate from author credits.
+        suffix=line.rsplit('[/url]',1)[-1].lstrip(' .') if '[/url]' in line else ''
+        if re.match(r'(?:GPL(?:v?\d[\w.+-]*)?|Лицензия|Licence|License)\b',suffix,re.I):lines.append(suffix)
+    result='\n'.join(lines)
+    result=re.sub(r'(?mi)^\s*(?:\[b\])?(?:Our source(?: code)?|Наши исходники)\s*:?(?:\[/b\])?\s*$','',result)
+    result=re.sub(r'(?i)\[h2\](?:OUR SOURCE CODE|НАШИ ИСХОДНИКИ|SOURCE CODE|ИСХОДНИКИ)\[/h2\]\s*(?=\[h2\]|$)','',result)
+    return re.sub(r'\n{3,}','\n\n',result).strip()+'\n'
+
 def forks():
     return json.loads((HERE/'fork_catalog.json').read_text(encoding='utf-8'))
 
@@ -66,3 +88,5 @@ def apply_sections(table,items):
             body=body.rstrip()+'\n\n'+supported_section(lang)
         pair.append(body.replace('Slinkysalmon 03','Slinkysalmon03'))
     table['ModConfigMenu']=tuple(pair)
+    for mod,pair in list(table.items()):
+        table[mod]=tuple(public_source_links(mod,body) for body in pair)

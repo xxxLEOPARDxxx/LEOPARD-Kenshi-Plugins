@@ -477,7 +477,8 @@ def render_descriptions(item):
                       encoding="utf-8").read().strip("\n")
     desc_en = "\n".join(en) + "\n" + body_en
 
-    return desc_ru, desc_en
+    from publication_sections import public_source_links
+    return public_source_links(mod,desc_ru), public_source_links(mod,desc_en)
 
 
 def runtime_source_path(mod, folder, name):

@@ -22,7 +22,7 @@ INPUT=WORK/'maintenance-inputs-20261102'
 SOURCE=ROOT/'AIFixed'
 PROOF=DEV/'build/ReleaseMaintenance20261102'
 DLL=DEV/'build/AIFixed/AIFixed.dll'
-EXPECTED='3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8'
+EXPECTED='686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23'
 sys.path.insert(0,str(CANON))
 from release_metadata import render_note
 
@@ -76,7 +76,7 @@ LEOPARD's robotic-repair fixes are joined by adaptations of [b]Basusu's GateFix 
 
 [b]Original mods:[/b] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3787399736]GateFix by Basusu[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3787375792]SleepFix by Basusu[/url].
 [b]Original source code:[/b] [url=https://github.com/Basusu0/Basusu-kenshi-plugins]Basusu-kenshi-plugins[/url].
-[b]Our source code:[/b] [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins]LEOPARD-Kenshi-Plugins[/url]. GPLv3; LICENSE and UPSTREAM.md are included.
+GPLv3; LICENSE and UPSTREAM.md are included.
 
 [h2]COMPATIBILITY[/h2]
 
@@ -104,7 +104,7 @@ AI Fixed — расширяемый сборник улучшений ИИ ра�
 
 [b]Оригинальные моды:[/b] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3787399736]GateFix — Basusu[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3787375792]SleepFix — Basusu[/url].
 [b]Исходники оригинала:[/b] [url=https://github.com/Basusu0/Basusu-kenshi-plugins]Basusu-kenshi-plugins[/url].
-[b]Наши исходники:[/b] [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins]LEOPARD-Kenshi-Plugins[/url]. GPLv3; LICENSE и UPSTREAM.md включены.
+GPLv3; LICENSE и UPSTREAM.md включены.
 
 [h2]СОВМЕСТИМОСТЬ[/h2]
 

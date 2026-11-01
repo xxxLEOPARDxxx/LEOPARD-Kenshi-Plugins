@@ -1,0 +1,11 @@
+# Public description source links, 2026-11-02
+
+All 39 current public description sets were regenerated and validated: the 37 current candidates plus existing Dark UI Advanced 2 and Formations 2. Only Mod Config Menu retains our two central repository links, in English/Russian Steam text and the combined Nexus description. Other public descriptions remove the whole labelled own-source block. Original authors, thanks, original mod/source links and GPL licence text remain. README, LICENSE and UPSTREAM provenance/source links are unchanged.
+
+The canonical guides/templates and both description-generation paths enforce this policy. The validator rejects our namespace outside MCM and requires both central repositories in MCM. Seven regression cases cover upstream credit/GPL retention, Russian text, empty source headings, central MCM links, invalid mixed source lines and canonical-guide idempotence. All 39 full description validations pass.
+
+This description-only regeneration changed no ZIPs or versions. Independently, the same AIFixed 2 archive was refreshed for the three UI text corrections and corrected Russian ASCII hyphen: DLL `686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23`, ZIP `ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962`. All other 36 candidate ZIP hashes remain unchanged. Its recorded runtime status is: PASS: candidate startup; user accepted percentage wording; installed RU catalog inspected. Older candidate startup evidence is historical, not current-candidate proof.
+
+No publication, upload, git commit/push or game installation was performed by this task. Exact output paths and hashes are in the companion JSON.
+
+Current-candidate acceptance evidence is explicit: the loaded 686e5a candidate and startup hooks, the user’s confirmation of the percentage wording, and installed RU catalog inspection (42 messages, SHA731848...). No current MCM-page or 42-string log trace is claimed; both log-trace flags are false. The older 3d0b58 startup log remains historical only. Seven dedicated smoke-evidence tests pass, including rejection of stale DLL/catalog hashes, missing user confirmation, wrong counts/text and error/missing-hook evidence.

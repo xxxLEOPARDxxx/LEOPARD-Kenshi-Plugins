@@ -1,0 +1,908 @@
+{
+  "verified_at_utc": "2026-11-01T22:39:41.260175+00:00",
+  "scope": "39 public description sets: 37 current plugin candidates plus existing Dark UI Advanced 2 and Formations 2; descriptions only",
+  "result": "PASS",
+  "public_description_sets": 39,
+  "only_our_link_location": "ModConfigMenu EN/RU Steam and combined Nexus description",
+  "upstream_sources_credits_licenses_preserved": true,
+  "readme_source_links_unchanged": true,
+  "regression_tests": "7 unittest cases including actual canonical guide subtests; 39 full description validations passed",
+  "zip_changes_from_description_regeneration": 0,
+  "AIFixed_refreshed_version": "2",
+  "AIFixed_dll_sha256": "686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23",
+  "AIFixed_archive_sha256": "ac33889c6faa972fe796a99ae9e75ea469040dd1bb43f3997a8c7a2522329962",
+  "AIFixed_runtime": {
+    "status": "PASS: candidate startup; user accepted percentage wording; installed RU catalog inspected",
+    "gameplay_verified": false,
+    "fps_memory_measured": false,
+    "logged_mcm_page": false,
+    "logged_ru_catalog_summary": false,
+    "installed_ru_catalog": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\AIFixed\\locale\\ru_RU\\LC_MESSAGES\\ai_fixed.mo",
+      "sha256": "731848996004d117f345a7bbf08c61ca318ae96888e0ea361e44df141f65cf24",
+      "messages": 42,
+      "evidence_kind": "installed_file_inspection"
+    },
+    "evidence_kind": "startup_user_confirmation_and_catalog_inspection",
+    "user_confirmation": "Сделал, проценты норм теперь объясняются",
+    "summary": "The exact loaded candidate and startup hooks are verified. The user explicitly accepted the percentage wording; the installed RU catalog file has 42 messages. Current MCM-page/42-string log traces are not claimed.",
+    "evidence": "D:\\DEV\\Kenshi\\build\\ReleaseMaintenance20261102\\aifixed-startup-686e5a2073045bc0-2bc5bb4df9b52c39.json",
+    "source_evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
+    "evidence_sha256": "2bc5bb4df9b52c395f1e3ba6a7edf13caada8e9d09b725f7d4967f00e2c26d43",
+    "evidence_utc": "2026-11-01T22:42:56.3926690Z",
+    "observed_process_id": 29328,
+    "new_automatic_modules_gameplay_verified": false,
+    "historical_candidate_smoke": [
+      {
+        "candidate_sha256": "3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8",
+        "evidence": "D:\\DEV\\Kenshi\\build\\ReleaseMaintenance20261102\\aifixed-startup-3d0b58002aa920f0-a9c042fd90e5a0e2.json",
+        "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
+        "evidence_utc": "2026-11-01T22:21:44.8514203Z",
+        "scope": "Historical load/MCM/RU smoke of a different candidate; not current-candidate runtime proof"
+      }
+    ]
+  },
+  "other_36_archives_unchanged": true,
+  "published_ledger_sha256": "5134f95b79d8907ef7593b8a57b6f434fa690715c70040c15d909e1424738536",
+  "packages": [
+    {
+      "package": "LiveXpBars",
+      "version": "12",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\LiveXpBars\\description_en.txt",
+          "sha256": "98febc1371b4c51992b4948c4c3440c98f56f618fd2762c653346294f3d24e2f",
+          "bytes": 2229
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\LiveXpBars\\description_ru.txt",
+          "sha256": "319d0226b02f1619ad8fb299a57a6b2ea481f6090c829317acd4cd0840037284",
+          "bytes": 3438
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\LiveXpBars_description.txt",
+          "sha256": "9a8ec7a61fd9bb98ceeb39fb33b7db2fd8986de9f693f2bf136955c863a15440",
+          "bytes": 5623
+        }
+      }
+    },
+    {
+      "package": "StatColours",
+      "version": "13",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\StatColours\\description_en.txt",
+          "sha256": "356bf22de96c287045263ef6b2cea5ac11731711e20d52ed42e0859a26c188a2",
+          "bytes": 2478
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\StatColours\\description_ru.txt",
+          "sha256": "cb80e551ad8de9240d9e35228eb9b9623422222c898b0b5078d0c0daa9ed6355",
+          "bytes": 3760
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\StatColours_description.txt",
+          "sha256": "cd4a582bd8bce9249712bf2444c3062721213885c0a977ece4f3ee1849578a73",
+          "bytes": 6158
+        }
+      }
+    },
+    {
+      "package": "GearCompare",
+      "version": "8",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\GearCompare\\description_en.txt",
+          "sha256": "19becf113d4782f62970ca630e4be819ae72f252ba542ce3b98009e0436e57d5",
+          "bytes": 3202
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\GearCompare\\description_ru.txt",
+          "sha256": "1a543cb8171defde4629007878c65d6331b5d933f745dec4048d2acd291a454c",
+          "bytes": 4846
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\GearCompare_description.txt",
+          "sha256": "c1f95e92e6ed3e3ac1b313a3f30cd82e2303a08b427f79af02cd9c47a94936b0",
+          "bytes": 7968
+        }
+      }
+    },
+    {
+      "package": "AssignedWorkers",
+      "version": "8",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\AssignedWorkers\\description_en.txt",
+          "sha256": "81d5fc05ff1355766751f539e7eb6e33b41dc016acf9b63e8bf5219644e8c71a",
+          "bytes": 2450
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\AssignedWorkers\\description_ru.txt",
+          "sha256": "d37e3e8ca7d2f25813fbb69e49530af78cd71a0f55a75acb603035216b64f79c",
+          "bytes": 3986
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\AssignedWorkers_description.txt",
+          "sha256": "067ba68194887011d9c0bceb180d0ef57d45829792a91f93e2bd87def4d4ea66",
+          "bytes": 6352
+        }
+      }
+    },
+    {
+      "package": "BestMinimap",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\BestMinimap\\description_en.txt",
+          "sha256": "02ea31f8f320b0ae9b1935a333d04103b70fd71145a486a2bfe2cde60e3d19ad",
+          "bytes": 3071
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\BestMinimap\\description_ru.txt",
+          "sha256": "8c664cc06438b020b47b2fbe6a9093a6f204685cc5832937d4e422a584e6206c",
+          "bytes": 4677
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\BestMinimap_description.txt",
+          "sha256": "afa36b62349ae057e28aa08ddefcac4da430d9ba7da1962a745419d2f1ddb282",
+          "bytes": 7666
+        }
+      }
+    },
+    {
+      "package": "UITweaks",
+      "version": "13",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\UITweaks\\description_en.txt",
+          "sha256": "ad7c6f26c4c09d3921e35805ac84a37b0738ae56c1722c4ac72a8e5ecebf3135",
+          "bytes": 3674
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\UITweaks\\description_ru.txt",
+          "sha256": "02a6c7b062ca267b6017fdf5d11379935436235722ac30c1920eac688cf67cc6",
+          "bytes": 5916
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\UITweaks_description.txt",
+          "sha256": "cb7f6de7e0c9e223471571ba3ece96b65ffe93fd8dd0e8af0cc56849a8bb6cfe",
+          "bytes": 9490
+        }
+      }
+    },
+    {
+      "package": "PatientSelfAid",
+      "version": "5",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\PatientSelfAid\\description_en.txt",
+          "sha256": "e63e412cfc1655fce71b5f94c3384803ea29934ffd047aa36e639e951f0b3605",
+          "bytes": 2095
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\PatientSelfAid\\description_ru.txt",
+          "sha256": "83aa98f8b877a74e78353a8365c39261327a7cfd76dabf494ac88a4147212521",
+          "bytes": 3209
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\PatientSelfAid_description.txt",
+          "sha256": "98e3e46c56116fff11bcf0929652800e5a0cfb9679c518d3b6c7e714eb0b3b13",
+          "bytes": 5242
+        }
+      }
+    },
+    {
+      "package": "ModConfigMenu",
+      "version": "11",
+      "our_repository_links_allowed": true,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\ModConfigMenu\\description_en.txt",
+          "sha256": "233984514be485d71ea3d2a168012290d6dfdee189118cfd3630b4d24eeba20a",
+          "bytes": 3244
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\ModConfigMenu\\description_ru.txt",
+          "sha256": "1938cee5f283e64ca3bd9eb1a7d50cafa3197c8229ae634430be1ab2f654ed86",
+          "bytes": 4484
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\ModConfigMenu_description.txt",
+          "sha256": "a4ed225fee2dd0ae0c8c6a3fbad8a9212d3674dc94b451229447d7bb5b3cecbd",
+          "bytes": 7724
+        }
+      }
+    },
+    {
+      "package": "QuickStartSelect",
+      "version": "7",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\QuickStartSelect\\description_en.txt",
+          "sha256": "97169b74fec61be7f9fc8b57529073d99721a2db5d695312c55050de51775fd3",
+          "bytes": 2342
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\QuickStartSelect\\description_ru.txt",
+          "sha256": "71809bd01a6b34f6ee9df977916389a1d32973fddcafd351a835940bd8bee028",
+          "bytes": 3461
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\QuickStartSelect_description.txt",
+          "sha256": "a2994cd1223d3f8a974e601d61c9ddfc518975f15f68751f886231bd5ef243b1",
+          "bytes": 5689
+        }
+      }
+    },
+    {
+      "package": "WantedMap",
+      "version": "7",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\WantedMap\\description_en.txt",
+          "sha256": "7756b8ef79157dc1d4ee208315d85c6592c9a5b9e69110530bce5dcc943588c8",
+          "bytes": 2261
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\WantedMap\\description_ru.txt",
+          "sha256": "fee19ad16b5bf038aff3992869b6dd5bd5b45a679afd5b2c73c0c2224964b12a",
+          "bytes": 3541
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\WantedMap_description.txt",
+          "sha256": "4577110cd730d80ceed216c0023171b3d77e254225d327854b0062fd00b4c38a",
+          "bytes": 5708
+        }
+      }
+    },
+    {
+      "package": "BuildModeGizmo",
+      "version": "5",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\BuildModeGizmo\\description_en.txt",
+          "sha256": "a8714d33f41353af9dcf38f87b4143250f5b1e6893a7a3b2eab3cb15e4e3de96",
+          "bytes": 2188
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\BuildModeGizmo\\description_ru.txt",
+          "sha256": "e067ac463a1c5d6ad86aea50475c745e2cc1e9e3cd34d929b4c978cd0fed3dc0",
+          "bytes": 3393
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\BuildModeGizmo_description.txt",
+          "sha256": "dcdb66e9a8c6889cdfc57e60a759f686544f422f7b8fc5b6b80d9d6bdbdd3e84",
+          "bytes": 5499
+        }
+      }
+    },
+    {
+      "package": "RangedDamageXp",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\RangedDamageXp\\description_en.txt",
+          "sha256": "29ff8ba8e0606c59033e25cce07158409f6184f89797c856ff5559cb36234bc7",
+          "bytes": 1591
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\RangedDamageXp\\description_ru.txt",
+          "sha256": "a111bdbbcf26f080af4fece6346a7dcb92cc1ec6e72becd37ce06603098bda66",
+          "bytes": 2304
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\RangedDamageXp_description.txt",
+          "sha256": "1dae10c6a9be7c822095eb4a7bb129c835c417d8a35df9e39d38059a317f9594",
+          "bytes": 3795
+        }
+      }
+    },
+    {
+      "package": "Wall-B-Gone",
+      "version": "5",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Wall-B-Gone\\description_en.txt",
+          "sha256": "e21396ae70c020901388c13d9e4ba171498a7077a02c9397eb518aa34e9c8fbc",
+          "bytes": 2115
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Wall-B-Gone\\description_ru.txt",
+          "sha256": "08330541a0916976d5760b2e67decb1bece2e232fe23518d22b22dcd514766ea",
+          "bytes": 3199
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Wall-B-Gone_description.txt",
+          "sha256": "3def1ecd62de409f94867e61d7a998a4eb70b8bbd3582d7c416ef7b0ca2c98e0",
+          "bytes": 5212
+        }
+      }
+    },
+    {
+      "package": "Auto-Pause-on-Load",
+      "version": "6",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Auto-Pause-on-Load\\description_en.txt",
+          "sha256": "4ebb93ee8a52f3581e063e7565e08860c2b380c0c1d86ade5b2b44be2829ec5a",
+          "bytes": 1790
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Auto-Pause-on-Load\\description_ru.txt",
+          "sha256": "11eee9326a68471582108dc1f5d52be06083d1a22cca024f6770ec89ce1fe511",
+          "bytes": 2670
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Auto-Pause-on-Load_description.txt",
+          "sha256": "4f98d6b3d603c7790ccc65804b9a363541f70b7eb2a3157f1251901f21a7d719",
+          "bytes": 4358
+        }
+      }
+    },
+    {
+      "package": "Loot-Scoot-Execute",
+      "version": "6",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Loot-Scoot-Execute\\description_en.txt",
+          "sha256": "ccdc03cec1a5bb2ba2977987d898eca5839ea5dbca46078aa40b91f2e256e9de",
+          "bytes": 2071
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Loot-Scoot-Execute\\description_ru.txt",
+          "sha256": "9cfc9f62f8b46f73ba2b8dad5031efaa72eea4ac8e54cdd22231ee2ae89321c4",
+          "bytes": 3094
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Loot-Scoot-Execute_description.txt",
+          "sha256": "8a06bdf94c9c08b92fe2876d858add1f67bd76557583f06481e18aaaa8084ba9",
+          "bytes": 5061
+        }
+      }
+    },
+    {
+      "package": "Vital-Sense",
+      "version": "7",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Vital-Sense\\description_en.txt",
+          "sha256": "51df4e758259a47875469459fc4735c9e8eacba5ace59eba9bde3013ac6165f6",
+          "bytes": 2351
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Vital-Sense\\description_ru.txt",
+          "sha256": "1e8a3666fab96a22cedacda8007cb1f0048a2304b1685d3f262ea4441a1c930e",
+          "bytes": 3623
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Sense_description.txt",
+          "sha256": "d04f9ddf27bcc60d9d59990ec43098cb5cce802263923a44cc57f3b1d544bec4",
+          "bytes": 5866
+        }
+      }
+    },
+    {
+      "package": "Organize-the-Trader",
+      "version": "8",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Organize-the-Trader\\description_en.txt",
+          "sha256": "bfd10bc7b950906d683a36aaa250f747d0d50ad410c89f500db48a8708fb4549",
+          "bytes": 3227
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Organize-the-Trader\\description_ru.txt",
+          "sha256": "936cd2d27d6cca66ccb6443acdc4515960a7ff575b44bb1dcb5564c4df86a1b0",
+          "bytes": 5218
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Organize-the-Trader_description.txt",
+          "sha256": "77869bfa346127152058aaac8b6dd281c6706b28ee06acd98165b027fdf074e0",
+          "bytes": 8381
+        }
+      }
+    },
+    {
+      "package": "Vital-Read",
+      "version": "6",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Vital-Read\\description_en.txt",
+          "sha256": "54490f93317a3871b120b0f600b56c8792d76c7e15286f5fe89c80cc33bed86e",
+          "bytes": 1908
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Vital-Read\\description_ru.txt",
+          "sha256": "df2ef35d2e7a7bd566ae08a8dcf8e1374005c3c1e9cb072b59e99d6acb33775f",
+          "bytes": 2879
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Read_description.txt",
+          "sha256": "82459a98cbcdddc3895e50e543d53db5c25e6aade6c40204f2d78d238df82276",
+          "bytes": 4681
+        }
+      }
+    },
+    {
+      "package": "Container-Highlight",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Container-Highlight\\description_en.txt",
+          "sha256": "4e77516e7ca902b6fc5920b62d93b6d59c20becdaaba2228c0765626554f0a3d",
+          "bytes": 1905
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Container-Highlight\\description_ru.txt",
+          "sha256": "50fda2eb105befefc583c75ba7050ab16908d14194bc8f4d79d9f557c06aed00",
+          "bytes": 2840
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Container-Highlight_description.txt",
+          "sha256": "7a5b44f593a261da638759b1a96fcd52c600ed9ef79e4f147a621de2daca1fef",
+          "bytes": 4645
+        }
+      }
+    },
+    {
+      "package": "Hidden-Faction-Relations",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Hidden-Faction-Relations\\description_en.txt",
+          "sha256": "9cb51142f22b27d43618fab7bf3349fd6271605e59ea485bafa01e4c47b4801b",
+          "bytes": 1639
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Hidden-Faction-Relations\\description_ru.txt",
+          "sha256": "6ad8171be0bb486d7074b690a502fd7fe0d9c60453b9edf8c17deefa4afa4bd1",
+          "bytes": 2362
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Hidden-Faction-Relations_description.txt",
+          "sha256": "16f861771ab277509ff6beb6e78a0c3b7653e2761a89250c9d9a786d91267d6a",
+          "bytes": 3903
+        }
+      }
+    },
+    {
+      "package": "Job-B-Gone",
+      "version": "6",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Job-B-Gone\\description_en.txt",
+          "sha256": "35272265a364cfa8784f4952bbdaf350858dca447c100a6fa2231710ddc46960",
+          "bytes": 1873
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Job-B-Gone\\description_ru.txt",
+          "sha256": "bc3d3d03f8d9db948fbd6abcb19f236cdec198d35ff878a3b3a05343e012b66c",
+          "bytes": 2771
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Job-B-Gone_description.txt",
+          "sha256": "69cbfa126c96b123600e07f744d81892e053c92deab98018a835d9a0fdab8cef",
+          "bytes": 4540
+        }
+      }
+    },
+    {
+      "package": "BetterLooting",
+      "version": "5",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\BetterLooting\\description_en.txt",
+          "sha256": "0571361fc6ce68c3ff50fd72c5877819a1c0afa8335d3ae1af8e8dc05f49710f",
+          "bytes": 3477
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\BetterLooting\\description_ru.txt",
+          "sha256": "9fa58d40c2b40babc4b7c7b58a5d9c4704117fb67a67c8126065a5b53d6b6669",
+          "bytes": 5732
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\BetterLooting_description.txt",
+          "sha256": "31db3c16e81d1a4650257f6474943a3ec66ff3c5cffbf034214f2e335fbbc6b6",
+          "bytes": 9163
+        }
+      }
+    },
+    {
+      "package": "Map-markers",
+      "version": "4",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Map-markers\\description_en.txt",
+          "sha256": "4b0bbda8716d51438d109029a6bb41d3503596ec1e38bde3b8e261b6d94d5d57",
+          "bytes": 1777
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Map-markers\\description_ru.txt",
+          "sha256": "c2df4556350892d93373182330b9b1c8a3337d07bf236f4262d1605f47da6cdb",
+          "bytes": 2593
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Map-markers_description.txt",
+          "sha256": "ee64b797d342cb971689cf9a2af1788b06391ce210b0313b3f8f47a363d71f91",
+          "bytes": 4272
+        }
+      }
+    },
+    {
+      "package": "Organize-the-Crafting-Stations",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Organize-the-Crafting-Stations\\description_en.txt",
+          "sha256": "81fe9d4e93e1541368fe42676af0dc44cac193e01d2c9afe70f3549e24a428e0",
+          "bytes": 1857
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Organize-the-Crafting-Stations\\description_ru.txt",
+          "sha256": "3eccf0145a97f691d2126005dadf865188f7f8a917a5106dca10fd3cf7823983",
+          "bytes": 2620
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Organize-the-Crafting-Stations_description.txt",
+          "sha256": "3048bde0c73b7734b70562e474594423d9682d3e34cae94c54084401ed6b04b6",
+          "bytes": 4375
+        }
+      }
+    },
+    {
+      "package": "KenshiJobManagement",
+      "version": "5",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\KenshiJobManagement\\description_en.txt",
+          "sha256": "63ad797456080ade1847841fc107a10c4c1b344dc52e5308412b08934d52a0db",
+          "bytes": 2747
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\KenshiJobManagement\\description_ru.txt",
+          "sha256": "e031902d18fba8f99eb5cc2ab39a81c80e7b320c08b65960d85a651de0f76ee8",
+          "bytes": 4104
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\KenshiJobManagement_description.txt",
+          "sha256": "d6a959a12f231918cd99f97154941f22c377a02df7e391d59a00db98f9f6928d",
+          "bytes": 6763
+        }
+      }
+    },
+    {
+      "package": "Dark UI Advanced",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Dark UI Advanced\\description_en.txt",
+          "sha256": "ba3c9b36eb5fb722b5d4519de7825bc234b7705e74e10f15c3cb4ce3acc7b2ca",
+          "bytes": 1815
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Dark UI Advanced\\description_ru.txt",
+          "sha256": "36218d46e31267f0b9936de5e55fd7511ba5568ddb54f0d04dae6e26274f1aa3",
+          "bytes": 2494
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Dark UI Advanced_description.txt",
+          "sha256": "73c4d7f6a7b166c1cbc41cbdd4199e006a8386a1305e22d5c7c7b79a9d7ea45a",
+          "bytes": 4291
+        }
+      }
+    },
+    {
+      "package": "ItemMarkers",
+      "version": "6",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\ItemMarkers\\description_en.txt",
+          "sha256": "7880d7ef71375631ac3c8a06d4d54c7f07686f981fd7c2480c1a3dc57f94b81f",
+          "bytes": 2626
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\ItemMarkers\\description_ru.txt",
+          "sha256": "ad4e43f29a627678ffba489922dad49ac9a66a69e1d7d42fd16053ae7fe432d2",
+          "bytes": 3958
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\ItemMarkers_description.txt",
+          "sha256": "966aec55fd1abe7d02824c7cd2e867e9277776be643b242c04254af11a27e113",
+          "bytes": 6492
+        }
+      }
+    },
+    {
+      "package": "Character-Highlight",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Character-Highlight\\description_en.txt",
+          "sha256": "8b6fe9d94c847ea09690d3d5736984ca1096c6dfc92d5f603c0430e3c6eb8b6e",
+          "bytes": 2587
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Character-Highlight\\description_ru.txt",
+          "sha256": "7640534244a35426d04fc2a6e6db21379b3d9396cde8d3290b539584aa945736",
+          "bytes": 3869
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Character-Highlight_description.txt",
+          "sha256": "5cd4e60526b527c0288c33572b97160d7af69744e1326085aba10982d0169319",
+          "bytes": 6364
+        }
+      }
+    },
+    {
+      "package": "Formations",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Formations\\description_en.txt",
+          "sha256": "8a0cf3847ed20f91109d5f3ca8320f21adbbb7c32259136b8f2d85f093c615a6",
+          "bytes": 3252
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Formations\\description_ru.txt",
+          "sha256": "c1fa95d068f40da30c69c11ccdcaefc370c29f3282a7f6394e826d201ab221a4",
+          "bytes": 4724
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Formations_description.txt",
+          "sha256": "5c42049f9997f8515a02d762bdab012d905c3680e22c217efd2f55eb8a73c4ce",
+          "bytes": 7912
+        }
+      }
+    },
+    {
+      "package": "RecruitMarkers",
+      "version": "5",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\RecruitMarkers\\description_en.txt",
+          "sha256": "f8cfe0e1c34f60c3f1f59fdd4495e011668b853d3fce6b5ff8716e5854939df2",
+          "bytes": 2334
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\RecruitMarkers\\description_ru.txt",
+          "sha256": "d04560f53546b8c4e6abde91d38da05888c7227ebc30e14e93bafd71678fd56d",
+          "bytes": 3573
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\RecruitMarkers_description.txt",
+          "sha256": "69b2699a160d1c2006b74a59c2c0c39d742c862eba5ec0700cc3815e228a0d9b",
+          "bytes": 5817
+        }
+      }
+    },
+    {
+      "package": "SkillLevelUpInfo",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\SkillLevelUpInfo\\description_en.txt",
+          "sha256": "ff46da403506ee28925eadafe9e4b9d4dd20ee82d63955e7447cd61f6d11d130",
+          "bytes": 2594
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\SkillLevelUpInfo\\description_ru.txt",
+          "sha256": "04bef42f87f27d7cd523d7e9b1aa90c374f30b248440d87ec890fddce9f3bcc8",
+          "bytes": 4487
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\SkillLevelUpInfo_description.txt",
+          "sha256": "a8c773c4c4c94203b3d032dcaf07da9c1573c1eb8d74368500be04bee9fc785b",
+          "bytes": 7033
+        }
+      }
+    },
+    {
+      "package": "MultiXPMining",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\MultiXPMining\\description_en.txt",
+          "sha256": "54e8eed46af64aff3c7294f2bfe9531e250a7ac0aab5c9f49f6dda170461b7cc",
+          "bytes": 2369
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\MultiXPMining\\description_ru.txt",
+          "sha256": "5eba155d76760d62435c952c29f229291aaba4ac3ba23f99e7c928f9ff50de93",
+          "bytes": 4124
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\MultiXPMining_description.txt",
+          "sha256": "7e68e0010df2c492ef656f81039e9c0f118c11a613eb92b501a709edd70f9d37",
+          "bytes": 6431
+        }
+      }
+    },
+    {
+      "package": "KillCounter",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\KillCounter\\description_en.txt",
+          "sha256": "3e66d0061a54694647a2a79e1151d1df387e7c37846683cb2a93d9e16b42ffa3",
+          "bytes": 2269
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\KillCounter\\description_ru.txt",
+          "sha256": "1f606a88a06a6546601713c41d4cc174ef00f6386ab6418f065616caacdb2290",
+          "bytes": 3726
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\KillCounter_description.txt",
+          "sha256": "4757e01c6ac4ab8b3aa2dfae7382541ec52408bab6d8ff70ba02cacfb58970bd",
+          "bytes": 5915
+        }
+      }
+    },
+    {
+      "package": "Character Inspector",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Character Inspector\\description_en.txt",
+          "sha256": "18a06f66e8830005a28664426fa5e03650f53082c506b8e9d7dbf87dbf62061f",
+          "bytes": 2315
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\Character Inspector\\description_ru.txt",
+          "sha256": "5c4e43d14b60a1e47f975625dd097e9a4b3af817acc5a180999ffe87b0534e88",
+          "bytes": 3620
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\Character Inspector_description.txt",
+          "sha256": "cbca1a624bf1f91553e531047f2f65a19c14c7fd3690b8a75385972a47a35df2",
+          "bytes": 5853
+        }
+      }
+    },
+    {
+      "package": "KenshiRotate",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\KenshiRotate\\description_en.txt",
+          "sha256": "43b21f7888476ae7dd00ef5a4dfe2be01b81796ea066449fc7db2bc9862c76b1",
+          "bytes": 2572
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\KenshiRotate\\description_ru.txt",
+          "sha256": "8462f44d7f42cf7b02dfa6abfc460e4289b199cd5f32a900f7283e769a843014",
+          "bytes": 4282
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\KenshiRotate_description.txt",
+          "sha256": "f3c920a57a103e1f2da0d71b312e53f66e2ab541d667aad881b237f914895a3d",
+          "bytes": 6770
+        }
+      }
+    },
+    {
+      "package": "StackSort",
+      "version": "3",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\StackSort\\description_en.txt",
+          "sha256": "20b44273cb1126df09e3ef39dae3311d1a3e7b9e8ec3807bf0f9fc67c013d4a3",
+          "bytes": 3586
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\StackSort\\description_ru.txt",
+          "sha256": "f3902d8ff2a1486936b2d678e7678ec992689b3ae01eae7cd8caba85c93c076c",
+          "bytes": 5873
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\StackSort_description.txt",
+          "sha256": "77706eae7156d3e1fe3287a005a4ecfd3b9490e232f21b553b6714a113039b68",
+          "bytes": 9387
+        }
+      }
+    },
+    {
+      "package": "TauntExpansion",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\TauntExpansion\\description_en.txt",
+          "sha256": "37aefe0a4e62ff0caf78f378ebbe43f8452cac914e681b51ce3c9cf68b50868a",
+          "bytes": 3327
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\TauntExpansion\\description_ru.txt",
+          "sha256": "ece63750cc3114db42f576cf7bf7534f83b9c550f75a18aad570387285cfa00f",
+          "bytes": 5190
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\TauntExpansion_description.txt",
+          "sha256": "fea6832f8a2241e1781024f5e64be4d798ab8b35c7f17ecb526442656fa598cd",
+          "bytes": 8437
+        }
+      }
+    },
+    {
+      "package": "GatePushGuard",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\GatePushGuard\\description_en.txt",
+          "sha256": "95b65276ff69ae38638685719bbe52a6642cd5bb99dc6c92963a981444da5b51",
+          "bytes": 2042
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\GatePushGuard\\description_ru.txt",
+          "sha256": "61fc021660267dfc48a7df56c16799ebd68a11edb31d5a59db65ea198ba7990e",
+          "bytes": 3163
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\GatePushGuard_description.txt",
+          "sha256": "3afb1d40d44899ff9de2000f1c9a3223de9647551ca903b422afbc30262f16c9",
+          "bytes": 5145
+        }
+      }
+    },
+    {
+      "package": "AIFixed",
+      "version": "2",
+      "our_repository_links_allowed": false,
+      "descriptions": {
+        "en": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\AIFixed\\description_en.txt",
+          "sha256": "7e45e5eea21f9cfa04b0b410c0431c38a90099df4de347674cf8700a5418b94a",
+          "bytes": 2978
+        },
+        "ru": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\AIFixed\\description_ru.txt",
+          "sha256": "d43f897b5066adce1f70f7690e8d7bf32053177698af1f3e85cf173126c598bf",
+          "bytes": 4850
+        },
+        "nexus": {
+          "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed_description.txt",
+          "sha256": "797e6a0f648fec5428948009d99b30abeba7c7bb94c71603fcab87e4ec6fc406",
+          "bytes": 7760
+        }
+      }
+    }
+  ],
+  "runtime_evidence_updated_at_utc": "2026-11-01T22:46:09.275741+00:00"
+}

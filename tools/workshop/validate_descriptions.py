@@ -6,7 +6,7 @@ import re
 import sys
 import build
 from release_metadata import render_note
-from publication_sections import forks, mcm_catalog
+from publication_sections import forks, mcm_catalog, OUR_REPOSITORY_URL
 from mcm_inventory import verify_catalog
 
 HERE=Path(__file__).resolve().parent
@@ -22,6 +22,12 @@ def balanced(text,path):
     if stack:raise ValueError('Unclosed BBCode: '+str(path))
 
 def player_feature_claims(mod,text,path):
+    if mod=='ModConfigMenu':
+        required=('https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins',
+                  'https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks')
+        if not all(url in text for url in required):raise ValueError('MCM must retain both central source repositories: '+str(path))
+    elif OUR_REPOSITORY_URL.search(text):
+        raise ValueError('Our repository link belongs only in the MCM description: '+str(path))
     # User, 2026-10-31: this vanilla behavior is not a UI Tweaks feature.
     # README/version history can document the investigation separately.
     if mod=='UITweaks' and re.search(r'Sequential squad trading|Последовательный обмен',text,re.I):
@@ -84,8 +90,7 @@ def validate(names):
                 for consumer in mcm_catalog():
                     if consumer['name'] not in text or consumer['name'] not in nexus:raise ValueError('Missing supported MCM page: '+consumer['name']+' '+lang)
             if mod=='AIFixed' and int(item['version'])>=2:
-                credits=('Basusu','3787399736','3787375792','https://github.com/Basusu0/Basusu-kenshi-plugins',
-                         'https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins','GPLv3')
+                credits=('Basusu','3787399736','3787375792','https://github.com/Basusu0/Basusu-kenshi-plugins','GPLv3')
                 if not all(value in text and value in nexus for value in credits):raise ValueError('Missing AI collection author/original/source credit: '+lang)
                 if ('Спасибо Basusu' if lang=='ru' else 'Thank you, Basusu') not in text:raise ValueError('Missing explicit AI collection gratitude: '+lang)
                 if ('Исходники оригинала:' if lang=='ru' else 'Original source code:') not in text:raise ValueError('Missing separately labelled AI original sources: '+lang)

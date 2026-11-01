@@ -342,7 +342,7 @@ Final current verification:
 | Dependency imports |210named,5modules,0missing|
 | git diff --check |PASS|
 
-**Current candidate:** `D:/DEV/Kenshi/build/AIFixed/AIFixed.dll`,175616bytes, SHA256
+Gate-pause candidate before the text-only correction:175616bytes, SHA256
 `3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8`.
 AIFixed.cpp SHA256
 `abc18872cba7396191d713c665690441d322fe6c3a278ced743e328dedc4f1f1`;
@@ -357,24 +357,74 @@ both Gate Push Guard load orders and live CPU/FPS/memory remain acceptance limit
 no offline test claims those measured gameplay outcomes. No installation,
 publication, package, commit or push was performed by this implementation work.
 
-## Parent installation and startup smoke
+## MCM percentage explanation and shorter labels, same prepared v2
+
+User MCM feedback found that RepairHealth did not explicitly explain its percentage
+condition and the Russian threshold label clipped. Only three CPP Tr literals
+and their corresponding PO entries in EN/RU/ZH were changed: toggle help, slider
+label and slider help. The toggle now explains that any robotic part below the
+health percentage set below starts repair, while wear is checked separately.
+Slider help explicitly names the percentage of maximum part health.
+
+Labels: EN `Robotic health threshold (%)`, RU `Порог здоровья робочастей (%)`,
+ZH `机械生命值阈值（%）`. The RU label is29 characters instead of38; this is a
+text-length check, not a new game-font pixel-width/UI screenshot claim. Actual
+visual smoke belongs to the parent-controlled game check.
+
+Reversing exactly those three literal substitutions reproduces the accepted
+pre-edit CPP byte SHA256
+`abc18872cba7396191d713c665690441d322fe6c3a278ced743e328dedc4f1f1`.
+No behavior, default, hook, API, hot-path frequency or allocation ownership changed.
+Fresh342 checks, the native clock audit, full build and210imports/5modules/0missing
+all pass. Release glyph validation caught one new RU em dash before replacing
+the archive; it was changed to ASCII hyphen. The153locale/settings checks and
+canonical EN/RU PO+MO game-font glyph validation then passed with the final catalogs.
+
+**Current candidate:** `D:/DEV/Kenshi/build/AIFixed/AIFixed.dll`,176128bytes,
+SHA256 `686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23`.
+CPP SHA256 `88ddb16c37f3f0caa8f54f0d2def1e429b17b13566c967de58c05ceb5ed3835b`.
+
+| Locale | Final PO SHA256 | Final MO SHA256 |
+|---|---|---|
+|en_GB|`64221617a6a37cbc986e42db30820cfd469bc079f345fb69d0122079253cee30`|`79948f0792156bc24a9ce2e8ccbf0028540bae3be6c82162a7ef80bbe0cbb128`|
+|ru_RU|`a63f03cb470c0c562b8c37e52541c8a0f9e71dd657294bfd284594c1fb5fcfeb`|`731848996004d117f345a7bbf08c61ca318ae96888e0ea361e44df141f65cf24`|
+|zh_CN|`9d18f216a49cd4395f03240334aa8d4564e41de157d27d09d03ab047f8f9a59d`|`107b0a90782ea7651aa8bbc3306e7d281263318add6fded9cfe25f9f43e0c74f`|
+
+The release owner was notified to refresh the same AI Fixed2 and combined package
+proof. This text correction did not install, package, publish or commit anything.
+
+## Parent installations and startup/UI smoke
 
 After the review, root independently reran57 lifecycle checks,49 gate checks,
 the native clock audit and inspected the final source/native-export boundary.
-The final candidate above was installed only after confirming Kenshi was closed,
+The reviewed behaviour candidate3d0b5800/175616B was installed after confirming Kenshi was closed,
 with three compiled catalogs, GPL/provenance files and new factory defaults.
 The personal INI was byte-identical at installation; its existing wear threshold
 20 and Detailed log1 were preserved. New modules remained opt-in. The game later
 expanded missing settings through MCM; that is separate from installer preservation.
 
 Fresh process15696, startUTC2026-11-01T22:18:40 (see exact evidence timestamp),
-loaded this exact local DLL. Startup logged diagnostics installed, then42 Russian
+loaded candidate3d0b5800. Startup logged diagnostics installed, then42 Russian
 catalog strings, MCM description registration and the AIFixed page. Root checked
 the loaded module path/SHA, responding process and absence of AI Fixed startup,
 hook or conflict errors. This proves loading and MCM initialization only; it does
 not upgrade the gameplay/feeding/gate/load-order/FPS/memory limitations above.
 
-Evidence: game/_codex_work/aifixed-20261102/before-basusu-integration/
-`installation.json` and `startup-smoke.json`. The backup includes the previous
+Historical evidence is archived in the release verification's content-addressed
+startup record. The original installation backup includes the previous
 DLL, catalogs, README, factory defaults and personal INI. Final README was copied
-after release-note preparation; the installed executable candidate did not change.
+after release-note preparation.
+
+The subsequent percentage-text correction installed candidate686e5a20/176128B
+and three matching catalogs while Kenshi was closed, preserving the personal INI.
+Its backup is game/_codex_work/aifixed-20261102/before-percent-clarification/.
+Process29328 loaded this exact candidate and logged installed hooks without
+AI Fixed errors. The user explicitly confirmed the percentage wording in MCM.
+Root inspected the installed Russian catalog:42 messages, hash73184899 and the
+correct new tooltip/short threshold label. The current log does not contain the
+older MCM-page/42-string trace; user acceptance is recorded separately from logs.
+
+Current evidence is the root `before-basusu-integration/startup-smoke.json` plus
+`before-percent-clarification/installed-catalog.json`. The release proof archives
+this record by hash and keeps the historical3d0b5800 record separate. Neither
+startup/UI check establishes new automatic-module gameplay or FPS/memory proof.

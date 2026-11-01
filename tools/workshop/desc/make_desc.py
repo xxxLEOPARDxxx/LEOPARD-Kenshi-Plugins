@@ -1430,7 +1430,6 @@ other_fork("Formations", """[h2]ЧТО ДЕЛАЕТ[/h2]
 
 Данных игры не меняет, работает с любым списком модов и любым сейвом. Если мод убрать, отряды вернутся к обычным построениям игры.
 
-Исходники этой версии - [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks/tree/main/Formations]GitHub[/url].
 """, """[h2]WHAT IT DOES[/h2]
 
 Bannerlord-style formations. Select your people, hold the modifier (ALT by default) and:
@@ -1456,7 +1455,6 @@ Every setting is right in the game with Mod Config Menu installed (optional): Op
 
 No game data is changed; works with any mod list and any save. Remove the mod and squads go back to the game's own layouts.
 
-The source of this version is on [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks/tree/main/Formations]GitHub[/url].
 """)
 
 other_fork("BetterLooting", """[h2]ЧТО ДЕЛАЕТ[/h2]

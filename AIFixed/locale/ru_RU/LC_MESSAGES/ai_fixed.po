@@ -71,14 +71,14 @@ msgstr "Здоровье живых частей для завершения н�
 msgid "Repair damaged robotic parts"
 msgstr "Ремонт повреждённых робочастей"
 
-msgid "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
-msgstr "Повреждение роботизированной части позволяет идти к работающей ремкровати независимо от износа. Для скелетов и протезов. По умолчанию выключено."
+msgid "Starts repair when any robotic part falls below the health percentage set below. Wear is checked separately. For skeletons and prosthetics. Off by default."
+msgstr "Ремонт начинается, когда здоровье любой робочасти ниже заданного ниже процента. Износ проверяется отдельно. Для скелетов и протезов. По умолчанию выключено."
 
-msgid "Repair below robotic health (%)"
-msgstr "Ремонт при здоровье робочасти ниже (%)"
+msgid "Robotic health threshold (%)"
+msgstr "Порог здоровья робочастей (%)"
 
-msgid "Lowest robotic part health that starts automatic repair when enabled."
-msgstr "Порог здоровья самой повреждённой роботизированной части для включённого авторемонта."
+msgid "When enabled, repair starts below this percentage of any robotic part's maximum health. Wear has a separate threshold."
+msgstr "Если включено, ремонт начинается, когда здоровье любой робочасти ниже этого процента от максимума. Для износа - отдельный порог."
 
 msgid "Bed search radius (m)"
 msgstr "Радиус поиска кровати (м)"

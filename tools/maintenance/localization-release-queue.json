@@ -46,8 +46,8 @@
     "XP_Overhaul": "local noncanonical compatibility build, no public release authorization/catalog package",
     "Organize-the-Inventory": "local only, do not publish (user decision09.10 preserved in memory and absent from release catalog)"
   },
-  "status": "37 local Nexus-ready artifact candidates; AI load/MCM/RU startup verified; gameplay unverified; not uploaded",
+  "status": "37 local Nexus-ready artifact candidates; AI startup/UI acceptance verified as recorded; gameplay unverified; not uploaded",
   "holds": {
-    "AIFixed": "Version 2 prepared and offline-reviewed; load/MCM/RU startup smoke passed; automatic-module gameplay/FPS/memory unverified. Not published."
+    "AIFixed": "Version 2 prepared and offline-reviewed; startup/UI acceptance passed as recorded; automatic-module gameplay/FPS/memory unverified. Not published."
   }
 }

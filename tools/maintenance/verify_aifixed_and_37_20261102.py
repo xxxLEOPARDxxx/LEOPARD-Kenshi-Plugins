@@ -24,7 +24,9 @@ CANON=ROOT/'tools/workshop'
 WORK=DEV/'workshop'
 INPUT=WORK/'maintenance-inputs-20261102'
 PROOF=DEV/'build/ReleaseMaintenance20261102'
-EXPECTED='3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8'
+EXPECTED='686e5a2073045bc038924cf11371424ca48626c543f6e864055184ea04c01c23'
+EXPECTED_RU='731848996004d117f345a7bbf08c61ca318ae96888e0ea361e44df141f65cf24'
+INSTALLED_AI=Path('D:/SteamLibrary/steamapps/common/Kenshi/mods/AIFixed/AIFixed.dll')
 sys.path.insert(0,str(CANON))
 from release_metadata import render_note
 
@@ -33,6 +35,44 @@ def read(p):return json.loads(p.read_text('utf-8-sig'))
 def digest(data):return hashlib.sha256(data).hexdigest()
 def sha(p):return digest(p.read_bytes())
 def write(p,x):p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+
+def smoke_acceptance(smoke,actual_dll_sha,ru_path,actual_ru_sha,catalog):
+    """Keep logged MCM evidence distinct from explicit user UI acceptance."""
+    normalize=lambda p:os.path.normcase(os.path.normpath(str(p)))
+    assert smoke['candidateSha256']==actual_dll_sha==EXPECTED
+    assert smoke['startupAndMcm']=='PASS' and smoke['responding']
+    assert any(normalize(p)==normalize(INSTALLED_AI) for p in smoke['loaded'])
+    logs=smoke['log']
+    assert any('AIFixed: installed' in line for line in logs)
+    assert not any(re.search(r'\b(?:error|assert|failed|incomplete)\b',line,re.I) for line in logs)
+    assert actual_ru_sha==EXPECTED_RU
+    message_count=sum(bool(key) for key in catalog)
+    assert message_count==42
+    logged_ru=any("locale id='ru_RU', strings loaded=42" in line for line in logs)
+    logged_page=any('page=AIFixed' in line for line in logs)
+    details={'logged_mcm_page':logged_page,'logged_ru_catalog_summary':logged_ru,
+             'installed_ru_catalog':{'path':str(ru_path),'sha256':actual_ru_sha,'messages':message_count,
+                                     'evidence_kind':'installed_file_inspection'}}
+    if logged_ru and logged_page:
+        details.update({'status':'PASS: candidate startup and actual MCM/RU log traces verified',
+                        'evidence_kind':'startup_and_logged_mcm_ru',
+                        'summary':'The exact loaded candidate, installed hooks, MCM page trace and RU 42-string log trace are verified.'})
+    else:
+        assert smoke.get('startupHooksVerified') is True
+        assert smoke.get('userPercentClarificationAccepted') is True
+        evidence=smoke['mcmEvidence']
+        assert evidence['kind']=='user_confirmation' and isinstance(evidence['text'],str) and evidence['text'].strip()
+        declared=smoke['catalogs']
+        assert normalize(declared['ruPath'])==normalize(ru_path)
+        assert declared['ruSha256']==actual_ru_sha and declared['ruMessageCount']==message_count
+        assert declared['percentageText'] in catalog.values() and declared['thresholdLabel'] in catalog.values()
+        assert '%' in declared['thresholdLabel'] and 'процент' in declared['percentageText'].lower()
+        details.update({'status':'PASS: candidate startup; user accepted percentage wording; installed RU catalog inspected',
+                        'evidence_kind':'startup_user_confirmation_and_catalog_inspection',
+                        'user_confirmation':evidence['text'],
+                        'summary':'The exact loaded candidate and startup hooks are verified. The user explicitly accepted the percentage wording; the installed RU catalog file has 42 messages. Current MCM-page/42-string log traces are not claimed.'})
+    return details
 
 
 def main():
@@ -82,7 +122,7 @@ def main():
                     assert n.lower().endswith('.defaults.ini') or ('/SourceData/' in n and Path(n).name in {'00_Vanilla.ini','50_OfficialExtensions.ini','90_ModSupport.ini'})
                     assert not re.search(r'(?mi)^Debug\s*=\s*(1|true)\s*$',z.read(n).decode('utf-8-sig',errors='replace'))
             if name=='AIFixed':
-                assert entry['dll_sha256']==EXPECTED and len(z.read(dll))==175616
+                assert entry['dll_sha256']==EXPECTED and len(z.read(dll))==176128
                 assert len(members)==10
                 for filename in ('README.txt','LICENSE','UPSTREAM.md'):
                     assert z.read('AIFixed/'+filename)==(ROOT/'AIFixed'/filename).read_bytes()
@@ -118,14 +158,23 @@ def main():
     startup={'status':'pending user launch/scene and root startup-log review','gameplay_verified':False,'fps_memory_measured':False}
     if smoke_path.is_file():
         smoke=read(smoke_path)
-        assert smoke['candidateSha256']==EXPECTED and smoke['startupAndMcm']=='PASS' and smoke['responding']
-        assert any("locale id='ru_RU', strings loaded=42" in line for line in smoke['log'])
-        assert any('page=AIFixed' in line for line in smoke['log'])
-        startup.update({'status':'PASS: loaded candidate, installed hooks, MCM page and 42-message RU catalog only',
-                        'evidence':str(smoke_path),'evidence_sha256':sha(smoke_path),'evidence_utc':smoke['utc'],
-                        'observed_process_id':smoke['processId'],'new_automatic_modules_gameplay_verified':False})
+        smoke_digest=sha(smoke_path)
+        archived_smoke=PROOF/('aifixed-startup-'+smoke['candidateSha256'][:16]+'-'+smoke_digest[:16]+'.json')
+        if archived_smoke.exists():assert sha(archived_smoke)==smoke_digest
+        else:archived_smoke.write_bytes(smoke_path.read_bytes())
+        if smoke['candidateSha256']==EXPECTED:
+            ru_path=INSTALLED_AI.parent/'locale/ru_RU/LC_MESSAGES/ai_fixed.mo'
+            with ru_path.open('rb') as stream:catalog=gettext.GNUTranslations(stream)._catalog
+            startup.update(smoke_acceptance(smoke,sha(INSTALLED_AI),ru_path,sha(ru_path),catalog))
+            startup.update({'evidence':str(archived_smoke),'source_evidence':str(smoke_path),
+                            'evidence_sha256':smoke_digest,'evidence_utc':smoke['utc'],
+                            'observed_process_id':smoke['processId'],'new_automatic_modules_gameplay_verified':False})
+    startup['historical_candidate_smoke']=[{'candidate_sha256':read(p)['candidateSha256'],
+        'evidence':str(p),'evidence_sha256':sha(p),'evidence_utc':read(p)['utc'],
+        'scope':'Historical load/MCM/RU smoke of a different candidate; not current-candidate runtime proof'}
+        for p in sorted(PROOF.glob('aifixed-startup-*.json')) if read(p).get('candidateSha256')!=EXPECTED]
     startup_ok=startup['status'].startswith('PASS')
-    state='37 local Nexus-ready artifact candidates; AI load/MCM/RU startup verified; gameplay unverified; not uploaded' if startup_ok else '37 local artifacts verified; AI startup acceptance pending; not uploaded'
+    state='37 local Nexus-ready artifact candidates; AI startup/UI acceptance verified as recorded; gameplay unverified; not uploaded' if startup_ok else '37 local artifacts verified; AI startup acceptance pending; not uploaded'
     report={'verified_at_utc':now,'status':state,
             'prepared':37,'AIFixed_public_baseline':baseline,'AIFixed':target,'AIFixed_startup':startup,
             'existing_36_archives_unchanged':True,'published_ledger_unchanged':True,'older_history_preserved':True,
@@ -135,7 +184,7 @@ def main():
     write(HERE/'release-preparation-37-proof-2026-11-02.json',report)
     write(HERE/'aifixed-release-verification-2026-11-02.json',{'verified_at_utc':now,'baseline':baseline,'candidate':target,'acceptance':startup,
         'checks':'CRC/exact content and file hashes, canonical DLL, ten-file clean payload, source README/GPL/provenance, 18 factory settings/default-off modules/Debug last, exactly three MO catalogs, complete bilingual notes/history/credits/guides, covers/screens, all 36 earlier archives unchanged'})
-    lines=['# 37 local plugin candidates, 2026-11-02','','37 local archive payloads and descriptions pass verification. Nothing was uploaded. '+('Root evidence verifies AI Fixed 2 loading, installed hooks, its MCM page and the 42-message RU catalog. ' if startup_ok else 'AI Fixed 2 startup acceptance is pending. ')+'Automatic-module gameplay, food/job/path cooperation, FPS and long-term memory are unverified.','',
+    lines=['# 37 local plugin candidates, 2026-11-02','','37 local archive payloads and descriptions pass verification. Nothing was uploaded. '+(startup['summary']+' ' if startup_ok else 'AI Fixed 2 startup acceptance is pending. ')+'Automatic-module gameplay, food/job/path cooperation, FPS and long-term memory are unverified.','',
            'AI Fixed 2 adds the reviewed GateFix/SleepFix adaptations with independent settings, explicit Basusu thanks/original Steam/source links and GPL provenance. New modules are off by default. The public guides describe player behavior; the README and changelog retain the full reference.','',
            'The existing 36 candidate versions and ZIP hashes are unchanged. The publication ledger and every older history entry are unchanged. AI Fixed 1 was removed only by the unified packer after AI Fixed 2 passed CRC/composition/hash checks. The historical installed-DLL preservation proof remains its pre-install snapshot; this is a separate artifact verification after authorized runtime installation.','',
            '| Package | Candidate | ZIP bytes | ZIP SHA256 |','| --- | --- | --- | --- |']
@@ -145,7 +194,7 @@ def main():
     queue=read(HERE/'localization-release-queue.json')
     queue['status']=state
     queue['policy']='Prepare locally; user uploads Nexus first and supplies links, then corresponding Steam updates. AI Fixed 2 includes the integrated Basusu modules and log fix in one version increment.'
-    queue['holds']={'AIFixed':'Version 2 prepared and offline-reviewed; '+('load/MCM/RU startup smoke passed; ' if startup_ok else 'startup smoke pending; ')+'automatic-module gameplay/FPS/memory unverified. Not published.'}
+    queue['holds']={'AIFixed':'Version 2 prepared and offline-reviewed; '+('startup/UI acceptance passed as recorded; ' if startup_ok else 'startup smoke pending; ')+'automatic-module gameplay/FPS/memory unverified. Not published.'}
     write(HERE/'localization-release-queue.json',queue)
     write(HERE/'release-candidate-plan-37-2026-11-02.json',{'status':state,
         'input_root':str(INPUT),'packages':[{'package':r['package'],'candidate_version':r['candidate_version']} for r in rows],

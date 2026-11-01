@@ -1311,8 +1311,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api,"AIFixed","AutoSleep",Tr("Sleep when wounded"),Tr("Bandaged biological wounds trigger a nearby ordinary bed. Healthy workers and manual travel orders are left alone. Off by default."),0,0);
     api->integer(api,"AIFixed","SleepBelowHealth",Tr("Sleep below health (%)"),Tr("Lowest biological part health that starts automatic sleep."),90,10,99,0);
     api->integer(api,"AIFixed","WakeAboveHealth",Tr("Wake above health (%)"),Tr("Biological health required to finish our sleep order. Prosthetic health is handled separately. Cannot be below the sleep threshold."),99,10,100,0);
-    api->toggle(api,"AIFixed","RepairHealth",Tr("Repair damaged robotic parts"),Tr("Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."),0,0);
-    api->integer(api,"AIFixed","RepairBelowHealth",Tr("Repair below robotic health (%)"),Tr("Lowest robotic part health that starts automatic repair when enabled."),90,10,99,0);
+    api->toggle(api,"AIFixed","RepairHealth",Tr("Repair damaged robotic parts"),Tr("Starts repair when any robotic part falls below the health percentage set below. Wear is checked separately. For skeletons and prosthetics. Off by default."),0,0);
+    api->integer(api,"AIFixed","RepairBelowHealth",Tr("Robotic health threshold (%)"),Tr("When enabled, repair starts below this percentage of any robotic part's maximum health. Wear has a separate threshold."),90,10,99,0);
     api->integer(api,"AIFixed","BedSearchRadius",Tr("Bed search radius (m)"),Tr("Maximum distance for automatic rest and replacement rescue beds. Only the same settlement is considered."),100,10,500,0);
     api->toggle(api,"AIFixed","OwnBedsOnly",Tr("Own beds only"),Tr("Use only your faction's beds. If disabled, allied beds may also be considered; enemy and neutral beds are excluded."),1,0);
     api->section(api,Tr("Gate passage"));

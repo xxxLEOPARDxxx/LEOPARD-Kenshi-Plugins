@@ -1,5 +1,5 @@
 {
-  "status": "37 local Nexus-ready artifact candidates; AI load/MCM/RU startup verified; gameplay unverified; not uploaded",
+  "status": "37 local Nexus-ready artifact candidates; AI startup/UI acceptance verified as recorded; gameplay unverified; not uploaded",
   "input_root": "D:\\DEV\\Kenshi\\workshop\\maintenance-inputs-20261102",
   "packages": [
     {
@@ -152,14 +152,35 @@
     }
   ],
   "AIFixed_startup": {
-    "status": "PASS: loaded candidate, installed hooks, MCM page and 42-message RU catalog only",
+    "status": "PASS: candidate startup; user accepted percentage wording; installed RU catalog inspected",
     "gameplay_verified": false,
     "fps_memory_measured": false,
-    "evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
-    "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
-    "evidence_utc": "2026-11-01T22:21:44.8514203Z",
-    "observed_process_id": 15696,
-    "new_automatic_modules_gameplay_verified": false
+    "logged_mcm_page": false,
+    "logged_ru_catalog_summary": false,
+    "installed_ru_catalog": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\AIFixed\\locale\\ru_RU\\LC_MESSAGES\\ai_fixed.mo",
+      "sha256": "731848996004d117f345a7bbf08c61ca318ae96888e0ea361e44df141f65cf24",
+      "messages": 42,
+      "evidence_kind": "installed_file_inspection"
+    },
+    "evidence_kind": "startup_user_confirmation_and_catalog_inspection",
+    "user_confirmation": "Сделал, проценты норм теперь объясняются",
+    "summary": "The exact loaded candidate and startup hooks are verified. The user explicitly accepted the percentage wording; the installed RU catalog file has 42 messages. Current MCM-page/42-string log traces are not claimed.",
+    "evidence": "D:\\DEV\\Kenshi\\build\\ReleaseMaintenance20261102\\aifixed-startup-686e5a2073045bc0-2bc5bb4df9b52c39.json",
+    "source_evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
+    "evidence_sha256": "2bc5bb4df9b52c395f1e3ba6a7edf13caada8e9d09b725f7d4967f00e2c26d43",
+    "evidence_utc": "2026-11-01T22:42:56.3926690Z",
+    "observed_process_id": 29328,
+    "new_automatic_modules_gameplay_verified": false,
+    "historical_candidate_smoke": [
+      {
+        "candidate_sha256": "3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8",
+        "evidence": "D:\\DEV\\Kenshi\\build\\ReleaseMaintenance20261102\\aifixed-startup-3d0b58002aa920f0-a9c042fd90e5a0e2.json",
+        "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
+        "evidence_utc": "2026-11-01T22:21:44.8514203Z",
+        "scope": "Historical load/MCM/RU smoke of a different candidate; not current-candidate runtime proof"
+      }
+    ]
   },
   "publication_order": "User Nexus first; Steam only after supplied links"
 }

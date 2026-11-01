@@ -71,14 +71,14 @@ msgstr "Biological health required to finish our sleep order. Prosthetic health 
 msgid "Repair damaged robotic parts"
 msgstr "Repair damaged robotic parts"
 
-msgid "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
-msgstr "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
+msgid "Starts repair when any robotic part falls below the health percentage set below. Wear is checked separately. For skeletons and prosthetics. Off by default."
+msgstr "Starts repair when any robotic part falls below the health percentage set below. Wear is checked separately. For skeletons and prosthetics. Off by default."
 
-msgid "Repair below robotic health (%)"
-msgstr "Repair below robotic health (%)"
+msgid "Robotic health threshold (%)"
+msgstr "Robotic health threshold (%)"
 
-msgid "Lowest robotic part health that starts automatic repair when enabled."
-msgstr "Lowest robotic part health that starts automatic repair when enabled."
+msgid "When enabled, repair starts below this percentage of any robotic part's maximum health. Wear has a separate threshold."
+msgstr "When enabled, repair starts below this percentage of any robotic part's maximum health. Wear has a separate threshold."
 
 msgid "Bed search radius (m)"
 msgstr "Bed search radius (m)"

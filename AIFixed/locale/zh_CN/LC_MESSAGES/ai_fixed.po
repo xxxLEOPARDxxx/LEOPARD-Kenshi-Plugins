@@ -71,14 +71,14 @@ msgstr "完成本模组睡眠命令所需的生物部位生命值。义肢单独
 msgid "Repair damaged robotic parts"
 msgstr "修复受损机械部位"
 
-msgid "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
-msgstr "机械部位生命值受损时，可独立于磨损情况前往通电的修理床。适用于骨人和义肢。默认关闭。"
+msgid "Starts repair when any robotic part falls below the health percentage set below. Wear is checked separately. For skeletons and prosthetics. Off by default."
+msgstr "任一机械部位的生命值低于下方设定的百分比时开始修理。磨损单独检查。适用于骨人和义肢。默认关闭。"
 
-msgid "Repair below robotic health (%)"
-msgstr "低于此机械生命值时修理（%）"
+msgid "Robotic health threshold (%)"
+msgstr "机械生命值阈值（%）"
 
-msgid "Lowest robotic part health that starts automatic repair when enabled."
-msgstr "启用后，受损最重的机械部位低于此生命值时开始自动修理。"
+msgid "When enabled, repair starts below this percentage of any robotic part's maximum health. Wear has a separate threshold."
+msgstr "启用后，任一机械部位的生命值低于其最大值的此百分比时开始修理。磨损使用独立阈值。"
 
 msgid "Bed search radius (m)"
 msgstr "床位搜索半径（米）"
