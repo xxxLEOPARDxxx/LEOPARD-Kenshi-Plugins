@@ -5,6 +5,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Saved games"
+msgstr "存档"
+
+msgid "Save screenshots"
+msgstr "存档截图"
+
+msgid "No preview available"
+msgstr "暂无预览图"
+
+msgid "Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."
+msgstr "保存成功时截取游戏场景，并在载入游戏窗口的存档列表下方显示。支持手动保存、快速保存和自动保存。没有预览图的旧存档仍可正常载入。"
+
 msgid "Interface tweaks"
 msgstr "界面调整"
 

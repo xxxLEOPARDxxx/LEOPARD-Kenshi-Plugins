@@ -5,6 +5,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Saved games"
+msgstr "Сохранённые игры"
+
+msgid "Save screenshots"
+msgstr "Снимки сохранений"
+
+msgid "No preview available"
+msgstr "Нет снимка сохранения"
+
+msgid "Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."
+msgstr "При успешном сохранении делает снимок игровой сцены и показывает его под списком в окне загрузки. Работает с ручными, быстрыми и автоматическими сохранениями. Старые сейвы загружаются и без снимка."
+
 msgid "Interface tweaks"
 msgstr "Правки интерфейса"
 

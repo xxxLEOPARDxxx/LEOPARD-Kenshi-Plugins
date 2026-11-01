@@ -5,6 +5,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Saved games"
+msgstr "Saved games"
+
+msgid "Save screenshots"
+msgstr "Save screenshots"
+
+msgid "No preview available"
+msgstr "No preview available"
+
+msgid "Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."
+msgstr "Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."
+
 msgid "Interface tweaks"
 msgstr "Interface tweaks"
 

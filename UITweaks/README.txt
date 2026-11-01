@@ -1,7 +1,13 @@
 UI Tweaks — доработки интерфейса, которых не сделать разметкой
 
-ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 12 (31.10.2026)
+ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 12 (31.10–01.11.2026)
 
+  * Снимки сохранений: кадр игровой сцены без интерфейса, рабочего стола
+    и окна сохранения. Предпросмотр выбранного слота под окном загрузки
+    в главном меню и в игре; пропорции изображения сохраняются.
+  * Ручные сохранения, перезапись, quicksave и autosave используют реальный
+    каталог слота. Снимок обновляется только при успешной записи. Старым
+    сейвам изображение не требуется; вместо него показана пустая область.
   * Последовательный обмен с союзниками через ПКМ по портрету работает
     при уже открытом обмене. Штатный подход к далёкой цели сохранён.
   * Защита от клика сквозь инвентарь и отдельный рюкзак сохранена.
@@ -9,11 +15,18 @@ UI Tweaks — доработки интерфейса, которых не сд�
   * Проверка принадлежности виджета выполняется только на новом ПКМ.
     До 64 родителей собираются один раз на стеке; ссылки не кэшируются.
     Существующая защёлка старого клика и пять хуков приказов не изменены.
-  * Новых настроек и переводных строк нет. Личные INI сохраняются.
+  * SavePreviews в MCM включён по умолчанию и применяется сразу.
+    Настройка и пустое состояние переведены на RU/EN/ZH. Личные INI сохраняются.
     Для загрузки заменённой DLL перезапустите игру.
 
-VERSION 12 CHANGES (31 OCTOBER 2026)
+VERSION 12 CHANGES (31 OCTOBER–1 NOVEMBER 2026)
 
+  * Saved game screenshots show the game scene without the interface,
+    desktop or save dialog. Selecting a slot shows its preview below the
+    Load Game window, in the main menu and in game, with its aspect ratio intact.
+  * Manual saves, overwrites, quicksaves and autosaves use the actual slot
+    directory. A preview is committed only after a successful save. Old saves
+    need no image and show a clear empty state.
   * Sequential squad trading through portrait RMB/Trade works while an
     earlier exchange remains open. Native out-of-range approach is retained.
   * Inventory and detached-backpack click-through protection remains active.
@@ -21,7 +34,8 @@ VERSION 12 CHANGES (31 OCTOBER 2026)
   * Window ancestry is checked only on a fresh RMB press. At most 64 parents
     are collected once on the stack, with no retained widget references.
     The existing stale-click latch and five order hooks are unchanged.
-  * No additional settings or translated strings; personal INI is preserved.
+  * SavePreviews in MCM is on by default and changes immediately.
+    Its setting and empty state are available in RU/EN/ZH; personal INI is preserved.
     Restart the game to load the replacement DLL.
 
 ИСТОРИЯ: ВЕРСИЯ 11 (30.10.2026)
@@ -195,6 +209,17 @@ VERSION 10 CHANGES (30 OCTOBER 2026)
    пересборку: все подписи пересобирались каждый кадр. Плагин пропускает
    такой вызов, когда место то же. SkipSameMoves (1), действует сразу.
 
+11. Снимки сохранений.
+   При успешном сохранении сохраняется кадр игровой сцены, снятый перед
+   отрисовкой интерфейса: окно сохранения и прочие панели в кадр не входят.
+   При выборе слота его снимок появляется под окном загрузки, в главном
+   меню и в уже загруженной игре. Поддерживаются ручные сохранения,
+   перезапись, quicksave и сменяемые autosave. Старые сейвы без снимка
+   загружаются как обычно; подпись — «Нет снимка сохранения».
+   Пропорции сохраняются. Если места снизу мало, окно загрузки сдвигается
+   вверх; его список, кнопки и правая панель остаются штатными.
+   SavePreviews (1), MCM «Сохранённые игры», действует сразу.
+
 
 С КАКИМ ИНТЕРФЕЙСОМ РАБОТАЕТ
 
@@ -224,6 +249,61 @@ VERSION 10 CHANGES (30 OCTOBER 2026)
 отрядов и панели описания — игра переписывает их размеры постоянно.
 Скрытые окна он пропускает целиком: их не видно, и правка им не нужна.
 Открытое окно поправляется в том же кадре или в следующем.
+
+Снимки сохранений не сканируют дерево интерфейса или каталоги сейвов
+каждый кадр. Читается только выбранный файл; в памяти — одна GPU-миниатюра.
+Захват — один раз на принятый запрос сохранения, не более 8 294 400 пикселей
+(бюджет 3840×2160). Кадры большего размера пропускаются с записью ошибки.
+На CPU снимок уменьшается до 640×360 без растяжения; один фоновый поток
+кодирует JPEG и записывает файл, очередь не растёт. Подробности — ниже.
+
+SAVE PREVIEWS / ТЕХНИЧЕСКИЙ СПРАВОЧНИК
+
+  SavePreviews=1: live MCM toggle, no restart flag. The preview appears below
+  the existing Load Game dialog in both contexts. Native controls remain in
+  their existing layout; only the dialog position may move to fit the preview.
+  Its frame and empty-state text inherit the installed XML skins and colours.
+
+  uitweaks-preview.bin is an optional, separately owned file inside the exact
+  save directory. It contains a 40-byte versioned header and a JPEG (80% quality,
+  at most 256 KiB). The header binds the image to quick.save's size and last-write
+  time. A stale image after an overwrite is ignored. Copying the complete save
+  with preserved quick.save timestamps carries the preview; a missing image does
+  not affect loading. External edits deliberately preserving both size and time
+  cannot be detected by this lightweight revision stamp.
+
+  Capture reads the game's native backbuffer before MyGUI draws, never the
+  desktop. Only the backend's main IRenderTarget is accepted; GUI RTTs and title
+  screens are excluded. SaveFileSystem::saveGame only accepts the request: commit
+  additionally requires COMPLETE and an empty failedToCopyError, inspected before
+  native sync clears it, and the same actual save path. Load/new game, disabling
+  the option and world/renderer changes invalidate pending work.
+
+  Worker data is owned BGR bytes, a path, revision and synchronization state.
+  It never receives game, MyGUI or Ogre objects. Before atomic replacement it
+  rechecks the native main-file revision and cancellation. Only one writer and
+  one pending capture exist. GUI textures upload through Ogre blitFromMemory,
+  which handles driver row pitch. No per-frame INI reads, decode or save scans.
+
+  ForgottenGUI::shutDown releases the owned panel, texture and widget-unlink
+  registrations before the native manager dies; registrations can be rebuilt
+  after GUI recreation. Ogre::Root::shutdown cancels and waits up to five seconds
+  for the CPU worker, outside DllMain. A timed-out job remains bounded and owned
+  until process exit; it cannot access engine objects. No thread is terminated.
+
+  Ошибки захвата/формата/записи видны всегда. Успешные снимки и запись файла —
+  только при Debug=1. Журнал по умолчанию выключен и остаётся последним в MCM.
+  Рабочие INI и сейвы разработчика не включаются в пакет. При отключении функции
+  уже записанные файлы не удаляются: их можно удалить отдельно без ущерба сейву.
+
+  Offline tests cover revision gating, copy errors cleared by native sync,
+  refused saves, load/new cancellation, writer cancellation/atomic replacement,
+  WIC round trips and malformed inputs, size bounds and aspect-preserving layout.
+  Native save/selection/target ABI was audited read-only in Steam 1.0.65 with the
+  installed KenshiLib 0.5. Runtime manual/quicksave/rolling-autosave, both Load
+  contexts, vanilla/Dark UI, FPS and long-run memory measurements remain required
+  before declaring the new feature accepted in game. Offline tests do not prove
+  freedom from every possible driver leak or universal UI compatibility.
 
 
 НАСТРОЙКИ В ИГРЕ

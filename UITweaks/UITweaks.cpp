@@ -135,6 +135,7 @@
 #include <kenshi/KingOfRenderThread.h>
 #include <kenshi/Renderer.h>
 #include <kenshi/RenderToTextureotron.h>
+#include "SavePreviews.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -159,6 +160,7 @@ namespace
     bool g_traderMoneyCentre = true; // деньги торговца по центру окна (Dark UI)
     bool g_randomName = true;        // кнопка случайного имени в редакторе персонажа
     bool g_skipSameMoves = true;     // не пересобирать слой, если виджет «сдвинули» на то же место
+    bool g_savePreviews = true;
     // Клавиша иконки (09.10.2026, просьба тестеров; задержку убрали):
     // иконка - пока зажата; NONE - просто по наведению.
     HoldKey::Key g_craftIconKey;
@@ -290,6 +292,7 @@ namespace
         fputs("TraderMoneyCentre=1\n", f);
         fputs("RandomName=1\n", f);
         fputs("SkipSameMoves=1\n", f);
+        fputs("SavePreviews=1\n", f);
         fputs("Debug=0\n", f);
 
         fclose(f);
@@ -340,6 +343,8 @@ namespace
             GetPrivateProfileIntA("Tweaks", "RandomName", 1, ini.c_str()) != 0;
         g_skipSameMoves =
             GetPrivateProfileIntA("Tweaks", "SkipSameMoves", 1, ini.c_str()) != 0;
+        g_savePreviews =
+            GetPrivateProfileIntA("Tweaks", "SavePreviews", 1, ini.c_str()) != 0;
         {
             char key[64] = {};
             GetPrivateProfileStringA("Tweaks", "CraftIconKey", "ALT", key, sizeof(key), ini.c_str());
@@ -348,6 +353,7 @@ namespace
         g_debug =
             GetPrivateProfileIntA("Tweaks", "Debug", 0, ini.c_str()) != 0;
         KLocLog::SetEnabled(g_debug);
+        UITSavePreviews::Configure(g_enabled && g_savePreviews, g_debug);
 
         if (g_rowHeight < 0)
             g_rowHeight = 0;
@@ -1849,6 +1855,7 @@ namespace
 
     void RenderToTarget_hook(void* thisptr, void* target, bool update)
     {
+        UITSavePreviews::SafePreGui(target);
         if (g_enabled && g_progressPad > 0 && g_statsPanel.get() != NULL)
             SafeRestyleStatsPanel();
 
@@ -1856,7 +1863,7 @@ namespace
     }
 
 
-    void HookSkillBars()
+    bool HookSkillBars()
     {
         HMODULE const mygui = GetModuleHandleA("MyGUIEngine_x64.dll");
         void* const target = mygui == NULL ? NULL : reinterpret_cast<void*>(
@@ -1870,7 +1877,9 @@ namespace
         {
             ErrorLog("UITweaks: could not hook the interface drawing, "
                      "the bar of a skill being trained may stay short");
+            return false;
         }
+        return true;
     }
 
 
@@ -3728,6 +3737,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "Tweaks", "RandomName", Tr("Random name button"), Tr("A button next to the name in the character editor (new game, recruiting, surgery): a random name from the game's name lists, female or male by the character. A mod that replaces the lists is used too."), 1, MCM_RESTART);
     api->section(api, Tr("Performance"));
     api->toggle(api, "Tweaks", "SkipSameMoves", Tr("Skip unchanged UI geometry"), Tr("Skip unchanged name positions and repeated relative sizes of plain interface widgets. Real pixel size changes, derived controls and explicit refreshes still work."), 1, 0);
+    api->section(api, Tr("Saved games"));
+    api->toggle(api, "Tweaks", "SavePreviews", Tr("Save screenshots"), Tr("Capture the game scene when a save succeeds and show it below the save list in Load Game. Works with manual saves, quicksaves and autosaves. Old saves remain loadable without a preview."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "Tweaks", "Debug", Tr("Detailed log"), Tr("Lists every description panel created and its flags in RE_Kenshi_log.txt - useful if the scroll bar did not appear."), 0, 0);
 }
@@ -3795,8 +3806,7 @@ __declspec(dllexport) void startPlugin()
     }
 
     // Полоса навыка: правка сразу после того, как её тронула игра.
-    if (g_progressPad > 0)
-        HookSkillBars();
+    UITSavePreviews::Initialize(HookSkillBars());
 
     // ПКМ сквозь окно инвентаря/торговли - не приказ в мир.
     if (KenshiLib::SUCCESS !=
