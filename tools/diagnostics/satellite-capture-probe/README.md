@@ -325,3 +325,38 @@ slot. Total fixture handle count returns to baseline. An omitted-close mutant
 fails on GetHandleInformation. Three raw native-layout checks avoid reading the
 uninitialized TID when HANDLE is null. Full259 checks/116 game+Ogre imports pass;
 repeat game HANDLE/memory behavior must still be measured after installation.
+
+### Live worker correction and world-grid proof
+The fixed worker adapter ran in PID30032/startUTC2026-11-01T01:55:26.3274481Z
+with DLL SHA502fac6be5d4c4ca4e5a92ca01f20116ead0a2e762528958ab81203951923c18.
+61 explicit requests produced60 successful512 captures and one clean abort when
+the native autosave became busy. All61 logged kernel join, repaired HANDLE close
+and Terrain-before-camera/scene destruction. Ten same-cell repeats no longer
+showed the previous +1HANDLE per capture. Whole-process HANDLE totals fluctuate
+with the other plugins and save activity; they are not an exact resource census.
+
+Two complete4x4 primary-grid passes succeeded. Every corresponding raw GBuffer
+BMP was byte-identical across the16 pairs. This demonstrates repeatable coarse
+world terrain coverage, not final8K refinement, shadows, water or buildings.
+Evidence: game/_codex_work/global-satellite-20261101/isolated-grid-30032 and
+isolated-grid-repeat-30032; worker log/metrics in isolated-native-worker-fixed-30032.
+
+Memory acceptance remains OPEN. After another16-cell pass, read-only VirtualQueryEx
+reported +217567232 bytes committed private memory (mapped/image totals unchanged).
+Some burst allocation returns during idle, but a remaining growth trend needs
+isolation. Do not scale Side to8192: explicit colour targets alone would require
+3GiB, plus depth, staging and overlapping CPU readbacks. Fixed buffers/sampled
+validation and bounded staging are required for the final renderer.
+
+### Explicit resource and GBuffer-only diagnostic A/B
+TerrainGeometryOnly=1 is private, opt-in, default0. It skips both Position/Sun
+program/workspace construction and their depth/float readbacks, retaining native
+terrain geometry, GBuffer rendering and one raw GBuffer BMP. It is an A/B tool,
+not a completed lighting mode. Normal full requests keep the existing outputs.
+
+Before construction and after successful Drop, telemetry uses three additional
+exact-profile exports to report scene existence, nine private resource names,
+active workspace count and four ResourceManager byte totals. The reported bytes
+exclude native/driver caches. No global eviction, depth-pool cleanup, heap
+compaction or game-resource removal is attempted. Source/ABI/PE guards and the
+full259-check build pass; the new A/B mode still requires controlled live use.

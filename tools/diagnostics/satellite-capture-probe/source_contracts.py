@@ -75,3 +75,9 @@ assert 'GetProcessIdOfThread' in worker and 'DuplicateHandle' in worker
 assert '_InterlockedExchange8' in worker and 'TerminateThread' not in worker
 assert 'typedefTerrainExperimentPolicy::Stats*(__fastcall*Info)(constTerrain*,TerrainExperimentPolicy::Stats*)' in ec
 print('Private native Terrain ownership/aggregate ABI/default-off contracts passed')
+
+assert 'LogResourceTelemetry("before-private-terrain")' in source
+assert 'LogResourceTelemetry("after-private-terrain")' in source
+assert 'NativeResourceBytesName' in source and 'HasPrivateSceneName' in source
+assert 'telemetry only; no resource eviction' in source
+print('Private resource telemetry uses exact exports without cache eviction')

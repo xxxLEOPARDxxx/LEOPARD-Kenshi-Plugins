@@ -958,10 +958,43 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
     Save(sunTarget,prefix+"_sun_noShadow_linear_clamped");
 }
 #include "TerrainExperiment.h"
+// Explicit exported calls avoid stale SDK inline fields. Diagnostic snapshots only;
+// manager-reported bytes exclude native/driver caches. Never evict game resources.
+void LogResourceTelemetry(const char *phase)
+{
+    try
+    {
+        if(!au||!au->render||!au->render->root||!RenderAbiMatches())return;
+        typedef size_t (__fastcall *Bytes)(const Ogre::ResourceManager*);
+        typedef bool (__fastcall *HasScene)(const Ogre::Root*,const Ogre::String&);
+        typedef size_t (__fastcall *Workspaces)(const Ogre::CompositorManager2*);
+        Bytes bytes=reinterpret_cast<Bytes>(AbiExport(nativeApi.ogre,NativeResourceBytesName,NativeResourceBytesRva));
+        HasScene has=reinterpret_cast<HasScene>(AbiExport(nativeApi.ogre,HasPrivateSceneName,HasPrivateSceneRva));
+        Workspaces workspaces=reinterpret_cast<Workspaces>(AbiExport(nativeApi.ogre,NativeWorkspaceCountName,NativeWorkspaceCountRva));
+        Ogre::TextureManager &textures=Ogre::TextureManager::getSingleton();
+        Ogre::MaterialManager &materials=Ogre::MaterialManager::getSingleton();
+        Ogre::HighLevelGpuProgramManager &high=Ogre::HighLevelGpuProgramManager::getSingleton();
+        Ogre::GpuProgramManager &low=Ogre::GpuProgramManager::getSingleton();
+        unsigned names=0;
+        names+=textures.resourceExists(PositionTargetName);names+=textures.resourceExists(SunTargetName);
+        names+=textures.resourceExists("LEOPARD_PrivateTerrainOutput");
+        names+=materials.resourceExists(PositionMaterialName);names+=materials.resourceExists(SunMaterialName);
+        names+=materials.resourceExists("LEOPARD_PrivateTerrainMaterial");
+        names+=high.resourceExists(PositionVertexName);names+=high.resourceExists(PositionFragmentName);names+=high.resourceExists(SunFragmentName);
+        std::ostringstream s;s<<"resource telemetry "<<phase
+          <<" scene="<<has(au->render->root,"LEOPARD_PrivateTerrainScene")<<" privateNames="<<names
+          <<" workspaces="<<workspaces(au->render->root->getCompositorManager2())
+          <<" textureBytes="<<bytes(&textures)<<" materialBytes="<<bytes(&materials)
+          <<" highProgramBytes="<<bytes(&high)<<" lowProgramBytes="<<bytes(&low)
+          <<"; telemetry only; no resource eviction";Log(s.str());
+    }
+    catch(...){Log("resource telemetry unavailable; no resource eviction attempted");}
+}
 void Drop()
 {
     if (!OnMain())
         return;
+    const bool privateRun=terrainExperiment.root!=NULL;
     if(!restorationSafe)
     {
         pending=false;cleanup=false;chainSafe=false;
@@ -1081,6 +1114,7 @@ void Drop()
     renderer = NULL;
     handles.clear();
     cleanup = false;
+    if(privateRun)LogResourceTelemetry("after-private-terrain");
 }
 struct ProbeListener : Ogre::CompositorWorkspaceListener
 {
@@ -1106,13 +1140,16 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                 {
                     const Ogre::CompositorChannel &gb=terrainExperiment.workspace->getGlobalTexture("global_gbuffer");
                     if(gb.textures.size()!=3)throw std::runtime_error("private Terrain GBuffer structure differs");
-                    std::vector<float> depth(Side*Side);
-                    Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_R,&depth[0]);
-                    gb.textures[2]->getBuffer()->blitToMemory(box);
                     std::ostringstream prefix;prefix<<"isolated_terrain_"<<GetCurrentProcessId()<<'_'<<GetTickCount()<<'_'<<++serial;
                     Save(gb.textures[0],prefix.str()+"_gbuffer_raw");
-                    InspectPositionPass(terrainExperiment.camera,depth);
-                    InspectSunPass(terrainExperiment.camera,prefix.str(),true);
+                    if(!terrainExperiment.geometryOnly)
+                    {
+                        std::vector<float> depth(Side*Side);
+                        Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_R,&depth[0]);
+                        gb.textures[2]->getBuffer()->blitToMemory(box);
+                        InspectPositionPass(terrainExperiment.camera,depth);
+                        InspectSunPass(terrainExperiment.camera,prefix.str(),true);
+                    }
                     Log("isolated primary-cell diagnostic saved; distant terrain only, not complete atlas");
                     terrainExperiment.active=false;cleanup=true;
                 }
@@ -1301,10 +1338,12 @@ void Update(MapScreen *map)
             std::string base(executable,n);base=base.substr(0,base.find_last_of("/\\"));
             if(base.size()>=9 && _stricmp(base.substr(base.size()-9).c_str(),"RE_Kenshi")==0)
                 base=base.substr(0,base.find_last_of("/\\"));
+            LogResourceTelemetry("before-private-terrain");
             terrainExperiment.Begin(renderer->root,
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
-                GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif");
+                GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif",
+                GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }

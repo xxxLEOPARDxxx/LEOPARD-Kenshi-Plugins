@@ -49,9 +49,9 @@ struct TerrainExperiment
     TerrainExperimentPolicy::Warmup warmup;
     TerrainExperimentPolicy::Region region;
     DWORD started,lastStep;
-    bool active,definitionsReady,definitionsFailed;
+    bool active,geometryOnly,definitionsReady,definitionsFailed;
     TerrainExperiment():root(NULL),scene(NULL),terrain(NULL),camera(NULL),workspace(NULL),definitionOwner(NULL),
-        started(0),lastStep(0),active(false),definitionsReady(false),definitionsFailed(false){}
+        started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false){}
     void Define(Ogre::CompositorManager2 *manager)
     {
         if((definitionOwner&&definitionOwner!=manager)||definitionsFailed)
@@ -79,7 +79,7 @@ struct TerrainExperiment
         def->connectOutput(nodeId,0);
         definitionsReady=true;definitionsFailed=false;
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath)
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
@@ -138,10 +138,15 @@ struct TerrainExperiment
             if(mainGb.textures[i]==gb.textures[i])throw std::runtime_error("private Terrain GBuffer aliases main scene");
         // Allocate auxiliary workspaces outside compositor iteration, including
         // failure paths, so pending registration cannot outlive their materials.
-        PreparePositionPass(manager,scene,camera,gb.textures[2]);
-        PrepareSunPass(manager,scene,camera,gb);
+        geometryOnly=geometryOnlyRequest;
+        if(!geometryOnly)
+        {
+            PreparePositionPass(manager,scene,camera,gb.textures[2]);
+            PrepareSunPass(manager,scene,camera,gb);
+        }
         started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();active=true;
         Log("isolated native Terrain ready; one 73728m primary cell,512 output; no simulation zones activated");
+        Log(geometryOnly?"private Terrain A/B mode: GBuffer only; no Position/Sun programs or readback":"private Terrain A/B mode: full Position/Sun diagnostics");
     }
     // Return false while bounded native stream/build work remains. Root calls only at
     // the main compositor boundary; native Root advances this Terrain's own worker.
