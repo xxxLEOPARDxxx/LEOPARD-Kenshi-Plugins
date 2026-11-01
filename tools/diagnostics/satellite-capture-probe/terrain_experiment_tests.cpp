@@ -32,5 +32,18 @@ int main()
     Warmup wrap;s.memory=1024;s.unbuilt=1;
     Check(wrap.Observe(0xffffff80UL,0x80UL,s)==Waiting,"deadline clock wrap");
     Check(!CanDestroy(NULL,(void*)1)&&!CanDestroy((void*)1,(void*)2)&&CanDestroy((void*)1,(void*)1),"owner identity required");
+    GridBatch batch;int bx=-1,bz=-1;
+    batch.Begin(true,100);
+    for(unsigned cell=0;cell<16;++cell)
+    {
+        Check(batch.Cell(bx,bz)&&bx==int(cell%4)&&bz==int(cell/4),"finite batch visits exact primary cell once");
+        if(cell<15)Check(batch.Advance(),"batch advances before last cell");
+    }
+    Check(!batch.Advance()&&!batch.Advance(),"batch cannot wrap or repeat after cell15");
+    Check(!batch.Expired(120099)&&batch.Expired(120100),"finite total batch deadline");
+    batch.Begin(true,0xffffff80UL);
+    Check(!batch.Expired(0x80UL)&&batch.Expired(119872UL),"batch deadline unsigned clock wrap");
+    batch.Begin(false,0);
+    Check(!batch.Cell(bx,bz)&&!batch.Advance()&&!batch.Expired(120000),"single-cell mode unchanged");
     std::cout<<checks<<" production isolated-terrain policy checks passed\n";
 }

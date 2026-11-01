@@ -2,6 +2,17 @@
 namespace TerrainExperimentPolicy
 {
 struct Region {double x,z,span,altitude;};
+struct GridBatch
+{
+    bool enabled;unsigned index;unsigned long started;
+    GridBatch():enabled(false),index(0),started(0){}
+    void Begin(bool requested,unsigned long now){enabled=requested;index=0;started=now;}
+    bool Cell(int &x,int &z)const
+    {if(!enabled||index>=16)return false;x=int(index%4);z=int(index/4);return true;}
+    bool Advance(){if(!enabled||index>=15)return false;++index;return true;}
+    bool Expired(unsigned long now)const
+    {return enabled&&static_cast<unsigned long>(now-started)>=120000UL;}
+};
 inline bool PrimaryCell(int x,int z,int altitude,Region &out)
 {
     if(x<0||x>3||z<0||z>3||altitude<10000||altitude>30000)return false;

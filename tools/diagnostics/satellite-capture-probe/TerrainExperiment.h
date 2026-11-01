@@ -48,10 +48,13 @@ struct TerrainExperiment
     Ogre::MaterialPtr material;
     TerrainExperimentPolicy::Warmup warmup;
     TerrainExperimentPolicy::Region region;
+    TerrainExperimentPolicy::GridBatch batch;
+    unsigned __int64 peakNativeMemory;
+    int primaryX,primaryZ;
     DWORD started,lastStep;
     bool active,geometryOnly,definitionsReady,definitionsFailed;
     TerrainExperiment():root(NULL),scene(NULL),terrain(NULL),camera(NULL),workspace(NULL),definitionOwner(NULL),
-        started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false){}
+        peakNativeMemory(0),primaryX(0),primaryZ(0),started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false){}
     void Define(Ogre::CompositorManager2 *manager)
     {
         if((definitionOwner&&definitionOwner!=manager)||definitionsFailed)
@@ -79,12 +82,15 @@ struct TerrainExperiment
         def->connectOutput(nodeId,0);
         definitionsReady=true;definitionsFailed=false;
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest)
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
+        batch.Begin(gridRequest,GetTickCount());
+        if(batch.enabled&&!batch.Cell(tileX,tileZ))throw std::runtime_error("private grid cursor refused");
         if(!TerrainExperimentPolicy::PrimaryCell(tileX,tileZ,altitude,region))
             throw std::runtime_error("private terrain primary cell/altitude refused");
+        primaryX=tileX;primaryZ=tileZ;peakNativeMemory=0;
         api.Bind();root=owner;
         Ogre::SceneManager *fresh=api.createScene(root,Ogre::ST_GENERIC,1,Ogre::INSTANCING_CULLING_SINGLETHREAD,"LEOPARD_PrivateTerrainScene");
         if(!fresh||fresh==au->render->scene)throw std::runtime_error("private scene aliases main scene");
@@ -148,24 +154,45 @@ struct TerrainExperiment
         started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();active=true;
         Log("isolated native Terrain ready; one 73728m primary cell,512 output; no simulation zones activated");
         Log(geometryOnly?"private Terrain A/B mode: GBuffer only; no Position/Sun programs or readback":"private Terrain A/B mode: full Position/Sun diagnostics");
+        if(batch.enabled)Log("private primary-grid batch started:16cells,oneTerrain,120s total deadline");
     }
     // Return false while bounded native stream/build work remains. Root calls only at
     // the main compositor boundary; native Root advances this Terrain's own worker.
     bool Step()
     {
         DWORD now=GetTickCount();
+        if(batch.Expired(now))throw std::runtime_error("private primary-grid batch total deadline exceeded");
         if(static_cast<DWORD>(now-lastStep)<100)return false;
         lastStep=now;
         workspace->_update();
         TerrainExperimentPolicy::Stats stats={0};
         if(api.info(terrain,&stats)!=&stats)throw std::runtime_error("native Terrain Info aggregate ABI differs");
+        peakNativeMemory=(std::max)(peakNativeMemory,stats.memory);
         const TerrainExperimentPolicy::Result result=warmup.Observe(started,now,stats);
         std::ostringstream s;s<<"isolated terrain step="<<warmup.frames<<" memory="<<stats.memory
           <<" patches="<<stats.patches<<" visible="<<stats.visible<<" triangles="<<stats.triangles
           <<" ogre="<<stats.ogre<<" unbuilt="<<stats.unbuilt;Log(s.str());
         if(result==TerrainExperimentPolicy::Exceeded)throw std::runtime_error("isolated terrain geometry budget exceeded");
         if(result==TerrainExperimentPolicy::Expired)throw std::runtime_error("isolated terrain did not stabilize before deadline");
+        if(result==TerrainExperimentPolicy::Ready)
+        {
+            std::ostringstream ready;ready<<"private primary cell ready x="<<primaryX<<" z="<<primaryZ
+              <<" center="<<region.x<<','<<region.z<<" span="<<region.span<<" altitude="<<region.altitude
+              <<" batchIndex="<<batch.index<<" nativePeak="<<peakNativeMemory;Log(ready.str());
+        }
         return result==TerrainExperimentPolicy::Ready;
+    }
+    bool AdvancePrimaryCell()
+    {
+        if(!batch.Advance())return false;
+        if(!batch.Cell(primaryX,primaryZ)||!TerrainExperimentPolicy::PrimaryCell(primaryX,primaryZ,int(region.altitude),region))
+            throw std::runtime_error("private primary-grid cursor invalid");
+        // Normal native camera notification/FrameListener updates drive selection.
+        // No Landscape cache writes, shared ZoneMap callback or game camera movement.
+        camera->setPosition(float(region.x),float(region.altitude),float(region.z));
+        started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();
+        std::ostringstream next;next<<"private primary-grid advanced x="<<primaryX<<" z="<<primaryZ
+          <<" batchIndex="<<batch.index<<" nativePeak="<<peakNativeMemory;Log(next.str());return true;
     }
     void Destroy(Ogre::Root *current)
     {

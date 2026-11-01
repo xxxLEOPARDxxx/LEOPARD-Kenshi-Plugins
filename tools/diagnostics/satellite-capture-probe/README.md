@@ -400,3 +400,31 @@ The next live A/B must baseline AFTER the first cached full capture and expect
 cachedPrograms3/privateNames3 (programs only), scene0/workspaces1 and balanced
 Material bytes. It tests compilation/program/driver cache churn together, not
 FXC in isolation. No retention improvement is claimed before measurement.
+
+Live reuse proof: PID35236/startUTC2026-11-01T02:50:43.9031687Z, DLL
+c1cd6f1bfeb7d3dcc36c7299d7847540e54c59ea8c5d39f3766144b6bd7f35a4.
+18 successful captures compiled3 programs total and reused them53 times, including
+a deliberate changed-source refusal and successful recovery after restoring the
+accepted source bytes. All19 partial/full cleanups joined the worker, restored
+scene0/workspaces1/material10775230 and retained only3 named programs. This avoided
+compilation churn but did not eliminate retained private memory (~200MB after a
+16-cell pass). Evidence isolated-program-reuse-35236 and its related folders.
+
+### One-lifetime primary-grid batch experiment
+PrimaryGridBatch=1 is explicit/default0 and starts at primary0,0, ignoring the
+single-cell selectors. One private Terrain/Scene/camera/GBuffer/worker covers the
+fixed row-major16 cells. Save and both optional readbacks finish before moving
+only the private camera to the next absolute cell centre. Native notification
+and FrameListener selection run normally; no Landscape cache writes are used.
+Each cell resets warmup; the whole batch retains a cooperative120s deadline and
+its native memory peak. Existing geometry budgets/context aborts remain active.
+Any exception or the final cell uses the same worker-before-camera cleanup once.
+
+Native inactive-patch eviction is age/history dependent (over500 Landscape ticks
+in eligible coarsened nodes), not a byte reservation. Fast traversal may retain
+prior cells. The existing1GiB observation limit aborts excess rather than forcing
+cache eviction. Compare all16 batch GBuffers with independent accepted fresh-cell
+captures before accepting the batch's output/refinement.35 new production cases
+verify the fixed cursor, no seventeenth cell, total deadline and clock wrap;
+the overrun mutant fails. Full310 checks/115 imports and independent review pass.
+Live batch coverage, memory peak and image comparison are still pending.

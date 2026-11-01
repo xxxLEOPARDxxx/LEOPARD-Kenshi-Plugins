@@ -1187,7 +1187,7 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                         InspectSunPass(terrainExperiment.camera,prefix.str(),true);
                     }
                     Log("isolated primary-cell diagnostic saved; distant terrain only, not complete atlas");
-                    terrainExperiment.active=false;cleanup=true;
+                    if(!terrainExperiment.AdvancePrimaryCell()){terrainExperiment.active=false;cleanup=true;}
                 }
             }
             catch(const std::exception &e)
@@ -1379,7 +1379,8 @@ void Update(MapScreen *map)
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif",
-                GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0);
+                GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0,
+                GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }
