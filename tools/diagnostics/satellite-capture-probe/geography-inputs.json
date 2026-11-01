@@ -1,0 +1,2059 @@
+{
+  "scope": "fixed guarded primary1,1 snapshot; reject mismatched live cells/assets",
+  "biomes": [
+    {
+      "sid": "12613-Newwworld.mod",
+      "diffuse": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        3
+      ],
+      "normal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        3
+      ]
+    },
+    {
+      "sid": "14390-Newwworld.mod",
+      "diffuse": [
+        5,
+        6,
+        7,
+        8,
+        3,
+        9
+      ],
+      "normal": [
+        5,
+        6,
+        7,
+        8,
+        3,
+        9
+      ]
+    },
+    {
+      "sid": "17948-Newwworld.mod",
+      "diffuse": [
+        10,
+        11,
+        11,
+        12,
+        13,
+        14
+      ],
+      "normal": [
+        10,
+        11,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "sid": "18940-Newwworld.mod",
+      "diffuse": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "normal": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "sid": "2742-Newwworld.mod",
+      "diffuse": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        21
+      ],
+      "normal": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        21
+      ]
+    },
+    {
+      "sid": "2743-Newwworld.mod",
+      "diffuse": [
+        22,
+        23,
+        24,
+        4,
+        3,
+        23
+      ],
+      "normal": [
+        9,
+        22,
+        23,
+        4,
+        3,
+        22
+      ]
+    },
+    {
+      "sid": "2804-Newwworld.mod",
+      "diffuse": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        28
+      ],
+      "normal": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        27
+      ]
+    },
+    {
+      "sid": "2806-Newwworld.mod",
+      "diffuse": [
+        3,
+        9,
+        30,
+        21,
+        23,
+        21
+      ],
+      "normal": [
+        3,
+        9,
+        29,
+        21,
+        22,
+        21
+      ]
+    },
+    {
+      "sid": "2822-Newwworld.mod",
+      "diffuse": [
+        10,
+        19,
+        11,
+        31,
+        32,
+        33
+      ],
+      "normal": [
+        10,
+        19,
+        11,
+        30,
+        31,
+        32
+      ]
+    },
+    {
+      "sid": "3395-Newwworld.mod",
+      "diffuse": [
+        0,
+        34,
+        35,
+        36,
+        4,
+        9
+      ],
+      "normal": [
+        0,
+        33,
+        34,
+        35,
+        4,
+        9
+      ]
+    },
+    {
+      "sid": "48690-Newwworld.mod",
+      "diffuse": [
+        19,
+        23,
+        24,
+        4,
+        3,
+        23
+      ],
+      "normal": [
+        36,
+        22,
+        23,
+        4,
+        3,
+        22
+      ]
+    },
+    {
+      "sid": "5532-Newwworld.mod",
+      "diffuse": [
+        37,
+        16,
+        38,
+        19,
+        39,
+        40
+      ],
+      "normal": [
+        37,
+        38,
+        39,
+        19,
+        37,
+        40
+      ]
+    },
+    {
+      "sid": "5570-Newwworld.mod",
+      "diffuse": [
+        21,
+        41,
+        7,
+        12,
+        3,
+        42
+      ],
+      "normal": [
+        21,
+        41,
+        7,
+        12,
+        3,
+        42
+      ]
+    },
+    {
+      "sid": "5611-Newwworld.mod",
+      "diffuse": [
+        18,
+        23,
+        24,
+        5,
+        43,
+        44
+      ],
+      "normal": [
+        18,
+        22,
+        23,
+        5,
+        43,
+        44
+      ]
+    },
+    {
+      "sid": "5746-Newwworld.mod",
+      "diffuse": [
+        45,
+        26,
+        27,
+        28,
+        21,
+        20
+      ],
+      "normal": [
+        45,
+        25,
+        26,
+        27,
+        21,
+        20
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "data/newland/land/textures/Whitestone_Floor_DIF.dds",
+      "sha256": "18bfacd2e7483fc71b6f6cdc58c8ccf7b0b50c365fb834b7bc03d2633e4d6f52",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 0,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/SharpBoulders_DIF.dds",
+      "sha256": "dd10530d438fdcbbe77e48317e16e773d20cc9b40152ea41becb9d5330b1820b",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 1,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/CliffChunky_DIF.dds",
+      "sha256": "83a446fb4e6a99aa77df94b14f2338052a4f3e1b10b5b8e543fc2e6091dfcb0b",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 2,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/SkinnersGravel_DIF.dds",
+      "sha256": "1b0f516c60e781820f511f999f7efd34e156fadbf70023e6e5fbae8bc012631d",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 3,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Landtexture_Rocksurface01_DIF.dds",
+      "sha256": "c6f56a207d9868415368d109262564b2e4081f713c9aea66f0b2b3bda6b155b4",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 4,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/GrasZ_DIF.dds",
+      "sha256": "38286f3f9ab1ba46539301980e5eef506a041fce762789eb5aca324b804e126b",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 5,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/SharpblockLoop_Darker_DIF.dds",
+      "sha256": "9996e0acdd197da92c3ed0f5b2d58ff4f774634d8d0aafcf45c65102be59bd31",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 6,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Cut-CliffRocks_DIF.dds",
+      "sha256": "c30b67458e11f0470ad5ca9ba66940676fcd13dc945b19bfff6d33ef065f03d9",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 7,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/NewMudWork_DIF.dds",
+      "sha256": "938f0911e0d246fe33a917cade2ae9b347af81d0ca43000b416d6a911c9eaca9",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 8,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/WadiGravel_DIF_HI.dds",
+      "sha256": "1826ed5d584340d10ac56140f908e4c9b72fb63f0333c0605790292777e274dd",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 9,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Sands_DIF.dds",
+      "sha256": "96c92dca64b9fd8ff93ec16cb4ddce1080924a6520078fc70afe2fa0a1a42d4d",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 10,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/EasySand_DIF.dds",
+      "sha256": "f54a1c5a6431793eb4f9ed56dffe432e8fbe3366bb7f6f35bf1c847e358ffa2d",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 11,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/MountainGrass_DIF.dds",
+      "sha256": "3f7ce6887601392e6093278a716447d2c41847d93a26bed2970087a4a38f73b7",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 12,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/DesertSandLoop03_DIF.dds",
+      "sha256": "2b0e97ed88fd57168b2b8389ea72840f73c27bace6cf83661a99b82e2315e464",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 13,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/DesertSands_DIF.dds",
+      "sha256": "ae37dc71e2fc4f46c491e7f426de22b384ccc8b571a96e0c79b4d654e5fe60fe",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 14,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Moraine-Loop_DIF.dds",
+      "sha256": "aeaa93c51af92050141363640b155d810668a755df178baf330ac0574151c980",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 15,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/sharpgravel_DIF.dds",
+      "sha256": "f6aa943f9e49bda71942fdb184df1b6e45504b422745a931ddae9cab86558d84",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 16,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/MesaShales_DIF.dds",
+      "sha256": "450b5bc4d5f6dcf75f19639be2ef46c559dfd8848de10298ad58de76f354c90d",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 17,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/GrassBadTestDIF.dds",
+      "sha256": "ceede2cb10d742fe983fb19f5e08041bb54e79d4f888f8c9682aa262ec4f59e2",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 18,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Sand01bc_Grey.dds",
+      "sha256": "70ada8b3ab3d6555dab34916a03737627bf256d7730d190bc8102649c84fdf63",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 19,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/RoadLoop01_DIF.dds",
+      "sha256": "3d9401809663e537657a2605835cacdc7549a87640de147898eb8bff037fbbd5",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 20,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/EarthStone_DIF.dds",
+      "sha256": "1075bf4e6e12d9bea711666006f570448597629330d6f3ff63cbd285c50d2589",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 21,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/WadiGravel-WHITE_DIF.dds",
+      "sha256": "bc712e270d0316ab91e87e3d6c4501f8f7ac8650cd1e21351bd86d42666b860d",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 22,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/RockBed01_DIF.dds",
+      "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+      "bytes": 5592560,
+      "bank": 0,
+      "layer": 23,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Mesa2ROCKLoop_DIF.dds",
+      "sha256": "1f30b580a90fe3db29f2d1e5b4261555b1784722daa1cf0964e60f52a8b48639",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 0,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/OrganicRock_DIF.dds",
+      "sha256": "140f9bee214ee8457a8d863fadedc68829473952a6ac17bf59378f4b76fd6065",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 1,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/SeaWeed-Tarsand_DIF.dds",
+      "sha256": "8a75ece7201638ce9a46dd81cf0737f5b23b38ec5a5eaa17c823fb8f995aca07",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 2,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/TarsandCLiff_DIF.dds",
+      "sha256": "c79440631b40b228d6f4a2117bd39b8fff4630b7a346f5899dbb33d42f578f09",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 3,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Driedcracked_DIF.dds",
+      "sha256": "1849d6693315eb5d6827a5d52fd8abaa084a2de64233369a952b6cfc4da877b8",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 4,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/River_Pebbles_DIF.dds",
+      "sha256": "47ff95b83ff73211d1506afcdf89e0751f11c156491c24f2fb629d0694902cd7",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 5,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/SlabSoilBank_DIF.dds",
+      "sha256": "6e653d62c79aadca2f436cb05054ece5f0baa3e0c90ea66b80f0836ac9f55c6f",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 6,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Grass-Space_Z_DIF.dds",
+      "sha256": "5fd8857ae4a3dde4a37e5d3776ff0dddd4159fb8ee132aba3c56aaff3eab57c4",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 7,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/StoneyRipples_DIF.dds",
+      "sha256": "ed9253738f5612568d632ee4e12243ae78128f39ddc5c1ac6eaebd7b32125959",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 8,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/RoadLoop02_(sand)_DIF.dds",
+      "sha256": "a4e4395ee6802b386207403c91536fa096bd4a337a263b23d6f849b3ee4d1fb3",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 9,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Smallish sharpGravel_DIF.dds",
+      "sha256": "1bf95d9662505c793c3fb2faf80f2e4d011efacd4c5d56728b304f3710dfe20e",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 10,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/TOOTHROCK_DIF.dds",
+      "sha256": "651c2ac37eddb97c36cdfb5115e7fd7d106f31e6dee1ec8cf90df3e3ef921338",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 11,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Splattering_DIF.dds",
+      "sha256": "27941e46199c570f69efb020641b0b198b4c853dbeb77b5dabbdda1e914c1a2c",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 12,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Flat_Land_DIF.dds",
+      "sha256": "b218a6d111fcace9509d00a4bfb7e93a05e8d2852807fe994fabb7cd459561bb",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 13,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Lichen_Rock_DIF.dds",
+      "sha256": "139c3eadf698933c55db7836a407fb533718d93f620649f051d88338017f8720",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 14,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Fractured_Rock_DIF.dds",
+      "sha256": "954241f2717b6bd92b74eec029d5eb62db2d048046275d38ece14440d61d354f",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 15,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Road_NewTex_Stones02_DIF.dds",
+      "sha256": "d6d48f38424fe41f16fff858c4def4254f9ec49b2a86fd6bebd4900d15f733c0",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 16,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Agglomerate_Cliff_DIF.dds",
+      "sha256": "de8ae09c7343d4d6c4a4a3d10a1e1294ad1a7f368b4d730b969c4d7b939f27a8",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 17,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Cement_Wall_INT_DIF.dds",
+      "sha256": "acb08f0dc61726e971f69ef86b6a70fb7023d10968cc5cd716dbf970a9e41d5f",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 18,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Okran_Dirt_DIF.dds",
+      "sha256": "1e8380c53f9d9e00f2ed117fc8dee7aa68b8c18b477f19b7e40d1e9d2103099d",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 19,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Road_NewTex_Stones01_DIF.dds",
+      "sha256": "8b69ba3874f50df63d0250fbed59acec6e10b1417be0f11eda4b5cb39c65dddc",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 20,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/CinderSurface01_DIF.dds",
+      "sha256": "e8bcdb6a2392b4e76dd599505e9a0452efaa155b1ca5ff218dd45d1185b1852e",
+      "bytes": 5592560,
+      "bank": 1,
+      "layer": 21,
+      "format": 77
+    },
+    {
+      "path": "data/newland/land/textures/Whitestone_Floor_NML.dds",
+      "sha256": "cf03c4f78de0f521b8b2bc66bf00894f3d43644f4f7c0b97080ba35dab0d2510",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 0,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/SharpBoulders_NML.dds",
+      "sha256": "116a307e30f42ede82158744de6ccde9ce983bfca50e68689ff4e37f208225d3",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 1,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/CliffChunky_NML.dds",
+      "sha256": "075eaa02b94126e094b1d5712f5d806bba610c9a3acfb1a616d6f2cd89b308bf",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 2,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/SkinnersGravel_NML.dds",
+      "sha256": "e36b85aafeaaaf10cfd756962739e514a87151f2b6cd6d1be7ec75320c9988e6",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 3,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Landtexture_Rocksurface01_NML.dds",
+      "sha256": "673991440497732ed8dbea7471ff100452afcadc0f3c939cc1e205a87d289bad",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 4,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/GrasZ_NML.dds",
+      "sha256": "25a7e758f50d4897e5d2bc9a6fef60d84a4eba86abf6506aa63d80ddfe52f80e",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 5,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/SharpblockLoop_NML.dds",
+      "sha256": "6cda77b6d8b88f94afad61cfb0b5169adc752a558c2ad261718e47f6c60f0101",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 6,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Cut-CliffRocks_NML.dds",
+      "sha256": "ab6c851ce176b4792221ccf4e9cb1a8e0449ec9237f0396457bca10afc68cd90",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 7,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/NewMudWork_NML.dds",
+      "sha256": "4f260b6aaaaf1fbc36bea059129bf09a72d26ddc19ecfb35fb845a745f86bb0a",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 8,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/WadiGravel_NML.dds",
+      "sha256": "83270743efca5f1541ecdc4a79a10be1c3b0925f1fed2ba05cbb2e33d3cd578d",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 9,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Sands_NML.dds",
+      "sha256": "5e75d2cc722404826bb3272bfbabb0713dcf95b062b3ff2b717dadcf4c116eb7",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 10,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/EasySand_NML.dds",
+      "sha256": "2297e4b22051b7afa0470be1be735c59ca4f5691088ac0123c63856c7ef2abd0",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 11,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/MountainGrass_NML.dds",
+      "sha256": "ecf38e914c8899d26db6f1b499800129b92c1f69d8ec593a7513b0d49ae03b8a",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 12,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/DesertSandLoop03_NML.dds",
+      "sha256": "71aaea0ec9f642e6e516a1244282947dd3b251c4b88b5a7f065ae2f5d7b5e851",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 13,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/DesertSands_NML.dds",
+      "sha256": "d6ed966bed71bcabfd148e4ea0f295caeb65b04f018513e23b14a5090476a6cd",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 14,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Moraine-Loop_NML.dds",
+      "sha256": "559c59685a8a43b568bbef12aee073df39b25ba19ac8841950d54caefaaeaa99",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 15,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/DESERT_sharpgravel_NML.dds",
+      "sha256": "2a02a925cfc2d3838f7e7bf8b8f90359fab0ba2c89a6182770f00af429da48cf",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 16,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/MesaShales_NML.dds",
+      "sha256": "570c0d7e8ea49010b72dd2ca1356dd11b4defae3c455e9ffdf7945e3f71b2a73",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 17,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/GrassBadTestNML.dds",
+      "sha256": "6d9eeadf87886708fe4291c77c61499d15a7f69fd55aeb33d1bf4c9be5b6d2ed",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 18,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Sand01bc_Grey_NML.dds",
+      "sha256": "8b9e747a498e1359e58a5264c606bc3b8edcba0718e4e09b3a2045244405a4ad",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 19,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/RoadLoop01_NML.dds",
+      "sha256": "e1e1912e621184f4406287f7f2cc8b84f5a45d4783b2f72177d5db9e8f4921ab",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 20,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/EarthStone_NML.dds",
+      "sha256": "04a5db60d66d8333da0c61c49656da1b6b29ee87ad86bfd535d3fafcafa5a7f7",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 21,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/RockBed01_NML.dds",
+      "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 22,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Mesa2ROCKLoop_NML.dds",
+      "sha256": "910318f3dca706b2c100cefdd2d261aed045d1e5f71cc15afcbd9bbd74019c7f",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 23,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/OrganicRock_NML.dds",
+      "sha256": "d7748fb593531b5ec371d384a650e402705b041a6cede71239a154ed9f993206",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 24,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/SeaWeedPlane_NML.dds",
+      "sha256": "7e4ba72691988c05fb93fb7f339ca7f8149757f534815554ee1250bdb2076104",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 25,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/TarsandCLiff_NML.dds",
+      "sha256": "f35dcaae6851085577a9813b30a3ffbac66b7fb067a7c3c4571c03f5d8030b98",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 26,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Driedcracked_NML.dds",
+      "sha256": "36d6170fce4ae743ef8acccd2638bce37f40ed40b68de249bbfa0fa34c72f3ca",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 27,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/River_Pebbles_NML.dds",
+      "sha256": "7936d13d397c9dd856cde5a59ada4eecc206b2d7073cbf15de20d2d1fe229166",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 28,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/SlabSoilBank_NML.dds",
+      "sha256": "b8c4aab17a4ef2eb1dd2a5aacf94539946ee54b75e8ff903ba74e75995ad14fa",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 29,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Grass-Space_Z_NML.dds",
+      "sha256": "1dd1325252e8170d94c44432b95ba3b1fb907feb32db1125c2fcbe4bbc38dfed",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 30,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/StoneyRipples_NML.dds",
+      "sha256": "e0a62fd981502e5a027a42546f791629c50ecba26f69bceac98adfb19bd1b71a",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 31,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/RoadLoop02_(sand)_NML.dds",
+      "sha256": "134d9e265ce6b8c6d3a95015f9dd5c3dfef5c6b24521b4e454774d54f6710254",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 32,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Smallish sharpGravel_NML.dds",
+      "sha256": "059c0c741b3113b45d3e8172b7ebbc3eeef984976d0f08c90c228c3d47b1ea4e",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 33,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/TOOTHROCK_NML.dds",
+      "sha256": "a5f1c0f023d8b3083916c9eaeab4e174407c58a61fdca9f4e3c0402379207678",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 34,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Splattering_NML.dds",
+      "sha256": "0a00224a0c67b6de60f2fa7f695eab72abc3d89cfe954af3488e00be23f0cfa0",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 35,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Sand3D_NML.dds",
+      "sha256": "aea8305b50dfdf370e5367273a6d30a66e710cd6c4401341a9aec5715032afc1",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 36,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Flat_Land_NML.dds",
+      "sha256": "5011e3768448a3c78ef1efc749fe6159ef32ad2d786d6e115988d3a12fd7597f",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 37,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/sharpgravel_NML.dds",
+      "sha256": "9b0410cb8f3ecf3e4d42cb6d937bdcea415669e0a20eef4e899cd4bf82b8772c",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 38,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Lichen_Rock_NML.dds",
+      "sha256": "0a59eacf3b8a5c51d26e431d5fc3935af7854eaa7f009b59d1759f3fe073e124",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 39,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Road_NewTex_Stones02_NML.dds",
+      "sha256": "0fa5ead9e81ca72ec44ba6ed990f7141bf8e51e0085a157ad9108cf151474276",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 40,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Agglomerate_Cliff_NML.dds",
+      "sha256": "20dbd8ab83b685286e59296177f04e999975d5895bea79139e21bf410f31ff98",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 41,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Cement_Wall_INT_NML.dds",
+      "sha256": "78bbf6a8a8f37ad63ed46a8726c8337a3f33e943b8b12d9cee623bac25f9422d",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 42,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Okran_Dirt_NML.dds",
+      "sha256": "91f566d859cd13c7fe93f16352c9e1086c9dafd2d4857b08a88c198264be5244",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 43,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/Road_NewTex_Stones01_NML.dds",
+      "sha256": "bd6e7fa9b106165c54a89d29965ae10c3b42def3341214e076881e5b26a0abe5",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 44,
+      "format": 71
+    },
+    {
+      "path": "data/newland/land/textures/CinderSurface01_NML.dds",
+      "sha256": "934e5bbb5e834ad8084a67f6e622988f5be4d87b9c6a4577f84ccc1c95b86873",
+      "bytes": 2796344,
+      "bank": 2,
+      "layer": 45,
+      "format": 71
+    }
+  ],
+  "cells": [
+    {
+      "slots": [
+        5,
+        4,
+        10,
+        0,
+        0
+      ],
+      "tree_sha256": "ba5d2b1a047e1d5b636b820f270b7dc90aa73c05e3e536806c3003e147f8f65e",
+      "selector": [
+        42,
+        20,
+        5,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        0,
+        10,
+        0,
+        0
+      ],
+      "tree_sha256": "09fc96082d34c2dfc1295d92073b5ea1dc8ef8da95f14dfded011ffb96d3e54b",
+      "selector": [
+        42,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        0,
+        10,
+        13,
+        0
+      ],
+      "tree_sha256": "89b10514b9cb248de006cf865f60365971e5a06c2a6d1c02d5a875a1133bd4f3",
+      "selector": [
+        61,
+        42,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        0,
+        10,
+        13,
+        0
+      ],
+      "tree_sha256": "54d72537cfcac06c2fe5f3decc82ad2987aa957cc094ea3ab6a679a09a43fd33",
+      "selector": [
+        61,
+        42,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        0,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "19d9dd8cb6d052ce846e8bfadb77fd8cd562bb776120267f2f125794ac51ba0e",
+      "selector": [
+        61,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        3,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "47062e0ce33287fecc5f8c7862b31385316b403aab428e82554a10fa8ae7178e",
+      "selector": [
+        61,
+        19,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        3,
+        0,
+        13,
+        9
+      ],
+      "tree_sha256": "40b7f6ef79b2ebb2ac65d346a9a3e2ae769bc7f553d31aec690c9c491a5ad584",
+      "selector": [
+        73,
+        61,
+        19,
+        2
+      ]
+    },
+    {
+      "slots": [
+        2,
+        0,
+        0,
+        0,
+        9
+      ],
+      "tree_sha256": "9adb9b4be6679ed358fad94da7ee6e1bb92931c1f280d265229cbd96831800be",
+      "selector": [
+        73,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        4,
+        10,
+        12,
+        0
+      ],
+      "tree_sha256": "63408cc6851149873031e6f68bc0b69db7666b0710ff408b762de154c9a80719",
+      "selector": [
+        60,
+        42,
+        20,
+        5
+      ]
+    },
+    {
+      "slots": [
+        5,
+        6,
+        10,
+        0,
+        0
+      ],
+      "tree_sha256": "108ecea41e4d129ba11ebbd45faf75879902416841b724da16dbd7fe156e1a25",
+      "selector": [
+        42,
+        22,
+        5,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        10,
+        13,
+        0
+      ],
+      "tree_sha256": "fc4b7ee6822c010889571bc2af99df712195978047101cd06d4c47deffda7d17",
+      "selector": [
+        61,
+        42,
+        22,
+        2
+      ]
+    },
+    {
+      "slots": [
+        2,
+        0,
+        10,
+        13,
+        0
+      ],
+      "tree_sha256": "5e2a2cecd6ea73622277da96763675634cdea976ae2ae81e4d14cd78e2cbf25c",
+      "selector": [
+        61,
+        42,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        0,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "88d0ea1b7039f16c913e6c7ec78740f5ac18e8f6d78677e8b57051057930bd61",
+      "selector": [
+        61,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        3,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "91c8cde5823b02933a45a551436470f1a7250420efb31dd240252b72734481a1",
+      "selector": [
+        61,
+        19,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "23e3d132d53d4a1fa47addd2ff594fe60c582691433db86487430d0218b212b7",
+      "selector": [
+        61,
+        22,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        0,
+        9
+      ],
+      "tree_sha256": "5caabde2bc935ce3363e47e450f1ad88d264d27bb0b54e1923ec5b53b2e05b95",
+      "selector": [
+        73,
+        22,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        4,
+        0,
+        12,
+        0
+      ],
+      "tree_sha256": "2727385315860b6026ae7595d2efe316e94595c8a05df4011df4b34944e49af2",
+      "selector": [
+        20,
+        5,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "6f3441f0874d462630fa4e6d90cc94c77bbbaf147c10cec634d5e4f87aa7f2d2",
+      "selector": [
+        22,
+        5,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "7863ac6e2ef90059872703fa2973a07a20d7031b2a8262caa314cd281099a26d",
+      "selector": [
+        22,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "90907d057d5c51e961d5edce86141febf8e5d348268f4321b630d05932ad2795",
+      "selector": [
+        61,
+        22,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        0
+      ],
+      "tree_sha256": "00ac6c1816e563136f17fd68f560533660601b2113557817bfd26aecab55c381",
+      "selector": [
+        61,
+        22,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        14
+      ],
+      "tree_sha256": "edc66bed0226a2591d3eff6fa9aa765b5beefa3685d0b63d11c977d41f40b52b",
+      "selector": [
+        78,
+        61,
+        22,
+        2
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        14
+      ],
+      "tree_sha256": "2ce37b20b6e9924286e70a40c7742e38019e8adf01d0630c2ed55a88db95781a",
+      "selector": [
+        78,
+        61,
+        22,
+        2
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        15,
+        0,
+        9
+      ],
+      "tree_sha256": "521bfd9b2a8a9bcc7f2fbc346f706674fb9f33be6d7077a7af28453684bc3cd7",
+      "selector": [
+        73,
+        47,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "bb7208bc9b5d7c04f1236a82a0093a5e33f40423d5ba8d4266f7092c3ba43b62",
+      "selector": [
+        5,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "1f7f2763b9ea2e79c6a840cdfbffa3dfe0c01e1ac033fdff0bcdc40fe06a7596",
+      "selector": [
+        22,
+        5,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "8a331fdde7032f33a71e1b2e257d80166e348e00fcb17914f48bdb57a1c63007",
+      "selector": [
+        22,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        14
+      ],
+      "tree_sha256": "ae2a6efcef3039ca36de7110e18091501bbf55c74dd207504114b472350968cb",
+      "selector": [
+        78,
+        61,
+        22,
+        2
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        13,
+        14
+      ],
+      "tree_sha256": "e69d6f9b4ba66fe3522b80cca7dd2b2111debff97e004cf0c894a632126b3488",
+      "selector": [
+        78,
+        61,
+        22,
+        2
+      ]
+    },
+    {
+      "slots": [
+        2,
+        6,
+        0,
+        0,
+        14
+      ],
+      "tree_sha256": "48617708457a147f89735dd7f7325c9391b84db13681315c0a031070e8668dcd",
+      "selector": [
+        78,
+        22,
+        2,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        15,
+        0,
+        14
+      ],
+      "tree_sha256": "490a6a8ae02196869658f7833f548a90125ac7b54b6a047bbffaf4aa7faf1eae",
+      "selector": [
+        78,
+        47,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        15,
+        0,
+        9
+      ],
+      "tree_sha256": "ccb106c654c5ff0c2cdbe7303a2d78ebc12a2bc5a1a945c39c0e8f0d6b88b3ba",
+      "selector": [
+        73,
+        47,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "533f5b51595a67c035817f9a94349a7c59a563833258959232ec6e448c26e9bb",
+      "selector": [
+        22,
+        5,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        6,
+        11,
+        0,
+        0
+      ],
+      "tree_sha256": "1b42cc5c219b9b038e531d682213f32fe7acf500e1dd917b89e8031ea0abf323",
+      "selector": [
+        43,
+        22,
+        5,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        11,
+        0,
+        14
+      ],
+      "tree_sha256": "0959545d8aafec6b05ac80f70400459cc9164c6dd9f73c5f1c31209f1478d156",
+      "selector": [
+        78,
+        43,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        0,
+        14
+      ],
+      "tree_sha256": "f693b7e82d1aae1477c65096b9918bffbdfc6de1f6df3a77e101214ba0c425d4",
+      "selector": [
+        78,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        0,
+        14
+      ],
+      "tree_sha256": "cdcb8329d62e248ac0da4f0a3dbea1589322fcdb255d7be7d18572b1172d6f72",
+      "selector": [
+        78,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        0,
+        0,
+        14
+      ],
+      "tree_sha256": "4afa4b092d8b51185851bf13ab04cd4bf11957c8c05baf104de443c3b9a781a1",
+      "selector": [
+        78,
+        22,
+        11,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        15,
+        0,
+        0
+      ],
+      "tree_sha256": "70a214c05ffddf72d5bb3f4841a74a64ee4dd250fec9924d12883bb93de59a47",
+      "selector": [
+        47,
+        22,
+        11,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        0,
+        15,
+        7,
+        0
+      ],
+      "tree_sha256": "f0d1a8f211307e6266234f2da1c7d489f041ba3d95a5f3e6ad4ab91e8a879443",
+      "selector": [
+        55,
+        47,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        5,
+        6,
+        8,
+        0,
+        0
+      ],
+      "tree_sha256": "aa55873cc4e06f6fdf3ca4634a01d4b9abe896bc099176d7e5c47e0774d691bb",
+      "selector": [
+        40,
+        22,
+        5,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        11,
+        0,
+        0
+      ],
+      "tree_sha256": "2c477928019b92aaa11df4765ddbd86654cec04c96993d0a79eb22178b29b193",
+      "selector": [
+        43,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        11,
+        0,
+        14
+      ],
+      "tree_sha256": "b64e81b80bec82d522026dbec76aa3faf76e26c87bffbe8c5bf4e80b719030ab",
+      "selector": [
+        78,
+        43,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        0,
+        14
+      ],
+      "tree_sha256": "e04dfaceccc7665a30126b38628f85d554b2f11e9666ee0fbede5c8f1ddacbb9",
+      "selector": [
+        78,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        0,
+        14
+      ],
+      "tree_sha256": "f8adadef96b4714890f789b01cff444ac17e05d42fbcd0eb103df3f957fac0c3",
+      "selector": [
+        78,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "da8e127643ccb23cf107583d609d80d2a4811a936b770db8f287ccc68590a751",
+      "selector": [
+        22,
+        11,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        15,
+        0,
+        0
+      ],
+      "tree_sha256": "7d730a5ae5a38ae21a13b19ad9f64cd7cc7faa354159976f02c4610a5115a458",
+      "selector": [
+        47,
+        22,
+        11,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        15,
+        7,
+        0
+      ],
+      "tree_sha256": "f1e0913c1a165db02f308f8d548224928d0cb7d5fb665addea29dadce799e505",
+      "selector": [
+        55,
+        47,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        8,
+        0,
+        0
+      ],
+      "tree_sha256": "2f87091b7fb6e93e95b7c97b9142d2c3f20ac1de0c215338265ed094bec0e57b",
+      "selector": [
+        40,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        8,
+        1,
+        0
+      ],
+      "tree_sha256": "b4536823e5b70ba3eef75db7567ed0be39c285efee2aed57a23076370e167990",
+      "selector": [
+        49,
+        40,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        0
+      ],
+      "tree_sha256": "e86b8b81187fbd8a6c20a3fdae30982dbca38e5bf9c826946103ebb3eebd324c",
+      "selector": [
+        49,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        14
+      ],
+      "tree_sha256": "19a6094a93607e8936d2e93b9959458960fa7634b00f7c1a77502e8aa8483330",
+      "selector": [
+        78,
+        49,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        14
+      ],
+      "tree_sha256": "c2dd6d82b01671aa778d35eaaec2c9c7ff9da4c5301d2d27e426aabfebcf3541",
+      "selector": [
+        78,
+        49,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        0,
+        1,
+        0
+      ],
+      "tree_sha256": "1c9b18873985eaa19c8f11dcaa5a3275bdcd6f383165c3cbb9a5252918c28811",
+      "selector": [
+        49,
+        22,
+        11,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "e140e182490ac8581544be75ee3f34522e7d4e1065170544908de9255f4d0ce2",
+      "selector": [
+        22,
+        11,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        15,
+        7,
+        0
+      ],
+      "tree_sha256": "b18ea245e6b448e953e6122781fd9a6c7c386457baa994d83ebd03975b63d2fa",
+      "selector": [
+        55,
+        47,
+        22,
+        11
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        8,
+        0,
+        0
+      ],
+      "tree_sha256": "60533d2580cb19daf74f2489748d0f31ae79e01320eb065fe9a32cbaa03a47fa",
+      "selector": [
+        40,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        8,
+        1,
+        0
+      ],
+      "tree_sha256": "51e0a5cb7044c8b7b9ca751a8d2b8ced48f058c56c86d30c1800eeceb59b5aea",
+      "selector": [
+        49,
+        40,
+        22,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        0
+      ],
+      "tree_sha256": "1eae769c9baa9ac834026519d1fb60d403575c6f947a11a9b8669d4c49f4eb42",
+      "selector": [
+        49,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        0
+      ],
+      "tree_sha256": "c427257139cb96c1ec61d970ff0c5c2706f350e56805fb8f0d7b910d0a77e5ae",
+      "selector": [
+        49,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        0
+      ],
+      "tree_sha256": "64b9a522dabb1d6eec03ef9848e50d8b976586ac8a475572767d7e9eedddfcac",
+      "selector": [
+        49,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        0,
+        6,
+        0,
+        1,
+        0
+      ],
+      "tree_sha256": "8786a1bef44b81d9b6d58cec32ef632f91aaadb065c18fa5557c9e8f1435b361",
+      "selector": [
+        49,
+        22,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        0,
+        0,
+        0
+      ],
+      "tree_sha256": "95890a2877c40abddee28c730f6fd04ef9db16e2cd62fc504203f262e66e973a",
+      "selector": [
+        22,
+        11,
+        0,
+        0
+      ]
+    },
+    {
+      "slots": [
+        11,
+        6,
+        0,
+        7,
+        0
+      ],
+      "tree_sha256": "71fd652b877597c97d3043865b15b2e730b86628b7240911bcefd2955bfda770",
+      "selector": [
+        55,
+        22,
+        11,
+        0
+      ]
+    }
+  ],
+  "blend": {
+    "path": "data/newland/land/blendmap.png",
+    "bytes": 51948,
+    "sha256": "db1b67238c5639f1791079b092c4d1a4cd66897c5a33093f07c781fa7d7ce907"
+  }
+}

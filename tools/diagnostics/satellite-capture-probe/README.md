@@ -666,3 +666,15 @@ Full-chain WARP and native completion seam checks pass locally; no full-chain
 DLL has been installed or requested in game by this change. Native PNG/slice
 pixel comparison and repeat resource/memory measurements remain pending; see
 full-mip-verification.md. One biome still does not represent final geography.
+
+### Geographic primary1,1 isolation trial (local candidate)
+
+An additional default-off `[Probe] GeographicBiomes=1` path integrates all
+15 active biome records and 92 hashed compressed DDS inputs for primary1,1.
+It requires the existing standalone512 painted trial. Three bounded compressed
+array banks, the actual full-mip blend map and an 8x8 per-fragment world selector
+preserve native SID/channel layouts and independent diffuse/normal role indexes.
+This first trial keeps distortion/fade disabled and dry conditions. It has only
+been built and tested offline; no game geography acceptance is claimed.
+See [geography-verification.md](geography-verification.md) for exact candidate,
+resource bounds, WARP evidence and remaining acceptance work.

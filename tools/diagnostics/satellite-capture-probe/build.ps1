@@ -9,6 +9,10 @@ $out=Join-Path $PSScriptRoot 'build'
 New-Item -ItemType Directory -Force $out | Out-Null
 & $python "$PSScriptRoot/verify_render_abi.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/generate_geography_inputs.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$PSScriptRoot/run_geography_tests.ps1"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$repo/GlobalSatelliteMap/tests/run_gpu_mip_tests.ps1"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$PSScriptRoot/run_painted_mip_tests.ps1"
@@ -19,7 +23,13 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/embed_painted_shader.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/embed_geography_shader.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 $fxc='C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe'
+& $fxc /nologo /T ps_4_0 /E main_fs /O3 /Gec /D DX11=1 "/Fo$out/GeographyTerrain.cso" "$out/GeographyTerrain.hlsl"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/test_geography_shader.py" "$out/GeographyTerrain.cso"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $fxc /nologo /T ps_4_0 /E main_fs /O3 /Gec /D DX11=1 "/Fo$out/PaintedTerrain.cso" "$out/PaintedTerrain.hlsl"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_painted_shader.py" "$out/PaintedTerrain.cso"

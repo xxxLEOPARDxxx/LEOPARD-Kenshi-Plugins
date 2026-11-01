@@ -56,10 +56,10 @@ struct TerrainExperiment
     int primaryX,primaryZ;
     DWORD started,lastStep;
     std::string heightSource;
-    bool active,geometryOnly,definitionsReady,definitionsFailed;
+    bool active,geometryOnly,definitionsReady,definitionsFailed,geographic;
     TerrainExperimentPolicy::RecycleState recycle;
     TerrainExperiment():root(NULL),scene(NULL),terrain(NULL),camera(NULL),workspace(NULL),definitionOwner(NULL),
-        peakNativeMemory(0),primaryX(0),primaryZ(0),started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false){}
+        peakNativeMemory(0),primaryX(0),primaryZ(0),started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false),geographic(false){}
     void Define(Ogre::CompositorManager2 *manager)
     {
         if((definitionOwner&&definitionOwner!=manager)||definitionsFailed)
@@ -169,7 +169,7 @@ struct TerrainExperiment
                <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
         Log(message.str());
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome,bool paintedRequest)
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome,bool paintedRequest,bool geographicRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
@@ -177,6 +177,8 @@ struct TerrainExperiment
             throw std::runtime_error("single-biome material reference requires standalone512 full diagnostics");
         if(paintedRequest&&(referenceBiome.empty()||tileX!=1||tileZ!=1))
             throw std::runtime_error("painted reference requires the one guarded biome/primary1,1 fixture");
+        if(geographicRequest&&(!paintedRequest||referenceBiome.empty()||tileX!=1||tileZ!=1))throw std::runtime_error("geographic trial requires standalone512 painted primary1,1");
+        geographic=geographicRequest;
         if(diagnosticRaster.resolutionOnly)
         {
             MEMORYSTATUSEX memory={sizeof(MEMORYSTATUSEX)};
@@ -229,14 +231,15 @@ struct TerrainExperiment
             GameData *data=ou->gamedata.getData(referenceBiome);
             if(!data||data->stringID!=referenceBiome)throw std::runtime_error("private biome record lookup differs");
             const std::string gameRoot=heightPath.substr(0,heightPath.size()-std::string("/data/newland/land/fullmap.tif").size());
-            BiomeReference().Begin(data,gameRoot);
+            if(geographic)GeographyReference().Begin(gameRoot,root->getCompositorManager2());else BiomeReference().Begin(data,gameRoot);
             if(paintedRequest)
             {
                 PaintedReference().Begin(gameRoot,root->getCompositorManager2());
-                PaintedReference().Program(material);
+                if(!geographic)PaintedReference().Program(material);
             }
-            BiomeReference().Configure(data,material);
-            if(paintedRequest)PaintedReference().Bind(material);
+            if(!geographic)BiomeReference().Configure(data,material);
+            if(paintedRequest&&!geographic)PaintedReference().Bind(material);
+            if(geographic)GeographyReference().Bind(material);
         }
         material->load();
         CreateNativeTerrain();
@@ -293,6 +296,7 @@ struct TerrainExperiment
         TerrainExperimentPolicy::Stats stats={0};
         if(api.info(terrain,&stats)!=&stats)throw std::runtime_error("native Terrain Info aggregate ABI differs");
         peakNativeMemory=(std::max)(peakNativeMemory,stats.memory);
+        if(geographic&&!SatelliteGeography::Combined(stats.memory,64ULL*1024*1024))throw std::runtime_error("geography combined private GPU/mesh budget exceeded");
         const TerrainExperimentPolicy::Result result=warmup.Observe(started,now,stats);
         std::ostringstream s;s<<"isolated terrain step="<<warmup.frames<<" memory="<<stats.memory
           <<" patches="<<stats.patches<<" visible="<<stats.visible<<" triangles="<<stats.triangles
@@ -331,6 +335,7 @@ struct TerrainExperiment
         if(scene){api.destroyScene(root,scene);scene=NULL;}
         if(!material.isNull())
         {Ogre::MaterialManager::getSingleton().remove(material->getName());material.setNull();}
+        GeographyReference().Destroy();
         PaintedReference().Destroy();
         BiomeReference().Destroy();
         if(!output.isNull())

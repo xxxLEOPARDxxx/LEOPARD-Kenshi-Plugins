@@ -70,6 +70,8 @@
 #include "OwnedRtvDebt.h"
 #include "../../../GlobalSatelliteMap/TextureArrayPolicy.h"
 #include "../../../GlobalSatelliteMap/GpuMipUpload.h"
+#include "GpuCompressedUpload.h"
+#include "GeographyCompletion.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -1169,6 +1171,7 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
 }
 #include "PrivateBiomeReference.h"
 #include "PrivatePaintedReference.h"
+#include "PrivateGeography.h"
 #include "TerrainExperiment.h"
 // Explicit exported calls avoid stale SDK inline fields. Diagnostic snapshots only;
 // manager-reported bytes exclude native/driver caches. Never evict game resources.
@@ -1194,16 +1197,18 @@ void LogResourceTelemetry(const char *phase)
         names+=textures.resourceExists("LEOPARD_PrivateBiomeReferenceNormals");
         names+=textures.resourceExists(PrivatePaintedReference::Name(0));
         names+=textures.resourceExists(PrivatePaintedReference::Name(1));
+        for(unsigned bank=0;bank<5;++bank)names+=textures.resourceExists(PrivateGeography::Name(bank));
         names+=materials.resourceExists(PositionMaterialName);names+=materials.resourceExists(SunMaterialName);
         names+=materials.resourceExists("LEOPARD_PrivateTerrainMaterial");
         names+=high.resourceExists(PositionVertexName);names+=high.resourceExists(PositionFragmentName);names+=high.resourceExists(SunFragmentName);
         names+=high.resourceExists(PrivatePaintedReference::ProgramName());
+        names+=high.resourceExists(PrivateGeography::ProgramName());
         std::ostringstream s;s<<"resource telemetry "<<phase
           <<" scene="<<has(au->render->root,"LEOPARD_PrivateTerrainScene")<<" privateNames="<<names
           <<" workspaces="<<workspaces(au->render->root->getCompositorManager2())
           <<" textureBytes="<<bytes(&textures)<<" materialBytes="<<bytes(&materials)
           <<" highProgramBytes="<<bytes(&high)<<" lowProgramBytes="<<bytes(&low)
-          <<" cachedPrograms="<<programCache.Count()+PaintedReference().cache.Count()<<"; telemetry only; no resource eviction";Log(s.str());
+          <<" cachedPrograms="<<programCache.Count()+PaintedReference().cache.Count()+GeographyReference().cache.Count()<<"; telemetry only; no resource eviction";Log(s.str());
     }
     catch(...){Log("resource telemetry unavailable; no resource eviction attempted");}
 }
@@ -1599,7 +1604,8 @@ void Update(MapScreen *map)
                 geometryOnlyRequest,
                 GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0,
                 GetPrivateProfileIntA("Probe","RecycleTerrainBetweenCells",0,ini.c_str())!=0,biomeSid,
-                GetPrivateProfileIntA("Probe","PaintedMapsReference",0,ini.c_str())==1);
+                GetPrivateProfileIntA("Probe","PaintedMapsReference",0,ini.c_str())==1,
+                GetPrivateProfileIntA("Probe","GeographicBiomes",0,ini.c_str())==1);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }
