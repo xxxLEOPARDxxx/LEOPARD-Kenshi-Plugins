@@ -174,6 +174,31 @@ while retaining bounded render resources, investigate process-memory retention,
 then measure adjacent world samples/LOD morph seams. Final8192 targets remain
 disabled. At checkpoint the game is closed/private probe disabled, source pushed.
 
+### Bounded raster-allocation control after recycled2048 proof
+
+Sourcef150aef completed two16-cell512 and two16-cell2048 grids with15 private
+Terrain recycles,16 joined/closed native workers and one Scene per batch. Both
+2048 runs preserved all16 raw GBuffer pixel arrays; independent cell1,1 also
+matches. Tiny raw Sun differences remain measured, not declared identical.
+
+Next test isolates raster cost from geometric refinement: explicitly opt in to
+ResolutionOnlyControl for4096/8192 and scale both native detail thresholds by
+Side/2048 (T=F=16/32,D=0). Native metric uses viewport height divided by distance;
+power-of-two scaling leaves the2048 LOD decision/morph ratios unchanged. Verify
+actual native last-viewport height after each private update; reject mismatches.
+This is2048-equivalent geometry rendered at a genuinely larger output resolution,
+not proof of final8K mesh detail, seams, complete materials or map integration.
+
+Keep1GiB native/16M estimated geometry limits and120s batch deadline. Before
+allocating private scene/targets require available physical and commit memory for
+named surfaces+peak CPU readback+native geometry+2GiB reserve. Observe actual free
+VRAM externally before the manual trial (16GB adapter,~11GB free at checkpoint);
+the host guard does not prove GPU availability. Start with standalone4096, then
+8192 only after cleanup/repeat acceptance. Definitions/detail remain startup
+immutable; unsupported/implicit high resolutions stay inert. Review significant
+code independently and verify real production helpers, native ABI, GPU shaders
+and negative guards before installation. Do not publish this private control.
+
 ### Next bounded experiment: recycle Terrain, retain render surfaces
 
 Opt-in RecycleTerrainBetweenCells, default off, only for the fixed16-cell batch.

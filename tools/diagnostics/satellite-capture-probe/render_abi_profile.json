@@ -6,6 +6,12 @@
     "image_size": "9c9000",
     "exports": [
       {
+        "key": "PrivateViewportHeight",
+        "name": "?getActualHeight@Viewport@Ogre@@QEBAHXZ",
+        "rva": "395120",
+        "code": "8b 41 34 c3 cc cc cc cc cc cc cc cc cc cc cc cc f3 0f 10 44 24 28 f3 0f"
+      },
+      {
         "key": "GetLast",
         "name": "?getLastViewport@Camera@Ogre@@QEBAPEAVViewport@2@XZ",
         "rva": "acc20",

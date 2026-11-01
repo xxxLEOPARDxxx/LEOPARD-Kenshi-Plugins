@@ -8,6 +8,12 @@ assert 'getTerrainHeight' not in source
 assert 'int Side = 512;' in source and 'Side = raster.side;' in source
 assert source.count('Side = ')==2 and 'RasterPolicy::Select' in source
 assert '"DiagnosticSide",512' in source
+assert '"ResolutionOnlyControl",0' in source
+assert 'diagnosticRaster=raster;' in compact
+legacy=compact.index('mode=GetPrivateProfileIntA("Probe","Mode"')
+high_guard=compact.index('if(diagnosticRaster.resolutionOnly)throwstd::runtime_error("highrastercontrolrequirestheisolatedTerrainpath")')
+assert high_guard<legacy
+assert 'if(!fileRequests||!reusePrivateShaders)' in compact
 assert 'activateZone' not in source and 'showDistantTown(' not in source
 assert 'setEnabled(false)' in source
 assert 'ExposureScopeexposure;ProxyScopeproxy;exposure.Apply();proxy.Apply();' in compact
@@ -67,6 +73,10 @@ assert 'api.createObject(scene,"Terrain",api.memory(scene,Ogre::SCENE_STATIC),NU
 assert 'api.scale(terrain,294912,9800)' in ec and 'api.limits(terrain,32,8)' in ec
 assert ec.index('api.destroyObject(scene,terrain)') < ec.index('scene->destroyCamera(camera)') < ec.index('api.destroyScene(root,scene)')
 assert 'setMaterialCallbacks' not in experiment and 'new Terrain' not in experiment
+assert ec.index('RasterPolicy::HostFits(')<ec.index('api.createScene(')
+assert 'api.detail(terrain,diagnosticRaster.detail,diagnosticRaster.detail,0)' in ec
+assert ec.index('workspace->_update();')<ec.index('RasterPolicy::ViewportMatches(')<ec.index('warmup.Observe(')
+assert 'if(!last||!RasterPolicy::ViewportMatches(' in ec
 assert 'activation' not in experiment and 'loadGame' not in experiment
 assert 'IsolatedTerrain",0' in source and 'terrainExperiment.root' in source
 assert 'fresh==au->render->scene' in experiment and 'object==au->terrain' in experiment

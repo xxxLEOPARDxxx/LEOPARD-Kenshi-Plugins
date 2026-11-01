@@ -70,6 +70,7 @@ extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
 {
 int Side = 512; // Latched once at startup, before any compositor definition exists.
+RasterPolicy::Layout diagnosticRaster;
 DWORD mainThread = 0;
 bool keyHeld = false, pending = false, cleanup = false, inside = false, profileOK = false,
      chainSafe = true;
@@ -1471,6 +1472,8 @@ void Update(MapScreen *map)
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;
         }
+        if(diagnosticRaster.resolutionOnly)
+            throw std::runtime_error("high raster control requires the isolated Terrain path");
         mode = GetPrivateProfileIntA("Probe", "Mode", 0, ini.c_str());
         cx = GetPrivateProfileIntA("Probe", "CellX", 0, ini.c_str());
         cz = GetPrivateProfileIntA("Probe", "CellZ", 0, ini.c_str());
@@ -1595,15 +1598,25 @@ __declspec(dllexport) void startPlugin()
     {
         requestIni=Folder()+"SatelliteCaptureProbe.ini";
         RasterPolicy::Layout raster;
-        if(!RasterPolicy::Select(int(GetPrivateProfileIntA("Probe","DiagnosticSide",512,requestIni.c_str())),raster))
+        if(!RasterPolicy::Select(int(GetPrivateProfileIntA("Probe","DiagnosticSide",512,requestIni.c_str())),raster,
+            GetPrivateProfileIntA("Probe","ResolutionOnlyControl",0,requestIni.c_str())==1))
         {ErrorLog("SatelliteCaptureProbe: unsupported diagnostic raster; inert");return;}
         Side = raster.side;
+        diagnosticRaster=raster;
         std::ostringstream rasterLog;
         rasterLog<<"diagnostic raster latched side="<<Side<<" named surface bytes="<<raster.targetBytes
                  <<" peak readback/staging bytes="<<raster.readbackBytes<<"; excludes native geometry, depth/driver/main-scene allocations";
         Log(rasterLog.str());
         fileRequests=GetPrivateProfileIntA("Probe","EnableRequestFile",0,requestIni.c_str())==1;
         reusePrivateShaders=GetPrivateProfileIntA("Probe","ReusePrivateShaders",0,requestIni.c_str())==1;
+        if(raster.resolutionOnly)
+        {
+            if(!fileRequests||!reusePrivateShaders)
+            {ErrorLog("SatelliteCaptureProbe: high raster control requires opt-in request file and shader reuse; inert");return;}
+            std::ostringstream control;
+            control<<"resolution-only allocation control:2048-equivalent geometry detail="<<raster.detail
+                   <<"; unchanged1GiB/16M native limits; final terrain quality unproven";Log(control.str());
+        }
     }
     catch(...){ErrorLog("SatelliteCaptureProbe: request path unavailable; inert");return;}
     if (KenshiLib::SUCCESS !=

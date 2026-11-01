@@ -15,9 +15,11 @@ struct TerrainExperimentApi
     typedef bool (__fastcall *Stream)(Terrain*,const Ogre::String&);
     // Native member aggregate ABI: RCX=this,RDX=out,RAX=out (not a free aggregate return).
     typedef TerrainExperimentPolicy::Stats *(__fastcall *Info)(const Terrain*,TerrainExperimentPolicy::Stats*);
+    typedef int (__fastcall *ViewportHeight)(const Ogre::Viewport*);
     CreateScene createScene;DestroyScene destroyScene;Memory memory;
     CreateObject createObject;DestroyObject destroyObject;
     Scale scale;Patch patch;Detail detail;Limits limits;Material material;Stream stream;Info info;
+    ViewportHeight viewportHeight;
     void Bind()
     {
         createScene=reinterpret_cast<CreateScene>(AbiExport(nativeApi.ogre,CreatePrivateSceneName,CreatePrivateSceneRva));
@@ -32,6 +34,7 @@ struct TerrainExperimentApi
         material=reinterpret_cast<Material>(AbiExport(nativeApi.terrain,PrivateDefaultMaterialName,PrivateDefaultMaterialRva));
         stream=reinterpret_cast<Stream>(AbiExport(nativeApi.terrain,PrivateOpenStreamName,PrivateOpenStreamRva));
         info=reinterpret_cast<Info>(AbiExport(nativeApi.terrain,PrivateInfoName,PrivateInfoRva));
+        viewportHeight=reinterpret_cast<ViewportHeight>(AbiExport(nativeApi.ogre,PrivateViewportHeightName,PrivateViewportHeightRva));
     }
 };
 struct TerrainExperiment
@@ -96,7 +99,7 @@ struct TerrainExperiment
         if(!object->getParentNode())scene->getRootSceneNode(Ogre::SCENE_STATIC)->attachObject(object);
         object->setRenderQueueGroup(25);
         api.scale(terrain,294912,9800);api.patch(terrain,64);
-        api.detail(terrain,8,8,0);api.limits(terrain,32,8);
+        api.detail(terrain,diagnosticRaster.detail,diagnosticRaster.detail,0);api.limits(terrain,32,8);
         api.material(terrain,material->getName());
         if(!api.stream(terrain,heightSource))throw std::runtime_error("private fullmap stream failed");
     }
@@ -170,6 +173,15 @@ struct TerrainExperiment
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
+        if(diagnosticRaster.resolutionOnly)
+        {
+            MEMORYSTATUSEX memory={sizeof(MEMORYSTATUSEX)};
+            if(!GlobalMemoryStatusEx(&memory)||!RasterPolicy::HostFits(diagnosticRaster,memory.ullAvailPhys,memory.ullAvailPageFile))
+                throw std::runtime_error("high raster control host memory preflight refused; no scene allocated");
+            std::ostringstream budget;
+            budget<<"high raster host preflight available physical="<<memory.ullAvailPhys<<" commit="<<memory.ullAvailPageFile
+                  <<" required="<<RasterPolicy::RequiredHostBytes(diagnosticRaster)<<"; GPU availability requires separate measurement";Log(budget.str());
+        }
         batch.Begin(gridRequest,GetTickCount());
         heightSource=heightPath;recycle.Start(recycleRequest,gridRequest);
         if(batch.enabled&&!batch.Cell(tileX,tileZ))throw std::runtime_error("private grid cursor refused");
@@ -243,6 +255,15 @@ struct TerrainExperiment
         if(static_cast<DWORD>(now-lastStep)<100)return false;
         lastStep=now;
         workspace->_update();
+        if(!warmup.frames)
+        {
+            Ogre::Viewport *last=nativeApi.getLast(camera);
+            if(!last||!RasterPolicy::ViewportMatches(diagnosticRaster,api.viewportHeight(last)))
+                throw std::runtime_error("private Terrain actual viewport height differs from raster control");
+            std::ostringstream lod;
+            lod<<"private Terrain LOD viewport height="<<api.viewportHeight(last)<<" detail="<<diagnosticRaster.detail
+               <<" resolutionOnly="<<diagnosticRaster.resolutionOnly;Log(lod.str());
+        }
         TerrainExperimentPolicy::Stats stats={0};
         if(api.info(terrain,&stats)!=&stats)throw std::runtime_error("native Terrain Info aggregate ABI differs");
         peakNativeMemory=(std::max)(peakNativeMemory,stats.memory);

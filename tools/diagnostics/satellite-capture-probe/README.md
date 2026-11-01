@@ -513,3 +513,28 @@ requests; full/unsafe abort clears the scheduling latch to prevent an error loop
 production deferred-state cases and an empty-Abort mutant that fails. Independent
 review clear after correcting the abort latch. Runtime coverage/memory acceptance
 still require new512 then2048 evidence; this is not a final8K mode.
+
+Live f150aef: two recycled512 grids completed10922/9584ms; two recycled2048
+grids completed31574/30265ms. Each saved16 cells, joined/closed16 native workers,
+recycled Terrain15 times and removed one Scene. All16 repeated2048 raw GBuffer
+arrays match; independent primary1,1 also matches. Raw Sun differs at very few
+pixels (max14 levels, mean~0.000003); exposed variants also reflect live adaptation.
+All96 position/raw/exposed GPU readbacks were finite. Native peak751566080B;
+named material/texture counts returned. Process idle grew~7.75→8.22GB after two
+grids: whole-process retention acceptance remains open.
+
+### Explicit4096/8192 raster allocation control
+ResolutionOnlyControl=1 plus startup DiagnosticSide4096/8192, EnableRequestFile1
+and ReusePrivateShaders1 enables only isolated Terrain. Legacy capture paths are
+refused before allocation. It renders genuine high-resolution outputs while
+preserving2048-equivalent native geometry (T=F16/32,D0). Actual last-viewport
+height is checked through an exact native export after each first cell update.
+Unchanged1GiB/16M native limits still apply. This control is not final8K mesh,
+seam, detailed-material/building or interactive-map acceptance.
+
+Named targets cost768MiB/3GiB and peak CPU staging384MiB/1.5GiB at4096/8192.
+Before creating a Scene, available physical and commit memory must cover these
+plus1GiB native geometry and2GiB reserve. This is a host guard, not a VRAM query;
+free GPU memory must be measured separately before explicit manual experiments.
+No automatic startup capture/resizing is added. Unsupported/implicit high sizes
+remain inert. Runtime allocation and repeat cleanup evidence are still pending.

@@ -15,5 +15,18 @@ int main()
     CHECK(!RasterPolicy::Select(8192,out));
     CHECK(!RasterPolicy::Select(2147483647,out));
     CHECK(out.side==last.side&&out.pixels==last.pixels&&out.targetBytes==last.targetBytes);
+    CHECK(RasterPolicy::Select(4096,out,true)&&out.detail==16&&out.resolutionOnly&&out.targetBytes==805306368ULL&&out.readbackBytes==402653184ULL);
+    CHECK(RasterPolicy::Select(8192,out,true)&&out.detail==32&&out.resolutionOnly&&out.targetBytes==3221225472ULL&&out.readbackBytes==1610612736ULL&&out.bmpBytes==268435510ULL);
+    CHECK(!RasterPolicy::Select(16384,out,true));
+    CHECK(RasterPolicy::Select(2048,out,true)&&out.detail==8&&!out.resolutionOnly);
+    CHECK(RasterPolicy::Select(8192,out,true));
+    const unsigned __int64 need=out.targetBytes+out.readbackBytes+3ULL*1024*1024*1024;
+    CHECK(RasterPolicy::HostFits(out,need,need));
+    CHECK(!RasterPolicy::HostFits(out,need-1,need));
+    CHECK(!RasterPolicy::HostFits(out,need,need-1));
+    CHECK(RasterPolicy::ViewportMatches(out,8192));
+    CHECK(!RasterPolicy::ViewportMatches(out,2048));
+    CHECK(!RasterPolicy::ViewportMatches(out,0));
+    CHECK(RasterPolicy::Select(512,out)&&out.detail==8&&!out.resolutionOnly);
     std::cout<<checks<<" production bounded diagnostic raster checks passed\n";
 }
