@@ -46,3 +46,87 @@ msgstr "Wear threshold"
 
 msgid "Wear of any robotic part above which the character goes to repair himself."
 msgstr "Wear of any robotic part above which the character goes to repair himself."
+
+msgid "Automatic rest"
+msgstr "Automatic rest"
+
+msgid "Sleep when wounded"
+msgstr "Sleep when wounded"
+
+msgid "Bandaged biological wounds trigger a nearby ordinary bed. Healthy workers and manual travel orders are left alone. Off by default."
+msgstr "Bandaged biological wounds trigger a nearby ordinary bed. Healthy workers and manual travel orders are left alone. Off by default."
+
+msgid "Sleep below health (%)"
+msgstr "Sleep below health (%)"
+
+msgid "Lowest biological part health that starts automatic sleep."
+msgstr "Lowest biological part health that starts automatic sleep."
+
+msgid "Wake above health (%)"
+msgstr "Wake above health (%)"
+
+msgid "Biological health required to finish our sleep order. Prosthetic health is handled separately. Cannot be below the sleep threshold."
+msgstr "Biological health required to finish our sleep order. Prosthetic health is handled separately. Cannot be below the sleep threshold."
+
+msgid "Repair damaged robotic parts"
+msgstr "Repair damaged robotic parts"
+
+msgid "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
+msgstr "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
+
+msgid "Repair below robotic health (%)"
+msgstr "Repair below robotic health (%)"
+
+msgid "Lowest robotic part health that starts automatic repair when enabled."
+msgstr "Lowest robotic part health that starts automatic repair when enabled."
+
+msgid "Bed search radius (m)"
+msgstr "Bed search radius (m)"
+
+msgid "Maximum distance for automatic rest and replacement rescue beds. Only the same settlement is considered."
+msgstr "Maximum distance for automatic rest and replacement rescue beds. Only the same settlement is considered."
+
+msgid "Own beds only"
+msgstr "Own beds only"
+
+msgid "Use only your faction's beds. If disabled, allied beds may also be considered; enemy and neutral beds are excluded."
+msgstr "Use only your faction's beds. If disabled, allied beds may also be considered; enemy and neutral beds are excluded."
+
+msgid "Gate passage"
+msgstr "Gate passage"
+
+msgid "Open own gates while travelling"
+msgstr "Open own gates while travelling"
+
+msgid "A stalled explicit movement order can open a closed gate belonging to your faction, pass and resume its destination. No teleporting. Off by default."
+msgstr "A stalled explicit movement order can open a closed gate belonging to your faction, pass and resume its destination. No teleporting. Off by default."
+
+msgid "Allow opening locked gates"
+msgstr "Allow opening locked gates"
+
+msgid "Allow passage to unlock your own gates. Disabled means locked gates remain untouched."
+msgstr "Allow passage to unlock your own gates. Disabled means locked gates remain untouched."
+
+msgid "Close after passage"
+msgstr "Close after passage"
+
+msgid "Request normal closing after passage only when the gate area is clear. Manual orders and lock changes cancel our assistance."
+msgstr "Request normal closing after passage only when the gate area is clear. Manual orders and lock changes cancel our assistance."
+
+msgid "Restore original lock"
+msgstr "Restore original lock"
+
+msgid "If we unlocked the gate, restore its lock only after it closes normally. Requires closing after passage."
+msgstr "If we unlocked the gate, restore its lock only after it closes normally. Requires closing after passage."
+
+msgid "Gate search radius (m)"
+msgstr "Gate search radius (m)"
+
+msgid "Local search distance around a stalled traveller; gates outside the movement corridor are ignored."
+msgstr "Local search distance around a stalled traveller; gates outside the movement corridor are ignored."
+
+msgid "Gate close delay (s)"
+msgstr "Gate close delay (s)"
+
+msgid "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
+msgstr "Minimum delay after crossing before requesting closure. Nearby characters postpone it."

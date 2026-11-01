@@ -46,3 +46,87 @@ msgstr "磨损阈值"
 
 msgid "Wear of any robotic part above which the character goes to repair himself."
 msgstr "任一机械部件的磨损超过此值时，角色会去修理。"
+
+msgid "Automatic rest"
+msgstr "自动休息"
+
+msgid "Sleep when wounded"
+msgstr "受伤时睡觉"
+
+msgid "Bandaged biological wounds trigger a nearby ordinary bed. Healthy workers and manual travel orders are left alone. Off by default."
+msgstr "生物部位受伤并已包扎时，自动前往附近的普通床。不会干预健康工人或手动移动命令。默认关闭。"
+
+msgid "Sleep below health (%)"
+msgstr "低于此生命值时睡觉（%）"
+
+msgid "Lowest biological part health that starts automatic sleep."
+msgstr "受伤最重的生物部位低于此生命值时开始自动睡觉。"
+
+msgid "Wake above health (%)"
+msgstr "达到此生命值时起床（%）"
+
+msgid "Biological health required to finish our sleep order. Prosthetic health is handled separately. Cannot be below the sleep threshold."
+msgstr "完成本模组睡眠命令所需的生物部位生命值。义肢单独处理。不能低于开始睡觉的阈值。"
+
+msgid "Repair damaged robotic parts"
+msgstr "修复受损机械部位"
+
+msgid "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
+msgstr "机械部位生命值受损时，可独立于磨损情况前往通电的修理床。适用于骨人和义肢。默认关闭。"
+
+msgid "Repair below robotic health (%)"
+msgstr "低于此机械生命值时修理（%）"
+
+msgid "Lowest robotic part health that starts automatic repair when enabled."
+msgstr "启用后，受损最重的机械部位低于此生命值时开始自动修理。"
+
+msgid "Bed search radius (m)"
+msgstr "床位搜索半径（米）"
+
+msgid "Maximum distance for automatic rest and replacement rescue beds. Only the same settlement is considered."
+msgstr "自动休息及救援时替换床位的最大距离。只考虑同一城镇或营地。"
+
+msgid "Own beds only"
+msgstr "仅使用己方床位"
+
+msgid "Use only your faction's beds. If disabled, allied beds may also be considered; enemy and neutral beds are excluded."
+msgstr "仅使用玩家阵营的床位。关闭后也可考虑盟友的床位；不会使用敌对或中立阵营的床位。"
+
+msgid "Gate passage"
+msgstr "通行大门"
+
+msgid "Open own gates while travelling"
+msgstr "移动时打开己方大门"
+
+msgid "A stalled explicit movement order can open a closed gate belonging to your faction, pass and resume its destination. No teleporting. Off by default."
+msgstr "手动移动命令被己方关闭的大门阻挡时，角色会打开大门、通过并继续前往原目的地。不使用传送。默认关闭。"
+
+msgid "Allow opening locked gates"
+msgstr "允许打开已上锁的大门"
+
+msgid "Allow passage to unlock your own gates. Disabled means locked gates remain untouched."
+msgstr "允许为通行而解锁己方大门。关闭时不会操作已上锁的大门。"
+
+msgid "Close after passage"
+msgstr "通过后关闭"
+
+msgid "Request normal closing after passage only when the gate area is clear. Manual orders and lock changes cancel our assistance."
+msgstr "通过后，仅在大门附近无人时请求正常关闭。手动命令或锁定状态更改会取消本模组的协助。"
+
+msgid "Restore original lock"
+msgstr "恢复原有锁定状态"
+
+msgid "If we unlocked the gate, restore its lock only after it closes normally. Requires closing after passage."
+msgstr "若本模组解锁了大门，则仅在大门正常关闭后重新上锁。需要启用通过后关闭。"
+
+msgid "Gate search radius (m)"
+msgstr "大门搜索半径（米）"
+
+msgid "Local search distance around a stalled traveller; gates outside the movement corridor are ignored."
+msgstr "在受阻角色周围搜索的距离；忽略移动路径走廊之外的大门。"
+
+msgid "Gate close delay (s)"
+msgstr "大门关闭延迟（秒）"
+
+msgid "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
+msgstr "通过后请求关闭大门的最短等待时间。附近有角色时会推迟关闭。"

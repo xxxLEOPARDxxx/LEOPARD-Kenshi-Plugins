@@ -46,3 +46,87 @@ msgstr "Порог износа"
 
 msgid "Wear of any robotic part above which the character goes to repair himself."
 msgstr "Износ любой робот-части, выше которого персонаж идёт чиниться."
+
+msgid "Automatic rest"
+msgstr "Автоматический отдых"
+
+msgid "Sleep when wounded"
+msgstr "Сон при ранениях"
+
+msgid "Bandaged biological wounds trigger a nearby ordinary bed. Healthy workers and manual travel orders are left alone. Off by default."
+msgstr "Персонаж с перевязанными живыми частями сам идёт к обычной кровати рядом. Здоровые работники и ручные приказы движения не затрагиваются. По умолчанию выключено."
+
+msgid "Sleep below health (%)"
+msgstr "Сон при здоровье ниже (%)"
+
+msgid "Lowest biological part health that starts automatic sleep."
+msgstr "Порог здоровья самой повреждённой живой части для автоматического сна."
+
+msgid "Wake above health (%)"
+msgstr "Вставать при здоровье от (%)"
+
+msgid "Biological health required to finish our sleep order. Prosthetic health is handled separately. Cannot be below the sleep threshold."
+msgstr "Здоровье живых частей для завершения нашего приказа сна. Протезы учитываются отдельно. Значение не ниже порога начала сна."
+
+msgid "Repair damaged robotic parts"
+msgstr "Ремонт повреждённых робочастей"
+
+msgid "Robotic part health can trigger a powered repair bed independently of wear. Works for skeletons and prosthetics. Off by default."
+msgstr "Повреждение роботизированной части позволяет идти к работающей ремкровати независимо от износа. Для скелетов и протезов. По умолчанию выключено."
+
+msgid "Repair below robotic health (%)"
+msgstr "Ремонт при здоровье робочасти ниже (%)"
+
+msgid "Lowest robotic part health that starts automatic repair when enabled."
+msgstr "Порог здоровья самой повреждённой роботизированной части для включённого авторемонта."
+
+msgid "Bed search radius (m)"
+msgstr "Радиус поиска кровати (м)"
+
+msgid "Maximum distance for automatic rest and replacement rescue beds. Only the same settlement is considered."
+msgstr "Предельное расстояние для автоматического отдыха и замены кровати при спасении. Только то же поселение."
+
+msgid "Own beds only"
+msgstr "Только свои кровати"
+
+msgid "Use only your faction's beds. If disabled, allied beds may also be considered; enemy and neutral beds are excluded."
+msgstr "Использовать только кровати своей фракции. Если выключено, допускаются союзные; вражеские и нейтральные исключены."
+
+msgid "Gate passage"
+msgstr "Проход через ворота"
+
+msgid "Open own gates while travelling"
+msgstr "Открывать свои ворота при движении"
+
+msgid "A stalled explicit movement order can open a closed gate belonging to your faction, pass and resume its destination. No teleporting. Off by default."
+msgstr "Если ручной приказ движения упёрся в закрытые ворота своей фракции, персонаж открывает их, проходит и продолжает путь. Без телепортации. По умолчанию выключено."
+
+msgid "Allow opening locked gates"
+msgstr "Разрешить открывать запертые ворота"
+
+msgid "Allow passage to unlock your own gates. Disabled means locked gates remain untouched."
+msgstr "Разрешить отпирать свои ворота для прохода. При выключении запертые ворота не затрагиваются."
+
+msgid "Close after passage"
+msgstr "Закрывать после прохода"
+
+msgid "Request normal closing after passage only when the gate area is clear. Manual orders and lock changes cancel our assistance."
+msgstr "После прохода просить обычное закрытие, только когда у ворот никого нет. Ручные приказы и изменения замка отменяют нашу помощь."
+
+msgid "Restore original lock"
+msgstr "Восстанавливать исходный замок"
+
+msgid "If we unlocked the gate, restore its lock only after it closes normally. Requires closing after passage."
+msgstr "Если мы отперли ворота, запереть их снова только после обычного закрытия. Требуется закрытие после прохода."
+
+msgid "Gate search radius (m)"
+msgstr "Радиус поиска ворот (м)"
+
+msgid "Local search distance around a stalled traveller; gates outside the movement corridor are ignored."
+msgstr "Расстояние поиска вокруг остановившегося персонажа; ворота в стороне от пути не учитываются."
+
+msgid "Gate close delay (s)"
+msgstr "Задержка закрытия ворот (с)"
+
+msgid "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
+msgstr "Минимальная задержка после прохода перед запросом закрытия. Персонажи рядом откладывают закрытие."

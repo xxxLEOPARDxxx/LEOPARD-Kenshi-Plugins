@@ -1,0 +1,91 @@
+#include <cstdio>
+#include <limits>
+#include "../RestPolicy.h"
+#include "../GatePolicy.h"
+int checks=0,failures=0;
+void Check(bool value,const char* name){++checks;if(!value){++failures;printf("FAIL: %s\n",name);}}
+int main()
+{
+    using namespace AIFixedRest;
+    Health healthy;healthy.Part(false,false,false,1,0,100,0,100);
+    Check(NutritionAllows(false,1),"native normal nutrition permits resting");
+    Check(!NutritionAllows(false,.75f),"native hunger penalty gives feeding priority");
+    Check(!NutritionAllows(false,std::numeric_limits<float>::quiet_NaN()),"invalid nutrition fails closed");
+    Check(NutritionAllows(true,0),"skeletons do not require food");
+    SimulationClock clock;unsigned stamp=0;
+    Check(clock.Sample(100,false,stamp)&&stamp==1,"simulation clock anchors without charging previous world age");
+    Check(clock.Sample(101,false,stamp)&&stamp==1001,"simulation clock counts actual native time progression");
+    Check(!clock.Sample(3701,true,stamp)&&stamp==1001,"paused native clock change does not consume a deadline");
+    Check(clock.Sample(3702,false,stamp)&&stamp==1001,"first resume gap is excluded");
+    Check(clock.Sample(3703,false,stamp)&&stamp==2001,"subsequent active simulation advances normally");
+    Check(clock.Sample(10,false,stamp)&&stamp==2001,"native clock rewind reanchors without expiring orders");
+    Check(!clock.Sample(std::numeric_limits<double>::quiet_NaN(),false,stamp),"invalid native clock fails closed");
+    Check(clock.Sample(10000,false,stamp)&&stamp==2001,"recovery from invalid clock does not charge unknown interval");
+    Check(!clock.Sample((std::numeric_limits<double>::max)(),false,stamp),"finite clock overflow fails closed before timestamp conversion");
+    clock.Reset();Check(clock.Sample(0,false,stamp)&&stamp==1,"world reset restores sentinel-safe timer origin");
+    clock.Sample(4294967.290,false,stamp);const unsigned beforeWrap=stamp;
+    clock.Sample(4294967.310,false,stamp);
+    Check(unsigned(stamp-beforeWrap)>=19&&unsigned(stamp-beforeWrap)<=21,"simulation timestamp wrap preserves short unsigned deadlines");
+    Check(Needed(healthy,true,true,true,.9f,.9f,50)==None,"healthy standing worker is not sent to bed");
+    Health flesh;flesh.Part(false,false,false,.6f,0,60,40,100);
+    Check(Needed(flesh,true,true,true,.9f,.9f,50)==Sleep,"bandaged flesh uses ordinary sleep");
+    Health bleeding;bleeding.Part(false,false,false,.6f,0,60,0,100);
+    Check(Needed(bleeding,true,true,true,.9f,.9f,50)==None,"untreated wounds wait for medical care");
+    Health mixed=flesh;mixed.Part(true,false,false,.2f,70,20,0,100);
+    Check(Needed(mixed,true,true,true,.9f,.9f,50)==Sleep,"human prosthetics do not select repair before flesh care");
+    mixed.fleshRatio=1;
+    Health lowerWake=mixed;lowerWake.fleshRatio=.95f;
+    Check(Needed(lowerWake,false,true,true,.9f,.9f,50,.9f)==Repair,"repair transition respects configured flesh completion threshold");
+    Check(Complete(mixed,Sleep,.99f),"ordinary bed completion ignores unrepairable prosthetics");
+    Check(!Complete(mixed,Repair,.99f),"robotic health and wear both gate repair completion");
+    Check(Needed(mixed,false,true,false,.9f,.9f,50)==Repair,"wear repair remains independent module");
+    mixed.wear=0;
+    Check(Needed(mixed,false,true,false,.9f,.9f,50)==None,"robotic damage alone does not enable disabled health module");
+    Check(Needed(mixed,false,false,true,.9f,.9f,50)==Repair,"robotic damage can trigger health repair without wear");
+    mixed.robotRatio=1;mixed.robotMissing=0;mixed.wear=.4f;
+    Check(Complete(mixed,Repair,.99f),"small completion epsilon permits repaired limbs");
+    mixed.wear=2;
+    Check(!Complete(mixed,Repair,.99f),"nonzero significant wear cannot finish repair");
+    Health highHP;highHP.Part(true,false,false,.995f,0,298.5f,0,300);
+    Check(!Complete(highHP,Repair,.99f),"high maximum robotic HP does not relax absolute completion epsilon");
+    Health stunned;stunned.Part(true,false,false,1,0,300,0,300,1);
+    Check(!Complete(stunned,Repair,.99f),"prosthetic stun damage must also recover");
+    Health almost;almost.Part(true,false,false,.998f,0,299.6f,0,300,0);
+    Check(Complete(almost,Repair,.99f),"absolute half HP epsilon matches existing repair guarantee");
+    Health missing;missing.Part(true,true,false,0,90,0,0,0);
+    Check(Needed(missing,false,true,true,.9f,.9f,50)==None,"missing limb is not an endless repair target");
+    Health invalid;invalid.Part(false,false,false,std::numeric_limits<float>::quiet_NaN(),0,100,0,100);
+    Check(Needed(invalid,true,true,true,.9f,.9f,50)==None,"invalid medical data fails closed");
+    Bed bed;bed.properFunction=bed.furniture=bed.useable=bed.free=bed.powered=bed.own=bed.sameTown=bed.sameFloor=true;
+    bed.distanceSq=10000;
+    Check(Allowed(bed,Repair,true,100),"bed at radius boundary is accepted");
+    Check(!Allowed(bed,Repair,true,99),"distant repair bed cannot cause continent travel");
+    bed.properFunction=false;Check(!Allowed(bed,Sleep,true,100),"barrel or wrong building function rejected");bed.properFunction=true;
+    bed.furniture=false;Check(!Allowed(bed,Sleep,true,100),"function flag without furniture rejected");bed.furniture=true;
+    bed.useable=false;Check(!Allowed(bed,Sleep,true,100),"unusable modded furniture rejected");bed.useable=true;
+    bed.sameFloor=false;Check(!Allowed(bed,Sleep,true,100),"wrong floor rejected");bed.sameFloor=true;
+    bed.sameTown=false;Check(!Allowed(bed,Sleep,true,100),"different town rejected");bed.sameTown=true;
+    bed.own=false;bed.allied=true;
+    Check(!Allowed(bed,Sleep,true,100),"own beds only excludes allied bed");
+    Check(Allowed(bed,Sleep,false,100),"optional allied beds accepted");bed.own=true;
+    bed.powered=false;Check(!Allowed(bed,Repair,true,100)&&Allowed(bed,Sleep,true,100),"repair power required only for repair");bed.powered=true;
+    bed.free=false;Check(!Allowed(bed,Sleep,true,100),"occupied or reserved slot rejected");
+    Check(!IntentAllows(true,false,false),"manual travel / NeedSleep orders take priority");
+    Check(!IntentAllows(false,true,true),"cancelled injury episode cannot reissue sleep");
+    Check(IntentAllows(true,true,false),"exact owned rest order can complete");
+    using namespace AIFixedGate;
+    Point in(-2,0,0),out(2,0,0),from(-4,0,0),to(4,0,0);
+    Check(Crosses(from,to,in,out,8),"gate corridor crossing selected");
+    Check(!Crosses(from,Point(-8,0,0),in,out,8),"same side movement does not open gate");
+    Check(!Crosses(Point(-4,0,20),Point(4,0,20),in,out,8),"unrelated nearby gate rejected");
+    Check(!Crosses(Point(-4,20,0),to,in,out,8),"gate on different floor rejected");
+    Check(!Crosses(from,to,in,in,8),"invalid native gate direction rejected");
+    Check(!Ready(1000,800,500,0),"click storm quiet period enforced");
+    Check(!Ready(1000,0,900,0),"stationary sample duration enforced");
+    Check(!Ready(1000,0,500,1),"moving actor not interrupted");
+    Check(Ready(1000,0,500,.25f),"stalled actor eligible after quiet period");
+    Check(Ready(200,0xffffff00u,0xffffff00u,0),"tick wrap uses unsigned time");
+    Check(!Expired(30000,0)&&Expired(30001,0),"gate episode has bounded lifetime");
+    printf("AIFixed policies: %s (%d checks)\n",failures?"FAIL":"PASS",checks);
+    return failures?1:0;
+}
