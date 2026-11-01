@@ -36,5 +36,11 @@ int main()
     Check(!SafeAuxiliaryCleanup(true,&owned,&other),"different live manager must retain auxiliary resources");
     Check(!SafeAuxiliaryCleanup(true,&owned,NULL),"unknown manager must retain auxiliary resources");
     Check(SafeAuxiliaryCleanup(false,&owned,NULL),"no auxiliary workspace needs no manager proof");
-    std::cout << "17 fixed-grid/projection/cleanup checks passed\n";
+    Check(ValidShaderSource("float4 main(){}",15),"ASCII shader source accepted");
+    Check(!ValidShaderSource("",0),"empty shader refused");
+    Check(!ValidShaderSource(NULL,1),"null shader refused");
+    Check(!ValidShaderSource("abc\0def",7),"embedded shader NUL refused");
+    Check(!ValidShaderSource("\xFF",1),"non-ASCII shader refused");
+    Check(!ValidShaderSource("x",32769),"oversized source refused before reading bytes");
+    std::cout << "23 fixed-grid/projection/cleanup/source checks passed\n";
 }

@@ -3,6 +3,13 @@
 #include <cstddef>
 namespace ProbePolicy
 {
+inline bool ValidShaderSource(const char *bytes, std::size_t size)
+{
+    if (!bytes || !size || size > 32768) return false;
+    for (std::size_t i=0;i<size;++i)
+        if (!bytes[i] || static_cast<unsigned char>(bytes[i]) > 127) return false;
+    return true;
+}
 inline bool SafeAuxiliaryCleanup(bool hasWorkspace, const void *owner, const void *current)
 {
     return !hasWorkspace || (owner && owner == current);

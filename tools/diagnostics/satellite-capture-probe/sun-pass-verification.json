@@ -2,7 +2,7 @@
   "utc": "2026-10-31T23:44:43.579658+00:00",
   "dll_sha256": "608024b4d248d85e60418c3c9b9f4248b026d14995ae650795a56bdab98a35d0",
   "bytes": 126976,
-  "status": "Built and independently reviewed; not installed/runtime tested",
+  "status": "Two runtime captures executed/repeated; COLOUR FAILED due legacy SRV binding mismatch",
   "checks": {
     "position_HLSL_WARP": 33,
     "reference_camera_HLSL_WARP": 45,
@@ -36,5 +36,54 @@
     "Uses source NoShadow texture configuration, not proved runtime RTW/CSM identity",
     "Linear-clamped BMP is diagnostic; HDR statistics govern brightness",
     "No world-atlas/FPS/long-memory acceptance"
-  ]
+  ],
+  "runtime": {
+    "pid": 33260,
+    "start_utc": "2026-10-31T23:51:32.4721216Z",
+    "captures": 2,
+    "cell": [
+      -51,
+      2
+    ],
+    "position_valid": 262144,
+    "sun_valid": 262138,
+    "sun_nonfinite": 0,
+    "mean_luminance": [
+      1.59125657,
+      1.59124935
+    ],
+    "max_luminance": 3.9919516,
+    "acceptance": "Runtime compile/repeat only; yellow-green colours incorrect",
+    "bindings": {
+      "albedoBuffer": "t1",
+      "normalBuffer": "t2",
+      "depthBuffer": "t0"
+    },
+    "images": [
+      {
+        "name": "probe_33260_56508406_1_mode3_final.bmp",
+        "sha256": "982dcdfb8e30d3065c49c230e0a63e064f5a66fc7eb7ba1131ded0eb62995641"
+      },
+      {
+        "name": "probe_33260_56508406_1_mode3_gbuffer0_raw.bmp",
+        "sha256": "79787b7878473651b3d90a3ac5339aef601cacf4897e56d6a961d3caecaa2cef"
+      },
+      {
+        "name": "probe_33260_56508406_1_mode3_sun_noShadow_linear_clamped.bmp",
+        "sha256": "2ffd5de1ce53e4fb44c56f45885fc7b2d194108c457319f2984d19c67a6b162e"
+      },
+      {
+        "name": "probe_33260_56513046_2_mode3_final.bmp",
+        "sha256": "08d2247b69d51fc7e687f681eadcfbab7b04393c9e2e2f50e5266997fa4766d3"
+      },
+      {
+        "name": "probe_33260_56513046_2_mode3_gbuffer0_raw.bmp",
+        "sha256": "79787b7878473651b3d90a3ac5339aef601cacf4897e56d6a961d3caecaa2cef"
+      },
+      {
+        "name": "probe_33260_56513046_2_mode3_sun_noShadow_linear_clamped.bmp",
+        "sha256": "d3742869d05935e0c5af56cb87ec51cb1c7c6cdb7f96948874c1241972aa7580"
+      }
+    ]
+  }
 }

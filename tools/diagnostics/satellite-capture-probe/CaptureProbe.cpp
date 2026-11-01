@@ -645,6 +645,36 @@ void InspectPositionPass(Ogre::Camera *camera, const std::vector<float> &depth)
       << " max radial error metres=" << maxRadialError;
     Log(s.str());
 }
+std::string LoadSunSource()
+{
+    const std::string path=Folder()+"SunShaderOverride.hlsl";
+    HANDLE h=CreateFileA(path.c_str(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    if(h==INVALID_HANDLE_VALUE)
+    {
+        const DWORD error=GetLastError();
+        if(error==ERROR_FILE_NOT_FOUND || error==ERROR_PATH_NOT_FOUND)
+        { Log("using embedded sun shader");return SunShaderSource; }
+        throw std::runtime_error("sun override unavailable; no fallback on read error");
+    }
+    struct LockedFile
+    {
+        HANDLE handle;
+        LockedFile(HANDLE value):handle(value){}
+        ~LockedFile(){CloseHandle(handle);}
+    } file(h);
+    LARGE_INTEGER size;
+    if(!GetFileSizeEx(h,&size) || size.QuadPart<=0 || size.QuadPart>32768)
+        throw std::runtime_error("sun override size outside bounds");
+    std::vector<char> bytes(static_cast<size_t>(size.QuadPart));DWORD read=0;
+    if(!ReadFile(h,&bytes[0],DWORD(bytes.size()),&read,NULL) || read!=bytes.size() ||
+       !ProbePolicy::ValidShaderSource(&bytes[0],bytes.size()))
+        throw std::runtime_error("sun override invalid or incomplete");
+    // FILE_SHARE_READ keeps normal writes/replacement denied through read and hash.
+    const std::string hash=FileHash(path.c_str());
+    if(hash.size()!=64)throw std::runtime_error("sun override hash unavailable");
+    Log("using sun override SHA256="+hash);
+    return std::string(&bytes[0],bytes.size());
+}
 Ogre::Vector4 SharedVector(const char *set, const char *name, unsigned count)
 {
     Ogre::GpuSharedParametersPtr p = Ogre::GpuProgramManager::getSingleton().getSharedParameters(set);
@@ -695,7 +725,7 @@ void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene
     if (source.isNull()) throw std::runtime_error("native no-shadow material missing");
     sunFragment = programs.createProgram(SunFragmentName,
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,"hlsl",Ogre::GPT_FRAGMENT_PROGRAM);
-    sunFragment->setSource(SunShaderSource);
+    sunFragment->setSource(LoadSunSource());
     sunFragment->setParameter("entry_point","main_ps");
     sunFragment->setParameter("target","ps_4_0");
     sunFragment->setParameter("enable_backwards_compatibility","true");
@@ -769,13 +799,23 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix)
     std::vector<float> pixels(Side*Side*4);
     Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_RGBA,&pixels[0]);
     sunTarget->getBuffer()->blitToMemory(box);
-    unsigned valid=0,nonfinite=0;double total=0,maximum=0;
+    unsigned valid=0,nonfinite=0,belowZero=0,aboveOne=0;
+    double total=0,maximum=0,channelSum[3]={0,0,0},channelMin[3]={1e30,1e30,1e30},channelMax[3]={-1e30,-1e30,-1e30};
     for (unsigned i=0;i<Side*Side;++i)
     {
         const float *v=&pixels[i*4];
         if (!_finite(v[0])||!_finite(v[1])||!_finite(v[2])||!_finite(v[3])) {++nonfinite;continue;}
         if (v[3]<.5f) continue;
         ++valid;
+        bool low=false,high=false;
+        for(unsigned component=0;component<3;++component)
+        {
+            channelSum[component]+=v[component];
+            channelMin[component]=(std::min)(channelMin[component],double(v[component]));
+            channelMax[component]=(std::max)(channelMax[component],double(v[component]));
+            low=low||v[component]<0;high=high||v[component]>1;
+        }
+        if(low)++belowZero;if(high)++aboveOne;
         const double luminance=.2126*v[0]+.7152*v[1]+.0722*v[2];
         total+=luminance;maximum=(std::max)(maximum,luminance);
     }
@@ -784,6 +824,12 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix)
      <<" mean luminance="<<(valid?total/valid:0)<<" max luminance="<<maximum
      <<"; no shadows/fog/local lights/water or tonemapping";
     Log(s.str());
+    std::ostringstream channels;channels.precision(9);
+    channels<<"private sun RGB mean="<<(valid?channelSum[0]/valid:0)<<','<<(valid?channelSum[1]/valid:0)<<','<<(valid?channelSum[2]/valid:0)
+            <<" min="<<channelMin[0]<<','<<channelMin[1]<<','<<channelMin[2]
+            <<" max="<<channelMax[0]<<','<<channelMax[1]<<','<<channelMax[2]
+            <<" pixels below0="<<belowZero<<" above1="<<aboveOne;
+    Log(channels.str());
     if (nonfinite) throw std::runtime_error("private sun nonfinite output; no BMP saved");
     Save(sunTarget,prefix+"_sun_noShadow_linear_clamped");
 }

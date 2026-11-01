@@ -96,3 +96,11 @@ direction and private frozen shared values. Ambient UV accounts for the camera a
 baked into native worldSize.zw;45actual-HLSL reference-camera cases and an omitted-delta
 mutant cover this offset. Its separate linear HDR target/BMP is diagnostic, with no shadows,
 fog, local lights, water or tone mapping. Runtime compilation/reference telemetry comes next.
+
+Two actual sun captures compiled/ran and recreated resources, but colour was wrong: compiled
+legacy samplers had s0albedo/s1normal/s2depth while implicit SRVs were t0depth/t1albedo/t2normal.
+Finite HDR output is therefore explicitly NOT colour acceptance. Corrected shader uses
+explicit modern t0..5/s3..5, reflection contracts and64GPU decoder cases (+28failing no-clamp
+mutant). A bounded manual-only source override permits future HLSL iterations without DLL
+replacement; generated override must pass compile/reflection checks before copying. Next:
+repeat colour capture with corrected bindings, then native HDR/tone mapping and shadows.

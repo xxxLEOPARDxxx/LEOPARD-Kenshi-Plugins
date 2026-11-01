@@ -11,6 +11,11 @@ New-Item -ItemType Directory -Force $out | Out-Null
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/embed_position_shader.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+$fxc='C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe'
+& $fxc /nologo /T ps_4_0 /E main_ps /O3 /Gec /D DX11=1 /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/common' /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/deferred' "/Fo$out/SunShaderEmbedded.cso" "$out/SunShaderOverride.hlsl"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$repo/GlobalSatelliteMap/tests/test_shader_bindings.py" "$out/SunShaderEmbedded.cso"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 $env:INCLUDE="$vc/include;$sdk/Include;$kl;$kl/ogre;$boost;D:/DEV/Kenshi/ours/shared;$PSScriptRoot;$out"
 $env:LIB="$vc/lib/amd64;$sdk/Lib/x64;D:/DEV/Kenshi/deps/KenshiLib/Libraries;$boost/stage/lib"
 $env:PATH="$vc/bin/amd64;$env:PATH"

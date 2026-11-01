@@ -121,8 +121,8 @@ real game shader compilation and float-target readback/algebra, not all geometry
 
 ## Private sun/ambient candidate (not runtime accepted)
 
-SunProbe.hlsl reuses the installed game's constants/GBuffer/PBR includes; those assets are
-not copied into this repository. It reconstructs orthographic view position, uses explicit
+SunProbe.hlsl reuses installed constants/PBR includes and a compatible explicit GBuffer
+decoder; game shader assets are not copied into this repository. It reconstructs orthographic view position, uses explicit
 camera right/up/back axes and a constant surface-to-camera direction. It retains native
 metalness, gloss, emissive/translucency and sun/environment equations. The private material
 clones configuration from Main_Lighting_NoShadow: slots0..2 become explicit named private
@@ -145,6 +145,34 @@ world offset/size, sun direction/colour and linear HDR mean/max/nonfinite statis
 extra BMP is explicitly labelled noShadow_linear_clamped: it is a diagnostic conversion,
 not a tonemapped finished map. There are no shadows, fog, local lights or water in this pass.
 All16x8K geometry, day/night/shadow/water correctness and performance remain unfinished.
+
+### Actual sun-colour failure and explicit binding correction
+
+Two captures on process33260/startUTC2026-10-31T23:51:32.4721216Z recreated the private
+resources without name-collision/ownership errors. Position readback remained262144valid,
+NDC0/radial residual0.000354068638m. Sun output was finite but visually wrong yellow/green;
+262138 valid pixels and HDR statistics alone did not establish correct colour.
+
+Actual compiled DXBC explains the defect: legacy `sampler albedoBuffer:register(s0)` does
+not also promise texture t0. The compiler assigned depthBuffer=t0,albedoBuffer=t1,
+normalBuffer=t2 by first use, while material units remained albedo0/normal1/depth2.
+The new reflection regression first rejected all three mismatches. Sun now explicitly
+declares Texture2D t0..3, TextureCube t4..5 and SamplerState s3..5, and the build checks exact
+names/types/dimensions/counts/slots for both original and embedded DXBC.
+
+The decoder uses clamped integer Load, native30/255 edge weights, +X fallback and checker
+Co/Cg parity. Its64 actual-HLSL WARP cases compare with an independent CPU reference,
+including both parities, every border/corner and all-zero fallback. A no-clamp mutant fails
+28 cases. The modern IBL adapter retains native cube mip/alpha scaling and pure BRDF calls,
+without invoking legacy sampler-taking functions. Correct colours still need a new live shot.
+
+For further shader iteration, a fixed optional SunShaderOverride.hlsl beside the DLL is
+read only on an explicit capture. Missing file uses the embedded shader; read errors fail
+that request. Source is bounded32KiB ASCII/noNUL, with a locked read handle through hashing;
+the actual source SHA256 is logged. There is no filesystem polling. Build generates and
+compiles/reflection-checks this exact expanded source before deployment. Validate future
+overrides the same way before copying; the loader validates bytes, not shader semantics.
+This is private diagnostic tooling, not a player-facing arbitrary shader loader.
 
 This is a feasibility experiment for the requested global 4×4 atlas of 8192-square tiles and a native dynamic layer. It does not implement that full feature and does not generate any map art automatically. Source, build products, diagnostics and tests stay in this private directory. No global-map viewer/shared source files were changed during this spike.
 

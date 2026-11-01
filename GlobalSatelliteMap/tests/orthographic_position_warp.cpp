@@ -5,6 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include <cstring>
 template<class T> struct Com
 {
     T *p;
@@ -32,7 +33,8 @@ int main(int argc,char**argv)
     try
     {
         if(argc!=2 && argc!=3)throw std::runtime_error("expected compiled shader path [reference]");
-        const bool referenceTest=argc==3;
+        const bool decodeTest=argc==3 && std::strcmp(argv[2],"decode")==0;
+        const bool referenceTest=argc==3 && !decodeTest;
         std::ifstream file(argv[1],std::ios::binary|std::ios::ate);
         if(!file)throw std::runtime_error("shader unavailable");
         std::streamoff bytes=file.tellg();
@@ -40,7 +42,36 @@ int main(int argc,char**argv)
         file.seekg(0);std::vector<char> code(size_t(bytes),0);file.read(&code[0],bytes);
         if(!file)throw std::runtime_error("shader truncated");
         std::vector<Case> cases;
-        if(referenceTest)
+        if(decodeTest)
+        {
+            for(int y=0;y<8;++y)for(int x=0;x<8;++x)
+            {
+                Case a={};a.valid=true;
+                a.input.v[0]=float(std::floor((.28+((x*11+y*7)%20)*.02)*255+.5)/255);
+                a.input.v[1]=float(std::floor((.2+((x*3+y*5)%10)*.05)*255+.5)/255);
+                a.input.v[2]=.13f;a.input.v[3]=.71f;
+                cases.push_back(a);
+            }
+            cases[3*8+3].input.v[0]=1; // native all-zero edge-weight fallback
+            const int dx[4]={1,-1,0,0},dy[4]={0,0,1,-1};
+            for(int y=0;y<8;++y)for(int x=0;x<8;++x)
+            {
+                Case&a=cases[y*8+x];float sum=0,total=0,first=0;
+                for(int k=0;k<4;++k)
+                {
+                    int nx=x+dx[k],ny=y+dy[k];nx=nx<0?0:(nx>7?7:nx);ny=ny<0?0:(ny>7?7:ny);
+                    const Four&n=cases[ny*8+nx].input;
+                    if(k==0)first=n.v[1];
+                    if(std::fabs(n.v[0]-a.input.v[0])<30.0f/255.0f){sum+=n.v[1];total+=1;}
+                }
+                const double neighbour=total?sum/total:first;
+                const bool same=(x%2)==(y%2);
+                const double co=(same?neighbour:a.input.v[1])-.5;
+                const double cg=(same?a.input.v[1]:neighbour)-.5;
+                a.x=a.input.v[0]+co-cg;a.y=a.input.v[0]+cg;a.z=a.input.v[0]-co-cg;
+            }
+        }
+        else if(referenceTest)
         {
             for(int ref=-2;ref<=2;++ref)for(int x=-1;x<=1;++x)for(int y=-1;y<=1;++y)
             {
@@ -94,7 +125,19 @@ int main(int argc,char**argv)
         desc.MiscFlags=0;desc.StructureByteStride=0;HR(device->CreateBuffer(&desc,NULL,&staging.p));
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc={};srvDesc.Format=DXGI_FORMAT_UNKNOWN;
         srvDesc.ViewDimension=D3D11_SRV_DIMENSION_BUFFER;srvDesc.Buffer.NumElements=UINT(cases.size());
-        Com<ID3D11ShaderResourceView> srv;HR(device->CreateShaderResourceView(in.p,&srvDesc,&srv.p));
+        Com<ID3D11ShaderResourceView> srv;
+        Com<ID3D11Texture2D> texture;
+        if(decodeTest)
+        {
+            D3D11_TEXTURE2D_DESC td={};td.Width=8;td.Height=8;td.MipLevels=1;td.ArraySize=1;
+            td.Format=DXGI_FORMAT_R32G32B32A32_FLOAT;td.SampleDesc.Count=1;
+            td.Usage=D3D11_USAGE_DEFAULT;td.BindFlags=D3D11_BIND_SHADER_RESOURCE;
+            data.SysMemPitch=8*sizeof(Four);HR(device->CreateTexture2D(&td,&data,&texture.p));
+            srvDesc.Format=td.Format;srvDesc.ViewDimension=D3D11_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Texture2D.MostDetailedMip=0;srvDesc.Texture2D.MipLevels=1;
+            HR(device->CreateShaderResourceView(texture.p,&srvDesc,&srv.p));
+        }
+        else HR(device->CreateShaderResourceView(in.p,&srvDesc,&srv.p));
         D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc={};uavDesc.Format=DXGI_FORMAT_UNKNOWN;
         uavDesc.ViewDimension=D3D11_UAV_DIMENSION_BUFFER;uavDesc.Buffer.NumElements=UINT(cases.size());
         Com<ID3D11UnorderedAccessView> uav;HR(device->CreateUnorderedAccessView(out.p,&uavDesc,&uav.p));
@@ -107,14 +150,14 @@ int main(int argc,char**argv)
         {
             const Case&a=cases[i];const Four&r=result[i];
             bool ok=(r.v[3]>.5f)==a.valid;
-            const double xyTolerance=referenceTest?1e-5:.003;
-            if(a.valid)ok=ok&&std::fabs(r.v[0]-a.x)<xyTolerance&&std::fabs(r.v[1]-a.y)<xyTolerance&&std::fabs(r.v[2]-a.z)<.1;
+            const double xyTolerance=referenceTest||decodeTest?1e-5:.003;
+            if(a.valid)ok=ok&&std::fabs(r.v[0]-a.x)<xyTolerance&&std::fabs(r.v[1]-a.y)<xyTolerance&&std::fabs(r.v[2]-a.z)<(decodeTest?1e-5:.1);
             else ok=ok&&r.v[0]==0&&r.v[1]==0&&r.v[2]==0;
             if(!ok){++failures;std::cerr<<"FAIL case"<<i<<" got "<<r.v[0]<<','<<r.v[1]<<','<<r.v[2]<<','<<r.v[3]<<'\n';}
         }
         context->Unmap(staging.p,0);context->ClearState();
         if(failures){std::cerr<<failures<<" shader failures\n";return 1;}
-        std::cout<<cases.size()<<" actual HLSL "<<(referenceTest?"reference-camera":"orthographic-position")
+        std::cout<<cases.size()<<" actual HLSL "<<(decodeTest?"native-colour-decoding":(referenceTest?"reference-camera":"orthographic-position"))
                  <<" cases passed on isolated D3D11 WARP\n";
         return 0;
     }

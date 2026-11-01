@@ -17,7 +17,11 @@ output.write_text('static const char PositionShaderSource[] =\n' +
 sun = (shaders / 'SunProbe.hlsl').read_text(encoding='utf-8')
 assert sun.count(include) == 1
 sun = helper + '\n' + sun.replace(include, '')
+decoder = (shaders / 'GBufferDecode.hlsl').read_text(encoding='utf-8')
+assert sun.count('#include "GBufferDecode.hlsl"') == 1
+sun = sun.replace('#include "GBufferDecode.hlsl"',decoder)
 assert len(sun) < 16384 and sun.isascii()
 (here / 'build/SunShader.h').write_text('static const char SunShaderSource[] =\n' +
     '\n'.join(json.dumps(line + '\n') for line in sun.splitlines()) + ';\n', encoding='ascii')
+(here / 'build/SunShaderOverride.hlsl').write_text(sun,encoding='ascii')
 print('Embedded tested position helper and private pass source')

@@ -1,0 +1,35 @@
+{
+  "utc": "2026-11-01T00:10:32.681850+00:00",
+  "dll_sha256": "842aa3bd183c408c7e59f96a36eacba8feb933521165fc9dc4e07814229cbcb1",
+  "bytes": 131584,
+  "override_sha256": "fa67971d24c6314a2e569a9364d7aed5a3c54f0310681de9d67fe9d3f9e4ab2d",
+  "override_bytes": 5978,
+  "status": "Built/reviewed correction; NOT installed or colour accepted",
+  "checks": {
+    "position_WARP": 33,
+    "reference_WARP": 45,
+    "decoder_WARP": 64,
+    "policy": 23,
+    "attachment": 11,
+    "pose": 13,
+    "native_imports": 112,
+    "source_and_generated_DXBC_bindings": "six textures t0..5,three samplers s3..5",
+    "SM4_compile": "passed",
+    "source_contracts": "passed",
+    "diff_check": "passed"
+  },
+  "red": {
+    "old_actual_DXBC": "3 wrong texture slots rejected",
+    "decoder_without_clamp": "28 GPU cases failed"
+  },
+  "review": "global_satellite_research clear; explicit resources/decoder/IBL/locked bounded override",
+  "sources": {
+    "GlobalSatelliteMap/shaders/SunProbe.hlsl": "14b95296ac47c197570a148f557d04c13fe047f4f2d9d597f2bea9a3f165fa3b",
+    "GlobalSatelliteMap/shaders/GBufferDecode.hlsl": "5f6804f56ba7fd77514ed9464d16cc57e233a621e860c037baad4a70d93d7401",
+    "GlobalSatelliteMap/tests/test_shader_bindings.py": "4ca01ec529eeac8b8aa08f2708599dbe203f5960eeee0518bc53f25100136275",
+    "GlobalSatelliteMap/tests/gbuffer_decode_cs.hlsl": "cebacaa6bf8434fbe7600f659dfe4886bc78756d21c625a80fd3b49d585949ee",
+    "GlobalSatelliteMap/tests/orthographic_position_warp.cpp": "d40d0f22e06ab787602d5b2671b6de8065c9f1a1938e94300b1484655982dc93",
+    "tools/diagnostics/satellite-capture-probe/CaptureProbe.cpp": "9a66bd831b090210787aa054ef45770be95440d63302891a5b408588373474ac",
+    "tools/diagnostics/satellite-capture-probe/ProbePolicy.h": "6a41e2b2fcd6486571861a9e3603bccde547199a1be218064807245b442a1ba6"
+  }
+}
