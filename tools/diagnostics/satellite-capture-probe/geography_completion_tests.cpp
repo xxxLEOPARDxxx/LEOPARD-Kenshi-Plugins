@@ -4,6 +4,7 @@
 #define GEOGRAPHY_COMPLETION_HEADER "GeographyCompletion.h"
 #endif
 #include GEOGRAPHY_COMPLETION_HEADER
+#include "GeographyPolicy.h"
 static unsigned checks=0;
 static void Check(bool ok,const char* text){++checks;if(!ok){std::fprintf(stderr,"FAIL %s\n",text);std::exit(1);}}
 // Native boundary model: notify credits, setLoaded changes state, unloaded
@@ -26,6 +27,7 @@ struct Boundary
 int main()
 {
     using SatelliteGeography::CompleteBank;
+    Check(SatelliteGeography::RequestedCompressedAdditionalMips()==10,"native BC request compensates two discarded levels for actual9");
     {bool u=false;Boundary b(u);Check(CompleteBank(b,u),"complete production bank");Check(!u&&b.order==123456&&b.credits==1&&b.finishes==1,"one credit and Loaded after all layers");
      b.available=false;Check(!CompleteBank(b,u)&&b.creates==1&&b.credits==1,"existing owned bank second attempt refused");}
     {bool u=false;Boundary b(u);b.available=false;Check(!CompleteBank(b,u)&&!u&&!b.creates,"name/ownership collision before allocation");}

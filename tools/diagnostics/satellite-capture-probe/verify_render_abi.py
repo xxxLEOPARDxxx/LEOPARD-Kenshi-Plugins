@@ -38,6 +38,10 @@ for key,module in profile.items():
         # field getter. Only the COM view it returns is borrowed by our code.
         assert pe.data[pe.offset(texture_srv_getter):pe.offset(texture_srv_getter)+8] == bytes.fromhex('488b8108020000c3')
         assert any(int(w['rva'],16)==texture_srv_getter for w in module['windows'])
+        # BC native creation drops two requested levels. Production compensates
+        # the creation request, while the COM upload still requires actual9.
+        assert pe.data[pe.offset(0x49154):pe.offset(0x49154)+3] == bytes.fromhex('8d41fe')
+        assert {0x4914a,0x49154}.issubset({int(w['rva'],16) for w in module['windows']})
         lines += [f'static const DWORD PrivateRttVtableRva = 0x{vtable:x};',
                   f'static const DWORD PrivateRttGetterRva = 0x{getter:x};',
                   f'static const DWORD PrivateRttDestructorRva = 0x{destructor:x};',

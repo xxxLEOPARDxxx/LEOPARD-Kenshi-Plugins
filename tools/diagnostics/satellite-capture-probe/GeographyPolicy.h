@@ -7,6 +7,10 @@ static const size_t CpuLimit=128u*1024u*1024u;
 static const unsigned __int64 GpuLimit=1024ULL*1024*1024;
 static const unsigned __int64 PoolBytes=385874496,OtherTextureBytes=111848096+5592404+256;
 struct Mip {const void* data;size_t bytes;};
+// Hashed native D3D _create2DTex4914A..49171 discards two requested BC
+// levels. Request11 total so the returned resource has the intended9 levels.
+// This compensates native creation, without changing upload shape or budget.
+inline unsigned RequestedCompressedAdditionalMips(){return 10;}
 inline unsigned U32(const unsigned char* p){unsigned v;std::memcpy(&v,p,4);return v;}
 inline bool Dds(const void* input,size_t bytes,unsigned format,Mip (&out)[9])
 {

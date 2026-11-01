@@ -23,6 +23,21 @@ int main(int argc,char**argv)
     Check(!Dds(&bytes[0],n,71,mips),"wrong BC format refused");
     Check(Combined(0,0)&&!Combined(GpuLimit,0)&&!Combined(0,~0ULL),"combined unchanged1GiB bound/overflow");
     Com<ID3D11Device>d;Com<ID3D11DeviceContext>c;HR(D3D11CreateDevice(NULL,D3D_DRIVER_TYPE_WARP,NULL,0,NULL,0,D3D11_SDK_VERSION,&d.p,NULL,&c.p),"WARP");
+    {
+        // Reproduce request1509's native BC shape: requested additional8 became
+        // actual7 levels. The strict9-level upload must refuse without writes.
+        D3D11_TEXTURE2D_DESC td={};td.Width=td.Height=2048;td.MipLevels=7;td.ArraySize=24;td.Format=DXGI_FORMAT_BC3_UNORM;td.SampleDesc.Count=1;td.BindFlags=D3D11_BIND_SHADER_RESOURCE;
+        Com<ID3D11Texture2D> texture;Com<ID3D11ShaderResourceView> view;HR(d->CreateTexture2D(&td,NULL,&texture.p),"native7-level reproduction create");HR(d->CreateShaderResourceView(texture.p,NULL,&view.p),"native7-level reproduction view");
+        std::vector<unsigned char> poison(4194304,193);c->UpdateSubresource(texture.p,0,NULL,&poison[0],8192,0);
+        UploadDescription detail;HR(DescribeUpload(view.p,detail),"native7-level descriptor snapshot");
+        Check(detail.hasView&&detail.hasTexture&&detail.view.Texture2DArray.MipLevels==7&&detail.texture.MipLevels==7&&detail.texture.ArraySize==24,"failure descriptor preserves actual7 levels and24 layers");
+        Check(UploadCompressedLayer(view.p,24,0,77,mips)==E_INVALIDARG,"native7-level texture refused by unchanged9-level guard");
+        D3D11_TEXTURE2D_DESC sd=td;sd.MipLevels=sd.ArraySize=1;sd.Usage=D3D11_USAGE_STAGING;sd.BindFlags=0;sd.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
+        Com<ID3D11Texture2D> staging;HR(d->CreateTexture2D(&sd,NULL,&staging.p),"native7-level unchanged staging");c->CopySubresourceRegion(staging.p,0,0,0,0,texture.p,0,NULL);
+        D3D11_MAPPED_SUBRESOURCE mapped={};HR(c->Map(staging.p,0,D3D11_MAP_READ,0,&mapped),"native7-level unchanged readback");
+        Check(*static_cast<unsigned char*>(mapped.pData)==193,"native7-level refusal performs no first-layer writes");c->Unmap(staging.p,0);
+        Check(DescribeUpload(NULL,detail)==E_INVALIDARG&&!detail.hasView&&!detail.hasTexture,"null descriptor snapshot clears previous evidence");
+    }
     const unsigned layers[3]={24,22,46};const unsigned formats[3]={77,77,71};
     for(unsigned bank=0;bank<3;++bank)
     {

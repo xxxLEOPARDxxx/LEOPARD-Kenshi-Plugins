@@ -7,6 +7,20 @@ namespace CompressedDetail
 {
 template<class T>struct Owned{T*p;Owned():p(NULL){}~Owned(){if(p)p->Release();}private:Owned(const Owned&);Owned&operator=(const Owned&);};
 }
+// Read-only snapshot for the existing probe's failure log. No retained COM.
+struct UploadDescription
+{
+    bool hasView,hasTexture;D3D11_SHADER_RESOURCE_VIEW_DESC view;D3D11_TEXTURE2D_DESC texture;
+    UploadDescription():hasView(false),hasTexture(false){std::memset(&view,0,sizeof(view));std::memset(&texture,0,sizeof(texture));}
+};
+inline HRESULT DescribeUpload(ID3D11ShaderResourceView* view,UploadDescription& out)
+{
+    out=UploadDescription();if(!view)return E_INVALIDARG;
+    view->GetDesc(&out.view);out.hasView=true;
+    CompressedDetail::Owned<ID3D11Resource> r;view->GetResource(&r.p);if(!r.p)return E_FAIL;
+    CompressedDetail::Owned<ID3D11Texture2D> t;HRESULT hr=r.p->QueryInterface(__uuidof(ID3D11Texture2D),reinterpret_cast<void**>(&t.p));if(FAILED(hr))return hr;
+    t.p->GetDesc(&out.texture);out.hasTexture=true;return S_OK;
+}
 // Borrowed SRV, one validated source layer at a time. All nine bounds are
 // checked before any UpdateSubresource. No autogen, retained COM or engine calls.
 inline HRESULT UploadCompressedLayer(ID3D11ShaderResourceView* view,unsigned layers,unsigned layer,unsigned format,const Mip (&source)[9])

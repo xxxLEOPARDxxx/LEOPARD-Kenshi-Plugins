@@ -102,35 +102,53 @@ struct PrivateGeography
     struct BankOperations
     {
         PrivateGeography& owner;unsigned bank;const std::string& root;Ogre::Image& blend;
-        BankOperations(PrivateGeography& value,unsigned index,const std::string& path,Ogre::Image& image):owner(value),bank(index),root(path),blend(image){}
-        bool Available(){return owner.textures[bank].isNull()&&!Ogre::TextureManager::getSingleton().resourceExists(Name(bank));}
+        const char* stage;unsigned layer;HRESULT result;SatelliteGeography::UploadDescription description;
+        BankOperations(PrivateGeography& value,unsigned index,const std::string& path,Ogre::Image& image):owner(value),bank(index),root(path),blend(image),stage("availability"),layer(~0u),result(S_OK){}
+        bool Available(){stage="availability";return owner.textures[bank].isNull()&&!Ogre::TextureManager::getSingleton().resourceExists(Name(bank));}
         void Create()
         {
+            stage="allocation";
             if(bank<3)
-            {const unsigned slices=bank==0?24:bank==1?22:46;owner.textures[bank]=Ogre::TextureManager::getSingleton().createManual(Name(bank),"Landscape",Ogre::TEX_TYPE_2D_ARRAY,2048,2048,slices,8,bank==2?Ogre::PF_DXT1:Ogre::PF_DXT5,0x15,NULL);}
+            {const unsigned slices=bank==0?24:bank==1?22:46;owner.textures[bank]=Ogre::TextureManager::getSingleton().createManual(Name(bank),"Landscape",Ogre::TEX_TYPE_2D_ARRAY,2048,2048,slices,SatelliteGeography::RequestedCompressedAdditionalMips(),bank==2?Ogre::PF_DXT1:Ogre::PF_DXT5,0x15,NULL);}
             else
             {const unsigned side=bank==3?1024:8,levels=bank==3?11:1;const Ogre::PixelFormat format=bank==3?blend.getFormat():Ogre::PF_A8B8G8R8;
              owner.textures[bank]=Ogre::TextureManager::getSingleton().createManual(Name(bank),"Landscape",Ogre::TEX_TYPE_2D,side,side,1,levels-1,format,0x15,NULL);}
         }
-        bool Preflight(){return !owner.textures[bank].isNull()&&owner.View(bank)!=NULL;}
+        bool Preflight()
+        {
+            stage="creator/Loaded preflight";if(owner.textures[bank].isNull())return false;
+            ID3D11ShaderResourceView* view=owner.View(bank);stage="descriptor snapshot";
+            result=SatelliteGeography::DescribeUpload(view,description);return SUCCEEDED(result);
+        }
         bool Upload()
         {
+            stage="GPU upload";
             if(bank>=3)
             {const unsigned side=bank==3?1024:8,levels=bank==3?11:1;const Ogre::PixelFormat format=bank==3?blend.getFormat():Ogre::PF_A8B8G8R8;
-             return SUCCEEDED(SatelliteGeography::UploadRgba2D(owner.View(bank),side,levels,format==Ogre::PF_A8R8G8B8?87:28,bank==3?blend.getData():GeoSelector,bank==3?blend.getSize():sizeof(GeoSelector)));}
+             result=SatelliteGeography::UploadRgba2D(owner.View(bank),side,levels,format==Ogre::PF_A8R8G8B8?87:28,bank==3?blend.getData():GeoSelector,bank==3?blend.getSize():sizeof(GeoSelector));return SUCCEEDED(result);}
             unsigned uploaded=0;const unsigned slices=bank==0?24:bank==1?22:46;
             for(unsigned f=0;f<92;++f)if(GeoFiles[f].bank==bank)
             {
+                layer=GeoFiles[f].layer;stage="source hash/layout";
                 std::vector<BYTE> source;Read(GeoFiles[f],root,source);SatelliteGeography::Mip mips[9];
-                if(!SatelliteGeography::Dds(&source[0],source.size(),GeoFiles[f].format,mips)||
-                    FAILED(SatelliteGeography::UploadCompressedLayer(owner.View(bank),slices,GeoFiles[f].layer,GeoFiles[f].format,mips)))return false;
+                if(!SatelliteGeography::Dds(&source[0],source.size(),GeoFiles[f].format,mips)){result=E_INVALIDARG;return false;}
+                stage="GPU upload";result=SatelliteGeography::UploadCompressedLayer(owner.View(bank),slices,layer,GeoFiles[f].format,mips);
+                if(FAILED(result))return false;
                 ++uploaded;
             }
             return uploaded==slices;
         }
-        void Notify(){owner.Notify(bank);}
-        void SetLoaded(){reinterpret_cast<PrivateBiomeReference::SetLoaded>(AbiExport(nativeApi.ogre,PrivateResourceSetLoadedName,PrivateResourceSetLoadedRva))(owner.textures[bank].get());}
-        bool Loaded(){return reinterpret_cast<PrivateBiomeReference::IsLoaded>(AbiExport(nativeApi.ogre,PrivateResourceLoadedName,PrivateResourceLoadedRva))(owner.textures[bank].get());}
+        void Notify(){stage="native notify";owner.Notify(bank);}
+        void SetLoaded(){stage="native setLoaded";reinterpret_cast<PrivateBiomeReference::SetLoaded>(AbiExport(nativeApi.ogre,PrivateResourceSetLoadedName,PrivateResourceSetLoadedRva))(owner.textures[bank].get());}
+        bool Loaded(){stage="Loaded verification";return reinterpret_cast<PrivateBiomeReference::IsLoaded>(AbiExport(nativeApi.ogre,PrivateResourceLoadedName,PrivateResourceLoadedRva))(owner.textures[bank].get());}
+        void Failure()const
+        {
+            std::ostringstream s;s<<"SatelliteCaptureProbe: geography bank="<<bank<<" layer="<<layer<<" stage="<<stage<<" HRESULT=0x"<<std::hex<<static_cast<unsigned long>(result)<<std::dec
+                <<" uncertain="<<owner.uncertain<<" hasView="<<description.hasView<<" hasTexture="<<description.hasTexture;
+            if(description.hasView){const D3D11_SHADER_RESOURCE_VIEW_DESC& v=description.view;s<<" SRV(format,dimension,mip0,levels,slice0,slices)="<<v.Format<<','<<v.ViewDimension<<','<<v.Texture2DArray.MostDetailedMip<<','<<v.Texture2DArray.MipLevels<<','<<v.Texture2DArray.FirstArraySlice<<','<<v.Texture2DArray.ArraySize;}
+            if(description.hasTexture){const D3D11_TEXTURE2D_DESC& d=description.texture;s<<" Texture(width,height,levels,slices,format,samples,quality,usage,bind,cpu,misc)="<<d.Width<<','<<d.Height<<','<<d.MipLevels<<','<<d.ArraySize<<','<<d.Format<<','<<d.SampleDesc.Count<<','<<d.SampleDesc.Quality<<','<<d.Usage<<','<<d.BindFlags<<','<<d.CPUAccessFlags<<','<<d.MiscFlags;}
+            ErrorLog(s.str());
+        }
     };
     void Begin(const std::string& root,Ogre::CompositorManager2* owner)
     {
@@ -158,7 +176,9 @@ struct PrivateGeography
         for(unsigned bank=0;bank<5;++bank)
         {
             BankOperations operations(*this,bank,root,blend);
-            if(!SatelliteGeography::CompleteBank(operations,uncertain))throw std::runtime_error("geography bank allocation/upload/native completion refused");
+            bool completed=false;
+            try{completed=SatelliteGeography::CompleteBank(operations,uncertain);}catch(...){operations.Failure();throw;}
+            if(!completed){operations.Failure();throw std::runtime_error("geography bank allocation/upload/native completion refused");}
         }
         Ogre::HighLevelGpuProgramManager& manager=Ogre::HighLevelGpuProgramManager::getSingleton();
         Ogre::HighLevelGpuProgramPtr existing;if(manager.resourceExists(ProgramName()))existing=manager.getByName(ProgramName());
