@@ -59,5 +59,9 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/raster_tests.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/rtv_debt_tests.exe" "/Fo$out/rtv_debt_tests.obj" "$PSScriptRoot/rtv_debt_tests.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/rtv_debt_tests.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

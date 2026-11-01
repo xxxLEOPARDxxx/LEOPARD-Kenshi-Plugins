@@ -24,6 +24,13 @@ int main()
     Check(!request.Changed(0)&&request.Changed(1),"token wrap accepted");
     Check(!PollDue(100,200)&&PollDue(100,350),"poll capped to four per second");
     Check(PollDue(0xffffff80UL,0x80UL),"poll clock wrap");
+    Check(!FileRequestAllowed(true,false,false,true,false,true),"background requests are opt-in");
+    Check(FileRequestAllowed(true,false,true,true,false,true),"explicit file request can run behind the user's editor");
+    Check(FileRequestAllowed(true,true,false,true,false,true),"foreground file requests retained");
+    Check(!FileRequestAllowed(false,false,true,true,false,true),"background flag cannot enable file control by itself");
+    Check(!FileRequestAllowed(true,false,true,false,false,true),"map must remain open in background");
+    Check(!FileRequestAllowed(true,false,true,true,true,true),"busy capture must not consume a queued token");
+    Check(!FileRequestAllowed(true,false,true,true,false,false),"quarantined renderer cannot accept file requests");
     int owned = 0, other = 0;
     const int *many[65];
     for (int i = 0; i < 65; ++i)
@@ -72,5 +79,5 @@ int main()
     FixedProgramCache empty;
     Check(empty.Inspect(&owned,0,NULL,"")==FixedProgramCache::Refuse,"empty cache source refused");
     Check(empty.Inspect(&owned,0,NULL,std::string(32769,'x'))==FixedProgramCache::Refuse,"cache source bytes bounded");
-    std::cout << "49 fixed-grid/projection/cleanup/source/request/cache checks passed\n";
+    std::cout << "56 fixed-grid/projection/cleanup/source/request/cache checks passed\n";
 }

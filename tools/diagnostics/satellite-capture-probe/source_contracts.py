@@ -37,6 +37,8 @@ assert 'unsafe borrowed camera at cleanup' in source
 assert 'Terrain helper must already borrow main LOD camera' in source
 assert compact.index('constructionrestorationfailed') < compact.rindex('gameWorkspace=renderer->workspace;')
 assert 'EnableRequestFile",0' in source and 'existing token latched without replay' in source
+assert 'AllowBackgroundFileRequests",0' in source and 'ProbePolicy::FileRequestAllowed(' in source
+assert 'bool down = pid == GetCurrentProcessId()' in source # Keyboard stays foreground-only.
 assert 'main/probe GBuffer aliasing refused' in source
 assert '(GetAsyncKeyState' in compact and 'press=down&&!keyHeld' in compact
 assert 'NativeReconstructedX' in (p/'ProbePolicy.h').read_text()

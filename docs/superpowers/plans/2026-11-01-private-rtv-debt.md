@@ -1,0 +1,11 @@
+# Private satellite RTV lifetime repair
+
+Restore bounded repeated capture memory before global-map integration. Current native D3D11RenderTexture construction acquires a creation reference, while both observed native destructors omit Release. This plan covers only independently owned isolated-Terrain targets, never the game's rendering targets or global caches.
+
+1. Freeze exact D3D11 disk hash, timestamp/image, loaded code windows, RTT vtable/getter, and Ogre native SharedPtr useCount accessor. Keep the ABI generator explicit about all three modules.
+2. Add a six-entry production debt policy, tested with real helper code and fake reference owners. Keep texture AND pixel-buffer pins. Require unique texture and buffer count2 before destroying texture; then buffer count1 before destroying buffer; only after RTT destruction spend the creation reference once. Preflight all entries before destroying any. Failures/aliases/changed views quarantine one set and prohibit subsequent requests.
+3. Track output, three GBuffer textures, position and Sun targets immediately as accessible. Mark native allocation/workspace-constructor attempts uncertain until successful registration; an exception can create inaccessible native RTVs, so do not claim this failure path fully reclaimed.
+4. Remove workspaces/material bindings/manager entries and ordinary plugin references first. Native registered RTT type, view identity, Root/context and counters must still match before final pin removal. Mark a debt spent before calling Release. Preserve original renderer listener/camera restoration.
+5. Independently review source and exact ABI evidence, then run two 512 captures with image comparison and two 8K captures in one loaded process. Check idle private bytes and VRAM against the old ~3GiB/request staircase. No global ClearState/Flush/depth-cache purge. Capture high resolution remains a raster proof, not completed biome/building imagery.
+
+Next stages remain native detailed terrain materials, loaded/unloaded buildings and LODs, real surface/lighting export, then optional global-map integration and day/night updates. Minimap source remains unchanged. DF remains paused; KEO follows the finished satellite feature.

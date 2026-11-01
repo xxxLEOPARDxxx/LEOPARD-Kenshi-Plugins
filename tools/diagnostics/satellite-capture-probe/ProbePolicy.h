@@ -18,6 +18,11 @@ inline bool PollDue(unsigned long last,unsigned long now)
 {
     return static_cast<unsigned long>(now-last)>=250UL;
 }
+inline bool FileRequestAllowed(bool enabled,bool foreground,bool backgroundOptIn,
+                               bool mapVisible,bool busy,bool safe)
+{
+    return enabled && (foreground||backgroundOptIn) && mapVisible && !busy && safe;
+}
 inline bool ValidShaderSource(const char *bytes, std::size_t size)
 {
     if (!bytes || !size || size > 32768) return false;

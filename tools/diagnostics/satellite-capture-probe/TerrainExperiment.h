@@ -220,8 +220,11 @@ struct TerrainExperiment
         material->load();
         CreateNativeTerrain();
         Ogre::CompositorManager2 *manager=root->getCompositorManager2();Define(manager);
+        rtvDebt.UncertainAllocation();
         output=Ogre::TextureManager::getSingleton().createManual("LEOPARD_PrivateTerrainOutput",
             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,Ogre::TEX_TYPE_2D,Side,Side,1,0,Ogre::PF_A8R8G8B8,Ogre::TU_RENDERTARGET);
+        TrackPrivateTarget(output);rtvDebt.AllocationConfirmed();
+        rtvDebt.UncertainAllocation(); // Native constructor may allocate internal GBuffer targets before throwing.
         workspace=manager->addWorkspace(scene,output->getBuffer()->getRenderTarget(),camera,
             Ogre::IdString("LEOPARD_PrivateTerrainWorkspace"),false);
         const Ogre::CompositorChannel &gb=workspace->getGlobalTexture("global_gbuffer");
@@ -230,6 +233,8 @@ struct TerrainExperiment
         if(mainGb.textures.size()!=3)throw std::runtime_error("main GBuffer structure differs");
         for(unsigned i=0;i<3;++i)
             if(mainGb.textures[i]==gb.textures[i])throw std::runtime_error("private Terrain GBuffer aliases main scene");
+        for(unsigned i=0;i<3;++i)TrackPrivateTarget(gb.textures[i]);
+        rtvDebt.AllocationConfirmed();
         // Allocate auxiliary workspaces outside compositor iteration, including
         // failure paths, so pending registration cannot outlive their materials.
         geometryOnly=geometryOnlyRequest;

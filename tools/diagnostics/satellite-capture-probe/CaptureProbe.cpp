@@ -65,6 +65,7 @@
 #include "NativeWorkerHandle.h"
 #include "ExposurePolicy.h"
 #include "RasterPolicy.h"
+#include "OwnedRtvDebt.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -78,6 +79,7 @@ int mode = 0, cx = 0, cz = 0;
 bool proxies = false;
 unsigned serial = 0;
 bool fileRequests=false;
+bool backgroundFileRequests=false; // Explicit/private opt-in; never affects keyboard input.
 bool reusePrivateShaders=false;
 ProbePolicy::FixedProgramCache programCache;
 DWORD lastRequestPoll=0;
@@ -125,11 +127,13 @@ struct NativeRenderApi
     typedef bool (__fastcall *GetMinFn)(const Ogre::Camera *);
     typedef void (__fastcall *SetMinFn)(Ogre::Camera *,bool);
     typedef Ogre::Frustum *(__fastcall *GetCullFn)(const Ogre::Camera *);
-    HMODULE ogre,terrain;
+    HMODULE ogre,terrain,d3d11;
+    typedef unsigned (__fastcall *UseCountFn)(const void*);
+    UseCountFn useCount;
     GetLastFn getLast;NotifyFn notify;GetMinFn getMin;SetMinFn setMin;GetCullFn getCull;
     const void *terrainPrimary,*terrainListener;
     bool ready;
-    NativeRenderApi():ogre(NULL),terrain(NULL),getLast(NULL),notify(NULL),getMin(NULL),setMin(NULL),
+    NativeRenderApi():ogre(NULL),terrain(NULL),d3d11(NULL),useCount(NULL),getLast(NULL),notify(NULL),getMin(NULL),setMin(NULL),
         getCull(NULL),terrainPrimary(NULL),terrainListener(NULL),ready(false){}
 } nativeApi;
 void (*originalUpdate)(MapScreen *) = NULL;
@@ -240,8 +244,10 @@ bool RenderAbiMatches()
 {
     return nativeApi.ready && GetModuleHandleA(OgreAbiFile)==nativeApi.ogre &&
         GetModuleHandleA(TerrainAbiFile)==nativeApi.terrain &&
+        GetModuleHandleA(D3d11AbiFile)==nativeApi.d3d11 &&
         AbiModuleMatches(nativeApi.ogre,OgreAbiTimestamp,OgreAbiSize,OgreAbiChecks,sizeof(OgreAbiChecks)/sizeof(OgreAbiChecks[0])) &&
-        AbiModuleMatches(nativeApi.terrain,TerrainAbiTimestamp,TerrainAbiSize,TerrainAbiChecks,sizeof(TerrainAbiChecks)/sizeof(TerrainAbiChecks[0]));
+        AbiModuleMatches(nativeApi.terrain,TerrainAbiTimestamp,TerrainAbiSize,TerrainAbiChecks,sizeof(TerrainAbiChecks)/sizeof(TerrainAbiChecks[0])) &&
+        AbiModuleMatches(nativeApi.d3d11,D3d11AbiTimestamp,D3d11AbiSize,D3d11AbiChecks,sizeof(D3d11AbiChecks)/sizeof(D3d11AbiChecks[0]));
 }
 FARPROC AbiExport(HMODULE module,const char *name,DWORD rva)
 {
@@ -264,8 +270,10 @@ void EnsureRenderAbi()
     }
     NativeRenderApi next;
     next.ogre=GetModuleHandleA(OgreAbiFile);next.terrain=GetModuleHandleA(TerrainAbiFile);
-    if(!next.ogre || !next.terrain || !ModuleFileMatches(next.ogre,OgreAbiHash) || !ModuleFileMatches(next.terrain,TerrainAbiHash))
-        throw std::runtime_error("exact Ogre/Terrain file profile failed; capture refused");
+    next.d3d11=GetModuleHandleA(D3d11AbiFile);
+    if(!next.ogre || !next.terrain || !next.d3d11 || !ModuleFileMatches(next.ogre,OgreAbiHash) || !ModuleFileMatches(next.terrain,TerrainAbiHash) || !ModuleFileMatches(next.d3d11,D3d11AbiHash))
+        throw std::runtime_error("exact Ogre/Terrain/D3D11 file profile failed; capture refused");
+    next.useCount=reinterpret_cast<NativeRenderApi::UseCountFn>(AbiExport(next.ogre,PrivateSharedUseCountName,PrivateSharedUseCountRva));
     next.getLast=reinterpret_cast<NativeRenderApi::GetLastFn>(AbiExport(next.ogre,GetLastName,GetLastRva));
     next.notify=reinterpret_cast<NativeRenderApi::NotifyFn>(AbiExport(next.ogre,NotifyViewportName,NotifyViewportRva));
     next.getMin=reinterpret_cast<NativeRenderApi::GetMinFn>(AbiExport(next.ogre,GetMinName,GetMinRva));
@@ -277,6 +285,89 @@ void EnsureRenderAbi()
     if(!RenderAbiMatches()){nativeApi.ready=false;throw std::runtime_error("loaded Ogre/Terrain code profile failed");}
     Log("exact native render ABI enabled: exported camera accessors and guarded Terrain178/180");
 }
+ProbeOwnership::OwnedRtvDebt rtvDebt;
+struct OwnedTargetPins
+{
+    struct Slot { Ogre::TexturePtr texture; Ogre::HardwarePixelBufferSharedPtr buffer; Ogre::RenderTexture *target; Slot():target(NULL){} } slots[6];
+};
+OwnedTargetPins& TargetPins()
+{
+    // One bounded metadata allocation for this DLL. In quarantine its six pins
+    // intentionally live to process exit; do not run native destructors after
+    // OgreRoot shutdown from a C++ static destructor.
+    static OwnedTargetPins *pins=new OwnedTargetPins;
+    return *pins;
+}
+bool ExactPrivateRttType(const Ogre::RenderTexture *target)
+{
+    if(!target||!RenderAbiMatches())return false;
+    __try
+    {
+        const BYTE *base=reinterpret_cast<const BYTE*>(nativeApi.d3d11);
+        const void *const *vtable=*reinterpret_cast<const void *const *const *>(target);
+        return vtable==reinterpret_cast<const void *const *>(base+PrivateRttVtableRva) &&
+            vtable[0]==base+PrivateRttDestructorRva &&
+            vtable[0x90/sizeof(void*)]==base+PrivateRttGetterRva;
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
+void* BorrowPrivateView(Ogre::RenderTexture *target)
+{
+    if(!ExactPrivateRttType(target))throw std::runtime_error("owned D3D11 RTT type/getter differs");
+    void *view=NULL;
+    target->getCustomAttribute("ID3D11RenderTargetView",&view); // Native getter does NOT AddRef.
+    if(!view)throw std::runtime_error("owned D3D11 RTV is null");
+    return view;
+}
+bool ReleaseCreationView(void *view,unsigned long &remaining)
+{
+    if(!view||!RenderAbiMatches())return false;
+    __try
+    {
+        typedef unsigned long (__stdcall *ReleaseFn)(void*);
+        void **vtable=*reinterpret_cast<void***>(view);
+        remaining=reinterpret_cast<ReleaseFn>(vtable[2])(view);
+        return true;
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
+void TrackPrivateTarget(const Ogre::TexturePtr &texture)
+{
+    if(!rtvDebt.Active())return; // Legacy diagnostic modes are outside this repair.
+    if(texture.isNull()||rtvDebt.Count()>=6)throw std::runtime_error("owned RTV registry capacity/texture refused");
+    const Ogre::CompositorChannel &mainGb=renderer->workspace->getGlobalTexture("global_gbuffer");
+    for(size_t i=0;i<mainGb.textures.size();++i)
+        if(texture==mainGb.textures[i])throw std::runtime_error("owned RTV aliases main GBuffer");
+    const unsigned index=rtvDebt.Count();OwnedTargetPins::Slot &pin=TargetPins().slots[index];
+    if(!pin.texture.isNull()||!pin.buffer.isNull())throw std::runtime_error("owned RTV slot still pinned");
+    pin.texture=texture; // Retain immediately, including subsequent validation failure.
+    pin.buffer=texture->getBuffer();
+    pin.target=pin.buffer->getRenderTarget();
+    void *view=BorrowPrivateView(pin.target);
+    if(!rtvDebt.Register(index,pin.texture.get(),pin.buffer.get(),pin.target,view))
+        throw std::runtime_error("owned RTV alias/identity registration refused");
+}
+struct PrivateViewCleanup
+{
+    bool Exclusive(unsigned i,const ProbeOwnership::RtvDebt& debt)
+    {
+        OwnedTargetPins::Slot &pin=TargetPins().slots[i];
+        // The exact native accessor reads only generic SharedPtr's control block
+        // ([this+8], then count+20), equally for TexturePtr and PixelBufferPtr.
+        return RenderAbiMatches() && pin.texture.get()==debt.texture && pin.buffer.get()==debt.buffer &&
+            pin.target==debt.target && BorrowPrivateView(pin.target)==debt.view &&
+            nativeApi.useCount(&pin.texture)==1 && nativeApi.useCount(&pin.buffer)==2;
+    }
+    bool DropTexture(unsigned i){TargetPins().slots[i].texture.setNull();return true;}
+    unsigned BufferCount(unsigned i){return nativeApi.useCount(&TargetPins().slots[i].buffer);}
+    bool DropBuffer(unsigned i){TargetPins().slots[i].buffer.setNull();TargetPins().slots[i].target=NULL;return true;}
+    bool ReleaseView(unsigned i,void *view)
+    {
+        unsigned long remaining=0;
+        if(!ReleaseCreationView(view,remaining))return false;
+        std::ostringstream line;line<<"owned RTV creation debt released slot="<<i<<" remaining="<<remaining;Log(line.str());return true;
+    }
+};
 bool ReadTerrainCache(Terrain *terrain,NativeTerrainCache::State &state)
 {
     if(!RenderAbiMatches())return false;
@@ -748,10 +839,13 @@ void PreparePositionPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *
     unit->setTextureFiltering(Ogre::TFO_NONE);
     unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
     positionMaterial->load();
+    if(rtvDebt.Active())rtvDebt.UncertainAllocation();
     positionTarget = textures.createManual(PositionTargetName, group, Ogre::TEX_TYPE_2D,
         Side, Side, 1, 0, Ogre::PF_FLOAT32_RGBA, Ogre::TU_RENDERTARGET);
+    TrackPrivateTarget(positionTarget);
     positionWorkspace = manager->addWorkspace(scene, positionTarget->getBuffer()->getRenderTarget(),
         camera, Ogre::IdString(PositionWorkspaceName), false);
+    if(rtvDebt.Active())rtvDebt.AllocationConfirmed();
 }
 void InspectPositionPass(Ogre::Camera *camera, const std::vector<float> &depth)
 {
@@ -969,11 +1063,14 @@ void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene
         unit->setTextureFiltering(Ogre::TFO_NONE);
     }
     sunMaterial->load();
+    if(rtvDebt.Active())rtvDebt.UncertainAllocation();
     sunTarget = textures.createManual(SunTargetName,
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,Ogre::TEX_TYPE_2D,
         Side,Side,1,0,Ogre::PF_FLOAT32_RGBA,Ogre::TU_RENDERTARGET);
+    TrackPrivateTarget(sunTarget);
     sunWorkspace = manager->addWorkspace(scene,sunTarget->getBuffer()->getRenderTarget(),camera,
         Ogre::IdString(SunWorkspaceName),false);
+    if(rtvDebt.Active())rtvDebt.AllocationConfirmed();
 }
 void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absoluteWorld=false,const LightingSnapshot *frozen=NULL)
 {
@@ -1224,6 +1321,23 @@ void Drop()
     renderer = NULL;
     handles.clear();
     cleanup = false;
+    if(rtvDebt.Active())
+    {
+        const unsigned debts=rtvDebt.Count();PrivateViewCleanup ownerProof;
+        const bool gone=!shot&&!positionWorkspace&&!sunWorkspace&&!terrainExperiment.workspace &&
+            !terrainExperiment.root&&target.isNull()&&positionTarget.isNull()&&sunTarget.isNull() &&
+            terrainExperiment.output.isNull()&&terrainExperiment.material.isNull()&&
+            positionMaterial.isNull()&&sunMaterial.isNull();
+        if(!rtvDebt.Clean(ownerProof,gone))
+        {
+            chainSafe=false;pending=false;
+            ErrorLog("SatelliteCaptureProbe: owned RTV lifetime proof failed; one set quarantined, further captures disabled");
+        }
+        else
+        {
+            std::ostringstream released;released<<"owned RTV lifetime proof complete; creation debts="<<debts;Log(released.str());
+        }
+    }
     if(privateRun)LogResourceTelemetry("after-private-terrain");
 }
 struct ProbeListener : Ogre::CompositorWorkspaceListener
@@ -1426,8 +1540,9 @@ void Update(MapScreen *map)
                     (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('Y') & 0x8000);
         bool press = down && !keyHeld;
         keyHeld = down;
-        if(fileRequests && pid==GetCurrentProcessId() && !pending && chainSafe &&
-           map && map->getVisible() && ProbePolicy::PollDue(lastRequestPoll,GetTickCount()))
+        if(ProbePolicy::FileRequestAllowed(fileRequests,pid==GetCurrentProcessId(),backgroundFileRequests,
+           map&&map->getVisible(),pending||terrainExperiment.root||inside,chainSafe) &&
+           ProbePolicy::PollDue(lastRequestPoll,GetTickCount()))
         {
             lastRequestPoll=GetTickCount();
             const bool wasArmed=requestLatch.armed;
@@ -1462,6 +1577,7 @@ void Update(MapScreen *map)
             const bool geometryOnlyRequest=GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0;
             if(!geometryOnlyRequest)
                 isolatedLighting=ReadLightingSnapshot(GetPrivateProfileIntA("Probe","NativeExposurePreview",0,ini.c_str())!=0,renderer->workspace);
+            if(!rtvDebt.Begin())throw std::runtime_error("owned RTV request still active/quarantined");
             terrainExperiment.Begin(renderer->root,
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
@@ -1608,6 +1724,7 @@ __declspec(dllexport) void startPlugin()
                  <<" peak readback/staging bytes="<<raster.readbackBytes<<"; excludes native geometry, depth/driver/main-scene allocations";
         Log(rasterLog.str());
         fileRequests=GetPrivateProfileIntA("Probe","EnableRequestFile",0,requestIni.c_str())==1;
+        backgroundFileRequests=fileRequests && GetPrivateProfileIntA("Probe","AllowBackgroundFileRequests",0,requestIni.c_str())==1;
         reusePrivateShaders=GetPrivateProfileIntA("Probe","ReusePrivateShaders",0,requestIni.c_str())==1;
         if(raster.resolutionOnly)
         {

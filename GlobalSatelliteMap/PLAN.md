@@ -238,3 +238,16 @@ verified captures/dynamic layers into the optional global-map viewer. Do not
 publish this intermediate grid or replace BestMinimap's source. DF stays paused.
 After this checkpoint the game is closed; only the private probe mods.cfg line
 was removed, other bytes preserved, request/control/batch disabled and Side512.
+
+### Later checkpoint: private RTV retention repaired
+
+The installed D3D11 backend omits creation-reference Release in its RTT
+destructors. Exact-profile, private-only ownership repair now passed two512 and
+two8192 repeated captures. All6 final RTV counts0;8192 idle8.066→8.079GB instead
+of another~3GiB/request. Initial warmup retention/longer-run FPS remain separate
+limits. See docs/verification/2026-11-01-satellite-rtv-lifetime.md.
+The game currently remains open in the background, Request0; user supplies
+launch/load/close while writing their article. Do not focus their windows.
+Next: independently owned near-biome material inputs; global ZoneMap callbacks
+must not mutate gameplay terrain. Then detailed geometry, buildings/LODs,
+lighting and optional global-map integration. DF remains paused.

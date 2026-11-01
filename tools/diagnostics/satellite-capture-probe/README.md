@@ -563,3 +563,24 @@ Named resources balanced; process memory did not return:~7.71GB baseline,
 2048-equivalent, distant colours coarse; this is not final map quality. Full
 evidence: docs/verification/2026-11-01-satellite-8192-control.md. Game closed/probe
 disabled after acceptance of this diagnostic grid; no public package changed.
+
+### Successful private RTV lifetime repair (later checkpoint)
+
+The previous retention was traced to six private D3D11RenderTexture creation
+references omitted by the installed native destructors. The probe now guards
+the exact getter/destructor ABI, pins texture and buffer ownership and releases
+each creation reference only after synchronous native RTT destruction. Unknown
+ownership/constructor failures quarantine one bounded set and disable capture.
+There is no global rendering/cache mutation or late static Ogre destruction.
+
+Two native512 and two native8192 captures pass; all six final COM counts are0.
+8192 idle process bytes were8,065,966,080 then8,078,729,216, removing the prior
+approximately3GiB/request staircase. This is short-run evidence for the identified
+leak, not a universal zero-leak/FPS claim. Raw GBuffer and Sun repeats match.
+See docs/verification/2026-11-01-satellite-rtv-lifetime.md for exact hashes,
+adapted-exposure differences, initial warmup retention and native logs.
+
+AllowBackgroundFileRequests defaults0; opt-in1 permits an explicit file token
+with an open map/valid idle context while Kenshi is in the background. Keyboard
+requests remain foreground-only. capture_rtv_lifetime.ps1 verifies PID/start,
+six releases, one worker close, three images and cancels its token on every exit.
