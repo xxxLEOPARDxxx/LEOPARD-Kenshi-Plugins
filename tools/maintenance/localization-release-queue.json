@@ -25,7 +25,6 @@
     "Vital-Read",
     "Job-B-Gone",
     "Organize-the-Trader",
-    "Organize-the-Inventory",
     "Organize-the-Crafting-Stations",
     "Auto-Pause-on-Load",
     "Loot-Scoot-Execute",
@@ -33,8 +32,8 @@
     "Hidden-Faction-Relations",
     "Map-markers",
     "KenshiJobManagement",
-    "CharacterHighlight",
-    "CharacterInspector",
+    "Character-Highlight",
+    "Character Inspector",
     "BetterLooting",
     "KillCounter",
     "KenshiRotate",
@@ -44,10 +43,8 @@
   "excluded": {
     "DynamicFactions": "private development, paused",
     "GlobalSatelliteMap": "private development, not installed",
-    "XP_Overhaul": "local noncanonical compatibility build, no public release authorization/catalog package"
+    "XP_Overhaul": "local noncanonical compatibility build, no public release authorization/catalog package",
+    "Organize-the-Inventory": "local only, do not publish (user decision09.10 preserved in memory and absent from release catalog)"
   },
-  "not_installed": [
-    "Organize-the-Inventory"
-  ],
   "status": "source fixes built and installed where present; public packages still pending"
 }
