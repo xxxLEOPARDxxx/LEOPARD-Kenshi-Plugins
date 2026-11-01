@@ -1,6 +1,6 @@
 {
   "reason": "User confirmed all affected public plugins need a release containing the detailed-log fix; 2026-11-01.",
-  "policy": "Prepare approved public updates in parallel with satellite work. Verify actual published versions, increment once per release; user uploads Nexus first, then agent updates Steam after links. AIFixed is held for its integrated release 2.",
+  "policy": "Prepare locally; user uploads Nexus first and supplies links, then corresponding Steam updates. AI Fixed 2 includes the integrated Basusu modules and log fix in one version increment.",
   "packages": [
     "AIFixed",
     "AssignedWorkers",
@@ -46,8 +46,8 @@
     "XP_Overhaul": "local noncanonical compatibility build, no public release authorization/catalog package",
     "Organize-the-Inventory": "local only, do not publish (user decision09.10 preserved in memory and absent from release catalog)"
   },
-  "status": "36 verified local Nexus-ready candidates prepared; AIFixed held; no uploads",
+  "status": "37 local Nexus-ready artifact candidates; AI load/MCM/RU startup verified; gameplay unverified; not uploaded",
   "holds": {
-    "AIFixed": "GateFix/SleepFix integration in progress; release 2 will combine it with the detailed-log fix. Do not package or bump until accepted."
+    "AIFixed": "Version 2 prepared and offline-reviewed; load/MCM/RU startup smoke passed; automatic-module gameplay/FPS/memory unverified. Not published."
   }
 }

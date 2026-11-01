@@ -1,0 +1,47 @@
+{
+  "verified_at_utc": "2026-11-01T22:24:35.902188+00:00",
+  "baseline": {
+    "checked_at_utc": "2026-11-01T22:17:18.147253+00:00",
+    "package": "AIFixed",
+    "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3829845490",
+    "api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+    "description_version": "1",
+    "candidate_version": "2",
+    "description_sha256": "5b83cc8e39cdb6ceec036840f7c60719eeea9fed66935e48b3b7c8f03566ffac",
+    "raw_response": "D:\\DEV\\Kenshi\\build\\ReleaseBaselineAudit\\aifixed-20261102-f8d9689d0f5df55a-steam-public-file-details.json",
+    "raw_response_sha256": "f8d9689d0f5df55ad8297b8d6445885bd329a19500e0446651386a16a7932c19",
+    "creator": "76561198098571264",
+    "consumer_app_id": 233860,
+    "scope": "Official public Steam description footer only; no remote mutation or Nexus version verification."
+  },
+  "candidate": {
+    "package": "AIFixed",
+    "candidate_version": "2",
+    "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed-2.zip",
+    "archive_bytes": 109685,
+    "archive_sha256": "5c0dd2736d0aa8006291fb57e9b479eec368a146450690b2684790b97331336f",
+    "dll_sha256": "3d0b58002aa920f09e33ad9088ef5dfab4b64f960637219cc63988e60c4ed4b8",
+    "files": 10,
+    "steam_description_bytes": {
+      "en": 3059,
+      "ru": 4943
+    },
+    "languages": [
+      "en_GB",
+      "ru_RU",
+      "zh_CN"
+    ],
+    "status": "local artifact verified; no publication"
+  },
+  "acceptance": {
+    "status": "PASS: loaded candidate, installed hooks, MCM page and 42-message RU catalog only",
+    "gameplay_verified": false,
+    "fps_memory_measured": false,
+    "evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
+    "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
+    "evidence_utc": "2026-11-01T22:21:44.8514203Z",
+    "observed_process_id": 15696,
+    "new_automatic_modules_gameplay_verified": false
+  },
+  "checks": "CRC/exact content and file hashes, canonical DLL, ten-file clean payload, source README/GPL/provenance, 18 factory settings/default-off modules/Debug last, exactly three MO catalogs, complete bilingual notes/history/credits/guides, covers/screens, all 36 earlier archives unchanged"
+}

@@ -1,5 +1,5 @@
 {
-  "verified_at_utc": "2026-11-01T21:25:47.896412+00:00",
+  "verified_at_utc": "2026-11-01T22:06:43.733687+00:00",
   "status": "36 accepted local Nexus-ready candidates; no upload",
   "independent_review": {
     "reviewer": "parent agent /root",
@@ -472,8 +472,8 @@
       ],
       "license_files": [],
       "steam_description_bytes": {
-        "en": 4294,
-        "ru": 6920
+        "ru": 5879,
+        "en": 3637
       },
       "screens": 9,
       "status": "verified local Nexus-ready candidate; not uploaded"
@@ -533,9 +533,9 @@
       "verified_steam_version": "6",
       "candidate_version": "7",
       "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Sense-7.zip",
-      "archive_bytes": 200362,
-      "archive_sha256": "ac5361bfaf1ff1a04468afdffc729c1d9c77bdc192e4d8ae83a3abd629b9c31b",
-      "dll_sha256": "3ebc420bd504b8f6782aae4cdb7d7f638d5565adb447cd5f6d4f2d5b597500bb",
+      "archive_bytes": 201198,
+      "archive_sha256": "20c98626f960ac879c4d41048d88931aea170fac67ae9df54ae364da2daf6a3d",
+      "dll_sha256": "cbc895107ec0e4cc5b6a42b53f946ca450d1311cea15c80a2a09caf8ed506ad3",
       "files": 19,
       "languages": [
         "en_GB",
@@ -549,8 +549,8 @@
         "LICENSE"
       ],
       "steam_description_bytes": {
-        "en": 2079,
-        "ru": 3134
+        "en": 2310,
+        "ru": 3582
       },
       "screens": 3,
       "status": "verified local Nexus-ready candidate; not uploaded"
@@ -1014,5 +1014,23 @@
       "screens": 4,
       "status": "verified local Nexus-ready candidate; not uploaded"
     }
-  ]
+  ],
+  "candidate_refinements": {
+    "date": "2026-11-02 Europe/Moscow",
+    "Vital-Sense": {
+      "version": "7",
+      "source_review": "CLEAR by parent /root",
+      "dll_sha256": "cbc895107ec0e4cc5b6a42b53f946ca450d1311cea15c80a2a09caf8ed506ad3",
+      "change": "Native Knockout artwork preserves its own RGB for unconscious/recovery fallback icons."
+    },
+    "UITweaks": {
+      "version": "13",
+      "change": "Vanilla sequential squad trading removed from EN/RU public feature guides and generator reinsertion; source README/history retained.",
+      "archive_unchanged": true,
+      "public_summary": "One simple optional save-preview feature and one MCM save-list-height feature per language; implementation detail remains in README/changelog."
+    },
+    "game_preservation_checked_at_utc": "2026-11-01T22:06:43.733687+00:00",
+    "game_preservation_scope": "All 34 installed DLLs verified unchanged before parent-authorized Vital Sense installation; the preservation assertion was not weakened."
+  },
+  "description_refresh_verified_at_utc": "2026-11-01T22:13:01.140930+00:00"
 }

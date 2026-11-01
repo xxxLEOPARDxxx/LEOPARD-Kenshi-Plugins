@@ -24,7 +24,7 @@ All 36 versions are exactly the current official Steam description baseline plus
 | UITweaks | 12 → 13 | 167308 | `d28e15297eedaf6e43d599ee8352e17b7dcda9567eafa0d35bf0c3a52094a48c` |
 | WantedMap | 6 → 7 | 112656 | `8f064ab107aced5c7a3409fa5a2abea37189c0de13c1d8616711d11d0db739f1` |
 | Container-Highlight | 2 → 3 | 154633 | `dc6e2f16f581b82943ce934e5bee3495340143d1d0dd5506d4a3d99e723ff777` |
-| Vital-Sense | 6 → 7 | 200362 | `ac5361bfaf1ff1a04468afdffc729c1d9c77bdc192e4d8ae83a3abd629b9c31b` |
+| Vital-Sense | 6 → 7 | 201198 | `20c98626f960ac879c4d41048d88931aea170fac67ae9df54ae364da2daf6a3d` |
 | Vital-Read | 5 → 6 | 197804 | `3a3f98c9f206cf6954cdc353dca1c9a34c378d4a6c0ef124537c7603dcbeae54` |
 | Job-B-Gone | 5 → 6 | 130922 | `4ca5b97250b95fb04ad91d4f0ad1ab3b0db28a927153cc156aa3bc3e0562ae78` |
 | Organize-the-Trader | 7 → 8 | 325805 | `1acd42c36831b63ea4140c33ad0f8ca07515a647872038ba8fd26c63a113ba32` |
@@ -43,10 +43,14 @@ All 36 versions are exactly the current official Steam description baseline plus
 | TauntExpansion | 1 → 2 | 74329 | `9d21c186786a8a01ec518becc79c7fcad81e8c77901720593e1f6390ecf99d00` |
 | StackSort | 2 → 3 | 235435 | `bce8179c463712e1560c8caf14d793c96d5e756d3d584a22ab16b256ae802bb8` |
 
-UI Tweaks 13 includes the new Save/Load PNG previews and configurable dialog height; the already published version 12 trading changes remain in history. Container Highlight 3 includes stale-model restoration protection. Vital Read 6/Vital Sense 7 include optional-icon preflight; StackSort 3 includes quiet optional Arrange lookup. ItemMarkers retains the native stolen badge without claiming an ownership/stacking cure. All 36 include the per-plugin detailed localization-log fix.
+UI Tweaks 13 includes the new Save/Load PNG previews and configurable dialog height; historical version 12 trading investigation stays in README/history and vanilla sequential squad trading is excluded from public feature descriptions. Container Highlight 3 includes stale-model restoration protection. Vital Read 6/Vital Sense 7 include optional-icon preflight; Vital Sense 7 also preserves the native coloured Knockout glyph beside green labels. StackSort 3 includes quiet optional Arrange lookup. ItemMarkers retains the native stolen badge without claiming an ownership/stacking cure. All 36 include the per-plugin detailed localization-log fix.
 
 StackSort, Hidden Faction Relations and Map markers were freshly built and import-checked; StackSort production tests pass. Only the disabled DEV stage copies of HFR/Map were synchronized. Clean release input folders were used, with no installation of game DLLs or edits to personal INI. RangedDamageXp factory Debug was corrected to 0; UI Tweaks factory defaults include SaveDialogHeightPercent=120 before Debug.
 
 Independent parent-agent review on 2026-11-02: CLEAR. The reviewer inspected the resolver, packer, release notes, UI README and defaults, then independently reran the 36-package verifier and both override/pack-boundary tests successfully, including old-ZIP preservation. The local candidates are accepted; this does not authorize or claim publication.
 
 Runtime acceptance, FPS and long-term memory claims are outside package verification. See the JSON proof for exact DLL identities, composition, descriptions and artifact paths.
+
+Same-version refresh: Vital Sense 7 includes the independently reviewed Knockout-colour correction. UI Tweaks public EN/RU guides omit vanilla sequential squad trading, while source README/history remain intact. All 34 installed DLLs passed preservation checks at 2026-11-01T22:06:43.733687+00:00 before the parent-authorized Vital Sense installation. The preservation check was not relaxed. Only the Vital Sense ZIP changed; the other 35 ZIP hashes remain identical.
+
+Public-guide simplification verified 2026-11-01T22:13:01.140930+00:00: UI Tweaks now has one optional save-preview feature and one MCM save-list-height feature in each language. Technical preview details stay in README/changelog. All 36 descriptions pass the strengthened validator; targeted UI ZIP CRC, composition and every file hash pass, with its archive/DLL unchanged. The full installed-DLL preservation check above remains its pre-install snapshot and was not rerun or relaxed.

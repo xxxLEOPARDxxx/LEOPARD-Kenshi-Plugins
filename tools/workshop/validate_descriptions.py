@@ -21,6 +21,19 @@ def balanced(text,path):
         else:stack.append(tag)
     if stack:raise ValueError('Unclosed BBCode: '+str(path))
 
+def player_feature_claims(mod,text,path):
+    # User, 2026-10-31: this vanilla behavior is not a UI Tweaks feature.
+    # README/version history can document the investigation separately.
+    if mod=='UITweaks' and re.search(r'Sequential squad trading|Последовательный обмен',text,re.I):
+        raise ValueError('Vanilla squad trading advertised as a plugin feature: '+str(path))
+    if mod=='UITweaks':
+        if re.search(r'\bPNG\b|lossless|1600\s*[x×]\s*900|\bpixels?\b|без потерь|пиксел',text,re.I):
+            raise ValueError('Save-preview implementation details in player guide: '+str(path))
+        for heading,preview,height in (('WHAT IT DOES','Save previews.','Save list height.'),
+                                        ('ЧТО ДЕЛАЕТ','Превью сохранений.','Высота списка сохранений.')):
+            if heading in text and (text.count('[b]'+preview+'[/b]')!=1 or text.count('[b]'+height+'[/b]')!=1):
+                raise ValueError('Expected one concise preview feature and one list-height feature: '+str(path))
+
 def validate(names):
     notes=json.loads((HERE/'release_notes.json').read_text(encoding='utf-8'))
     history=json.loads((HERE/'changelog.json').read_text(encoding='utf-8'))
@@ -42,12 +55,14 @@ def validate(names):
         nexus_path=HERE/'nexus'/(mod+'_description.txt')
         nexus=nexus_path.read_text(encoding='utf-8')
         balanced(nexus,nexus_path)
+        player_feature_claims(mod,nexus,nexus_path)
         if '[line]' not in nexus or '[size=5][b]Русский[/b][/size]' not in nexus:raise ValueError('Missing Nexus language separator: '+mod)
         sizes={}
         for lang,index,heading in (('ru',0,'Что изменено в версии '),('en',1,"What's changed in version ")):
             path=stage/('description_'+lang+'.txt');text=path.read_text(encoding='utf-8')
             if '\ufffd' in text or len(text.encode('utf-8'))>build.LIMIT:raise ValueError('Damaged/oversized description: '+str(path))
             balanced(text,path);sizes[lang]=len(text.encode('utf-8'))
+            player_feature_claims(mod,text,path)
             forbidden=('Что изменено в версии ',"What's changed in version ",'ИСТОРИЯ ВЕРСИЙ НАШЕГО ФОРКА','OUR FORK VERSION HISTORY')
             if any(value in text or value in nexus for value in forbidden):raise ValueError('Release changelog duplicated in player description: '+mod+' '+lang)
             if mod in notes and '[h2]' not in text:raise ValueError('Missing formatted sections: '+str(path))
@@ -68,6 +83,12 @@ def validate(names):
             if mod=='ModConfigMenu':
                 for consumer in mcm_catalog():
                     if consumer['name'] not in text or consumer['name'] not in nexus:raise ValueError('Missing supported MCM page: '+consumer['name']+' '+lang)
+            if mod=='AIFixed' and int(item['version'])>=2:
+                credits=('Basusu','3787399736','3787375792','https://github.com/Basusu0/Basusu-kenshi-plugins',
+                         'https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins','GPLv3')
+                if not all(value in text and value in nexus for value in credits):raise ValueError('Missing AI collection author/original/source credit: '+lang)
+                if ('Спасибо Basusu' if lang=='ru' else 'Thank you, Basusu') not in text:raise ValueError('Missing explicit AI collection gratitude: '+lang)
+                if ('Исходники оригинала:' if lang=='ru' else 'Original source code:') not in text:raise ValueError('Missing separately labelled AI original sources: '+lang)
         checked.append({'mod':mod,'version':item['version'],'steam_bytes':sizes,'nexus_languages':['en','ru'],'separate_version_notes':mod in notes or mod in fork_data,'fork_history_versions':list(fork_data[mod]['history']) if mod in fork_data else [],'explicit_fork_credit':mod in fork_data})
     return checked
 

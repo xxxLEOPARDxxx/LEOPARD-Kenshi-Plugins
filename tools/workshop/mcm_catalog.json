@@ -5,16 +5,27 @@
     "id": "AIFixed",
     "group": "own",
     "status": "canonical_supported",
-    "author": "LEOPARD",
+    "author": "LEOPARD; Basusu (GateFix/SleepFix)",
     "source": "D:\\DEV\\Kenshi\\ours\\AIFixed",
     "source_export": [
       {
         "path": "D:\\DEV\\Kenshi\\ours\\AIFixed\\AIFixed.cpp",
-        "line": 1139,
+        "line": 1295,
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "contributors": [
+      {
+        "name": "LEOPARD",
+        "scope": "Robotic-repair fixes and collection integration"
+      },
+      {
+        "name": "Basusu",
+        "scope": "GateFix/SleepFix adaptations",
+        "source_url": "https://github.com/Basusu0/Basusu-kenshi-plugins"
+      }
+    ]
   },
   {
     "package": "AssignedWorkers",

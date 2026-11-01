@@ -1,0 +1,89 @@
+{
+  "created_utc": "2026-11-01T22:08:55.705486+00:00",
+  "status": "local refresh verified; no upload/commit/push by this task",
+  "full_36_verification_utc": "2026-11-01T22:06:43.733687+00:00",
+  "installed_dlls_preserved_at_verification": 34,
+  "changed_archive_names": [
+    "Vital-Sense"
+  ],
+  "unchanged_archive_count": 35,
+  "workshop_authoritative_files_synchronized": 20,
+  "refinement": {
+    "date": "2026-11-02 Europe/Moscow",
+    "Vital-Sense": {
+      "version": "7",
+      "source_review": "CLEAR by parent /root",
+      "dll_sha256": "cbc895107ec0e4cc5b6a42b53f946ca450d1311cea15c80a2a09caf8ed506ad3",
+      "change": "Native Knockout artwork preserves its own RGB for unconscious/recovery fallback icons."
+    },
+    "UITweaks": {
+      "version": "13",
+      "change": "Vanilla sequential squad trading removed from EN/RU public feature guides and generator reinsertion; source README/history retained.",
+      "archive_unchanged": true,
+      "public_summary": "One simple optional save-preview feature and one MCM save-list-height feature per language; implementation detail remains in README/changelog."
+    },
+    "game_preservation_checked_at_utc": "2026-11-01T22:06:43.733687+00:00",
+    "game_preservation_scope": "All 34 installed DLLs verified unchanged before parent-authorized Vital Sense installation; the preservation assertion was not weakened."
+  },
+  "packages": [
+    {
+      "package": "Vital-Sense",
+      "verified_steam_version": "6",
+      "candidate_version": "7",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Sense-7.zip",
+      "archive_bytes": 201198,
+      "archive_sha256": "20c98626f960ac879c4d41048d88931aea170fac67ae9df54ae364da2daf6a3d",
+      "dll_sha256": "cbc895107ec0e4cc5b6a42b53f946ca450d1311cea15c80a2a09caf8ed506ad3",
+      "files": 19,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2310,
+        "ru": 3582
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "UITweaks",
+      "verified_steam_version": "12",
+      "candidate_version": "13",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\UITweaks-13.zip",
+      "archive_bytes": 167308,
+      "archive_sha256": "d28e15297eedaf6e43d599ee8352e17b7dcda9567eafa0d35bf0c3a52094a48c",
+      "dll_sha256": "b6a0589ba8d888062c907c3586e49d8a50c8fba39b85e0269aa37b82ac659d8d",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "ru": 5879,
+        "en": 3637
+      },
+      "screens": 9,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    }
+  ],
+  "personal_vitalsense_config_sha256": "8d8dbfd79a61ee049f8fb2c81f69237a5a3857c0205f700f3d0b89eb531d4419",
+  "publication_ledger_sha256": "5134f95b79d8907ef7593b8a57b6f434fa690715c70040c15d909e1424738536",
+  "AIFixed_held_at": "1",
+  "description_policy_boundary_checks": 5,
+  "ui_public_guide_simplified_at_utc": "2026-11-01T22:13:01.140930+00:00",
+  "ui_preview_normalization_boundary_checks": 8,
+  "final_all_description_count": 36
+}

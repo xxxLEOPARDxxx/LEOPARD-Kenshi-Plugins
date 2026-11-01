@@ -1,0 +1,165 @@
+{
+  "status": "37 local Nexus-ready artifact candidates; AI load/MCM/RU startup verified; gameplay unverified; not uploaded",
+  "input_root": "D:\\DEV\\Kenshi\\workshop\\maintenance-inputs-20261102",
+  "packages": [
+    {
+      "package": "AssignedWorkers",
+      "candidate_version": "8"
+    },
+    {
+      "package": "BestMinimap",
+      "candidate_version": "3"
+    },
+    {
+      "package": "BuildModeGizmo",
+      "candidate_version": "5"
+    },
+    {
+      "package": "GatePushGuard",
+      "candidate_version": "2"
+    },
+    {
+      "package": "GearCompare",
+      "candidate_version": "8"
+    },
+    {
+      "package": "ItemMarkers",
+      "candidate_version": "6"
+    },
+    {
+      "package": "LiveXpBars",
+      "candidate_version": "12"
+    },
+    {
+      "package": "ModConfigMenu",
+      "candidate_version": "11"
+    },
+    {
+      "package": "MultiXPMining",
+      "candidate_version": "2"
+    },
+    {
+      "package": "PatientSelfAid",
+      "candidate_version": "5"
+    },
+    {
+      "package": "QuickStartSelect",
+      "candidate_version": "7"
+    },
+    {
+      "package": "RangedDamageXp",
+      "candidate_version": "3"
+    },
+    {
+      "package": "RecruitMarkers",
+      "candidate_version": "5"
+    },
+    {
+      "package": "SkillLevelUpInfo",
+      "candidate_version": "3"
+    },
+    {
+      "package": "StatColours",
+      "candidate_version": "13"
+    },
+    {
+      "package": "UITweaks",
+      "candidate_version": "13"
+    },
+    {
+      "package": "WantedMap",
+      "candidate_version": "7"
+    },
+    {
+      "package": "Container-Highlight",
+      "candidate_version": "3"
+    },
+    {
+      "package": "Vital-Sense",
+      "candidate_version": "7"
+    },
+    {
+      "package": "Vital-Read",
+      "candidate_version": "6"
+    },
+    {
+      "package": "Job-B-Gone",
+      "candidate_version": "6"
+    },
+    {
+      "package": "Organize-the-Trader",
+      "candidate_version": "8"
+    },
+    {
+      "package": "Organize-the-Crafting-Stations",
+      "candidate_version": "2"
+    },
+    {
+      "package": "Auto-Pause-on-Load",
+      "candidate_version": "6"
+    },
+    {
+      "package": "Loot-Scoot-Execute",
+      "candidate_version": "6"
+    },
+    {
+      "package": "Wall-B-Gone",
+      "candidate_version": "5"
+    },
+    {
+      "package": "Hidden-Faction-Relations",
+      "candidate_version": "3"
+    },
+    {
+      "package": "Map-markers",
+      "candidate_version": "4"
+    },
+    {
+      "package": "KenshiJobManagement",
+      "candidate_version": "5"
+    },
+    {
+      "package": "Character-Highlight",
+      "candidate_version": "3"
+    },
+    {
+      "package": "Character Inspector",
+      "candidate_version": "3"
+    },
+    {
+      "package": "BetterLooting",
+      "candidate_version": "5"
+    },
+    {
+      "package": "KillCounter",
+      "candidate_version": "2"
+    },
+    {
+      "package": "KenshiRotate",
+      "candidate_version": "2"
+    },
+    {
+      "package": "TauntExpansion",
+      "candidate_version": "2"
+    },
+    {
+      "package": "StackSort",
+      "candidate_version": "3"
+    },
+    {
+      "package": "AIFixed",
+      "candidate_version": "2"
+    }
+  ],
+  "AIFixed_startup": {
+    "status": "PASS: loaded candidate, installed hooks, MCM page and 42-message RU catalog only",
+    "gameplay_verified": false,
+    "fps_memory_measured": false,
+    "evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\aifixed-20261102\\before-basusu-integration\\startup-smoke.json",
+    "evidence_sha256": "a9c042fd90e5a0e21dadd7d7d06be97740723464fd79cef34eab09bc5d35513c",
+    "evidence_utc": "2026-11-01T22:21:44.8514203Z",
+    "observed_process_id": 15696,
+    "new_automatic_modules_gameplay_verified": false
+  },
+  "publication_order": "User Nexus first; Steam only after supplied links"
+}

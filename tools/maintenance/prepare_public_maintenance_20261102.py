@@ -59,8 +59,8 @@ EXTRA={
   'en':['[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages when the standard icon is used.'],
   'ru':['[b]Совместимость необязательных значков.[/b] Необязательные пользовательские текстуры проверяются до загрузки: использование штатного значка не вызывает ложных сообщений об отсутствующей текстуре.']},
  'Vital-Sense':{
-  'en':['[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages. Settings explain the standard-icon fallback.'],
-  'ru':['[b]Совместимость необязательных значков.[/b] Пользовательские текстуры проверяются до загрузки, без ложных сообщений об отсутствующих файлах. Подсказки настроек поясняют использование штатных значков.']},
+  'en':["[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour.", '[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages. Settings explain the standard-icon fallback.'],
+  'ru':['[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему.', '[b]Совместимость необязательных значков.[/b] Пользовательские текстуры проверяются до загрузки, без ложных сообщений об отсутствующих файлах. Подсказки настроек поясняют использование штатных значков.']},
  'StackSort':{
   'en':['[b]Quiet optional controls.[/b] Opening an inventory layout without the game\'s Arrange button no longer produces misleading missing-widget warnings. Existing sorting, merging, rotation and undo behavior is preserved.'],
   'ru':['[b]Необязательные кнопки без предупреждений.[/b] Открытие окна инвентаря без штатной кнопки раскладки больше не вызывает ложных предупреждений об отсутствующем виджете. Сортировка, объединение, повороты и отмена сохраняются.']},
@@ -83,6 +83,19 @@ def readme_path(name):
     return root/'README.txt' if (root/'README.txt').is_file() else root/'README.md'
 def plain_note(note):
     return '\n'.join(['English','']+['- '+re.sub(r'\[/?b\]','',s) for s in note['en']]+['','Русский','']+['- '+re.sub(r'\[/?b\]','',s) for s in note['ru']])
+
+def simplify_ui_preview_features(body,lang):
+    # User's public guide wording; implementation details stay in README/history.
+    labels=('Save and load previews','Clear saved-game screenshots','Save/load window height',
+            'Снимки сохранений','Чёткий предпросмотр','Высота окон сохранения и загрузки',
+            'Save previews.','Save list height.','Превью сохранений.','Высота списка сохранений.')
+    body=re.sub(r'(?m)^\[\*\]\[b\](?:'+'|'.join(re.escape(label) for label in labels)+r')\[/b\][^\n]*\n?','',body)
+    bullets=('[*][b]Save previews.[/b] Optional screenshots of the selected save in the Save and Load menus.\n'
+             '[*][b]Save list height.[/b] An MCM setting lets you show more saves.\n') if lang=='en' else (
+             '[*][b]Превью сохранений.[/b] Добавлена опция показа снимка выбранного сохранения в меню сохранения и загрузки.\n'
+             '[*][b]Высота списка сохранений.[/b] Настройка в MCM позволяет показывать больше сохранений.\n')
+    if '[/list]' not in body:raise ValueError('UI Tweaks public feature list missing')
+    return body.replace('[/list]',bullets+'[/list]',1)
 
 def versioned_catalog(text):
     raw=text.encode('utf-8');lines=raw.splitlines(keepends=True);replacements={}
@@ -144,22 +157,11 @@ def metadata():
             if heading in body:body=body[:body.index(heading)].rstrip()
             body=body.rstrip()+'\n\n'+heading+'\n\n'+plain_note(note)+'\n'
         path.write_text(body,encoding='utf-8')
-    # Add actual new UI behavior to the main features, with current controls/settings.
+    # Keep the public feature list concise; detailed current notes remain separate.
     for lang in ('en','ru'):
-        body=guides['UITweaks'][lang]
-        if '[b]Save and load previews' not in body and '[b]Снимки сохранений' not in body:
-            bullets=('\n[*][b]Save and load previews[/b] - select an existing slot in Save Game or Load Game to see its screenshot below the dialog. The window opens higher and stays put when changing rows. No image means no preview frame.\n'
-                     '[*][b]Clear saved-game screenshots[/b] - successful manual saves, quicksaves and autosaves capture the game with its HUD, excluding save/load and pause menus. Filtered lossless PNG previews reach 1600x900; old JPEG previews remain readable.\n'
-                     '[*][b]Save/load window height[/b] - 100% to 160% in MCM, default 120%, applied when the dialog next opens. The image fits without cropping and respects available screen space.\n') if lang=='en' else (
-                     '\n[*][b]Снимки сохранений[/b] - выберите существующий слот в меню сохранения или загрузки, чтобы увидеть его снимок под окном. Окно сразу открывается выше и не двигается при смене строки. Без изображения рамка скрыта.\n'
-                     '[*][b]Чёткий предпросмотр[/b] - успешные ручные, быстрые и автоматические сохранения получают снимок игры с HUD, без меню сохранения, загрузки и паузы. Качественное уменьшение и PNG без потерь до 1600x900; старые JPEG читаются.\n'
-                     '[*][b]Высота окон сохранения и загрузки[/b] - от 100% до 160% в MCM, по умолчанию 120%; применяется при следующем открытии. Снимок вписывается целиком без обрезки с учётом экрана.\n')
-            body=body.replace('[/list]',bullets+'[/list]',1)
-        # The 12 release already included portrait trading; preserve it in the guide.
-        if lang=='en' and 'Sequential squad trading' not in body:
-            body=body.replace('[/list]','[*][b]Sequential squad trading[/b] - RMB/Trade on another allied portrait opens that exchange even while an earlier trade remains open; the native approach to distant targets is retained.\n[/list]',1)
-        if lang=='ru' and 'Последовательный обмен' not in body:
-            body=body.replace('[/list]','[*][b]Последовательный обмен[/b] - ПКМ и «Обмен» по портрету другого союзника открывает следующий обмен, даже если предыдущий ещё открыт; штатный подход к далёкой цели сохранён.\n[/list]',1)
+        body=simplify_ui_preview_features(guides['UITweaks'][lang],lang)
+        # User excludes vanilla squad-trading behaviour from public guides.
+        body=re.sub(r'(?m)^\[\*\]\[b\](?:Sequential squad trading|Последовательный обмен)\[/b\][^\n]*\n?','',body)
         guides['UITweaks'][lang]=body
     assert held_before==json.dumps({'notes':notes.get('AIFixed'),'guide':guides.get('AIFixed')},sort_keys=True)
     (CANON/'build.py').write_text(text,encoding='utf-8')

@@ -1326,12 +1326,14 @@
       },
       "7": {
         "en": [
+          "[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour.",
           "[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages. Settings explain the standard-icon fallback.",
           "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
           "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
           "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
         ],
         "ru": [
+          "[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему.",
           "[b]Совместимость необязательных значков.[/b] Пользовательские текстуры проверяются до загрузки, без ложных сообщений об отсутствующих файлах. Подсказки настроек поясняют использование штатных значков.",
           "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
@@ -1346,7 +1348,8 @@
         "Лимит 8–256 значков: приоритет у видимых ближайших к центру камеры целей.",
         "Цели с наградой используют цвет тира; окраска сосуществует с Character Highlight и не попадает в портреты.",
         "Клавиша задаётся одним сочетанием с модификаторами.",
-        "[b]Необязательные значки.[/b] Настройки поясняют замену пользовательского значка штатным; недоступные файлы не вызывают ложных сообщений о текстурах."
+        "[b]Необязательные значки.[/b] Настройки поясняют замену пользовательского значка штатным; недоступные файлы не вызывают ложных сообщений о текстурах.",
+        "[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
@@ -1354,7 +1357,8 @@
         "An 8–256 marker budget prioritizes visible targets nearest the camera center.",
         "Bounty targets use tier colors; tint coexists with Character Highlight and is not baked into portraits.",
         "The show key is assigned as one binding with modifiers.",
-        "[b]Optional icons.[/b] Settings explain when a custom icon falls back to the standard game icon; unavailable files no longer cause misleading texture messages."
+        "[b]Optional icons.[/b] Settings explain when a custom icon falls back to the standard game icon; unavailable files no longer cause misleading texture messages.",
+        "[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour."
       ]
     }
   },

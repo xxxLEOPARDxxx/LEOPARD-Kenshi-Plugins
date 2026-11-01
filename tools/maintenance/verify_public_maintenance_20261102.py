@@ -102,6 +102,7 @@ for item in plan['packages']:
             image.verify()
         assert (WORK/name/'screens').is_dir()
         if name=='UITweaks':
+            assert not any(label in nexus for label in ('Sequential squad trading','Последовательный обмен'))
             defaults=z.read('UITweaks/UITweaks.defaults.ini').decode('utf-8-sig')
             assert 'SavePreviews=1' in defaults and 'SaveDialogHeightPercent=120' in defaults and defaults.index('SaveDialogHeightPercent=120')<defaults.index('Debug=0')
             cpp=(ROOT/'UITweaks/UITweaks.cpp').read_text('utf-8-sig')
@@ -109,7 +110,9 @@ for item in plan['packages']:
             for n in catalogs:
                 catalog=gettext.GNUTranslations(io.BytesIO(z.read(n)))
                 assert catalog.gettext('Save/load window height, %')
-            assert '1600x900' in descriptions['en'] and '120%' in descriptions['en']
+            assert descriptions['en'].count('[b]Save previews.[/b]')==1
+            assert descriptions['ru'].count('[b]Превью сохранений.[/b]')==1
+            assert not any(token in nexus for token in ('1600x900','lossless PNG','PNG без потерь'))
         rows.append({'package':name,'verified_steam_version':item['verified_steam_version'],'candidate_version':version,
                      'archive':str(archive),'archive_bytes':archive.stat().st_size,'archive_sha256':sha(archive),
                      'dll_sha256':entry['dll_sha256'],'files':len(members),'languages':languages,
@@ -130,6 +133,7 @@ review={'reviewer':'parent agent /root','result':'CLEAR','recorded_date':'2026-1
                     'Fresh independent input-override and pack-boundary tests passed, including old-ZIP preservation.']}
 report={'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':'36 accepted local Nexus-ready candidates; no upload',
         'independent_review':review,
+        'candidate_refinements': {'date': '2026-11-02 Europe/Moscow', 'Vital-Sense': {'version': '7', 'source_review': 'CLEAR by parent /root', 'dll_sha256': 'cbc895107ec0e4cc5b6a42b53f946ca450d1311cea15c80a2a09caf8ed506ad3', 'change': 'Native Knockout artwork preserves its own RGB for unconscious/recovery fallback icons.'}, 'UITweaks': {'version': '13', 'change': 'Vanilla sequential squad trading removed from EN/RU public feature guides and generator reinsertion; source README/history retained.', 'archive_unchanged': True, 'public_summary': 'One simple optional save-preview feature and one MCM save-list-height feature per language; implementation detail remains in README/changelog.'}, 'game_preservation_checked_at_utc': '2026-11-01T22:06:43.733687+00:00', 'game_preservation_scope': 'All 34 installed DLLs verified unchanged before parent-authorized Vital Sense installation; the preservation assertion was not weakened.'},
         'prepared':len(rows),'held':{'AIFixed':'Release 1 archive unchanged; release 2 awaits GateFix/SleepFix integration acceptance.'},
         'publication_ledger_unchanged':True,'past_changelog_and_fork_history_preserved':True,
         'game_dlls_verified_unchanged':unchanged_game_dlls,
@@ -140,7 +144,7 @@ lines=['# Prepared public plugin updates, 2026-11-02','','36 local Nexus-ready c
        'All 36 versions are exactly the current official Steam description baseline plus one. CRC and every archived file hash match prepared content; primary DLLs match canonical builds; all packages contain current README and three MO catalogs only. Personal settings/logs/99 overrides are excluded. Bilingual descriptions, BBCode, Steam byte limits, source licenses, covers and screenshot folders pass. Prior changelog/fork-history entries and the published ledger are unchanged.','',
        '| Package | Steam baseline → local candidate | ZIP bytes | SHA256 |','| --- | --- | --- | --- |']
 for r in rows:lines.append(f'| {r["package"]} | {r["verified_steam_version"]} → {r["candidate_version"]} | {r["archive_bytes"]} | `{r["archive_sha256"]}` |')
-lines+=['','UI Tweaks 13 includes the new Save/Load PNG previews and configurable dialog height; the already published version 12 trading changes remain in history. Container Highlight 3 includes stale-model restoration protection. Vital Read 6/Vital Sense 7 include optional-icon preflight; StackSort 3 includes quiet optional Arrange lookup. ItemMarkers retains the native stolen badge without claiming an ownership/stacking cure. All 36 include the per-plugin detailed localization-log fix.','',
+lines+=['','UI Tweaks 13 includes the new Save/Load PNG previews and configurable dialog height; historical version 12 trading investigation stays in README/history and vanilla sequential squad trading is excluded from public feature descriptions. Container Highlight 3 includes stale-model restoration protection. Vital Read 6/Vital Sense 7 include optional-icon preflight; Vital Sense 7 also preserves the native coloured Knockout glyph beside green labels. StackSort 3 includes quiet optional Arrange lookup. ItemMarkers retains the native stolen badge without claiming an ownership/stacking cure. All 36 include the per-plugin detailed localization-log fix.','',
         'StackSort, Hidden Faction Relations and Map markers were freshly built and import-checked; StackSort production tests pass. Only the disabled DEV stage copies of HFR/Map were synchronized. Clean release input folders were used, with no installation of game DLLs or edits to personal INI. RangedDamageXp factory Debug was corrected to 0; UI Tweaks factory defaults include SaveDialogHeightPercent=120 before Debug.','',
         'Independent parent-agent review on 2026-11-02: CLEAR. The reviewer inspected the resolver, packer, release notes, UI README and defaults, then independently reran the 36-package verifier and both override/pack-boundary tests successfully, including old-ZIP preservation. The local candidates are accepted; this does not authorize or claim publication.','',
         'Runtime acceptance, FPS and long-term memory claims are outside package verification. See the JSON proof for exact DLL identities, composition, descriptions and artifact paths.','']
