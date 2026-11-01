@@ -98,10 +98,27 @@ PID28204/startUTC2026-11-01T02:38:21.0755222Z, source3950a8e, installedDLL
 Evidence: `isolated-material-fixed-28204`, `isolated-material-fixed-28204-warmup`,
 `isolated-material-fixed-28204-grid` (accounting proof and image comparison).
 
-## Remaining feature work
+## One-lifetime batch follow-up
 
-Bounded program reuse and allocator/cache isolation precede heavier rendering.
-Then prove refinement/seams and native exposure, unloaded/player/modded building
+PID3036/startUTC2026-11-01T03:02:52.0513899Z, source083ee5d, installed DLL
+5c1f0ba6e09fbaa44575a5eb725f296bbe18d03be0d00664d2b88257bd37776b.
+Three full16-cell batches completed in9858/7199/7481ms. All48 raw pixel arrays
+matched the independent fresh-cell references exactly (comparison JSON in each
+isolated-grid-batch-3036-first/second/third evidence folder). One worker/Scene
+lifetime per whole batch; three kernel joins/handle closes and cleanups. Native
+terrain first-batch peak400946656B. After each cleanup: scene0/privateNames3,
+workspace1, materials10766652, textures1957652437, highPrograms925825.
+
+Baseline process private7726104576B; successive idle observations approximately
+7768481792/7780630528/7801016320B. Whole-process/allocator growth is still present,
+and other plugins/autosaves were not disabled. No attribution or leak-free claim.
+Batching avoids the observed ~200MB per16 from repeated full scene recreation;
+bounded shader reuse alone did not remove that growth.
+
+## Outstanding
+
+Further allocator/cache isolation and refinement/seams need proof before heavier
+rendering. Then prove native exposure, unloaded/player/modded building
 proxies, water/shadows/fog, interactive global-map integration and dynamic day/night
 refresh. The512 diagnostics must not be advertised as the requested finished map.
 BestMinimap is unchanged. No satellite/DF public package or publication was made.

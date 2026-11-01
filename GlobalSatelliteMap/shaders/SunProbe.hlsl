@@ -3,6 +3,7 @@
 #include "constants.hlsl"
 #include "GBufferDecode.hlsl"
 #include "lightingFunctions.hlsl"
+#include "NativeExposure.hlsl"
 Texture2D<float4> normalBuffer : register(t1);
 Texture2D<float> depthBuffer : register(t2);
 Texture2D<float4> ambientMap : register(t3);
@@ -15,6 +16,8 @@ float4 captureWindow;
 float3 captureRight, captureUp, captureBack, captureCameraDelta;
 float3 sunDirection, worldOffset;
 float4 sunColour, envColour, ambientParams, worldSize;
+// y=0 explicitly preserves raw HDR, regardless of the installed gamma switch.
+float2 captureExposure;
 float4 main_ps(float4 pixel : SV_Position) : SV_Target
 {
     float2 uv = pixel.xy / captureWindow.w;
@@ -53,5 +56,6 @@ float4 main_ps(float4 pixel : SV_Position) : SV_Target
     environment.specular *= ambient.rgb * environmentScale;
     float3 colour = direct.specular + environment.specular +
                     (direct.diffuse + environment.diffuse) * albedo + albedo * emissive;
+    colour=SatelliteExposureOrRaw(colour,captureExposure);
     return float4(colour, 1.0f);
 }

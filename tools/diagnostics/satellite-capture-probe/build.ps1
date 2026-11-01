@@ -14,7 +14,7 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/embed_position_shader.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 $fxc='C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe'
-& $fxc /nologo /T ps_4_0 /E main_ps /O3 /Gec /D DX11=1 /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/common' /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/deferred' "/Fo$out/SunShaderEmbedded.cso" "$out/SunShaderOverride.hlsl"
+& $fxc /nologo /T ps_4_0 /E main_ps /O3 /Gec /D DX11=1 /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/common' /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/deferred' /I 'D:/SteamLibrary/steamapps/common/Kenshi/data/materials/post' "/Fo$out/SunShaderEmbedded.cso" "$out/SunShaderOverride.hlsl"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$repo/GlobalSatelliteMap/tests/test_shader_bindings.py" "$out/SunShaderEmbedded.cso"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
@@ -50,6 +50,10 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/worker_handle_tests.exe" "/Fo$out/worker_handle_tests.obj" "$PSScriptRoot/worker_handle_tests.cpp"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/worker_handle_tests.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/exposure_tests.exe" "/Fo$out/exposure_tests.obj" "$PSScriptRoot/exposure_tests.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/exposure_tests.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

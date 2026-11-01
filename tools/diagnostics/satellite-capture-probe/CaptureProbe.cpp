@@ -62,6 +62,7 @@
 #include "RenderAbiProfile.h"
 #include "TerrainExperimentPolicy.h"
 #include "NativeWorkerHandle.h"
+#include "ExposurePolicy.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -822,7 +823,7 @@ Ogre::Vector4 SharedVector(const char *set, const char *name, unsigned count)
 {
     Ogre::GpuSharedParametersPtr p = Ogre::GpuProgramManager::getSingleton().getSharedParameters(set);
     const Ogre::GpuConstantDefinition &d = p->getConstantDefinition(name);
-    if (d.arraySize != 1 || d.constType != (count == 3 ? Ogre::GCT_FLOAT3 : Ogre::GCT_FLOAT4))
+    if (d.arraySize != 1 || d.constType != (count == 1 ? Ogre::GCT_FLOAT1 : (count == 3 ? Ogre::GCT_FLOAT3 : Ogre::GCT_FLOAT4)))
         throw std::runtime_error("sun shared parameter type mismatch");
     const float *v = static_cast<const Ogre::GpuSharedParameters *>(p.get())->getFloatPointer(d.physicalIndex);
     Ogre::Vector4 result(0,0,0,0);
@@ -834,6 +835,58 @@ Ogre::Vector4 SharedVector(const char *set, const char *name, unsigned count)
     return result;
 }
 Ogre::Vector3 AsVector3(const Ogre::Vector4 &v) { return Ogre::Vector3(v.x,v.y,v.z); }
+struct LightingSnapshot
+{
+    Ogre::Vector3 reference,direction,offset;
+    Ogre::Vector4 sun,world,environment,ambient;
+    bool preview;
+    float key,luminance;
+    LightingSnapshot():preview(false),key(0),luminance(0){}
+};
+LightingSnapshot isolatedLighting;
+LightingSnapshot ReadLightingSnapshot(bool preview,Ogre::CompositorWorkspace *mainWorkspace)
+{
+    LightingSnapshot value;
+    // Copy the reference camera and its paired ambient UV transform together.
+    // No shared-parameter pointers or main texture references escape this call.
+    value.reference=AsVector3(SharedVector("SharedDeferredParams","camera",3));
+    value.direction=AsVector3(SharedVector("SharedSkyParams","sunDirection",3));
+    value.sun=SharedVector("SharedSkyParams","sunColour",4);
+    value.world=SharedVector("AmbientParams","worldSize",4);
+    value.offset=AsVector3(SharedVector("SharedWaterParams","worldOffset",3));
+    value.environment=SharedVector("AmbientParams","envColour",4);
+    value.ambient=SharedVector("AmbientParams","ambientParams",4);
+    if(value.direction.squaredLength()<1e-8f)throw std::runtime_error("sun direction invalid");
+    if(preview)
+    {
+        if(!mainWorkspace)throw std::runtime_error("native exposure main workspace missing");
+        typedef char IdSize[(sizeof(Ogre::IdString)==4)?1:-1];
+        typedef char PtrSize[(sizeof(Ogre::TexturePtr)==16)?1:-1];
+        typedef Ogre::CompositorNode *(__fastcall *Find)(const Ogre::CompositorWorkspace*,Ogre::IdString,bool);
+        typedef Ogre::TexturePtr *(__fastcall *Texture)(const Ogre::CompositorNode*,Ogre::TexturePtr*,Ogre::IdString,size_t);
+        Find find=reinterpret_cast<Find>(AbiExport(nativeApi.ogre,NativeFindNodeName,NativeFindNodeRva));
+        Texture texture=reinterpret_cast<Texture>(AbiExport(nativeApi.ogre,NativeNodeTextureName,NativeNodeTextureRva));
+        Ogre::CompositorNode *node=find(mainWorkspace,Ogre::IdString("Resolve_HDR"),false);
+        if(!node)throw std::runtime_error("native exposure Resolve_HDR node missing");
+        Ogre::TexturePtr adapted; // Native aggregate ABI initializes an EMPTY output only.
+        if(texture(node,&adapted,Ogre::IdString("rt_adaptedLum"),0)!=&adapted||adapted.isNull()||
+           adapted->getWidth()!=1||adapted->getHeight()!=1||adapted->getDepth()!=1||adapted->getFormat()!=Ogre::PF_FLOAT32_R)
+            throw std::runtime_error("native exposure texture shape/format differs");
+        float logLuminance=0;
+        Ogre::PixelBox pixel(1,1,1,Ogre::PF_FLOAT32_R,&logLuminance);
+        Ogre::HardwarePixelBufferSharedPtr buffer=adapted->getBuffer(0,0);
+        buffer->blitToMemory(Ogre::Box(0,0,0,1,1,1),pixel);
+        value.key=SharedVector("HDRSettings","EXPOSURE_KEY",1).x;
+        if(!ExposurePolicy::Decode(value.key,logLuminance,value.luminance))
+            throw std::runtime_error("native exposure key/luminance invalid");
+        value.preview=true;
+        std::ostringstream message;message.precision(9);
+        message<<"native exposure frozen key="<<value.key<<" adaptedLog="<<logLuminance<<" luminance="<<value.luminance
+               <<"; installed ToneMap/gamma settings, no bloom/shadows/fog/water";
+        Log(message.str());
+    }
+    return value;
+}
 void CopyPrivateTechniqueConfiguration(const Ogre::MaterialPtr &source,const Ogre::MaterialPtr &destination)
 {
     if(source.isNull()||destination.isNull()||source==destination||source->getNumTechniques()!=1||
@@ -919,19 +972,19 @@ void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene
     sunWorkspace = manager->addWorkspace(scene,sunTarget->getBuffer()->getRenderTarget(),camera,
         Ogre::IdString(SunWorkspaceName),false);
 }
-void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absoluteWorld=false)
+void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absoluteWorld=false,const LightingSnapshot *frozen=NULL)
 {
     if (!sunWorkspace || sunMaterial.isNull()) throw std::runtime_error("sun workspace missing");
     Ogre::GpuProgramParametersSharedPtr p = sunMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
     Ogre::Quaternion basis = camera->getDerivedOrientation();
     basis.normalise();
-    const Ogre::Vector3 reference = AsVector3(SharedVector("SharedDeferredParams","camera",3));
+    const LightingSnapshot snapshot=frozen?*frozen:ReadLightingSnapshot(false,NULL);
+    const Ogre::Vector3 reference = snapshot.reference;
     const Ogre::Vector3 delta = camera->getDerivedPosition()-reference;
-    const Ogre::Vector3 direction = AsVector3(SharedVector("SharedSkyParams","sunDirection",3));
+    const Ogre::Vector3 direction = snapshot.direction;
     if (direction.squaredLength()<1e-8f) throw std::runtime_error("sun direction invalid");
-    const Ogre::Vector4 sun = SharedVector("SharedSkyParams","sunColour",4),
-                        world = SharedVector("AmbientParams","worldSize",4);
-    const Ogre::Vector3 offset = absoluteWorld ? Ogre::Vector3::ZERO : AsVector3(SharedVector("SharedWaterParams","worldOffset",3));
+    const Ogre::Vector4 sun = snapshot.sun,world = snapshot.world;
+    const Ogre::Vector3 offset = absoluteWorld ? Ogre::Vector3::ZERO : snapshot.offset;
     p->clearAutoConstants();
     p->removeAllSharedParameters();
     p->setNamedConstant("captureWindow",Ogre::Vector4(camera->getOrthoWindowWidth(),camera->getOrthoWindowHeight(),camera->getFarClipDistance(),float(Side)));
@@ -941,8 +994,8 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
     p->setNamedConstant("captureCameraDelta",delta);
     p->setNamedConstant("sunDirection",direction);
     p->setNamedConstant("sunColour",sun);
-    p->setNamedConstant("envColour",SharedVector("AmbientParams","envColour",4));
-    p->setNamedConstant("ambientParams",SharedVector("AmbientParams","ambientParams",4));
+    p->setNamedConstant("envColour",snapshot.environment);
+    p->setNamedConstant("ambientParams",snapshot.ambient);
     p->setNamedConstant("worldSize",world);
     p->setNamedConstant("worldOffset",offset);
     std::ostringstream state;
@@ -954,6 +1007,7 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
           <<" sunDirection="<<direction.x<<','<<direction.y<<','<<direction.z
           <<" sunColour="<<sun.x<<','<<sun.y<<','<<sun.z<<','<<sun.w;
     Log(state.str());
+    p->setNamedConstant("captureExposure",Ogre::Vector2(0,0));
     sunWorkspace->_update();
     std::vector<float> pixels(Side*Side*4);
     Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_RGBA,&pixels[0]);
@@ -991,6 +1045,23 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
     Log(channels.str());
     if (nonfinite) throw std::runtime_error("private sun nonfinite output; no BMP saved");
     Save(sunTarget,prefix+"_sun_noShadow_linear_clamped");
+    if(snapshot.preview)
+    {
+        p->setNamedConstant("captureExposure",Ogre::Vector2(snapshot.key,snapshot.luminance));
+        sunWorkspace->_update();
+        sunTarget->getBuffer()->blitToMemory(box);
+        unsigned clipped=0,invalid=0;
+        for(unsigned i=0;i<Side*Side;++i)
+        {
+            const float *v=&pixels[i*4];
+            if(!_finite(v[0])||!_finite(v[1])||!_finite(v[2])||!_finite(v[3])){++invalid;continue;}
+            if(v[3]>.5f&&(v[0]>1||v[1]>1||v[2]>1))++clipped;
+        }
+        std::ostringstream message;message<<"private native exposure preview nonfinite="<<invalid<<" clipped pixels="<<clipped<<'/'<<valid;
+        Log(message.str());
+        if(invalid)throw std::runtime_error("private exposure nonfinite output; no BMP saved");
+        Save(sunTarget,prefix+"_sun_noShadow_native_exposure");
+    }
 }
 #include "TerrainExperiment.h"
 // Explicit exported calls avoid stale SDK inline fields. Diagnostic snapshots only;
@@ -1184,7 +1255,7 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                         Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_R,&depth[0]);
                         gb.textures[2]->getBuffer()->blitToMemory(box);
                         InspectPositionPass(terrainExperiment.camera,depth);
-                        InspectSunPass(terrainExperiment.camera,prefix.str(),true);
+                        InspectSunPass(terrainExperiment.camera,prefix.str(),true,&isolatedLighting);
                     }
                     Log("isolated primary-cell diagnostic saved; distant terrain only, not complete atlas");
                     if(!terrainExperiment.AdvancePrimaryCell()){terrainExperiment.active=false;cleanup=true;}
@@ -1375,11 +1446,14 @@ void Update(MapScreen *map)
             if(base.size()>=9 && _stricmp(base.substr(base.size()-9).c_str(),"RE_Kenshi")==0)
                 base=base.substr(0,base.find_last_of("/\\"));
             LogResourceTelemetry("before-private-terrain");
+            const bool geometryOnlyRequest=GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0;
+            if(!geometryOnlyRequest)
+                isolatedLighting=ReadLightingSnapshot(GetPrivateProfileIntA("Probe","NativeExposurePreview",0,ini.c_str())!=0,renderer->workspace);
             terrainExperiment.Begin(renderer->root,
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","Altitude",12000,ini.c_str()),base+"/data/newland/land/fullmap.tif",
-                GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0,
+                geometryOnlyRequest,
                 GetPrivateProfileIntA("Probe","PrimaryGridBatch",0,ini.c_str())!=0);
             gameWorkspace=renderer->workspace;previous=gameWorkspace->getListener();ourListener=&listener;
             requestedWorld=ou;gameWorkspace->setListener(&listener);return;

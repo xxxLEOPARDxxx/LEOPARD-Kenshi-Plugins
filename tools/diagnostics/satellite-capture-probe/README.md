@@ -427,4 +427,32 @@ cache eviction. Compare all16 batch GBuffers with independent accepted fresh-cel
 captures before accepting the batch's output/refinement.35 new production cases
 verify the fixed cursor, no seventeenth cell, total deadline and clock wrap;
 the overrun mutant fails. Full310 checks/115 imports and independent review pass.
-Live batch coverage, memory peak and image comparison are still pending.
+Live batch proof: PID3036/start03:02:52.0513899Z, DLL5c1f0ba6, source083ee5d.
+Three complete batches took9858/7199/7481ms,48 cells total. Every raw GBuffer
+pixel array matched its independently accepted fresh-Terrain reference. Each
+batch created/joined/closed one worker and removed one private scene; resource
+counts returned to scene0/workspaces1/names3(cached programs). Material10766652,
+texture1957652437 and highProgram925825 remained balanced. First native terrain
+peak400946656B. Process private bytes after idle were approximately7.768/7.781/
+7.801GB, versus7.726GB before the first batch. This substantially reduces the
+earlier per-cell recreation growth but does NOT prove zero retention or leaks.
+
+### Native exposure preview (private, default off)
+NativeExposurePreview=1 reads the current main Resolve_HDR/rt_adaptedLum1x1
+log-luminance and HDRSettings.EXPOSURE_KEY once, before private Terrain creation.
+Exact exported aggregate-return adapters and shape/format/finite guards refuse
+unknown layouts. Local TexturePtr/buffer references are released immediately;
+only CPU values persist. Lighting and its paired reference-camera/ambient UV
+values are frozen for the whole16-cell batch, never read anew per tile.
+
+Every cell first renders/saves the unchanged linear HDR diagnostic, explicitly
+bypassing exposure/gamma. An optional second render overwrites the SAME private
+Sun target using installed hdrutils.ToneMap and constants.hdr_to_gamma/hdr_disable.
+It saves a separately named native_exposure BMP and reports clipping/nonfinite
+pixels. No fourth program/target, adaptation chain, shared HDR writes or per-tile
+average. Bloom, shadows, fog, water and complete buildings remain absent; this is
+not the full native compositor. Installed gamma is false and the filmic curve
+is disabled in native ToneMap; no invented gamma/filmic correction is applied.
+351 checks include32 actual HLSL exposure/raw cases and9 production validation
+boundaries. Removing the native exposure floor fails10 GPU cases. Live preview
+acceptance is recorded separately after installation.

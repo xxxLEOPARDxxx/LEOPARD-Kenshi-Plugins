@@ -118,6 +118,18 @@
         "name": "?setTransparencyCastsShadows@Material@Ogre@@QEAAX_N@Z",
         "rva": "1901d0",
         "code": "88 91 01 02 00 00 c3 cc cc cc cc cc cc cc cc cc 88 91 00 02 00 00 c3 cc"
+      },
+      {
+        "key": "NativeFindNode",
+        "name": "?findNode@CompositorWorkspace@Ogre@@QEBAPEAVCompositorNode@2@UIdString@2@_N@Z",
+        "rva": "3c74d0",
+        "code": "48 89 5c 24 08 48 89 7c 24 10 4c 8b 49 28 33 c0 44 8b d2 48 8b 51 30 41"
+      },
+      {
+        "key": "NativeNodeTexture",
+        "name": "?getDefinedTexture@CompositorNode@Ogre@@QEBA?AV?$SharedPtr@VTexture@Ogre@@@2@UIdString@2@_K@Z",
+        "rva": "3bee90",
+        "code": "44 89 44 24 18 48 89 54 24 10 55 56 57 48 83 ec 40 48 c7 44 24 30 fe ff"
       }
     ],
     "windows": [
