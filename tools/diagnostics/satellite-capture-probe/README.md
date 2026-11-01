@@ -382,3 +382,21 @@ Resource loading/accounting metadata is never copied or patched. Build259 checks
 115 game/Ogre imports and independent review pass. Fresh-process before/after
 MaterialManager balance remains the required live acceptance; no global counter
 compensation or game-engine patch is installed.
+
+### Opt-in fixed shader reuse experiment
+ReusePrivateShaders=1 is startup-latched and default0. It retains exactly three
+private native-manager-owned programs and bounded source text, while releasing
+all per-request smart pointers, material parameters, targets, workspaces, cameras
+and scenes. Manager identity, resource identity and source must match; a missing,
+replaced or changed source refuses reuse until restart. Foreign names are never
+adopted. Failed compilation remains Drop-owned and does not enter the cache.
+Native managers release the programs at shutdown; the cache retains no Ogre
+smart pointer across requests. No game cache is cleared or changed.
+
+16 production policy cases cover bounded identities/source, collision, owner
+change, replacement/removal and refusal to overwrite; an always-recompile mutant
+fails the reuse case. Full275 checks/115 imports and independent review pass.
+The next live A/B must baseline AFTER the first cached full capture and expect
+cachedPrograms3/privateNames3 (programs only), scene0/workspaces1 and balanced
+Material bytes. It tests compilation/program/driver cache churn together, not
+FXC in isolation. No retention improvement is claimed before measurement.

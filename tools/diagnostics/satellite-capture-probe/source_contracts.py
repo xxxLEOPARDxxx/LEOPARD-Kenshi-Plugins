@@ -84,3 +84,6 @@ print('Private resource telemetry uses exact exports without cache eviction')
 assert '->clone(' not in source and '->clone(' not in experiment
 assert 'CopyPrivateTechniqueConfiguration' in source and 'CopyPrivateTechniqueConfiguration' in experiment
 print('Private material copies preserve fresh Resource loading/accounting metadata')
+assert 'ReusePrivateShaders",0' in source and 'programCache.Inspect' in source
+assert 'programCache.Owns' in source and 'PreparePrivateProgram' in source
+print('Opt-in shader cache has fixed identities and no cross-request smart pointers')

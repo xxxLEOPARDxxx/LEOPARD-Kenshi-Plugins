@@ -53,6 +53,7 @@
 #undef protected
 #include "GuardProfile.h"
 #include "ProbePolicy.h"
+#include "FixedProgramCache.h"
 #include "OwnedCameraAttachment.h"
 #include "OwnedCameraPose.h"
 #include "PositionShader.h"
@@ -73,6 +74,8 @@ int mode = 0, cx = 0, cz = 0;
 bool proxies = false;
 unsigned serial = 0;
 bool fileRequests=false;
+bool reusePrivateShaders=false;
+ProbePolicy::FixedProgramCache programCache;
 DWORD lastRequestPoll=0;
 std::string requestIni;
 ProbePolicy::RequestLatch requestLatch;
@@ -650,6 +653,35 @@ void Save(const Ogre::TexturePtr &texture, const std::string &name)
     s << name << " black pixels=" << dark << "/" << px.size();
     Log(s.str());
 }
+void PreparePrivateProgram(unsigned slot,const char *name,const std::string &source,
+                           const char *entry,const char *target,Ogre::GpuProgramType type,
+                           Ogre::HighLevelGpuProgramPtr &owned,bool compatibility=false)
+{
+    Ogre::HighLevelGpuProgramManager &programs=Ogre::HighLevelGpuProgramManager::getSingleton();
+    Ogre::HighLevelGpuProgramPtr existing;
+    if(programs.resourceExists(name))existing=programs.getByName(name);
+    const ProbePolicy::FixedProgramCache::Choice choice=reusePrivateShaders?
+        programCache.Inspect(positionDefinitionOwner,slot,existing.get(),source):
+        (existing.isNull()?ProbePolicy::FixedProgramCache::Create:ProbePolicy::FixedProgramCache::Refuse);
+    if(choice==ProbePolicy::FixedProgramCache::Refuse)
+        throw std::runtime_error("private shader identity/source changed; restart diagnostic");
+    if(choice==ProbePolicy::FixedProgramCache::Reuse)
+    {
+        owned=existing;
+        if(!owned->isSupported()||owned->hasCompileError())throw std::runtime_error("cached private shader unsupported");
+        Log(std::string("reused fixed private shader ")+name);return;
+    }
+    // Assign before compilation so any exception remains owned by Drop.
+    owned=programs.createProgram(name,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,"hlsl",type);
+    owned->setSource(source);owned->setParameter("entry_point",entry);owned->setParameter("target",target);
+    if(compatibility)
+    {owned->setParameter("enable_backwards_compatibility","true");owned->setParameter("preprocessor_defines","DX11=1");}
+    owned->load();
+    if(!owned->isSupported()||owned->hasCompileError())throw std::runtime_error("private shader unsupported");
+    if(reusePrivateShaders&&!programCache.Record(positionDefinitionOwner,slot,owned.get(),source))
+        throw std::runtime_error("private shader cache record refused");
+    Log(std::string("compiled fixed private shader ")+name);
+}
 void PreparePositionPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene,
                          Ogre::Camera *camera, const Ogre::TexturePtr &depth)
 {
@@ -687,24 +719,11 @@ void PreparePositionPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *
     Ogre::HighLevelGpuProgramManager &programs = Ogre::HighLevelGpuProgramManager::getSingleton();
     Ogre::MaterialManager &materials = Ogre::MaterialManager::getSingleton();
     Ogre::TextureManager &textures = Ogre::TextureManager::getSingleton();
-    if (programs.resourceExists(PositionVertexName) || programs.resourceExists(PositionFragmentName) ||
-        materials.resourceExists(PositionMaterialName) || textures.resourceExists(PositionTargetName))
+    if (materials.resourceExists(PositionMaterialName) || textures.resourceExists(PositionTargetName))
         throw std::runtime_error("private position resource name collision");
     const Ogre::String &group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-    positionVertex = programs.createProgram(PositionVertexName, group, "hlsl", Ogre::GPT_VERTEX_PROGRAM);
-    positionVertex->setSource(PositionShaderSource);
-    positionVertex->setParameter("entry_point", "main_vs");
-    positionVertex->setParameter("target", "vs_4_0");
-    positionVertex->load();
-    if (!positionVertex->isSupported() || positionVertex->hasCompileError())
-        throw std::runtime_error("private position vertex shader unsupported");
-    positionFragment = programs.createProgram(PositionFragmentName, group, "hlsl", Ogre::GPT_FRAGMENT_PROGRAM);
-    positionFragment->setSource(PositionShaderSource);
-    positionFragment->setParameter("entry_point", "main_ps");
-    positionFragment->setParameter("target", "ps_4_0");
-    positionFragment->load();
-    if (!positionFragment->isSupported() || positionFragment->hasCompileError())
-        throw std::runtime_error("private position fragment shader unsupported");
+    PreparePrivateProgram(0,PositionVertexName,PositionShaderSource,"main_vs","vs_4_0",Ogre::GPT_VERTEX_PROGRAM,positionVertex);
+    PreparePrivateProgram(1,PositionFragmentName,PositionShaderSource,"main_ps","ps_4_0",Ogre::GPT_FRAGMENT_PROGRAM,positionFragment);
     positionMaterial = materials.create(PositionMaterialName, group);
     positionMaterial->removeAllTechniques();
     Ogre::Pass *pass = positionMaterial->createTechnique()->createPass();
@@ -867,21 +886,11 @@ void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene
     Ogre::MaterialManager &materials = Ogre::MaterialManager::getSingleton();
     Ogre::HighLevelGpuProgramManager &programs = Ogre::HighLevelGpuProgramManager::getSingleton();
     Ogre::TextureManager &textures = Ogre::TextureManager::getSingleton();
-    if (materials.resourceExists(SunMaterialName) || programs.resourceExists(SunFragmentName) ||
-        textures.resourceExists(SunTargetName))
+    if (materials.resourceExists(SunMaterialName) || textures.resourceExists(SunTargetName))
         throw std::runtime_error("private sun resource name collision");
     Ogre::MaterialPtr source = materials.getByName("Main_Lighting_NoShadow");
     if (source.isNull()) throw std::runtime_error("native no-shadow material missing");
-    sunFragment = programs.createProgram(SunFragmentName,
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,"hlsl",Ogre::GPT_FRAGMENT_PROGRAM);
-    sunFragment->setSource(LoadSunSource());
-    sunFragment->setParameter("entry_point","main_ps");
-    sunFragment->setParameter("target","ps_4_0");
-    sunFragment->setParameter("enable_backwards_compatibility","true");
-    sunFragment->setParameter("preprocessor_defines","DX11=1");
-    sunFragment->load();
-    if (!sunFragment->isSupported() || sunFragment->hasCompileError())
-        throw std::runtime_error("private sun fragment shader unsupported");
+    PreparePrivateProgram(2,SunFragmentName,LoadSunSource(),"main_ps","ps_4_0",Ogre::GPT_FRAGMENT_PROGRAM,sunFragment,true);
     // Clone only resource configuration. Read installed native ambient/IBL textures;
     // replace every GPU parameter binding and all compositor texture bindings privately.
     sunMaterial = materials.create(SunMaterialName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -1012,7 +1021,7 @@ void LogResourceTelemetry(const char *phase)
           <<" workspaces="<<workspaces(au->render->root->getCompositorManager2())
           <<" textureBytes="<<bytes(&textures)<<" materialBytes="<<bytes(&materials)
           <<" highProgramBytes="<<bytes(&high)<<" lowProgramBytes="<<bytes(&low)
-          <<"; telemetry only; no resource eviction";Log(s.str());
+          <<" cachedPrograms="<<programCache.Count()<<"; telemetry only; no resource eviction";Log(s.str());
     }
     catch(...){Log("resource telemetry unavailable; no resource eviction attempted");}
 }
@@ -1074,7 +1083,8 @@ void Drop()
     }
     if (!sunFragment.isNull())
     {
-        Ogre::HighLevelGpuProgramManager::getSingleton().remove(SunFragmentName);sunFragment.setNull();
+        if(!programCache.Owns(2,sunFragment.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(SunFragmentName);
+        sunFragment.setNull();
     }
     if (manager && ManagerAccess::Contains(manager, positionWorkspace))
         manager->removeWorkspace(positionWorkspace);
@@ -1091,12 +1101,12 @@ void Drop()
     }
     if (!positionVertex.isNull())
     {
-        Ogre::HighLevelGpuProgramManager::getSingleton().remove(PositionVertexName);
+        if(!programCache.Owns(0,positionVertex.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(PositionVertexName);
         positionVertex.setNull();
     }
     if (!positionFragment.isNull())
     {
-        Ogre::HighLevelGpuProgramManager::getSingleton().remove(PositionFragmentName);
+        if(!programCache.Owns(1,positionFragment.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(PositionFragmentName);
         positionFragment.setNull();
     }
     if (manager && ManagerAccess::Contains(manager, shot))
@@ -1497,6 +1507,7 @@ __declspec(dllexport) void startPlugin()
     {
         requestIni=Folder()+"SatelliteCaptureProbe.ini";
         fileRequests=GetPrivateProfileIntA("Probe","EnableRequestFile",0,requestIni.c_str())==1;
+        reusePrivateShaders=GetPrivateProfileIntA("Probe","ReusePrivateShaders",0,requestIni.c_str())==1;
     }
     catch(...){ErrorLog("SatelliteCaptureProbe: request path unavailable; inert");return;}
     if (KenshiLib::SUCCESS !=

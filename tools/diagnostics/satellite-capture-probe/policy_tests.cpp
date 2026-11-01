@@ -1,4 +1,5 @@
 #include "ProbePolicy.h"
+#include "FixedProgramCache.h"
 #include <iostream>
 #include <cstdlib>
 void Check(bool ok, const char *message)
@@ -53,5 +54,23 @@ int main()
     Check(!ValidShaderSource("abc\0def",7),"embedded shader NUL refused");
     Check(!ValidShaderSource("\xFF",1),"non-ASCII shader refused");
     Check(!ValidShaderSource("x",32769),"oversized source refused before reading bytes");
-    std::cout << "33 fixed-grid/projection/cleanup/source/request checks passed\n";
+    FixedProgramCache programs;
+    Check(programs.Inspect(&owned,0,NULL,"vs")==FixedProgramCache::Create,"fresh shader slot create");
+    Check(programs.Inspect(&owned,0,&other,"vs")==FixedProgramCache::Refuse,"foreign existing shader refused");
+    Check(!programs.Record(&owned,0,NULL,"vs"),"null program cannot be cached");
+    Check(programs.Record(&owned,0,&other,"vs"),"owned shader recorded");
+    Check(programs.Inspect(&owned,0,&other,"vs")==FixedProgramCache::Reuse,"unchanged shader reused");
+    Check(programs.Inspect(&owned,0,&other,"changed")==FixedProgramCache::Refuse,"source change requires diagnostic restart");
+    Check(programs.Inspect(&owned,0,NULL,"vs")==FixedProgramCache::Refuse,"externally removed shader refused");
+    Check(programs.Inspect(&other,0,&other,"vs")==FixedProgramCache::Refuse,"changed compositor owner refused");
+    Check(!programs.Record(&owned,0,&owned,"vs"),"cache identity cannot be overwritten");
+    Check(programs.Record(&owned,1,&owned,"ps"),"second fixed shader recorded");
+    Check(programs.Record(&owned,2,&programs,"sun"),"third fixed shader recorded");
+    Check(programs.Count()==3&&!programs.Record(&owned,3,&programs,"extra"),"cache bounded to three programs");
+    Check(programs.Owns(0,&other)&&!programs.Owns(1,&other)&&!programs.Owns(3,&other),"cleanup recognizes exact owned slot only");
+    Check(programs.Inspect(NULL,0,&other,"vs")==FixedProgramCache::Refuse,"unknown manager refused");
+    FixedProgramCache empty;
+    Check(empty.Inspect(&owned,0,NULL,"")==FixedProgramCache::Refuse,"empty cache source refused");
+    Check(empty.Inspect(&owned,0,NULL,std::string(32769,'x'))==FixedProgramCache::Refuse,"cache source bytes bounded");
+    std::cout << "49 fixed-grid/projection/cleanup/source/request/cache checks passed\n";
 }
