@@ -621,3 +621,34 @@ not accepted final map imagery. Existing modes retain their previous material.
 Runtime upload/accounting/repeated cleanup pass. Neutral-colour imagery remains
 strongly overexposed and is not final output; actual painted maps are the next
 input stage. See docs/verification/2026-11-01-satellite-biome-reference.md.
+
+### Four-pair painted reference (candidate, default off)
+
+PaintedMapsReference=1 additionally requires the single-biome reference, primary
+cell1,1 and standalone512 diagnostics. It reads exactly eight hash-guarded PNGs
+from native painted tiles2,2 through3,3. Four RGBA1024 overlays and four RGBA2048
+colour maps remain unchanged, including alpha. Encoded45799579bytes, decoded
+80MiB; each encoded/decoded aggregate caps128MiB. Two private arrays contain
+four layers each and exactly one mip: native minification mip chains are not
+accepted by this input experiment. This requires a later mip-complete stage.
+
+Native patches at quadtree depth0–2 can cross painted boundaries, so center-based
+material callbacks are unsuitable. One private fragment program selects the
+four maps per absolute world pixel, using native18m borders and SampleGrad
+world-space derivatives. The rest of the exact installed native terrain shader
+is preserved and flattened into the private program. Textures t0..t4 and samplers
+s0/s2/s4 are verified from actual DXBC reflection. Installed shaders/ZoneMaps/
+material callbacks are never edited. One extra fixed owned program is cached
+only when opt-in shader reuse is enabled, without cross-request smart pointers.
+
+All CPU images are checked before GPU allocation; both groups are held together,
+129685659 encoded+decoded bytes in this exact fixture, plus object/codec overhead.
+Direct array upload retains
+the proven state/accounting completion. Private Terrain/material die before
+painted arrays; unverified ownership quarantines one bounded set. Native runtime
+colour/repeat accounting now pass two512 trials: texture2201047008 and
+material13132148 bytes return exactly before/after each request, six RTVs reach0.
+Four fixed cached programs stabilize after the first request. Raw GBuffer and
+linear-clamped Sun BMP pixels are identical; exposed preview differs by at most
+one level in351pixels. Actual painted colours are present, but one biome and
+one-mip painted inputs are deliberately incomplete. See verification report.

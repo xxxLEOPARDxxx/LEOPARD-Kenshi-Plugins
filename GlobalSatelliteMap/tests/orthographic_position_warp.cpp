@@ -35,7 +35,8 @@ int main(int argc,char**argv)
         if(argc!=2 && argc!=3)throw std::runtime_error("expected compiled shader path [reference]");
         const bool decodeTest=argc==3 && std::strcmp(argv[2],"decode")==0;
         const bool exposureTest=argc==3 && std::strcmp(argv[2],"exposure")==0;
-        const bool referenceTest=argc==3 && !decodeTest && !exposureTest;
+        const bool paintedTest=argc==3 && std::strcmp(argv[2],"painted")==0;
+        const bool referenceTest=argc==3 && !decodeTest && !exposureTest && !paintedTest;
         std::ifstream file(argv[1],std::ios::binary|std::ios::ate);
         if(!file)throw std::runtime_error("shader unavailable");
         std::streamoff bytes=file.tellg();
@@ -43,7 +44,20 @@ int main(int argc,char**argv)
         file.seekg(0);std::vector<char> code(size_t(bytes),0);file.read(&code[0],bytes);
         if(!file)throw std::runtime_error("shader truncated");
         std::vector<Case> cases;
-        if(exposureTest)
+        if(paintedTest)
+        {
+            const double points[]={0,18,18432,36863.75,36864,36864.25,73710,73728};
+            for(int z=0;z<8;++z)for(int x=0;x<8;++x)
+            {
+                Case a={};a.valid=true;
+                a.input.v[0]=float(-73728+points[x]);a.input.v[1]=float(-73728+points[z]);
+                a.input.v[2]=-73728;a.input.v[3]=-73728;
+                const int tx=points[x]<36864?0:1,tz=points[z]<36864?0:1;
+                a.x=(points[x]-36864*tx+18)/36900;
+                a.y=(points[z]-36864*tz+18)/36900;a.z=tx+2*tz;cases.push_back(a);
+            }
+        }
+        else if(exposureTest)
         {
             for(int i=0;i<32;++i)
             {
@@ -165,14 +179,14 @@ int main(int argc,char**argv)
         {
             const Case&a=cases[i];const Four&r=result[i];
             bool ok=(r.v[3]>.5f)==a.valid;
-            const double xyTolerance=exposureTest?(std::max)(1e-5,1e-5*(std::max)(std::fabs(a.x),std::fabs(a.y))):(referenceTest||decodeTest?1e-5:.003);
+            const double xyTolerance=exposureTest?(std::max)(1e-5,1e-5*(std::max)(std::fabs(a.x),std::fabs(a.y))):(referenceTest||decodeTest||paintedTest?1e-5:.003);
             if(a.valid)ok=ok&&std::fabs(r.v[0]-a.x)<xyTolerance&&std::fabs(r.v[1]-a.y)<xyTolerance&&std::fabs(r.v[2]-a.z)<(exposureTest?(std::max)(1e-5,1e-5*std::fabs(a.z)):(decodeTest?1e-5:.1));
             else ok=ok&&r.v[0]==0&&r.v[1]==0&&r.v[2]==0;
             if(!ok){++failures;std::cerr<<"FAIL case"<<i<<" got "<<r.v[0]<<','<<r.v[1]<<','<<r.v[2]<<','<<r.v[3]<<'\n';}
         }
         context->Unmap(staging.p,0);context->ClearState();
         if(failures){std::cerr<<failures<<" shader failures\n";return 1;}
-        std::cout<<cases.size()<<" actual HLSL "<<(exposureTest?"native-exposure":(decodeTest?"native-colour-decoding":(referenceTest?"reference-camera":"orthographic-position")))
+        std::cout<<cases.size()<<" actual HLSL "<<(paintedTest?"painted-map-coordinates":(exposureTest?"native-exposure":(decodeTest?"native-colour-decoding":(referenceTest?"reference-camera":"orthographic-position"))))
                  <<" cases passed on isolated D3D11 WARP\n";
         return 0;
     }

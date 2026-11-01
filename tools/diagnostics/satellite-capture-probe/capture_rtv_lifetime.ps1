@@ -30,12 +30,15 @@ foreach($key in @('PrimaryGridBatch','RecycleTerrainBetweenCells')){
 $config=[regex]::Replace($config,'(?m)^PrimaryX=\d+','PrimaryX=1')
 $config=[regex]::Replace($config,'(?m)^PrimaryZ=\d+','PrimaryZ=1')
 $config=[regex]::Replace($config,'(?m)^Request=\d+',"Request=$Token")
+$scope='distant Terrain raster, successful native owned RTV cleanup; not complete map'
+if($config -match '(?m)^BiomeMaterialReference=1\s*$'){$scope='private single-biome Terrain reference; not complete map'}
+if($config -match '(?m)^PaintedMapsReference=1\s*$'){$scope='private single-biome/four-pair painted Terrain reference, mip0; not complete map'}
 $tokenPattern="(?m)explicit request token=$Token[ \t]*\r?$"
 if([regex]::IsMatch((Read-Log),$tokenPattern)){throw 'Request token already used'}
 $began=[DateTime]::UtcNow
 $samples=@();$section='';$success=$false
 try {
-    Set-Content -LiteralPath $ini -Value $config -Encoding ASCII
+    [System.IO.File]::WriteAllText($ini,$config,[System.Text.Encoding]::ASCII)
     do {
         Start-Sleep -Milliseconds 200
         $samples+=,(Sample)
@@ -57,7 +60,7 @@ try {
     $files=@(Get-ChildItem -LiteralPath $probeRoot -Filter ($prefix+'*.bmp'))
     if($files.Count -ne 3){throw 'Expected GBuffer, raw Sun and exposed Sun images'}
     $files | Copy-Item -Destination $proof -Force
-    $row=[ordered]@{processId=$ProbeProcessId;processStart=$ExpectedStart;token=$Token;elapsedMs=[int]([DateTime]::UtcNow-$began).TotalMilliseconds;baseline=$baseline;after=Sample;prefix=$prefix;files=@($files|ForEach-Object{@{name=$_.Name;bytes=$_.Length;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLower()}});log=$section;scope='distant Terrain raster, successful native owned RTV cleanup; not complete map'}
+    $row=[ordered]@{processId=$ProbeProcessId;processStart=$ExpectedStart;token=$Token;elapsedMs=[int]([DateTime]::UtcNow-$began).TotalMilliseconds;baseline=$baseline;after=Sample;prefix=$prefix;files=@($files|ForEach-Object{@{name=$_.Name;bytes=$_.Length;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLower()}});log=$section;scope=$scope}
     $row|ConvertTo-Json -Depth 7|Set-Content -LiteralPath (Join-Path $proof 'capture.json') -Encoding utf8
     Write-Output ([pscustomobject]@{proof=$ProofName;ms=$row.elapsedMs;debts=6;privateBefore=$baseline.privateBytes;privateAfter=$row.after.privateBytes;prefix=$prefix})
 } finally {
@@ -68,7 +71,7 @@ try {
         $currentConfig=Get-Content -LiteralPath $ini -Raw
         if($currentConfig -match "(?m)^Request=$Token[ \t]*\r?$") {
             $currentConfig=[regex]::Replace($currentConfig,'(?m)^Request=\d+','Request=0')
-            Set-Content -LiteralPath $ini -Value $currentConfig -Encoding ASCII
+            [System.IO.File]::WriteAllText($ini,$currentConfig,[System.Text.Encoding]::ASCII)
         }
     } finally {
         $section|Set-Content -LiteralPath (Join-Path $proof 'request.log') -Encoding utf8

@@ -169,12 +169,14 @@ struct TerrainExperiment
                <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
         Log(message.str());
     }
-    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome)
+    void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome,bool paintedRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
         if(!referenceBiome.empty()&&(Side!=512||geometryOnlyRequest||gridRequest||recycleRequest||diagnosticRaster.resolutionOnly))
             throw std::runtime_error("single-biome material reference requires standalone512 full diagnostics");
+        if(paintedRequest&&(referenceBiome.empty()||tileX!=1||tileZ!=1))
+            throw std::runtime_error("painted reference requires the one guarded biome/primary1,1 fixture");
         if(diagnosticRaster.resolutionOnly)
         {
             MEMORYSTATUSEX memory={sizeof(MEMORYSTATUSEX)};
@@ -227,7 +229,14 @@ struct TerrainExperiment
             GameData *data=ou->gamedata.getData(referenceBiome);
             if(!data||data->stringID!=referenceBiome)throw std::runtime_error("private biome record lookup differs");
             const std::string gameRoot=heightPath.substr(0,heightPath.size()-std::string("/data/newland/land/fullmap.tif").size());
-            BiomeReference().Begin(data,gameRoot);BiomeReference().Configure(data,material);
+            BiomeReference().Begin(data,gameRoot);
+            if(paintedRequest)
+            {
+                PaintedReference().Begin(gameRoot,root->getCompositorManager2());
+                PaintedReference().Program(material);
+            }
+            BiomeReference().Configure(data,material);
+            if(paintedRequest)PaintedReference().Bind(material);
         }
         material->load();
         CreateNativeTerrain();
@@ -322,6 +331,7 @@ struct TerrainExperiment
         if(scene){api.destroyScene(root,scene);scene=NULL;}
         if(!material.isNull())
         {Ogre::MaterialManager::getSingleton().remove(material->getName());material.setNull();}
+        PaintedReference().Destroy();
         BiomeReference().Destroy();
         if(!output.isNull())
         {Ogre::TextureManager::getSingleton().remove(output->getName());output.setNull();}
