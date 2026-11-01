@@ -55,6 +55,8 @@
 #include "OwnedCameraPose.h"
 #include "PositionShader.h"
 #include "SunShader.h"
+#include "NativeTerrainCache.h"
+#include "RenderAbiProfile.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -66,6 +68,10 @@ bool keyHeld = false, pending = false, cleanup = false, inside = false, profileO
 int mode = 0, cx = 0, cz = 0;
 bool proxies = false;
 unsigned serial = 0;
+bool fileRequests=false;
+DWORD lastRequestPoll=0;
+std::string requestIni;
+ProbePolicy::RequestLatch requestLatch;
 GameWorld *requestedWorld = NULL;
 Ogre::CompositorWorkspace *gameWorkspace = NULL, *shot = NULL;
 Renderer *renderer = NULL;
@@ -100,6 +106,21 @@ const char *SunTargetName = "LEOPARD_PrivateCaptureSunTarget";
 Ogre::CompositorWorkspaceListener *previous = NULL;
 Ogre::CompositorWorkspaceListener *ourListener = NULL;
 std::vector<hand> handles;
+bool restorationSafe = true;
+struct NativeRenderApi
+{
+    typedef Ogre::Viewport *(__fastcall *GetLastFn)(const Ogre::Camera *);
+    typedef void (__fastcall *NotifyFn)(Ogre::Camera *,Ogre::Viewport *);
+    typedef bool (__fastcall *GetMinFn)(const Ogre::Camera *);
+    typedef void (__fastcall *SetMinFn)(Ogre::Camera *,bool);
+    typedef Ogre::Frustum *(__fastcall *GetCullFn)(const Ogre::Camera *);
+    HMODULE ogre,terrain;
+    GetLastFn getLast;NotifyFn notify;GetMinFn getMin;SetMinFn setMin;GetCullFn getCull;
+    const void *terrainPrimary,*terrainListener;
+    bool ready;
+    NativeRenderApi():ogre(NULL),terrain(NULL),getLast(NULL),notify(NULL),getMin(NULL),setMin(NULL),
+        getCull(NULL),terrainPrimary(NULL),terrainListener(NULL),ready(false){}
+} nativeApi;
 void (*originalUpdate)(MapScreen *) = NULL;
 void Log(const std::string &s)
 {
@@ -186,6 +207,85 @@ bool LoadedGuard()
         return false;
     }
 }
+bool AbiModuleMatches(HMODULE module,DWORD timestamp,DWORD size,const AbiWindow *checks,size_t count)
+{
+    if(!module)return false;
+    __try
+    {
+        const BYTE *base=reinterpret_cast<const BYTE *>(module);
+        const IMAGE_DOS_HEADER *dos=reinterpret_cast<const IMAGE_DOS_HEADER *>(base);
+        if(dos->e_magic!=IMAGE_DOS_SIGNATURE || dos->e_lfanew<static_cast<LONG>(sizeof(IMAGE_DOS_HEADER)) || dos->e_lfanew>4096)return false;
+        const IMAGE_NT_HEADERS64 *nt=reinterpret_cast<const IMAGE_NT_HEADERS64 *>(base+dos->e_lfanew);
+        if(nt->Signature!=IMAGE_NT_SIGNATURE || nt->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64 ||
+           nt->OptionalHeader.Magic!=IMAGE_NT_OPTIONAL_HDR64_MAGIC ||
+           nt->FileHeader.TimeDateStamp!=timestamp || nt->OptionalHeader.SizeOfImage!=size)return false;
+        for(size_t i=0;i<count;++i)
+            if(checks[i].rva>size-24 || std::memcmp(base+checks[i].rva,checks[i].code,24))return false;
+        return true;
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
+bool RenderAbiMatches()
+{
+    return nativeApi.ready && GetModuleHandleA(OgreAbiFile)==nativeApi.ogre &&
+        GetModuleHandleA(TerrainAbiFile)==nativeApi.terrain &&
+        AbiModuleMatches(nativeApi.ogre,OgreAbiTimestamp,OgreAbiSize,OgreAbiChecks,sizeof(OgreAbiChecks)/sizeof(OgreAbiChecks[0])) &&
+        AbiModuleMatches(nativeApi.terrain,TerrainAbiTimestamp,TerrainAbiSize,TerrainAbiChecks,sizeof(TerrainAbiChecks)/sizeof(TerrainAbiChecks[0]));
+}
+FARPROC AbiExport(HMODULE module,const char *name,DWORD rva)
+{
+    FARPROC function=GetProcAddress(module,name);
+    if(!function || reinterpret_cast<const BYTE *>(function)!=reinterpret_cast<const BYTE *>(module)+rva)
+        throw std::runtime_error("native render ABI export differs; capture refused");
+    return function;
+}
+bool ModuleFileMatches(HMODULE module,const char *expected)
+{
+    char path[MAX_PATH]={0};DWORD size=GetModuleFileNameA(module,path,MAX_PATH);
+    return size && size<MAX_PATH && FileHash(path)==expected;
+}
+void EnsureRenderAbi()
+{
+    if(nativeApi.ready)
+    {
+        if(!RenderAbiMatches())throw std::runtime_error("native render ABI changed; capture refused");
+        return;
+    }
+    NativeRenderApi next;
+    next.ogre=GetModuleHandleA(OgreAbiFile);next.terrain=GetModuleHandleA(TerrainAbiFile);
+    if(!next.ogre || !next.terrain || !ModuleFileMatches(next.ogre,OgreAbiHash) || !ModuleFileMatches(next.terrain,TerrainAbiHash))
+        throw std::runtime_error("exact Ogre/Terrain file profile failed; capture refused");
+    next.getLast=reinterpret_cast<NativeRenderApi::GetLastFn>(AbiExport(next.ogre,GetLastName,GetLastRva));
+    next.notify=reinterpret_cast<NativeRenderApi::NotifyFn>(AbiExport(next.ogre,NotifyViewportName,NotifyViewportRva));
+    next.getMin=reinterpret_cast<NativeRenderApi::GetMinFn>(AbiExport(next.ogre,GetMinName,GetMinRva));
+    next.setMin=reinterpret_cast<NativeRenderApi::SetMinFn>(AbiExport(next.ogre,SetMinName,SetMinRva));
+    next.getCull=reinterpret_cast<NativeRenderApi::GetCullFn>(AbiExport(next.ogre,GetCullName,GetCullRva));
+    next.terrainPrimary=reinterpret_cast<const void *>(AbiExport(next.terrain,TerrainPrimaryName,TerrainPrimaryRva));
+    next.terrainListener=reinterpret_cast<const void *>(AbiExport(next.terrain,TerrainListenerName,TerrainListenerRva));
+    next.ready=true;nativeApi=next;
+    if(!RenderAbiMatches()){nativeApi.ready=false;throw std::runtime_error("loaded Ogre/Terrain code profile failed");}
+    Log("exact native render ABI enabled: exported camera accessors and guarded Terrain178/180");
+}
+bool ReadTerrainCache(Terrain *terrain,NativeTerrainCache::State &state)
+{
+    if(!RenderAbiMatches())return false;
+    __try
+    {
+        return NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener) &&
+               NativeTerrainCache::Read(terrain,state);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
+bool WriteTerrainCache(Terrain *terrain,const NativeTerrainCache::State &state)
+{
+    if(!RenderAbiMatches())return false;
+    __try
+    {
+        return NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener) &&
+               NativeTerrainCache::Write(terrain,state);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
 BOOL CALLBACK FindWindowThread(HWND w, LPARAM)
 {
     DWORD pid = 0;
@@ -233,17 +333,6 @@ struct ManagerAccess : Ogre::CompositorManager2
         return false;
     }
 };
-struct CameraAccess : Ogre::Camera
-{
-    static Ogre::Viewport *Last(const Ogre::Camera *c)
-    {
-        return c->*(&CameraAccess::mLastViewport);
-    }
-    static void Last(Ogre::Camera *c, Ogre::Viewport *v)
-    {
-        c->*(&CameraAccess::mLastViewport) = v;
-    }
-};
 bool Supported(Ogre::Camera *c)
 {
     return c && !c->isCustomViewMatrixEnabled() && !c->isCustomProjectionMatrixEnabled() &&
@@ -282,7 +371,7 @@ void CameraSample(const char *stage, const char *label, Ogre::Camera *c,
       << " derivedQ=" << q.w << ',' << q.x << ',' << q.y << ',' << q.z
       << " near/far=" << c->getNearClipDistance() << ',' << c->getFarClipDistance()
       << " fov/aspect=" << c->getFOVy().valueRadians() << ',' << c->getAspectRatio()
-      << " cull=" << c->getCullingFrustum() << " lod=" << c->getLodCamera() << " view=";
+      << " cull=" << nativeApi.getCull(c) << " lod=" << c->getLodCamera() << " view=";
     for (unsigned row = 0; row < 4; ++row)
         for (unsigned col = 0; col < 4; ++col)
             s << view[row][col] << ',';
@@ -340,8 +429,8 @@ struct CameraScope
           nearZ(c->getNearClipDistance()), farZ(c->getFarClipDistance()),
           aspect(c->getAspectRatio()), width(c->getOrthoWindowWidth()),
           height(c->getOrthoWindowHeight()), autoAspect(c->getAutoAspectRatio()),
-          useDistance(c->getUseRenderingDistance()), usePixels(c->getUseMinPixelSize()),
-          last(CameraAccess::Last(c))
+          useDistance(c->getUseRenderingDistance()), usePixels(nativeApi.getMin(c)),
+          last(nativeApi.getLast(c))
     {
     }
     ~CameraScope()
@@ -357,8 +446,8 @@ struct CameraScope
         c->setFarClipDistance(farZ);
         c->setAutoAspectRatio(autoAspect);
         c->setUseRenderingDistance(useDistance);
-        c->setUseMinPixelSize(usePixels);
-        CameraAccess::Last(c, last);
+        nativeApi.setMin(c,usePixels);
+        nativeApi.notify(c,last);
     }
 };
 struct ExposureScope
@@ -401,21 +490,25 @@ struct ExposureScope
 struct TerrainCameraScope
 {
     Terrain *terrain;
-    const Ogre::Camera *camera;
-    Ogre::Vector3 position;
+    NativeTerrainCache::State state;
     TerrainCameraScope()
-        : terrain(au ? au->terrain : NULL), camera(terrain ? terrain->mCamera : NULL),
-          position(terrain ? terrain->mCameraPosition : Ogre::Vector3::ZERO)
+        : terrain(au ? au->terrain : NULL)
     {
+        std::memset(&state,0,sizeof(state));
+        if(terrain && !ReadTerrainCache(terrain,state))
+            throw std::runtime_error("Terrain instance/layout guard failed; capture refused");
     }
     ~TerrainCameraScope()
     {
         // A secondary viewport can leave this pointer referencing its temporary camera.
         // Restore the known camera cache without depending on a subsequent successful main pass.
-        if (au && au->terrain == terrain && terrain)
+        if (terrain)
         {
-            terrain->mCamera = camera;
-            terrain->mCameraPosition = position;
+            if(!au || au->terrain!=terrain || !WriteTerrainCache(terrain,state))
+            {
+                restorationSafe=false;chainSafe=false;
+                ErrorLog("SatelliteCaptureProbe: Terrain restore guard failed; resources retained; restart diagnostic");
+            }
         }
     }
 };
@@ -480,7 +573,7 @@ void Aim(Ogre::Camera *c)
     // Only remove camera culling thresholds for resources ALREADY resident in the scene.
     // This neither loads geometry nor activates NPC zones.
     c->setUseRenderingDistance(false);
-    c->setUseMinPixelSize(false);
+    nativeApi.setMin(c,false);
     c->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
     c->setOrthoWindow(1024, 1024);
     c->setNearClipDistance(1);
@@ -837,6 +930,11 @@ void Drop()
 {
     if (!OnMain())
         return;
+    if(!restorationSafe)
+    {
+        pending=false;cleanup=false;chainSafe=false;
+        return;
+    }
     Renderer *current = au ? au->render : NULL;
     Ogre::CompositorManager2 *manager =
         current && current->root ? current->root->getCompositorManager2() : NULL;
@@ -953,7 +1051,7 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
             inside = true;
             try
             {
-                if (!OnMain() || !LoadedGuard() || ou != requestedWorld || !renderer ||
+                if (!restorationSafe || !chainSafe || !OnMain() || !LoadedGuard() || !RenderAbiMatches() || ou != requestedWorld || !renderer ||
                     renderer->workspace != w || !Supported(renderer->camera))
                     throw std::runtime_error("capture context changed; refused");
                 CameraScope camera(renderer);
@@ -973,9 +1071,11 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                 if (!shot)
                     throw std::runtime_error("probe workspace unavailable");
                 std::ostringstream terrainBefore;
-                terrainBefore << "Terrain camera before shot matches requested="
-                              << (au->terrain && au->terrain->mCamera == cam) << " matches main="
-                              << (au->terrain && au->terrain->mCamera == camera.binding);
+                NativeTerrainCache::State cacheBefore;
+                if(!ReadTerrainCache(au->terrain,cacheBefore))throw std::runtime_error("Terrain pre-shot cache unavailable");
+                terrainBefore << "Terrain camera before shot matches requested LOD="
+                              << (cacheBefore.camera == cam->getLodCamera()) << " matches main LOD="
+                              << (cacheBefore.camera == camera.binding->getLodCamera());
                 Log(terrainBefore.str());
                 const Ogre::CompositorChannel &a = w->getGlobalTexture("global_gbuffer");
                 const Ogre::CompositorChannel &b = shot->getGlobalTexture("global_gbuffer");
@@ -1013,8 +1113,10 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                     throw std::runtime_error("no isolated GUI node to disable");
                 shot->_update();
                 std::ostringstream terrainAfter;
-                terrainAfter << "Terrain camera after shot matches requested="
-                             << (au->terrain && au->terrain->mCamera == cam);
+                NativeTerrainCache::State cacheAfter;
+                if(!ReadTerrainCache(au->terrain,cacheAfter))throw std::runtime_error("Terrain post-shot cache unavailable");
+                terrainAfter << "Terrain camera after shot matches requested LOD="
+                             << (cacheAfter.camera == cam->getLodCamera());
                 Log(terrainAfter.str());
                 std::ostringstream prefix;
                 prefix << "probe_" << GetCurrentProcessId() << "_" << GetTickCount() << "_"
@@ -1086,10 +1188,23 @@ void Update(MapScreen *map)
                     (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('Y') & 0x8000);
         bool press = down && !keyHeld;
         keyHeld = down;
+        if(fileRequests && pid==GetCurrentProcessId() && !pending && chainSafe &&
+           map && map->getVisible() && ProbePolicy::PollDue(lastRequestPoll,GetTickCount()))
+        {
+            lastRequestPoll=GetTickCount();
+            const bool wasArmed=requestLatch.armed;
+            DWORD token=GetPrivateProfileIntA("Probe","Request",0,requestIni.c_str());
+            if(requestLatch.Changed(token))
+            {
+                press=true;std::ostringstream s;s<<"explicit request token="<<token;Log(s.str());
+            }
+            if(!wasArmed)Log("opt-in request file armed; existing token latched without replay");
+        }
         if (!press || pending || !map || !map->getVisible() || !chainSafe)
             return;
         if (!profileOK || !LoadedGuard() || !au || !au->render || !ou)
             throw std::runtime_error("guard/native world unavailable");
+        EnsureRenderAbi();
         SaveFileSystem *fs = SaveFileSystem::getSingleton();
         if (!fs || fs->busy())
             throw std::runtime_error("save/load is busy");
@@ -1149,7 +1264,7 @@ void Update(MapScreen *map)
         own->setFocalLength(c->getFocalLength());
         own->setFrustumOffset(c->getFrustumOffset());
         own->setUseRenderingDistance(c->getUseRenderingDistance());
-        own->setUseMinPixelSize(c->getUseMinPixelSize());
+        nativeApi.setMin(own,nativeApi.getMin(c));
         own->setAutoAspectRatio(false);
         CameraPairSample("after-clone", c, own);
         target = Ogre::TextureManager::getSingleton().createManual(
@@ -1182,6 +1297,8 @@ void Update(MapScreen *map)
                 PrepareSunPass(renderer->root->getCompositorManager2(),renderer->scene,cam,gb);
             }
         }
+        if(!restorationSafe || !chainSafe)
+            throw std::runtime_error("construction restoration failed; capture not armed");
         gameWorkspace = renderer->workspace;
         previous = gameWorkspace->getListener();
         ourListener = &listener;
@@ -1216,6 +1333,12 @@ __declspec(dllexport) void startPlugin()
         ErrorLog("SatelliteCaptureProbe: exact504b RE/loaded-code guard failed; inert");
         return;
     }
+    try
+    {
+        requestIni=Folder()+"SatelliteCaptureProbe.ini";
+        fileRequests=GetPrivateProfileIntA("Probe","EnableRequestFile",0,requestIni.c_str())==1;
+    }
+    catch(...){ErrorLog("SatelliteCaptureProbe: request path unavailable; inert");return;}
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(KenshiLib::GetRealAddress(&MapScreen::update), Update, &originalUpdate))
         ErrorLog("SatelliteCaptureProbe: cannot attach manual map observer; inert");

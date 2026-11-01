@@ -217,3 +217,33 @@ Next root-controlled steps: inspect/review this private probe; if chosen, instal
 ## Loader contract correction, 2026-11-01
 
 The previous build exported C `startPlugin`; actual RE_Kenshi `Plugins.cpp:43` resolves only `?startPlugin@@YAXXZ`, so that build could never initialize. It was never installed or invoked. Both prior built DLLs were rejected by a new actual-PE regression before changing linkage. The private probe now exports C++ startup; the viewer also retains its separate C `MCM_Describe`. `build.ps1` now fails if the resulting PE cannot satisfy the loader, if native imports are absent, or if the13 offline/source-contract checks fail. Source-contract tests also reject the retained historical broken DLL fixtures. `loader-contract.json` records fresh PE evidence; this is initialization compatibility, not runtime capture proof.
+
+## Exact native ABI correction and unattended capture requests, 2026-11-01
+
+The compiled NDEBUG SDK removes MovableObject's debug member, shifting later
+Camera/Terrain fields by eight bytes relative to the installed DLLs. Previous
+private-field restoration assumptions were invalid; earlier runs do not establish
+correct camera-cache restoration. Camera lastViewport/minPixel/culling now use
+five typed native exports, checked against exact module hashes, PE metadata,
+export RVAs and code windows. Terrain cache uses guarded primary/FrameListener
+vtable identities and native camera178/position180 offsets, preserving all other
+bytes. Unknown world/Terrain identity or failed restoration retains the one bounded
+resource set and disables further requests. No shared SDK layout was changed.
+Build verifies both installed DLL profiles before generating the included profile.
+Twelve production byte-layout checks include the original FrameListener-vptr
+regression and exact restoration of surrounding sentinel bytes.
+
+For unattended root-controlled experiments, opt-in EnableRequestFile=1 in the
+private INI permits changing Request to a new nonzero integer. The first visible
+foreground-map poll latches the existing token without replay. A changed token
+uses the same bounded capture path and native/save/load guards as Ctrl+Shift+Y.
+Polling is limited to four reads per second, only in that foreground map; disabled
+by default, with no autonomous traversal or timer captures. Zero never captures.
+Shader source remains read only upon an explicit request. Ten token/clock checks
+cover restart latching, repeat suppression, cancellation and unsigned clock wrap.
+
+Full build: 142 actual HLSL GPU cases,33 policy,11 attachment,13 pose,12 native
+cache checks;111 native imports resolve. Independent review caught and corrected
+Terrain identity loss and post-restoration arming paths. Live colour acceptance
+still requires a fresh game after installing this candidate. This is not the
+finished global 16x8192 atlas or complete day/night/shadow/water renderer.

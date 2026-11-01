@@ -3,6 +3,21 @@
 #include <cstddef>
 namespace ProbePolicy
 {
+struct RequestLatch
+{
+    bool armed; unsigned long token;
+    RequestLatch():armed(false),token(0){}
+    bool Changed(unsigned long next)
+    {
+        if(!armed){armed=true;token=next;return false;}
+        const bool changed=next!=token;token=next;
+        return changed && next!=0;
+    }
+};
+inline bool PollDue(unsigned long last,unsigned long now)
+{
+    return static_cast<unsigned long>(now-last)>=250UL;
+}
 inline bool ValidShaderSource(const char *bytes, std::size_t size)
 {
     if (!bytes || !size || size > 32768) return false;

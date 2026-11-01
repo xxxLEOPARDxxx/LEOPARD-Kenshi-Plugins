@@ -12,12 +12,20 @@ assert 'ExposureScopeexposure;ProxyScopeproxy;exposure.Apply();proxy.Apply();' i
 for property in ('setPosition(position)','setOrientation(orientation)','setOrthoWindow(width,height)',
                  'setProjectionType(type)','setFOVy(fov)','setNearClipDistance(nearZ)',
                  'setFarClipDistance(farZ)','setAutoAspectRatio(autoAspect)',
-                 'setUseRenderingDistance(useDistance)','setUseMinPixelSize(usePixels)'):
+                 'setUseRenderingDistance(useDistance)','nativeApi.setMin(c,usePixels)'):
     assert property in compact,property
-assert 'r->camera=binding;' in compact and 'CameraAccess::Last(c,last)' in compact
+assert 'r->camera=binding;' in compact and 'nativeApi.notify(c,last)' in compact
+for obsolete in ('CameraAccess::', '->setUseMinPixelSize(', '->getUseMinPixelSize(',
+                 '->getLastViewport(', '->getCullingFrustum(', 'terrain->mCamera', 'terrain->mPos'):
+    assert obsolete not in source, obsolete
+assert 'EnsureRenderAbi();' in source and '!RenderAbiMatches()' in source
+assert 'NativeTerrainCache::Matches' in source and 'restorationSafe=false;chainSafe=false;' in compact
 assert 'gameWorkspace->getListener()==ourListener' in compact
 assert 'ManagerAccess::Contains(manager,shot)' in compact
-assert 'if(!OnMain()||!LoadedGuard()' in compact
+assert 'if(!restorationSafe||!chainSafe||!OnMain()||!LoadedGuard()' in compact
+assert 'if(!au||au->terrain!=terrain||!WriteTerrainCache(terrain,state))' in compact
+assert compact.index('constructionrestorationfailed') < compact.index('gameWorkspace=renderer->workspace;')
+assert 'EnableRequestFile",0' in source and 'existing token latched without replay' in source
 assert 'main/probe GBuffer aliasing refused' in source
 assert '(GetAsyncKeyState' in compact and 'press=down&&!keyHeld' in compact
 assert 'NativeReconstructedX' in (p/'ProbePolicy.h').read_text()

@@ -1,0 +1,31 @@
+{
+  "ogre": {
+    "file": "OgreMain_x64.dll",
+    "sha256": "7d3888d21398647519f10a89b1f300d8606f761ad159e6021a797b1b9b3df5f6",
+    "timestamp": "5ca5f929",
+    "image_size": "9c9000",
+    "exports": [
+      {"key":"GetLast", "name":"?getLastViewport@Camera@Ogre@@QEBAPEAVViewport@2@XZ", "rva":"acc20", "code":"48 8b 81 00 06 00 00 c3 cc cc cc cc cc cc cc cc 40 53 48 83 ec 20 48 8b"},
+      {"key":"NotifyViewport", "name":"?_notifyViewport@Camera@Ogre@@QEAAXPEAVViewport@2@@Z", "rva":"2366a0", "code":"48 89 91 00 06 00 00 c3 cc cc cc cc cc cc cc cc 48 89 91 10 06 00 00 c3"},
+      {"key":"GetMin", "name":"?getUseMinPixelSize@Camera@Ogre@@QEBA_NXZ", "rva":"2366e0", "code":"0f b6 81 28 06 00 00 c3 cc cc cc cc cc cc cc cc f3 0f 10 81 2c 06 00 00"},
+      {"key":"SetMin", "name":"?setUseMinPixelSize@Camera@Ogre@@QEAAX_N@Z", "rva":"2366d0", "code":"88 91 28 06 00 00 c3 cc cc cc cc cc cc cc cc cc 0f b6 81 28 06 00 00 c3"},
+      {"key":"GetCull", "name":"?getCullingFrustum@Camera@Ogre@@QEBAPEAVFrustum@2@XZ", "rva":"2366c0", "code":"48 8b 81 10 06 00 00 c3 cc cc cc cc cc cc cc cc 88 91 28 06 00 00 c3 cc"}
+    ],
+    "windows": [{"rva":"80b70", "code":"48 89 4c 24 08 57 48 83 ec 30 48 c7 44 24 20 fe ff ff ff 48 89 5c 24 48"}]
+  },
+  "terrain": {
+    "file": "Plugin_Terrain_x64.dll",
+    "sha256": "53afd1e4faf35020556d33f57007d51c2a9d2330b630e39a67161ee850b7a239",
+    "timestamp": "65fb1113",
+    "image_size": "56000",
+    "exports": [
+      {"key":"TerrainPrimary", "name":"??_7Terrain@@6BMovableObject@Ogre@@@", "rva":"36ec8"},
+      {"key":"TerrainListener", "name":"??_7Terrain@@6BFrameListener@Ogre@@@", "rva":"36e98"}
+    ],
+    "windows": [
+      {"rva":"11e3c", "code":"48 c7 80 78 01 00 00 00 00 00 00 48 8b 84 24 b0 03 00 00 48 05 80 01 00"},
+      {"rva":"1288c", "code":"48 8b 8c 24 d0 00 00 00 48 89 81 78 01 00 00 48 8b 84 24 d0 00 00 00 48"},
+      {"rva":"14d6e", "code":"f3 0f 10 80 80 01 00 00 f3 0f 5c 81 d4 01 00 00 48 8b 84 24 f0 00 00 00"}
+    ]
+  }
+}

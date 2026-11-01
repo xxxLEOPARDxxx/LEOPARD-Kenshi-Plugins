@@ -7,6 +7,8 @@ $kl='D:/DEV/Kenshi/KenshiLib-src/Include'
 $boost='D:/DEV/Kenshi/deps/boost_1_60_0'
 $out=Join-Path $PSScriptRoot 'build'
 New-Item -ItemType Directory -Force $out | Out-Null
+& $python "$PSScriptRoot/verify_render_abi.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$repo/GlobalSatelliteMap/tests/run_shader_tests.ps1"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/embed_position_shader.py"
@@ -36,6 +38,10 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/pose_tests.exe" "/Fo$out/pose_tests.obj" "$PSScriptRoot/pose_tests.cpp"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & "$out/pose_tests.exe"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/native_abi_tests.exe" "/Fo$out/native_abi_tests.obj" "$PSScriptRoot/native_abi_tests.cpp"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& "$out/native_abi_tests.exe"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

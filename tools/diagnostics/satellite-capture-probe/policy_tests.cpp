@@ -12,6 +12,17 @@ void Check(bool ok, const char *message)
 int main()
 {
     using namespace ProbePolicy;
+    RequestLatch request;
+    Check(!request.Changed(17),"startup token must not capture");
+    Check(!request.Changed(17),"unchanged token ignored");
+    Check(request.Changed(18),"new token captured once");
+    Check(!request.Changed(18),"repeat token ignored");
+    Check(!request.Changed(0),"zero token cancels without capture");
+    Check(request.Changed(1),"token after zero accepted");
+    Check(request.Changed(0xffffffffUL),"maximum token accepted");
+    Check(!request.Changed(0)&&request.Changed(1),"token wrap accepted");
+    Check(!PollDue(100,200)&&PollDue(100,350),"poll capped to four per second");
+    Check(PollDue(0xffffff80UL,0x80UL),"poll clock wrap");
     int owned = 0, other = 0;
     const int *many[65];
     for (int i = 0; i < 65; ++i)
@@ -42,5 +53,5 @@ int main()
     Check(!ValidShaderSource("abc\0def",7),"embedded shader NUL refused");
     Check(!ValidShaderSource("\xFF",1),"non-ASCII shader refused");
     Check(!ValidShaderSource("x",32769),"oversized source refused before reading bytes");
-    std::cout << "23 fixed-grid/projection/cleanup/source checks passed\n";
+    std::cout << "33 fixed-grid/projection/cleanup/source/request checks passed\n";
 }
