@@ -5,7 +5,9 @@ source=(p/'CaptureProbe.cpp').read_text(encoding='utf-8')
 compact=re.sub(r'\s+','',source)
 assert 'setProjectionType(Ogre::PT_ORTHOGRAPHIC)' in source
 assert 'getTerrainHeight' not in source
-assert 'const int Side = 512;' in source
+assert 'int Side = 512;' in source and 'Side = raster.side;' in source
+assert source.count('Side = ')==2 and 'RasterPolicy::Select' in source
+assert '"DiagnosticSide",512' in source
 assert 'activateZone' not in source and 'showDistantTown(' not in source
 assert 'setEnabled(false)' in source
 assert 'ExposureScopeexposure;ProxyScopeproxy;exposure.Apply();proxy.Apply();' in compact

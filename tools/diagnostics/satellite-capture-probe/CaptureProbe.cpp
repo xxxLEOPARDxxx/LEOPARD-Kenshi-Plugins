@@ -63,11 +63,12 @@
 #include "TerrainExperimentPolicy.h"
 #include "NativeWorkerHandle.h"
 #include "ExposurePolicy.h"
+#include "RasterPolicy.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
 {
-const int Side = 512;
+int Side = 512; // Latched once at startup, before any compositor definition exists.
 DWORD mainThread = 0;
 bool keyHeld = false, pending = false, cleanup = false, inside = false, profileOK = false,
      chainSafe = true;
@@ -1581,6 +1582,14 @@ __declspec(dllexport) void startPlugin()
     try
     {
         requestIni=Folder()+"SatelliteCaptureProbe.ini";
+        RasterPolicy::Layout raster;
+        if(!RasterPolicy::Select(int(GetPrivateProfileIntA("Probe","DiagnosticSide",512,requestIni.c_str())),raster))
+        {ErrorLog("SatelliteCaptureProbe: unsupported diagnostic raster; inert");return;}
+        Side = raster.side;
+        std::ostringstream rasterLog;
+        rasterLog<<"diagnostic raster latched side="<<Side<<" named surface bytes="<<raster.targetBytes
+                 <<" peak readback/staging bytes="<<raster.readbackBytes<<"; excludes native geometry, depth/driver/main-scene allocations";
+        Log(rasterLog.str());
         fileRequests=GetPrivateProfileIntA("Probe","EnableRequestFile",0,requestIni.c_str())==1;
         reusePrivateShaders=GetPrivateProfileIntA("Probe","ReusePrivateShaders",0,requestIni.c_str())==1;
     }

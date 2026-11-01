@@ -151,3 +151,17 @@ autosave abort, two identical16-cell surface grids, explicit native HANDLE repai
 and17 fresh-material accounting-balanced captures. Whole-process memory acceptance
 is still OPEN. Shader reuse is an opt-in next A/B, not a demonstrated memory fix.
 Do not allocate final8K targets by simply increasing the diagnostic Side constant.
+
+### Exposure and bounded-resolution checkpoint
+One-lifetime batch083ee5d passed three16-cell512 runs (all48 raw pixel arrays
+match independent fresh-cell references), oneworker perbatch. Source340e7ca
+adds native exposure snapshot and frozen lighting, with two live16-cell runs
+accepted. Raw and exposed diagnostics are separate, no shared HDR writes.
+See verification report and private evidence, not old pending stage notes above.
+
+Next bounded trial: DiagnosticSide2048(single primary cell), immutable from
+startup, explicit named-surface/CPU-vector estimates, old geometry limits intact.
+This is a staged refinement/resource experiment, not final8K. Native viewport
+height increases LOD metric, so keep detail(8,8,0) unchanged for comparison.
+Compare geometry/nativepeak/output vs512, repeat cleanup, then assess a primary
+boundary with overlap before choosing the final large-target/budget strategy.

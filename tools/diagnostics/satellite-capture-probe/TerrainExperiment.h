@@ -152,7 +152,9 @@ struct TerrainExperiment
             PrepareSunPass(manager,scene,camera,gb);
         }
         started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();active=true;
-        Log("isolated native Terrain ready; one 73728m primary cell,512 output; no simulation zones activated");
+        std::ostringstream dimensions;
+        dimensions<<"isolated native Terrain ready; one 73728m primary cell,"<<Side<<" output; no simulation zones activated";
+        Log(dimensions.str());
         Log(geometryOnly?"private Terrain A/B mode: GBuffer only; no Position/Sun programs or readback":"private Terrain A/B mode: full Position/Sun diagnostics");
         if(batch.enabled)Log("private primary-grid batch started:16cells,oneTerrain,120s total deadline");
     }

@@ -456,3 +456,24 @@ is disabled in native ToneMap; no invented gamma/filmic correction is applied.
 351 checks include32 actual HLSL exposure/raw cases and9 production validation
 boundaries. Removing the native exposure floor fails10 GPU cases. Live preview
 acceptance is recorded separately after installation.
+
+Live exposure proof: source340e7ca/DLLb0938b87, PID9868/start03:26:27.8414634Z.
+Two16-cell batches completed9854/7460ms. Both read exactly one key/luminance
+snapshot (.55/~.9959) and kept identical sun settings across all16 cells.
+All32 raw and exposed HDR readbacks were finite; all32 raw GBuffer pixel arrays
+matched the accepted fresh-cell references. Material10767052/texture1957652437
+returned unchanged; each batch joined/closed its one worker. Clipped highlights
+are measured, not silently tone-curved. Evidence isolated-native-exposure-9868-*
+and isolated-native-exposure-9868-proof.json; diagnostic contact sheet saved.
+
+### Bounded resolution experiment
+DiagnosticSide is startup-latched to512(default),1024 or2048 BEFORE any observer
+or compositor definition. Unknown values, including4096/8192, leave the probe
+inert. There is no in-session resize of definitions/program ownership. At2048,
+the named private color targets account for192MiB and peak CPU readback/staging
+vectors96MiB, excluding native geometry, depth/driver/main-scene allocations.
+Native Terrain LOD uses actual viewport height: higher output also increases
+refinement at the unchanged(8,8,0) detail threshold. Existing1GiB/16Mtriangle
+observation limits remain, and may refuse a finer capture. Do not lift those
+limits automatically or market2048 as final8K.361 checks include10 raster-bound
+cases; actual2048 runtime/resource proof follows separately.
