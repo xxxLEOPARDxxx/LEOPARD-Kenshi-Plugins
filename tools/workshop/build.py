@@ -30,6 +30,19 @@ def mod_dir(mod):
     """Папка мода: Kenshi/mods/<Mod> или папка Мастерской - её именем
     (туда пользователь переносит моды сам) или подпапка-номер с <Mod>.mod.
     Нет нигде - None."""
+    release_root = os.environ.get("KENSHI_RELEASE_INPUT_ROOT")
+    if release_root:
+        # Explicit clean candidate inputs must never fall back to an installed
+        # DLL. Metadata-only cross references do not call this resolver.
+        if not os.path.isabs(release_root) or mod not in {i["mod"] for i in ITEMS}:
+            raise ValueError("Invalid release input root or package: " + mod)
+        root = os.path.realpath(release_root)
+        candidate = os.path.realpath(os.path.join(root, mod))
+        if os.path.commonpath([root, candidate]) != root or not os.path.isdir(candidate):
+            raise ValueError("Missing clean release candidate: " + mod)
+        if not os.path.isfile(os.path.join(candidate, "RE_Kenshi.json")):
+            raise ValueError("Release candidate has no plugin manifest: " + mod)
+        return candidate
     # stage - папки форков, удалённых из игры (tools/stage_forks.py)
     for root in (MODS, WORKSHOP, r"D:\DEV\Kenshi\stage"):
         p = os.path.join(root, mod)
@@ -44,54 +57,54 @@ def mod_dir(mod):
 LIMIT = 7900   # у Steam 8000; запас
 
 ITEMS = [
-    dict(mod="LiveXpBars", title="Live Xp Bars (QoL)", nexus=2188, version="11",
+    dict(mod="LiveXpBars", title="Live Xp Bars (QoL)", nexus=2188, version="12",
          tags=["GUI", "RE_Kenshi"], lang=True,
          drop=["ТРИ МЕСТА, ГДЕ ЛЕГКО ОШИБИТЬСЯ", "КАК ОПРЕДЕЛЯЕТСЯ РОСТ"],
          en="Live XP bars for the skills that are levelling right now: name, "
             "level, progress to the next level. Nothing to pick or click - a "
             "bar appears when a skill grows and fades out when it stops."),
-    dict(mod="StatColours", title="Stat Colours (QoL)", nexus=2189, version="12",
+    dict(mod="StatColours", title="Stat Colours (QoL)", nexus=2189, version="13",
          tags=["GUI", "RE_Kenshi"], lang=True,
          drop=["ЗАЧЕМ ОН, ЕСЛИ ЕСТЬ StatsColor"],
          en="Colours the numbers in the character stats window by value, shows "
             "what gear, injuries and fighting indoors add to a skill, racial XP "
             "multipliers (hold ALT) and the current XP rate of the selected "
             "skill."),
-    dict(mod="GearCompare", title="Gear Compare Alt (QoL)", nexus=2190, version="7",
+    dict(mod="GearCompare", title="Gear Compare Alt (QoL)", nexus=2190, version="8",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hover armour or a weapon and hold ALT: a second panel next to the "
             "tooltip shows what is worn in that slot now, what changes, and a "
             "verdict - better, worse or mixed."),
-    dict(mod="AssignedWorkers", title="Assigned Workers (QoL)", nexus=2191, version="7",
+    dict(mod="AssignedWorkers", title="Assigned Workers (QoL)", nexus=2191, version="8",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='See who is assigned to a building, select idle characters and spot switched-off or unpowered player machines by red lightning markers.'),
-    dict(mod="BestMinimap", title="Best Minimap (QoL)", nexus=2242, version="2",
+    dict(mod="BestMinimap", title="Best Minimap (QoL)", nexus=2242, version="3",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="A minimap in the corner of the screen on the game's own map picture: "
             "characters nearby, discovered towns, attack alerts, Map-markers and "
             "WantedMap marks, camera range; right click to send the selected, "
             "double click to move the camera."),
-    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="12",
+    dict(mod="UITweaks", title="UI Tweaks (QoL)", nexus=2192, version="13",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='Interface fixes for queues, descriptions, squad panels and tooltips, plus fewer redundant name-label and status-bar updates. Works with vanilla and modded interfaces.'),
-    dict(mod="PatientSelfAid", title="Patient Self Aid (QoL)", nexus=2193, version="4",
+    dict(mod="PatientSelfAid", title="Patient Self Aid (QoL)", nexus=2193, version="5",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en='Let a conscious patient help with their own treatment, including repair of robotic limbs on biological characters.'),
     # --- новые, 05.10.2026 (Nexus 2201-2205) ---
-    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="10",
+    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="11",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='In-game settings for RE_Kenshi plugins, with tooltips, page scrolling and keyboard or mouse binding support.'),
-    dict(mod="QuickStartSelect", title="Quick Start Select (QoL)", nexus=2201, version="6",
+    dict(mod="QuickStartSelect", title="Quick Start Select (QoL)", nexus=2201, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="The 'Choose your beginning' window as a list of all starts: two "
             "layouts, sorting by name and difficulty, search, race filter, the "
             "game's advanced options inside with right-click reset."),
-    dict(mod="WantedMap", title="Wanted Map (QoL)", nexus=2203, version="6",
+    dict(mod="WantedMap", title="Wanted Map (QoL)", nexus=2203, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Select a character carrying 'Wanted' posters and the world map "
             "shows where the targets are: exact, approximate, at their home "
             "town, imprisoned or recently dead."),
-    dict(mod="BuildModeGizmo", title="Build Mode Gizmo (QoL)", nexus=2204, version="4",
+    dict(mod="BuildModeGizmo", title="Build Mode Gizmo (QoL)", nexus=2204, version="5",
          tags=["Gameplay", "RE_Kenshi"], lang=True,
          drop=["СТАРЫЙ РЕЖИМ: МЕНЮ РАЗРАБОТЧИКА", "КАК СДЕЛАНО",
                "ТЕХНИЧЕСКОЕ: ДОСТУП К НЕЭКСПОРТИРОВАННЫМ ФУНКЦИЯМ",
@@ -99,7 +112,7 @@ ITEMS = [
          en="Select your own building site that is not built yet and move or "
             "rotate it with the editor's arrows - no dismantling, no developer "
             "menu."),
-    dict(mod="RangedDamageXp", title="Ranged Damage Xp (QoL)", nexus=2205, version="2",
+    dict(mod="RangedDamageXp", title="Ranged Damage Xp (QoL)", nexus=2205, version="3",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Crossbow (and turret) experience for the damage a hit actually "
             "dealt after armour, on top of the vanilla XP for shooting; a share "
@@ -107,62 +120,62 @@ ITEMS = [
     # --- форки модов Emkej (оригиналы - Emkej8 на Nexus), настройки в MCM.
     # Наши страницы на Nexus - 2206-2215 (05.10.2026).
     # Описания - desc/make_desc.py (шапка fork_header: автор и что изменено).
-    dict(mod="Wall-B-Gone", title="Wall B Gone (MCM fork) (QoL)", nexus=2215, version="4",
+    dict(mod="Wall-B-Gone", title="Wall B Gone (MCM fork) (QoL)", nexus=2215, version="5",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="A key to dismantle your walls, beds and furniture - a fork of Emkej8's mod "
             "with settings in Mod Config Menu."),
-    dict(mod="Auto-Pause-on-Load", title="Auto-Pause on Load (MCM fork) (QoL)", nexus=2206, version="5",
+    dict(mod="Auto-Pause-on-Load", title="Auto-Pause on Load (MCM fork) (QoL)", nexus=2206, version="6",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Pauses the game after a save loads, on trade and on inventory - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Loot-Scoot-Execute", title="Loot Scoot Execute (MCM fork) (QoL)", nexus=2210, version="5",
+    dict(mod="Loot-Scoot-Execute", title="Loot Scoot Execute (MCM fork) (QoL)", nexus=2210, version="6",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Execute and Execute All for downed enemies in the context menu - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Vital-Sense", title="Vital Sense (MCM fork) (QoL)", nexus=2214, version="6",
+    dict(mod="Vital-Sense", title="Vital Sense (MCM fork) (QoL)", nexus=2214, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT for state and bounty markers over visible characters - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Organize-the-Trader", title="Organize the Trader (MCM fork) (QoL)", nexus=2212, version="7",
+    dict(mod="Organize-the-Trader", title="Organize the Trader (MCM fork) (QoL)", nexus=2212, version="8",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Search and sorting in the trader window - a fork of Emkej8's mod with settings "
             "in Mod Config Menu."),
-    dict(mod="Vital-Read", title="Vital Read (MCM fork) (QoL)", nexus=2213, version="5",
+    dict(mod="Vital-Read", title="Vital Read (MCM fork) (QoL)", nexus=2213, version="6",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="State icons on squad portraits: downed, dying, starving, crippled - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Container-Highlight", title="Container Highlight (MCM fork) (QoL)", nexus=2207, version="2",
+    dict(mod="Container-Highlight", title="Container Highlight (MCM fork) (QoL)", nexus=2207, version="3",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold a key to mark nearby lootable containers - a fork of Emkej8's mod with "
             "settings in Mod Config Menu."),
     dict(mod="Hidden-Faction-Relations", title="Hidden Faction Relations (MCM fork) (QoL)", nexus=2208,
-         version="2", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
+         version="3", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Your relations with every faction, hidden ones included, in the Options window - "
             "a fork of Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Job-B-Gone", title="Job B Gone (MCM fork) (QoL)", nexus=2209, version="5",
+    dict(mod="Job-B-Gone", title="Job B Gone (MCM fork) (QoL)", nexus=2209, version="6",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="A panel to clear job queues for yourself, the selection, the squad or everyone - "
             "a fork of Emkej8's mod with settings in Mod Config Menu."),
     # --- форк BetterLooting (XxAtreuSSxX, GitHub, GPLv3); страница в Steam
     # автором снята, на Nexus - чужая перезаливка 2178. nexus - после
     # нашей выкладки на Nexus.
-    dict(mod="BetterLooting", title="Better Looting (MCM fork) (QoL)", nexus=2218, version="4",
+    dict(mod="BetterLooting", title="Better Looting (MCM fork) (QoL)", nexus=2218, version="5",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en='Rule-based looting, required-item lists, protected player storage, optional ground pickup and deposit to base storage.'),
-    dict(mod="Map-markers", title="Map markers (MCM fork) (QoL)", nexus=2211, version="3",
+    dict(mod="Map-markers", title="Map markers (MCM fork) (QoL)", nexus=2211, version="4",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Your own markers with labels on the world map, per save - a fork of Emkej8's "
             "mod with settings in Mod Config Menu."),
     # nexus - после нашей выкладки на Nexus (08.10.2026: готовится).
     dict(mod="Organize-the-Crafting-Stations", title="Organize the Crafting Stations (MCM fork) (QoL)",
-         nexus=2219, version="1", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
+         nexus=2219, version="2", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="A search bar in crafting and research windows - a fork of Emkej8's mod with "
             "settings in Mod Config Menu."),
     # --- форк Kenshi Job Management (SirixKC, GitHub, GPLv3; весь код - Codex).
     # Папка мода та же, что у оригинала (Steam 3785306982) - вместе не включать.
     # nexus - после нашей выкладки на Nexus.
     dict(mod="KenshiJobManagement", title="Kenshi Job Management (MCM fork) (QoL)", nexus=2225,
-         version="4", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
+         version="5", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="A window for squad job queues and work stations: who does what, in which order and "
             "who works where. A fork of SirixKC's mod with the game's own interface, translations "
             "and settings in Mod Config Menu."),
@@ -173,14 +186,14 @@ ITEMS = [
          tags=["GUI"], lang=False, plugin=False, drop=[],
          en="A dark interface for Kenshi - a hybrid of Dark UI by Eldryn and Russian Dark UI "
             "simplistic by FG, with layout fixes. Works with any game language."),
-    dict(mod="ItemMarkers", title="Item Markers (QoL)", nexus=2224, version="5",
+    dict(mod="ItemMarkers", title="Item Markers (QoL)", nexus=2224, version="6",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Item grade colours, stolen goods and faction uniforms right on the item icons - "
             "a heavily optimised replacement for LtEast's Rarity Backgrounds and Item Status "
             "Indicators."),
     # --- форк Character Highlight (BFrizzleFoShizzle, KenshiLib_Examples, GPLv3).
     dict(mod="Character-Highlight", title="Character Highlight (MCM fork) (QoL)", nexus=2233,
-         version="2", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
+         version="3", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT to tint characters by how they stand to you - squad, enemies, allies, "
             "neutrals, diplomats. A heavily optimised fork of BFrizzleFoShizzle's mod with "
             "settings in Mod Config Menu."),
@@ -190,19 +203,19 @@ ITEMS = [
          en="Bannerlord-style squad formations: drag a shape, march in order, and keep a formation "
             "while following the leader - 13 follow shapes, a shape of its own for every squad. A fork of "
             "Slinkysalmon03's Formations with settings in Mod Config Menu."),
-    dict(mod="RecruitMarkers", title="Recruit Markers (QoL)", nexus=2232, version="4",
+    dict(mod="RecruitMarkers", title="Recruit Markers (QoL)", nexus=2232, version="5",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='Recruit bubbles, trader coins and gold squad-leader stars, with a shared show key and independent star size.'),
 ]
 
-ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': 2257, 'version': '2', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Full XP Info displays: blue experience gains, gold level increases and recent-training bars, configured through MCM.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': 2258, 'version': '1', 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': 2261, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': 2259, 'version': '2', 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': 2260, 'version': '1', 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
+ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': 2257, 'version': "3", 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Full XP Info displays: blue experience gains, gold level increases and recent-training bars, configured through MCM.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': 2258, 'version': "2", 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': 2261, 'version': "2", 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': 2259, 'version': "3", 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': 2260, 'version': "2", 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
 
-ITEMS.append(dict(mod="StackSort",title="Stack Sort (MCM fork) (QoL)",nexus=2262,version="2",tags=["GUI","Gameplay","RE_Kenshi"],lang=True,drop=[],en="Pack inventories, consolidate compatible stacks and reserve free space, with Rotate Items support and MCM settings."))
+ITEMS.append(dict(mod="StackSort",title="Stack Sort (MCM fork) (QoL)",nexus=2262,version="3",tags=["GUI","Gameplay","RE_Kenshi"],lang=True,drop=[],en="Pack inventories, consolidate compatible stacks and reserve free space, with Rotate Items support and MCM settings."))
 ITEMS.extend([
-    dict(mod="TauntExpansion", title="Taunt Expansion (MCM fork) (QoL)", nexus=2265, version="1",
+    dict(mod="TauntExpansion", title="Taunt Expansion (MCM fork) (QoL)", nexus=2265, version="2",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Adjust the native Taunt bonus and enemy retargeting strength through optional MCM settings."),
-    dict(mod="GatePushGuard", title="Gate Push Guard (QoL)", nexus=2264, version="1",
+    dict(mod="GatePushGuard", title="Gate Push Guard (QoL)", nexus=2264, version="2",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors."),
 ])

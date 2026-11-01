@@ -1,150 +1,162 @@
 {
   "RecruitMarkers": {
-    "version": "4",
-    "published_version": "3",
-    "ru": [
-      "[b]Звёзды только у настоящих лидеров группы.[/b] У лидера должен быть хотя бы один другой живой участник того же загруженного отряда. Одиночные торговцы и рекруты больше не получают звезду.",
-      "[b]Корректный состав отряда.[/b] Мёртвые участники и персонажи, уже перешедшие в другую группу, не создают ложную отметку лидера. Торговец с реальной охраной по-прежнему может быть лидером."
-    ],
+    "version": "5",
+    "published_version": "4",
     "en": [
-      "[b]Stars for actual group leaders.[/b] A leader must have at least one other living member in the same loaded squad. Solo traders and recruits no longer receive a star.",
-      "[b]Accurate squad membership.[/b] Dead members and characters who have moved to another group cannot create a false leader marker. A trader with real followers can still be a leader."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "AssignedWorkers": {
-    "version": "7",
-    "ru": [
-      "[b]Красная молния над выключенными машинами.[/b] Значок показывает достроенные машины игрока, которые выключены, по общей клавише показа панели работников.",
-      "[b]Отметки нехватки питания.[/b] Можно также отмечать машины без необходимой энергии; размер, дальность и высота молнии настраиваются.",
-      "[b]Быстрее обновление панели.[/b] Убраны повторные поиски одних и тех же элементов интерфейса. Включение и настройки применяются сразу."
-    ],
+    "version": "8",
+    "published_version": "7",
     "en": [
-      "[b]Red lightning above switched-off machines.[/b] Markers identify completed player machines that are switched off, using the worker panel's show key.",
-      "[b]Missing-power warnings.[/b] Machines lacking required power can also be marked; icon size, range and height are adjustable.",
-      "[b]Lighter panel updates.[/b] Repeated searches for the same interface elements have been removed. Enable and settings changes apply immediately."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "PatientSelfAid": {
-    "version": "4",
-    "ru": [
-      "[b]Протезы у биологических персонажей.[/b] Пациент может чинить повреждённые роботизированные конечности своим ремкомплектом, пока другой персонаж оказывает ему помощь.",
-      "[b]Лечение и ремонт учитываются отдельно.[/b] Наличие протеза больше не исключает обычного персонажа из проверки ремонта. Для ран всё ещё нужна аптечка, для протезов - ремкомплект.",
-      "[b]Включение без перезапуска.[/b] Переключатель в MCM действует сразу; уже отданные приказы остаются под управлением игры."
-    ],
+    "version": "5",
+    "published_version": "4",
     "en": [
-      "[b]Prosthetics on biological characters.[/b] A patient can repair damaged robotic limbs with their own repair kit while another character assists them.",
-      "[b]Healing and repairs are checked separately.[/b] A biological character is no longer excluded from repair checks. Wounds still require a first aid kit; prosthetics require a repair kit.",
-      "[b]No restart for the enable switch.[/b] MCM changes apply immediately; orders already issued remain under the game's control."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "UITweaks": {
-    "version": "12",
-    "published_version": "11",
-    "ru": [
-      "[b]Последовательный обмен между персонажами.[/b] Пока открыт обмен с одним союзником, можно выбрать «Обмен» у другого через ПКМ по портрету. Если расстояние велико, персонаж штатно подбегает и открывает нужный инвентарь.",
-      "[b]Защита от кликов сквозь инвентарь сохранена.[/b] Нажатия в окне инвентаря или рюкзака не отправляют персонажа в точку под окном. Приказы через портреты, их меню и карту остаются доступны."
-    ],
+    "version": "13",
+    "published_version": "12",
     "en": [
-      "[b]Sequential squad trading.[/b] While trading with one squad member, right-click another portrait and choose Trade. When out of range, the character approaches normally and opens the requested inventory.",
-      "[b]Inventory click-through protection retained.[/b] Presses inside inventory and backpack windows cannot send the character to the ground beneath them. Portraits, their context menus and map commands remain available."
+      "[b]Save and load previews.[/b] Select an existing slot in Save Game or Load Game to see its screenshot below the window. Successful manual saves, quicksaves and autosaves capture the game with its HUD while excluding save/load and pause menus. Slots without an image show no preview frame.",
+      "[b]Stable, sharper previews.[/b] The dialog opens higher before selection and stays put when changing rows. Its full-width preview frame fits the complete image without cropping. New screenshots use filtered resizing and lossless PNG up to 1600x900; older JPEG previews remain readable.",
+      "[b]A taller save list.[/b] MCM offers Save/load window height from 100% to 160%, default 120%. It applies on the next opening and respects the screen and preview space.",
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Предпросмотр сохранений и загрузок.[/b] Выберите существующий слот в меню сохранения или загрузки, чтобы увидеть снимок под окном. Успешные ручные, быстрые и автоматические сохранения получают снимок игры с HUD, без меню сохранения, загрузки и паузы. У слотов без изображения рамка предпросмотра скрыта.",
+      "[b]Стабильный и чёткий снимок.[/b] Окно сразу открывается выше и не двигается при смене строки. Рамка идёт по ширине окна, изображение вписывается целиком без обрезки. Новые снимки используют качественное уменьшение и PNG без потерь до 1600x900; старые JPEG по-прежнему читаются.",
+      "[b]Более высокий список сейвов.[/b] В MCM настраивается высота окон сохранения и загрузки от 100% до 160%, по умолчанию 120%. Изменение применяется при следующем открытии с учётом экрана и места под снимок.",
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "ModConfigMenu": {
-    "version": "10",
-    "ru": [
-      "[b]Колесо над любой обычной строкой настроек.[/b] Страница прокручивается и над флажком, ползунком, полем ввода или кнопкой. Значение самой настройки от колеса не меняется.",
-      "[b]Клавиатура и мышь в одном назначении.[/b] Поддерживающие это плагины позволяют назначить кнопку мыши или клавишу, включая сочетания с CTRL, SHIFT и ALT.",
-      "[b]Независимая прокрутка списков.[/b] Собственные списки плагинов, в том числе источники Multi XP Mining, сохраняют своё управление.",
-      "[b]Длинные списки предметов.[/b] Текстовые настройки сохраняют полный список без прежнего обрезания, в том числе список обязательной добычи Better Looting.",
-      "[b]Повторные открытия страниц.[/b] Старые динамические строки больше не накапливаются, убраны лишние обновления неизменных подписей кнопок."
-    ],
+    "version": "11",
+    "published_version": "10",
     "en": [
-      "[b]Wheel scrolling over ordinary settings rows.[/b] Pages scroll over checkboxes, sliders, input fields and buttons without changing the setting's value.",
-      "[b]Keyboard and mouse in one binding.[/b] Supporting plugins can assign a mouse button or key, including CTRL, SHIFT and ALT combinations.",
-      "[b]Independent list scrolling.[/b] Plugin-owned lists, including Multi XP Mining sources, retain their own controls.",
-      "[b]Long item lists.[/b] Text settings retain complete lists without the former truncation, including Better Looting's required-item list.",
-      "[b]Repeated page visits.[/b] Old dynamic rows no longer accumulate, and unchanged button captions no longer receive redundant updates."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
     ],
-    "published_version": "9"
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
   },
   "BetterLooting": {
-    "version": "4",
-    "ru": [
-      "Добавлены точный список имён/ID обязательной добычи, защита хранилищ игрока по умолчанию и необязательный подбор с земли, изначально выключенный. Подбор ограничен 256 результатами и 32 приказами; маршрут идёт от ближайшей вещи к следующей ближайшей без приоритета цены за вес, сохраняя прежние приказы и проверки кражи/вместимости."
-    ],
+    "version": "5",
+    "published_version": "4",
     "en": [
-      "Added an exact name/ID required-item list, player-storage protection enabled by default and optional ground pickup, off by default. Ground pickup is bounded to 256 results and 32 orders and follows nearest-neighbor routing instead of value-per-weight priority, preserving existing orders and theft/capacity checks."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "SkillLevelUpInfo": {
-    "version": "2",
-    "published_version": "1",
-    "ru": [
-      "Возвращены все три вида отображения xp_info: синие сообщения о приросте опыта, золотые повышения уровня и полосы недавно тренируемых навыков под характеристиками персонажа.",
-      "В MCM доступны все восемь исходных настроек: три независимых вида отображения, число строк, минимальный процент, интервал сообщений, время активности и подробный журнал.",
-      "Сохранены объединение приростов и краткий остаток списка, цвета, подъём и затухание надписей. Уровни показываются независимо от порога дробного опыта.",
-      "Убраны лишние обновления неизменившейся панели; обработка опыта защищена от смены мира и повторного использования объектов при загрузке.",
-      "Сохранены дополнительные настройки выбранных персонажей и игрового журнала. Подробный журнал остаётся последней настройкой и выключен по умолчанию.",
-      "Исправлена разметка полос под характеристиками: штатное поле значения выровнено вправо на всю строку и больше не трактуется как отдельная узкая колонка. Убрана лишняя фраза о MCM из описания внутри меню.",
-      "Устранено исчезновение полос при переходе от пяти к шести характеристикам: шаг вычисляется по отсортированным нижним границам, как в оригинале. Малые приросты и удержание не изменялись.",
-      "Полосы используют шрифт и стиль обычных характеристик, с разделителем. Настраивается максимум одна или две строки; при шести штатных характеристиках число строк автоматически уменьшается по свободному месту.",
-      "Устранён лишний сброс контекста полос, когда выбранный персонаж не меняется."
-    ],
+    "version": "3",
+    "published_version": "2",
     "en": [
-      "Restored all three xp_info displays: blue XP-gain notifications, gold level increases and recently trained skill bars below character statistics.",
-      "MCM exposes all eight original settings: three independent displays, row count, minimum percentage, announcement interval, recent-activity duration and detailed logging.",
-      "Preserved gain aggregation, the short remainder summary, colours, rising motion and fading. Whole levels are independent of the fractional XP threshold.",
-      "Avoided redundant updates of an unchanged panel; XP processing is protected against world changes and object-address reuse during loading.",
-      "Retained selected-character filtering and optional game-log copies. Detailed logging remains the final setting and is disabled by default.",
-      "Corrected character-panel bar layout: the native full-row right-aligned value field is no longer mistaken for a separate narrow column. Removed the redundant MCM sentence inside the menu.",
-      "Fixed bars disappearing when switching from five to six vanilla stats: spacing uses sorted row bottoms, as in the original. Tiny-gain detection and retention were not changed.",
-      "Bars follow the font and style of the normal character stats, with a divider. The maximum is one or two rows; with six native stats the visible count automatically drops to fit the available space.",
-      "Prevented unnecessary bar-context resets while the selected character remains unchanged."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "MultiXPMining": {
-    "version": "1",
-    "ru": [
-      "[b]Источники из загруженной сборки.[/b] Добыча определяется по данным игры, включая добавленные модами жилы и шахты: олово, уголь и другие ресурсы не требуют списка названий вручную.",
-      "[b]Удобный выбор источника.[/b] Список с поиском по имени или ID, прокруткой и подсказками; над параметрами видны имя и ID выбранного источника.",
-      "[b]Отдельные опыт и пределы.[/b] Сила, стойкость и ловкость настраиваются для каждого источника, вместе с общими множителями.",
-      "[b]Личные изменения сохраняются.[/b] У новых автоматически найденных источников начальные значения могут совпадать, но правки каждого источника независимы.",
-      "Исправлен повторный выбор: параметры источника можно обновить повторным щелчком, если окно настроек перестраивалось во время первого выбора."
-    ],
-    "en": [
-      "[b]Sources from the loaded mod list.[/b] Mining is detected from game data, including modded veins and mines: tin, coal and other resources do not need a hand-written name list.",
-      "[b]A practical source picker.[/b] Search by name or ID, scroll and read tooltips; the selected source's name and ID appear above its settings.",
-      "[b]Separate XP and caps.[/b] Configure Strength, Toughness and Dexterity for each source, with shared multipliers.",
-      "[b]Personal changes survive updates.[/b] Newly detected sources can share initial defaults, while edits to each source remain independent.",
-      "Repeated selection retries the parameter refresh if the options window was being rebuilt when a source was first selected."
-    ]
-  },
-  "Character Inspector": {
     "version": "2",
     "published_version": "1",
     "en": [
-      "[b]Correct environmental protection above 100%.[/b] High combined acid, dust, burning, gas and rain protection no longer falls to a misleading 2%. Full protection is displayed as 100%, retaining the existing effective-protection limit."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
     ],
     "ru": [
-      "[b]Правильная защита от среды выше 100%.[/b] Высокая суммарная защита от кислоты, пыли, опаления, газа и дождя больше не превращается в ошибочные 2%. Полная защита показывается как 100%, с сохранением прежнего предела отображения."
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Character Inspector": {
+    "version": "3",
+    "published_version": "2",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "KenshiRotate": {
-    "version": "1",
-    "ru": [
-      "Настройки перенесены из MODS в MCM с одним назначением клавиатуры/мыши и модификаторов: MMB по умолчанию, NONE отключает ввод, первый активный старый способ переносится автоматически. Исправлены повторные повороты при фокусе инвентаря с защитой ввода текста; добавлены три языка, сокращены лишние обновления значков, состояние очищается при удалении предметов и значков."
-    ],
+    "version": "2",
+    "published_version": "1",
     "en": [
-      "Settings moved from MODS to MCM with one keyboard/mouse binding and modifiers: MMB by default, NONE disables input, and the first active old binding migrates automatically. Repeated rotation with inventory focus was fixed while protecting text entry; three languages, fewer redundant icon updates and item/icon lifetime cleanup were added."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "KillCounter": {
-    "version": "1",
-    "ru": [
-      "Добавлены MCM-переключатели нового учёта и независимого показа каждой строки, английские/русские/китайские подписи. Обновляются только изменившиеся числа, удаляются записи об уничтоженных персонажах и просроченных попытках оглушения; отключение сохраняет накопленное, совместимость со StatColours сохранена."
-    ],
+    "version": "2",
+    "published_version": "1",
     "en": [
-      "Added MCM controls for new-event tracking and independent visibility of each row, with English, Russian and Chinese labels. Only changed numbers are refreshed, destroyed-character and expired stealth-attempt records are removed, disabling retains totals, and StatColours compatibility is preserved."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "AIFixed": {
@@ -165,49 +177,47 @@
     ]
   },
   "StackSort": {
-    "version": "2",
-    "published_version": "1",
-    "ru": [
-      "[b]Исправлено объединение стопок.[/b] Сортировка теперь находит предметы и запускает штатное складывание совместимых вещей, включая болты, аптечки и ремкомплекты.",
-      "[b]Повторная сортировка без закрытия окна.[/b] После разделения стопки, изменения количества или ресурса объединение снова проверяется при следующем нажатии. Переключение неизменённых раскладок не выполняет лишнее попарное объединение.",
-      "[b]Правила игры сохраняются.[/b] Владение, совместимость и перенос ресурса определяются нативными методами; повороты и отмена раскладки сохраняются.",
-      "В подробный журнал добавлены ограниченные сводки этапов объединения. Устранено несовпадение виртуального сравнения hand в SDK/VC10; используется проверенный невиртуальный экспорт. Диагностика не добавляет нативных проверок в горячий игровой цикл."
-    ],
+    "version": "3",
+    "published_version": "2",
     "en": [
-      "[b]Stack merging corrected.[/b] Sorting now finds live items and invokes native consolidation for compatible goods, including bolts, medical kits and repair kits.",
-      "[b]Repeated sorting without reopening.[/b] Splitting stacks or changing quantities or charges triggers a fresh merge check on the next click. Cycling unchanged arrangements avoids unnecessary pairwise consolidation.",
-      "[b]Game rules preserved.[/b] Ownership, compatibility and charge transfer remain controlled by native methods; rotation and arrangement undo remain available.",
-      "Detailed logging gains bounded merge-stage summaries. Corrected an SDK/VC10 virtual hand-comparison mismatch using the verified nonvirtual export. Diagnostics add no native checks to the hot gameplay loop."
+      "[b]Quiet optional controls.[/b] Opening an inventory layout without the game's Arrange button no longer produces misleading missing-widget warnings. Existing sorting, merging, rotation and undo behavior is preserved.",
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательные кнопки без предупреждений.[/b] Открытие окна инвентаря без штатной кнопки раскладки больше не вызывает ложных предупреждений об отсутствующем виджете. Сортировка, объединение, повороты и отмена сохраняются.",
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "Organize-the-Trader": {
-    "version": "7",
-    "published_version": "6",
-    "ru": [
-      "[b]Деньги игрока справа.[/b] Возвращена общая сумма игрока в правый край верхней строки; деньги торговца остаются слева, а отключаемый итог сделки - по центру. Сумма обновляется при изменении кошелька.",
-      "[b]Оформление и узкие окна.[/b] Сохранены подложка и шрифт текущего интерфейса, цвета дохода/расхода и перенос длинных сумм без наложения. Чужой выбранный персонаж не меняет показанный кошелёк."
-    ],
+    "version": "8",
+    "published_version": "7",
     "en": [
-      "[b]Player money on the right.[/b] Restored the player's shared wallet at the right edge of the trade header; merchant money remains on the left and the optional deal balance in the centre. The amount updates when the wallet changes.",
-      "[b]Themes and narrow windows.[/b] Preserved the active interface background and font, gain/cost colours and overlap-free wrapping of long amounts. Inspecting an NPC does not switch the displayed wallet."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "BestMinimap": {
-    "version": "2",
-    "published_version": "1",
-    "ru": [
-      "[b]Отдельный размер стрелки камеры.[/b] Абсолютное значение от 4 до 64 пикселей можно уменьшать и увеличивать независимо от размера меток.",
-      "[b]Более заметная граница камеры.[/b] Толщина 1–8 пикселей для пунктира и сплошной линии, без обрезки толстого контура у края карты.",
-      "[b]Исправлена автодальность.[/b] При 0 используется проверенный предел игры, а не сохранённый ошибочный максимальный замер. Проверки учитывают полный список персонажей игрока; для неизвестных модификаций камеры доступна ручная дальность.",
-      "Убран постоянный сбор максимального расстояния и его периодическая запись; новые настройки применяются сразу. Переводы обновлены на русском, английском и китайском.",
-      "Русские игровые подсказки используют короткие дефисы; проверка готовых переводов предотвращает повторное появление неподдерживаемых длинных тире."
-    ],
+    "version": "3",
+    "published_version": "2",
     "en": [
-      "[b]Independent camera arrow size.[/b] An absolute 4-64 pixel value can be reduced or enlarged independently of marker size.",
-      "[b]Clearer camera boundary.[/b] A 1–8 pixel width for dotted and solid lines, with thick contours retained at map edges.",
-      "[b]Automatic reach corrected.[/b] Range 0 uses the verified game limit instead of a persisted incorrect maximum observation. Checks use the complete player-character list; manual distance remains available for unknown camera modifications.",
-      "Removed the ongoing maximum-distance observation scan and periodic writes. New settings apply immediately. English, Russian and Chinese translations updated.",
-      "Russian in-game tooltips use supported hyphens; compiled-translation checks prevent unsupported typographic dashes returning."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   },
   "Formations": {
@@ -223,35 +233,319 @@
     ]
   },
   "TauntExpansion": {
-    "version": "1",
+    "version": "2",
+    "published_version": "1",
     "en": [
-      "[b]First MCM fork.[/b] Preserve tata / Tata-Gari's Taunt and retarget mechanics with the original package defaults of 5 and 2.",
-      "[b]Optional live settings.[/b] Add a Taunt Expansion page in Mod Config Menu with English, Russian and Simplified Chinese labels and tooltips. All settings, including enabled state, apply immediately.",
-      "[b]Reliable startup and settings.[/b] Preserve RE_Kenshi's required startup entry and initialize the settings lock before callbacks, including early settings access or failed gameplay initialization.",
-      "[b]Consistent strength and bounded diagnostics.[/b] Preserve the correct bonus across simultaneous and nested target evaluations. Add a detailed-log master switch that is off by default; keep errors unconditional and diagnostic history bounded.",
-      "[b]Defensive compatibility checks.[/b] Verify the complete unique Taunt instruction and original +2 bonus before patching; safely preserve code lifetime on failures and shutdown. Add production-code, binary import/signature and locale checks. Runtime game verification is tracked separately."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
     ],
     "ru": [
-      "[b]Первый MCM-форк.[/b] Сохранены механика провокации и дополнительного усиления смены цели tata / Tata-Gari со стандартными множителями поставки 5 и 2.",
-      "[b]Необязательные настройки во время игры.[/b] Добавлена страница Taunt Expansion в Mod Config Menu с русскими, английскими и китайскими подписями и подсказками. Все настройки, включая включение механики, применяются сразу.",
-      "[b]Надёжный запуск и настройки.[/b] Сохранена требуемая RE_Kenshi точка запуска; блокировка настроек создаётся до callbacks, включая раннее открытие настроек и ошибки инициализации механики.",
-      "[b]Стабильная сила и ограниченная диагностика.[/b] Исправлено сохранение бонуса при одновременных и вложенных вычислениях цели. Добавлен выключенный по умолчанию общий подробный журнал; ошибки записываются всегда, история диагностики ограничена.",
-      "[b]Защитные проверки совместимости.[/b] Перед изменением кода проверяются полная уникальная инструкция провокации и обычный бонус +2; безопасно сохраняется срок жизни кода при ошибках и завершении. Добавлены проверки production-кода, импортов, сигнатуры и переводов. Игровая проверка учитывается отдельно."
-    ],
-    "published_version": "0"
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
   },
   "GatePushGuard": {
-    "version": "1",
-    "published_version": "0",
+    "version": "2",
+    "published_version": "1",
     "en": [
-      "New independently authored protection for observed outside-to-inside crowd-push crossings through closed player-owned gates and doors.",
-      "Continuous closed-state history, actual finite door-leaf bounds and conservative exclusions prevent proximity or gate closure from moving existing occupants.",
-      "Optional live MCM settings, standalone defaults, English/Russian/Simplified Chinese interface and detailed logging off by default."
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
     ],
     "ru": [
-      "Новая самостоятельно написанная защита от замеченного проталкивания снаружи внутрь через закрытые ворота и двери игрока.",
-      "Непрерывная история закрытого состояния, конечные границы самой створки и осторожные исключения: близость к двери и закрытие ворот не перемещают находящихся внутри.",
-      "Необязательные настройки MCM с применением сразу, отдельные настройки без MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию."
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "BuildModeGizmo": {
+    "version": "5",
+    "published_version": "4",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "GearCompare": {
+    "version": "8",
+    "published_version": "7",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "ItemMarkers": {
+    "version": "6",
+    "published_version": "5",
+    "en": [
+      "[b]Native stolen-item indication.[/b] The game's stolen-item indicator remains visible while dragging. Item ownership and stack-merging rules are unchanged.",
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Штатная отметка краденого.[/b] Значок краденой вещи сохраняется при перетаскивании. Правила владения и объединения стопок не меняются.",
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "LiveXpBars": {
+    "version": "12",
+    "published_version": "11",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "QuickStartSelect": {
+    "version": "7",
+    "published_version": "6",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "RangedDamageXp": {
+    "version": "3",
+    "published_version": "2",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "StatColours": {
+    "version": "13",
+    "published_version": "12",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "WantedMap": {
+    "version": "7",
+    "published_version": "6",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Container-Highlight": {
+    "version": "3",
+    "published_version": "2",
+    "en": [
+      "[b]Safer highlight removal.[/b] Obsolete tint records are retired when container models change or disappear. A restoration failure stops further attempts on that record, while replacement materials are preserved.",
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Защищённое снятие подсветки.[/b] Устаревшие записи окраски удаляются после замены или выгрузки модели контейнера. Ошибка восстановления прекращает повторные попытки с этой записью; новые материалы сохраняются.",
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Vital-Sense": {
+    "version": "7",
+    "published_version": "6",
+    "en": [
+      "[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages. Settings explain the standard-icon fallback.",
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Совместимость необязательных значков.[/b] Пользовательские текстуры проверяются до загрузки, без ложных сообщений об отсутствующих файлах. Подсказки настроек поясняют использование штатных значков.",
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Vital-Read": {
+    "version": "6",
+    "published_version": "5",
+    "en": [
+      "[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages when the standard icon is used.",
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Совместимость необязательных значков.[/b] Необязательные пользовательские текстуры проверяются до загрузки: использование штатного значка не вызывает ложных сообщений об отсутствующей текстуре.",
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Job-B-Gone": {
+    "version": "6",
+    "published_version": "5",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Organize-the-Crafting-Stations": {
+    "version": "2",
+    "published_version": "1",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Auto-Pause-on-Load": {
+    "version": "6",
+    "published_version": "5",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Loot-Scoot-Execute": {
+    "version": "6",
+    "published_version": "5",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Wall-B-Gone": {
+    "version": "5",
+    "published_version": "4",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Hidden-Faction-Relations": {
+    "version": "3",
+    "published_version": "2",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Map-markers": {
+    "version": "4",
+    "published_version": "3",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "KenshiJobManagement": {
+    "version": "5",
+    "published_version": "4",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+    ]
+  },
+  "Character-Highlight": {
+    "version": "3",
+    "published_version": "2",
+    "en": [
+      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
+      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
+      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+    ],
+    "ru": [
+      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
+      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
+      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
     ]
   }
 }

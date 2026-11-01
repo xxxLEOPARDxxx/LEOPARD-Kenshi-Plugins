@@ -4,6 +4,8 @@ Versioned sources for the local release tools. Copy these files, preserving `des
 
 Run `prepare_release.py ModName ...` in that working folder. It refreshes README, Steam and Nexus descriptions, screenshot folders and CRC-verified ZIPs. Releases contain one runtime catalog per language; compiled-MO plugins ship MO only. Obsolete ZIPs for the same mod are removed only after the replacement succeeds.
 
+For preparation without installing a DLL, set `KENSHI_RELEASE_INPUT_ROOT` to an absolute directory containing clean `<ModName>/RE_Kenshi.json` candidate folders. Selected packages resolve only there; incomplete, missing or unknown candidates fail instead of falling back to the game. Leave it unset for the existing installed-mod workflow. Metadata-only MCM cross references can still describe held packages without packaging them. Run `test_release_input_override.py` to verify these boundaries.
+
 Maintain full player descriptions in `desc/qol-20261029.json`: purpose, features, controls, settings and compatibility, with matching Russian and English detail. Keep the existing BBCode headings, lists and bold feature names. Forks credit the original author and link the original project before their changes. Technical implementation details belong in README; MCM's SDK section is the exception.
 
 Write both languages of each current version's changes in `release_notes.json`. Preparation updates `changelog.json` while retaining older versions. Full version notes are sent once to Steam Updates; they must not be duplicated in Steam or Nexus descriptions. The history is synchronized with its versioned copy. Every mod/fork README also describes current-version changes in English and Russian.

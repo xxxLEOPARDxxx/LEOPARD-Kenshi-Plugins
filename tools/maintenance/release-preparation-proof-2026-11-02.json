@@ -1,0 +1,1018 @@
+{
+  "verified_at_utc": "2026-11-01T21:25:47.896412+00:00",
+  "status": "36 accepted local Nexus-ready candidates; no upload",
+  "independent_review": {
+    "reviewer": "parent agent /root",
+    "result": "CLEAR",
+    "recorded_date": "2026-11-02 Europe/Moscow",
+    "evidence": [
+      "Independent review of fail-closed resolver, exact-payload packer, full proof, release-note examples, UI README and factory defaults.",
+      "Fresh independent verify_public_maintenance_20261102.py passed all 36 candidates.",
+      "Fresh independent input-override and pack-boundary tests passed, including old-ZIP preservation."
+    ]
+  },
+  "prepared": 36,
+  "held": {
+    "AIFixed": "Release 1 archive unchanged; release 2 awaits GateFix/SleepFix integration acceptance."
+  },
+  "publication_ledger_unchanged": true,
+  "past_changelog_and_fork_history_preserved": true,
+  "game_dlls_verified_unchanged": [
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\AssignedWorkers\\AssignedWorkers.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\BestMinimap\\BestMinimap.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\BuildModeGizmo\\BuildModeGizmo.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\GatePushGuard\\GatePushGuard.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\GearCompare\\GearCompare.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ItemMarkers\\ItemMarkers.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\LiveXpBars\\LiveXpBars.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\ModConfigMenu.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\MultiXPMining\\MultiXPMining.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\PatientSelfAid\\PatientSelfAid.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\QuickStartSelect\\QuickStartSelect.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\RangedDamageXp\\RangedDamageXp.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\RecruitMarkers\\RecruitMarkers.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\SkillLevelUpInfo\\SkillLevelUpInfo.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\StatColours\\StatColours.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\UITweaks\\UITweaks.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\WantedMap\\WantedMap.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Container-Highlight\\Container-Highlight.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Vital-Sense\\Vital-Sense.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Vital-Read\\Vital-Read.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Job-B-Gone\\Job-B-Gone.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Organize-the-Trader\\Organize-the-Trader.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Organize-the-Crafting-Stations\\Organize-the-Crafting-Stations.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Auto-Pause-on-Load\\Auto-Pause-on-Load.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Loot-Scoot-Execute\\Loot-Scoot-Execute.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Wall-B-Gone\\Wall-B-Gone.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KenshiJobManagement\\KenshiJobManagement.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Character-Highlight\\CharacterHighlight.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Character Inspector\\CharacterInspector.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\BetterLooting\\BetterLooting.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KillCounter\\KillCounter.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KenshiRotate\\KenshiRotate.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\TauntExpansion\\TauntExpansion.dll",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\StackSort\\StackSort.dll"
+  ],
+  "checks": "CRC, exact content/source/DLL SHA256, no PO/personal INI/logs/99 override, three MO languages, current bilingual README/notes, source licenses, full EN/RU descriptions and BBCode/Steam limits, existing cover/screen folders",
+  "scripts_and_metadata_identical": [
+    "build.py",
+    "changelog.json",
+    "fork_catalog.json",
+    "mcm_catalog.json",
+    "mcm_inventory.py",
+    "nexus_desc.py",
+    "nexus_pack.py",
+    "prepare_release.py",
+    "publication_sections.py",
+    "published_releases.json",
+    "refresh_descriptions.py",
+    "release_metadata.py",
+    "release_notes.json",
+    "steam_upload.py",
+    "test_release_input_override.py",
+    "test_release_pack_boundary.py",
+    "validate_descriptions.py"
+  ],
+  "packages": [
+    {
+      "package": "AssignedWorkers",
+      "verified_steam_version": "7",
+      "candidate_version": "8",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AssignedWorkers-8.zip",
+      "archive_bytes": 90691,
+      "archive_sha256": "fa107fe592ae7f78f1c48760bd4fd162edf1d3b7d0a445223b987e309b9860eb",
+      "dll_sha256": "73e18b627455a0fc4c86f8952552e4ad16d141ccf399e301edde47b29ffc6007",
+      "files": 10,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2408,
+        "ru": 3944
+      },
+      "screens": 2,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "BestMinimap",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\BestMinimap-3.zip",
+      "archive_bytes": 158691,
+      "archive_sha256": "27e7d11b951c3ff8cadbee2d75dfcef4a95cd29f9255e5e1eff5a8e7dd8b5000",
+      "dll_sha256": "6e66445da4eef4194d0f7fef08e63f82c38d8eda8687c700df89c185bdc8842d",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 3030,
+        "ru": 4636
+      },
+      "screens": 7,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "BuildModeGizmo",
+      "verified_steam_version": "4",
+      "candidate_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\BuildModeGizmo-5.zip",
+      "archive_bytes": 69233,
+      "archive_sha256": "a91095b890b95d94f26fef6d29de7a232b5a804908e340b5ce4fbfff48e9f5ba",
+      "dll_sha256": "39b6f50a9c17caa72fb8f0e684ed53d260796c21784689f0f464d67c21251508",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2160,
+        "ru": 3365
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "GatePushGuard",
+      "verified_steam_version": "1",
+      "candidate_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\GatePushGuard-2.zip",
+      "archive_bytes": 79311,
+      "archive_sha256": "2fead4ff9181c368cd20ee70b030d506ea791be11a8a8a8cd0ad8a3c595eee71",
+      "dll_sha256": "3131b00ca5317ba2ec5773eb2f53954191b787ee932916190cd3bcbb66b10d95",
+      "files": 10,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2151,
+        "ru": 3284
+      },
+      "screens": 0,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "GearCompare",
+      "verified_steam_version": "7",
+      "candidate_version": "8",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\GearCompare-8.zip",
+      "archive_bytes": 119030,
+      "archive_sha256": "81b7b3f3ab2062922d34bd0fd7a73fa1f99b0d121d793e5ad3984a2143ba56c5",
+      "dll_sha256": "77b90e5d6218e6fe91b32ba4ac31c8ebe337fca4309c6d2e1cb4185311a8131d",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 3149,
+        "ru": 4793
+      },
+      "screens": 6,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "ItemMarkers",
+      "verified_steam_version": "5",
+      "candidate_version": "6",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\ItemMarkers-6.zip",
+      "archive_bytes": 89545,
+      "archive_sha256": "5c6fc4da5f731ec05afd41790dcedd9ef0ef4d66d481100d39c2cb7cad7edb2b",
+      "dll_sha256": "af35084fd1399a52c40e9be5790010249ac4f75a087b00f7ac6bcff960fe8642",
+      "files": 17,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2593,
+        "ru": 3925
+      },
+      "screens": 9,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "LiveXpBars",
+      "verified_steam_version": "11",
+      "candidate_version": "12",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\LiveXpBars-12.zip",
+      "archive_bytes": 89202,
+      "archive_sha256": "33f2d28dae42a39d8a208e0f3de3b95f4d55721e7b29559f2369ca95778d2614",
+      "dll_sha256": "c1ee699d644f400949a65e95929d539bf64d2cbb1986e5a4dd80628527504677",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2194,
+        "ru": 3403
+      },
+      "screens": 4,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "ModConfigMenu",
+      "verified_steam_version": "10",
+      "candidate_version": "11",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\ModConfigMenu-11.zip",
+      "archive_bytes": 142909,
+      "archive_sha256": "9df91d79ec8d8ff2d711c4347d99bc2dfd587e6159fd29e2ba43ba33f33b8628",
+      "dll_sha256": "bb7efd79a1346e2c9824855bb05d40ae12aa85ef272eb0fe2b093aedc8f65f12",
+      "files": 15,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 3206,
+        "ru": 4446
+      },
+      "screens": 10,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "MultiXPMining",
+      "verified_steam_version": "1",
+      "candidate_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\MultiXPMining-2.zip",
+      "archive_bytes": 105125,
+      "archive_sha256": "6ff0d4547740d6363350a948f3b9ce5c6d875917553cb9b7a2725cbac7f81e5e",
+      "dll_sha256": "b27aaccc3c0b9cb0b2b905caf05b542593147195846d121fec3d9490a4fb7aab",
+      "files": 11,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2338,
+        "ru": 4093
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "PatientSelfAid",
+      "verified_steam_version": "4",
+      "candidate_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\PatientSelfAid-5.zip",
+      "archive_bytes": 57059,
+      "archive_sha256": "cb719309e7617598245c3cb3ec596f88028ff27cdc211563f8fde35be493b3c7",
+      "dll_sha256": "5a12721a82dbf61242a291af45687b41943615417ee62df1a74f8117566d4dd6",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2064,
+        "ru": 3178
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "QuickStartSelect",
+      "verified_steam_version": "6",
+      "candidate_version": "7",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\QuickStartSelect-7.zip",
+      "archive_bytes": 125730,
+      "archive_sha256": "a7418972e3b731628323ee3994ca3137b8929a0b36edc62ae75f90430c1e1367",
+      "dll_sha256": "e71f36ae299eb429e1eb5d7a1b2fc0e57fbe1caa67e8a0cc6eebd7fe6e9a5a62",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2311,
+        "ru": 3430
+      },
+      "screens": 9,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "RangedDamageXp",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\RangedDamageXp-3.zip",
+      "archive_bytes": 52900,
+      "archive_sha256": "2a46aaae5125b516f7b7ee28cc911383f1096614aadfbdeabe71c157c67f4b4d",
+      "dll_sha256": "2e0eb141cd0952acd6910e6890dc3d488649c2136408ac476ec120a4075d1d1e",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 1567,
+        "ru": 2280
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "RecruitMarkers",
+      "verified_steam_version": "4",
+      "candidate_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\RecruitMarkers-5.zip",
+      "archive_bytes": 88828,
+      "archive_sha256": "7849822686edc13cb8c611e4bb99d0f5b612872ea51d4a64b19ddda3d4ee19c6",
+      "dll_sha256": "3a3408258d23ec43d46a0e82797fcc40cd31e9d42f567892dca72edafa7105c8",
+      "files": 11,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2302,
+        "ru": 3541
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "SkillLevelUpInfo",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\SkillLevelUpInfo-3.zip",
+      "archive_bytes": 103030,
+      "archive_sha256": "16d7f5eba139454d2d741319d55fd480411772144c8c2c068b56c133a3417f24",
+      "dll_sha256": "a5edf23e1998bd59b7f48b3cc731a8bdbde8f3452497049b51956e727752f6dd",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2668,
+        "ru": 4573
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "StatColours",
+      "verified_steam_version": "12",
+      "candidate_version": "13",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\StatColours-13.zip",
+      "archive_bytes": 104117,
+      "archive_sha256": "7fab165f5e18b9a6819de3f49af9948da1c56022267870bdb3233019b1443dfb",
+      "dll_sha256": "eda129e1843d1fe09b5550c82d269b1a18ba2166849c18284e82a5fd2d6e5a30",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2451,
+        "ru": 3733
+      },
+      "screens": 7,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "UITweaks",
+      "verified_steam_version": "12",
+      "candidate_version": "13",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\UITweaks-13.zip",
+      "archive_bytes": 167308,
+      "archive_sha256": "d28e15297eedaf6e43d599ee8352e17b7dcda9567eafa0d35bf0c3a52094a48c",
+      "dll_sha256": "b6a0589ba8d888062c907c3586e49d8a50c8fba39b85e0269aa37b82ac659d8d",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 4294,
+        "ru": 6920
+      },
+      "screens": 9,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "WantedMap",
+      "verified_steam_version": "6",
+      "candidate_version": "7",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\WantedMap-7.zip",
+      "archive_bytes": 112656,
+      "archive_sha256": "8f064ab107aced5c7a3409fa5a2abea37189c0de13c1d8616711d11d0db739f1",
+      "dll_sha256": "08ceed9e62d6b1357ee57e9c35b9f9626d12a15c56e8fc5a610f4e04062a3d18",
+      "files": 11,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.txt"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2227,
+        "ru": 3507
+      },
+      "screens": 4,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Container-Highlight",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Container-Highlight-3.zip",
+      "archive_bytes": 154633,
+      "archive_sha256": "dc6e2f16f581b82943ce934e5bee3495340143d1d0dd5506d4a3d99e723ff777",
+      "dll_sha256": "ba4ce0f870584f8b293f189f394bc507de5ddc5e8864d5a66403ce5133cf97ef",
+      "files": 12,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 1868,
+        "ru": 2803
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Vital-Sense",
+      "verified_steam_version": "6",
+      "candidate_version": "7",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Sense-7.zip",
+      "archive_bytes": 200362,
+      "archive_sha256": "ac5361bfaf1ff1a04468afdffc729c1d9c77bdc192e4d8ae83a3abd629b9c31b",
+      "dll_sha256": "3ebc420bd504b8f6782aae4cdb7d7f638d5565adb447cd5f6d4f2d5b597500bb",
+      "files": 19,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2079,
+        "ru": 3134
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Vital-Read",
+      "verified_steam_version": "5",
+      "candidate_version": "6",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Read-6.zip",
+      "archive_bytes": 197804,
+      "archive_sha256": "3a3f98c9f206cf6954cdc353dca1c9a34c378d4a6c0ef124537c7603dcbeae54",
+      "dll_sha256": "be8e463390ae28c6f71bba49561da79499d29b42500d78a1f87d9fc3dc513bd3",
+      "files": 16,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 1868,
+        "ru": 2839
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Job-B-Gone",
+      "verified_steam_version": "5",
+      "candidate_version": "6",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Job-B-Gone-6.zip",
+      "archive_bytes": 130922,
+      "archive_sha256": "4ca5b97250b95fb04ad91d4f0ad1ab3b0db28a927153cc156aa3bc3e0562ae78",
+      "dll_sha256": "ad97f0074edb2a9e4839fbbaa0f85bfbf842dbaad1d2a131dbe78bf8ff17c139",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 1834,
+        "ru": 2732
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Organize-the-Trader",
+      "verified_steam_version": "7",
+      "candidate_version": "8",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Organize-the-Trader-8.zip",
+      "archive_bytes": 325805,
+      "archive_sha256": "1acd42c36831b63ea4140c33ad0f8ca07515a647872038ba8fd26c63a113ba32",
+      "dll_sha256": "934b97ac2a6d904bceb5a2f3f33f370afe95b95364bb388e985da34b05cc1cc8",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 3182,
+        "ru": 5173
+      },
+      "screens": 6,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Organize-the-Crafting-Stations",
+      "verified_steam_version": "1",
+      "candidate_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Organize-the-Crafting-Stations-2.zip",
+      "archive_bytes": 250260,
+      "archive_sha256": "e83315b0eb8dfb76080692f2556200be6bdff9f11d50c671090efd9b41ae5b1e",
+      "dll_sha256": "f8436d4c410688704b7911e55fc4462537007e87c9a93913a2520f3501b7c363",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 1819,
+        "ru": 2582
+      },
+      "screens": 2,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Auto-Pause-on-Load",
+      "verified_steam_version": "5",
+      "candidate_version": "6",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Auto-Pause-on-Load-6.zip",
+      "archive_bytes": 77702,
+      "archive_sha256": "7ec24a575068a45c7b9ca153cefaba4f70c78e2b72da38cae069ec07656f4ba1",
+      "dll_sha256": "7494a907bfc1dfa74a8d3744d5abd08a0cd8285561317e7cbd3e0f2453250086",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 1752,
+        "ru": 2632
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Loot-Scoot-Execute",
+      "verified_steam_version": "5",
+      "candidate_version": "6",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Loot-Scoot-Execute-6.zip",
+      "archive_bytes": 129485,
+      "archive_sha256": "90047792ece8bbdc5e311c61ba03a973fd240f40901fd3d857abeb1abcb8d7a9",
+      "dll_sha256": "c86b7795b9553e686fbe25b0210e42575ff1aa16237f8ac923548d42600eb2a8",
+      "files": 14,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2032,
+        "ru": 3055
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Wall-B-Gone",
+      "verified_steam_version": "4",
+      "candidate_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Wall-B-Gone-5.zip",
+      "archive_bytes": 92227,
+      "archive_sha256": "e429b398ab61d842e5def899375c5d041ff9e056e3067a1bfa1e3a775018e79a",
+      "dll_sha256": "34dbae2f8ae4ae2bb5405625f7c03d0bdde92f6b3ec4f203196c5b5e1a555e56",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2077,
+        "ru": 3161
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Hidden-Faction-Relations",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Hidden-Faction-Relations-3.zip",
+      "archive_bytes": 96322,
+      "archive_sha256": "f845130a766aaf9ba2c7a3d549c30429eb7ba15c82535f9311218b11aa37da0f",
+      "dll_sha256": "459b8899ede55575f6991ccf4aff6d5f5152939c47dc739b9ff4a4ca64a00ef5",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 1603,
+        "ru": 2326
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Map-markers",
+      "verified_steam_version": "3",
+      "candidate_version": "4",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Map-markers-4.zip",
+      "archive_bytes": 125451,
+      "archive_sha256": "354abe598513d9629e22f4d2602baf3f48f972b2c25c6c31dd7949640c9a1de7",
+      "dll_sha256": "85028bd01adaac533f4de0bc7e13589bb9586501454a60afbc7186719914bd80",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 1741,
+        "ru": 2557
+      },
+      "screens": 1,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "KenshiJobManagement",
+      "verified_steam_version": "4",
+      "candidate_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KenshiJobManagement-5.zip",
+      "archive_bytes": 2265108,
+      "archive_sha256": "3236da9ffc71ddb77dbae278f54686c68f23297d50fa7f37209fa706ff203092",
+      "dll_sha256": "58ec70720f02a5af5bc101e63c1b9d5aed21e1e9c0be287103d67d2dff3ac64d",
+      "files": 33,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2703,
+        "ru": 4060
+      },
+      "screens": 8,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Character-Highlight",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Character-Highlight-3.zip",
+      "archive_bytes": 71495,
+      "archive_sha256": "645bc65e967ac1601980b0daf9519f98cf326a4bf995d7c039e6c74c54b7a641",
+      "dll_sha256": "51d5c1f5d9ce02c2f48b50acef1a53999c3827710967bc81c70410e0c9c22f85",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2541,
+        "ru": 3823
+      },
+      "screens": 4,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "Character Inspector",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Character Inspector-3.zip",
+      "archive_bytes": 274215,
+      "archive_sha256": "3f4ff1ba743082327b6c207a282c9af1aa263eb859a7f5a27d0652c0d55821e5",
+      "dll_sha256": "8a4a33eaa911e6809ddd1fe3b084d60d86fbec93f1b60bc42a0a464d64346ca4",
+      "files": 48,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md",
+        "README.txt"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2274,
+        "ru": 3579
+      },
+      "screens": 4,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "BetterLooting",
+      "verified_steam_version": "4",
+      "candidate_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\BetterLooting-5.zip",
+      "archive_bytes": 120174,
+      "archive_sha256": "e9a7e675f5eb3ac49559bdca70d3a716b80d5c9537a36dec6e48811bdfd4e4d5",
+      "dll_sha256": "11efb667483b5937f7a44fb9436148dd2792bcfc7e761c6e5ce07ad06fe99ca2",
+      "files": 8,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE.txt"
+      ],
+      "steam_description_bytes": {
+        "en": 3428,
+        "ru": 5683
+      },
+      "screens": 3,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "KillCounter",
+      "verified_steam_version": "1",
+      "candidate_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KillCounter-2.zip",
+      "archive_bytes": 63558,
+      "archive_sha256": "6443bb48b3ac9a3f68ee0a84dd6ba9fb46f31135deccc797a7d7f4079002cce8",
+      "dll_sha256": "792c5b15ad6767dbd98e610adce1f1f64b65f701a93f131038f7b26efc55f727",
+      "files": 9,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [],
+      "steam_description_bytes": {
+        "en": 2229,
+        "ru": 3686
+      },
+      "screens": 2,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "KenshiRotate",
+      "verified_steam_version": "1",
+      "candidate_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KenshiRotate-2.zip",
+      "archive_bytes": 89376,
+      "archive_sha256": "869565a821fcd0e74931630717d9c9fe690b9c14b62b05032066924fd1402cdb",
+      "dll_sha256": "117061950e27d9ac586515dedc5517ad6c75c4ecf78fb340bfcc5c6bc934815a",
+      "files": 10,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 2530,
+        "ru": 4240
+      },
+      "screens": 2,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "TauntExpansion",
+      "verified_steam_version": "1",
+      "candidate_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\TauntExpansion-2.zip",
+      "archive_bytes": 74329,
+      "archive_sha256": "9d21c186786a8a01ec518becc79c7fcad81e8c77901720593e1f6390ecf99d00",
+      "dll_sha256": "f51ec7db872780cf9e7d542cdc2c03497d4a9f40268fe4e784ca17e50bd4ae96",
+      "files": 11,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE",
+        "LICENSE.upstream.md"
+      ],
+      "steam_description_bytes": {
+        "en": 3274,
+        "ru": 5137
+      },
+      "screens": 0,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    },
+    {
+      "package": "StackSort",
+      "verified_steam_version": "2",
+      "candidate_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\StackSort-3.zip",
+      "archive_bytes": 235435,
+      "archive_sha256": "bce8179c463712e1560c8caf14d793c96d5e756d3d584a22ab16b256ae802bb8",
+      "dll_sha256": "35fc2b168db724d6371b0c0cf9d8cab06f13b5fa277b1f3a64d3d44a194805a9",
+      "files": 11,
+      "languages": [
+        "en_GB",
+        "ru_RU",
+        "zh_CN"
+      ],
+      "readmes": [
+        "README.md"
+      ],
+      "license_files": [
+        "LICENSE"
+      ],
+      "steam_description_bytes": {
+        "en": 3537,
+        "ru": 5824
+      },
+      "screens": 4,
+      "status": "verified local Nexus-ready candidate; not uploaded"
+    }
+  ]
+}

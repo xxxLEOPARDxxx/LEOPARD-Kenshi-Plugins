@@ -1,56 +1,34 @@
 UI Tweaks — доработки интерфейса, которых не сделать разметкой
 
-ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 12 (31.10–01.11.2026)
+Prepared release 13 / Подготовленный выпуск 13 (2026-11-02)
 
-  * Снимки сохранений: игра с HUD, мини-картой и панелями персонажей,
-    без меню сохранения/загрузки, меню паузы и его затемнения. Предпросмотр
-    выбранного существующего слота под окном сохранения или загрузки.
-    Окно сразу открывается выше, оставляя место под снимок; смена строки
-    не сдвигает его. Рамка идёт по ширине окна, снимок не обрезается.
-  * Ручные сохранения, перезапись, quicksave и autosave используют реальный
-    каталог слота. Снимок обновляется только при успешной записи. Старым
-    сейвам изображение не требуется; без снимка рамка полностью скрыта.
-  * Новые снимки заметно чётче: до 1600×900, с качественным уменьшением
-    и без потерь при сжатии. Старые снимки по-прежнему поддерживаются.
-  * Высота окон сохранения и загрузки настраивается в MCM: по умолчанию
-    120% исходной, чтобы в списке помещалось больше строк. Изменение
-    применяется при следующем открытии и учитывает место под снимок.
-  * Последовательный обмен с союзниками через ПКМ по портрету работает
-    при уже открытом обмене. Штатный подход к далёкой цели сохранён.
-  * Защита от клика сквозь инвентарь и отдельный рюкзак сохранена.
-    Портреты, их меню и карта больше не считаются окнами инвентаря.
-  * Проверка принадлежности виджета выполняется только на новом ПКМ.
-    До 64 родителей собираются один раз на стеке; ссылки не кэшируются.
-    Существующая защёлка старого клика и пять хуков приказов не изменены.
-  * SavePreviews в MCM включён по умолчанию и применяется сразу.
-    Настройка переведена на RU/EN/ZH. Личные INI сохраняются.
-    Для загрузки заменённой DLL перезапустите игру.
+English
 
-VERSION 12 CHANGES (31 OCTOBER–1 NOVEMBER 2026)
+- Save and load previews. Select an existing slot in Save Game or Load Game to see its screenshot below the window. Successful manual saves, quicksaves and autosaves capture the game with its HUD while excluding save/load and pause menus. Slots without an image show no preview frame.
+- Stable, sharper previews. The dialog opens higher before selection and stays put when changing rows. Its full-width preview frame fits the complete image without cropping. New screenshots use filtered resizing and lossless PNG up to 1600x900; older JPEG previews remain readable.
+- A taller save list. MCM offers Save/load window height from 100% to 160%, default 120%. It applies on the next opening and respects the screen and preview space.
+- Optional language diagnostics. Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.
+- Useful errors remain visible. Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.
+- Clean update package. English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved.
 
-  * Saved game screenshots include the HUD, minimap and character panels,
-    excluding save/load and pause menus with their backdrop. Selecting a slot
-    shows its preview below Save Game or Load Game. The dialog opens higher
-    immediately to reserve preview space and stays put when changing rows.
-    The frame spans the dialog; the image keeps its proportions without cropping.
-  * Manual saves, overwrites, quicksaves and autosaves use the actual slot
-    directory. A preview is committed only after a successful save. Old saves
-    need no image; the preview and its frame stay hidden when no image is available.
-  * New screenshots are clearer: up to 1600×900, with filtered resizing and
-    lossless compression. Previously captured previews remain compatible.
-  * Save/load window height is configurable in MCM, defaulting to 120% of
-    the original height to show more rows. Changes apply on the next opening
-    and respect the available screen and preview space.
-  * Sequential squad trading through portrait RMB/Trade works while an
-    earlier exchange remains open. Native out-of-range approach is retained.
-  * Inventory and detached-backpack click-through protection remains active.
-    Portraits, their context menus and the map are not inventory windows.
-  * Window ancestry is checked only on a fresh RMB press. At most 64 parents
-    are collected once on the stack, with no retained widget references.
-    The existing stale-click latch and five order hooks are unchanged.
-  * SavePreviews in MCM is on by default and changes immediately.
-    Its setting is available in RU/EN/ZH; personal INI is preserved.
-    Restart the game to load the replacement DLL.
+Русский
+
+- Предпросмотр сохранений и загрузок. Выберите существующий слот в меню сохранения или загрузки, чтобы увидеть снимок под окном. Успешные ручные, быстрые и автоматические сохранения получают снимок игры с HUD, без меню сохранения, загрузки и паузы. У слотов без изображения рамка предпросмотра скрыта.
+- Стабильный и чёткий снимок. Окно сразу открывается выше и не двигается при смене строки. Рамка идёт по ширине окна, изображение вписывается целиком без обрезки. Новые снимки используют качественное уменьшение и PNG без потерь до 1600x900; старые JPEG по-прежнему читаются.
+- Более высокий список сейвов. В MCM настраивается высота окон сохранения и загрузки от 100% до 160%, по умолчанию 120%. Изменение применяется при следующем открытии с учётом экрана и места под снимок.
+- Необязательная диагностика языка. Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.
+- Ошибки остаются видимыми. Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.
+- Чистый пакет обновления. Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются.
+
+ИСТОРИЯ: ВЕРСИЯ 12 / VERSION 12 HISTORY
+
+v12 - English
+- Sequential squad trading. While trading with one squad member, right-click another portrait and choose Trade. When out of range, the character approaches normally and opens the requested inventory.
+- Inventory click-through protection retained. Presses inside inventory and backpack windows cannot send the character to the ground beneath them. Portraits, their context menus and map commands remain available.
+
+v12 - Русский
+- Последовательный обмен между персонажами. Пока открыт обмен с одним союзником, можно выбрать «Обмен» у другого через ПКМ по портрету. Если расстояние велико, персонаж штатно подбегает и открывает нужный инвентарь.
+- Защита от кликов сквозь инвентарь сохранена. Нажатия в окне инвентаря или рюкзака не отправляют персонажа в точку под окном. Приказы через портреты, их меню и карту остаются доступны.
 
 ИСТОРИЯ: ВЕРСИЯ 11 (30.10.2026)
 

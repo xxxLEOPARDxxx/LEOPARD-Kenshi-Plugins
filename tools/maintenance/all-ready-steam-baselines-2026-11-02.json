@@ -1,0 +1,873 @@
+{
+  "read_only": true,
+  "scope": "36 package version baselines. Official public Steam metadata only; no authentication, uploads, version edits or package changes.",
+  "api_error": null,
+  "raw_api_response": "D:\\DEV\\Kenshi\\build\\ReleaseBaselineAudit\\all-ready-steam-baselines-2026-11-02-steam-public-file-details.json",
+  "raw_api_response_sha256": "8492f3f618171f86903c44718e0e8d4721ac4a8cc0a8fdc8ff4c82ad772e4a61",
+  "packages": [
+    {
+      "package": "AssignedWorkers",
+      "checked_at_utc": "2026-11-01T21:02:36.950868+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812150807",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2191",
+      "local_catalog_version": "7",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Assigned Workers (QoL)",
+      "description_sha256": "2c82ebe18b10fb7deff72434490469ca022284370192a149d4fd8b01d780c482",
+      "version_markers": [
+        "7"
+      ],
+      "verified_steam_description_version": "7",
+      "steam_time_updated": 1793318781,
+      "steam_file_size": "206816",
+      "steam_content_manifest": "5875109679176576189",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 7 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "BestMinimap",
+      "checked_at_utc": "2026-11-01T21:02:36.950868+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824087152",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2242",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Best Minimap (QoL)",
+      "description_sha256": "8f475fbf2db0b04c084db2fb248833ab59836d7b734b53d2f0d5e1372a76ff40",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1793407196,
+      "steam_file_size": "369551",
+      "steam_content_manifest": "7259992185356976653",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "BuildModeGizmo",
+      "checked_at_utc": "2026-11-01T21:02:36.950868+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761881",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2204",
+      "local_catalog_version": "4",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Build Mode Gizmo (QoL)",
+      "description_sha256": "9a7237ef53d33b021c93bf2e6309ccdb73e2dce143008e372804dee11b559082",
+      "version_markers": [
+        "4"
+      ],
+      "verified_steam_description_version": "4",
+      "steam_time_updated": 1792050297,
+      "steam_file_size": "162308",
+      "steam_content_manifest": "3329655576890704575",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "GatePushGuard",
+      "checked_at_utc": "2026-11-01T21:02:36.950868+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831174166",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2264",
+      "local_catalog_version": "1",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Gate Push Guard (QoL)",
+      "description_sha256": "167a0789e0278113f377e3f9e6c19b166350f00a02cbdc59de84982fde93ef85",
+      "version_markers": [
+        "1"
+      ],
+      "verified_steam_description_version": "1",
+      "steam_time_updated": 1793481129,
+      "steam_file_size": "183581",
+      "steam_content_manifest": "5106863727817633660",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 1 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "GearCompare",
+      "checked_at_utc": "2026-11-01T21:02:36.950868+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812150687",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2190",
+      "local_catalog_version": "7",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Gear Compare Alt (QoL)",
+      "description_sha256": "fb6a04151674210fef40cddb4b1a3e502e44c9e76cfc911b9bb95ce2f891280f",
+      "version_markers": [
+        "7"
+      ],
+      "verified_steam_description_version": "7",
+      "steam_time_updated": 1792271528,
+      "steam_file_size": "279520",
+      "steam_content_manifest": "3529162733411202795",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 7 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "ItemMarkers",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3816608451",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2224",
+      "local_catalog_version": "5",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Item Markers (QoL)",
+      "description_sha256": "9482d1833e12a13a112ac5048a1b935a406cf3777a5f51bd71a203828315efdf",
+      "version_markers": [
+        "5"
+      ],
+      "verified_steam_description_version": "5",
+      "steam_time_updated": 1792259721,
+      "steam_file_size": "195126",
+      "steam_content_manifest": "4388478649489128279",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "LiveXpBars",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812150449",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2188",
+      "local_catalog_version": "11",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Live Xp Bars (QoL)",
+      "description_sha256": "d4993236df30099db00ab1d48a64fe465fe44dc5335663eff76a9975922033c3",
+      "version_markers": [
+        "11"
+      ],
+      "verified_steam_description_version": "11",
+      "steam_time_updated": 1792621057,
+      "steam_file_size": "210296",
+      "steam_content_manifest": "120656758781452573",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 11 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "ModConfigMenu",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2202",
+      "local_catalog_version": "10",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Mod Config Menu (QoL)",
+      "description_sha256": "ed05db9d477f6e9ae3bdd736234c51a0c4615f9fddb69c21f83f0e2e9e10a5df",
+      "version_markers": [
+        "10"
+      ],
+      "verified_steam_description_version": "10",
+      "steam_time_updated": 1793318923,
+      "steam_file_size": "340694",
+      "steam_content_manifest": "2206613046959730619",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 10 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "MultiXPMining",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3829848414",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2258",
+      "local_catalog_version": "1",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Multi XP Mining (QoL)",
+      "description_sha256": "cd28618bc958f5bc3df9843d34ceb600d79f9d852b6418af4c16229e3340f927",
+      "version_markers": [
+        "1"
+      ],
+      "verified_steam_description_version": "1",
+      "steam_time_updated": 1793319372,
+      "steam_file_size": "245702",
+      "steam_content_manifest": "1392500947076475687",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 1 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "PatientSelfAid",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812149895",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2193",
+      "local_catalog_version": "4",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Patient Self Aid (QoL)",
+      "description_sha256": "584a57653f9c5f5e78f6c816514ba605dc4a4b241621329d6207f4b26206c7f6",
+      "version_markers": [
+        "4"
+      ],
+      "verified_steam_description_version": "4",
+      "steam_time_updated": 1793318774,
+      "steam_file_size": "130907",
+      "steam_content_manifest": "6970794466273795630",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "QuickStartSelect",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761725",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2201",
+      "local_catalog_version": "6",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Quick Start Select (QoL)",
+      "description_sha256": "e9adf46d82683bd47056843b16eec86fe733bbcb47f5a4ce2f436ee4c2cf313d",
+      "version_markers": [
+        "6"
+      ],
+      "verified_steam_description_version": "6",
+      "steam_time_updated": 1792106912,
+      "steam_file_size": "315421",
+      "steam_content_manifest": "6555951792854946590",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "RangedDamageXp",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761935",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2205",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Ranged Damage Xp (QoL)",
+      "description_sha256": "3594ec48f00853adc6131e26817ec1d5506582c978f4addffe21035dcc61fd84",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1791754561,
+      "steam_file_size": "117588",
+      "steam_content_manifest": "9159637039558451938",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "RecruitMarkers",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820514162",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2232",
+      "local_catalog_version": "4",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Recruit Markers (QoL)",
+      "description_sha256": "5b635ae5523d525a3a7c2a7b44971457a432e8a828c19446921c07eef2f5446a",
+      "version_markers": [
+        "4"
+      ],
+      "verified_steam_description_version": "4",
+      "steam_time_updated": 1793407168,
+      "steam_file_size": "187024",
+      "steam_content_manifest": "2094440672711488483",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "SkillLevelUpInfo",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3829848328",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2257",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Skill Level Up Info (QoL)",
+      "description_sha256": "002b725bec808b12aa792218b2e4724c0e92a160095d228b0193c29645872e8e",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1793407175,
+      "steam_file_size": "238205",
+      "steam_content_manifest": "6887114704058034564",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "StatColours",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812150560",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2189",
+      "local_catalog_version": "12",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Stat Colours (QoL)",
+      "description_sha256": "1db6182106a770e923e0cb609a2dec23c85ae91f6b1cf83c3f0f0238d2db4244",
+      "version_markers": [
+        "12"
+      ],
+      "verified_steam_description_version": "12",
+      "steam_time_updated": 1792434883,
+      "steam_file_size": "275774",
+      "steam_content_manifest": "4003625292750516732",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 12 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "UITweaks",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812150876",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2192",
+      "local_catalog_version": "12",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "UI Tweaks (QoL)",
+      "description_sha256": "1fdd34c4bfe7b4b01d56d51be13779e2226b05f62595440e9e9ea741e312050c",
+      "version_markers": [
+        "12"
+      ],
+      "verified_steam_description_version": "12",
+      "steam_time_updated": 1793410346,
+      "steam_file_size": "333495",
+      "steam_content_manifest": "7713076854418852963",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 12 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "WantedMap",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761812",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2203",
+      "local_catalog_version": "6",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Wanted Map (QoL)",
+      "description_sha256": "8cb281479bf63d941935a00677c84d570c077a05efee47e95d5ed06c5e562341",
+      "version_markers": [
+        "6"
+      ],
+      "verified_steam_description_version": "6",
+      "steam_time_updated": 1792600075,
+      "steam_file_size": "269638",
+      "steam_content_manifest": "2278795581395472982",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Container-Highlight",
+      "checked_at_utc": "2026-11-01T21:02:36.951880+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852014",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2207",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Container Highlight (MCM fork) (QoL)",
+      "description_sha256": "84dc2c3ff1898630811f16d9ef9949acc345cf91a79904095eb82a83d86d475f",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1792111951,
+      "steam_file_size": "359068",
+      "steam_content_manifest": "4015719396925683776",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Vital-Sense",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852288",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2214",
+      "local_catalog_version": "6",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Vital Sense (MCM fork) (QoL)",
+      "description_sha256": "067baeb8921c9e7f2db85769cbde5c064d8ae28c6271a8d1a721746cf7b34540",
+      "version_markers": [
+        "6"
+      ],
+      "verified_steam_description_version": "6",
+      "steam_time_updated": 1792696752,
+      "steam_file_size": "412263",
+      "steam_content_manifest": "6479330648516175435",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Vital-Read",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852230",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2213",
+      "local_catalog_version": "5",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Vital Read (MCM fork) (QoL)",
+      "description_sha256": "ba7df53dba22fa5561fc1e248daa0fc5095fe120a3937ecf4832c175491e34f4",
+      "version_markers": [
+        "5"
+      ],
+      "verified_steam_description_version": "5",
+      "steam_time_updated": 1792176276,
+      "steam_file_size": "390874",
+      "steam_content_manifest": "3921200706575063810",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Job-B-Gone",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852087",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2209",
+      "local_catalog_version": "5",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Job B Gone (MCM fork) (QoL)",
+      "description_sha256": "6c3bcaaf30c73e4113dd832157da31fbf63f066fb3eb6165e429f17b6dd1980e",
+      "version_markers": [
+        "5"
+      ],
+      "verified_steam_description_version": "5",
+      "steam_time_updated": 1792696763,
+      "steam_file_size": "265224",
+      "steam_content_manifest": "1479159080468187547",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Organize-the-Trader",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852189",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2212",
+      "local_catalog_version": "7",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Organize the Trader (MCM fork) (QoL)",
+      "description_sha256": "221204534f0e656e8af87032fa828cfb4e7b566705929ccf65fe0c27b749f71d",
+      "version_markers": [
+        "7"
+      ],
+      "verified_steam_description_version": "7",
+      "steam_time_updated": 1793489631,
+      "steam_file_size": "750643",
+      "steam_content_manifest": "5485947977971037979",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 7 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Organize-the-Crafting-Stations",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3816121254",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2219",
+      "local_catalog_version": "1",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Organize the Crafting Stations (MCM fork) (QoL)",
+      "description_sha256": "24ac213a2b35ee5fa58aba5a165c53b62afc0ab57bb981bd26306044a6cfa109",
+      "version_markers": [
+        "1"
+      ],
+      "verified_steam_description_version": "1",
+      "steam_time_updated": 1791572736,
+      "steam_file_size": "542992",
+      "steam_content_manifest": "1233806976455048236",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 1 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Auto-Pause-on-Load",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813851956",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2206",
+      "local_catalog_version": "5",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Auto-Pause on Load (MCM fork) (QoL)",
+      "description_sha256": "444db15b5838b2fac779823c23f97435e3a7df00c7656962d3613e66ab2bb016",
+      "version_markers": [
+        "5"
+      ],
+      "verified_steam_description_version": "5",
+      "steam_time_updated": 1792106918,
+      "steam_file_size": "137265",
+      "steam_content_manifest": "8210710687286336939",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Loot-Scoot-Execute",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852124",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2210",
+      "local_catalog_version": "5",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Loot Scoot Execute (MCM fork) (QoL)",
+      "description_sha256": "d0efacc6da332aa4517d618384bdd3dd28d788312cbccfa8997d4e7be10a6ab4",
+      "version_markers": [
+        "5"
+      ],
+      "verified_steam_description_version": "5",
+      "steam_time_updated": 1792050246,
+      "steam_file_size": "268973",
+      "steam_content_manifest": "3660442579778340550",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Wall-B-Gone",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852362",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2215",
+      "local_catalog_version": "4",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Wall B Gone (MCM fork) (QoL)",
+      "description_sha256": "0c7bbd4b0aad6305e6bcfed75e67107fd61f95349ec21d6c3a3e97eaace294db",
+      "version_markers": [
+        "4"
+      ],
+      "verified_steam_description_version": "4",
+      "steam_time_updated": 1792050258,
+      "steam_file_size": "173306",
+      "steam_content_manifest": "4898396367185302588",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Hidden-Faction-Relations",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852055",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2208",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Hidden Faction Relations (MCM fork) (QoL)",
+      "description_sha256": "5087fd0f9f8ffaf7a7d587c8e84b39a170cb96c8f5fc2f776cc7bdbe297f3740",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1791572716,
+      "steam_file_size": "190955",
+      "steam_content_manifest": "5812890952058594742",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Map-markers",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813852161",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2211",
+      "local_catalog_version": "3",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Map markers (MCM fork) (QoL)",
+      "description_sha256": "59d05a91ed6acd4a4aec65099ebd2b3aef216a09d68d483ed5f555b247cb9eb6",
+      "version_markers": [
+        "3"
+      ],
+      "verified_steam_description_version": "3",
+      "steam_time_updated": 1791572731,
+      "steam_file_size": "247834",
+      "steam_content_manifest": "403775836097003676",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "KenshiJobManagement",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3818460323",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2225",
+      "local_catalog_version": "4",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Kenshi Job Management (MCM fork) (QoL)",
+      "description_sha256": "5c975f6ea323265be4740b2f28ee4efddfdefd2e4785ee8b562013cc8fa8b6c0",
+      "version_markers": [
+        "4"
+      ],
+      "verified_steam_description_version": "4",
+      "steam_time_updated": 1792621064,
+      "steam_file_size": "2830115",
+      "steam_content_manifest": "3302718819280087904",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Character-Highlight",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820546396",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2233",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Character Highlight (MCM fork) (QoL)",
+      "description_sha256": "fb8df75c527c85efba3913ce800136834e3dc7546d795d6d9562e8fd9a7734f3",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1792259727,
+      "steam_file_size": "139864",
+      "steam_content_manifest": "7013291964017815217",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "Character Inspector",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3829848451",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2259",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Character Inspector (MCM fork) (QoL)",
+      "description_sha256": "9e39fd4ce0fd618e22f0946c6d69a7f20872139c94bb60a3c64b7eae9e183d4b",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1793455077,
+      "steam_file_size": "628822",
+      "steam_content_manifest": "7946646998543073462",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "BetterLooting",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3816121198",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2218",
+      "local_catalog_version": "4",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Better Looting (MCM fork) (QoL)",
+      "description_sha256": "50f3ef716540c45f8f915d962c3b2b91e588708c5d22f1eef74c86d5db01c1e3",
+      "version_markers": [
+        "4"
+      ],
+      "verified_steam_description_version": "4",
+      "steam_time_updated": 1793318796,
+      "steam_file_size": "275691",
+      "steam_content_manifest": "2809723555522315009",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "KillCounter",
+      "checked_at_utc": "2026-11-01T21:02:36.952894+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3829848599",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2261",
+      "local_catalog_version": "1",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Kill Counter (MCM fork) (QoL)",
+      "description_sha256": "92269d2b6d96af75daa27e65427c952be86532150b1d75dc321b780da849e219",
+      "version_markers": [
+        "1"
+      ],
+      "verified_steam_description_version": "1",
+      "steam_time_updated": 1793319403,
+      "steam_file_size": "150473",
+      "steam_content_manifest": "5459958856694044081",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 1 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "KenshiRotate",
+      "checked_at_utc": "2026-11-01T21:02:36.953901+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3829848534",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2260",
+      "local_catalog_version": "1",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Rotate Items (MCM fork) (QoL)",
+      "description_sha256": "8679070111356860e17aa33103d7a17e4ef0970c7797514224b594a0f90dc0fb",
+      "version_markers": [
+        "1"
+      ],
+      "verified_steam_description_version": "1",
+      "steam_time_updated": 1793319393,
+      "steam_file_size": "206548",
+      "steam_content_manifest": "9160884576235913266",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 1 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "TauntExpansion",
+      "checked_at_utc": "2026-11-01T21:02:36.953901+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831174059",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2265",
+      "local_catalog_version": "1",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Taunt Expansion (MCM fork) (QoL)",
+      "description_sha256": "e1d671b3214d33720f6bfbe3c33dd3dc008b98d2805a7318b6c45350f11ab03d",
+      "version_markers": [
+        "1"
+      ],
+      "verified_steam_description_version": "1",
+      "steam_time_updated": 1793481121,
+      "steam_file_size": "173082",
+      "steam_content_manifest": "4130647303315740547",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 1 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    },
+    {
+      "package": "StackSort",
+      "checked_at_utc": "2026-11-01T21:02:36.953901+00:00",
+      "steam_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3830285370",
+      "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      "nexus_url": "https://www.nexusmods.com/kenshi/mods/2262",
+      "local_catalog_version": "2",
+      "steam_result": 1,
+      "consumer_app_id": 233860,
+      "creator": "76561198098571264",
+      "title": "Stack Sort (MCM fork) (QoL)",
+      "description_sha256": "3a2f096700a76ba012e91abe4f7559d6f34b98b0b9bcc5e2601b79178651e115",
+      "version_markers": [
+        "2"
+      ],
+      "verified_steam_description_version": "2",
+      "steam_time_updated": 1793407182,
+      "steam_file_size": "514498",
+      "steam_content_manifest": "936376310091735859",
+      "version_evidence": [
+        "Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nex"
+      ],
+      "status": "verified official Steam description version"
+    }
+  ]
+}
