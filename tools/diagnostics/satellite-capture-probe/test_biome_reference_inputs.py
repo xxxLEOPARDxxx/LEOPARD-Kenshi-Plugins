@@ -25,4 +25,6 @@ assert source.index('Hash(encoded)!=expected->sha256')<source.index('void Begin(
 assert 'AddBytes(decodedTotal,shape.bytes)' in source
 assert 'first.getNumMipmaps()-3,first.getFormat(),0x15,NULL' in source
 assert 'PrivateArrayTextureVtableRva' in source and '0x2d8' in source
+assert source.index('if(loaded(textures[kind]')<source.index('if(!write(textures[kind]')<source.index('finish(textures[kind]')
+assert 'textures[kind]->load()' not in source and 'textures[kind]->reload()' not in source
 print('12 actual profiled DDS identities/headers and native array-upload source contracts passed')

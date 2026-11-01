@@ -602,10 +602,22 @@ sourceMips-3, usage0x15, direct upload outside Resource::load to avoid a duplica
 resource-manager credit. CPU images/streams are not retained by the native upload.
 The64-byte Image and96-byte MemoryDataStream ABI are checked against native code.
 
+Two512 references exposed a native accounting mismatch: direct array upload
+credits TextureManager but leaves Resource::isLoaded false. Destruction then
+frees its buffers without the corresponding manager debit (+37,749,854 bytes
+per request in manager accounting). Complete only the owned resource's state
+with the guarded setToLoaded export after successful upload, once, without
+calling Resource::load or sending another credit. Static review/tests pass;
+balanced repeated runtime accounting is now proven by two512 requests in
+PID12568: textureBytes2189512166 and materialBytes14474953 match before/after
+both requests; six RTV creation debts reach0 each time. See the verification
+report below for process-memory limits and image limitations.
+
 Only a fresh private Terrain material receives the arrays and copied biome
 parameters. Shared GPU parameter objects are not edited. The reference deliberately
 uses neutral painted overlays/colour, no biome mixing, no cliff distortion, dry
 water parameters and no orbital distance fade. It is a material/ownership proof,
 not accepted final map imagery. Existing modes retain their previous material.
-Runtime colour/resource-accounting and repeated cleanup proof remain pending
-until the candidate is installed and exercised.
+Runtime upload/accounting/repeated cleanup pass. Neutral-colour imagery remains
+strongly overexposed and is not final output; actual painted maps are the next
+input stage. See docs/verification/2026-11-01-satellite-biome-reference.md.

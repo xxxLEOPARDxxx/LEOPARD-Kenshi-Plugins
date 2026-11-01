@@ -16,6 +16,8 @@ bool IsPrivateArrayTexture(const Ogre::Texture *texture)
 struct PrivateBiomeReference
 {
     typedef bool (__fastcall *WriteArray)(Ogre::Texture*,const Ogre::Image*,int);
+    typedef bool (__fastcall *IsLoaded)(const Ogre::Resource*);
+    typedef void (__fastcall *SetLoaded)(Ogre::Resource*);
     struct ImageSet
     {
         Ogre::Image images[6];std::vector<BYTE> encoded[6];std::string name;
@@ -129,9 +131,20 @@ struct PrivateBiomeReference
                textures[kind]->getNumMipmaps()>first.getNumMipmaps())
                 throw std::runtime_error("private biome native array type/shape unverified");
             WriteArray write=reinterpret_cast<WriteArray>(reinterpret_cast<BYTE*>(nativeApi.d3d11)+PrivateArrayUploadRva);
+            IsLoaded loaded=reinterpret_cast<IsLoaded>(AbiExport(nativeApi.ogre,PrivateResourceLoadedName,PrivateResourceLoadedRva));
+            SetLoaded finish=reinterpret_cast<SetLoaded>(AbiExport(nativeApi.ogre,PrivateResourceSetLoadedName,PrivateResourceSetLoadedRva));
+            if(loaded(textures[kind].getPointer()))
+                throw std::runtime_error("private biome array unexpectedly loaded before direct upload");
             uncertain=true;
             if(!write(textures[kind].getPointer(),loader.images,6))
                 throw std::runtime_error("private biome array native upload/accounting unverified");
+            // Native writer credits the manager but omits Loaded state. Without
+            // this owned-only completion, destruction frees GPU memory while
+            // skipping Resource::unload's matching accounting debit. This exact
+            // export sets only state=Loaded; it sends no second manager credit.
+            finish(textures[kind].getPointer());
+            if(!loaded(textures[kind].getPointer()))
+                throw std::runtime_error("private biome array loaded-state completion unverified");
             uncertain=false;
         }
         // The native method retains no images or loader callback.

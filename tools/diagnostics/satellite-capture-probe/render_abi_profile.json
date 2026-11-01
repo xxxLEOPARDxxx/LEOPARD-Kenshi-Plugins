@@ -160,6 +160,18 @@
         "name": "?useCount@?$SharedPtr@VHardwarePixelBuffer@Ogre@@@Ogre@@QEBAIXZ",
         "rva": "107890",
         "code": "48 8b 41 08 8b 40 20 c3 cc cc cc cc cc cc cc cc 48 83 ec 48 45 33 c0 4c"
+      },
+      {
+        "key": "PrivateResourceLoaded",
+        "name": "?isLoaded@Resource@Ogre@@UEBA_NXZ",
+        "rva": "66750",
+        "code": "8b 91 d0 00 00 00 83 fa 02 0f 94 c0 c3 cc cc cc 8b 41 18 c3 cc cc cc cc"
+      },
+      {
+        "key": "PrivateResourceSetLoaded",
+        "name": "?setToLoaded@Resource@Ogre@@UEAAXXZ",
+        "rva": "66740",
+        "code": "c7 81 d0 00 00 00 02 00 00 00 c3 cc cc cc cc cc 8b 91 d0 00 00 00 83 fa"
       }
     ],
     "windows": [
