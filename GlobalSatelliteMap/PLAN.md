@@ -2,6 +2,37 @@
 
 The requested feature is an optional satellite view on the GLOBAL map. BestMinimap keeps its existing map source. The target atlas is exactly 4 x 4 tiles, each 8192 x 8192 (32768 squared logical pixels).
 
+## Current checkpoint, 2026-11-02
+
+The completed16x8192 raster control is historical allocation/projection evidence,
+not the final material/model atlas. Current live material acceptance covers one
+standalone512 primary1,1 region:15 actual biome records, native painted maps,
+full mip chains, per-fragment biome selection and native vertex cliff sampling.
+The optional native distance-fade off/on/off trial now passes: returning off
+restores packed material and linear Sun pixels exactly, with stable resource
+accounting and six fixed cached programs. See the capture probe's
+`geography-cliff-verification.md` and `geography-native-fade-verification.md`.
+
+Player wording: this fade means **simplifying distant ground textures**, not
+unloading zones or hiding their models. Future MCM label: “Simplify distant
+terrain textures” / “Упрощать дальние текстуры”, with matching Chinese text.
+Keep it optional/default-off for the orbital view; literal native distance
+strongly removes ground detail at this height. Do not disguise it as streaming.
+
+Next independent tracks are whole-world regional biome/asset coverage and a
+resident-town geometry/light reference. Native deferred local lighting assumes
+perspective rays and has global side effects; adding model proxies does not
+establish correct orthographic illumination. Prefer already-rendered native
+HDR/GBuffer for the first reference before introducing another lighting pass.
+Unloaded town/model/light state needs an authoritative source, not invented data.
+
+The final base atlas remains exactly16large tiles. Small high-detail test views
+are diagnostic references, not approval to return to many stored miniature tiles.
+Dynamic lights should use bounded visible-map updates/overlays without rerendering
+all16base tiles for each light movement. Water, shadows, local lights, city and
+building LODs, complete regional material coverage and final viewer acceptance
+remain unfinished. Short request/accounting tests are not FPS/leak-free proof.
+
 ## User clarification: dynamic lights and optional render layers,2026-11-01
 
 Dynamic illumination includes real torches, carried lanterns, installed lamps
