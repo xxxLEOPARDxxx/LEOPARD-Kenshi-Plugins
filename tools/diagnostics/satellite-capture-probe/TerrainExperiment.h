@@ -106,7 +106,8 @@ struct TerrainExperiment
         if(materials.resourceExists(materialName))throw std::runtime_error("private terrain material collision");
         Ogre::MaterialPtr original=materials.getByName("DistantTerrain");
         if(original.isNull())throw std::runtime_error("native distant terrain material absent");
-        material=original->clone(materialName);
+        material=materials.create(materialName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        CopyPrivateTechniqueConfiguration(original,material);
         if(material->getNumTechniques()!=1||material->getTechnique(0)->getNumPasses()!=1)
             throw std::runtime_error("native distant terrain material structure differs");
         Ogre::GpuProgramParametersSharedPtr fp=material->getTechnique(0)->getPass(0)->getFragmentProgramParameters();

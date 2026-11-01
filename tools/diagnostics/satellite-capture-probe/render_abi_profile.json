@@ -82,6 +82,42 @@
         "name": "?getNumWorkspaces@CompositorManager2@Ogre@@QEBA_KXZ",
         "rva": "2a20e0",
         "code": "48 8b 81 a0 00 00 00 48 2b 81 98 00 00 00 48 c1 f8 03 c3 cc cc cc cc cc"
+      },
+      {
+        "key": "PrivateTechniqueCopy",
+        "name": "??4Technique@Ogre@@QEAAAEAV01@AEBV01@@Z",
+        "rva": "3729e0",
+        "code": "40 57 48 83 ec 30 48 c7 44 24 20 fe ff ff ff 48 89 5c 24 48 48 89 6c 24"
+      },
+      {
+        "key": "PrivateTechniqueParent",
+        "name": "?getParent@Technique@Ogre@@QEBAPEAVMaterial@2@XZ",
+        "rva": "bf330",
+        "code": "48 8b 41 40 c3 cc cc cc cc cc cc cc cc cc cc cc 0f b7 41 50 c3 cc cc cc"
+      },
+      {
+        "key": "PrivateReceiveShadows",
+        "name": "?getReceiveShadows@Material@Ogre@@QEBA_NXZ",
+        "rva": "1901c0",
+        "code": "0f b6 81 00 02 00 00 c3 cc cc cc cc cc cc cc cc 88 91 01 02 00 00 c3 cc"
+      },
+      {
+        "key": "PrivateTransparencyShadows",
+        "name": "?getTransparencyCastsShadows@Material@Ogre@@QEBA_NXZ",
+        "rva": "1901b0",
+        "code": "0f b6 81 01 02 00 00 c3 cc cc cc cc cc cc cc cc 0f b6 81 00 02 00 00 c3"
+      },
+      {
+        "key": "PrivateSetReceiveShadows",
+        "name": "?setReceiveShadows@Material@Ogre@@QEAAX_N@Z",
+        "rva": "1901e0",
+        "code": "88 91 00 02 00 00 c3 cc cc cc cc cc cc cc cc cc e9 2b e2 3c 00 cc cc cc"
+      },
+      {
+        "key": "PrivateSetTransparencyShadows",
+        "name": "?setTransparencyCastsShadows@Material@Ogre@@QEAAX_N@Z",
+        "rva": "1901d0",
+        "code": "88 91 01 02 00 00 c3 cc cc cc cc cc cc cc cc cc 88 91 00 02 00 00 c3 cc"
       }
     ],
     "windows": [

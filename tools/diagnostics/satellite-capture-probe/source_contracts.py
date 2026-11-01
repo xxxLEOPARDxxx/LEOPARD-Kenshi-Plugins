@@ -81,3 +81,6 @@ assert 'LogResourceTelemetry("after-private-terrain")' in source
 assert 'NativeResourceBytesName' in source and 'HasPrivateSceneName' in source
 assert 'telemetry only; no resource eviction' in source
 print('Private resource telemetry uses exact exports without cache eviction')
+assert '->clone(' not in source and '->clone(' not in experiment
+assert 'CopyPrivateTechniqueConfiguration' in source and 'CopyPrivateTechniqueConfiguration' in experiment
+print('Private material copies preserve fresh Resource loading/accounting metadata')

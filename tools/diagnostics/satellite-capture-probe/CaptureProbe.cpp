@@ -815,6 +815,31 @@ Ogre::Vector4 SharedVector(const char *set, const char *name, unsigned count)
     return result;
 }
 Ogre::Vector3 AsVector3(const Ogre::Vector4 &v) { return Ogre::Vector3(v.x,v.y,v.z); }
+void CopyPrivateTechniqueConfiguration(const Ogre::MaterialPtr &source,const Ogre::MaterialPtr &destination)
+{
+    if(source.isNull()||destination.isNull()||source==destination||source->getNumTechniques()!=1||
+       source->getTechnique(0)->getNumPasses()!=1)
+        throw std::runtime_error("private material configuration requires one independent technique/pass");
+    // Native Material::clone/operator= also copy Resource loaded-state/size without
+    // crediting its manager. Copy only technique configuration into a fresh owned
+    // Resource; Technique assignment retains its fresh parent and deep-copies Pass.
+    typedef Ogre::Technique *(__fastcall *Copy)(Ogre::Technique*,const Ogre::Technique*);
+    typedef Ogre::Material *(__fastcall *Parent)(const Ogre::Technique*);
+    typedef bool (__fastcall *ReadFlag)(const Ogre::Material*);
+    typedef void (__fastcall *WriteFlag)(Ogre::Material*,bool);
+    Copy copy=reinterpret_cast<Copy>(AbiExport(nativeApi.ogre,PrivateTechniqueCopyName,PrivateTechniqueCopyRva));
+    Parent parent=reinterpret_cast<Parent>(AbiExport(nativeApi.ogre,PrivateTechniqueParentName,PrivateTechniqueParentRva));
+    ReadFlag receive=reinterpret_cast<ReadFlag>(AbiExport(nativeApi.ogre,PrivateReceiveShadowsName,PrivateReceiveShadowsRva));
+    ReadFlag transparent=reinterpret_cast<ReadFlag>(AbiExport(nativeApi.ogre,PrivateTransparencyShadowsName,PrivateTransparencyShadowsRva));
+    WriteFlag setReceive=reinterpret_cast<WriteFlag>(AbiExport(nativeApi.ogre,PrivateSetReceiveShadowsName,PrivateSetReceiveShadowsRva));
+    WriteFlag setTransparent=reinterpret_cast<WriteFlag>(AbiExport(nativeApi.ogre,PrivateSetTransparencyShadowsName,PrivateSetTransparencyShadowsRva));
+    setReceive(destination.get(),receive(source.get()));
+    setTransparent(destination.get(),transparent(source.get()));
+    destination->removeAllTechniques();
+    Ogre::Technique *fresh=destination->createTechnique();
+    if(parent(fresh)!=destination.get()||copy(fresh,source->getTechnique(0))!=fresh||parent(fresh)!=destination.get())
+        throw std::runtime_error("private Technique assignment ABI differs");
+}
 void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene,
                     Ogre::Camera *camera, const Ogre::CompositorChannel &gb)
 {
@@ -859,7 +884,8 @@ void PrepareSunPass(Ogre::CompositorManager2 *manager, Ogre::SceneManager *scene
         throw std::runtime_error("private sun fragment shader unsupported");
     // Clone only resource configuration. Read installed native ambient/IBL textures;
     // replace every GPU parameter binding and all compositor texture bindings privately.
-    sunMaterial = source->clone(SunMaterialName);
+    sunMaterial = materials.create(SunMaterialName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    CopyPrivateTechniqueConfiguration(source,sunMaterial);
     if (sunMaterial->getNumTechniques()!=1 || sunMaterial->getTechnique(0)->getNumPasses()!=1)
         throw std::runtime_error("unexpected native no-shadow material structure");
     Ogre::Pass *pass = sunMaterial->getTechnique(0)->getPass(0);

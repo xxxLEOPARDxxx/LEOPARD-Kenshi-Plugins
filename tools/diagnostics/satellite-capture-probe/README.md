@@ -360,3 +360,25 @@ active workspace count and four ResourceManager byte totals. The reported bytes
 exclude native/driver caches. No global eviction, depth-pool cleanup, heap
 compaction or game-resource removal is attempted. Source/ABI/PE guards and the
 full259-check build pass; the new A/B mode still requires controlled live use.
+
+### Material accounting correction after live A/B
+The actual49-capture A/B in PID35284/startUTC2026-11-01T02:24:23.6256228Z
+confirmed scene0/privateNames0/workspaces1 and stable texture/high-program byte
+totals after Drop. Geometry-only16 passes retained roughly75MB then70MB at idle;
+the full16 pass retained roughly218MB. These whole-process observations narrow
+the issue but do not prove a particular native cache is leaking.
+
+MaterialManager bytes instead decreased exactly13198 per geometry-only capture
+and18995 per full capture. Exact Ogre disassembly identified Material::clone's
+assignment copying Resource loaded-stateD0/sizeE0 without a manager load credit;
+later unload debits that copied size. copyDetailsTo uses the same assignment.
+This accounting error is separate from actual committed private memory growth.
+
+Both private clones now use cleanup-owned fresh MaterialManager.create results,
+then copy only one technique/pass configuration with the exact native Technique
+assignment export. Its destination parent is checked before/after; material
+receive/transparency-shadow flags are preserved with four exact accessors.
+Resource loading/accounting metadata is never copied or patched. Build259 checks,
+115 game/Ogre imports and independent review pass. Fresh-process before/after
+MaterialManager balance remains the required live acceptance; no global counter
+compensation or game-engine patch is installed.
