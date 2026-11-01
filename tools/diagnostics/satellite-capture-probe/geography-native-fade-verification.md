@@ -109,3 +109,36 @@ the enabled trial. Require finite position/HDR, resource balance, six stable
 programs, six RTV debts0, joined worker and restored scene/workspace. Albedo,
 material normals and Sun intentionally differ when enabled. Existing BMPs still
 provide no per-pixel depth/occupancy baseline; no exact old geometry claim follows.
+
+## Parent off/on/off runtime proof, 2026-11-02
+
+The user loaded the paused SAT scene with the global map open. Process28976
+accepted tokens1514(off),1515(on),1516(off) in2674/2860/2806ms. Each success log
+identifies its actual fade mode, including literal actual-camera distance for on.
+The controller records separate native-fade/zero-fade scopes from those markers.
+
+All three return texture2277637264B and material14921846B accounting exactly to
+their before-request values. Six fixed cached programs remain stable after the
+first request. Each joins/closes one worker, releases all six owned RTV debts to
+zero and restores scene0/workspaces1. All262144 positions and HDR pixels are
+finite; position validity/reprojection/radial residual match the previous scope.
+
+Off->on changes239228 packed-material BMP pixels and241550 linear Sun pixels.
+Returning off reproduces the first packed-material and linear Sun images exactly.
+The exposed off images differ by at most one channel level in663pixels. Root
+inspected the three real images: native fade visibly smooths ground detail at
+this orbital height, as expected from the literal distance formula. This remains
+optional/default-off; no alternative distance policy was silently substituted.
+
+Process-private before/after readings were8467644416/8715833344,
+8492773376/8724381696 and8724381696/8718184448B. These are short asynchronous
+allocation readings, not a steady-state FPS/memory or zero-leak acceptance.
+The diagnostic INI was restored byte-for-byte to its pre-test state, Request0
+and no fade key (default0). No personal plugin INI or save file was modified.
+
+Evidence under game/_codex_work/global-satellite-20261101/rtv-lifetime-20261101/:
+`512-native-fade-off-first-20261102`, `512-native-fade-on-20261102`,
+`512-native-fade-off-return-20261102`, `native-fade-off-on-off-proof-20261102.json`
+and `native-fade-off-on-off-20261102.png`. The label strip is a presentation copy;
+all comparisons use the original saved BMP pixels. This is one512 primary-cell
+trial; full-world materials, cities/LODs, water, shadows and local lights remain.
