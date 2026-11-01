@@ -67,5 +67,7 @@ assert ec.index('api.destroyObject(scene,terrain)') < ec.index('scene->destroyCa
 assert 'setMaterialCallbacks' not in experiment and 'new Terrain' not in experiment
 assert 'activation' not in experiment and 'loadGame' not in experiment
 assert 'IsolatedTerrain",0' in source and 'terrainExperiment.root' in source
+assert 'fresh==au->render->scene' in experiment and 'object==au->terrain' in experiment
+assert 'mainGb.textures[i]==gb.textures[i]' in experiment
 assert 'typedefTerrainExperimentPolicy::Stats*(__fastcall*Info)(constTerrain*,TerrainExperimentPolicy::Stats*)' in ec
 print('Private native Terrain ownership/aggregate ABI/default-off contracts passed')

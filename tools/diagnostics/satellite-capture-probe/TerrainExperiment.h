@@ -85,7 +85,9 @@ struct TerrainExperiment
         if(!TerrainExperimentPolicy::PrimaryCell(tileX,tileZ,altitude,region))
             throw std::runtime_error("private terrain primary cell/altitude refused");
         api.Bind();root=owner;
-        scene=api.createScene(root,Ogre::ST_GENERIC,1,Ogre::INSTANCING_CULLING_SINGLETHREAD,"LEOPARD_PrivateTerrainScene");
+        Ogre::SceneManager *fresh=api.createScene(root,Ogre::ST_GENERIC,1,Ogre::INSTANCING_CULLING_SINGLETHREAD,"LEOPARD_PrivateTerrainScene");
+        if(!fresh||fresh==au->render->scene)throw std::runtime_error("private scene aliases main scene");
+        scene=fresh;
         camera=scene->createCamera("LEOPARD_PrivateTerrainCamera");
         Ogre::SceneNode *cameraNode=scene->getRootSceneNode()->createChildSceneNode();
         if(!ProbeOwnership::AttachOwnedCamera(camera,au->render->camera,cameraNode))
@@ -112,6 +114,7 @@ struct TerrainExperiment
         fp->setNamedConstant("map",Ogre::Vector4(-147456,-147456,1.0f/294912,1.0f/294912));
         material->load();
         Ogre::MovableObject *object=api.createObject(scene,"Terrain",api.memory(scene,Ogre::SCENE_STATIC),NULL);
+        if(!object||object==au->terrain)throw std::runtime_error("fresh Terrain aliases main Terrain");
         terrain=static_cast<Terrain*>(object);
         if(!NativeTerrainCache::Matches(terrain,nativeApi.terrainPrimary,nativeApi.terrainListener))
             throw std::runtime_error("fresh private terrain type differs");
@@ -128,6 +131,10 @@ struct TerrainExperiment
             Ogre::IdString("LEOPARD_PrivateTerrainWorkspace"),false);
         const Ogre::CompositorChannel &gb=workspace->getGlobalTexture("global_gbuffer");
         if(gb.textures.size()!=3)throw std::runtime_error("private Terrain GBuffer structure differs");
+        const Ogre::CompositorChannel &mainGb=au->render->workspace->getGlobalTexture("global_gbuffer");
+        if(mainGb.textures.size()!=3)throw std::runtime_error("main GBuffer structure differs");
+        for(unsigned i=0;i<3;++i)
+            if(mainGb.textures[i]==gb.textures[i])throw std::runtime_error("private Terrain GBuffer aliases main scene");
         // Allocate auxiliary workspaces outside compositor iteration, including
         // failure paths, so pending registration cannot outlive their materials.
         PreparePositionPass(manager,scene,camera,gb.textures[2]);
