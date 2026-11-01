@@ -44,10 +44,12 @@ struct Warmup
         {
             // Native getDebugInfo estimates visible*FIRST geometry indexCount-2.
             // The worker publishes vertices before indexCount. Exact0-2 can thus
-            // appear while builds are pending. Do not treat it as ready or clamp
+            // appear before index publication, even with unbuilt==0. Native Info
+            // counts deferred GPU drawables, not CPU-worker queue completion.
+            // Do not treat it as ready or clamp
             // the reported value. Patch64's maximum indexCount is8572; retain a
             // conservative16M bound while waiting for real telemetry to recover.
-            if(s.triangles!=~0ULL-1||!s.visible||!s.unbuilt||s.visible>16000000ULL/8572)return Exceeded;
+            if(s.triangles!=~0ULL-1||!s.visible||s.visible>16000000ULL/8572)return Exceeded;
             stable=0;previous=s;return Waiting;
         }
         const bool same=s.patches==previous.patches&&s.visible==previous.visible&&

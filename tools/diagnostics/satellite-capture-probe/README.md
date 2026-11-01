@@ -538,3 +538,14 @@ plus1GiB native geometry and2GiB reserve. This is a host guard, not a VRAM query
 free GPU memory must be measured separately before explicit manual experiments.
 No automatic startup capture/resizing is added. Unsupported/implicit high sizes
 remain inert. Runtime allocation and repeat cleanup evidence are still pending.
+
+The4096 control completed4874/3406ms with actual native viewport4096/detail16,
+all16777216 position pixels finite, raw GBuffer/Sun repeats identical and exposed
+repeat differing by<=1level. Two8192 attempts then refused exact0-2 telemetry
+with unbuilt==0 before any image. Native audit corrected the counter meaning:
+Info.unbuilt counts deferred GPU drawable builds, not CPU-worker queue completion.
+Warmup now waits on exact0-2 even with that counter zero, still bounding visible
+patch64 upper indices to16M and preserving all other budgets/deadlines. It never
+marks unknown geometry ready; three normal stable observations remain mandatory.
+442 checks include the actual observed369289120B/675visible/deferred0 regression
+which fails under the old policy. Runtime8192 recovery is not yet established.
