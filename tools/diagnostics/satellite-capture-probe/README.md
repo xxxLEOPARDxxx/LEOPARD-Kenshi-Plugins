@@ -549,3 +549,17 @@ patch64 upper indices to16M and preserving all other budgets/deadlines. It never
 marks unknown geometry ready; three normal stable observations remain mandatory.
 442 checks include the actual observed369289120B/675visible/deferred0 regression
 which fails under the old policy. Runtime8192 recovery is not yet established.
+
+Runtime6e46a6b establishes recovery from those same unbuilt0/index0-2 samples.
+Two8192 cell1,1 captures completed8627/7242ms, raw GBuffer/Sun byte-identical,
+exposed difference<=1level, all67108864 position pixels finite. One full recycled
+4x4 grid of16 actual8192² tiles completed123535ms:15 Terrain recycles/16 joined
+workers/one Scene,48 finite GPU readbacks and one frozen lighting snapshot.
+The cooperative120s deadline was passed only while final blocking proof
+readbacks/file writes completed; it is not a hard120s wall-clock guarantee.
+
+Named resources balanced; process memory did not return:~7.71GB baseline,
+16.51GB observed peak,11.26GB idle. Retention remains unresolved. Geometry remains
+2048-equivalent, distant colours coarse; this is not final map quality. Full
+evidence: docs/verification/2026-11-01-satellite-8192-control.md. Game closed/probe
+disabled after acceptance of this diagnostic grid; no public package changed.

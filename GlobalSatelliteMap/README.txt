@@ -14,12 +14,24 @@ Save identity = SHA256 of sorted "<relative native file>\n<SHA256>\n" records fo
 Pending: native dynamic sun/shadows/lamps, geometry-only DistantTown/render proxy audit, loaded/unloaded/player/modded building coverage, real orthographic/global capture, fixed exposure, overlap and seam-safe mip generation/sampling, capture generation tool, UI skin/input/marker acceptance and actual CPU/FPS/memory tests. Two day/night screenshots are NOT a substitute for native lighting. Never force-activate the world for this renderer. Existing DistantTown models are promising but complete/updated coverage has not been proved.
 
 Build: powershell -ExecutionPolicy Bypass -File D:/DEV/Kenshi/ours/GlobalSatelliteMap/build.ps1
+Separate private diagnostic proof now includes a real4x4 grid of16 tiles at8192²,
+with frozen native sun/exposure and recycled native Terrain. Its geometry retains
+the2048 control detail and distant colour texture; no complete buildings/water/
+shadows or map integration. This is not bundled/installed by the viewer. Memory
+retention and final quality remain open. See docs/verification/2026-11-01-satellite-8192-control.md.
+
 The scoped build and test runner inspect the actual resulting PE export table: RE_Kenshi Plugins.cpp:43 requires ?startPlugin@@YAXXZ (C++), while MCM requires MCM_Describe (C). Native imports are checked against installed DLL exports. An undecorated C startPlugin does not initialize under this loader, even if linking succeeds.
 Tests: powershell -ExecutionPolicy Bypass -File GlobalSatelliteMap/tests/run_tests.ps1
 Then: python GlobalSatelliteMap/tests/source_contracts.py
 VC10 x64 /GL + /LTCG, official local KenshiLib bindings. No installer/release package is supplied. Runtime MO catalogs only; PO files remain source material.
 
 RU
+Отдельный закрытый диагностический стенд уже снял настоящую сетку4x4 из16 плиток
+по8192×8192 с единым освещением. Детализация геометрии пока как в контрольном2048,
+используется грубая цветовая текстура дальнего рельефа. Полные здания, вода, тени
+и подключение к карте ещё не готовы; удержание памяти исследуется. Эти снимки
+не входят в установленный мод и не означают завершение спутниковой карты.
+
 Это незавершённый прототип отдельного спутникового слоя глобальной карты, не публичный выпуск. Он не установлен и не содержит выдуманных снимков. По умолчанию выключен; подробный журнал тоже выключен. Без настоящих проверенных снимков текущего сохранения слой не появляется: остаётся обычная карта и один раз показывается понятное уведомление. Исходная текстура BestMinimap не меняется.
 
 Реализованы отдельный слой под метками без перехвата мыши, учёт удаления виджетов, строгий манифест 4x4 по 8192, проверка файлов в рабочем потоке, ограниченная загрузка видимых уровней и сброс при смене/повторной загрузке сохранения. Не более одной загрузки уровня за 200 мс; полезные сжатые текстуры ограничены 96 МиБ и 16 записями. Это не оценка полной видеопамяти: драйвер и движок создают дополнительные данные. Игровые замеры ещё не выполнены.

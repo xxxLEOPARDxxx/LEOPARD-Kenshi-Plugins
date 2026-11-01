@@ -216,3 +216,25 @@ cleanup ordering; review significant code independently, build/import/profile
 contracts, then live2048 grid with memory observations. If accepted, compare
 fresh-cell reference surfaces and budget/context-failure recovery. Final8K,
 seams/material detail and global map integration remain separate work.
+
+### Live high-resolution control checkpoint,08:32 Moscow
+
+Recycled2048 is accepted across two full16-cell batches. Sourcea02503f adds an
+explicit resolution-only4096/8192 control; source6e46a6b correctly waits on native
+unpublished index telemetry even when its deferred-drawable count is zero.
+Both underwent independent review;442 production/GPU checks and116 imports pass.
+
+Actual4096/8192 repeated cell1,1 captures have identical raw GBuffer/Sun arrays.
+The complete16x8192 grid saved in123535ms,15 native recycles/16 joined workers/
+one Scene,48 finite GPU readbacks. This retains2048-equivalent geometry and the
+coarse DistantTerrain colour texture; it is not full final map-quality acceptance.
+Evidence: docs/verification/2026-11-01-satellite-8192-control.md. The cooperative
+120s batch deadline was exceeded only during the last blocking readbacks/IO.
+
+Next required work: identify large retained resources/proof-buffer cost, verify
+geometry and shared-boundary LOD continuity, then native near-biome materials,
+building/model coverage and real water/shadow/day-night rendering. Finally wire
+verified captures/dynamic layers into the optional global-map viewer. Do not
+publish this intermediate grid or replace BestMinimap's source. DF stays paused.
+After this checkpoint the game is closed; only the private probe mods.cfg line
+was removed, other bytes preserved, request/control/batch disabled and Side512.
