@@ -20,10 +20,14 @@ not a public release announcement. Latest instructions override historical notes
    see GlobalSatelliteMap/PLAN.md. Full atlas rerender on every lamp change is
    not an acceptable update strategy. Article finished; still check process and
    avoid taking window focus without a new instruction.
-2. **KEO research — PARALLEL; implementation AFTER satellite.** User2026-11-02
+2. **KEO — PARALLEL agents; satellite remains the main task.** User2026-11-02
    explicitly asks to read current Steam reports/source now: broken pathfinding,
    town inhabitants spawning outside and slowly returning, excess squads at normal
-   settings, GOG refusal, and possible mouse-input latency (unconfirmed). Keep
+   settings, GOG refusal, and possible mouse-input latency (unconfirmed). The user
+   has now explicitly requested parallel agent implementation. A scoped startup
+   routing-OFF fix has passed independent review; it is not a full KEO release.
+   Read-only spawn/GOG audits are in research/keo-spawn-audit-20261102 and
+   research/keo-gog-audit-20261102. Neither report proves the spawn defect fixed. Keep
    player reports separate from verified causes; inspect native streaming/spawn
    readiness, routing and build gates. Research: `research/keo-audit-20261102`.
    New user request explicitly authorizes

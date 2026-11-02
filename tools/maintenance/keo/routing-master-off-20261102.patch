@@ -1,0 +1,293 @@
+From 13953b03cb2f8df1638a9194d58467372f922262 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Mon, 2 Nov 2026 17:22:52 +0300
+Subject: [PATCH] Fix routing master OFF leaving KEO path overrides active
+
+---
+ leopard/routing-maintenance-20261102.md    | 43 ++++++++++++
+ leopard/routing-verification-20261102.json | 27 ++++++++
+ leopard/routing_switch_tests.cpp           | 51 +++++++++++++++
+ leopard/test_routing_switch.py             | 76 ++++++++++++++++++++++
+ src/movement/movement_config.cpp           | 14 ++--
+ src/movement/movement_config.h             |  7 +-
+ 6 files changed, 211 insertions(+), 7 deletions(-)
+ create mode 100644 leopard/routing-maintenance-20261102.md
+ create mode 100644 leopard/routing-verification-20261102.json
+ create mode 100644 leopard/routing_switch_tests.cpp
+ create mode 100644 leopard/test_routing_switch.py
+
+diff --git a/leopard/routing-maintenance-20261102.md b/leopard/routing-maintenance-20261102.md
+new file mode 100644
+index 0000000..7958a84
+--- /dev/null
++++ b/leopard/routing-maintenance-20261102.md
+@@ -0,0 +1,43 @@
++# Temporary KEO maintenance: routing master OFF
++
++## Scope / область работ
++
++This is a narrow local maintenance patch for the original KEO by jacobericson / Jakematt2004. Thank you to the original author. Original sources: https://github.com/jacobericson/KEO (local upstream base e712fa6134b4d2f16bb67122638db5a1f19a69aa). GPLv3 license and original history are preserved. This work follows the user's temporary-maintenance policy: fix defects without expanding the author's feature design, and withdraw the maintenance fork if the author returns. It is not a published release or a completed MCM/GOG port.
++
++Это локальная точечная правка KEO автора jacobericson / Jakematt2004. Спасибо автору оригинала. Исходники оригинала указаны выше, лицензия GPLv3 и история сохранены. По указанию пользователя это временное сопровождение: исправлять ошибки без расширения возможностей автора и снять свой форк с сопровождения, если автор вернётся. Публикации нет; перенос в MCM и поддержка GOG этой правкой не завершены.
++
++## Confirmed defect / подтверждённая ошибка
++
++`keoRouting=false` already disabled the planner, hierarchical search, island routing/reissue and squad movement overrides. It left `pathfindDiag=true`, `clusterGraphBypass=player` and `playerRepathTier=true` behind. Despite its name, `pathfindDiag` installs hooks that modify queue tiers and player A* budgets; it is not merely a log toggle. The master OFF switch therefore still allowed routing changes.
++
++The currently installed DLL matches the old local production build exactly: SHA256 dda7c280cf1074f68dd38774f07d3f9691a0a51ea9a7a39b24cca3dd64f3f0d3. Its current personal INI contains `keoRouting=false`, while the latest log reports `conn=.../player` and `playerRepath ... set13`. This confirms the configuration defect is present in the actually used build. It does not prove that it caused every reported loop, NPC spawn outside a town or excess squad.
++
++`keoRouting=false` выключал часть маршрутизации, но оставлял группу изменяющих пути хуков, обход связности графа и повышение приоритета повторных запросов игрока. Это подтверждено исходниками и журналом реально установленной локальной DLL. Причины отдельных петель, появления NPC снаружи города и избытка отрядов пока не установлены.
++
++## Change / исправление
++
++Startup `ApplyRoutingSwitch` now additionally sets `pathfindDiagEnabled=false`, `clusterGraphBypassMode=CGB_ORIGINAL`, `playerRepathTierEnabled=false`. No pathfinding detours or submit-tier hooks are requested through this group when the master is OFF. Even an already retained connectivity handler obeys the original verdict exactly once, and the explicit matched-player repath policy cannot request a tier write. Master ON leaves all individual settings unchanged. Existing load/navmesh/inventory/GUI settings and independent crash guards remain unchanged.
++
++This is a startup-only setting, as the existing configuration row declares. The original Options/KEO tab writes the value for the next launch; it does not hot-uninstall hooks. The fix adds no runtime writer, queue, thread, retained pointer, resource or per-frame INI read. With no logger the actual clamp allocates no C++ heap memory; its optional single startup summary is unchanged in frequency. Full CPU/FPS/memory behavior still needs game measurement after approval to install.
++
++При запуске главный выключатель теперь отключает и оставшиеся три настройки. Включённый главный переключатель не меняет выбранные частные параметры. Нужен перезапуск, как и раньше: живого удаления хуков не добавлено. Новых потоков, кэшей, ссылок на игровые объекты и покадрового чтения INI нет.
++
++This is not a complete vanilla-mode promise: zone preload/readiness/navmesh scheduling still use their own settings. Upstream's path-extraction hook is itself tied to the disabled pathfindDiag group, so only independent crash guards are claimed to remain. The old tooltip's broad vanilla wording should be replaced during the requested MCM/three-language migration; this code patch introduces no new UI message or partial locale.
++
++## Verification / проверка
++
++Run bundled Python `leopard/test_routing_switch.py`. It compiles the actual eight configuration modules, hook-desire policy and repath policy, plus the extracted unchanged production connectivity hook. Old code first failed the original-connectivity assertion. Fixed code passes436 checks in PROD and436 in DEV, across every bypass/hierarchical/diagnostic combination. Tests cover ON preservation, OFF/idempotence, routing hook exclusion, unchanged loading/navmesh/inventory/GUI/guard state, startup-only row, original handler fallback, matched-player tier suppression and no-logger allocation. Five separately compiled mutants fail the intended assertions. Manifest wiring of all six affected hook rows is checked.
++
++Fresh native DEV and PROD builds compiled all336 source files each, object cache disabled, isolated `_routingfix` output. Both x64/startPlugin/143 KenshiLib imports pass the0.5.0 export baseline. No installation, personal INI change, game input, commit or publication was performed.
++
++The full host gate was also run and is **not green**:111/122 C++ suites pass; eight existing GUI suites fail because the local localization bridge now needs game headers in a formerly host-only suite; three existing config suites fail old counts/goldens which omit the earlier local keoRouting row. Recompiling those three with HEAD's original movement_config.cpp reproduces the same failures. The relevant GUI/Localization source files are HEAD-identical after normalizing checkout line endings. The Python object-cache shadowing-header test fails in the complete module run, but passes alone; its sources are also HEAD-identical. Candidate builds use `BUILD_CACHE=off`, so every object was actually compiled. These inherited harness/cache issues are recorded, not hidden or weakened to claim a passing full gate.
++
++Полная старая проверка стенда не зелёная: есть унаследованные проблемы GUI-зависимостей, устаревшие ожидаемые количества настроек и нестабильная проверка кэша сборки. Они не выдаются за успех; для кандидата кэш объектов отключён. Новые точечные проверки и обе сборки проходят.
++
++## Remaining requests / что остаётся
++
++MCM integration, complete ru_RU/en_GB/zh_CN catalogs, an optional detailed-log setting defaulting OFF, and coherent fork/release metadata remain separate work. This checkout still exports the author's own Options tab and has the earlier two-language local catalogs. No new release number is assigned by this patch.
++
++GOG remains intentionally blocked before hooks. The located GOG evidence is the official address table; no verified matching GOG executable/module byte profile is available in the checked research. A safe port requires the real matching GOG executable/modules and audited executable/mid-function/module/vtable/member sites. A Steam-to-GOG blanket substitution or removing the existing gate is not an acceptable compatibility fix.
++
++Spawn/excess-squad reports remain open regression cases: preserve an unchanged save, compare the same world time and squad/population settings, distinguish extra loaded zones from newly created platoons, and record platoon/home-town/position and readiness before changing spawning logic. No save import or speculative spawn patch was made.
+diff --git a/leopard/routing-verification-20261102.json b/leopard/routing-verification-20261102.json
+new file mode 100644
+index 0000000..98f9d41
+--- /dev/null
++++ b/leopard/routing-verification-20261102.json
+@@ -0,0 +1,27 @@
++{
++  "date": "2026-11-02",
++  "sourceHead": "ed366bbd1dd850555052615725c466cc6879c2cb",
++  "branch": "leopard",
++  "scope": "startup routing-master OFF maintenance only; no installation, commit/publication, MCM migration, spawning/GOG claims",
++  "candidate": {
++    "path": "D:\\DEV\\Kenshi\\forks\\KEO\\build\\KEO_step4_routingfix_prod\\KEO.dll",
++    "size": 1417728,
++    "sha256": "328fdec4694cb9d4dcef9782b62360bb31ec6dd64395246e20fa6c34fc51ed7b"
++  },
++  "testResults": {
++    "prodChecks": 436,
++    "devChecks": 436,
++    "compiledMutantsRejected": 5,
++    "nativeBuild": "DEV+PROD PASS;336cpp compiled each; object cache disabled",
++    "imports": "x64/startPlugin/143KenshiLib imports compatible0.5.0",
++    "fullHost": "NOT GREEN:111/122CPP;8 existing GUI header failures;3 existing config golden/count failures; object-cache Python shadow test fails in module but passes alone",
++    "baseline": "HEADmovement.cpp reproduces same3 config failures; relevantGUI andobjcache sources unchanged after line-ending normalization"
++  },
++  "files": {
++    "src/movement/movement_config.cpp": "48a1170f901d6e523147fa4e21259a2964aadc661d92e1884580511ce2fc897a",
++    "src/movement/movement_config.h": "23d02ffaa0b9b107a2f5967de3c71d04d265397abf458ca78ead056492a9700d",
++    "leopard/test_routing_switch.py": "3a40e3ee0aacbbe705645fade30da6c1a9407ca3669c69813ed6b2e550785dd9",
++    "leopard/routing_switch_tests.cpp": "c68747fa4e7ce87401e5e54d3c2481ba0a4634c2f21863d4708033bd153fb88d",
++    "leopard/routing-maintenance-20261102.md": "68768ddcdac26d8d64298ac461ef099f56553bc44250bd434f2cd4fbee20ead8"
++  }
++}
+diff --git a/leopard/routing_switch_tests.cpp b/leopard/routing_switch_tests.cpp
+new file mode 100644
+index 0000000..18729e6
+--- /dev/null
++++ b/leopard/routing_switch_tests.cpp
+@@ -0,0 +1,51 @@
++#include <Windows.h>
++#include "base/config_values.h"
++#include "plugin/hook_manifest_policy.h"
++#include "pathfind/player_repath_tier_policy.h"
++#include <cstdio>
++#include <cstring>
++#include <new>
++#include <cstdlib>
++static unsigned checks=0,logs=0,allocations=0;static bool track=false;
++void*operator new(size_t n){if(track)++allocations;void*p=std::malloc(n?n:1);if(!p)throw std::bad_alloc();return p;}void operator delete(void*p){std::free(p);}void*operator new[](size_t n){return ::operator new(n);}void operator delete[](void*p){::operator delete(p);}
++static void Check(bool b,const char*s){++checks;if(!b){std::fprintf(stderr,"FAIL %s\n",s);throw 1;}}
++static void Log(const std::string&){++logs;}
++static void Defaults(){zone::g_zoneCfg=zone::kZoneDefaults;navmesh::g_navmeshCfg=navmesh::kNavMeshDefaults;pathfind::g_pathfindCfg=pathfind::kPathfindDefaults;movement::g_movementCfg=movement::kMovementDefaults;fixes::g_fixesCfg=fixes::kFixesDefaults;planner::g_plannerCfg=planner::kPlannerDefaults;keo_inventory::g_inventoryCfg=keo_inventory::kInventoryDefaults;keo_gui::g_guiCfg=keo_gui::kGuiDefaults;}
++struct Snapshot{zone::ZoneConfig zone;navmesh::NavMeshConfig nav;pathfind::PathfindConfig path;movement::MovementConfig move;fixes::FixesConfig fix;planner::PlannerConfig planner;keo_inventory::InventoryConfig inv;keo_gui::GuiConfig gui;Snapshot():zone(zone::g_zoneCfg),nav(navmesh::g_navmeshCfg),path(pathfind::g_pathfindCfg),move(movement::g_movementCfg),fix(fixes::g_fixesCfg),planner(planner::g_plannerCfg),inv(keo_inventory::g_inventoryCfg),gui(keo_gui::g_guiCfg){}bool Same()const{return !std::memcmp(&zone,&zone::g_zoneCfg,sizeof(zone))&&!std::memcmp(&nav,&navmesh::g_navmeshCfg,sizeof(nav))&&!std::memcmp(&path,&pathfind::g_pathfindCfg,sizeof(path))&&!std::memcmp(&move,&movement::g_movementCfg,sizeof(move))&&!std::memcmp(&fix,&fixes::g_fixesCfg,sizeof(fix))&&!std::memcmp(&planner,&planner::g_plannerCfg,sizeof(planner))&&!std::memcmp(&inv,&keo_inventory::g_inventoryCfg,sizeof(inv))&&!std::memcmp(&gui,&keo_gui::g_guiCfg,sizeof(gui));}};
++// Owned dependency seam for the actual retained connectivity-hook body. The
++// game answer is the observation; no native game function is executed.
++const unsigned PLAYER_FAIL_RING=8;enum{WAVE_NPC=0,WAVE_PLAYER=1,WAVE_UNK=2};
++namespace pathfind{struct Failure{int goalX,goalZ;LONG status,cause,iterCount,valid;};struct Diag{LONG diagConnAttempts,diagConnFail,playerFailWriteIdx,diagConnRejectByGate[3],diagWaveStale;Failure playerFailRing[PLAYER_FAIL_RING];Diag(){std::memset(this,0,sizeof(*this));}}g_pathDiag;}
++static char originalAnswer=0;static unsigned originalCalls=0,probes=0;static bool currentRequestIsPlayer=false;static int t_waveTag=0,t_waveConsumed=0;
++static char Original(void*,unsigned,unsigned){++originalCalls;return originalAnswer;}
++namespace game{struct Originals{char(*orig_csCheckFaceConn)(void*,unsigned,unsigned);Originals():orig_csCheckFaceConn(Original){}}g_hookOrig;}
++static int ConnGateOwner(){return WAVE_PLAYER;}static void RecordConnProbe(unsigned,char){++probes;}
++#include "connectivity.extract.h"
++static void Disabled(){
++ using namespace movement;using namespace pathfind;
++ Check(!g_pathfindCfg.pathfindDiagEnabled,"master OFF must suppress route-changing path hooks");
++ Check(g_pathfindCfg.clusterGraphBypassMode==CGB_ORIGINAL,"master OFF restores original connectivity verdict");
++ Check(!g_pathfindCfg.playerRepathTierEnabled,"master OFF disables repath tier writes");
++ Check(g_pathfindCfg.playerHierarchicalMode==AHIER_OFF&&!g_movementCfg.islandFixEnabled&&!g_movementCfg.groupCohesionEnabled&&!g_movementCfg.cfg_islandFarSpan&&!g_movementCfg.islandEdgeRingEnabled&&!g_movementCfg.islandDeletedReissueEnabled&&g_movementCfg.cfg_k7PostDeathHold==K7_HOLD_OFF&&!g_movementCfg.k7DestReadyGateEnabled&&!g_movementCfg.k7ArrivalTriggerEnabled&&!g_movementCfg.formationGatherPaceEnabled&&planner::g_plannerCfg.mode==planner::PLANNER_OFF&&!fixes::g_fixesCfg.clusterCrossCostOn,"all existing master routing overrides remain disabled");
++ HookWantInputs in=HookWantInputsFromConfig();const HookWant route[]={HOOK_WANT_PATHFIND_DIAG,HOOK_WANT_FIND_PATH_FULL,HOOK_WANT_PATH_EXTRACT,HOOK_WANT_CLUSTER_CROSS_COST,HOOK_WANT_PLANNER,HOOK_WANT_GATHER_PACE,HOOK_WANT_PLANNER_PRE_ARRIVAL};
++ for(unsigned i=0;i<sizeof(route)/sizeof(route[0]);++i)Check(!HookWantEval(route[i],in),"disabled routing hooks are never requested at startup");
++ Check(HookWantEval(HOOK_WANT_GRAPH_HEURISTIC,in)==in.graphHeuristicGuard,"independent graph crash guard retains its own switch");
++ Check(!PlayerRepathTierDecide(0,true,g_pathfindCfg.playerRepathTierEnabled).tier,"matched player rerequest cannot write a new tier");
++ for(unsigned answer=0;answer<2;++answer){originalAnswer=char(answer);unsigned before=originalCalls;t_waveTag=0;Check(hook_csCheckFaceConn(NULL,17,23)==originalAnswer&&originalCalls==before+1&&!t_waveTag,"even retained partial connectivity hook calls original exactly once without bypass");}
++}
++int main(){try{
++ Defaults();Snapshot on;movement::ApplyRoutingSwitch(&Log);Check(on.Same()&&!logs,"master ON preserves defaults and emits no override log");
++ const ConfigKey*key=movement::g_movementConfigKeys;while(key->name&&std::strcmp(key->name,"keoRouting"))++key;Check(key->name&&key->kind==CK_BOOL&&!key->live,"routing master is startup-only, never a live settings write");
++ for(int graph=CGB_BYPASS;graph<=CGB_PLAYER;++graph)for(int hierarchical=AHIER_OFF;hierarchical<=AHIER_ON;++hierarchical)for(unsigned diag=0;diag<2;++diag){
++  Defaults();pathfind::g_pathfindCfg.clusterGraphBypassMode=graph;pathfind::g_pathfindCfg.playerHierarchicalMode=hierarchical;pathfind::g_pathfindCfg.pathfindDiagEnabled=diag!=0;
++  Snapshot customOn;movement::ApplyRoutingSwitch(NULL);Check(customOn.Same(),"master ON preserves explicit individual overrides too");
++  movement::g_movementCfg.routingEnabled=false;zone::ZoneConfig zone=zone::g_zoneCfg;navmesh::NavMeshConfig nav=navmesh::g_navmeshCfg;keo_inventory::InventoryConfig inv=keo_inventory::g_inventoryCfg;keo_gui::GuiConfig gui=keo_gui::g_guiCfg;
++  const bool visitor=fixes::g_fixesCfg.graphVisitorGuardEnabled,expand=fixes::g_fixesCfg.graphExpandGuardEnabled;movement::ApplyRoutingSwitch(NULL);Disabled();
++  Check(!std::memcmp(&zone,&zone::g_zoneCfg,sizeof(zone))&&!std::memcmp(&nav,&navmesh::g_navmeshCfg,sizeof(nav))&&!std::memcmp(&inv,&keo_inventory::g_inventoryCfg,sizeof(inv))&&!std::memcmp(&gui,&keo_gui::g_guiCfg,sizeof(gui))&&fixes::g_fixesCfg.graphVisitorGuardEnabled==visitor&&fixes::g_fixesCfg.graphExpandGuardEnabled==expand,"master leaves loading/navmesh/inventory/GUI/crash guards untouched");
++  Snapshot off;movement::ApplyRoutingSwitch(NULL);Check(off.Same(),"OFF remains idempotent including partial path hook refusal");
++ }
++ Defaults();movement::g_movementCfg.routingEnabled=false;allocations=0;track=true;movement::ApplyRoutingSwitch(NULL);track=false;Check(!allocations,"startup scalar clamp without logger allocates no heap resources");
++ movement::ApplyRoutingSwitch(&Log);Check(logs==1,"one startup override summary when caller requests logging");
++ std::printf("actual routing switch %u checks PASS\n",checks);return 0;
++}catch(...){return 1;}}
++
+diff --git a/leopard/test_routing_switch.py b/leopard/test_routing_switch.py
+new file mode 100644
+index 0000000..1482c79
+--- /dev/null
++++ b/leopard/test_routing_switch.py
+@@ -0,0 +1,76 @@
++"""Local maintenance regression: compile actual configs and routing policies.
++
++No game modules, live process operations or personal INI writes. The graph hook
++body is extracted unchanged so the retained-hook fallback is executable too.
++"""
++from pathlib import Path
++import os,re,subprocess
++
++ROOT=Path(__file__).resolve().parents[1]
++OUT=ROOT/'build/leopard-routing-tests'
++OUT.mkdir(parents=True,exist_ok=True)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC')
++SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
++text=(ROOT/'src/pathfind/pathfind_hooks.cpp').read_text(encoding='utf-8')
++a=text.index('char hook_csCheckFaceConn(');b=text.index('{',a);end=b+1;depth=1
++while depth:
++    depth+=(text[end]=='{')-(text[end]=='}');end+=1
++(OUT/'connectivity.extract.h').write_text(text[a:end],encoding='utf-8')
++# The switch is applied on both LoadConfig exits; a startup row must never be
++# applied live to an already-patched process by the built-in settings panel.
++config=(ROOT/'src/base/config.cpp').read_text(encoding='utf-8')
++assert 'movement::ApplyRoutingSwitch(&LogMsg);' in config
++assert config.count('FinalizeConfig();')==2
++finalize=config[config.index('void FinalizeConfig()'):]
++assert finalize.index('movement::ApplyRoutingSwitch(&LogMsg);')<finalize.index('GetSystemInfo(')
++manifest=(ROOT/'src/plugin/hook_manifest_rows.inc').read_text(encoding='utf-8')
++for row,want in (
++    ('HOOK_CS_FIND_PATH','HOOK_WANT_PATHFIND_DIAG'),
++    ('HOOK_CS_CHECK_FACE_CONN','HOOK_WANT_PATHFIND_DIAG'),
++    ('HOOK_FIND_PATH_FULL','HOOK_WANT_FIND_PATH_FULL'),
++    ('HOOK_REQUEST_PATH','HOOK_WANT_PATHFIND_DIAG'),
++    ('HOOK_PATH_REQ_SUBMIT','HOOK_WANT_PATHFIND_DIAG'),
++    ('HOOK_CS_FIND_PATH_FALLBACK','HOOK_WANT_PATHFIND_DIAG'),
++):
++    match=re.search(r'HOOK_ROW\('+row+r',([^\n]*)',manifest)
++    assert match and want in match.group(1),(row,want)
++
++sources=[ROOT/'leopard/routing_switch_tests.cpp',ROOT/'src/base/ini_text.cpp',
++         ROOT/'src/plugin/hook_manifest_policy.cpp',ROOT/'src/pathfind/player_repath_tier_policy.cpp',ROOT/'src/zone/geometry/zone_geometry_cert.cpp']
++sources += [ROOT/f'src/{p}/{p}_config.cpp' for p in ('zone','navmesh','pathfind','movement','fixes','inventory','planner','gui')]
++env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src;{OUT}',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++for variant,defines in [('prod',[]),('dev',['/DKEO_DEBUG'])]:
++    directory=OUT/variant;directory.mkdir(exist_ok=True)
++    cmd=[VC/'bin/amd64/cl.exe','/nologo','/EHsc','/MD','/O2','/W3',*defines,
++         '/Fo'+str(directory)+'/', '/Fe'+str(directory/'tests.exe'),*sources]
++    p=subprocess.run([str(x) for x in cmd],cwd=ROOT,env=env,capture_output=True,text=True)
++    (directory/'build.log').write_text(p.stdout+p.stderr,encoding='utf-8')
++    if p.returncode:raise RuntimeError(p.stdout+p.stderr)
++    p=subprocess.run([str(directory/'tests.exe')],capture_output=True,text=True)
++    (directory/'run.log').write_text(p.stdout+p.stderr,encoding='utf-8')
++    print(variant,p.stdout+p.stderr,end='')
++    if p.returncode:raise SystemExit(p.returncode)
++
++movement=(ROOT/'src/movement/movement_config.cpp').read_text(encoding='utf-8')
++policy=(ROOT/'src/plugin/hook_manifest_policy.cpp').read_text(encoding='utf-8')
++for name,original,needle,replacement,reason in (
++    ('omit-hook-switch',ROOT/'src/movement/movement_config.cpp','pathfind::g_pathfindCfg.pathfindDiagEnabled = false;','','master OFF must suppress route-changing path hooks'),
++    ('omit-graph-switch',ROOT/'src/movement/movement_config.cpp','pathfind::g_pathfindCfg.clusterGraphBypassMode = CGB_ORIGINAL;','','master OFF restores original connectivity verdict'),
++    ('omit-repath-switch',ROOT/'src/movement/movement_config.cpp','pathfind::g_pathfindCfg.playerRepathTierEnabled = false;','','master OFF disables repath tier writes'),
++    ('ignore-master-on',ROOT/'src/movement/movement_config.cpp','if (movement::g_movementCfg.routingEnabled)','if (false)','master ON preserves defaults and emits no override log'),
++    ('force-hook-desire',ROOT/'src/plugin/hook_manifest_policy.cpp','in.pathfindDiag        = pathfind::g_pathfindCfg.pathfindDiagEnabled;','in.pathfindDiag        = true;','disabled routing hooks are never requested at startup'),
++):
++    source=movement if original.name=='movement_config.cpp' else policy
++    assert source.count(needle)==1,(name,source.count(needle))
++    directory=OUT/name;directory.mkdir(exist_ok=True);mutated=directory/original.name
++    mutated.write_text(source.replace(needle,replacement),encoding='utf-8')
++    changed=[mutated if p==original else p for p in sources]
++    cmd=[VC/'bin/amd64/cl.exe','/nologo','/EHsc','/MD','/O2','/W3','/Fo'+str(directory)+'/', '/Fe'+str(directory/'tests.exe'),*changed]
++    p=subprocess.run([str(x) for x in cmd],cwd=ROOT,env=env,capture_output=True,text=True)
++    (directory/'build.log').write_text(p.stdout+p.stderr,encoding='utf-8')
++    if p.returncode:raise RuntimeError(p.stdout+p.stderr)
++    p=subprocess.run([str(directory/'tests.exe')],capture_output=True,text=True)
++    (directory/'run.log').write_text(p.stdout+p.stderr,encoding='utf-8')
++    assert p.returncode and 'FAIL '+reason in p.stdout+p.stderr,(name,p.stdout+p.stderr)
++    print('Expected RED:',name,'->',reason)
++print('5 compiled routing master-switch mutants rejected')
+diff --git a/src/movement/movement_config.cpp b/src/movement/movement_config.cpp
+index 856d974..45a823f 100644
+--- a/src/movement/movement_config.cpp
++++ b/src/movement/movement_config.cpp
+@@ -158,8 +158,10 @@ const ConfigKey g_movementConfigKeys[] =
+ 
+ // LEOPARD fork: keoRouting=false. The same clears CheckBuildGate makes when no hook may
+ // install (islandFix, groupCohesion, islandFarSpan), plus the planner, the hierarchical
+-// player search, the cluster cross cost and the deleted-order re-issue, so their hooks
+-// stay out (HookWantInputsFromConfig) and the always-installed ones answer as the game.
++// player search, cluster connectivity bypass/repath tiers, cluster cross cost and
++// deleted-order re-issue. pathfindDiag is an installer switch, not just logging:
++// its hooks also change queue tiers and A* budgets. Keep those hooks out rather
++// than leaving the default pathfindDiag=true behind the master OFF switch.
+ void movement::ApplyRoutingSwitch(ConfigLogFn log)
+ {
+ 	if (movement::g_movementCfg.routingEnabled)
+@@ -174,9 +176,13 @@ void movement::ApplyRoutingSwitch(ConfigLogFn log)
+ 	movement::g_movementCfg.k7ArrivalTriggerEnabled = false;
+ 	movement::g_movementCfg.formationGatherPaceEnabled = false;
+ 	planner::g_plannerCfg.mode = planner::PLANNER_OFF;
++	pathfind::g_pathfindCfg.pathfindDiagEnabled = false;
++	pathfind::g_pathfindCfg.clusterGraphBypassMode = CGB_ORIGINAL;
++	pathfind::g_pathfindCfg.playerRepathTierEnabled = false;
+ 	pathfind::g_pathfindCfg.playerHierarchicalMode = AHIER_OFF;
+ 	fixes::g_fixesCfg.clusterCrossCostOn = 0;
+ 	if (log)
+-		log("Config: keoRouting=false -- route planner, hierarchical search, cluster cross cost,"
+-		    " island overlay, deleted-order re-issue, squad cohesion and gather pace are off (vanilla pathing)");
++		log("Config: keoRouting=false -- route planner, pathfinding hooks, connectivity bypass, repath tiers,"
++		    " hierarchical search, cluster cross cost, island overlay, deleted-order re-issue, squad cohesion"
++		    " and gather pace are off; zone loading, navmesh and independent guard settings are unchanged");
+ }
+diff --git a/src/movement/movement_config.h b/src/movement/movement_config.h
+index 64274ac..84e33e4 100644
+--- a/src/movement/movement_config.h
++++ b/src/movement/movement_config.h
+@@ -104,9 +104,10 @@ struct MovementConfig
+ 
+ 	// keoRouting (LEOPARD fork): false turns every KEO change to how routes are found and
+ 	// followed off at once -- the route planner, the hierarchical player search, the
+-	// cluster cross cost, the island overlay and its far-span and edge-ring answers, the
+-	// deleted-order re-issue (K7) and squad cohesion and gather pace -- so characters path
+-	// as in the vanilla game. Zone loading, navmesh generation and the crash guards stay.
++	// connectivity bypass/repath tiers and their pathfinding hook group, cluster cross
++	// cost, island overlay and its far-span and edge-ring answers, deleted-order re-issue
++	// (K7), squad cohesion and gather pace. This does not restore vanilla zone loading or
++	// navmesh scheduling; those features and the crash guards keep their own settings.
+ 	// Applied by ApplyRoutingSwitch from FinalizeConfig. Read at startup only.
+ 	bool routingEnabled;
+ };
+-- 
+2.46.0.windows.1
+
