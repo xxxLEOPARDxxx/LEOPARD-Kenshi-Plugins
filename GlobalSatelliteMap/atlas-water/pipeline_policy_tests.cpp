@@ -25,5 +25,11 @@ int main(){
  v=d;v.Usage=D3D11_USAGE_STAGING;CHECK(!AtlasView::HdrOutputShape(v,256));
  v=d;v.Format=DXGI_FORMAT_R8G8B8A8_UNORM;v.MiscFlags=1;v.BindFlags=D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET;CHECK(AtlasView::OutputShape(v,256));
  AtlasWater::Pipeline off;AtlasView::Cell cell;AtlasView::Uniforms terrain={};AtlasWater::Uniforms water={};CHECK(off.Render(cell,terrain,NULL,NULL,water,NULL,NULL,NULL,~0ULL)==S_FALSE);
+ CHECK(off.RenderWithStage(cell,terrain,NULL,NULL,water,NULL,NULL,NULL,~0ULL,NULL)==S_FALSE);
+ CHECK(off.RenderTerrainWithStage(cell,terrain,NULL,NULL,NULL,~0ULL,NULL)==S_FALSE);
+ AtlasWater::HdrStage invalid={};CHECK(off.RenderTerrainWithStage(cell,terrain,NULL,NULL,NULL,~0ULL,&invalid)==E_INVALIDARG);
+ const AtlasWater::U64 outsideStage=526416ULL;
+ CHECK(AtlasWater::PipelineFits(AtlasView::GpuCap-AtlasWater::PipelinePrivateBytes-outsideStage+outsideStage));
+ CHECK(!AtlasWater::PipelineFits(AtlasView::GpuCap-AtlasWater::PipelinePrivateBytes-outsideStage+outsideStage+1));
  std::printf("Pipeline policy PASS %u checks,%u failures\n",checks,bad);return bad?1:0;
 }

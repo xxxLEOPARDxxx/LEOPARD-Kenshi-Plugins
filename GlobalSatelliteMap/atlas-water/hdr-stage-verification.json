@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-02",
+  "scope": "optional per-call pure GPU HDR stage only; no caller/atlas-lights/main/install edits",
+  "review": "CLEAR: independent read-only review by container_restore_audit, 2026-11-02",
+  "tests": {
+    "policy": 26,
+    "warp": 262326,
+    "legacyCompiledMutants": 10,
+    "stageCompiledMutants": 10,
+    "nativeHdrMaxAbs": 0,
+    "nativeCompositionMaxUnorm": 1
+  },
+  "pipelinePrivateBytes": 3408256,
+  "externalStageCallerBytes": 526416,
+  "currentBaseCallerBytes": 189006000,
+  "combinedOwnedBytes": 192940672,
+  "sharedCapBytes": 201326592,
+  "headroomBytes": 8385920,
+  "files": {
+    "WaterPipeline.h": "94d2de52f1d710793d28783dd97a086c926b1e3fa47a5b8cc21b0a231b835047",
+    "pipeline_policy_tests.cpp": "8989dd9c5dd748094d2b5c7b9b791007120b93f4ccae8d1fc2310d0f68e4e215",
+    "pipeline_warp.cpp": "d7d5f4c39721693b8fdbbbccc89005502fa26c15796322a7fb3f6061153f86d3",
+    "generate_pipeline.py": "12a4d225a51d2d1a8460da569727f64c94819228e39be795d061b6294f1e6fb8",
+    "hdr-stage-plan.md": "ad9e514abd4f4b41ff6b0654fbb8f48cecc2c71b16cdd55b33d6462159576706",
+    "hdr-stage-integration.md": "8eefacca45ba467c9b2878d0a62dc9d7fe0e7acb737d41cdf60c090bc6a22227"
+  },
+  "shaders": {
+    "TerrainHdr.cso": "51013b959677e9e6a59efd43f25b4e966e5bcf17b30c9a65afbb7947e7ac0314",
+    "Water.cso": "9c5b41477ec29d1663dc58fb1242e09ac80f1b7209d90ce1f3055328be13b5d3",
+    "Tone.cso": "d4d78e7aceb2ee776dbe5afab1011c2b7275072f88abeddb863a48f8868a4f77"
+  },
+  "logs": {
+    "hdr-stage-full.log": "24ba95107afbc3b3fc328f5e99856471c9e93ee565d7e07dacd91788c9edc223",
+    "hdr-stage-mutants.log": "623ec908fe7ccec52b8485c1ae9e343e50eab8607aa5590d6cb1baa4dbc95597"
+  },
+  "limits": [
+    "real additive compute fixture; not native point-light parity",
+    "root owns native frame/GST alignment and actual stage integration",
+    "no runtime or long-session performance/leak claim"
+  ],
+  "independentReview": {
+    "reviewer": "container_restore_audit",
+    "policy": 26,
+    "warp": 262326,
+    "legacyCompiledMutants": 10,
+    "stageCompiledMutants": 10,
+    "sourceUnchanged": true,
+    "productionShaderBytecodesUnchanged": true,
+    "scope": "offline source, actual GPU fixture, state and ownership review; no game runtime acceptance"
+  }
+}

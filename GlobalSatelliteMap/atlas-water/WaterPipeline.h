@@ -5,6 +5,10 @@ const U64 HdrTerrainPrivateBytes=256ULL*256*8+AtlasView::UniformGpuBytes;
 const U64 HdrWorkBytes=256ULL*256*8,TonePrivateBytes=256ULL*256*4+16;
 const U64 PipelinePrivateBytes=HdrTerrainPrivateBytes+HdrWorkBytes+PrivateBytes+TonePrivateBytes;
 inline bool PipelineFits(U64 callerOwnedBytes){return callerOwnedBytes<=AtlasView::GpuCap-PipelinePrivateBytes;}
+struct HdrStage {
+ void*context;
+ HRESULT(*apply)(void*,const AtlasView::Cell&,const AtlasView::Uniforms&,ID3D11ShaderResourceView*,ID3D11Texture2D*);
+};
 class Pipeline {
  AtlasView::Relighter terrain_;
  Layer water_;
@@ -55,16 +59,26 @@ public:
  // caller renders the original terrain path on any failed HRESULT.
  HRESULT Render(const AtlasView::Cell&cell,const AtlasView::Uniforms&terrain,ID3D11ShaderResourceView*const terrainLight[3],ID3D11SamplerState*const terrainSampler[3],const Uniforms&water,ID3D11ShaderResourceView*const waterInputs[5],ID3D11SamplerState*const waterSamplers[5],ID3D11Texture2D*output,U64 callerOwnedBytes){
   if(water.waterPlane[1]==0)return S_FALSE;
-  if(!device_.p||!PipelineFits(callerOwnedBytes)||cell.side!=256||!terrain.Valid(256)||!water.Valid(256,256)||water.sourceWindow[0]!=256||water.sourceWindow[1]!=0||water.sourceWindow[2]!=0||std::memcmp(terrain.tileBounds,water.tileBounds,16)||!terrainLight||!terrainSampler||!waterInputs||!waterSamplers||!AtlasView::SameDevice(output,device_.p))return E_INVALIDARG;
+  return RenderWithStage(cell,terrain,terrainLight,terrainSampler,water,waterInputs,waterSamplers,output,callerOwnedBytes,NULL);
+ }
+ HRESULT RenderWithStage(const AtlasView::Cell&cell,const AtlasView::Uniforms&terrain,ID3D11ShaderResourceView*const terrainLight[3],ID3D11SamplerState*const terrainSampler[3],const Uniforms&water,ID3D11ShaderResourceView*const waterInputs[5],ID3D11SamplerState*const waterSamplers[5],ID3D11Texture2D*output,U64 callerOwnedBytes,const HdrStage*stage){
+  const bool waterEnabled=water.waterPlane[1]!=0;
+  if(!waterEnabled&&!stage)return S_FALSE;
+  if(stage&&!stage->apply)return E_INVALIDARG;
+  if(!device_.p||!PipelineFits(callerOwnedBytes)||cell.side!=256||!terrain.Valid(256)||!terrainLight||!terrainSampler||!AtlasView::SameDevice(output,device_.p))return E_INVALIDARG;
+  if(waterEnabled&&(!water.Valid(256,256)||water.sourceWindow[0]!=256||water.sourceWindow[1]!=0||water.sourceWindow[2]!=0||std::memcmp(terrain.tileBounds,water.tileBounds,16)||!waterInputs||!waterSamplers))return E_INVALIDARG;
   D3D11_TEXTURE2D_DESC d;output->GetDesc(&d);if(!AtlasView::OutputShape(d,256))return E_INVALIDARG;
   AtlasView::Com<ID3D11DeviceContext>c;device_.p->GetImmediateContext(&c.p);
   if(!c.p||c.p->GetType()!=D3D11_DEVICE_CONTEXT_IMMEDIATE||AtlasView::Bound(c.p,output,true))return DXGI_ERROR_INVALID_CALL;
   for(unsigned p=0;p<3;++p)if(!InputSafe(c.p,cell.view[p].p,output)||!InputSafe(c.p,terrainLight[p],output)||!AtlasView::SameDevice(terrainSampler[p],device_.p))return DXGI_ERROR_INVALID_CALL;
-  for(unsigned p=0;p<5;++p)if(!InputSafe(c.p,waterInputs[p],output)||!AtlasView::SameDevice(waterSamplers[p],device_.p)||!AtlasView::LightView(waterInputs[p],device_.p,p>=3,1))return DXGI_ERROR_INVALID_CALL;
+  if(waterEnabled)for(unsigned p=0;p<5;++p)if(!InputSafe(c.p,waterInputs[p],output)||!AtlasView::SameDevice(waterSamplers[p],device_.p)||!AtlasView::LightView(waterInputs[p],device_.p,p>=3,1))return DXGI_ERROR_INVALID_CALL;
   HRESULT hr=terrain_.Render(cell,terrain,terrainLight,terrainSampler,work_.p);
-  ID3D11ShaderResourceView*source[8]={workView_.p,cell.view[1].p,cell.view[2].p,waterInputs[0],waterInputs[1],waterInputs[2],waterInputs[3],waterInputs[4]};
-  if(SUCCEEDED(hr))hr=water_.Render(water,source,waterSamplers,work_.p,callerOwnedBytes+PipelinePrivateBytes-PrivateBytes);
+  if(SUCCEEDED(hr)&&stage){SavedPredicate stagePredicate(c.p);SavedCompute stageSaved(c.p);hr=stage->apply(stage->context,cell,terrain,workView_.p,work_.p);}
+  if(waterEnabled){ID3D11ShaderResourceView*source[8]={workView_.p,cell.view[1].p,cell.view[2].p,waterInputs[0],waterInputs[1],waterInputs[2],waterInputs[3],waterInputs[4]};
+  if(SUCCEEDED(hr))hr=water_.Render(water,source,waterSamplers,work_.p,callerOwnedBytes+PipelinePrivateBytes-PrivateBytes);}
   if(SUCCEEDED(hr))hr=Tone(c.p,terrain,output);return hr;
  }
+
+ HRESULT RenderTerrainWithStage(const AtlasView::Cell&cell,const AtlasView::Uniforms&terrain,ID3D11ShaderResourceView*const terrainLight[3],ID3D11SamplerState*const terrainSampler[3],ID3D11Texture2D*output,U64 callerOwnedBytes,const HdrStage*stage){Uniforms off={};return RenderWithStage(cell,terrain,terrainLight,terrainSampler,off,NULL,NULL,output,callerOwnedBytes,stage);}
 };
 }
