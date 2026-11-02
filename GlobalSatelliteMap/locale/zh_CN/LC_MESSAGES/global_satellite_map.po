@@ -7,8 +7,8 @@ msgstr ""
 msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
 msgstr "卫星地形不可用。缺少预先准备的地形数据，或数据与当前游戏不匹配。普通地图仍然可见。"
 
-msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
-msgstr "开发中的地形视图，使用当前阳光和天空光照。尚不包括建筑、水面和局部光源。"
+msgid "Development terrain view with current sunlight, sky lighting and optional water. Buildings and local lights are not included."
+msgstr "开发中的地形视图，使用当前太阳光、天空光和可选水面。尚不包含建筑及局部光源。"
 
 msgid "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
 msgstr "注意：生成 4x4 块 8192x8192 图块需要至少 24 GB 可用磁盘空间。\n未压缩的地形数据约占 23 GB。"
@@ -45,3 +45,9 @@ msgstr "将详细诊断信息写入 RE_Kenshi_log.txt。错误始终会被记录
 
 msgid "Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."
 msgstr "无法绘制卫星地形。已保留准备好的数据，普通地图仍然可见。"
+
+msgid "Water"
+msgstr "水面"
+
+msgid "Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."
+msgstr "使用当前海平面和光照显示水面。若水面资源不可用，仍显示地形。"

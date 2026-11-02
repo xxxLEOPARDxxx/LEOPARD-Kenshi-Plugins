@@ -33,6 +33,16 @@ inline bool OutputShape(const D3D11_TEXTURE2D_DESC&d,unsigned side){
         d.Usage==D3D11_USAGE_DEFAULT&&!d.CPUAccessFlags&&
         (!d.MiscFlags||(d.MiscFlags==D3D11_RESOURCE_MISC_GENERATE_MIPS&&d.BindFlags==(D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET)));
 }
+inline bool HdrOutputShape(const D3D11_TEXTURE2D_DESC&d,unsigned side){
+    return side==256&&d.Width==side&&d.Height==side&&d.MipLevels==1&&d.ArraySize==1&&
+        d.Format==DXGI_FORMAT_R16G16B16A16_FLOAT&&d.SampleDesc.Count==1&&!d.SampleDesc.Quality&&
+        d.Usage==D3D11_USAGE_DEFAULT&&d.BindFlags==D3D11_BIND_SHADER_RESOURCE&&!d.CPUAccessFlags&&!d.MiscFlags;
+}
+inline bool RelighterFits(U64 callerBytes,unsigned side,DXGI_FORMAT format){
+    if(format==DXGI_FORMAT_R8G8B8A8_UNORM)return Fits(callerBytes,side);
+    const U64 hdrPrivate=U64(256)*256*8+UniformGpuBytes;
+    return format==DXGI_FORMAT_R16G16B16A16_FLOAT&&side==256&&callerBytes<=GpuCap-hdrPrivate;
+}
 // Writable aliases are refused before mutation. Read-only owned-output aliases
 // can be scoped below without touching hidden append counters/OM state.
 inline bool Bound(ID3D11DeviceContext*c,ID3D11Resource*r,bool writesOnly=false){
@@ -114,21 +124,22 @@ public:
 };
 class Relighter {
     Com<ID3D11Device>device_;Com<ID3D11ComputeShader>shader_;Com<ID3D11Buffer>constants_;
-    Com<ID3D11Texture2D>scratch_;Com<ID3D11UnorderedAccessView>uav_;unsigned side_,scratchSide_;
+    Com<ID3D11Texture2D>scratch_;Com<ID3D11UnorderedAccessView>uav_;unsigned side_,scratchSide_;DXGI_FORMAT outputFormat_;
     Relighter(const Relighter&);Relighter&operator=(const Relighter&);
 public:
-    Relighter():side_(0),scratchSide_(0){}
-    void Clear(){uav_.Reset();scratch_.Reset();constants_.Reset();shader_.Reset();device_.Reset();side_=scratchSide_=0;}
+    Relighter():side_(0),scratchSide_(0),outputFormat_(DXGI_FORMAT_R8G8B8A8_UNORM){}
+    void Clear(){uav_.Reset();scratch_.Reset();constants_.Reset();shader_.Reset();device_.Reset();side_=scratchSide_=0;outputFormat_=DXGI_FORMAT_R8G8B8A8_UNORM;}
     // One reusable scratch. Clear/reinitialize only on cache/mip configuration
     // changes, never per frame. Account previous live allocations before calling.
-    HRESULT Init(ID3D11Device*d,const void*code,SIZE_T bytes,unsigned scratchSide,U64 cellBytes){
-        if(device_.p||!d||!code||!bytes||d->GetFeatureLevel()<D3D_FEATURE_LEVEL_11_0||scratchSide<256||scratchSide>2048||(scratchSide&(scratchSide-1))||!Fits(cellBytes,scratchSide))return E_INVALIDARG;
+    HRESULT Init(ID3D11Device*d,const void*code,SIZE_T bytes,unsigned scratchSide,U64 cellBytes,DXGI_FORMAT outputFormat=DXGI_FORMAT_R8G8B8A8_UNORM){
+        if(device_.p||!d||!code||!bytes||d->GetFeatureLevel()<D3D_FEATURE_LEVEL_11_0||scratchSide<256||scratchSide>2048||(scratchSide&(scratchSide-1))||!RelighterFits(cellBytes,scratchSide,outputFormat))return E_INVALIDARG;
+        if(outputFormat==DXGI_FORMAT_R16G16B16A16_FLOAT){UINT support=0;HRESULT check=d->CheckFormatSupport(outputFormat,&support);const UINT need=D3D11_FORMAT_SUPPORT_TEXTURE2D|D3D11_FORMAT_SUPPORT_TYPED_UNORDERED_ACCESS_VIEW;if(FAILED(check)||(support&need)!=need)return FAILED(check)?check:E_FAIL;}
         HRESULT hr=d->CreateComputeShader(code,bytes,NULL,&shader_.p);
         D3D11_BUFFER_DESC b={};b.ByteWidth=sizeof(Uniforms);b.Usage=D3D11_USAGE_DEFAULT;b.BindFlags=D3D11_BIND_CONSTANT_BUFFER;
         if(SUCCEEDED(hr))hr=d->CreateBuffer(&b,NULL,&constants_.p);
-        D3D11_TEXTURE2D_DESC t={};t.Width=t.Height=ScratchSide(scratchSide);t.MipLevels=t.ArraySize=1;t.Format=DXGI_FORMAT_R8G8B8A8_UNORM;t.SampleDesc.Count=1;t.Usage=D3D11_USAGE_DEFAULT;t.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
+        D3D11_TEXTURE2D_DESC t={};t.Width=t.Height=ScratchSide(scratchSide);t.MipLevels=t.ArraySize=1;t.Format=outputFormat;t.SampleDesc.Count=1;t.Usage=D3D11_USAGE_DEFAULT;t.BindFlags=D3D11_BIND_UNORDERED_ACCESS;
         if(SUCCEEDED(hr))hr=d->CreateTexture2D(&t,NULL,&scratch_.p);if(SUCCEEDED(hr))hr=d->CreateUnorderedAccessView(scratch_.p,NULL,&uav_.p);
-        if(FAILED(hr)){Clear();return hr;}device_.p=d;d->AddRef();side_=scratchSide;scratchSide_=t.Width;return S_OK;
+        if(FAILED(hr)){Clear();return hr;}device_.p=d;d->AddRef();side_=scratchSide;scratchSide_=t.Width;outputFormat_=outputFormat;return S_OK;
     }
     HRESULT Render(const Cell&cell,const Uniforms&values,ID3D11ShaderResourceView*const light[3],ID3D11SamplerState*const sampler[3],ID3D11Texture2D*output,unsigned*refusal=NULL){
         if(refusal)*refusal=1;
@@ -136,7 +147,7 @@ public:
         for(unsigned p=0;p<3;++p){if(refusal)*refusal=2+p;if(!SameDevice(cell.view[p].p,device_.p)||!SameDevice(sampler[p],device_.p)||!LightView(light[p],device_.p,p!=0,p==0?1:(p==1?4:8)))return E_INVALIDARG;}
         if(refusal)*refusal=5;
         D3D11_TEXTURE2D_DESC d;output->GetDesc(&d);
-        if(!OutputShape(d,cell.side))return E_INVALIDARG;
+        if(outputFormat_==DXGI_FORMAT_R16G16B16A16_FLOAT?!HdrOutputShape(d,cell.side):!OutputShape(d,cell.side))return E_INVALIDARG;
         if(refusal)*refusal=6;
         Com<ID3D11DeviceContext>c;device_.p->GetImmediateContext(&c.p);
         if(!c.p||c.p->GetType()!=D3D11_DEVICE_CONTEXT_IMMEDIATE||Bound(c.p,output,true))return DXGI_ERROR_INVALID_CALL;

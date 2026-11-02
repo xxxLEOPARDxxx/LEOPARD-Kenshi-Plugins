@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-02",
+  "scope": "GPU pipeline helper; root owns caller/native snapshots/settings/runtime acceptance",
+  "tests": {
+    "policy": 19,
+    "warp": 126,
+    "mutantsRejected": 10,
+    "nativeRawHdrMaxAbs": 0,
+    "composedNativeMaxUnorm": 1,
+    "legacyTerrain": [
+      29,
+      53,
+      92,
+      6
+    ],
+    "legacyWater": [
+      2,
+      11,
+      163,
+      8
+    ]
+  },
+  "review": {
+    "peer": "CLEAR, independent fresh19/126/10",
+    "root": "CLEAR, independent fresh19/126/10"
+  },
+  "gpu": {
+    "capBytes": 100663296,
+    "callerWindowBytes": 94634160,
+    "privateBytes": 3408256,
+    "totalBytes": 98042416,
+    "headroomBytes": 2620880
+  },
+  "sourceSha256": {
+    "atlas-view/AtlasRelight.h": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86",
+    "atlas-view/AtlasRelight.hlsl": "a5d1db2389bf25dea27db07bc6148da32de91c23f819b795a02a24df1bb63596",
+    "atlas-water/AtlasWater.h": "900811f6e864a1cb52dcbc04d87a813e68aed0d5c696bc28814450e0f14ba33b",
+    "atlas-water/WaterPipeline.h": "92a6b142debb55e994c727336c589670d712f96b50121939fd6127ac2e601372",
+    "atlas-water/ToneWater.hlsl": "5ef5ff94541b1acc1a229a21850591084f6187fef77bb0a688cd453c10e8abec",
+    "atlas-water/generate_pipeline.py": "903d3562f1640a87cb4388163672c636ec8bd8a68e1722b4c1b8ca7429216b73",
+    "atlas-water/PipelineTerrainOracle.hlsl": "d869dd62355ac2382bcd8527ec75bb74af5128f6689143a42bcc37d20b927785",
+    "atlas-water/PipelineToneOracle.hlsl": "4092f0146bdaede27a2fe5af98987f97e32733017570b45df7223b7af450ae81",
+    "atlas-water/pipeline_warp.cpp": "c9f6a626da17c268155584ce8b63bf9ff4f7e6e43d508c289baf1b0c019c4000",
+    "atlas-water/pipeline_policy_tests.cpp": "f404b163b41b7e2d29ddf8b5aa256752363cf34ff5dbc74137f0d9c31d4673d7",
+    "atlas-water/run_pipeline_tests.ps1": "391711592533b233830dd07b55afcbd22340a977c9f34d8ee6ec90a69adb8be5",
+    "atlas-water/verify_pipeline_shaders.py": "82362ecb8ea463ce38ddb31c7fa912a6911cf47b5d3ab2885b76129b2cad2949",
+    "atlas-water/test_pipeline_mutations.py": "05ef85ff81d2691894ec75d7aed35d1975c1be06f5bc404ae739a853614af869",
+    "atlas-water/pipeline-integration.md": "4b05bf96f7a1543b6446bd7ae418390063f285a265e00ed7d5c4ea15b0394a27"
+  },
+  "shaders": [
+    {
+      "symbol": "AtlasTerrainHdrShader",
+      "file": "TerrainHdr.cso",
+      "bytes": 5960,
+      "sha256": "51013b959677e9e6a59efd43f25b4e966e5bcf17b30c9a65afbb7947e7ac0314"
+    },
+    {
+      "symbol": "AtlasWaterMaterialShader",
+      "file": "Water.cso",
+      "bytes": 9816,
+      "sha256": "9c5b41477ec29d1663dc58fb1242e09ac80f1b7209d90ce1f3055328be13b5d3"
+    },
+    {
+      "symbol": "AtlasWaterToneShader",
+      "file": "Tone.cso",
+      "bytes": 1240,
+      "sha256": "d4d78e7aceb2ee776dbe5afab1011c2b7275072f88abeddb863a48f8868a4f77"
+    }
+  ],
+  "defaultTerrainSha256": "e9d39a51c87a02b4dffe81b40c41a48e549dbf17fc0cf504d34d0a77b3e485b6",
+  "evidence": {
+    "pipeline-hdr-red.log": "d5865cd2ecb243632a4ef86aa98788c7f2e40faa57f65e83b3d655ea8e66d4d6",
+    "pipeline-one-mip-red.log": "10ee98bd59adf1b96b8c892eddd960c65e83d433c46d2519edcddecca1e3ceb8",
+    "pipeline-composition-red.log": "4d30532f964255f3387410c174931c17a7ac27f8073d8ce770bba9911fcb6000",
+    "pipeline-full-suite.log": "92638e93eceb7bab7334d72e211e57f9564b3a0ec90287ab2d7a4d8bb19a5259",
+    "pipeline-legacy-terrain-regression.log": "6aeffc86c75740102e4a5f5d2a793703a9ccf16554fa0ea80b9de98b2dc156ca",
+    "pipeline-legacy-water-regression.log": "55decc639b256e5b34e23f87090293cec9b6d45069719bbdee1334a3f1284fc1"
+  },
+  "limitations": [
+    "No game runtime or install performed by GPU implementer",
+    "Per-call material/native-HDR parity only",
+    "Geometric cached-height shore, no native depth bias",
+    "No native animated-window temporal synchronization claim",
+    "No FPS, residency or long-session leak claim",
+    "Nonempty shader class-instance lists uninstantiated"
+  ]
+}

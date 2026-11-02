@@ -25,3 +25,8 @@ foreach($test in @('window_geometry_tests.py','window_adoption_tests.py','window
     & $python "$PSScriptRoot/$test"
     if($LASTEXITCODE -ne 0){throw "Window integration failed: $test"}
 }
+& $python "$PSScriptRoot/water_caller_tests.py"
+if($LASTEXITCODE -ne 0){throw 'Extracted water caller lifecycle failed'}
+& "$PSScriptRoot/run_water_job_tests.ps1"
+if($LASTEXITCODE -ne 0){throw 'Water-source worker/window minimum failed'}
+exit 0

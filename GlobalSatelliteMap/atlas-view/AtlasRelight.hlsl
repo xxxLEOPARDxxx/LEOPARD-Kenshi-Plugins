@@ -59,6 +59,8 @@ void main(uint3 id : SV_DispatchThreadID) {
     environment.diffuse*=ambient.rgb*scale;
     environment.specular*=ambient.rgb*scale;
     float3 colour=direct.specular+environment.specular+(direct.diffuse+environment.diffuse)*albedo;
+#ifndef ATLAS_LINEAR_HDR
     colour=SatelliteNativeExposure(colour,exposure.xy);
+#endif
     result[id.xy]=all(isfinite(colour))?float4(colour,encoded.a):float4(0,0,0,0);
 }

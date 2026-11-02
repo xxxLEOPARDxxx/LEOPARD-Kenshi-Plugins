@@ -10,8 +10,8 @@ struct Manifest {
     unsigned char header[16][32];
     unsigned char captureMetadata[32];
     unsigned char windowIndexHash[32];AtlasView::WindowIndex windows;
-    double minX,minZ,maxX,maxZ;
-    Manifest():minX(0),minZ(0),maxX(0),maxZ(0){std::memset(header,0,sizeof(header));std::memset(captureMetadata,0,32);std::memset(windowIndexHash,0,32);}
+    double minX,minZ,maxX,maxZ;bool waterVerified;
+    Manifest():minX(0),minZ(0),maxX(0),maxZ(0),waterVerified(false){std::memset(header,0,sizeof(header));std::memset(captureMetadata,0,32);std::memset(windowIndexHash,0,32);}
 };
 inline bool Hex(const std::string&s,unsigned char*out){if(!GSM::Hash(s))return false;for(unsigned i=0;i<32;++i){unsigned a=s[i*2],b=s[i*2+1];out[i]=static_cast<unsigned char>(((a<='9'?a-'0':a-'a'+10)<<4)|(b<='9'?b-'0':b-'a'+10));}return true;}
 inline bool Json(const std::string&s,boost::property_tree::ptree&tree){

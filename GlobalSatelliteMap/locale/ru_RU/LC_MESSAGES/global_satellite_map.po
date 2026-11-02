@@ -7,8 +7,8 @@ msgstr ""
 msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
 msgstr "Спутниковый рельеф недоступен. Подготовленные данные отсутствуют или не соответствуют этой сборке игры. Обычная карта остаётся видимой."
 
-msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
-msgstr "Разрабатываемый вид рельефа с текущим солнечным светом и освещением неба. Здания, вода и местные источники света не включены."
+msgid "Development terrain view with current sunlight, sky lighting and optional water. Buildings and local lights are not included."
+msgstr "Разрабатываемый вид рельефа с текущим солнечным светом, светом неба и водой по выбору. Здания и местные источники света пока не включены."
 
 msgid "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
 msgstr "ВНИМАНИЕ: Перед рендером 4x4 плиток по 8192x8192 нужно не менее 24 ГБ свободного места.\nНесжатые данные рельефа: около 23 ГБ."
@@ -45,3 +45,9 @@ msgstr "Записывать подробную диагностику в RE_Ken
 
 msgid "Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."
 msgstr "Не удалось отрисовать спутниковый рельеф. Подготовленные данные сохранены. Обычная карта остаётся видимой."
+
+msgid "Water"
+msgstr "Вода"
+
+msgid "Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."
+msgstr "Показывать воду с текущим уровнем моря и освещением. Если её ресурсы недоступны, рельеф остаётся видимым."

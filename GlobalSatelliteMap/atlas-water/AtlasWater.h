@@ -79,7 +79,9 @@ public:
   if(!values.Valid(d.Width,d.Height)||d.Format!=DXGI_FORMAT_R16G16B16A16_FLOAT||d.MipLevels!=1||d.ArraySize!=1||d.SampleDesc.Count!=1||d.SampleDesc.Quality||d.Usage!=D3D11_USAGE_DEFAULT||d.CPUAccessFlags||d.MiscFlags)return E_INVALIDARG;
   unsigned side=unsigned(values.sourceWindow[0]);
   if(!View2D(source[0],device_.p,d.Format,d.Width,d.Height)||!View2D(source[1],device_.p,DXGI_FORMAT_R8G8B8A8_UNORM,side,side)||!View2D(source[2],device_.p,DXGI_FORMAT_R32_FLOAT,side,side))return E_INVALIDARG;
-  for(unsigned p=3;p<8;++p)if(!AtlasView::LightView(source[p],device_.p,p>=6,p<6?1:p==6?4:8))return E_INVALIDARG;
+  // Actual native water may expose a one-mip cube. Its unchanged shader's
+  // explicit3/7 LODs clamp to that visible range; never synthesize mip levels.
+  for(unsigned p=3;p<8;++p)if(!AtlasView::LightView(source[p],device_.p,p>=6,1))return E_INVALIDARG;
   for(unsigned s=0;s<5;++s)if(!AtlasView::SameDevice(sampler[s],device_.p))return E_INVALIDARG;
   AtlasView::Com<ID3D11DeviceContext> c;device_.p->GetImmediateContext(&c.p);
   if(!c.p||c.p->GetType()!=D3D11_DEVICE_CONTEXT_IMMEDIATE||AtlasView::Bound(c.p,ownedHdr,true))return DXGI_ERROR_INVALID_CALL;

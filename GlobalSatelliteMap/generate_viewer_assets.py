@@ -53,6 +53,15 @@ while pending:
 lines += ['struct GsmShaderInput {const char*path;const char*sha256;};','static const GsmShaderInput GsmShaderInputs[]={']
 lines += ['{'+json.dumps(p.relative_to(game_root).as_posix())+','+json.dumps(h)+'},' for p,h in sorted(shader_files.items())]
 lines += ['};']
+water_pins_raw=(here/'atlas-water/NativeWaterSnapshot.h').read_text()
+water_pin_body=re.search(r'static const SourcePin SourcePins\[\]=\{(.*?)\};',water_pins_raw,re.S).group(1)
+water_pins=re.findall(r'\{"([^"]+)","([0-9a-f]{64})"\}',water_pin_body)
+assert len(water_pins)==5 and len({p for p,h in water_pins})==5
+lines += ['static const GsmShaderInput GsmWaterShaderInputs[]={']
+for relative,pinned_hash in water_pins:
+ assert hashlib.sha256((game_root/relative).read_bytes()).hexdigest()==pinned_hash,relative
+ lines += ['{'+json.dumps(relative)+','+json.dumps(pinned_hash)+'},']
+lines += ['};']
 (out/'GsmNativeProfile.h').write_text('\n'.join(lines)+'\n')
 game=Path('D:/SteamLibrary/steamapps/common/Kenshi/data/materials')
 fxc=Path('C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe')
@@ -60,3 +69,6 @@ subprocess.run([str(fxc),'/nologo','/T','cs_5_0','/E','main','/O3','/Gec','/D','
 code=(out/'GsmRelight.cso').read_bytes()
 (out/'GsmRelightShader.h').write_text('static const unsigned char GsmRelightShader[]={\n'+',\n'.join(','.join(str(b) for b in code[i:i+24]) for i in range(0,len(code),24))+'\n};\n')
 print('GSM native profile and shader generated; source manifest',sha)
+sys.path.insert(0,str(here/'atlas-water'))
+from generate_pipeline import generate as generate_water_pipeline
+generate_water_pipeline()
