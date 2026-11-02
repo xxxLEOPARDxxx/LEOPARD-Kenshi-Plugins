@@ -11,6 +11,10 @@ class Packet {
 public:Packet():count_(0),generation_(0){std::memset(rawSceneWorld_,0,sizeof(rawSceneWorld_));std::memset(sourceSceneOrigin_,0,sizeof(sourceSceneOrigin_));}
     void Clear(){for(unsigned n=0;n<16;++n){for(unsigned i=0;i<16;++i)draw_[n].vertex[i].Reset();draw_[n].index.Reset();draw_[n].diffuse.Reset();draw_[n].sampler.Reset();draw_[n].layout.Reset();draw_[n].raster.Reset();}count_=generation_=0;std::memset(rawSceneWorld_,0,sizeof(rawSceneWorld_));std::memset(sourceSceneOrigin_,0,sizeof(sourceSceneOrigin_));}
     unsigned Count()const{return count_;}unsigned Generation()const{return generation_;}const float*RawSceneWorld()const{return rawSceneWorld_;}const float*SourceSceneOrigin()const{return sourceSceneOrigin_;}
+    // Borrowed, read-only retention enumeration for a caller's global unique ledger.
+    // Slots0..15 are VBs, slot16 is the IB; sizes were validated during Adopt.
+    ID3D11Buffer*RetainedBuffer(unsigned draw,unsigned slot,UINT&bytes)const{bytes=0;if(draw>=count_||slot>16)return NULL;const Draw&d=draw_[draw];ID3D11Buffer*b=slot==16?d.index.p:d.vertex[slot].p;if(b)bytes=slot==16?d.shape.indexBytes:d.shape.bytes[slot];return b;}
+    ID3D11ShaderResourceView*RetainedDiffuse(unsigned draw)const{return draw<count_?draw_[draw].diffuse.p:NULL;}
     HRESULT Adopt(ID3D11Device*d,const RawDraw*raw,unsigned count,const float*world,const float*origin,unsigned generation,const void*vs,SIZE_T bytes){
         if(!d||!raw||!count||count>16||count_||!world||!origin||!generation||!vs||!bytes||!Finite(world,16)||!Finite(origin,3))return E_INVALIDARG;
         ID3D11Buffer*unique[272]={0};unsigned uniqueCount=0;U64 total=0,vertices=0,indices=0;
