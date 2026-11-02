@@ -1,0 +1,115 @@
+{
+  "scope": "isolated compact twoSID native-material owner and4 WARP controls; no Main/probe/game/install/INI/commit",
+  "status": "implementer PASS; independent review pending",
+  "command": "C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe run_tests.py",
+  "production": {
+    "CompactMaterial.h": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc",
+    "generate.py": "48794eb7b5eaddfc0b618f110720733d7a66b85f8473bec6a3320f3eb7bb8706",
+    "run_tests.py": "ad0df7c1b2f645742d76340acd577f2cb3379808f892ce561ebc13e53b2736a8",
+    "warp_tests.cpp": "12ba9e4032d44527fb01a4052b318c0f7370491d8cf7025c5f15f8cfac5fcbd5",
+    "policy_tests.cpp": "60ad95c4de6a916cd2b504aa41178758c2707c60af3d70cf3951f98d95277408",
+    "test_mutants.py": "6787035eef6c9696ca36bd31465ffcef3f1d5826ffc850b0e4a171a238201bf8",
+    "case-sources.json": "2cf4e88619092de7e689f92d00d02b8c8f914b8cb1dbcad9f95f84aa79777508",
+    "README.md": "421c070162eea1a1e602b446b78b0fa85eaf1726f9e925fa98b2dc11322d9e21",
+    ".gitignore": "830e84a3f8066e8ba5705237bdcbc43a6ba471f2c8f1b4239571ffb1ac26866b",
+    "_source/GeographyTerrain.hlsl": "f9326a91f29e1f1644fc0acbb33bc126bce04590faef2cc7b89dabd1292fd9a1",
+    "_source/GeographyVertex.hlsl": "6ef9efa2c8027da354f812b3f59bfa055c48edcfa4a2057782bd7416f58d54e9",
+    "prepare_sources.py": "1d1c702755e7bad6656ae69b3d7a19fb423f994b645bf6ca0044773f45cadb5f"
+  },
+  "artifacts": {
+    "contract.json": "afe79b4152ba35cc364e4f7c92a59771a428d4dec2d63217d442bfba2993f0b9",
+    "controls.json": "ec22349ed380df69288d5226cea306f1ead2790469e91d8a27ccc471383811ac",
+    "Case.h": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9",
+    "Shaders.h": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315",
+    "Pixel.cso": "4b3b71ccb9c75b79791b9cf3bef5f858ba9c53151a9cfc0d65cd2e7d113fdebe",
+    "Vertex.cso": "dbd13838450fa683426bf3df92728fc0c3dbdf2b798c31c6c1004d0a3e3ed238",
+    "Pixel.reflection.txt": "8bae7e131e75495bb847efd9056bd80aee7f0cbb160c0d50428d9f055ada806e",
+    "Vertex.reflection.txt": "846bee6144a115283412b1abd5dadd6efddab1c332426d8b960fcd71e8882d76",
+    "ProbeExpected.h": "5f0b36351b8b47dbb5f61a4917fdbbde736873ff31a8a2bf27d7f5d584bf1823",
+    "height.u16": "4c2943629387364ee0bfd9f630656affd94fdc7671ab0754b5199e8f3109d3f2",
+    "generate.log": "d10d7fa4ffde1706b5d4af9f1c6b1ba9c7b3328258850773abd177d31c2f0fd3",
+    "policy-red.log": "4d47922a6a2bb446bd783b81e8886d9e0859f34681e9931fc7a4a50572bc3a3a",
+    "policy-build.log": "4d3630623c6a2ae941c3161596f2c04f9df6d146f9f07af207e3bda7835b5a99",
+    "policy-run.log": "907692c0f368304279bde93b0ff4162927e23bf7df14df88ec1f0aa327c130fc",
+    "warp-build.log": "2e6fedf4f4c8a2d99b2a2ff58a6035813e3f4202497bd357a4ba683ab61bfa68",
+    "warp-run.log": "9600989d3f2ace03a6604a5904d5db3405882dc3f6a0c455c441fecc495db902",
+    "mutants.log": "c7b3a50b7f0d0bc3cc4a20b34adfcd0bdff7e412c0a381bfd1a6eea99c8fbaac",
+    "control3-vertex-cb.bin": "c15e061152fdb7f8006c6eb259653008bc0c72d35148008f4bf6986610b468a7",
+    "control3-pixel-cb.bin": "6db46c5f659d574500167fa43543461b5dec629fd1b9787e837574eaa1aee5ab",
+    "control3-gbuffer0.bin": "e8a66123e6e522e3c16e89f65829f0dee36ab65339134c00b3b198ac34097c52",
+    "control3-gbuffer1.bin": "025899c807ea53b9e8a2ce831b921a56b2c8fa2987cc57e407d7d9938b01ee1d",
+    "control3-gbuffer2.bin": "262c8c343630a30e6086c1321dc229528dea56ee79dd341a61dc922914ae1bd7",
+    "control9-vertex-cb.bin": "a6080d49054309c5afa5d485b68a7b6145bee48c3360cabdd8b838bdd465c13f",
+    "control9-pixel-cb.bin": "6db46c5f659d574500167fa43543461b5dec629fd1b9787e837574eaa1aee5ab",
+    "control9-gbuffer0.bin": "10cdb0c2c276bd6733bf1b6da1d5660da8ca363ab25649eecafdcaf85d48b2c0",
+    "control9-gbuffer1.bin": "46e391925cab26550df372cd6c6256a8e4f1ced3f635372cb5a74a071b1f6b7a",
+    "control9-gbuffer2.bin": "1cd67e8b94b19d44ce3d7270b51d211da60da9b465c6536d33f76cf2a524deeb",
+    "shift3-vertex-cb.bin": "f4507aaf678ff9e3fed67fc96bfe3bac8f553f6907a8a6d4f15e7eff9d841adc",
+    "shift3-pixel-cb.bin": "3dcfe2a62028731c94fd6dbf4a59ca13bf87f0650b4dcc0ee5f895c143089be7",
+    "shift3-gbuffer0.bin": "8fca472ec5107ee11ec2339bf29268d93ce8a1b0f0565496d5c6d669768d5d39",
+    "shift3-gbuffer1.bin": "390042fe00bbc7284bee4074c7efc20199caab81ee3127d6a7c806060c882c99",
+    "shift3-gbuffer2.bin": "862437d14853fe16a5ba8bf091bc65b892e56491bdceb80de220ca056426c3eb",
+    "control1-vertex-cb.bin": "412f421ba2c7e8cb15635d4452d3282dd0062a274dc083e45a9d354bf2cd57e5",
+    "control1-pixel-cb.bin": "6db46c5f659d574500167fa43543461b5dec629fd1b9787e837574eaa1aee5ab",
+    "control1-gbuffer0.bin": "10b0670c392a3e24e0bf7eb826494e25e07b5fad06fee225f993ffe0a2e146e4",
+    "control1-gbuffer1.bin": "24de1bdb26c6b5d040427773b3b6001353c4141e56a14a351d011c0f882279e1",
+    "control1-gbuffer2.bin": "affb526e48da7b5d6d4495c68c9e9bc9aee3e2e4c385fc5029c7a4f6c8a32df3"
+  },
+  "geometryHeader": {
+    "path": "../fixed-geometry/FixedTerrainGeometry.h",
+    "sha256": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698"
+  },
+  "results": {
+    "warpChecks": 1125972,
+    "coveredSamples": 262144,
+    "controls": 4,
+    "functionalMutants": 9,
+    "realTextureAllocationFailureStages": 7,
+    "allShaderMath": "unchanged pinned VS/PS DXBC",
+    "independentDdsDecode": "36 actual BC3/BC1 texels x4channels; <=1.01byte tolerance",
+    "fullMipProof": "3 last PNG mips versus independent pixelmeans <4byte; foreign predicate restored",
+    "maxTriangleHeightErrorMeters": 0.00178735014,
+    "shift64pixel": {
+      "samples": 36864,
+      "maxPackedNormalByte": 1,
+      "changedComponents": 196,
+      "maxHeightMeters": 0.00243142879
+    },
+    "spacing3vs9": {
+      "samples": 7396,
+      "maxMaterialNormalByte": 47,
+      "changedComponents": 28802,
+      "maxHeightMeters": 0.00238656325,
+      "materialEquality": false
+    }
+  },
+  "budget": {
+    "sourcePayload": 83885956,
+    "strictControlCap": 94371840,
+    "globalCap": 201326592,
+    "vertexPayload": 676000,
+    "indexPayload": 17144,
+    "cbPayload": 4304,
+    "gbufferPayload": 786432,
+    "largestReadbackPayload": 262144,
+    "newResourcesPerUpload": 0,
+    "liveNativePointers": 0
+  },
+  "limitations": [
+    "Fixed base source profile/fixture scalar values are not proof of actual active resource winners/current native material or weather.",
+    "Packed native material GBuffer, not lit display/RGB preview; root owns later Sun/HDR.",
+    "All immediate-context operations require serialized live render thread; all caller/pending/retired sources counted.",
+    "Arbitrary finite native inputs are not safe; canonical material/weather domain remains necessary.",
+    "No native game calls, Main integration, GUI/FPS/all-leaks/runtime shutdown acceptance."
+  ],
+  "packagingAmendment": {
+    "priorFreezeSha256": "b575f75f55d70e7dcc0d212fe5a8e031ede9c8ab18564c830d7eeee0c4743197",
+    "changedOnly": [
+      "generate.py",
+      "README.md",
+      ".gitignore",
+      "prepare_sources.py"
+    ],
+    "description": "Reconstruct ignored exact shader snapshots locally from installed assets; all37 frozen artifacts unchanged, no owner/math/test changes."
+  }
+}

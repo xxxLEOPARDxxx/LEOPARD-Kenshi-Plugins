@@ -1,0 +1,318 @@
+{
+  "region": [
+    3,
+    3
+  ],
+  "cell": 10,
+  "selector": [
+    18,
+    4,
+    0,
+    0
+  ],
+  "biomes": [
+    {
+      "slot": 0,
+      "globalBiome": 11,
+      "sid": "2743-Newwworld.mod",
+      "roles": [
+        {
+          "kind": 0,
+          "role": 0,
+          "asset": 210,
+          "path": "data/newland/land/textures/wadigravel-white_dif.dds",
+          "sha256": "bc712e270d0316ab91e87e3d6c4501f8f7ac8650cd1e21351bd86d42666b860d",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 1,
+          "asset": 148,
+          "path": "data/newland/land/textures/rockbed01_dif.dds",
+          "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 2,
+          "asset": 109,
+          "path": "data/newland/land/textures/mesa2rockloop_dif.dds",
+          "sha256": "1f30b580a90fe3db29f2d1e5b4261555b1784722daa1cf0964e60f52a8b48639",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 3,
+          "asset": 100,
+          "path": "data/newland/land/textures/landtexture_rocksurface01_dif.dds",
+          "sha256": "c6f56a207d9868415368d109262564b2e4081f713c9aea66f0b2b3bda6b155b4",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 4,
+          "asset": 194,
+          "path": "data/newland/land/textures/skinnersgravel_dif.dds",
+          "sha256": "1b0f516c60e781820f511f999f7efd34e156fadbf70023e6e5fbae8bc012631d",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 5,
+          "asset": 148,
+          "path": "data/newland/land/textures/rockbed01_dif.dds",
+          "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 1,
+          "role": 0,
+          "asset": 212,
+          "path": "data/newland/land/textures/wadigravel_nml.dds",
+          "sha256": "83270743efca5f1541ecdc4a79a10be1c3b0925f1fed2ba05cbb2e33d3cd578d",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 1,
+          "asset": 149,
+          "path": "data/newland/land/textures/rockbed01_nml.dds",
+          "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 2,
+          "asset": 110,
+          "path": "data/newland/land/textures/mesa2rockloop_nml.dds",
+          "sha256": "910318f3dca706b2c100cefdd2d261aed045d1e5f71cc15afcbd9bbd74019c7f",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 3,
+          "asset": 101,
+          "path": "data/newland/land/textures/landtexture_rocksurface01_nml.dds",
+          "sha256": "673991440497732ed8dbea7471ff100452afcadc0f3c939cc1e205a87d289bad",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 4,
+          "asset": 195,
+          "path": "data/newland/land/textures/skinnersgravel_nml.dds",
+          "sha256": "e36b85aafeaaaf10cfd756962739e514a87151f2b6cd6d1be7ec75320c9988e6",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 5,
+          "asset": 149,
+          "path": "data/newland/land/textures/rockbed01_nml.dds",
+          "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+          "fileBytes": 2796344,
+          "format": 71
+        }
+      ]
+    },
+    {
+      "slot": 1,
+      "globalBiome": 37,
+      "sid": "48690-Newwworld.mod",
+      "roles": [
+        {
+          "kind": 0,
+          "role": 0,
+          "asset": 163,
+          "path": "data/newland/land/textures/sand01bc_grey.dds",
+          "sha256": "70ada8b3ab3d6555dab34916a03737627bf256d7730d190bc8102649c84fdf63",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 1,
+          "asset": 148,
+          "path": "data/newland/land/textures/rockbed01_dif.dds",
+          "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 2,
+          "asset": 109,
+          "path": "data/newland/land/textures/mesa2rockloop_dif.dds",
+          "sha256": "1f30b580a90fe3db29f2d1e5b4261555b1784722daa1cf0964e60f52a8b48639",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 3,
+          "asset": 100,
+          "path": "data/newland/land/textures/landtexture_rocksurface01_dif.dds",
+          "sha256": "c6f56a207d9868415368d109262564b2e4081f713c9aea66f0b2b3bda6b155b4",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 4,
+          "asset": 194,
+          "path": "data/newland/land/textures/skinnersgravel_dif.dds",
+          "sha256": "1b0f516c60e781820f511f999f7efd34e156fadbf70023e6e5fbae8bc012631d",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 0,
+          "role": 5,
+          "asset": 148,
+          "path": "data/newland/land/textures/rockbed01_dif.dds",
+          "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+          "fileBytes": 5592560,
+          "format": 77
+        },
+        {
+          "kind": 1,
+          "role": 0,
+          "asset": 167,
+          "path": "data/newland/land/textures/sand3d_nml.dds",
+          "sha256": "aea8305b50dfdf370e5367273a6d30a66e710cd6c4401341a9aec5715032afc1",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 1,
+          "asset": 149,
+          "path": "data/newland/land/textures/rockbed01_nml.dds",
+          "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 2,
+          "asset": 110,
+          "path": "data/newland/land/textures/mesa2rockloop_nml.dds",
+          "sha256": "910318f3dca706b2c100cefdd2d261aed045d1e5f71cc15afcbd9bbd74019c7f",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 3,
+          "asset": 101,
+          "path": "data/newland/land/textures/landtexture_rocksurface01_nml.dds",
+          "sha256": "673991440497732ed8dbea7471ff100452afcadc0f3c939cc1e205a87d289bad",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 4,
+          "asset": 195,
+          "path": "data/newland/land/textures/skinnersgravel_nml.dds",
+          "sha256": "e36b85aafeaaaf10cfd756962739e514a87151f2b6cd6d1be7ec75320c9988e6",
+          "fileBytes": 2796344,
+          "format": 71
+        },
+        {
+          "kind": 1,
+          "role": 5,
+          "asset": 149,
+          "path": "data/newland/land/textures/rockbed01_nml.dds",
+          "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+          "fileBytes": 2796344,
+          "format": 71
+        }
+      ]
+    }
+  ],
+  "painted": [
+    {
+      "kind": 0,
+      "globalPainted": 27,
+      "path": "data/newland/land/overlaymaps/new_overlay.3.3.png",
+      "sha256": "079e3557b69ba792df738bddefd098ad728482de4a48725bd3585e8ba04186c2",
+      "fileBytes": 1707240,
+      "side": 1024
+    },
+    {
+      "kind": 1,
+      "globalPainted": 91,
+      "path": "data/newland/land/overlaymaps/colour.3.3.png",
+      "sha256": "49154c4aca9bfde375314568f330f665347c8bc2fd8068db6cc7a8c0d5a9a9bd",
+      "fileBytes": 9960925,
+      "side": 2048
+    }
+  ],
+  "scope": "pinned base catalog; NOT active native resolution proof",
+  "patch": {
+    "side": 256,
+    "spacing": 3,
+    "bounds": [
+      -14208,
+      -14208,
+      -13440,
+      -13440
+    ],
+    "center": [
+      -13824,
+      -13824
+    ],
+    "nativeSpacing": 18,
+    "heightVertexIndexInclusive": [
+      7402,
+      7446
+    ],
+    "minimalVisibleVertexSide": 45,
+    "minimalVisibleNormalHeightRingSide": 49,
+    "nativeCoarseNormalSourceHalo": 2
+  },
+  "actualGeometry": {
+    "chunkOrigins": [
+      [
+        7360,
+        7360
+      ],
+      [
+        7424,
+        7360
+      ],
+      [
+        7360,
+        7424
+      ],
+      [
+        7424,
+        7424
+      ]
+    ],
+    "vertices": 16900,
+    "stride": 40,
+    "sharedStripIndices": 8572,
+    "heightFixtureMin": [
+      7358,
+      7358
+    ],
+    "heightFixtureMax": [
+      7490,
+      7490
+    ],
+    "heightFixtureSide": 133
+  }
+}
