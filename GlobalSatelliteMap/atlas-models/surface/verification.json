@@ -1,0 +1,25 @@
+{
+  "scope": "isolated surface helper; offline WARP/extracted production tests and compile only, no game runtime parity/performance claim",
+  "date": "2026-11-02",
+  "tdd": "Inert Copy returned E_NOTIMPL and actual WARP fixture failed at copy pristine input; then GREEN",
+  "command": "./run_tests.ps1",
+  "results": {
+    "warpChecks": 138,
+    "extractedInitClearChecks": 43,
+    "compiledWarpMutantsRejected": 10,
+    "compiledInitClearMutantsRejected": 3,
+    "fullSdkNativeDecodeAdapterCompile": "PASS (not invoked)"
+  },
+  "gpuBytes": 1048576,
+  "authoritativeCapBytes": 201326592,
+  "combinedBytes": 196086608,
+  "combinedWithFutureLoadedRasterBytes": 197135408,
+  "files": {
+    "AtlasModelSurface.h": "5a4e44d20025e922057271b197d1e7929cd5736e2b4039c9b9cc0ad72adb58f4",
+    "warp_tests.cpp": "31c3af5ff4bcf2706573db24db483429b4d3db4e3ed2f49a914bc57f08d48b32",
+    "partial_init_tests.py": "948cfcd8ab1b9c9d3de6c1c222f27f9168993b74243f21de960fbd397acfbf77",
+    "mutation_tests.py": "d454d4227f3dcaf729282cf9343d58a256e6dc0520087276cc8781b2c4032006",
+    "compile_adapter.cpp": "59cc3a582ac9583dd3401f760e2822480b30f623ff0e9c00dd4776b6447754ad",
+    "run_tests.ps1": "78cbd4bddada9dc1075585225a3f81393dee96301386ff740468042737045728"
+  }
+}
