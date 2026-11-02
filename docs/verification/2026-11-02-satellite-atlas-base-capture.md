@@ -94,3 +94,44 @@ personal viewer INI unchanged and all222 source hashes reverified. Backup:
 game/_codex_work/global-satellite-20261102/before-atlas-lod32/installation.json.
 Next request1519 remains pending a fresh loaded scene. Full256 runtime fit and
 whole-map display remain unaccepted.
+
+## Full LOD32 capture1519: complete, initial display still pending
+
+Fresh PID28184 completed all256 passes in785.25s. All256 private worker joins
+completed and all1024 owned RTV creation references returned0. Every cleanup
+reported exactly scene0/privateNames3/workspaces1/texture2256116049/material15077810/
+cachedPrograms3. Maximum reported native mesh201312256B remained below the
+unchanged combined cap. Sampled process private bytes ranged8516382720..9787568128,
+ending8743911424. These short paused-scene samples are not FPS or long-session
+leak acceptance. Evidence: game/_codex_work/global-satellite-20261102/
+atlas-1519-runtime-proof.json and atlas-1519-monitor.jsonl.
+
+The offline builder completed global native-packed decoding, all semantic mip
+levels, all288 plane hashes and atomic readiness in343.38s. All222 source hashes
+matched both before and after processing. Exactly16 finalized GST2 files occupy
+22900916224 logical bytes. The completed folder was moved on the same volume to
+game/mods/GlobalSatelliteMap/captures, not copied. The viewer is a separate layer;
+no further world capture is needed for its sun/ambient changes.
+
+First live enable successfully validated the complete atlas/source profile and
+initialized native light resources, then failed on the first relight with
+E_INVALIDARG80070057. Therefore this is NOT proof of visible whole-map rendering.
+The native Ogre one-mip output carries GENERATE_MIPS1 with BindSRV|RT0x28; the
+private helper incorrectly required MiscFlags0. A real WARP allocation with that
+native descriptor reproduces the same error before the narrow admission repair.
+Cube/shared flags and extra mips remain refused. Review and evidence:
+research/gsm-output-descriptor-20261102/report.md. The pending candidate also
+distinguishes draw failure from missing data and contains a visible red MCM disk
+warning in all three languages. Installation/runtime acceptance remain separate.
+
+Storage correction requested by the user: old failed1517/1518 directories and57
+obsolete loose BMPs (4526752753 logical bytes) were moved out of the probe into
+D:/DEV/Kenshi/backup/obsolete-satellite-probe-20261102 with an explicit manifest.
+Automated review rejected deletion without a reason; no destructive fallback
+was attempted. This move alone does not free disk space. Reversible NTFS
+compression is being measured separately. One finalized tile compresses from
+1431307264 to1029234688 allocated bytes with identical full-file SHA256. This
+single-tile result is not a claim about the whole atlas or final distribution
+size. Keep one current atlas; do not retain a new23GB full map for every lighting
+update. A future cache-format optimization must preserve image/data quality and
+bounded random reads, rather than silently lower the requested8K resolution.

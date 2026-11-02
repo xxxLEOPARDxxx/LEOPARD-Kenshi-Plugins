@@ -25,6 +25,14 @@ typedef char UniformSize[(sizeof(Uniforms)==UniformGpuBytes)?1:-1];
 inline bool Identity(IUnknown*a,IUnknown*b){if(!a||!b)return false;Com<IUnknown>x,y;return SUCCEEDED(a->QueryInterface(__uuidof(IUnknown),reinterpret_cast<void**>(&x.p)))&&SUCCEEDED(b->QueryInterface(__uuidof(IUnknown),reinterpret_cast<void**>(&y.p)))&&x.p==y.p;}
 inline bool SameDevice(ID3D11DeviceChild*object,ID3D11Device*device){if(!object)return false;Com<ID3D11Device>d;object->GetDevice(&d.p);return Identity(d.p,device);}
 inline bool SameResource(ID3D11View*view,ID3D11Resource*resource){if(!view)return false;Com<ID3D11Resource>r;view->GetResource(&r.p);return Identity(r.p,resource);}
+inline bool OutputShape(const D3D11_TEXTURE2D_DESC&d,unsigned side){
+    // Native Ogre loadImage retains GENERATE_MIPS even for one requested mip.
+    // Accept only that profiled SRV|RT shape, not cube/shared/other misc flags.
+    return d.Width==side&&d.Height==side&&d.MipLevels==1&&d.ArraySize==1&&
+        d.Format==DXGI_FORMAT_R8G8B8A8_UNORM&&d.SampleDesc.Count==1&&!d.SampleDesc.Quality&&
+        d.Usage==D3D11_USAGE_DEFAULT&&!d.CPUAccessFlags&&
+        (!d.MiscFlags||(d.MiscFlags==D3D11_RESOURCE_MISC_GENERATE_MIPS&&d.BindFlags==(D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET)));
+}
 // Writable aliases are refused before mutation. Read-only owned-output aliases
 // can be scoped below without touching hidden append counters/OM state.
 inline bool Bound(ID3D11DeviceContext*c,ID3D11Resource*r,bool writesOnly=false){
@@ -122,14 +130,18 @@ public:
         if(SUCCEEDED(hr))hr=d->CreateTexture2D(&t,NULL,&scratch_.p);if(SUCCEEDED(hr))hr=d->CreateUnorderedAccessView(scratch_.p,NULL,&uav_.p);
         if(FAILED(hr)){Clear();return hr;}device_.p=d;d->AddRef();side_=scratchSide;scratchSide_=t.Width;return S_OK;
     }
-    HRESULT Render(const Cell&cell,const Uniforms&values,ID3D11ShaderResourceView*const light[3],ID3D11SamplerState*const sampler[3],ID3D11Texture2D*output){
+    HRESULT Render(const Cell&cell,const Uniforms&values,ID3D11ShaderResourceView*const light[3],ID3D11SamplerState*const sampler[3],ID3D11Texture2D*output,unsigned*refusal=NULL){
+        if(refusal)*refusal=1;
         if(!device_.p||!cell.side||cell.side>side_||!values.Valid(cell.side)||!light||!sampler||!SameDevice(output,device_.p))return E_INVALIDARG;
-        for(unsigned p=0;p<3;++p)if(!SameDevice(cell.view[p].p,device_.p)||!SameDevice(sampler[p],device_.p)||!LightView(light[p],device_.p,p!=0,p==0?1:(p==1?4:8)))return E_INVALIDARG;
+        for(unsigned p=0;p<3;++p){if(refusal)*refusal=2+p;if(!SameDevice(cell.view[p].p,device_.p)||!SameDevice(sampler[p],device_.p)||!LightView(light[p],device_.p,p!=0,p==0?1:(p==1?4:8)))return E_INVALIDARG;}
+        if(refusal)*refusal=5;
         D3D11_TEXTURE2D_DESC d;output->GetDesc(&d);
-        if(d.Width!=cell.side||d.Height!=cell.side||d.MipLevels!=1||d.ArraySize!=1||d.Format!=DXGI_FORMAT_R8G8B8A8_UNORM||d.SampleDesc.Count!=1||d.SampleDesc.Quality!=0||d.Usage!=D3D11_USAGE_DEFAULT||d.CPUAccessFlags||d.MiscFlags)return E_INVALIDARG;
+        if(!OutputShape(d,cell.side))return E_INVALIDARG;
+        if(refusal)*refusal=6;
         Com<ID3D11DeviceContext>c;device_.p->GetImmediateContext(&c.p);
         if(!c.p||c.p->GetType()!=D3D11_DEVICE_CONTEXT_IMMEDIATE||Bound(c.p,output,true))return DXGI_ERROR_INVALID_CALL;
-        for(unsigned p=0;p<3;++p){Com<ID3D11Resource>r;light[p]->GetResource(&r.p);if(SameResource(light[p],output)||Identity(cell.texture[p].p,output)||Bound(c.p,r.p,true))return DXGI_ERROR_INVALID_CALL;}
+        for(unsigned p=0;p<3;++p){if(refusal)*refusal=7+p;Com<ID3D11Resource>r;light[p]->GetResource(&r.p);if(SameResource(light[p],output)||Identity(cell.texture[p].p,output)||Bound(c.p,r.p,true))return DXGI_ERROR_INVALID_CALL;}
+        if(refusal)*refusal=0;
         // Caller guarantees this is its verified owned Ogre output, not an
         // arbitrary native target. Restore only matching read bindings exactly.
         SavedOutputReads outputReads(c.p,output);

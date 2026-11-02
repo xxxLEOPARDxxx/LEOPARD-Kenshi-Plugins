@@ -11,7 +11,7 @@ for key in ('ogre','d3d11'):
  lines += [f'static const char {prefix}File[]={json.dumps(p["file"])};',f'static const char {prefix}Hash[]={json.dumps(p["sha256"])};',f'static const DWORD {prefix}Timestamp=0x{p["timestamp"]};',f'static const DWORD {prefix}Size=0x{p["image_size"]};']
  checks=list(p['windows'])
  for e in p['exports']:
-  if key=='ogre' and e['key'] in ('NativeFindNode','NativeNodeTexture'):
+  if key=='ogre' and e['key'] in ('NativeFindNode','NativeNodeTexture','PrivateResourceCreator','PrivateResourceLoaded','PrivateResourceSetLoaded'):
    lines += [f'static const char Gsm{e["key"]}Name[]={json.dumps(e["name"])};',f'static const DWORD Gsm{e["key"]}Rva=0x{e["rva"]};']
   if 'code' in e:checks.append(e)
  lines += [f'static const GsmCodeWindow {prefix}Windows[]={{']

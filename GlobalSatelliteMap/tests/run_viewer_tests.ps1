@@ -16,5 +16,7 @@ foreach($test in @('atlas_manifest_tests','atlas_job_tests','atlas_geometry_test
 }
 & $python "$PSScriptRoot/native_sampler_tests.py"
 if($LASTEXITCODE -ne 0){throw 'Native sampler contract failed'}
+& $python "$PSScriptRoot/managed_image_tests.py"
+if($LASTEXITCODE -ne 0){throw 'Extracted managed image completion failed'}
 & $python "$PSScriptRoot/source_contracts.py"
 if($LASTEXITCODE -ne 0){throw 'Viewer source/catalog contracts failed'}

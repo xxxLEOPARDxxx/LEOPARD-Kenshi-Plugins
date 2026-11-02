@@ -10,6 +10,9 @@ msgstr "Satellite terrain is unavailable. Prepared terrain data is missing or do
 msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
 msgstr "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
 
+msgid "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
+msgstr "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
+
 msgid "Global map"
 msgstr "Global map"
 
@@ -39,3 +42,6 @@ msgstr "Detailed log"
 
 msgid "Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."
 msgstr "Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."
+
+msgid "Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."
+msgstr "Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."

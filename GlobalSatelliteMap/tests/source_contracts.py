@@ -19,6 +19,13 @@ assert 'GsmAtlas::Run' in s and 'GsmNative::Srv(e.texture.get())' in s
 assert 'getActiveSave' not in s and 'manifest.gsm' not in s
 assert 'GetModuleFileNameW' in s and 'SharedIniDefaults/MCMuseWindowsACP' in s
 assert s.rfind('api->toggle(api,ID,"Debug"')>s.rfind('api->toggle(api,ID,"AmbientLight"')
+# Visible warning uses supported v4 custom UI: info is only a list tooltip.
+assert 'api->customArea(api,&AttachDiskWarning,&DetachDiskWarning,NULL,15)' in s
+assert 'w->setTextColour(MyGUI::Colour(1.0f,0.2f,0.2f))' in s
+assert 'w->setEditWordWrap(true)' in s and 'w->setEditStatic(true)' in s and 'diskWarning.get()->getParent()==p' in s
+assert 'void__cdeclDetachDiskWarning(void*)' in s and 'diskWarning.reset()' in s
+warning='WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\\nUncompressed terrain data: about 23 GB.'
+assert warning in raw
 ini=(base/'GlobalSatelliteMap.ini').read_text()
 for key in ('Enabled=0','Sunlight=1','AmbientLight=1','Debug=0'):assert key in ini
 worker=(base/'GsmAtlasJob.h').read_text()

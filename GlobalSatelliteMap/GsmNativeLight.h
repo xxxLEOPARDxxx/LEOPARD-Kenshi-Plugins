@@ -5,6 +5,7 @@
 #include <OgreTechnique.h>
 #include <OgrePass.h>
 #include <OgreTextureUnitState.h>
+#include <OgreTextureManager.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreHardwarePixelBuffer.h>
 #include <Compositor/OgreCompositorWorkspace.h>
@@ -21,6 +22,21 @@ inline bool Profile(){return Engine()&&Module(GetModuleHandleA(GsmOgreFile),GsmO
 inline FARPROC Export(const char*name,DWORD rva){HMODULE h=GetModuleHandleA(GsmOgreFile);FARPROC p=GetProcAddress(h,name);if(!p||reinterpret_cast<const BYTE*>(p)!=reinterpret_cast<const BYTE*>(h)+rva)throw std::runtime_error("native lighting export profile differs");return p;}
 inline bool TextureType(Ogre::Texture*t){__try{return t&&*reinterpret_cast<const BYTE*const*>(t)==reinterpret_cast<const BYTE*>(GetModuleHandleA(GsmD3d11File))+GsmTextureVtable;}__except(EXCEPTION_EXECUTE_HANDLER){return false;}}
 inline ID3D11ShaderResourceView*Srv(Ogre::Texture*t){if(!Profile()||!TextureType(t))throw std::runtime_error("native texture identity/profile differs");typedef ID3D11ShaderResourceView*(__fastcall*Get)(Ogre::Texture*);ID3D11ShaderResourceView*v=reinterpret_cast<Get>(reinterpret_cast<BYTE*>(GetModuleHandleA(GsmD3d11File))+GsmSrvGetter)(t);if(!v)throw std::runtime_error("native texture SRV missing");return v;}
+// TextureManager::loadImage already credits its creator. The audited D3D
+// override leaves Loaded false; settle only that state, never notify again.
+inline void CompleteManagedImage(Ogre::Texture*t){
+    if(!Profile()||!TextureType(t))throw std::runtime_error("managed image identity/profile differs");
+    typedef Ogre::ResourceManager*(__fastcall*Creator)(Ogre::Resource*);
+    typedef bool(__fastcall*Loaded)(const Ogre::Resource*);
+    typedef void(__fastcall*SetLoaded)(Ogre::Resource*);
+    Creator creator=reinterpret_cast<Creator>(Export(GsmPrivateResourceCreatorName,GsmPrivateResourceCreatorRva));
+    if(creator(t)!=static_cast<Ogre::ResourceManager*>(&Ogre::TextureManager::getSingleton()))throw std::runtime_error("managed image creator differs");
+    Loaded loaded=reinterpret_cast<Loaded>(Export(GsmPrivateResourceLoadedName,GsmPrivateResourceLoadedRva));
+    if(!loaded(t)){
+        reinterpret_cast<SetLoaded>(Export(GsmPrivateResourceSetLoadedName,GsmPrivateResourceSetLoadedRva))(t);
+        if(!loaded(t))throw std::runtime_error("managed image Loaded completion failed");
+    }
+}
 inline Ogre::Vector4 Shared(const char*set,const char*name,unsigned count){Ogre::GpuSharedParametersPtr p=Ogre::GpuProgramManager::getSingleton().getSharedParameters(set);const Ogre::GpuConstantDefinition&d=p->getConstantDefinition(name);if(d.arraySize!=1||d.constType!=(count==1?Ogre::GCT_FLOAT1:count==3?Ogre::GCT_FLOAT3:Ogre::GCT_FLOAT4))throw std::runtime_error("native lighting shared type differs");const float*v=static_cast<const Ogre::GpuSharedParameters*>(p.get())->getFloatPointer(d.physicalIndex);Ogre::Vector4 r(0,0,0,0);for(unsigned i=0;i<count;++i){if(!_finite(v[i]))throw std::runtime_error("native lighting nonfinite");r[i]=v[i];}return r;}
 inline void Put(float*out,const Ogre::Vector4&v){out[0]=v.x;out[1]=v.y;out[2]=v.z;out[3]=v.w;}
 inline D3D11_TEXTURE_ADDRESS_MODE Address(Ogre::TextureUnitState::TextureAddressingMode m){switch(m){case Ogre::TextureUnitState::TAM_WRAP:return D3D11_TEXTURE_ADDRESS_WRAP;case Ogre::TextureUnitState::TAM_MIRROR:return D3D11_TEXTURE_ADDRESS_MIRROR;case Ogre::TextureUnitState::TAM_CLAMP:return D3D11_TEXTURE_ADDRESS_CLAMP;case Ogre::TextureUnitState::TAM_BORDER:return D3D11_TEXTURE_ADDRESS_BORDER;default:throw std::runtime_error("native sampler address unsupported");}}

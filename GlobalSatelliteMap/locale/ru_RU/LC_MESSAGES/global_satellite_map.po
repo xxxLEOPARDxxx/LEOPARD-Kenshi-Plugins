@@ -10,6 +10,9 @@ msgstr "Спутниковый рельеф недоступен. Подгото
 msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
 msgstr "Разрабатываемый вид рельефа с текущим солнечным светом и освещением неба. Здания, вода и местные источники света не включены."
 
+msgid "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
+msgstr "ВНИМАНИЕ: Перед рендером 4x4 плиток по 8192x8192 нужно не менее 24 ГБ свободного места.\nНесжатые данные рельефа: около 23 ГБ."
+
 msgid "Global map"
 msgstr "Глобальная карта"
 
@@ -39,3 +42,6 @@ msgstr "Подробный журнал"
 
 msgid "Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."
 msgstr "Записывать подробную диагностику в RE_Kenshi_log.txt. Ошибки записываются всегда."
+
+msgid "Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."
+msgstr "Не удалось отрисовать спутниковый рельеф. Подготовленные данные сохранены. Обычная карта остаётся видимой."
