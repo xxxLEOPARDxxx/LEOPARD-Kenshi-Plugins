@@ -11,24 +11,25 @@ struct AtlasRun {
   Gst2::Writer* writer;std::string controlPath;bool ok;unsigned valid,invalid;char error[256];
   Pixels():writer(NULL),ok(false),valid(0),invalid(0){error[0]=0;}
  };
- bool active,cancelled,quarantined,control;unsigned index,limit;void* world;
+ bool active,cancelled,quarantined,control;unsigned index,limit,controlCase;void* world;
  std::string directory;HANDLE thread;Pixels* pixels;
  Gst2::Win32File* file;Gst2::Writer* writer;
- AtlasRun():active(false),cancelled(false),quarantined(false),control(false),index(0),limit(256),world(NULL),thread(NULL),pixels(NULL),file(NULL),writer(NULL){}
- bool Block(AtlasCapture::Block& out)const{return control?AtlasCapture::OverlapControl(out):AtlasCapture::Select(index,out);}
+ AtlasRun():active(false),cancelled(false),quarantined(false),control(false),index(0),limit(256),controlCase(0),world(NULL),thread(NULL),pixels(NULL),file(NULL),writer(NULL){}
+ bool Block(AtlasCapture::Block& out)const{return control?AtlasCapture::OverlapControl(out,controlCase):AtlasCapture::Select(index,out);}
  static std::wstring Wide(const std::string& text){
   int n=MultiByteToWideChar(CP_ACP,0,text.c_str(),-1,NULL,0);if(n<=1)throw std::runtime_error("atlas output path conversion failed");
   std::vector<wchar_t> p(n);if(MultiByteToWideChar(CP_ACP,0,text.c_str(),-1,&p[0],n)!=n)throw std::runtime_error("atlas output path conversion failed");return &p[0];
  }
  void CloseFile(){delete writer;writer=NULL;bool closed=!file||file->Close();delete file;file=NULL;if(!closed){quarantined=true;active=false;throw std::runtime_error("atlas file close failed; job quarantined");}}
- void Begin(const std::string& folder,unsigned token,void* identity,unsigned blocks=256,bool overlapControl=false){
+ void Begin(const std::string& folder,unsigned token,void* identity,unsigned blocks=256,bool overlapControl=false,unsigned requestedCase=0){
   if(active||thread||pixels||writer||file||quarantined||!identity||!token||(blocks!=1&&blocks!=16&&blocks!=256))throw std::runtime_error("atlas job already owns resources/invalid identity");
+  if(requestedCase>1||(!overlapControl&&requestedCase!=0))throw std::runtime_error("overlap control case refused");
   const unsigned __int64 needed=overlapControl?128ULL*1024*1024:Gst2::FileBytes()*16+1024ULL*1024*1024;
   ULARGE_INTEGER available={0};if(!GetDiskFreeSpaceExA(folder.c_str(),&available,NULL,NULL)||available.QuadPart<needed)
    throw std::runtime_error(overlapControl?"overlap control needs128MiB free output space":"atlas needs23GiB free output space including reserve");
   std::ostringstream path;path<<folder<<(overlapControl?"overlap-":"atlas-")<<token;
   if(!CreateDirectoryA(path.str().c_str(),NULL))throw std::runtime_error("atlas output directory must be new; existing data never overwritten");
-  directory=path.str();index=0;limit=overlapControl?1:blocks;control=overlapControl;cancelled=false;world=identity;active=true;
+  directory=path.str();index=0;limit=overlapControl?1:blocks;control=overlapControl;controlCase=requestedCase;cancelled=false;world=identity;active=true;
  }
  void PrepareFile(){
   if(control)return;

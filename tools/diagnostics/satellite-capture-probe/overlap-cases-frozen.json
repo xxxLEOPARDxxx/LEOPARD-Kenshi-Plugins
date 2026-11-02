@@ -1,0 +1,38 @@
+{
+  "AtlasCapturePolicy.h": {
+    "bytes": 1053,
+    "sha256": "d3217c51e59a02be167bf424e14302fc47092c939dcdae5d3e17f7982a3ab69e"
+  },
+  "AtlasRun.h": {
+    "bytes": 9064,
+    "sha256": "1d922d019d4b2694fa62289a64ba531b5ec873a0ad36163f2655166e24a05cff"
+  },
+  "TerrainExperiment.h": {
+    "bytes": 25822,
+    "sha256": "a05ce1fa9672d1fdebb229b73e03b783f9bbb7d95606d60a00af86b3f0145244"
+  },
+  "CaptureProbe.cpp": {
+    "bytes": 91204,
+    "sha256": "b46ab128f859fdf643e044de7e72e9ff3e8fb86c7bbad7f87d6bb22c3641fcab"
+  },
+  "test_overlap_control.py": {
+    "bytes": 10155,
+    "sha256": "68140b293009af2ed53b401f722549a3f94862feae649f41a0eac9fd0e2b8577"
+  },
+  "test_atlas_worker.py": {
+    "bytes": 10440,
+    "sha256": "b10c7ca15b200cba02ffc513bb1a0feefe6de2fe2352874063c18a78743d1afc"
+  },
+  "README.md": {
+    "bytes": 57276,
+    "sha256": "4419b4994a36b4451ceefc6e63d2ca3587a6b21b5b2fa7ab0547fbb5ac637a0a"
+  },
+  "overlap-cases-verification.md": {
+    "bytes": 3250,
+    "sha256": "721b27a0c771966f98566e8dbf54bc2322e9c6fc3c9490cbd8da90ac94f38e20"
+  },
+  "build/SatelliteCaptureProbe.dll": {
+    "bytes": 559104,
+    "sha256": "9cf875c2bd3f9e4a5e45d2fb37a34e7709511633edb72f68285cd04951a7d4e3"
+  }
+}

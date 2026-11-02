@@ -1614,8 +1614,12 @@ void Update(MapScreen *map)
             if(GetPrivateProfileIntA("Probe","BiomeMaterialReference",0,ini.c_str())==1)
                 GetPrivateProfileStringA("Probe","ReferenceBiomeSID","5611-Newwworld.mod",biomeSid,sizeof(biomeSid),ini.c_str());
             if(atlasRequest){
-                if(!atlasRun.active){unsigned token=GetPrivateProfileIntA("Probe","Request",0,requestIni.c_str());atlasRun.Begin(Folder(),token?token:GetTickCount(),ou,GetPrivateProfileIntA("Probe","AtlasBlocks",256,requestIni.c_str()),overlapRequest);}
-                terrainExperiment.BeginAtlas(renderer->root,atlasRun.index,base+"/data/newland/land/fullmap.tif",atlasRun.control);
+                if(!atlasRun.active){
+                    unsigned token=GetPrivateProfileIntA("Probe","Request",0,requestIni.c_str());
+                    const unsigned controlCase=overlapRequest?GetPrivateProfileIntA("Probe","OverlapCase",0,requestIni.c_str()):0;
+                    atlasRun.Begin(Folder(),token?token:GetTickCount(),ou,GetPrivateProfileIntA("Probe","AtlasBlocks",256,requestIni.c_str()),overlapRequest,controlCase);
+                }
+                terrainExperiment.BeginAtlas(renderer->root,atlasRun.index,base+"/data/newland/land/fullmap.tif",atlasRun.control,atlasRun.controlCase);
             }else
             terrainExperiment.Begin(renderer->root,
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),

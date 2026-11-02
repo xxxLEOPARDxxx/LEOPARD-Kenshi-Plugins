@@ -102,16 +102,16 @@ static void Run(int failPlane,int invalid,bool oom){
  }else{Check(p.ok&&!p.error[0],"complete worker success");Check(io.dataWrites==6144,"exactly three2048row writes");Check(!writer.BaseComplete(),"one capture block is never a complete primary");}
  Check(!p.packed.empty()==(failPlane==0),"raw copy released only after successful material write");
 }
-static void Control(){
+static void Control(unsigned controlCase){
  const char* path="overlap-worker-control.bin";std::remove(path);
  Recording io;Gst2::Writer writer;Check(writer.Begin(io,0,0,true),"control fixture original writer");
- ActualWorker::Pixels p;Fill(p,writer);p.writer=NULL;p.controlPath=path;AtlasCapture::OverlapControl(p.block);
+ ActualWorker::Pixels p;Fill(p,writer);p.writer=NULL;p.controlPath=path;Check(AtlasCapture::OverlapControl(p.block,controlCase),"control case accepted");
  ActualWorker::WritePixels(&p);Check(p.ok&&!p.error[0],"compact control accepts no GST writer");
  FILE* file=NULL;Check(fopen_s(&file,path,"rb")==0&&file,"real control file exists");
  unsigned char header[32];Check(fread(header,1,32,file)==32,"control header readable");
  Check(std::memcmp(header,"GSOV1\r\n",8)==0,"versioned diagnostic header");
  unsigned side=0;float minX=0,minZ=0,step=0;std::memcpy(&side,header+8,4);std::memcpy(&minX,header+12,4);std::memcpy(&minZ,header+16,4);std::memcpy(&step,header+20,4);
- Check(side==2048&&minX==-27648&&minZ==-18432&&step==9,"overlap footprint stored exactly");
+ Check(side==2048&&minX==(controlCase?-18576:-27648)&&minZ==(controlCase?-18576:-18432)&&step==9,"selected overlap footprint stored exactly");
  const unsigned count=2048u*2048u;std::vector<unsigned> plane(count);
  Check(fread(&plane[0],4,count,file)==count,"packed material plane complete");
  for(unsigned i=0;i<count;++i)if(plane[i]!=Packed(i)){Check(false,"packed plane exact");break;}
@@ -130,8 +130,8 @@ static void Control(){
 int main(){
  Run(-1,0,false);Run(0,0,false);Run(1,0,false);Run(2,0,false);
  Run(-1,1,false);Run(-1,2,false);Run(-1,3,false);Run(-1,0,true);
- Control();
- std::printf("PASS %u extracted production AtlasRun::WritePixels checks;8 full-size cases; no Ogre/game calls\n",checks);return 0;
+ Control(0);Control(1);
+ std::printf("PASS %u extracted production AtlasRun::WritePixels checks;8 atlas cases,2 full controls,4 control refusals; no Ogre/game calls\n",checks);return 0;
 }
 '''
 generated=OUT/'actual_atlas_worker.cpp'

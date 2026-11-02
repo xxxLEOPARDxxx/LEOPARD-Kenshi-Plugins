@@ -694,3 +694,38 @@ distance-fade coefficients for the same15 biome rows; shader/resources/caps stay
 unchanged. At the16000m orbital camera this strongly fades base detail, before
 roads/cliffs are composed. The local candidate has offline evidence only; see
 [geography-native-fade-verification.md](geography-native-fade-verification.md).
+
+## Fixed overlap controls (private diagnostic, 2026-11-03)
+
+The existing isolated2048 terrain path accepts `OverlapControl=1` and
+`OverlapCase=0` (default) or `OverlapCase=1`. A new positive request token starts
+one frame in a NEW `overlap-<token>` directory. `Request=0` only arms the file
+latch; stable zero does not capture. These controls require `IsolatedTerrain=1`
+and startup `DiagnosticSide=2048`. They do not enable or write an atlas.
+
+| Case | Primary / material region | Source start | Camera center | World bounds |
+|---|---|---|---|---|
+|0, default/original|1,1 /3,3|5120,6144|(-18432,-9216)|X[-27648,-9216],Z[-18432,0]|
+|1, inset edge control|1,1 /3,3|6128,6128|(-9360,-9360)|X/Z[-18576,-144]|
+
+Both are2048 square at9m/sample, altitude16000, detail32/32/0, original patch64,
+build limits32/8 and unchanged combined budget. Case1 puts old source edges
+x6144/z6144 at output coordinate16; it is intended to test an interior crop with
+guard context. It is not a ready2016-core atlas writer or a production seam fix.
+The chosen unsigned case latches with the job/world at Begin; runtime INI edits
+cannot redirect the active terrain or copied worker payload. Values other than
+0/1 are rejected before disk query, directory creation or terrain allocation.
+Normal atlas requests do not read OverlapCase; direct non-control case1 calls
+are refused. Existing case0 remains reproducible without specifying the new key.
+
+Output format remains `control.bin`:32-byte GSOV1 header and three2048-square
+planes: raw packed material, normalized-channel normal/coverage and world-height
+R32. Exactly50,331,680 bytes. No installed GST/mips/GSI/ready files are written.
+
+Actual case0/token1520 evidence established a narrow producer edge defect in the
+examined fixture: four columns of changed height/normal and six decoded material
+columns (one-texel axial chroma support), up to12.23m height difference. Interior
+material and normals outside the edge strip matched. This does not identify the
+exact native stitch branch, prove a universal halo width or register the original
+user screenshot. Case1 still requires actual equal-world comparison against the
+case0 interior reference; full-world recapture is not authorized by this control.
