@@ -29,7 +29,7 @@ foreach($test in @('window_geometry_tests.py','window_adoption_tests.py','window
 if($LASTEXITCODE -ne 0){throw 'Extracted water caller lifecycle failed'}
 & "$PSScriptRoot/run_water_job_tests.ps1"
 if($LASTEXITCODE -ne 0){throw 'Water-source worker/window minimum failed'}
-foreach($test in @('model_job_tests.py','model_caller_tests.py','zoom_mutation_tests.py','zoom_caller_tests.py','zoom_step_caller_tests.py')){
+foreach($test in @('model_job_tests.py','model_caller_tests.py','cached_town_job_tests.py','cached_town_job_mutations.py','cached_town_state_tests.py','cached_town_caller_tests.py','zoom_mutation_tests.py','zoom_caller_tests.py','zoom_step_caller_tests.py')){
     & $python "$PSScriptRoot/$test"
     if($LASTEXITCODE -ne 0){throw "Model integration failed: $test"}
 }

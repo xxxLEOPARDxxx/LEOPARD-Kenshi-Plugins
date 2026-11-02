@@ -18,6 +18,7 @@ def run():
  a=s.index('    unsigned shaded=0,next=shadeCursor;');b=s.index('}shadeCursor=next;',a)+len('}shadeCursor=next;')
  shade='static unsigned ShadeSlice(){AtlasView::WindowRect cells[16],clip(0,0,8192,8192);for(unsigned i=0;i<16;++i)cells[i]=AtlasView::WindowRect(0,0,8192,8192);Plan plan;'+s[a:b]+'return shaded;}'
  code=r'''
+#include <memory>
 #include "GsmAtlasManifest.h"
 #include "GsmViewerClock.h"
 #include "GsmZoomPolicy.h"
@@ -29,7 +30,7 @@ static const char*ID="GlobalSatelliteMap";
 static GsmZoom::Lease zoomLease;static bool zoomFailed=false;static int zoomMultiplier=1;
 static void Check(bool x,const char*s){++checks;if(!x){std::fprintf(stderr,"FAIL %s\n",s);throw 1;}}
 namespace GSM {volatile LONG generation=7;}
-namespace GsmAtlas {struct Job{HANDLE thread;LONG generation;bool waterValidation,modelValidation,validation,ok;char error[512];Manifest manifest;AtlasView::ReadRequest read;Job():thread(reinterpret_cast<HANDLE>(1)),generation(7),waterValidation(false),modelValidation(false),validation(false),ok(false){std::strcpy(error,"fixture source error");}};}
+namespace GsmAtlas {struct Job{HANDLE thread;LONG generation;bool cachedTown,waterValidation,modelValidation,validation,ok;char error[512];Manifest manifest;AtlasView::ReadRequest read;Job():thread(reinterpret_cast<HANDLE>(1)),generation(7),cachedTown(false),waterValidation(false),modelValidation(false),validation(false),ok(false){std::strcpy(error,"fixture source error");}};}
 struct MapScreen{};struct Output{ID3D11Texture2D*p;Output():p(NULL){}};
 struct Entry{AtlasView::WindowKey key;unsigned shaded,waterStamp,localStamp,modelStamp;bool waterApplied,hasHeight,localApplied,modelApplied;float minHeight;AtlasView::Cell gpu;Output output;Entry():shaded(0),waterStamp(0),localStamp(0),modelStamp(0),waterApplied(false),hasHeight(true),localApplied(false),modelApplied(false),minHeight(90){}};
 static Entry cache[AtlasView::WindowSlots];static unsigned shadeCursor=0,lightVersion=5,waterVersion=1,localVersion=1;
@@ -38,6 +39,7 @@ static void ResetLocal(){}
 struct LocalStub{void Reset(){}void Clear(){}};static LocalStub localDiagnostic,localLayer;
 static bool WantsLocal(Entry&){return false;}
 static bool modelOption=false,modelAttempted=false,modelFailed=false;
+static void CachedTownCompletion(const GsmAtlas::Job&){throw std::runtime_error("cached branch must not run in water fixture");}
 static void ResetModels(){}static bool ModelsAvailable(){return false;}
 struct Models{unsigned Revision()const{return 1;}};static Models models;
 static AtlasView::Cell modelCell;

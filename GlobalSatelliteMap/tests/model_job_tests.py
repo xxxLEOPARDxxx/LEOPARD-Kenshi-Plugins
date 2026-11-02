@@ -80,7 +80,7 @@ for mode in range(7):execute(exe,mode)
 source=(BASE/'GsmAtlasJob.h').read_text()
 cases=[
  ('skip-model-mode','if(job.modelValidation){ValidateModelSources(job);','if(false){ValidateModelSources(job);',0,'actual model-only worker validates all generated source pins'),
- ('allow-mixed-mode','if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)>1)','if(false)',4,'model refusal never leaves stale acceptance'),
+ ('allow-mixed-mode','if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)+unsigned(job.cachedTown)>1)','if(false)',4,'model refusal never leaves stale acceptance'),
  ('expand-model-cap','16ULL*1024*1024','64ULL*1024*1024',5,'sixteen MiB model source cap refuses before oversized file IO'),
  ('stale-proof',None,None,2,'model refusal never leaves stale acceptance'),
 ]

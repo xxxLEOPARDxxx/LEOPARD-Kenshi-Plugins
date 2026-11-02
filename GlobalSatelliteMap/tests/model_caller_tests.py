@@ -38,7 +38,8 @@ namespace GsmModels{const unsigned Slots=64;struct Source{bool valid;AtlasModels
 struct Entry{AtlasView::Cell gpu;};
 bool modelOption=true,modelFailed=false,modelGpuReady=false,modelCatalogReady=false;DWORD modelCatalogAt=0;LONG observedGeneration=7;unsigned modelRenders=0;
 struct Manifest{bool modelVerified;Manifest():modelVerified(true){}}manifest;
-GsmModels::Cache models;AtlasModels::Raster modelRaster;AtlasModelDecode::Layer modelDecode;AtlasModelSurface::Layer modelSurface;AtlasView::Cell modelCell;AtlasModelDecode::ProvenMapping modelMapping;const void*modelProofScene=NULL;
+struct CachedTown{bool valid,clearOk;unsigned generation,clearCalls;AtlasView::U64 owned;AtlasModels::Packet packet;AtlasModelRegion::Bounds bounds;CachedTown():valid(false),clearOk(true),generation(7),clearCalls(0),owned(0){}bool Clear(){++clearCalls;valid=false;if(clearOk)owned=0;return clearOk;}bool Valid(unsigned g)const{return valid&&g==generation;}AtlasView::U64 OwnedGpuBytes()const{return owned;}const AtlasModels::Packet&Geometry()const{return packet;}const AtlasModelRegion::Bounds&Bounds()const{return bounds;}}cachedTown;
+std::string cachedSelectionError;GsmModels::Cache models;AtlasModels::Raster modelRaster;AtlasModelDecode::Layer modelDecode;AtlasModelSurface::Layer modelSurface;AtlasView::Cell modelCell;AtlasModelDecode::ProvenMapping modelMapping;const void*modelProofScene=NULL;
 const AtlasView::U64 ModelGpuBytes=AtlasModels::PrivateBytes+AtlasModelDecode::PrivateBytes+AtlasModelSurface::PrivateBytes;
 struct NativeLight{Ref<Resource>device;}nativeLight;
 const unsigned char AtlasModelVertexShader[]={0},AtlasModelPixelShader[]={0},AtlasModelDecodeShader[]={0};
@@ -64,6 +65,35 @@ int main(){Resource original[3];Entry e;for(unsigned i=0;i<3;++i){original[i].va
  Admit();failDecode=S_OK;failCopy=E_FAIL;unsigned prior=rasters;CHECK(FAILED(PrepareModelCell(e,u,applied))&&rasters==prior);ModelFailure("copy");
  Admit();failCopy=S_OK;failInit=true;CHECK(FAILED(PrepareModelCell(e,u,applied))&&!modelGpuReady);ModelFailure("init");
  CHECK(Other+ModelGpuBytes==196086608&&Other+ModelGpuBytes<AtlasView::GpuCap);
+ // Cached packet is the logical extra index64; its one owned source never mutates the streamed base.
+ ResetModels();Admit();models.items[0].source.valid=false;failInit=false;cachedTown.valid=true;cachedTown.owned=323550;
+ unsigned r0=rasters,d0=decodes,c0=copies;
+ CHECK(PrepareModelCell(e,u,applied)==S_OK&&applied&&rasters==r0+1&&decodes==d0+1&&copies==c0+1);
+ for(unsigned i=0;i<3;++i){CHECK(original[i].value==int(i+1));CHECK(modelSurface.tex[i].value==int(i+11));}
+ CHECK(PrepareModelCell(e,u,applied)==S_OK&&rasters==r0+2&&copies==c0+2);
+ for(unsigned i=0;i<3;++i)CHECK(modelSurface.tex[i].value==int(i+11));
+ // A current native source plus cached source replays both after one pristine copy.
+ models.items[63].source.valid=true;r0=rasters;c0=copies;
+ CHECK(PrepareModelCell(e,u,applied)==S_OK&&rasters==r0+2&&copies==c0+1);
+ for(unsigned i=0;i<3;++i)CHECK(modelSurface.tex[i].value==int(i+21));
+ models.items[63].source.valid=false;cachedTown.generation=6;r0=rasters;c0=copies;
+ CHECK(PrepareModelCell(e,u,applied)==S_FALSE&&!applied&&rasters==r0&&copies==c0);
+ cachedTown.generation=7;cachedTown.packet.origin[2]=1;
+ CHECK(PrepareModelCell(e,u,applied)==S_FALSE&&!applied&&copies==c0);cachedTown.packet.origin[2]=0;
+ modelMapping.generation=6;CHECK(PrepareModelCell(e,u,applied)==S_FALSE&&!applied&&copies==c0);modelMapping.generation=7;
+ modelOption=false;CHECK(PrepareModelCell(e,u,applied)==S_FALSE&&!applied&&copies==c0);modelOption=true;
+ modelFailed=true;CHECK(PrepareModelCell(e,u,applied)==S_FALSE&&!applied&&copies==c0);modelFailed=false;
+ manifest.modelVerified=false;CHECK(PrepareModelCell(e,u,applied)==S_FALSE&&!applied&&copies==c0);manifest.modelVerified=true;
+ // Exact inclusive cap accepted; plus one rejected with no raster/decode or base write.
+ cachedTown.owned=AtlasView::GpuCap-Other-ModelGpuBytes;r0=rasters;
+ CHECK(PrepareModelCell(e,u,applied)==S_OK&&applied&&rasters==r0+1);
+ ++cachedTown.owned;r0=rasters;CHECK(FAILED(PrepareModelCell(e,u,applied))&&!applied&&rasters==r0);
+ ResetModels();Admit();models.items[0].source.valid=false;cachedTown.valid=true;cachedTown.owned=AtlasView::GpuCap-Other-ModelGpuBytes+1;
+ CHECK(FAILED(PrepareModelCell(e,u,applied))&&!modelGpuReady&&!applied);
+ unsigned cc=cachedTown.clearCalls;ModelFailure("cached budget");CHECK(cachedTown.clearCalls==cc+1&&!cachedTown.valid&&!cachedTown.owned);
+ // Failed cleanup must retain quarantine bytes and remain unavailable, never erase the ledger.
+ cachedTown.clearOk=false;cachedTown.owned=1234;cachedTown.valid=true;unsigned priorErrors=errors;ResetModels();
+ CHECK(!cachedTown.valid&&cachedTown.owned==1234&&errors==priorErrors+1);cachedTown.clearOk=true;ResetModels();CHECK(!cachedTown.owned);
  printf("Actual model caller %u checks PASS\n",checks);return 0;}
 '''.replace('ACTUAL','\n'.join(body(x) for x in ('void ResetModels()', 'void ModelFailure(const char*why){', 'bool ModelsAvailable()', 'HRESULT PrepareModelCell(')))
 
@@ -83,6 +113,11 @@ for name,old,new in (
  ('recreate_each_window','if(!modelGpuReady){','if(true){'),
  ('retain_proof','modelMapping=AtlasModelDecode::ProvenMapping();',''),
  ('forget_cell_clear','modelCell.Clear();',''),
+ ('skip_cached_slot','i<=GsmModels::Slots','i<GsmModels::Slots'),
+ ('omit_cached_budget','+cachedTown.OwnedGpuBytes()',''),
+ ('forget_cached_clear','if(!cachedTown.Clear())ErrorLog("GlobalSatelliteMap: cached town cleanup refused; private slot retained");',''),
+ ('ignore_cached_origin','cachedTown.Valid(unsigned(observedGeneration))&&!std::memcmp(modelMapping.sourceSceneOrigin,cachedTown.Geometry().SourceSceneOrigin(),12)','cachedTown.Valid(unsigned(observedGeneration))'),
+ ('ignore_cached_generation','cachedTown.Valid(unsigned(observedGeneration))','cachedTown.valid'),
 ):
     assert old in CODE,name
     changed=CODE.replace(old,new)
@@ -90,4 +125,4 @@ for name,old,new in (
     # Add declaration before production bodies for this deliberately bypassed call.
     if name=='skip_pristine_copy':changed=changed.replace('void ResetModels(){','HRESULT SkipCopy(bool,Resource*const*,AtlasView::U64);\nvoid ResetModels(){')
     run(name,changed,False)
-print('5 compiled actual model caller mutants rejected')
+print('10 compiled actual model caller mutants rejected')

@@ -2,6 +2,7 @@
 #include "GsmAtlasManifest.h"
 #include "CaptureValidation.h" // Existing atomic world/load generation, no game calls.
 #include "build/GsmNativeProfile.h"
+#include "GsmCachedTownJob.h"
 #include "../tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalogData.h"
 namespace GsmAtlas {
 inline std::wstring Wide(const std::string&s){for(size_t i=0;i<s.size();++i)if(static_cast<unsigned char>(s[i])<32||s[i]==127||(s[i]==':'&&i!=1))throw std::runtime_error("source path control/alias refused");int n=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s.data(),static_cast<int>(s.size()),NULL,0);if(n<=0||n>=MAX_PATH)throw std::runtime_error("source path UTF8/length refused");std::wstring w(n,0);if(MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s.data(),static_cast<int>(s.size()),&w[0],n)!=n)throw std::runtime_error("source path conversion failed");for(size_t i=0;i<w.size();++i)if(w[i]=='/')w[i]='\\';return w;}
@@ -13,8 +14,8 @@ inline std::wstring Canonical(const std::string&s){
     return w;
 }
 struct Job {
-    HANDLE thread;LONG generation;bool validation,waterValidation,modelValidation,ok;std::string folder,game,engine,module[2];char error[512];Manifest manifest;AtlasView::ReadRequest read;AtlasView::WindowKey window;unsigned char windowHashes[3][32];float windowMinHeight;bool windowHasFiniteHeight;
-    Job():thread(NULL),generation(0),validation(false),waterValidation(false),modelValidation(false),ok(false),windowMinHeight(0),windowHasFiniteHeight(false){error[0]=0;}
+    HANDLE thread;LONG generation;bool validation,waterValidation,modelValidation,cachedTown,ok;std::string folder,game,engine,module[2];char error[512];Manifest manifest;AtlasView::ReadRequest read;AtlasView::WindowKey window;unsigned char windowHashes[3][32];float windowMinHeight;bool windowHasFiniteHeight;GsmCachedTown::Request cachedTownRequest;GsmCachedTown::Result cachedTownResult;
+    Job():thread(NULL),generation(0),validation(false),waterValidation(false),modelValidation(false),cachedTown(false),ok(false),windowMinHeight(0),windowHasFiniteHeight(false){error[0]=0;}
 };
 inline void ObserveGeneration(void*input){Job&job=*static_cast<Job*>(input);if(job.generation!=InterlockedCompareExchange(&GSM::generation,0,0))InterlockedExchange(&job.read.cancel,1);}
 inline bool Cancelled(Job&job){ObserveGeneration(&job);return AtlasView::Cancelled(job.read);}
@@ -111,5 +112,25 @@ inline bool WindowMinimum(Job&job){
     if(Cancelled(job))return false;
     job.windowMinHeight=minimum;job.windowHasFiniteHeight=found;return true;
 }
-inline DWORD WINAPI Run(void*input){Job&job=*static_cast<Job*>(input);job.ok=false;job.error[0]=0;job.windowMinHeight=0;job.windowHasFiniteHeight=false;if(job.waterValidation)job.manifest.waterVerified=false;if(job.modelValidation)job.manifest.modelVerified=false;job.read.afterChunk=ObserveGeneration;job.read.observer=&job;try{if(Cancelled(job))throw std::runtime_error("GST2 job cancelled");if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)>1)throw std::runtime_error("GST2 worker validation mode is ambiguous");if(job.modelValidation){ValidateModelSources(job);job.ok=!Cancelled(job);}else if(job.waterValidation){ValidateWaterSources(job);job.ok=!Cancelled(job);}else if(job.validation){Validate(job);job.ok=!Cancelled(job);}else{job.ok=AtlasView::ReadWindow(job.read,job.window,job.windowHashes);if(job.ok)job.ok=WindowMinimum(job);}if(!job.ok&&!job.error[0])sprintf_s(job.error,sizeof(job.error),"GST2 window worker failed win32=%lu tile=%u level=%u x=%u z=%u",job.read.error,job.window.tile,job.window.level,job.window.x,job.window.z);}catch(const std::exception&e){strncpy_s(job.error,sizeof(job.error),e.what(),_TRUNCATE);}catch(...){strcpy_s(job.error,sizeof(job.error),"GST2 file worker exception");}if(!job.ok&&job.waterValidation)job.manifest.waterVerified=false;if(!job.ok&&job.modelValidation)job.manifest.modelVerified=false;return job.ok?0:1;}
+inline bool CachedTownCancelled(void*input){return Cancelled(*static_cast<Job*>(input));}
+inline void CachedTownChunk(void*input,unsigned bytes){Job&job=*static_cast<Job*>(input);job.read.readBytes+=bytes;if(job.read.afterChunk)job.read.afterChunk(job.read.observer);}
+inline void ReadCachedTown(Job&job){GsmCachedTown::State state=GsmCachedTown::Read(job.game,job.cachedTownRequest,job.cachedTownResult,CachedTownCancelled,&job,CachedTownChunk);if(Cancelled(job)){GsmCachedTown::Discard(job.cachedTownResult);return;}job.ok=state==GsmCachedTown::Ready||state==GsmCachedTown::Unavailable;if(!job.ok&&job.cachedTownResult.error[0])strncpy_s(job.error,sizeof(job.error),job.cachedTownResult.error,_TRUNCATE);}
+inline DWORD WINAPI Run(void*input){
+    Job&job=*static_cast<Job*>(input);job.ok=false;job.error[0]=0;job.windowMinHeight=0;job.windowHasFiniteHeight=false;
+    if(job.cachedTown){job.cachedTownResult.Clear();job.read.readBytes=0;job.read.error=0;}
+    if(job.waterValidation)job.manifest.waterVerified=false;if(job.modelValidation)job.manifest.modelVerified=false;
+    job.read.afterChunk=ObserveGeneration;job.read.observer=&job;
+    try{
+        if(Cancelled(job))throw std::runtime_error("GST2 job cancelled");
+        if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)+unsigned(job.cachedTown)>1)throw std::runtime_error("GST2 worker validation mode is ambiguous");
+        if(job.cachedTown){ReadCachedTown(job);}
+        else if(job.modelValidation){ValidateModelSources(job);job.ok=!Cancelled(job);}
+        else if(job.waterValidation){ValidateWaterSources(job);job.ok=!Cancelled(job);}
+        else if(job.validation){Validate(job);job.ok=!Cancelled(job);}
+        else{job.ok=AtlasView::ReadWindow(job.read,job.window,job.windowHashes);if(job.ok)job.ok=WindowMinimum(job);}
+        if(!job.ok&&!job.error[0])sprintf_s(job.error,sizeof(job.error),"GST2 window worker failed win32=%lu tile=%u level=%u x=%u z=%u",job.read.error,job.window.tile,job.window.level,job.window.x,job.window.z);
+    }catch(const std::exception&e){strncpy_s(job.error,sizeof(job.error),e.what(),_TRUNCATE);}catch(...){strcpy_s(job.error,sizeof(job.error),"GST2 file worker exception");}
+    if(job.cachedTown&&!job.ok){if(Cancelled(job))GsmCachedTown::Discard(job.cachedTownResult);else if(job.cachedTownResult.state==GsmCachedTown::Empty)GsmCachedTown::Failure(job.cachedTownResult,job.error);}
+    if(!job.ok&&job.waterValidation)job.manifest.waterVerified=false;if(!job.ok&&job.modelValidation)job.manifest.modelVerified=false;return job.ok?0:1;
+}
 }

@@ -40,7 +40,7 @@ for token in ('8ULL*1024*1024*1024','65536','512','CurrentSources(job)!=currentS
 assert 'Ogre::' not in worker and 'MyGUI::' not in worker and 'activateZone' not in worker
 assert 'job.error=e.what' not in worker
 assert 'ValidateModelSources(Job&job)' in worker and 'GsmModelShaderInputs' in worker
-assert 'unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)>1' in worker
+assert 'unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)+unsigned(job.cachedTown)>1' in worker
 assert 'if(!job.ok&&job.modelValidation)job.manifest.modelVerified=false;' in worker
 native=(base/'GsmNativeLight.h').read_text()
 for token in ('ownedViews_[i].p=views[i];views[i]->AddRef()','Resolve_HDR','rt_adaptedLum','GsmSamplerWindows','SharedSkyParams','SharedDeferredParams'):assert token in native,token
