@@ -3,6 +3,7 @@
 #include "warp_tests.cpp"
 #undef main
 #include "WaterPipeline.h"
+#include "../atlas-view/AtlasWindowPolicy.h"
 static unsigned maximumPipelineUnorm=0;
 
 __declspec(noinline) static void TerrainValues(AtlasView::Uniforms&u){
@@ -78,7 +79,7 @@ static void ToneOracle(Fixture&f,const std::vector<unsigned char>&code,ID3D11Tex
 }
 static ULONG DeviceReferences(ID3D11Device*d){ULONG n=d->AddRef();d->Release();return n;}
 static void PipelineState(Fixture&f,AtlasWater::Pipeline&pipeline,AtlasView::Cell&cell,const AtlasView::Uniforms&u,const AtlasWater::Uniforms&w,ID3D11ShaderResourceView*const lights[3],ID3D11SamplerState*const lightSamplers[3],ID3D11ShaderResourceView*const waterViews[5],Inputs&i,ID3D11Texture2D*output,const std::vector<unsigned char>&csCode,const std::vector<unsigned char>&vsCode,const std::vector<unsigned char>&psCode){
- const AtlasWater::U64 caller=94634160ULL;
+ const AtlasWater::U64 caller=AtlasView::WindowGpuBytes();
  f.c.p->ClearState();Hr(pipeline.Render(cell,u,lights,lightSamplers,w,waterViews,i.samplers,output,caller),"state reference pixels");std::vector<unsigned char>expected=Read8(f,output),zero(256*256*4,0);f.c.p->UpdateSubresource(output,0,NULL,&zero[0],256*4,0);
  Com<ID3D11ComputeShader>oldCs;Com<ID3D11VertexShader>vs;Com<ID3D11PixelShader>ps;
  Hr(f.d.p->CreateComputeShader(&csCode[0],csCode.size(),NULL,&oldCs.p),"pipeline sentinel CS");Hr(f.d.p->CreateVertexShader(&vsCode[0],vsCode.size(),NULL,&vs.p),"pipeline sentinel VS");Hr(f.d.p->CreatePixelShader(&psCode[0],psCode.size(),NULL,&ps.p),"pipeline sentinel PS");f.c.p->CSSetShader(oldCs.p,NULL,0);f.c.p->VSSetShader(vs.p,NULL,0);f.c.p->PSSetShader(ps.p,NULL,0);
@@ -105,7 +106,7 @@ static void PipelineOracle(Fixture&f,char**argv){
  NativeOneMipCube(f,i,6);NativeOneMipCube(f,i,7);ID3D11ShaderResourceView*waterViews[5]={i.views[3],i.views[4],i.views[5],i.views[6],i.views[7]};
  AtlasView::ReadRequest r;FillTerrain(r,true);AtlasView::Cell cell;Hr(cell.Upload(f.d.p,r),"pipeline cache cell");r.Clear();i.Height(f,true);
  Com<ID3D11Texture2D>raw,waterReference,expected,output;Texture(f,256,256,DXGI_FORMAT_R16G16B16A16_FLOAT,D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_UNORDERED_ACCESS,raw);Texture(f,256,256,DXGI_FORMAT_R16G16B16A16_FLOAT,D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET,waterReference);Texture(f,256,256,DXGI_FORMAT_R8G8B8A8_UNORM,D3D11_BIND_UNORDERED_ACCESS,expected);NativeOutput8(f,output);
- AtlasWater::Pipeline pipeline;const AtlasWater::U64 caller=94634160ULL;Hr(pipeline.Init(f.d.p,&hdrCode[0],hdrCode.size(),&waterCode[0],waterCode.size(),&toneCode[0],toneCode.size(),caller),"bounded HDR/water/tone initialization");
+ AtlasWater::Pipeline pipeline;const AtlasWater::U64 caller=AtlasView::WindowGpuBytes();Hr(pipeline.Init(f.d.p,&hdrCode[0],hdrCode.size(),&waterCode[0],waterCode.size(),&toneCode[0],toneCode.size(),caller),"bounded HDR/water/tone initialization");
  for(unsigned test=0;test<6;++test){AtlasView::Uniforms u;TerrainValues(u);if(test>=4)u.tileBounds[2]=u.tileBounds[3]=2304;AtlasWater::Uniforms w;Values(w,256);std::memcpy(w.tileBounds,u.tileBounds,16);w.waterPlane[0]=test==2?110:test==3?-1e8f:100;if(test==5)w.waterTime[0]=13.456f;
   if(test==1){u.sunColour[3]=0;u.sunDirection[1]=-.95f;u.exposure[0]=.03125f;u.exposure[1]=.05f;w.waterSunColour[0]=w.waterSunColour[1]=w.waterSunColour[2]=0;w.waterSunDirection[1]=-.9f;}
   ActualTerrainOracle(f,nativeTerrain,i,u,raw.p,terrainLights);f.c.p->CopyResource(i.texture[0].p,raw.p);NativeDraw(f,i,w,nativeWater,vertex,depth,waterReference.p,true);ToneOracle(f,nativeTone,waterReference.p,u,expected.p);

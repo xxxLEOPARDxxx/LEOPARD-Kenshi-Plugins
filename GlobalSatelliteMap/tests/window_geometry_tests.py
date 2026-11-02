@@ -57,7 +57,7 @@ int main(){try {
    }
   }
  }
- Check(AtlasView::WindowGpuBytes()==94634160ULL,"72window payload ledger");
+ Check(AtlasView::WindowGpuBytes()==189006000ULL,"144window payload ledger including default scratch");
  std::printf("PASS %u extracted production bounds/geometry/supersession checks\n",checks);return 0;
 }catch(...){return 1;}}
 '''.replace('PARTS',parts)

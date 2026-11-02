@@ -1,0 +1,60 @@
+{
+  "scope": "policy/header/tests/docs only; no main/buildscript/README/game/install edits",
+  "measuredDimensions": {
+    "primary": [
+      4096,
+      4096
+    ],
+    "viewport": [
+      2160,
+      1044
+    ]
+  },
+  "red": {
+    "source": 2,
+    "density": 1,
+    "visible": 24,
+    "baseBytes": 94634160
+  },
+  "green": {
+    "source": 1,
+    "density": 1,
+    "visible": 60,
+    "planned": 96,
+    "baseBytes": 189006000
+  },
+  "checks": 56755,
+  "functionalMutants": 7,
+  "capBytes": 201326592,
+  "combinedOwnedBytes": 192414256,
+  "headroom": 8912336,
+  "terrainRegression": [
+    32,
+    53,
+    92,
+    6
+  ],
+  "waterRegression": [
+    2,
+    11,
+    163,
+    8
+  ],
+  "pipelineRegression": [
+    21,
+    126,
+    10
+  ],
+  "callerChecks": 563,
+  "workerChecks": 45,
+  "files": {
+    "atlas-view/AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af",
+    "atlas-view/AtlasWindowPolicy.h": "5c07dbc43fff567ef6504d90ffe944011c67d4e200c4c46c37b18bd51561b224",
+    "atlas-water/AtlasWater.h": "e4d16fa4a58278b00f79aa44926b475b63e417897d22ef2d13510acc833fff3a",
+    "tests/atlas_quality_policy_tests.cpp": "f9ed8ae1c5b5ae3bf0b1ed2df909dcd703f90adf23bf26688320e0f7cf813bf9",
+    "tests/quality_policy_mutations.py": "9c2b646ffb538e1f20f0636956559289269894dca937f9cdd9fd76e820cdd1be",
+    "tests/water_caller_tests.py": "af3b5fb136a9d958a0b3388829dc7b32f22184374158aa9fa8d014708d36a5e3",
+    "atlas-water/pipeline_policy_tests.cpp": "2c9af1c1b740e25db5f0c737c6822c82d05da5f0d3e594695f6a659120f438f1",
+    "atlas-water/pipeline_warp.cpp": "2b7e142ca2ed5b3007285e352cc1926bc6cfa40cff3c3f55deb888e59bc0a04b"
+  }
+}

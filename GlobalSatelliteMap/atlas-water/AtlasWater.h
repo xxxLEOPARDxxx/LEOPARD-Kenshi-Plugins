@@ -5,7 +5,7 @@
 #include <cmath>
 namespace AtlasWater {
 typedef unsigned __int64 U64;
-const U64 Cap=96ULL*1024*1024;
+const U64 Cap=AtlasView::GpuCap;
 const U64 PrivateBytes=512ULL*512*8+192;
 inline bool Fits(U64 callerOwnedBytes){return callerOwnedBytes<=Cap-PrivateBytes;}
 struct Uniforms {

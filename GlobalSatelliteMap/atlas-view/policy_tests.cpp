@@ -15,9 +15,14 @@ int main(){
     Budget b;
     CHECK(b.Set(0,2));
     CHECK(b.Set(1,5));
-    CHECK(!b.Set(2,3));
+    CHECK(b.Set(2,3));
     b.Remove(0);
     b.Remove(1);
+    b.Remove(2);
+    Budget large;
+    CHECK(large.Set(0,2));
+    CHECK(large.Set(1,2));
+    CHECK(!large.Set(2,2));
     for(unsigned i=0;i<16;++i)CHECK(b.Set(i,4));
     CHECK(b.Bytes()==80ULL*1024*1024&&b.ScratchSide()==512);
     CHECK(!b.Set(16,5));

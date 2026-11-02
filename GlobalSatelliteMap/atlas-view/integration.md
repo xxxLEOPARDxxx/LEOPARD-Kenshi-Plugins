@@ -1,5 +1,13 @@
 # GST2 reader and terrain relighting helper, 2026-11-02
 
+Current quality-policy revision: the shared admission cap is192MiB, CPU cap
+remains64MiB, and the window viewer has128 detail plus16 fallback slots. All144
+windows plus default scratch/constants total189006000B; water pipeline adds
+3408256B for192414256B. The measured4096-square primary /2160x1044 viewport now
+retains sourceLevel1=densityLevel1 across pan phases. See
+`../tests/quality-policy-20261102.md`. The original96MiB cutpoint/verification
+figures below remain a historical baseline, not the current viewer capacity.
+
 This is an offline-tested helper cutpoint. It is **not wired into GlobalSatelliteMap.cpp**, does not install anything and does not prove live whole-map terrain, buildings, local lights, shadows, FPS or leak-free gameplay.
 
 `run_tests.ps1` builds with VC10/SDK7.1, compiles the shader against the installed game assets, and runs29 budget checks,53 file/crypto checks,81 real D3D11 WARP checks. All163 pass. Six deliberate mutants fail for their intended reason: lost compute-shader restoration, lost owned-output SRV restoration, omitted plane hash check, wrong dispatch-block origin, ignored fractional coverage, clipped HDR reflectance. Generated executables/fixtures/logs stay in `_generated/`.

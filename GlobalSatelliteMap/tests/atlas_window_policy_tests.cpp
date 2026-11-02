@@ -4,7 +4,7 @@
 using namespace AtlasView;
 unsigned checks=0;void Check(bool b,const char*s){++checks;if(!b){std::printf("FAIL %s\n",s);std::exit(1);}}
 int main(){
-    Check(WindowGpuBytes()<GpuCap,"all64 windows within existing96MiB GPU cap");
+    Check(WindowGpuBytes()<GpuCap,"all144 windows within explicit192MiB GPU cap");
     WindowRect cells[16];for(unsigned t=0;t<16;++t)cells[t]=WindowRect((t%4)*8192.,(t/4)*8192.,8192,8192);
     WindowPlan p=PlanWindows(cells,WindowRect(800,900,1600,900));
     Check(p.level==0&&p.count>1&&p.count<=DetailSlots,"native8K level visible window instead of full2048 cap");

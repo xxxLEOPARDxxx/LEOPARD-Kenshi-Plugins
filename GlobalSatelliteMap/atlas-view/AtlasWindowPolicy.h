@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 namespace AtlasView {
-const unsigned WindowSide=256, FallbackSlots=16, DetailSlots=56, WindowSlots=FallbackSlots+DetailSlots;
+const unsigned WindowSide=256, FallbackSlots=16, DetailSlots=128, WindowSlots=FallbackSlots+DetailSlots;
 struct WindowKey {
     unsigned tile,level,x,z;
     WindowKey():tile(16),level(6),x(0),z(0){}

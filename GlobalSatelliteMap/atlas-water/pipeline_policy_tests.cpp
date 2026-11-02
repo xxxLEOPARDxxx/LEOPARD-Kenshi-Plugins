@@ -1,11 +1,14 @@
 #include "WaterPipeline.h"
+#include "../atlas-view/AtlasWindowPolicy.h"
 #include <cstdio>
 static unsigned checks=0,bad=0;
 #define CHECK(x) do{++checks;if(!(x)){++bad;std::printf("FAIL %u %s\n",__LINE__,#x);}}while(0)
 int main(){
  CHECK(sizeof(AtlasView::Uniforms)==176&&sizeof(AtlasWater::Uniforms)==192);
  CHECK(AtlasWater::PipelinePrivateBytes==3408256ULL);
- CHECK(94634160ULL+AtlasWater::PipelinePrivateBytes==98042416ULL);
+ CHECK(AtlasView::WindowGpuBytes()==189006000ULL);
+ CHECK(AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes==192414256ULL);
+ CHECK(AtlasWater::Cap==AtlasView::GpuCap);
  CHECK(AtlasWater::PipelineFits(AtlasView::GpuCap-AtlasWater::PipelinePrivateBytes));
  CHECK(!AtlasWater::PipelineFits(AtlasView::GpuCap-AtlasWater::PipelinePrivateBytes+1));
  CHECK(AtlasView::RelighterFits(AtlasView::GpuCap-AtlasWater::HdrTerrainPrivateBytes,256,DXGI_FORMAT_R16G16B16A16_FLOAT));

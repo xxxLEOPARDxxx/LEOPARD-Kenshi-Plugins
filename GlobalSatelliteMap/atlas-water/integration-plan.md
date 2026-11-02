@@ -14,7 +14,8 @@ User accepted the terrain viewer and authorized unattended completion. Keep the
    apply the existing native exposure once into the owned RGBA8 display image.
    Preserve actual native mip ranges, including a one-mip specular cube; do not
    generate mips or substitute terrain resources. Validate format/state/aliasing
-   and inclusive GPU payload under96MiB. No default or guessed water values.
+   and inclusive GPU payload under the current192MiB profile (the original
+   96MiB proof is historical). No default or guessed water values.
 5. Add a live MCM water toggle and matching EN/RU/ZH text. Water-off must avoid
    snapshot work and retain the original terrain path. Invalid water state logs
    an error and leaves terrain visible. Reuse native snapshot/sampler/COM owners.

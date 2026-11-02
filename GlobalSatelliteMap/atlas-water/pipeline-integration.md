@@ -88,9 +88,12 @@ Writable input/output aliases and native input aliases to display are refused.
 | Tone256 RGBA8 scratch +16B constants |262160|
 | **Additional total** |**3408256**|
 
-Init and every enabled Render require caller payload plus3408256 <=100663296B.
-The current72-window/default-renderer ledger94634160B gives98042416B total,
-leaving2620880B. Include every simultaneous pending/retired/caller allocation;
+The current quality profile uses one authoritative192MiB cap shared by terrain,
+water and pipeline. Init and every enabled Render require caller payload
+plus3408256 <=201326592B. The144-window/default-renderer ledger189006000B
+gives192414256B total, leaving8912336B. This replaces the original72-window/
+96MiB profile; archived verification for that profile remains historical.
+Include every simultaneous pending/retired/caller allocation;
 do not add this pipeline's private total twice. No full HDR atlas or2048 HDR
 intermediate exists. Shader/driver allocation metadata and borrowed native
 assets are outside this payload count; it is not a residency measurement.

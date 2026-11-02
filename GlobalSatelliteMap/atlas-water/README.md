@@ -1,6 +1,6 @@
 # Optional native distant-water HDR layer
 
-This isolated helper adapts the installed `water.hlsl` **DISTANT + NO_REFLECTION** material to a bounded atlas compute pass. It has no game/Ogre calls, zone activation, worker, polling, model clones, file cache or installation hook. It is not yet connected to the map viewer. The terrain viewer can ship independently.
+This helper adapts the installed `water.hlsl` **DISTANT + NO_REFLECTION** material to a bounded atlas compute pass. The GPU helper itself has no game/Ogre calls. It is now connected to the private viewer through `WaterPipeline.h` and `NativeWaterSnapshot.h`; see `pipeline-integration.md` for that256-square HDR path, actual source admission, failure handling and runtime limits. The terrain path remains available independently.
 
 ## Integration contract
 
@@ -8,7 +8,7 @@ This isolated helper adapts the installed `water.hlsl` **DISTANT + NO_REFLECTION
 
 The frozen `atlas-view` renderer currently writes exposed RGBA8. Integration therefore needs a <=512 straight **LINEAR_HDR RGBA16F cutpoint** before its tone operation; feeding that RGBA8 output to this helper is refused. Do not allocate a full 2048 RGBA16F intermediate. The destination is caller owned, single mip/layer/sample, DEFAULT usage, no CPU access/misc flags. It may be the same texture as source0. None of sources1..7 may alias it; all writable native/input/output bindings cause refusal before state mutation.
 
-`callerOwnedBytes` must count every simultaneously resident owned GPU payload: selected material/coverage/height, display outputs, HDR block, terrain scratch/constants, pending/retired resources and other renderer buffers. Init and every enabled Render require that count plus **2,097,344 bytes** (512x512x8 + 192) <= **100,663,296 bytes (96 MiB)**. Borrowed native textures/samplers are not copied. This is a payload ledger, not a measurement of driver residency or the entire process. Reinitialization requires Clear; loss/reset or world/device switch must Clear and recreate on the render thread. Render and Clear must be serialized; no background calls.
+`callerOwnedBytes` must count every simultaneously resident owned GPU payload: selected material/coverage/height, display outputs, HDR block, terrain scratch/constants, pending/retired resources and other renderer buffers. Init and every enabled Render require that count plus **2,097,344 bytes** (512x512x8 +192) <= the shared `AtlasView::GpuCap`, currently **201,326,592 bytes (192MiB)**. Borrowed native textures/samplers are not copied. This is a payload ledger, not a measurement of driver residency or the entire process. Reinitialization requires Clear; loss/reset or world/device switch must Clear and recreate on the render thread. Render and Clear must be serialized; no background calls.
 
 All pointers are borrowed only for the duration of Render. The caller must hold their COM references and a coherent native material/light/time/water-height snapshot for that call. Read native parameters on the existing render thread; do not change global native water parameters or invoke scene loading. Selected cell row0 is absolute minZ and column0 minX. Origins must be integer/even to preserve native pixel-quad derivatives. All selected sides 256/512/1024/2048 and block sizes 1..512 are validated.
 
@@ -19,7 +19,7 @@ All pointers are borrowed only for the duration of Render. The caller must hold 
 | t2 | Full selected-cell R32_FLOAT **absolute** terrain height |
 | t3/t4/t5 | Actual `waterDistant` colourmap / flowmap / normalmap SRVs |
 | t6 | Actual water irradiance cube, >=4 visible mips |
-| t7 | Actual water specularity cube (`mp_specuwatery`), >=8 visible mips |
+| t7 | Actual water specularity cube (`mp_specuwatery`), >=1 visible mip; preserve native sampler clamp |
 | s0..s4 | Native colour / flow / normal / irradiance / water-specularity samplers |
 | u0 | Helper-owned 512 RGBA16F scratch |
 

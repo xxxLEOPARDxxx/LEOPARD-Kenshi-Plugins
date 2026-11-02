@@ -2,7 +2,7 @@
 #include <cstring>
 namespace AtlasView {
 typedef unsigned __int64 U64;
-const U64 GpuCap=96ULL*1024*1024, CpuCap=64ULL*1024*1024;
+const U64 GpuCap=192ULL*1024*1024, CpuCap=64ULL*1024*1024;
 const unsigned UniformGpuBytes=176;
 inline unsigned Side(unsigned level){return level<6?8192U>>level:0;}
 inline unsigned Stride(unsigned plane){return plane==0?8:4;}
