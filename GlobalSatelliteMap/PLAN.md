@@ -2,7 +2,44 @@
 
 The requested feature is an optional satellite view on the GLOBAL map. BestMinimap keeps its existing map source. The target atlas is exactly 4 x 4 tiles, each 8192 x 8192 (32768 squared logical pixels).
 
-## Current checkpoint, 2026-11-02, user-accepted terrain viewer
+## Current direction, 2026-11-03: deterministic terrain and closer detail
+
+The user has explicitly withdrawn the former restriction on changing the
+terrain-render method: "Делай как надо" and "сделай лучше детализацию при
+приближении на максимум". This supersedes older no-rewrite notes below.
+
+The two same-world controls proved capture-context geometry changes, not an IO
+gap. A16px crop does not fix them. Replace camera-dependent patch refinement and
+border stitching with a bounded, world-aligned mesh from the real height source.
+Shared vertices, triangle diagonals and normal support must agree for every
+window and primary-cell boundary. Preserve the installed atlas until a new
+controlled boundary passes actual raw height/normal/material comparison.
+
+Keep the requested4x4 primary8192 tiles as the whole-world base. At close zoom,
+render genuine finer material/model detail for visible windows, with explicit
+GPU/CPU/cache bounds and source/light epochs. Enlarging every tile, sharpening
+the9m image, or inventing finer geometry than the18m source is not an improvement
+in source detail. Existing192MiB viewer and1GiB capture caps remain constraints;
+large source textures need bounded batches rather than an unaccounted full set.
+
+Execution checkpoints:
+
+1. Isolated fixed-global geometry with real-height fixtures, native triangle/
+   normal/input-layout evidence and failing controls for wrong diagonals/halos.
+2. Paired render of one previously failing boundary using the actual materials;
+   exact world-coordinate overlap and stable cleanup, no full atlas replacement.
+3. Bounded fine-window production path, screen-density selection and base atlas
+   fallback; show a real maximum-zoom comparison before broad regeneration.
+4. Integrate dense city/wall/object coverage and common light/water composition;
+   verify pan/zoom, both UI skins, light toggles and resource lifetime in game.
+5. Only after these checks replace affected atlas data, preserving a working
+   fallback and avoiding duplicate full-world output. No release is implied.
+
+Parallel ownership: deterministic geometry helper and material/cache audit have
+separate agents; root owns integration and deployment. KEO remains a separate
+parallel maintenance task; Dynamic Factions remains paused.
+
+## Historical checkpoint, 2026-11-02, user-accepted terrain viewer
 
 The complete4x4 atlas of16 real8192 GST2 cells is captured, validated and installed.
 The first native-light terrain viewer is accepted by the user. It uses native

@@ -1,0 +1,2008 @@
+From 680a2b57aad2af3a77525552ed3565556c850103 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Tue, 3 Nov 2026 01:49:47 +0300
+Subject: [PATCH] Publish player request priority before native queue ownership
+ transfer
+
+---
+ README.md                                     |  16 +
+ .../current-submit.extract.cpp                |  32 +
+ .../publication_fixture.cpp                   | 176 ++++
+ leopard/priority-publication-20261103.json    | 785 ++++++++++++++++++
+ leopard/priority-publication-20261103.md      | 157 ++++
+ leopard/test_module_census_notice.py          |  86 ++
+ leopard/test_path_budget.py                   |  25 +-
+ leopard/test_path_priority_publication.py     |  85 ++
+ src/pathfind/path_pool_bindings.h             |   6 +-
+ src/pathfind/path_pool_hooks.cpp              |   5 +
+ src/pathfind/path_priority_hooks.h            |   8 +
+ src/pathfind/path_priority_publication.cpp    |  77 ++
+ src/pathfind/path_priority_publication.h      |  27 +
+ src/pathfind/pathfind_cache.h                 |   2 +-
+ src/pathfind/pathfind_hooks.cpp               | 150 ++--
+ src/planner/planner_water_table.cpp           |   2 +
+ src/planner/planner_water_table.h             |   2 +
+ src/plugin/crash_record.cpp                   |   4 +-
+ src/plugin/hook_manifest.cpp                  |   6 +
+ src/plugin/hook_manifest_rows.inc             |   4 +-
+ tools/build/coresrc.txt                       |   2 +
+ tools/tests/path_priority_units.cpp           |  20 +
+ tools/tests/suites.txt                        |   2 +
+ 23 files changed, 1610 insertions(+), 69 deletions(-)
+ create mode 100644 leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp
+ create mode 100644 leopard/fixtures/priority_publication_6e15/publication_fixture.cpp
+ create mode 100644 leopard/priority-publication-20261103.json
+ create mode 100644 leopard/priority-publication-20261103.md
+ create mode 100644 leopard/test_module_census_notice.py
+ create mode 100644 leopard/test_path_priority_publication.py
+ create mode 100644 src/pathfind/path_priority_hooks.h
+ create mode 100644 src/pathfind/path_priority_publication.cpp
+ create mode 100644 src/pathfind/path_priority_publication.h
+ create mode 100644 tools/tests/path_priority_units.cpp
+
+diff --git a/README.md b/README.md
+index 03fe9f9..4d8b33c 100644
+--- a/README.md
++++ b/README.md
+@@ -89,6 +89,14 @@ performance figures above are the original author's results, not measurements of
+ this maintenance candidate. Static review/host tests do not establish in-game
+ FPS, skin layout, route behavior or absence of all memory leaks.
+ 
++Priority 45 for an eligible player order is now initialized before the native
++input queue publishes the request. Admission requires the exact supported native
++contract and all three hooks; refused admission retains the native priority.
++Nested and exceptional calls restore their prior context. NPC requests, routing
++OFF, group/water settings and the separate request-local search budget keep their
++existing behavior. The optional bounded module-census summary is detailed output;
++its raw and curated tables and crash attribution are unchanged.
++
+ ### Локальные изменения сопровождения (ещё не опубликованы)
+ 
+ - Добавлена страница **Mod Config Menu → KEO** с 20 исходными игровыми настройками
+@@ -108,6 +116,14 @@ FPS, skin layout, route behavior or absence of all memory leaks.
+   обслуживание удерживаемых зон и освобождение записей, обработка смены мира и
+   загрузки сохранения. Диагностические данные трассировки движения освобождаются.
+ 
++Приоритет 45 подходящего приказа игрока теперь задаётся до передачи запроса в
++исходную очередь. Для допуска нужны проверенный код поддерживаемой игры и все три
++перехвата; при отказе остаётся исходный приоритет. Вложенные вызовы и исключения
++восстанавливают прежний контекст. Поведение NPC, отключённой маршрутизации,
++групповых и водных настроек и отдельный бюджет текущего поиска сохраняются.
++Необязательная сводка ограниченного списка модулей относится к подробному журналу;
++таблицы и определение модуля при аварии не меняются.
++
+ Эта заметка относится к локальной подготовке, а не выпуску. Указанные выше
+ замеры скорости принадлежат оригинальному автору. Проверки исходников и тесты
+ вне игры не подтверждают FPS, отсутствие любых утечек, раскладку на разных
+diff --git a/leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp b/leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp
+new file mode 100644
+index 0000000..c2256cc
+--- /dev/null
++++ b/leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp
+@@ -0,0 +1,32 @@
++void hook_pathReqSubmit(void* sectionMgr, void* requestObj, bool highPriority)
++{
++	planner::PlannerWaterOnSubmit(requestObj ? (float*)((uintptr_t)requestObj + OFF_REQ_WATER_COST_MULT) : NULL);
++	game::g_hookOrig.orig_pathReqSubmit(sectionMgr, requestObj, highPriority);
++
++	if (squadBoostTier > 0)
++	{
++		int gamePri = *(int*)((uintptr_t)requestObj + 44);
++		if (squadBoostTier > gamePri)
++		{
++			*(int*)((uintptr_t)requestObj + 44) = squadBoostTier;
++			if (squadBoostFromRepathTier)
++			{
++				InterlockedIncrement(&p12DiagSubmitBoostsState6);
++				PlayerRepathTierNoteTiered();
++				// Not counted into playerRequestsInFlight: that counter feeds
++				// the 4x A* search-budget boost in hook_findPathFull, a
++				// separate lever this change does not touch. Only the queue
++				// tier (req+44) changes here.
++			}
++			else
++			{
++				InterlockedIncrement(&p12DiagSubmitBoostsOrder);
++				InterlockedIncrement(&pathfind::g_pathDiag.playerRequestsInFlight);
++			}
++		}
++	}
++
++
++	squadBoostTier = 0;
++	squadBoostFromRepathTier = false;
++}
+diff --git a/leopard/fixtures/priority_publication_6e15/publication_fixture.cpp b/leopard/fixtures/priority_publication_6e15/publication_fixture.cpp
+new file mode 100644
+index 0000000..5431da5
+--- /dev/null
++++ b/leopard/fixtures/priority_publication_6e15/publication_fixture.cpp
+@@ -0,0 +1,176 @@
++
++#define NOMINMAX
++#include <windows.h>
++#include <stdint.h>
++#include <cstdio>
++#include <cstring>
++#include <string>
++#include <stdexcept>
++struct Request { unsigned char bytes[0xa0]; int& pri(){return *reinterpret_cast<int*>(bytes+44);} int& kind(){return *reinterpret_cast<int*>(bytes+40);} };
++struct Manager {unsigned char bytes[0x300];};
++volatile LONG p12DiagSubmitBoostsState6=0,p12DiagSubmitBoostsOrder=0,tiered=0;
++namespace pathfind {struct Diag{volatile LONG playerRequestsInFlight;};Diag g_pathDiag={};}
++__declspec(thread) int squadBoostTier=0;__declspec(thread) bool squadBoostFromRepathTier=false;
++const size_t OFF_REQ_WATER_COST_MULT=0x34;void PlayerRepathTierNoteTiered(){InterlockedIncrement(&tiered);}
++namespace planner{void PlannerWaterOnSubmit(float*){}}
++namespace game {struct Orig {void(*orig_pathReqSubmit)(void*,void*,bool);};Orig g_hookOrig={};}
++void hook_pathReqSubmit(void* sectionMgr, void* requestObj, bool highPriority)
++{
++	planner::PlannerWaterOnSubmit(requestObj ? (float*)((uintptr_t)requestObj + OFF_REQ_WATER_COST_MULT) : NULL);
++	game::g_hookOrig.orig_pathReqSubmit(sectionMgr, requestObj, highPriority);
++
++	if (squadBoostTier > 0)
++	{
++		int gamePri = *(int*)((uintptr_t)requestObj + 44);
++		if (squadBoostTier > gamePri)
++		{
++			*(int*)((uintptr_t)requestObj + 44) = squadBoostTier;
++			if (squadBoostFromRepathTier)
++			{
++				InterlockedIncrement(&p12DiagSubmitBoostsState6);
++				PlayerRepathTierNoteTiered();
++				// Not counted into playerRequestsInFlight: that counter feeds
++				// the 4x A* search-budget boost in hook_findPathFull, a
++				// separate lever this change does not touch. Only the queue
++				// tier (req+44) changes here.
++			}
++			else
++			{
++				InterlockedIncrement(&p12DiagSubmitBoostsOrder);
++				InterlockedIncrement(&pathfind::g_pathDiag.playerRequestsInFlight);
++			}
++		}
++	}
++
++
++	squadBoostTier = 0;
++	squadBoostFromRepathTier = false;
++}
++struct Context {Context*previous;void*request;void*queue;int tier,nativePriority;bool repath,admitted,consumed;};
++__declspec(thread) Context*t_submit=NULL;
++unsigned checks=0,failures=0;void C(bool ok,const char*msg){++checks;if(!ok){++failures;printf("FAIL %s\n",msg);fflush(stdout);ExitProcess(1);}}
++struct Harness {bool proposed,retire,submitLocked,nested,cppThrow,sehThrow;int observed,observedCounter;bool observedLocked;unsigned submits,enqueues,writes;void*published;HANDLE publish,done;Request*request;};
++__declspec(thread) Harness*harness=NULL;
++volatile LONG capabilityMask=7,routingEnabled=1;
++const uintptr_t NativeSubmitEnqueueReturn=0x3aaf60,NativeCancelEnqueueReturn=0x3aafd5;
++bool TryPriorityBeforePublish(void*queue,void**item,uintptr_t caller)
++{
++ Context*c=t_submit;
++ if(!c||!c->admitted||c->consumed||c->tier<=0||!queue||queue!=c->queue||!item||caller!=NativeSubmitEnqueueReturn) return false;
++ if(!c->request||*item!=c->request) return false;
++ Request*r=reinterpret_cast<Request*>(c->request);
++ const int nativePriority=r->pri();
++ if(nativePriority!=c->nativePriority||r->kind()!=0||c->tier<=nativePriority) return false;
++ c->consumed=true;r->pri()=c->tier;
++ if(c->repath){InterlockedIncrement(&p12DiagSubmitBoostsState6);PlayerRepathTierNoteTiered();}
++ else {InterlockedIncrement(&p12DiagSubmitBoostsOrder);InterlockedIncrement(&pathfind::g_pathDiag.playerRequestsInFlight);}
++ if(harness)++harness->writes;
++ return true;
++}
++void ProposalSubmit(void*manager,void*request,bool highPriority)
++{
++ Context frame={t_submit,request,manager?static_cast<unsigned char*>(manager)+0xb8:NULL,squadBoostTier,highPriority?20:10,squadBoostFromRepathTier,
++  (InterlockedCompareExchange(&capabilityMask,0,0)==7&&InterlockedCompareExchange(&routingEnabled,0,0)!=0),false};
++ t_submit=&frame;
++ __try {
++  planner::PlannerWaterOnSubmit(request?reinterpret_cast<float*>(static_cast<unsigned char*>(request)+OFF_REQ_WATER_COST_MULT):NULL);
++  game::g_hookOrig.orig_pathReqSubmit(manager,request,highPriority);
++ } __finally {t_submit=frame.previous;}
++ // Deliberately no request reads/writes here: original may have published it.
++}
++void Observe(Harness*h)
++{
++ h->observed=h->request->pri();h->observedLocked=h->submitLocked;
++ h->observedCounter=InterlockedCompareExchange(&pathfind::g_pathDiag.playerRequestsInFlight,0,0);
++ if(h->retire){DWORD oldProtect=0;C(VirtualProtect(h->request,4096,PAGE_NOACCESS,&oldProtect)!=FALSE,"owned request retirement");}
++}
++DWORD WINAPI Worker(void*p){Harness*h=static_cast<Harness*>(p);if(WaitForSingleObject(h->publish,10000)!=WAIT_OBJECT_0)return 3;Observe(h);SetEvent(h->done);return 0;}
++void OriginalEnqueue(void*queue,void**item)
++{
++ Harness*h=harness;++h->enqueues;h->published=*item;h->request=reinterpret_cast<Request*>(*item);
++ if(h->publish){SetEvent(h->publish);C(WaitForSingleObject(h->done,10000)==WAIT_OBJECT_0,"controlled consumer completed before native return");}
++ else Observe(h);
++}
++void NativeSubmit(void*manager,void*request,bool highPriority)
++{
++ Harness*h=harness;++h->submits;h->submitLocked=true;
++ Request*r=reinterpret_cast<Request*>(request);r->kind()=0;r->pri()=highPriority?20:10;
++ if(h->cppThrow)throw std::runtime_error("owned original C++ unwind");
++ if(h->sehThrow)RaiseException(0xe0424242,0,0,NULL);
++ if(h->nested){
++  h->nested=false;Context*outer=t_submit;Manager other;Request inner={};int tier=squadBoostTier;bool source=squadBoostFromRepathTier;
++  squadBoostTier=0;squadBoostFromRepathTier=false;ProposalSubmit(&other,&inner,false);
++  C(t_submit==outer,"nested submit restores exact outer context");C(inner.pri()==10,"nested NPC keeps native priority");squadBoostTier=tier;squadBoostFromRepathTier=source;
++ }
++ void*queue=static_cast<unsigned char*>(manager)+0xb8;void*item=request;
++ if(h->proposed)TryPriorityBeforePublish(queue,&item,NativeSubmitEnqueueReturn);
++ OriginalEnqueue(queue,&item);h->submitLocked=false;
++}
++unsigned Invoke(bool proposed,void*manager,void*request,bool highPriority)
++{
++ __try{if(proposed)ProposalSubmit(manager,request,highPriority);else hook_pathReqSubmit(manager,request,highPriority);return 0;}
++ __except(GetExceptionCode()==EXCEPTION_ACCESS_VIOLATION||GetExceptionCode()==0xe0424242?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){return GetExceptionCode();}
++}
++void ResetCounters(){InterlockedExchange(&p12DiagSubmitBoostsState6,0);InterlockedExchange(&p12DiagSubmitBoostsOrder,0);InterlockedExchange(&tiered,0);InterlockedExchange(&pathfind::g_pathDiag.playerRequestsInFlight,0);}
++void Race(bool proposed,bool retire,bool high)
++{
++ Manager mgr;Harness h={};h.proposed=proposed;h.retire=retire;h.observed=-1;
++ Request*r=static_cast<Request*>(VirtualAlloc(NULL,4096,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE));C(r!=NULL,"owned request allocation");if(!r)return;
++ h.publish=CreateEventA(NULL,FALSE,FALSE,NULL);h.done=CreateEventA(NULL,FALSE,FALSE,NULL);HANDLE worker=CreateThread(NULL,0,Worker,&h,0,NULL);
++ C(h.publish&&h.done&&worker,"owned consumer/event creation");harness=&h;squadBoostTier=45;squadBoostFromRepathTier=!high;ResetCounters();
++ unsigned code=Invoke(proposed,&mgr,r,high);C(WaitForSingleObject(worker,10000)==WAIT_OBJECT_0,"owned consumer joined");DWORD result=9;GetExitCodeThread(worker,&result);C(result==0,"owned consumer exit");
++ C(h.submits==1&&h.enqueues==1,"original submit and enqueue exactly once");C(h.observedLocked,"consumer observes while native submit mutex still held");
++ C(h.observed==(proposed?45:high?20:10),"consumer priority matches publication boundary");
++ C(code==(!proposed&&retire?EXCEPTION_ACCESS_VIOLATION:0),"no postpublication request touch in prototype");
++ if(!retire)C(r->pri()==45,"current and prototype eventually carry tier45");
++ if(high)C(h.observedCounter==(proposed?1:0),"order accounting precedes prototype publication");
++ else C(pathfind::g_pathDiag.playerRequestsInFlight==0,"repath accounting does not manufacture order token");
++ DWORD oldProtect=0;VirtualProtect(r,4096,PAGE_READWRITE,&oldProtect);VirtualFree(r,0,MEM_RELEASE);CloseHandle(worker);CloseHandle(h.publish);CloseHandle(h.done);
++ C(t_submit==NULL,"submit context gone after return");harness=NULL;squadBoostTier=0;squadBoostFromRepathTier=false;
++ printf("controlled %s high=%d retired=%d observed=%d code=%08x\n",proposed?"prototype":"CURRENT",high,retire,h.observed,code);
++}
++void Predicates()
++{
++ Manager mgr;Request request={},other={};void*q=static_cast<unsigned char*>(static_cast<void*>(&mgr))+0xb8;void*item=&request;
++ Context outer={NULL,&request,q,45,20,false,true,false};t_submit=&outer;request.kind()=0;request.pri()=20;
++ C(!TryPriorityBeforePublish(static_cast<unsigned char*>(q)+0x40,&item,NativeSubmitEnqueueReturn)&&request.pri()==20&&!outer.consumed,"result queue cannot borrow input context");
++ void*wrong=&other;other.kind()=0;other.pri()=20;C(!TryPriorityBeforePublish(q,&wrong,NativeSubmitEnqueueReturn)&&other.pri()==20&&!outer.consumed,"unrelated pointer cannot borrow request tier");
++ C(!TryPriorityBeforePublish(q,&item,NativeCancelEnqueueReturn)&&request.pri()==20&&!outer.consumed,"cancel callsite cannot consume request context");
++ request.pri()=-1;C(!TryPriorityBeforePublish(q,&item,NativeSubmitEnqueueReturn)&&request.pri()==-1,"negative cancel priority stays unchanged");request.pri()=20;
++ request.kind()=2;C(!TryPriorityBeforePublish(q,&item,NativeSubmitEnqueueReturn)&&request.pri()==20,"cancel kind stays unchanged");request.kind()=0;
++ request.pri()=60;C(!TryPriorityBeforePublish(q,&item,NativeSubmitEnqueueReturn)&&request.pri()==60,"foreign higher tier is not lowered");request.pri()=20;
++ C(!TryPriorityBeforePublish(q,NULL,NativeSubmitEnqueueReturn)&&!outer.consumed,"null item pointer refuses before read");
++ C(TryPriorityBeforePublish(q,&item,NativeSubmitEnqueueReturn)&&request.pri()==45&&outer.consumed,"matching synchronous request is tiered before publication");
++ request.pri()=20;C(!TryPriorityBeforePublish(q,&item,NativeSubmitEnqueueReturn)&&request.pri()==20,"one consumption per context even if priority is reset");
++ t_submit=NULL;C(!TryPriorityBeforePublish(q,&item,NativeSubmitEnqueueReturn)&&request.pri()==20,"no active scope no behavior");
++ for(int mask=0;mask<8;++mask)for(int on=0;on<2;++on)for(int high=0;high<2;++high){
++  Harness h={};h.proposed=true;harness=&h;capabilityMask=mask;routingEnabled=on;request.pri()=99;squadBoostTier=45;squadBoostFromRepathTier=false;
++  ProposalSubmit(&mgr,&request,high!=0);const bool enabled=mask==7&&on;
++  C(h.observed==(enabled?45:high?20:10)&&h.writes==(enabled?1:0),"partial hook or routingOFF degrades to native without late write");C(t_submit==NULL,"partial/refused scope cleaned");
++ }
++ capabilityMask=7;routingEnabled=1;harness=NULL;
++}
++void NestedAndUnwind()
++{
++ Manager mgr;Request request={};Harness h={};h.proposed=true;h.nested=true;harness=&h;squadBoostTier=45;squadBoostFromRepathTier=false;
++ ProposalSubmit(&mgr,&request,true);C(request.pri()==45&&h.submits==2&&h.enqueues==2&&h.writes==1,"nested NPC cannot erase captured outer player tier");C(!t_submit,"nested context fully cleaned");
++ Context outer={NULL,NULL,NULL,0,0,false,false,false};t_submit=&outer;h.cppThrow=true;bool caught=false;
++ try{ProposalSubmit(&mgr,&request,true);}catch(const std::runtime_error&){caught=true;}C(caught&&t_submit==&outer,"C++ unwind restores prior context");h.cppThrow=false;h.sehThrow=true;
++ C(Invoke(true,&mgr,&request,true)==0xe0424242&&t_submit==&outer,"native unwind restores prior context");t_submit=NULL;harness=NULL;
++}
++struct ThreadCase {int tier,observed;unsigned writes;};
++DWORD WINAPI Publisher(void*arg){ThreadCase*c=static_cast<ThreadCase*>(arg);Manager mgr;Request req={};Harness h={};h.proposed=true;harness=&h;squadBoostTier=c->tier;squadBoostFromRepathTier=false;ProposalSubmit(&mgr,&req,false);c->observed=h.observed;c->writes=h.writes;return t_submit?1:0;}
++void Threads()
++{
++ ThreadCase a={45,0,0},b={0,0,0};HANDLE ta=CreateThread(NULL,0,Publisher,&a,0,NULL),tb=CreateThread(NULL,0,Publisher,&b,0,NULL);C(ta&&tb,"two original-caller test threads created");
++ C(WaitForSingleObject(ta,10000)==WAIT_OBJECT_0&&WaitForSingleObject(tb,10000)==WAIT_OBJECT_0,"two publisher threads joined");DWORD ea=9,eb=9;GetExitCodeThread(ta,&ea);GetExitCodeThread(tb,&eb);
++ C(!ea&&!eb&&a.observed==45&&a.writes==1&&b.observed==10&&!b.writes,"TLS player/NPC contexts isolated across original caller threads");CloseHandle(ta);CloseHandle(tb);
++}
++int main(int argc,char**argv)
++{
++ game::g_hookOrig.orig_pathReqSubmit=NativeSubmit;
++ if(argc>1&&strcmp(argv[1],"--require-current-priority")==0){Manager mgr;Request req={};Harness h={};harness=&h;squadBoostTier=45;hook_pathReqSubmit(&mgr,&req,true);C(h.observed==45,"intended current consumer must see45 (known RED)");printf("current intended property failures=%u\n",failures);return failures?1:0;}
++ Race(false,false,true);Race(false,false,false);Race(true,false,true);Race(true,false,false);Race(false,true,true);Race(true,true,true);
++ Predicates();NestedAndUnwind();Threads();
++ printf("publication characterization/prototype %u checks, %u failures\n",checks,failures);return failures?1:0;
++}
+diff --git a/leopard/priority-publication-20261103.json b/leopard/priority-publication-20261103.json
+new file mode 100644
+index 0000000..d70386f
+--- /dev/null
++++ b/leopard/priority-publication-20261103.json
+@@ -0,0 +1,785 @@
++{
++  "timestampUtc": "2026-11-02T22:27:23.940496+00:00",
++  "head": "6e15b3a6926040de19f0418df10e5f1c47c0dc2a",
++  "scope": "Pre-publication player priority; paired native profile; optional census notice severity only",
++  "frozenSource": {
++    "KEO.ini": "3a9c5b74b52503f5a6d6f94fbc7a23808306c5f3fa67546af3dc59249362e595",
++    "README.md": "4fbbd4c6ec130d46b4ba225d0d8c4fe080419f567d30dad7628bd24ed2b36745",
++    "leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp": "e9a29f6a7069f81e227dd38bcb9274af3ef0e2319246283c0754c134055a21b1",
++    "leopard/fixtures/priority_publication_6e15/publication_fixture.cpp": "4d3b03961e6285cc346de7a64ec4c0deeaa63970ac2a40d29bfb616772ed2dbb",
++    "leopard/test_logging_task3.py": "7b6ef5e156808e25dd5380d085f995d6b4b9e49c47ae3c527ef50ecd44454b99",
++    "leopard/test_mcm_writer.py": "4d4f2edba4ea96226968da3000c05eae1558a6c94a88fd22c6999e25d4935c9b",
++    "leopard/test_module_census_notice.py": "a82c84b76f1fb541a2d9ecc624c34448eec90641a0496bc56dcc09470312792b",
++    "leopard/test_path_budget.py": "f0f4e11103bd40baa5622f8bb3ccbd2994a86509207b770d33de14fac093a3ce",
++    "leopard/test_path_priority_publication.py": "d1a370135c250a1abe443f209bb87bfd48825a8af3993914bc88e09a08865ed9",
++    "leopard/test_task3_catalog.py": "70c975aa65f822ca44c2e6e003ea6b7a15bf6d4d93b53cbd3cb4360738e2907c",
++    "leopard/test_task3_error_alarm.py": "ec66897041e16917200007558799cf2cd10fba197f2b4ee45314f47c346baf7a",
++    "leopard/test_task3_maintenance.py": "10a7908e367fab1d968adfc809cfba4d57cbf28b5e16eddaa79021c909172973",
++    "leopard/test_task3_player_keys.py": "9b6087c2351e7489241595946b7a16ddd2e1d5c3f374b552d47caca65ea73c8b",
++    "leopard/test_task3_status_callbacks.py": "e52e1994baf180a48462f2eb62fbc85028ad03801861108a6ee04faf34bd9642",
++    "leopard/test_translation_seam.py": "d8f5ec1b73a5f1f35aa9a64784ef1e1d5679e7dc9765b990d14e2a34403286fa",
++    "leopard/verify_logging_task3.py": "8963a1a66ba6138dfa76df4284b4faefb8c023bfad34dc0f82379953e2ae2952",
++    "locale/en_GB/LC_MESSAGES/keo.po": "2d720a04a438dca808f0fb753c3753d5282301693aeb8038a76d139c14b07d04",
++    "locale/ru_RU/LC_MESSAGES/keo.po": "f763920748254115ee4586173063885d939a77fa8dc355cbca44e58ee8e7c074",
++    "locale/zh_CN/LC_MESSAGES/keo.po": "103f587f3f2a3f61afaf87e076db8c982456fe398230d39a1ab19c44a5b93420",
++    "src/base/Localization.h": "35d180dd810070b2b0ab21d60a09a48432b512af46430f73b0d23841842e4885",
++    "src/base/LocalizationLog.h": "2d373d8146a3ce16281a0d00bde0c4e40a365c435ce96f0112983c99aab7a6cc",
++    "src/base/clock.h": "bd76c5a074a417762a2999b7df079cc4c068673a5f3874a1a1b98fd9066f32bb",
++    "src/base/config.cpp": "9dee1f104f43ff00ebdda62bd75c87fa7aedd44cf9d432f10bc0d6ba2af9fbd6",
++    "src/base/config.h": "0fee6dd9415bc85eef74ae236575a58e65f1d80913336789a41ca1a287439945",
++    "src/base/config_keys.cpp": "272881823da11654b5e9b02b0b273d89a03936e4655f33e365c0b3ebc198f1b7",
++    "src/base/config_rows.h": "99e5b9e6ca640895b215f4e41c51197dc99476633d7b88205a20eb37707aadc1",
++    "src/base/config_table.cpp": "97ba02a1be82cc69afe64a0678966c8215c85b8c48a6a177bc187d20646104ee",
++    "src/base/config_table.h": "4348096b3425c16c017f331018ab4bca0b5dab8fee3f995591fe18f3f70d872c",
++    "src/base/config_values.h": "5b0dab978b47a925dc606bb7b59ee67b33625c7f0a10ff15545d53f77d331574",
++    "src/base/core.cpp": "9c7a33b843b4ab963a260559387b6e54beb97b37ea10d90e44db26c14fe65a2f",
++    "src/base/core.h": "40cb1be51c8fd2cd0805d7e3a032af9b41e638ed121147e2083ef74fd75d8623",
++    "src/base/core_internal.h": "05dddeab617f7796221614e9b9caeff007f7ffc092c80d5fb7dac04e27fbb9f6",
++    "src/base/fixed_log_buf.h": "edf98e527864a26e6a45c35fb26cbbb0890551e8aea3224963ff5fd527764cc4",
++    "src/base/hash.h": "5042a265f621aea95a320399167d415be6750bc8698fe8c60f03ea22548ef99c",
++    "src/base/havok_alloc.cpp": "9af21518c572ef8175f4863560dd13739485c094cee3fa571d64a21667cf5c30",
++    "src/base/ini_names.h": "7221d1aacc969c7337d3fca5b392499761743ea8ec2a801b0112ea35f0fb424f",
++    "src/base/ini_text.cpp": "18399219fbc756dac95d266b17810559896601eb8697da330ab012ff6dc36f79",
++    "src/base/ini_text.h": "7dd6bd4755fd61f2b2aca0afd4934e57e292d42e47e9bc16c8c9eabad28b4f5c",
++    "src/base/keo_tr.cpp": "4b36e8626280bb69fb1abf15adb23ff98bd1b039ab23a804c6de6c80552e0b07",
++    "src/base/keo_tr.h": "3f63b18fa9958c7932ac8079dca38429c10cb7fdaec26de496b0ed5310832c1a",
++    "src/base/klib_include.h": "54cbfed95272c3baa07a31255d98016d9d09ec807d902ec0e84b4d579d705cbb",
++    "src/base/klib_include_end.h": "23b55f2c4268a902db198658a154f6766e0f89cf51bf03511b9ccb057f7591b9",
++    "src/base/legacy_ini_import.cpp": "7b93732dfbff8b09723e81149c05c286601edad68090a7561bfe38ea32d2ebdd",
++    "src/base/legacy_ini_import.h": "148229caf1f02888061df1971bf01e195ef99c54132fbd6e7a190457a908efbd",
++    "src/base/log.cpp": "c90d7c830f40426917f471c03a14ce4c365b7b636b34cc048bfe500c3bba1079",
++    "src/base/log_admission.h": "73a1532e4a9c8460a5be75ad0e495fa1fd8676cc201fa2c5b7dbc0ae693f34c0",
++    "src/base/log_bounded.cpp": "41f13f8bac43b6a3a85ef4911ff4a799fbf052e8471115227fca36057a6467f7",
++    "src/base/log_bounded.h": "291e618bed5923af84f1e8c465a795a50cd437386703e450269cb2eb3cbfde65",
++    "src/base/log_status.h": "dfcf4e9d7eac7fdc8e6b0ee57f530a0fb679b0956ee8f73b54b34d6d6739b19c",
++    "src/base/prologue.cpp": "4e8c3f84ff72c9f00729a199528b703844b128959374a52f5b15d25b62ba3899",
++    "src/base/worker_count.cpp": "a0810f31bb48b9f9030ddcdf65f1d7098faea2a8c7a5c2bca0d0aceea7bab0a9",
++    "src/base/worker_count.h": "b37ef07c454f38fb93fdf86068b1c46b92b5b1a7d174c5cafe0d96c7e23c16ba",
++    "src/bench/bench_game.cpp": "19cc61f2eb62b4a69b5be4e7812c5c1d77c28fb2a9acea633219c94b4d782798",
++    "src/bench/bench_game.h": "7b21ca0165333d77f471aaafa7f3a00382b84b6fc528eb2d0b32f11981b66e6d",
++    "src/bench/bench_game_internal.h": "313f7469bb256312d0cdaa1a2392b1f6bcb72a1d31fab919c258f59ade124374",
++    "src/bench/bench_game_math.cpp": "7cc19a6a095e30f7aa46d942cce3a432333d03420f21d98cadf16e7012f262f6",
++    "src/bench/bench_game_math.h": "8a74eac6fa5f911176a1a9e3ab029091a055e18a1555243a2bb0c81ade5e562e",
++    "src/bench/bench_group.cpp": "51b64ffc07199ec0d77ccfc61ccb81e5406ae865f0fcd95b12803d5e42fea68d",
++    "src/bench/bench_group.h": "bf0dd3d7e0ed7651d7ca2981f2352e313f232979d5a418af8ee0dc677778cdcf",
++    "src/bench/bench_lever_ab.cpp": "530b1b4846125f2fd0a794714e3416a30f8a022cd2e13a7a256c50a860aad2f8",
++    "src/bench/bench_lever_ab.h": "9ff6ac17747d3f7c9ee0d121566fea8279273040dc9f929c73b88da3e48edad3",
++    "src/bench/bench_pin.cpp": "78852a70ef4946524124c5ff2d7f2435ff245e6cd37871704ef1d0c21cacaafb",
++    "src/bench/bench_pin.h": "cf5289d53cf7c074b4fccd0c2b62d227a4738bb5bd6267197ffcb49252281beb",
++    "src/bench/bench_pin_run.cpp": "3b151bc94dc2f0ba0bcc769f1db6ded38da5d23daa96af5bbe26de94c7331a0c",
++    "src/bench/bench_recorders.cpp": "8ccd417b166e93c0ff481e004de7ddc5e1b98de7913471161be0aa10aecc8f46",
++    "src/bench/bench_recorders.h": "7c39e27ce6d6f82da963d856541f7c5e26f9245a4137caaa5b19e0e7a5fe1ec4",
++    "src/bench/bench_report.cpp": "c6526525ace9f0026289d20565e563a0c5d9eae3aee56044f3e6c6a801d2e338",
++    "src/bench/bench_report.h": "14cd49264f9f8a64cb094de915f38e8a409d68c8cd2714cae4ee7c7f337593e6",
++    "src/bench/bench_restore.cpp": "47f6b4ca4bbae68b5ac74a0b570e110f4e7e1624f636ca415d4d82a844609de9",
++    "src/bench/bench_restore.h": "a90200dad86e2c1d70bf55173ddf75fa357f23a7790e1b94d27f4d96588d05ad",
++    "src/bench/bench_run_report.cpp": "16ad453bb409a9c1f72f32d07671ac21bb2c31419879c0dc5d42d63727abcb5c",
++    "src/bench/bench_run_report.h": "076f841fb754e190d1a9229a4008b416e4a06faf85b6bebb77908c93d2e4e7d0",
++    "src/bench/bench_runner.cpp": "e09388b56b1b611f19a846e2d8971f6217116b6bd5faa9c3203cb2b19b6334a9",
++    "src/bench/bench_runner.h": "e08434aee2fc4f503eea08a4bca0f15e9e473a97fa9a2c3f73308d54221cf758",
++    "src/bench/bench_scenario.cpp": "205afac30cb015bf557ce91dd1b92c0f263236a8ae0e95716fc886899918bb01",
++    "src/bench/bench_scenario.h": "2bfb5c611e6b45ea1695d0552d1fb7740787281ccb467e623e9fa6c18a66149b",
++    "src/bench/bench_slots.cpp": "0b39544902421150e6e63a73fc5ca4557df007aff8a9827c6a5964c601bf8437",
++    "src/bench/bench_slots.h": "49a99910cb0c010558cec61b1961ac3f797ddaaa7b8f3bef00e472bb4b2a6009",
++    "src/bench/bench_stats.cpp": "3a8c30c89578a8ac9fa2671222de1aa169ec9f259f1f7fbe9c9fdbbece7a5bc9",
++    "src/bench/bench_stats.h": "b0780fea4a796443a2b611c10d7a0c7a17e508d0ff52b457f71dbf91595f2821",
++    "src/bench/bench_sweep.cpp": "620c78812cb841b8856f0ce6579057b4d804ded9f801129d0deb970589d97462",
++    "src/bench/bench_sweep.h": "b62a77cf5ddca2c4c11264d863738dcf56166c43ece89f1b322f9cfcdc62e2e6",
++    "src/bench/bench_weather.cpp": "012802d391187f578dbc1ea289a1dc56df8db56157bca4cc06beda7b8f046465",
++    "src/diag/cpp_exception.cpp": "778528f0f1f98769935328cfc34a96a7182759f7b6ea80cb1cfba5bff6b50369",
++    "src/diag/cpp_exception.h": "4e637ce3b5c19ceb720dec1122ac52b738b474ad8040c7849619c5562205f400",
++    "src/diag/exit_capture.cpp": "aaa5ceadf8867c80e49acc9e5e5b18f2df349ed5d0d248193483fefda9872f05",
++    "src/diag/exit_capture.h": "4c8aae046e0b5912de5dcb3d2acc6311cf823866080bb004ee08e67f29a7d9e2",
++    "src/diag/exit_capture_policy.cpp": "31c532f12b90b08f2ffb6348ee1a031f636009c0152e3993bea1f66ee8ded634",
++    "src/diag/exit_capture_policy.h": "e8af61c920ae8b645f1c9ae8923455e85126e9a94db04e9ab46aaeee023d2ce1",
++    "src/diag/fatal_class.cpp": "847be1f0e9013983a7e0f82cf25bd0a9d8d28a0ca13d73c1ddda280ea13ddef7",
++    "src/diag/fatal_class.h": "6014e7526b7fd1b81de507d1f6f0828790f43ed5d5b9dcc74f4c6f3b7afc7089",
++    "src/diag/mem_format.cpp": "77840b286a560efd4bcd11484fb7dc0bf29a4f03cbfc755e887a25be81f41d8e",
++    "src/diag/mem_format.h": "599316feee66bef92844bd72bbd85788bd4490cc2a151bf27fb9929240da529c",
++    "src/diag/mem_probe.cpp": "573805d8c613ae458a3e85ca74c69ed0a7ed51e179a652246faacd38ae817b02",
++    "src/diag/mem_probe.h": "cba15d481eb6d9731e150dee2de3fb91cf28ec313c5c00aab1e468d697406146",
++    "src/diag/module_bases.cpp": "528e2eb9b9d68401b0d0a9b56de6f7977ac662a0e70494f17c3f106d430dd580",
++    "src/diag/module_bases.h": "7ff7d94437d50df1f37d7af6552e9f812a7e304d2d27a37b0f51f817217646d6",
++    "src/diag/physx_pool_probe.cpp": "73f6953ea2406d770efb718d8217045e966d53091cba118ba0a6384569988789",
++    "src/diag/physx_pool_probe.h": "078e4ea32d93f5b735139ca0bd48e3bbda680d6080afea1b86fb7c011e712d39",
++    "src/diag/physx_pool_sets.cpp": "ca3c7aad444bf49a0ae0c17cd489e8a98fdc7f4fe13abb89c30a0400f7d388c0",
++    "src/diag/physx_pool_sets.h": "a9062e97bb978e86f25703c97611167f5f689a83105ca2351c5484383a7ff67f",
++    "src/diag/throw_ring.cpp": "14d189ad487285221a81324ba30790dc03ab2132d19a3ea6238a0604179bc670",
++    "src/diag/throw_ring.h": "a65c8164213c9f907ad3b2f19f2519046f83f9155ed66b6502105bd12486578b",
++    "src/fixes/crash_claim.cpp": "c2950914510d1c73a2bb4fa6c5061646b317bded18cb95829db9e39bc499b89c",
++    "src/fixes/crash_claim.h": "ff38d347e95381e0ae1cfd51a8ae8761b4e28e01926681df74e779853b7c75e2",
++    "src/fixes/fixes_config.cpp": "2f1b271a7dce9e5b5269858bb090e6413fc50d68814fdb93184c2bff2955fbf0",
++    "src/fixes/fixes_config.h": "5d924cc3dc3b9a36f2bcd4e018ae258c842ffc9c97ee375e1e05c45a3e542089",
++    "src/fixes/guard_report.h": "5b5e384c0c6bc855c50144b637cb7556d2388b050612bb1136eed0af74e69ad9",
++    "src/fixes/near_page.cpp": "71f5af0587040af521021dda5106fa3f74dbe3aeac1db0455db64fc0742ee3b8",
++    "src/fixes/near_page.h": "7fdfadcb21e3893c21aabcbcbd1c263dc982d8da8fef9d2cf2d7bf23e4b4f7e1",
++    "src/fixes/physx/hull_queue_guard.cpp": "989704325c5e1fd4a7be59672a52beb8f46856fe9ebeb8005cfecc5dc230238d",
++    "src/fixes/physx/hull_queue_guard.h": "e63a3c4e02672a792b0db366e530ba8bcb0da75976c5e2a5255a83a1847612a4",
++    "src/fixes/physx/hull_queue_guard_policy.cpp": "7644057df020be5668f5217ae2f7f6094dd5fd852f809657a08b3c997c87d541",
++    "src/fixes/physx/hull_queue_guard_policy.h": "174d16ea0bc610441e8f2b8d8880cf1805ee41570a0d4d92a7eb382fb86266cd",
++    "src/fixes/physx/hull_same_skip.cpp": "13539de661a5ca7afff160b23a687cfe8b7cb58c5e7efe1df1f0c29ffac6715a",
++    "src/fixes/physx/hull_same_skip.h": "d1824176f1b442fbba60021601c125bb4b0756749c835fb5bd41e07d4ace4002",
++    "src/fixes/physx/hull_same_skip_policy.cpp": "d7e82768d999c37f22882a31411cc182026932a9bf4c0fca66841347b4d76e7a",
++    "src/fixes/physx/hull_same_skip_policy.h": "12c48d81d19a611a25f2f3f0c631cc1d6098a8c1522719add34ea7a073297146",
++    "src/fixes/physx/physx_query_guard.cpp": "f861a9992fbf9393a4a3c8f1726a56fd481dff397b980b4c1da92de443a1b69b",
++    "src/fixes/physx/physx_query_guard.h": "09b5b2bb12a4059f171b21be30ca4c4aa7b998bf2c52b420e002e47bfd6918e8",
++    "src/fixes/physx/physx_query_guard_policy.cpp": "3e10527158eb8aa844c0faa0ec46f61580dd499a11839438390bf809c629f073",
++    "src/fixes/physx/physx_query_guard_policy.h": "e0d9a1626e45c6d49223f87ab11e22982313074364085f56d20b1bcbf432c0fa",
++    "src/fixes/physx/purecall_layout.cpp": "1dc7a0a5e66163416328940cf6b378c7d601a91d54251ecc548d2a011a50870c",
++    "src/fixes/physx/purecall_layout.h": "d72c4c37d9fb82e2700dcbf420a24eeca1658f29857210883ee6a60081d148b1",
++    "src/fixes/physx/purecall_record.cpp": "641c71f45150005c7c224feb240ef18de41938d8d1225b46cbd81aa9e7bc2e00",
++    "src/fixes/physx/purecall_record.h": "c65f147877e7a904077a3a4c860bb61182839ea08ec1edaa0b4390d6b7e101ea",
++    "src/fixes/search/cluster_cross_cost.cpp": "48c3821fa329fbf822cab5c80bb7fcdd28b7ca1ddec278ebb842afbd63dd6cdc",
++    "src/fixes/search/cluster_cross_cost.h": "f8aecf7d94fcc3828c02ec36f19cdd33bf6c522388f0e124e064dfa9ae420255",
++    "src/fixes/search/cluster_cross_cost_policy.cpp": "6ff7a423452c42783f79ab55ae509c4049909fd9716e045a81fa7b03ed112d8b",
++    "src/fixes/search/cluster_cross_cost_policy.h": "ea24997f749e1052e1ee6889394b2c14da70da8e173a8fc2235ff600878ce934",
++    "src/fixes/search/graph_expand_guard.cpp": "21954f8023c19df3b7443d684ab552109928ff1d34cad41cf543c7eb1e25a6b8",
++    "src/fixes/search/graph_expand_guard.h": "026c2f6a22632d5f66e67c49483e5b894a29ce1398098e3b28f3cd7e78fe6414",
++    "src/fixes/search/graph_expand_guard_policy.cpp": "961a964a9dbec9321b9ac4c6ffa4508e19dbe0c64460b64e6639b640a3142876",
++    "src/fixes/search/graph_expand_guard_policy.h": "45728df2fce8333e448b7290d2ec5fc2ee15c0464ec18d5f64baf7b5292e8768",
++    "src/fixes/search/graph_heuristic_guard.cpp": "8c2af84d58c4a8a64ae20386cd49581243b90b056d4f5df5b0071cb7abc78d66",
++    "src/fixes/search/graph_heuristic_guard.h": "9d08eaf6e399f74b6f0b6f7ed90d0dab756c6445976225783c519b9ad67aeaf5",
++    "src/fixes/search/graph_heuristic_guard_policy.cpp": "724d53ee1437ad21c634ff373b121e2af73e25716b4b0dab9304c1cd8b662691",
++    "src/fixes/search/graph_heuristic_guard_policy.h": "07a370b0515bcfa6af1aaa60a1c6a6f77605214ec44cad982b1e6838fcebd88a",
++    "src/fixes/search/graph_position_guard.cpp": "29f7c2afc198c34920df65d4e37c88f63021018fb5a225a6a7319a878d67349a",
++    "src/fixes/search/graph_position_guard.h": "25dc5e699467300a87da38bf483fb782438fcceebd5ccd318458534f66b39198",
++    "src/fixes/search/graph_position_guard_policy.cpp": "c701d6dde2861a2446269423fa7febb3b298147a1501244ff906cb9557332c6d",
++    "src/fixes/search/graph_position_guard_policy.h": "f2634ba6d99257b3e7469904842fa9bd2e2fb6f16612a306c5b667bd95489019",
++    "src/fixes/search/graph_visitor_guard.cpp": "90df6d059b20d987572e968e3fe7d81bd2360be5f0ec0f94f1c2f8c5a92f2e0f",
++    "src/fixes/search/graph_visitor_guard.h": "c97ae1c431f4d74b19aab511661352ab72deb1ed8d7dc8a21b44c133ecdafab3",
++    "src/fixes/search/graph_visitor_guard_policy.cpp": "0fcc44a56b8716eccd7a4d0310b6b4754f933dc9f7bf01bad655b35e9b34fccd",
++    "src/fixes/search/graph_visitor_guard_policy.h": "08f44ed582615440e8410db965a9cc14301447678534807aab7687627d18701c",
++    "src/fixes/stitch/stitch_byte_guard.cpp": "1c87897afcf552d9efa5e2757bafb1b215299f05e1c82cdaa4d4ff94c52ce6ad",
++    "src/fixes/stitch/stitch_byte_guard.h": "2b86654d5a8a4e5c3854fcd03d2c6fb97bc0ba287ea816caa27a50f5c738d92a",
++    "src/fixes/stitch/stitch_byte_guard_policy.cpp": "b91e13c37ab6bab8cc1d2b44d2a8e8f0a99fd01784b6f5f0a34ba5a6afbcdcf6",
++    "src/fixes/stitch/stitch_byte_guard_policy.h": "43e84ece6b96899b6cc0021f02a3cf857c7f28ae849b32c7f93f68c77af30596",
++    "src/fixes/stitch/stitch_source.cpp": "9176091dcb947f10cea942882269e677a7a6fe6416b86828208deb601a9f2615",
++    "src/fixes/stitch/stitch_source.h": "c363a5444ea41637c547fc78c802862988df68d9e2ef01d688a064c74d3ea01a",
++    "src/fixes/stitch/stitch_source_policy.cpp": "d1af5e0a83ed9dbff5d6b23dbd2025ef54c854d8d65676728e54edccbb4dd5db",
++    "src/fixes/stitch/stitch_source_policy.h": "ff1922c5777c97997c256349827133ddf8472bad76de5249a1467d16dae29b35",
++    "src/fixes/stitch/unstitch_guard.cpp": "335d68a344743abceb6a269f126d0819e405aa459e3a72985cd61f43504b09f5",
++    "src/fixes/stitch/unstitch_guard.h": "7c80ba8d523e491666e2c807ca3b214becd4e600427f53bd73487719744211a8",
++    "src/fixes/stitch/unstitch_guard_policy.cpp": "a3b0ec0aa56f59cbe22bc36e706e047d737d3a6fc2800000f72d3d8a022918cb",
++    "src/fixes/stitch/unstitch_guard_policy.h": "bcadea766fdaea4c8751925578307411a5075183c7fbfaeb568e89e836dc26d0",
++    "src/fixes/stitch/unstitch_layout.h": "8f46ecf93bd6a223d73c265ca2375b9369cde16d471d7f61e38e287edde88f52",
++    "src/fixes/stitch/unstitch_probe.cpp": "2bb11c2bbe393b72d19822730785aa4e283c3392132c8e2da600caa661d06016",
++    "src/fixes/stitch/unstitch_probe.h": "33813e9bd731f6f1986aa015e588745a6572f174d209a5095fe8a0f7832b4784",
++    "src/fixes/stitch/unstitch_probe_policy.cpp": "5f0e6b6f4a00e3a54ad18949161da28f0ba1a2f7dbd62ed193a2dc261c2d567b",
++    "src/fixes/stitch/unstitch_probe_policy.h": "9625642baf86c31d77b1402d92fb89f2e9b1e516cae70c8f4ee4b7ab0d7457ec",
++    "src/fixes/streaming/create_instance_guard.cpp": "d2d2e15458ec7cd0375e9c075d9cefba4473c5cee0d6c85677403c5bdcef168e",
++    "src/fixes/streaming/create_instance_guard.h": "dd8ba3f70c122f0fd94132813ac66d09b082799b65b5fb7e0b1473c571661163",
++    "src/fixes/streaming/create_instance_guard_policy.cpp": "60af3a8ae057ce04447fb823fc0c7c480dd2d3d4de64f9259742ba23e3c9f1e1",
++    "src/fixes/streaming/create_instance_guard_policy.h": "034e78e5af1e62ca162f2e6ded8cd9102e307b5457956fe50e97ea34b60955f1",
++    "src/fixes/streaming/mesh_face_guard.cpp": "81defff25b5c5a2dd48e6c55d4c4871a0d4126b05e0bcc3a934bcc9e10f57ec7",
++    "src/fixes/streaming/mesh_face_guard.h": "4086851463b0cc317fbd8be937b1dd54d7c245774205fb7652d9072c2a2bce40",
++    "src/fixes/streaming/mesh_face_guard_policy.cpp": "a07049be8cc140300e5b4ad1ce61706b69a4a5e9c16f63995a2caaef02c3d21d",
++    "src/fixes/streaming/mesh_face_guard_policy.h": "388a50dd06833a6e0739a891ef4c1567842f7b73ae3b2d8c66dc3850acb329f0",
++    "src/fixes/streaming/navmesh_guard_policy.cpp": "a4aa8ce7b8bbefaa70d8a6b4f5e17f085cbe4e59acac610b00464ef2885750d4",
++    "src/fixes/streaming/navmesh_guard_policy.h": "3382e5f21ff76d75768ef9a7bf4ca15f69d42b44382b9bd83da6f0283d54ab10",
++    "src/fixes/streaming/navmesh_life.cpp": "59aa550b5c495bd7a13e8f1e444172a6d2c4334512f4d945e05ba751db26cc76",
++    "src/fixes/streaming/navmesh_life.h": "7b1571cea4c5f3ffad260b3c9006c4f841b13997ab6860084755de4d110cb37a",
++    "src/fixes/streaming/navmesh_update_guard.cpp": "b875cfaa4b7f4752d427d4a363fa6d5c515d431f58aefe29cc9c9dd05f04e41a",
++    "src/fixes/streaming/navmesh_update_guard.h": "17ca88ebf88ffb2f807135fc832a0b4d720b928e399c4e457b6d121d81fda8a8",
++    "src/fixes/streaming/section_key_policy.cpp": "bab7ac6292910ef87ff73065b02e4298da856231f11f4be2c9b8b4d21b129d93",
++    "src/fixes/streaming/section_key_policy.h": "ba26da5cb384ce5ee8827d7108a1bc5f249e6d042830e94c1c9ea218cb064cb9",
++    "src/fixes/streaming/section_key_probe.cpp": "e1a66d807fd57ca851095d8e18d6c24f5c6d6bb6b716d1a690c9f9521cb8ea8c",
++    "src/fixes/streaming/section_key_probe.h": "c54e32285365f02fb3a290489ad70980f51fd46c9c644d68b129958d2c407d26",
++    "src/fixes/streaming/section_key_ring.cpp": "f5fcaad9ee61853000f32977d4fc73ad4b0c43bd3bd6447df824536a890f98e1",
++    "src/fixes/streaming/section_key_ring.h": "69180a02a236ce8ba3e751c49dd9dcd42a1b38cb556deccc7d7aa238410388a0",
++    "src/fixes/streaming/section_key_scan.cpp": "ffac308146fb02d8cd90c335c4ce10cb0ab45337a72f49820eba2d062d976313",
++    "src/fixes/streaming/section_key_scan.h": "5a12d8ac4b229fdf6e1579ad23c634410c1cca9df4bc7d9c562398e2d6621713",
++    "src/fixes/world/corpse_pin.cpp": "87b178388b1231e92905da237694c099c8b31da4bb4dae5909cf3d0e04abb3e8",
++    "src/fixes/world/corpse_pin.h": "2e1a6fa1d24eb9fa3284b65ad8a24fbf83150e4f1f3f267d5aed6ac57fdf5897",
++    "src/fixes/world/corpse_pin_policy.cpp": "88d13c54b2b06a13c17993f3ddf9fa5f0a24e15cdfd021ff838bddd8ecdf5df3",
++    "src/fixes/world/corpse_pin_policy.h": "335600cb39024bb40781ce2c98b4076fc5672294cda940231aee71b22d35b2da",
++    "src/fixes/world/destroy_list_defer.cpp": "83cb0d8c8bf050d15f964237e93eb78723d42f528c1f591d205c3c2aed5bc8fd",
++    "src/fixes/world/destroy_list_defer.h": "d7ede167b0b6486ccafe0b0c73acf9c924bd6cd32320fcf875a3296c81ee3f7e",
++    "src/fixes/world/faction_relations.cpp": "9142c58b3dd36ab5d6d9a089aeeabbc15454585bfc49eed5f9f6f651b65be7e2",
++    "src/fixes/world/faction_relations.h": "19bd3460af6b8b598f374a1ed81581484e61457f4b7996b03ddd3cfe41b51d63",
++    "src/fixes/world/faction_relations_policy.cpp": "1a5b2116308f56d2c4eef8d7d6245992dc8d6807a434f9b7286176c8be4ea805",
++    "src/fixes/world/faction_relations_policy.h": "1bc973d2a0843f008ba3905dcd9b04419bc93d5989db5fb60d9f8de97b65b8bd",
++    "src/fixes/world/nest_validation.cpp": "89a39141c39bdcf3e7c72f6f91c441846848780f1239b7b68d3c9b993d23a3e6",
++    "src/fixes/world/nest_validation.h": "33d761897137d378bf25dfc7d1ebfd1f985aa9be84172a39b75e84ef447efde9",
++    "src/fixes/world/nest_validation_policy.cpp": "fae0d08d9a854b1b7cd51c229c9e869e4cf6ded0b2e1550faff11554a90da81c",
++    "src/fixes/world/nest_validation_policy.h": "be78f7b0db4b877c09f8200f945d42656802a9f0cc2235d6542974a63b387fa6",
++    "src/fixes/world/onscreen_stagger.cpp": "240a090fc84385685ef3585099ca39a740eeae3d9068fb19e925644d2189a9f6",
++    "src/fixes/world/onscreen_stagger.h": "0669a61bbf44be75d4e2dd0a6f6fc956d1b1427f8853b05430851b68c3625825",
++    "src/fixes/world/onscreen_stagger_policy.cpp": "728ecfe7b3f6127f5ca47b8105db8843447039d7fa303066c51b997ad29329a5",
++    "src/fixes/world/onscreen_stagger_policy.h": "a3ef471624f73d8690504cb82a26b04a7154f62050f2d50bb7a05252423c9e6f",
++    "src/fixes/world/paused_skip.cpp": "521f5aba18f3128b7c094955f8bbc9fbcd68652d0af8f3718db957b4dbc1fe63",
++    "src/fixes/world/paused_skip.h": "baa354cec613a6cbab0013bc92a1d3f29251a99f82aed63ddff2ceb6a356bf9d",
++    "src/fixes/world/paused_skip_policy.cpp": "c083fff3e68fc648ce77bcbd4e0667b40b40e660e3733ba4eae9c9a6237837f0",
++    "src/fixes/world/paused_skip_policy.h": "ae3496326c330aac5c512df6300b7bb13b9a8e985aa451259cc46ae737bd911d",
++    "src/fixes/world/throwout.cpp": "010f7eeff5ecc41aad044ec5326044a0c02a3a7c2b63e9c7ed6ce8fa1f0b06e4",
++    "src/fixes/world/throwout.h": "ce93ca8b0da4fe5279910238b5b853fe6e2502887a894f0c1e1ee69476d3e498",
++    "src/fixes/world/throwout_finder.cpp": "e2e6efcb5f9b7eaaaf9572004040fbd618057761155b064d29ec7553ded81f45",
++    "src/fixes/world/throwout_hold.cpp": "f929979f52cdedb23c38ea4198828a880a81ffd510141317f764ab8f4e0af91e",
++    "src/fixes/world/throwout_hold.h": "6597816e7aab9e3304718960f6d44b6a03fecc944d8f7fbda0f8b431177f0bf8",
++    "src/fixes/world/throwout_internal.h": "44b8d83c2c6b07aaac86fd4b44379e5170e4da8795fa1fe85bc56988f114d631",
++    "src/fixes/world/throwout_policy.cpp": "b7cb2bc9a14a389fc4d4f2b592a8ff8cd38597d0441d33a8928b7a4e7768115a",
++    "src/fixes/world/throwout_policy.h": "4724406a325a23d1b12c9d3bbfd666addb7cb8d91edce41086afa194d82b84bd",
++    "src/fixes/world/town_claim.cpp": "7788acdd82628df45b2cc12c18ba798fc7e507f6a08c3ef1fe9ff0c78b032011",
++    "src/fixes/world/town_claim.h": "48b21221ce9bf31486718fb90cdec186320e9b738092fc0d50734a99be05367c",
++    "src/fixes/world/town_claim_patch.cpp": "174c02630387c09d4ec3cf3ad8575b7c6ba11a3ee23b68a4716598497ee7eef3",
++    "src/fixes/world/town_claim_policy.cpp": "5b97e66cc76fcb93e3a5827568ef8ad3126c246406dd5363b4da4f4339593c84",
++    "src/fixes/world/town_claim_policy.h": "9d382ae25c7d176947c4ee68dc310cce6600420f0edc840ce651b8d905aed078",
++    "src/game/bindings.h": "48f17f39687d38fe9b3069fdfeb71ee9df3373732980c736ecfcc7a6629802a4",
++    "src/game/game.cpp": "2bca1ce4bf8ad35664a0c8f3f123999d1df17bb49b5e43d8cbbef80c876ea5eb",
++    "src/game/game.h": "9e1494a013b829a6cdac506724963171b511e857dab4ba9dfe6fcded3c70f059",
++    "src/game/hand_key.cpp": "1fe8fdaab118c4640ba91588e5b2459a310afd5aff576d99f711c9bbd596fba2",
++    "src/game/hand_key.h": "d4cfe0be680819cf2655a9357f7bd79271369b24552991e4a9bdb462c327e692",
++    "src/game/klib_address_policy.h": "490d5b752fd598c1d7d5294c943428dfe55f27293ba192a61242ba2f1d8f5a51",
++    "src/game/klib_bindings.cpp": "c2eaf5f595ae8e85b10ada23991b9ca473670cf0a9e2cd18216c8f3cefc45235",
++    "src/game/klib_bindings.h": "5d5dee9ac3e57c15487fcb9c46f289a7c8fa6be699f2025fe09ab448451a4e93",
++    "src/game/klib_dethunk_policy.h": "4c76cf9f4f21011d74614711f5e44b650a198219a1dd7524399a9257ec4faf4a",
++    "src/game/klib_globals.cpp": "5c76ec22cc7165b71d1c3c07ed2b03819dd294bdc6f3608e85b3870ff7ea3953",
++    "src/game/klib_layout.cpp": "494a5847281a27fb6a6d1618a82f63eabf69c311f9984789059cc388066a0414",
++    "src/game/klib_layout_combat.cpp": "64a4087b27df9b8f819fa1e4eac61f2c59526b6216bc76bd09cad82571a41bec",
++    "src/game/klib_layout_ogre.cpp": "d1f4dd4ab1448ae87b5eedff7b8c27c2c08d5770d0e67eeabd29f1562c7416bc",
++    "src/game/klib_member_combat.inc": "4440955e89716beb3209c114e228d27fc6d95566f2360d7c175e09a44acc1102",
++    "src/game/klib_member_contract.h": "49f69512cf0c65d6a1f76ca852e9e9ce83be168d49511a7c83bae3ba67923f17",
++    "src/game/klib_member_fields.inc": "ab19b6ae0ea15ab36791e5beb48b634c8942f394702b7cf85fb73e5c239a9449",
++    "src/game/klib_members.h": "54889a9a7f733ce4de63f892290ba612260e8f35da24db4c1ef39dc39b81e51a",
++    "src/game/klib_platform_policy.h": "df2f9934c4bbf1dcd716a5aa2b39fd61cbaca0e2c8e39610c7a33425960d8178",
++    "src/game/offsets.h": "f7849717b4e4791f7d23a17a7c7829a36827320352be697673e7f5b81b5f3e57",
++    "src/game/prologue_policy.h": "346b34007e254ea6dd5d63eef3b032870f74913eb476e5ae368c4dc56e4f050f",
++    "src/game/rva.h": "4aba5ce43e2637d537d247e1d3b99556939ba23bf3ee7aecc138a8d7de6fd22d",
++    "src/gui/ModConfigMenu.h": "90060552da7f7144241443de48e12f73023c9c7667762e07b88b7606bf805aa9",
++    "src/gui/bench_buttons.cpp": "b8ea3ef4ea8fb986fc6a2c62a14d3eda600ca2c6fdf26b4826f1920a13ba547a",
++    "src/gui/bench_buttons.h": "e5b67e6f9a305729962197eae566eec56e011d929b364deacbed5381a03d8562",
++    "src/gui/gui_config.cpp": "a0e80832f9b18e25968d889579c102cc86878cc33dcba1f49ab323eb0ea5c353",
++    "src/gui/gui_config.h": "83a934409c4a0b324ad977b1ffa445565309a39500ffcb5ed0683775fee0ee81",
++    "src/gui/mcm_bridge.cpp": "d6b094e79e8294c4944d30bcb37a233c53d34e1dc7120f15d79de86045861e1c",
++    "src/gui/mcm_bridge.h": "34e40c19e60999bfe7dcd5cb2bc3c3b4280063ab8219767ff94ea79a311e904f",
++    "src/gui/requested_settings.cpp": "0a961459eb2426bc0c7199dc42a8af8a95f5f0f4984ddf5899c474f8f5898c68",
++    "src/gui/requested_settings.h": "19fedbc63eeb5e8c5202c06ed12b128004c274a981270a1f3154df8b8becceaa",
++    "src/gui/settings_factory.cpp": "808f6846bce8003bd7ac0cd379d7c9244b7770b68513e74f5a81386dc427d07f",
++    "src/gui/settings_factory.h": "7b56fc7a3fdd4ec1d3fd31b6d2ce8c206a517a5666ccaf7e2b822fb5ec4178cb",
++    "src/gui/settings_layout.cpp": "9b4fcd985d104717d777e3c7057576ada710f6adef762b7c159074b46775d97a",
++    "src/gui/settings_layout.h": "5053d92a4b88d5fac187153cc0d45c9dee8a927be3f04b00cac87bf511c035ae",
++    "src/gui/settings_panel.cpp": "28e7c13a11ea2b42fbf5ce5d79f398069e7d38cdbfe892893bbe86f64c51cd9f",
++    "src/gui/settings_panel.h": "ba8f731f7ca8154a3132a05c8536a9d76b8d9cc38d3f67fc13bcf0a8c1a25e6e",
++    "src/gui/settings_rows.cpp": "a6b447750d620fb4fae2f87104af30f29c51e539301422f2c0279dab9f5485c0",
++    "src/gui/settings_rows.h": "43580312d8d429e02e964b708dfd813fec9d70fb718353812eba89174d0f1e55",
++    "src/inventory/backpack_first.cpp": "2a485a0512278ce7103e98e2de869818d6aa64d5249bbeda3912a4c7b27c6cde",
++    "src/inventory/backpack_first.h": "81eead291eb7d13b4f8f996f881dae9f895e2350e5b355278c1884777d9b5507",
++    "src/inventory/backpack_food.cpp": "4298d3a68a77233a83af1a942cdb04e0f1d5b5b42a9787ff51defed4b7e460de",
++    "src/inventory/backpack_food.h": "1c31c8c340c326baf7c36904ed288ac0b6e3d813670d3651800bb917648b6913",
++    "src/inventory/backpack_policy.cpp": "4d92cb487c8109fe976d9b29c70eb0639e945257b80497632e33b9b7c9d58bfd",
++    "src/inventory/backpack_policy.h": "97ef515aeb3586b11a99630bb654ba569fd175f002a1b53e54c486470ddb871f",
++    "src/inventory/backpack_reader.cpp": "1eb1168dcdf81f2c8a409badc607cc47a2075d96a7e12a297364231f6ca8cd26",
++    "src/inventory/backpack_reader.h": "32552f318272563cdb536fda1c20bd7f2f83ecb12856dd5d1e58bd149d1226cc",
++    "src/inventory/backpack_sidecar.cpp": "5ac55834548703cf0dfae150778d4612cbce17cde11baddd2986bb0df4bea947",
++    "src/inventory/backpack_sidecar.h": "12d7f4ce84eea0636c1e533c49a00885a3efc43c412e7a0dc3f7488c38c5903b",
++    "src/inventory/backpack_sidecar_policy.cpp": "3ec7beb7fea8982124558f0e7d770cead7e8cd13288ec5cdad8f2d5843c0a131",
++    "src/inventory/backpack_sidecar_policy.h": "b91f2e8e7af4d8418c956262a0f5e5ef0c689be3bc79a3cf5974ca1493afc9cf",
++    "src/inventory/backpack_table.cpp": "6a1370ead67815eb37e6468d39b919faea37c00366d5a1c4a14c1746f0e2600c",
++    "src/inventory/backpack_table.h": "d2497694ac292caaf457a64598086d4a60eb5f360bc79a3cc8b54cba47ff4cb3",
++    "src/inventory/backpack_window.cpp": "93f09f8e75ec4f8b4494ef29ae3a60a643a66a2b39b1038a35267ae90ab1a0e4",
++    "src/inventory/backpack_window.h": "bffb6ddf547f5a036b0b0aaf74a92f736fa30680552d433798d55287881f8534",
++    "src/inventory/byte_check_policy.cpp": "305c7ae5fb0bc1a0d1ddea4c90daf9ed23d3d62b2e09dcdd5d29f360b2240cb9",
++    "src/inventory/byte_check_policy.h": "2df1cf65a0eac60f4c32d5a50bbfdceb383b4ba652152e242a0147c46b8c8630",
++    "src/inventory/dialogue_item_function.cpp": "abf4c12a283453372bb38f42666c599b778a2258b54a8e976c9499202962a62d",
++    "src/inventory/dialogue_item_function.h": "35418c24af6dbd7d18de2c9b40d6b54af8c2cb43f19531214dabfa3742cc014a",
++    "src/inventory/dialogue_thunk_policy.cpp": "c3d33ced34cdb2f23b7125c0db0e2f53dedbd7dfd4051c0612bf36dea56408a6",
++    "src/inventory/dialogue_thunk_policy.h": "058f288012469462bb12e65cc282693df67e1b6c8b603572c181bf3513ecbc74",
++    "src/inventory/inventory_config.cpp": "9baae1b7bda487986c7248383093118b4afa178af4dd87990c3497dff646eb5f",
++    "src/inventory/inventory_config.h": "6a2d54d2b03746edee383eaff3683b44d8df16122c1494afb17f941074b97dce",
++    "src/inventory/job_counters.cpp": "c71ff54d6936848de86618b4715dc32976efe24afc396ebde352a417434bd36c",
++    "src/inventory/job_counters.h": "a2c8c6dd3df47c6e5066f551ea9ab9b57650642f008f094476b8a95f4e0287dd",
++    "src/inventory/operator_policy.cpp": "f1cfef5b6c9ddb349ae2d7d7a405f4958a8e04d9f9deda027b1074a4734b64c8",
++    "src/inventory/operator_policy.h": "714e34011b9905d68d98669aa107302cd93eedba74e2b968df3efee09e3d6ac3",
++    "src/inventory/operator_trips.cpp": "55cb391b0bbd40e2f2624d6f7afabe5003b5d166033d2cbac58769f3d823c4de",
++    "src/inventory/operator_trips.h": "34bc2487ddf164444c3703d065c49ace6d042e86271fdd5e59d87c8350bd01ce",
++    "src/movement/char_movement_fields.h": "f5842f69f71c29880d61782a40a7d4d0fc6182d489c9067ecfb7817b86ed2f95",
++    "src/movement/formation.cpp": "6720af4f2df554d5a7d1aeef2bc4b9e36f16295f4bfe852fa1df4001892b586c",
++    "src/movement/formation.h": "19aa1fb6fa0aee42a446a710d865b5eb37ac38ccf498d6feef129e948f338b2f",
++    "src/movement/formation_follow.cpp": "e6c4565b5133738c6813135a669ea51d978e85c0960a2b13a975bff31f5de4f2",
++    "src/movement/formation_follow.h": "274053ff1111ddd12b452f2ef1fd68c055be75bd411d04c9be773779e069d1dd",
++    "src/movement/formation_follow_policy.cpp": "bf01f71202ff34bcdfb997933f8e846c50e40ee69bd9aaa313bb69ca1d6fed13",
++    "src/movement/formation_follow_policy.h": "5ebabf4fc87fe79a151aed4f88dd0510bc3d2cc8cf7e584c0ff6ce5feb4bbc79",
++    "src/movement/formation_gather_policy.cpp": "b4de3ce67f7e28a5fa1db6d67f8a675b6630829114dd4d5b5c98aa41d096f0f2",
++    "src/movement/formation_gather_policy.h": "ff143d77c2472413328f344030c0d74892aba07997af3eeea5d1ccbcbdb99591",
++    "src/movement/formation_internal.h": "234cec327821a9087b16c678f9b3d19a71dff1b87ae11cdacfd8bdb64c56c55e",
++    "src/movement/formation_members.cpp": "1265efe7f143e30c455e8c620aff68f58c4efdab3ce5415cb1955e75d05ac277",
++    "src/movement/formation_members.h": "c406d4df2dc0933e4b39ba92364e4e82a58c76da33c1d6267829a6b86a886a1f",
++    "src/movement/formation_pace.cpp": "ee771eb8a3e5ae89646ad4f2ac92a371a748e75b7c51d3d579c60bc69b0810cb",
++    "src/movement/formation_pace.h": "e25da4a8b4c6a220392bd55d273978b0598e8b1c2865b972fbbf904c918164d2",
++    "src/movement/formation_pace_policy.cpp": "24f4e749455a1ddae73b8d6f539de57b0fe04648ab344a278c7cc2f24ca10e2f",
++    "src/movement/formation_pace_policy.h": "5fec89bae830dc193c527f4bed035354cd3b0dec052e431b11a89865160a08df",
++    "src/movement/formation_query.cpp": "7989efe08479fad7707e47cd00444a4fe14c07ea1fdab38aeda0647f1ce54388",
++    "src/movement/island_cancel_hooks.cpp": "3f47e295515f853247d88867fd07d8a68c1d78d7fcfed10ed4cbab04e2ea1772",
++    "src/movement/island_components.cpp": "9fb8e5e314997fa41a9f0a0aca75871404d3e2286a6407e8ca55a72ce8e0bfc0",
++    "src/movement/island_edge_legs.cpp": "5a02bfbf8de8162a2a2201395bbfcbb6afb3fddf992ca0bdbb253f44579f6489",
++    "src/movement/island_edge_legs.h": "ce675a133a1c63364d61455d2e1b289256fd851b58db04f9010f007188af9306",
++    "src/movement/island_edge_ring.cpp": "bad8eb4249fe785aaf6243a63ef7aaa7583cf7bee1f3eca85089a315e02664ca",
++    "src/movement/island_edge_ring.h": "149f360968943ec172f4c967ba8bfef33a6350282c067d2fc0adbc93cc6a722c",
++    "src/movement/island_edge_ring_policy.cpp": "9d2c95b93eae66b29c196595a31d38716714527f3943cbf6d8f2b1904185abcc",
++    "src/movement/island_edge_ring_policy.h": "c7ff87902bb57f409ab49863ba1ea4fcfd37caca8d414766a1daa9493b0104c8",
++    "src/movement/island_hooks.cpp": "e0e53fb5b0041a81d2c97622d241ecb1b781dc756c62a9db4f8db4067a35db7d",
++    "src/movement/island_orders.cpp": "8dd84df7784dfbd299835d8f3e4960785c2ca90c8580c30a6a7a0ba2584f1bc1",
++    "src/movement/island_overlay_internal.h": "7c8cb99134d08567377c42ccf49b4767c773e2e5e8f2bc266573fabdb59fea9e",
++    "src/movement/island_reissue.cpp": "8b82016dd8c13e0b841a29345d2b02c9ede9e0c95b574d1d3b6524ea3e3a3637",
++    "src/movement/island_span_policy.cpp": "dc555695d8b2af7a83acc2e7f87e59abd2730713248b879d77c5078d6b19902e",
++    "src/movement/island_span_policy.h": "bc1747b0f27c3db5f08e3ee38045c7c993cbeb48bf5cfce03037c52c3971970a",
++    "src/movement/island_stuck.cpp": "eacd01d2c7d35b70043a6a2b839364f93a2730dbd27f20d3ed522f9585dbb0ba",
++    "src/movement/islands.cpp": "2f1a4559ad4047fd705d36a337277efbe24cf4edac16b868f993014cff220107",
++    "src/movement/islands.h": "71cefc1a216c527425cf42c588114ed12a22dd002d4ae6cbf7b7600a97cfe5bd",
++    "src/movement/islands_inline.h": "818cb8fe106767b13b8bc99699b84a562de8801ded6223fabcb9b0bf74f0ad0b",
++    "src/movement/islands_internal.h": "d0dba7ca39be14e56c561a1945ceb7e724f9001bc89c3d23c1b73dfbd740f640",
++    "src/movement/islands_reissue.cpp": "055f10dc88004ef1369e1c53bcf8f7d63ee2b121efb94be4cd0d8487a8b44a6a",
++    "src/movement/islands_reissue_counters.h": "216185cc4b82c3113e696346664707dbdabdee6b26c7937bb930019a28210f07",
++    "src/movement/islands_reissue_internal.h": "493c0c52d926a171ed4ed09128efffe0bbff12b264d75cbab7ae6fb651e7ceb3",
++    "src/movement/k7_arrival_policy.cpp": "fd95893b6d5396a20aad9fba59dbcd78b9a02dc21749e73bea5e3bb677044fb6",
++    "src/movement/k7_arrival_policy.h": "e16f0c6ab9094c8f774244ed9a8b97d4a29dd4cb88e48717a1c7d1f94576b51d",
++    "src/movement/k7_observe.cpp": "54bad8cfbb89bf272b510cd02268a47355c2596e9486dd333527aa5831b5ebf2",
++    "src/movement/k7_reissue.cpp": "e9f68546ce4abdc05801339e581f7182e83a3c74069c866d888016b4055f5d0b",
++    "src/movement/k7_swap_policy.cpp": "c1d91d468b088fea604de23546826fde5532d96c486a98f5d9a7a7b30f1058f7",
++    "src/movement/k7_swap_policy.h": "31345cc243b0ae393d5c9a5632ff62c35a5eebfa3f76fe55177f9aae198fc240",
++    "src/movement/movement_config.cpp": "48a1170f901d6e523147fa4e21259a2964aadc661d92e1884580511ce2fc897a",
++    "src/movement/movement_config.h": "23d02ffaa0b9b107a2f5967de3c71d04d265397abf458ca78ead056492a9700d",
++    "src/movement/movement_trace.cpp": "5f16a93b48d5a69e59d414b3dadc3f9e33e7f4f2626b29f12fb2c43d0ff20530",
++    "src/movement/movement_trace.h": "14173749618368756bffc257fdec2e7ce9f3eeb0ff598261fb9dd1763a4e35b9",
++    "src/movement/movement_trace_policy.cpp": "2810f49d09601f9714e28f067d45c76ca52e72d55b94aed39d000f2352a16d05",
++    "src/movement/movement_trace_policy.h": "dcd710df56912c006cc012eea733324149e229bb788faa7bc98f0b86143cce4c",
++    "src/movement/mover_policy.cpp": "a8cb31b1ba902e72d9ab51411371de64ef33c27b664a835129bd07d740161f99",
++    "src/movement/mover_policy.h": "eeae10ff62869ea20b2453521fdc15a32a6909c67f3760e19dcfa449bc43f017",
++    "src/movement/order_outcome.cpp": "2cc0b09547dfa4175ed729671ad8b6df9c72221b6ba1bca3831de0cef2307e8a",
++    "src/movement/order_outcome.h": "0259e108dbf296809d2a58c473fd696f3d7dead25df0b45e9885a1786f61c14f",
++    "src/movement/order_outcome_policy.cpp": "711831bca1077567aa4c9087a04021e6e5f21944ba16d1830b7577eccb4b4ab9",
++    "src/movement/order_outcome_policy.h": "5130d9a0043eb94dc3ebbdf22a24f9c50728e27c10b173ca384d1c60002bf574",
++    "src/movement/order_outcome_table.cpp": "56f0883f41628e72494edfca4d4698d51d430d4cc54719125011587f58bee9ad",
++    "src/movement/order_outcome_table.h": "bfcfe5eb07b9f75fee06f788192d009b10f9f92bbd79e657e0731c8c1f0d000e",
++    "src/movement/scatter_patch.cpp": "c60187434eb1bd22a63d3da5053ee6e254db6f6aaea1a3c791a4b41a7b2a86cf",
++    "src/movement/tracking.cpp": "04b36965093e4e506d1fb219850ed5b7a83843ce7968606ff1310f5f04e368cb",
++    "src/movement/tracking.h": "ee2abc145571b64178532c58069c0934819d899fa1748f35fd400f5a301bfceb",
++    "src/navmesh/cache/nm_building_hash.cpp": "f905f6480ede3c7609d143815e383ca39171a4b18ba53c648c246c965c31df05",
++    "src/navmesh/cache/nm_cache_core.cpp": "3bd0fe5b036ab94c3efcb0c940a75d24dfbc2c2a438406970ec57e924840d812",
++    "src/navmesh/cache/nm_cache_core.h": "abd249cf054649815037405eb8d4bf86cd634b9791cce0c6789a202836ba1c3a",
++    "src/navmesh/cache/nm_cache_key.h": "cc392bd45e01778f642cda8f3ca08cee6d86a0f4b135da2b7cd1df9b9b45abc5",
++    "src/navmesh/cache/nm_cache_report.cpp": "b24c2a006bd7e556dc2f4b9fc7a795644dd7b3cba0ac2b954e0d95a091a75395",
++    "src/navmesh/cache/nm_cache_slot_policy.cpp": "b0cabea0d4dd9dba8b7a28057eb34b90aac9a0fe43928df47b0bd82371ac3860",
++    "src/navmesh/cache/nm_cache_slot_policy.h": "2e287af67339101594853b236ee61b7ecb6582239d8f8e722d1a16d96b74349c",
++    "src/navmesh/cache/nm_cache_type_policy.cpp": "7f29e3423b8a0a82f901355a63ec43d3912a10a12358671f6acb1856acd1d299",
++    "src/navmesh/cache/nm_cache_type_policy.h": "cb2f5c681b7bfbe316497995e22be54e1af6467afbc92a030814f1396ad32af8",
++    "src/navmesh/cache/nm_cache_types.h": "954b22ca6ae824c3784c2ed9297d095941f7cb92b3be2ab1682206ccfe350847",
++    "src/navmesh/cache/nm_disk_cache.cpp": "63dd600a55e279c77469b2be22b097ae8d1c794e40e232b58e8481b4f27e9e68",
++    "src/navmesh/cache/nm_disk_cache.h": "0f28c37c3d7603868de38809f59049b0d79e676c6ca3f2047a23a110f9fe1dad",
++    "src/navmesh/cache/nm_force_rebuild.cpp": "31695beec5f9251a37c8e862d396907861548829155bfbf71bce9b056c6d129e",
++    "src/navmesh/cache/nm_force_rebuild.h": "8049d4e49e75013d4071fa2e5af0331e1aa79113ec8594988f5c5758d90b4d49",
++    "src/navmesh/cache/nm_force_rebuild_policy.cpp": "8fa53cda3d34f24521160a606a47ab937bfe71d0455397c28c258e450c41404c",
++    "src/navmesh/cache/nm_force_rebuild_policy.h": "c6cf50c115397990d7a1c9697849360ef00bf6a26294717682e92c1c4fbfd730",
++    "src/navmesh/cache/nm_key_hash.h": "ffd6c6ecd662e3084040bed2f9b68e12743c6f70324d3b005830514e4409f038",
++    "src/navmesh/cache/nm_l2_writer.cpp": "d4c090d0fe51958fad969f6b0ce326c5e0e9b063596fc06d6cded307a337db36",
++    "src/navmesh/cache/nm_l2_writer.h": "350f39433406cf93ef87a607037fab757929f6448d0742e332a7a498d17ff629",
++    "src/navmesh/construction/splice_queue_policy.cpp": "9ae3d5c746e14f6a8842c5766ccad7021320af6db92246ffd89eeb95aba56e69",
++    "src/navmesh/construction/splice_queue_policy.h": "b68944ee680f8576736bb2101872977be9d22b92c083bc1006282cc41a8802af",
++    "src/navmesh/construction/splice_ring.cpp": "1b814306bba44cc9f41432fdeca61c57cf7f9730ba45a8ff4b61014de6cabf16",
++    "src/navmesh/construction/splice_ring.h": "1a1c8b2db21eb5ac774b8c8c193e14004a5ded6cf88e2f796c9085c11d7fcd95",
++    "src/navmesh/construction/splice_seam.cpp": "243f431dc8cd2345a9f7b42b27725585727455f4bb87a1aad6dcd800585d5a44",
++    "src/navmesh/construction/splice_seam.h": "8884e14a01a6830f3bd896cdd28a4a3056c9dda5f5cd60028e37600e1c4ab9cd",
++    "src/navmesh/construction/splice_seam_policy.cpp": "af9c21b25d24f73649e0f927c5751b30e214d3a9ef5ba2f43cd162ca2170567d",
++    "src/navmesh/construction/splice_seam_policy.h": "2931aa189a29a562ac13ce6104060856b60317faad2e17bc56e08f5023be74b8",
++    "src/navmesh/construction/wall_splice.cpp": "b642e737f62483d89bbcc2184217187c762607618455d95e2445ce1ceca45930",
++    "src/navmesh/construction/wall_splice.h": "9928de5489ccee9b8a4a4ee56a1d43cb6bb7320d5fa9fc17d22d4021e20f3361",
++    "src/navmesh/construction/wall_splice_drain.cpp": "90052a7bd3bed8e41ad522648a9fa2d022946358061f80be150e169d7a461375",
++    "src/navmesh/construction/wall_splice_internal.h": "9fa50b0841247ca4f5c39c8d69a8da8a47ef8cc285be987df35c9085bb325df4",
++    "src/navmesh/generation/misspar_math.cpp": "675bbb106aa02e331890e04017fe15666f22eceb63d5079569fdbcc5297bf5b2",
++    "src/navmesh/generation/misspar_math.h": "81cb2733f2f09c057912f4a7da0d1968154f5bce25344765b50dd1297f37eb4e",
++    "src/navmesh/generation/nbr_seed_bindings.h": "75ef25f041fb625cc8494cc30494abf9826fcb0635c4ea4dc25d339ddeb49540",
++    "src/navmesh/generation/nm_clone.cpp": "474b3d69b131d1be47c279fed087ca673382209562a7fbe9c0aaf062f2942032",
++    "src/navmesh/generation/nm_fresh_wb.cpp": "9ee6c024760b70745012d387254f3c3d17a2773f1994623ab3236ac6eed4a965",
++    "src/navmesh/generation/nm_misspar.cpp": "6d3039b2647beaa644afd44b0277a16fede785748f790f9b82d2ca8a2f6f5563",
++    "src/navmesh/generation/nm_misspar.h": "e3e6f93fd3d587fff2a6112aecba058617712ddd395a0f7df7b55f1f06ffc0a8",
++    "src/navmesh/generation/nm_nbr_seeds.cpp": "3abfebb3d807f3ffdc6c5ff39b65e4506464c2da2763a9cc5ff1542e55760d07",
++    "src/navmesh/generation/nm_quality.cpp": "37f19b770e902855c48af03aa232d5ea970aa61c2cf44cd976d00327a5019ad0",
++    "src/navmesh/generation/nm_quality.h": "b4147483ed038d9bcb40c9796fc556622c8a6a37f10a9deb8cc54d2bc79e9d1d",
++    "src/navmesh/jobs/buildlock_audit.cpp": "bc1db8c3d915163b5878e08f63ae4ee260b8d40a733e96240ff3261eeaa0e239",
++    "src/navmesh/jobs/buildlock_audit.h": "98bb96ca06e48611be0e88b191a24431c364fb54183cc82aa9726a3766a8e007",
++    "src/navmesh/jobs/nm_buildlock.cpp": "8306036aa50ad491ebdf29745c7ca2e5b63f2944b5d53986364046c463359d09",
++    "src/navmesh/jobs/nm_buildlock.h": "8ccf7529f24737fe96014363bfcc61a8315176f3de03e7f32893675d12d85172",
++    "src/navmesh/jobs/nm_buildlock_stall.cpp": "f0fb8becec9e4ac98965521430288e26a4eea73f3a504fbfffda998a5a82baaa",
++    "src/navmesh/jobs/nm_buildlock_stall.h": "a9d2dd78bffec706e97a0fa1075a59ab67d63213e762eddea30dabd5ae4c67d9",
++    "src/navmesh/jobs/nm_busy_bridge_policy.cpp": "50ab0e07eaf1682dd0286f135e8e18633eac0fd8a5a6e6c19ddfeac3c4be16d0",
++    "src/navmesh/jobs/nm_busy_bridge_policy.h": "9b0051cec279e62d18aaf800969663f125c3c2432f632fdd119ae02dfa49399a",
++    "src/navmesh/jobs/nm_claimed_job.cpp": "e0b8bcdd0d56a207ba80bcc09e850a9f607f00f69596b2669b9da79a83861ca2",
++    "src/navmesh/jobs/nm_claimed_job.h": "ef97becda255764b8afe6d46b9b3847206844b7285bdccb5bdd9065803dce5ba",
++    "src/navmesh/jobs/nm_claimed_job_policy.cpp": "e5776512597508a874b9caee000733b1e9d6b1717c96a260c48a714dc3bebd6b",
++    "src/navmesh/jobs/nm_claimed_job_policy.h": "3f4329f2d63a8038378ab50549b91cd34400f7f8f37bf3e8e1ebe15e31ed3db4",
++    "src/navmesh/jobs/nm_dispatch.cpp": "527f046d9050dcd519ab13732857b9b508695216a544e083b2d7d1530a196cba",
++    "src/navmesh/jobs/nm_job_claim.cpp": "7e533880ba9cf915eb67bbd2f0df42c02bea76a90fbe9ba9e21394d7f59cff7a",
++    "src/navmesh/jobs/nm_job_pipeline.cpp": "dd81a3a6b15049c9e71bc51b42cc2f3aa34628980cbacfa1315fbcbad15b0fda",
++    "src/navmesh/jobs/nm_process_job_lock.cpp": "ebfb96adc162ee0368829e2b1e235d0fa6c916140ba2be50f0ed10c4e55d7a7d",
++    "src/navmesh/jobs/nm_queue_lock.h": "44ad6da7ab137f9dc2023f7bb06deab204ef318b1f0c9ce2849a1b823507fb49",
++    "src/navmesh/jobs/nm_unload.cpp": "002413ea7251dfd3ba5b5da120341b648eba9af9a1b2675a33ae04395c82d9a2",
++    "src/navmesh/jobs/nm_unload_fence_policy.cpp": "2a75d16a853d3af5994537b134c036623d9d962f34b1e4980325ee3eab712899",
++    "src/navmesh/jobs/nm_unload_fence_policy.h": "0f87314f29841885850a00af9c45ffddaf9413246df04bf3138579b10acdbd0a",
++    "src/navmesh/navmesh_config.cpp": "37c14ac1e4d6b5755eeba8d51c36c335dc3c5bc38816734dc2bf9c726e3c659f",
++    "src/navmesh/navmesh_config.h": "a989f946a812ba0d1aed872bb07ef8b8ff9b632d1c74f8cfce90c0f5a815815d",
++    "src/navmesh/nm_lazy_hooks.cpp": "ddf26ad6981f6cc3cf320e6c0fe5909f9d9cc431728075bdf00db01ead953a4f",
++    "src/navmesh/nm_workers.h": "efa2f4b2b6b630070793024a0974c8c4059fae81012ba45d3f99be502fe9a1bf",
++    "src/navmesh/nm_workers_internal.h": "0531d8279b297d559a49de8aa77200572e4f7cf28504b8430a15cc91d15407a8",
++    "src/navmesh/scheduling/navmesh_sched.cpp": "9ddadeb1f82dfaa04f5bd906bec11a1ae6d4647387b86ae851bd6f98fbb3daf9",
++    "src/navmesh/scheduling/navmesh_sched.h": "882e905748c94506a155eadfed08f3a0e7868f07f25f1ed51dfb0d3a474d537c",
++    "src/navmesh/scheduling/nm_adjacency.cpp": "e90b2dd16b5d5b7b18cdc92674db8cd6dd74fc5bb94df3e9cf6cf042d21a42a4",
++    "src/navmesh/scheduling/nm_adjacency.h": "dd7a25730eb98cce917df8184fb646769d911f5dfea94cbea17b1f87b0ef5487",
++    "src/navmesh/scheduling/nm_adjacency_check.cpp": "9933849862142a971c00e704aebc7afee9deaa5820235f310885106891858830",
++    "src/navmesh/scheduling/nm_adjacency_counters.h": "05465e938cab60bad874eb7bab66e9921dc2137199685235f3995d605b755486",
++    "src/navmesh/scheduling/nm_adjacency_internal.h": "ee6aa7f00989f93ef6f4d00fdad532e0f9fe686188d22098f4f726d6af10960f",
++    "src/navmesh/scheduling/nm_adjacency_observer.cpp": "4a0204ec81164a045fd5799172db2d7efcdf40c50548c9920cf1706c06340c6c",
++    "src/navmesh/scheduling/nm_adjacency_policy.cpp": "a721d4900ae0ce5b32bb1ecac4f7650e1cb6bb2c4e04dd2b289655f2bd3135c7",
++    "src/navmesh/scheduling/nm_adjacency_policy.h": "737787d01ffea026eed0aead387359834ce60fef3ec48fc416c32e7fe89158a6",
++    "src/navmesh/scheduling/nm_adjacency_protocol.cpp": "6f7d022f1a5fe4cf8909748c4af77cdefb6401a51c691c5be9548bbd75fd1ed1",
++    "src/navmesh/scheduling/nm_adjacency_report.cpp": "1ff5495a36d64db68b5f217b18deac09dcafdb212f5eb9528df4e3c5cc8d9663",
++    "src/navmesh/scheduling/nm_inflight.cpp": "041151be7f9fe5ea150b2f8c5964aa8c5faff500c788bf3edf7ee3d3bac9d22f",
++    "src/navmesh/scheduling/nm_inflight.h": "8f75a0bd9dd6f7dca586fbb80d0732185980c38d8bec726fdf338e1fff6e2fcf",
++    "src/navmesh/workers/nm_retire_ops.cpp": "2e3b4d72660f0b6a361f7409c0775bc37ec288217d8de326087736cd4032a9df",
++    "src/navmesh/workers/nm_retire_policy.cpp": "422372916843217254731743c6a50a2f45d541910310e4306bbf6bd218b32801",
++    "src/navmesh/workers/nm_retire_policy.h": "d722c737505ece51917be57c7ea64f6fa59f503628f24c8d495cf010fc5cd7d8",
++    "src/navmesh/workers/nm_worker_gate_policy.cpp": "c089e1580211a8641269bdba4ea9c3e11bad52cca13a5f90a649152e16131f25",
++    "src/navmesh/workers/nm_worker_gate_policy.h": "2ee1f64d5f7cca5388c17596defa418e8961f0ea7afa5c25779e807dfe66f316",
++    "src/navmesh/workers/nm_worker_pool.cpp": "d1bf91de8fe218e4cca7384e3e2f637c88022ee40269f56201265d6839526a7d",
++    "src/pathfind/astar_cost.cpp": "06c1ba2aff54f2d6b14c30b40d1ffdd9fe7ea4d6f88ced53d99a27f27e081ac2",
++    "src/pathfind/astar_cost.h": "7693e0299cb20f380e777af1f9e94a713416eaa66fa0a2b19fb1f63f62c8970f",
++    "src/pathfind/astar_cost_policy.cpp": "30f1591d0c1da84bcbab45f9b386f7a9b6f2a0c2cfa99661c7a09030138f64bc",
++    "src/pathfind/astar_cost_policy.h": "fd7f9e61d7e64b2405d7d20141a7dac2eb4c2eba9aa059e738829147dad32401",
++    "src/pathfind/astar_hier.cpp": "06ef15e6a253ac6cc82681c410bf6e1d6f13e7deb06d25af6a31faa7ca3742bc",
++    "src/pathfind/astar_hier.h": "929ad916f377eb1fc726f7d8a1807cf2e76a795651de02cd91060843c0658a93",
++    "src/pathfind/astar_hier_policy.cpp": "9a992a17f4d214f221a8a9a101f1de06935244070f6bfbfec2d64c4b4b24a484",
++    "src/pathfind/astar_hier_policy.h": "c4010add9522fe9eaf1a7a91c03dc7b638e55391f553c896ddd8c07025ce4e7b",
++    "src/pathfind/gate_loop.cpp": "8ae862efd9d1b5fb87a3bdfee0601023301e6851cc90011f57a8819ecbf5d3ca",
++    "src/pathfind/gate_loop.h": "5e181ead5bc8201ce00787eee53d4eda47b9e6ea9ecdfdcb7913eba661393734",
++    "src/pathfind/gate_pass.cpp": "974c2621f47a17c432b4b5ea8047502c8326875670f59f0239c35101c3a235a3",
++    "src/pathfind/gate_pass.h": "095b11bec6c98f3ca391528a871ce8dafcbd360024a04b04529af5559d1effac",
++    "src/pathfind/npc_cap_requester.cpp": "827e1e0c1fa582eae42dd6c21e8ce34591cd29eccda7b672f884bcb1c8cd8d8d",
++    "src/pathfind/npc_cap_requester.h": "854a8e85a2750402e7ca4dd8ac72f9c46400d6e910a10a1b02f9d17dc1dd5246",
++    "src/pathfind/npc_search_probe_policy.cpp": "35ccb589db8ce4cc8352f1c5854c15e6325d61396704d6313d05447084c4eef3",
++    "src/pathfind/npc_search_probe_policy.h": "7c49bb634d546aaa140905065f33269c3cf6252d7c329f6217c0408cff8d66a6",
++    "src/pathfind/npc_wait_diag.cpp": "f5d9cc79ba044f3aecc3c4fb435a429338c2694edb6243f8091de075c08526c2",
++    "src/pathfind/order_hook.cpp": "4f4b823e9924aa8c24b4293e10a6741058d86211e5a3be3eae6e4c9e6e804c43",
++    "src/pathfind/order_hook.h": "c173af44d72e96dbb198c1f54762848437b30b8a2a9ca00f25ce2d91e403840c",
++    "src/pathfind/path_budget_policy.cpp": "c1bbab57e6ed6af89b3969e0601d43a6273c00b1021112fe8e2d9ffe80035569",
++    "src/pathfind/path_budget_policy.h": "bb02db23d362bae744c9163e3088cdd1181fff6a528b539ff2dd2d6b2c8b38a6",
++    "src/pathfind/path_guard_hooks.cpp": "ae059c34d5f75e9970547f817bfbe28e6605f50c690a1a40e654cceeebc40a36",
++    "src/pathfind/path_pool.cpp": "85193baf79f9156ffbec4a6a80afbebe97ae60f99ec16a4a107ea1ed0efa5649",
++    "src/pathfind/path_pool.h": "ea1e885f0150f1249aeb19051a1157c25884961f968f654262e0f13cc4781484",
++    "src/pathfind/path_pool_bindings.h": "530d6143d77e5b284dc43913214fd8c128f8de5c2ec869d62902737eaae6e260",
++    "src/pathfind/path_pool_hist.cpp": "46716423b9ab6e41b38291411a974708502e5f14a837fe41949f3fc37b44121a",
++    "src/pathfind/path_pool_hooks.cpp": "bd2099bef6546945ca7059a3ef127b08c0620decfddd63eb93cea7009021d038",
++    "src/pathfind/path_pool_internal.h": "30285c93953eb3e352198601e6e01e651406cd4c0cf1e7a7f93670b52a2f56f2",
++    "src/pathfind/path_pool_report.cpp": "9ac9932b516e3319445f44d8e3789a1e2fc7095fd827600e6f448aff70c68746",
++    "src/pathfind/path_priority_hooks.h": "b1c9f55e932af354e957dda368f3e05824a61bc1566e02115956b9b4b5cf1e53",
++    "src/pathfind/path_priority_publication.cpp": "dbeed9e3bb2ab9a74c3a98964c1900e60ab01c769959799dbf7254207ab19c80",
++    "src/pathfind/path_priority_publication.h": "5af07f3d75a288a94389f7893ddcf2efee8bb5c72e30500b67a4235a3b2404e9",
++    "src/pathfind/path_probe.cpp": "59b9dcaccb2b5c202ccdffaae5794bdb13b11342efbcceca0811f35291f5479c",
++    "src/pathfind/path_result_trace.cpp": "b6306b1c9787e53741dd55faf7a80fe5c795895eb487dc58c2a0ae2d96a9bd0a",
++    "src/pathfind/path_result_trace.h": "c35038817468311d23ab27915c6ca310e990633cf2dbeb3d87157731b5037770",
++    "src/pathfind/pathfind_cache.cpp": "66499a68916059aefb8b2d2ebd94c414a473c324754670b9077fddfd5bdd038d",
++    "src/pathfind/pathfind_cache.h": "41b5289f986d04746714bf7a1695b8358aa92199eb232a375ae21c2a21c0babf",
++    "src/pathfind/pathfind_config.cpp": "0b1f59d94b9512cf05e6b3daecdaea233239048fc93c09874ca50db0b16d5936",
++    "src/pathfind/pathfind_config.h": "30207237c1127432fe0674a46e070870e83e681b89b2c7bd74b94e53b592ddd2",
++    "src/pathfind/pathfind_diag.cpp": "5f1482bbb1a87653ac4b1eee0181dc7bdf3b1c5d06ed92076699bb136f07af26",
++    "src/pathfind/pathfind_diag.h": "69743122df580f0c9d6c1aa136d4d0abdab9f8248c63cf9bb46430c7e2da2056",
++    "src/pathfind/pathfind_diag_report.cpp": "7863bcf66dcb84bc5099a04c8d75dda65cc640e217ee50e376a1b1e9102ce62e",
++    "src/pathfind/pathfind_hooks.cpp": "a01b815e356a5493480dfb177aaf22a0e0fcb7d197529837cfc856c664575964",
++    "src/pathfind/pathfinding.h": "3e95cf29577318f59ba9045054fba4d234657120a42be56901d4eb457d0ec740",
++    "src/pathfind/player_repath_tier.cpp": "1624b9f07f610941b06a34fd762fde0c48702c5cfd59dd77c5758ae69514a4dd",
++    "src/pathfind/player_repath_tier.h": "81c7c614c67b24ef0930e033f43e8a5855e17e4a263206638faff7816db4ca66",
++    "src/pathfind/player_repath_tier_policy.cpp": "de180b17ae9e0386f327a83576954866e25dec3fbda66d81d593161eede9327d",
++    "src/pathfind/player_repath_tier_policy.h": "bee6f5271409f21e90321197325bb9f44b5c8c4b9ff180ccfee331aa1ba1821b",
++    "src/pathfind/player_task_policy.h": "83d6d8c87244270068d07872608b46394daf19bc8f37ae650681e2063dbf7a10",
++    "src/pathfind/player_task_snap.cpp": "70ee3c71ce471badf6cf66ad01e1fec6b24238ace10cd04cb7a2d150ef89ba05",
++    "src/planner/coarse_graph.cpp": "afde93ed21926397dab0988e4432f8003abc29232944246cec47fdf6822a268d",
++    "src/planner/coarse_graph.h": "327a2cbe1f5758f93040504f2705295b9476b62f910d59ac2da4c94ba271fd70",
++    "src/planner/coarse_graph_base.cpp": "e7959438fc5df55a25ee6fcf0d84c65bbca131fffb25b7f812a0759cf5ffe3da",
++    "src/planner/coarse_graph_base.h": "7d46bf7252a2986a8fada3525b7695e66559a66079bba6c764f5074f9b370e38",
++    "src/planner/coarse_graph_cache.cpp": "62c23de685cc88d0de9d7f5bd65482640904383e654c916614cc7ee74a233d17",
++    "src/planner/coarse_graph_cache.h": "5a28f2b1430333d320beedeb22984de40ba966518c61932b448d2cc00211f23e",
++    "src/planner/coarse_graph_cross.cpp": "280f83d4f78c5fbc757b676c27529af5f9d3af6f86eace975d58cbc0865bf8fe",
++    "src/planner/coarse_graph_live.cpp": "7b6d0607d666dbcd632e169edf29ba53d0497469a35a1bb0f6fcbd82d05b94a7",
++    "src/planner/coarse_graph_live.h": "e511f5eddf0155b03f78d42d5f1b37f4c8338a8853c4134f1b4d8d452d2a5088",
++    "src/planner/coarse_graph_live_site.cpp": "a7d2d3025e5e8a5e27cd0ada12133e544166a8a3d688f95c7bd1898de25e2c0e",
++    "src/planner/coarse_search.cpp": "db73c406c46e19047bd4e8009eac1dc4262025e6395cb2275419e9d77ac785bf",
++    "src/planner/coarse_search.h": "f3427b46b9d4466f47ab0aabf49d32d396e7b099219928a4fce07726901fdca4",
++    "src/planner/plan_build.cpp": "566c2bd2db5bfb518a011da6367d4d21e881b0cb9c134f4fed18d9f85139f0b0",
++    "src/planner/plan_build.h": "43cdfa5abca8fe4e527dd0e8654219aeb213d946da4f04bc7d7960a6978120b0",
++    "src/planner/plan_merge.cpp": "0180e91465be298b9f82e7e78b64dbdeaee091c55578ccf460342e052880e54f",
++    "src/planner/plan_merge.h": "1474a7314455a2941e805307c0d5ab607b275516f5823643e572a3bc5bbcb0c6",
++    "src/planner/plan_policy.cpp": "adf1fdb0d26a76d525afbcf01d82eee58245a3c74addb7dd80cc1c090c5ca133",
++    "src/planner/plan_policy.h": "6bbeb8e7f4bdb3e97bd6de9189ec3d858a5d0ba38a0fd2cebf56ff505fdd614c",
++    "src/planner/plan_store.cpp": "35a43a630711af162a8e2dc9d3e923c0cbc517385a54d3c69ee7aa621b6beb55",
++    "src/planner/plan_store.h": "0a203bf07510bdc7b635d391c71ae5bb885d0b28806bee211fcc547b992cb2e5",
++    "src/planner/planner_acid.cpp": "50ef63d62ec53d6743ca8117a0a33fca2831b28705574d0ed6e76d51a009d68a",
++    "src/planner/planner_acid.h": "e5549b2bc4958e52f9f99726c7ef5102839e53482f5819c6fe32689538fa179a",
++    "src/planner/planner_capture.cpp": "61f2b1b21ee6dd2b110412dc72f1dc17f270ecc8452f767025b54e4acfbd98b1",
++    "src/planner/planner_config.cpp": "d240bfd309e4ecfa345744f196167549e057a67676380810dd3b9475327ec378",
++    "src/planner/planner_config.h": "fcb3737d37229923bbf1a6734d9d72ba66e816722223aea398d33148a766741d",
++    "src/planner/planner_hooks.cpp": "e3fa2c80712345586848a522be49efa05950374b57f4f0ce7f1304a07dd541f6",
++    "src/planner/planner_hooks.h": "b5fa73626033e1c5605f0a6a6fcb145576b1157053b7a44bdcd9105dbc71a4b9",
++    "src/planner/planner_merge.cpp": "1394b169dfdafca379bbdaeeb7a369f98f07ed08712d14da7c92643b4136ce76",
++    "src/planner/planner_merge.h": "654a94a8acad77af5215692880868811b66e42e57e71cbbfaa344c4176873e65",
++    "src/planner/planner_prearrival.cpp": "a5b69a2a3ba657a02e33f9b784bf1a5e3e56737a7e4a104fd95d894fbf87fbe2",
++    "src/planner/planner_prearrival.h": "c3caa7f842438b8ce2c6087dba9f4e3fd31214a0746ef0a27d653741aad69eef",
++    "src/planner/planner_report.cpp": "4a251c774e6d4f59be4ea744182a82112d4879aaf6750f73f263752a7ba3fcfb",
++    "src/planner/planner_search_ops.cpp": "09cffb97bb100b6501b1ecd882f7a880d6aec87f62429f76f3a76199fe6b7f31",
++    "src/planner/planner_search_ops.h": "efaf2376b5426a5cc2456f8acf2cf6b26bd21a3abef5ca341df6497371ea4b01",
++    "src/planner/planner_tick.cpp": "c83c4e4635df3c785b7aa45cdc08ba19eed5495df24c9d2f85fdeecf0a3dd24d",
++    "src/planner/planner_tick.h": "e050845bcb44597ff64f77dc9b51a9564b1c20365c34139369d1e4139c6ea0e2",
++    "src/planner/planner_tick_internal.h": "2d6b9536339aae8f0f84c4633ea73349472d6293b5e6f0d8573699584647d4a7",
++    "src/planner/planner_water.cpp": "5fc53163b3c260d6166a9d1297beb1b6dbf4d72dd61333a4f640000c126ec047",
++    "src/planner/planner_water.h": "82e76ab80a46473cbfac2c2d6e830982ea705859404af1055ae08c5f547bf09c",
++    "src/planner/planner_water_table.cpp": "92e09b6e6066f0ed525b906cadc9a97f1700ec6c63b4fd19a4c5c891e85841e1",
++    "src/planner/planner_water_table.h": "c2921b20d11f442b5ea7e88f0fe9384d7d111d26813836a09cfcb2ecf04678af",
++    "src/planner/tagfile_reader.cpp": "b70067ec465133d9a9926c2905f042cd382321916a53ecfced6f6418977cb423",
++    "src/planner/tagfile_reader.h": "e4f4609323fc8f723dc0886297ba0bca819f78ef273624c2a54e5917ecac40de",
++    "src/planner/tile_graph_extract.cpp": "652e7dc66d2c3a1db1328db0efc324d0d740971ae5c737d442cfc9b4f03767e0",
++    "src/planner/tile_graph_extract.h": "f7caceb9587b2a041f1ceced69547d7567fdecbcad205da742f66d2e5b716ba8",
++    "src/plugin/banner.cpp": "fb9d8e4a840c393d0de1d6705c1e3b2d4cfa94af29a71304064c1f762ba3b9af",
++    "src/plugin/crash_record.cpp": "608f0fd262562fc1ee72457706f3eee03fd60e1a1ccae9cf101571b7f7d870b1",
++    "src/plugin/crash_record.h": "0f83f0adbdfd3b4ca8e97b575de115a5dc31c758f0662bac581808daad570e61",
++    "src/plugin/hook_manifest.cpp": "60755c79579cb2846c19bddd9956719610cb1dffaa82fad5efcc90165b700677",
++    "src/plugin/hook_manifest.h": "3917bb75e63f557564f2a029504ea33e2097c39d46d491cddddd00fc8f6271db",
++    "src/plugin/hook_manifest_policy.cpp": "733975e37fda2fe50489d66e51e864078a274d7a8019f3f6b36c3e993783bba5",
++    "src/plugin/hook_manifest_policy.h": "4b254827806cc6fdeed6e64c207206764e63d7bab5a6d5ab75151095395b6427",
++    "src/plugin/hook_manifest_rows.inc": "f483579980dd237577b6baebee8afea29fe95d87f947c4bbb6b05eb0f3ba01e7",
++    "src/plugin/plugin_entry.cpp": "b7356a4b1413f6e8e3f09a292128bd16d2c234e057ab35a9197d21285b77a548",
++    "src/plugin/plugin_entry_internal.h": "2b68213c6cf8b2bad17cd0184ed2c4c1e18602da5e2fa11917bcb0d9df05c83d",
++    "src/plugin/profiler_image.cpp": "2f98914f426cc096edabafa50c6f02db14e62c38b5746b991fa53641697176fb",
++    "src/plugin/profiler_image.h": "f067d8800a1d32ca23631cf330931f291e4036a535b6e82b9a05a615d9bc67fc",
++    "src/render/compositor_layout.cpp": "b4b8f77f50ed8a87f1ecbc0dec3f3196849d3da54c54c229ec5a0e74e6164c18",
++    "src/render/compositor_layout.h": "6127ad599fbf6156b81aa6cac7de258c236e3ae9c8399bae1396b4dd275b936d",
++    "src/render/compositor_lever.cpp": "3f5c5bde9b7aa542e705a1da79892bab937b93636ee6534b2fb8b63ebdb67d2a",
++    "src/render/d3d_state_policy.cpp": "67fd6417c77d431abdd16db25289ec6bc0b914d59b3bdeaac33ada122163130d",
++    "src/render/d3d_state_policy.h": "8c9dfbea525655143bc4a46b398d35420ef42b000efbb933ee4715f90bd60096",
++    "src/render/d3d_state_skip.cpp": "bbd0569f552009abd8e827030ea2834dc3a0c102a3455e1756c6122c21a09a6c",
++    "src/render/d3d_state_skip.h": "0ebd70e097a54d5ca30774730b19edd25d787b067eb5dc76fb7ad32e573bad3f",
++    "src/render/empty_pass_policy.h": "c78e6341ab4a755cdfaf64fc52a1390529a0093fa016b458b99057ccf2b2ae92",
++    "src/render/empty_pass_visibility.cpp": "d71798c1d2d391612271a940f239f5dcc4b6c75df6b66f0969e0537455f87d8d",
++    "src/render/empty_pass_visibility.h": "553eff20cddab49463b0e025cdb743299702f7c6f27428d55393e6e86ba6fdeb",
++    "src/render/fog_fade.cpp": "aeafe9c33959abaa81021cf4e7b53b8bf36d49ca31e954c245d1e66011c44d19",
++    "src/render/fog_fade.h": "e8b2ae5eef550f496d7ea8d43d5541b59f13984bc808a85cfa382afc39edaded",
++    "src/render/foliage_budget.cpp": "6a81adb0c142e634095edb9ac62bf22367d6a1cfe28f8abd98deb62dbfef80ab",
++    "src/render/foliage_budget.h": "4daa30821060bab622e02d7766abaf4b5301740bbf17495ef15367a9edb91497",
++    "src/render/foliage_lever.cpp": "16700e4a4d88c33878fb0e3b940a4700eee78fd97ad20ef268ab0978d59eb24e",
++    "src/render/gpu_param_cache.cpp": "81dd209d1ae4a1ecb2fec1f1a5bfb7b061e9186cd250231e28c7e3fe4fedd1f8",
++    "src/render/gpu_param_cache.h": "4127a368c9bd2b45a8a879329c38cb2a6c5b581286d756934a43a25c23a9cf56",
++    "src/render/gpu_params.cpp": "173c10e2025deae9600c098b504064ebfe8548c12ea719f9bb6f24b90963d5f2",
++    "src/render/gpu_upload.cpp": "36e18d3ca46dbdaa2d85d8bde5f56ea87aa8cf2defa7f376af0fa2e4e6318463",
++    "src/render/id_string.cpp": "88eb452162fe99e41904997f35e44ffd1b14ec0b88c49955c8dcfbf97fe91893",
++    "src/render/id_string.h": "a80c45c6418d5f31466bb4cc1c2dc3d37774d9032fdd8417f4256c9b491fadba",
++    "src/render/inst_empty_skip.cpp": "14590d61e41f0a2afd449be376b52e365f8282acd45175e202e60385f05bdc8d",
++    "src/render/module_hooks.cpp": "7fec0c1c2940acfa4dc17aee112e86342eab7480347085a6ade452d455e8bcd4",
++    "src/render/module_hooks.h": "7c42b2ba88f8c914c5de93596a9a6ad75baaf40709ae759978b727ec0692f7ed",
++    "src/render/name_list.h": "2ba38ea3c4586f53aef2b08c2229b7d8602136cdc9df46eec25ffcbdf3876c01",
++    "src/render/ogre_join_spin.cpp": "68affb5325a5abe7e034c510aab3e91cdf2f3ed353552adbace7451217ef5fe0",
++    "src/render/ogre_join_spin.h": "298e748decf6d6c4d8f35011af98d43a5772f0a6280090f950873521005304b2",
++    "src/render/ogre_purge_policy.cpp": "3ea01fc7da6f88d1b80843e1c8ba501265f411e14e97b6111d18e08ff8b3a336",
++    "src/render/ogre_purge_policy.h": "aedbf918e1008a1e87fe28a6220ca7fb3bfa4ea92381915f2f041769c1a5be5a",
++    "src/render/ogre_purge_skip.cpp": "a81f2549a22513169c7a90ba499f918b7d562af19f8efc2e4d932faf9feafecd",
++    "src/render/ogre_worker_policy.cpp": "ec0cd47fc6d77d11cba8972a78e51cb62e1eb1cf5c7dcf099adf6879341e2084",
++    "src/render/ogre_worker_policy.h": "3a33020f530610c29af6a67d99bc53186201b7a092860bfb33c81e25e3e744f8",
++    "src/render/old_anim_lever.cpp": "a24ba164bc2d29c1fd1a90587e622dc02dc0f6baeed6a1846f9bd5131b294502",
++    "src/render/particle_levers.cpp": "86fa4d17c6872183b7699e7545f5a1289d100c3236e745e00ffa9e9266389fbb",
++    "src/render/particle_policy.h": "cf7f4b4f02f65d7ec7cb46b16c43e9908ddfaf18e50fc43d8ccfab9f06a79c97",
++    "src/render/pass_visibility.cpp": "3a7d04ab7b17dd91cc0589fd568fd69b1760041147ca5cf9fa4cb2cd48a50e0b",
++    "src/render/pass_visibility.h": "81e56a8ba0e6e5aa297f1190c8beb991adff6eca1a0f4af166b05f8a3b4d2dc9",
++    "src/render/pe_imports.cpp": "c36a85baaa59c1ecce06640557b3766149995bde0ed3fff2a32e2517c85bf899",
++    "src/render/pe_imports.h": "8cb38753acc3c3729f483714a4f06953d7414c3bf817ce7a62e0e3c19c6c9ec6",
++    "src/render/ptr_set.h": "63f24ae9f28431c9f014c975dc237b9b3a9c9a1873df2eccd5d18344d4922ddd",
++    "src/render/pu_layout.cpp": "39910abccee1a5ca2f37490f1f30197089a48a92a3ffbd01d01c5300b8d17b6e",
++    "src/render/pu_layout.h": "7d42b331acc7fd6f943adb7b04a68e164201ce2ccddd0bb92cfeefb062f13b12",
++    "src/render/reflection_lever.cpp": "7718dd07f7b5ea8c4b9c84e73c7e635d5953d034e6107a1e540d0d32ab0efaf1",
++    "src/render/render_config.cpp": "1642b9f8587d03d05d4a42141812ee4a4840b18fe94f186b1aa100584c3230cf",
++    "src/render/render_config.h": "57654a6701ce17ea815df145edd1b2b9425a427259271354e32d9015c526930b",
++    "src/render/render_defaults.cpp": "20ced78dc85dfcd2a40f615839140dda6f210b15895bfb062cec7e4a17432e37",
++    "src/render/render_keys.cpp": "d268370dbf78563b8ffaff0454c1e62da3a14ac5036e7cf7826881d2184c468a",
++    "src/render/render_keys.h": "43874623f8a5b47e85a9c013f2de621af7189438d38923654074e40fbe9b0c8a",
++    "src/render/render_levers.cpp": "338e666e0cec2ca5abf5ccad9232d8d5caed02d22ece64bd37be9447b4753e4f",
++    "src/render/render_levers.h": "d986915c172a69484cf89683878708d7c4ddc52137902a28cd7d050f197fc93d",
++    "src/render/render_live.cpp": "4359c603292ff06a203be974d27c68e45d6240f1b48be286e907376cf61c4b25",
++    "src/render/scene_fork_skip.cpp": "46c7df4d394b6446002f76632e61a3f1d838f9b37568090e0dd3f10455b2419c",
++    "src/render/scene_lever_policy.cpp": "dc023a49bd33c62881a82f07a7a3f069c4915c486634624995fe569d74ce1dcb",
++    "src/render/scene_lever_policy.h": "95c769317d9c67ac2767c2f6699b123e7d6fd910251f5c7a0f17758d76c36658",
++    "src/render/scene_levers.h": "2f2d6eb6d31f677a7d7c33dbb471e567ebe966c977cbbabb57a4be5ecb77b8bb",
++    "src/render/shadow_reach.cpp": "71b2b988a3f6031ea676825f5888552421945e1cbbe7c3f220edd3929ffc4b96",
++    "src/render/shadow_reach_math.cpp": "4b9411b42685048b06e9a10b779ed7e146d69ba7b81322d1c96762a393618203",
++    "src/render/shadow_reach_math.h": "0e3d73edf88a4e16179cd5d3205167b441c27440a814a042b85376e3ee4bf685",
++    "src/render/shadow_receiver_depth.cpp": "1e781200833bd35b556c96234185809f96cdeb8bcf50ecdd8b37a10ebd13b565",
++    "src/render/shadow_receiver_depth.h": "2dd17731d0dfb54e5e98e1dd749ec53b079f25b5be288d9db5ac41ac9484efc5",
++    "src/render/upload_plan.cpp": "ec834215c58f7ee587a30dcee173e81801581fa5cf701b11d7615e5dd45ef03c",
++    "src/render/upload_plan.h": "c9cc6b28cf3a4471965fa740c77e1f37df439bc644bd7cd3ce0b450e7906a8e4",
++    "src/render/upload_shadow.cpp": "1fcca4c9831dfc239e156c395fccfaeefb3231fcc0dfec84e20a644d5a89b528",
++    "src/render/upload_shadow.h": "ef5d3cca8c6559bee8cf6b0b6391493730393f55b8fab0d08d3cb1e3bd4e2733",
++    "src/zone/camera_zone_hook.cpp": "93102918e20982b7a0fcb3acd8f42706c2e54abe85819a8d67652294f38777b1",
++    "src/zone/camera_zone_hook.h": "acee184ad4ab4c007add5815305cea9e9033dd8c141ff984555a84ad1c5df931",
++    "src/zone/geometry/zone_geometry_cert.cpp": "ed2b6a584fe8f04727f6d575d3e16fb4b30b1d0c33e57cadd645aab725ee1299",
++    "src/zone/geometry/zone_geometry_cert.h": "0292419650f7633d3ec3799f98f3da90ea8c12ddf8de2e204978d0d7a30c91eb",
++    "src/zone/geometry/zone_geometry_epoch.cpp": "39662e2f25a4bf714fd57de33d6c3d9dad788d6d614ff7552df251e1f3fe640e",
++    "src/zone/geometry/zone_geometry_epoch.h": "d444fbccf8ba811c791cf934bf4ac45c0b0c070d9854904729fbbbaa03781ab9",
++    "src/zone/geometry/zone_nav_ledger.cpp": "08a67868914420049f9b4b60936d5b4a103fe458c851d5b000fe0c4e97cc79c7",
++    "src/zone/geometry/zone_nav_ledger.h": "de419ec9fa338ca6492fbd6fa7ded1729e43256e2dffe475f43abdf541b89f1b",
++    "src/zone/geometry/zone_nav_recovery.cpp": "b3f861051701264bafdbcf863ccbf2eff12cbab552ba727a4438cac8f99c50f4",
++    "src/zone/geometry/zone_nav_recovery.h": "4ca9c9417dd5bc4f5062852e4b875c3c7d0ed5e405ce280301897f601f6cd07f",
++    "src/zone/grid.cpp": "0418a93b3664b8f65d98ee1f4858581f433163a9ce3c5be6d4db7ded077e1716",
++    "src/zone/grid.h": "4748629c2600a5c8fec8108fbb4663774f6ceb7b02828b84e09595550cd84298",
++    "src/zone/handoff/first_time_bindings.h": "65bd8a579b9a95b267bf2ec8f11418f577192bd20e14bf4e61aab6d68b470933",
++    "src/zone/handoff/zone_adoption_latency.cpp": "8b15710511bce42e1980b9dbcbef570118a45280e4b4c4fd1ff45d6c216e9f6b",
++    "src/zone/handoff/zone_adoption_latency.h": "d2286f6ea09f47583a610207d157b3b6d6f9baa8cf78c8ea40e92e43645551a3",
++    "src/zone/handoff/zone_adoption_seam.cpp": "2cd49dac51b0fcb3b2437d17ddd59a79738a0263e4d2c020678222e1967c4696",
++    "src/zone/handoff/zone_adoption_seam.h": "2798b78e2db2cfd669a6244cfbd3acfc43d9d1a8b96afa16f26e9b6edc197416",
++    "src/zone/handoff/zone_first_time.cpp": "3e934ea39782aafcdd57bdbabb1a62c9e31e2693771db542e1225da49d3be043",
++    "src/zone/handoff/zone_handoff.cpp": "717aa31cf621d7d26ddb1ba1ec3561ae26f4a3baa3d79396628829d29b8a40fe",
++    "src/zone/handoff/zone_handoff.h": "bdce72049bc25d85d356e6e91b98ed0d47136fe42bb2a378ba70ba429a2c2e9a",
++    "src/zone/handoff/zone_lifecycle_hooks.cpp": "bee14fc480cca009f9c97e3b83178b5978c10003c014b88c35a8871a7c6b4a28",
++    "src/zone/handoff/zone_lifecycle_hooks.h": "4e129d6b3e3203d6aec5d020aff688bbcbd3df1b0214a72a6a2c6e85020bbb3b",
++    "src/zone/handoff/zone_prep_ledger.cpp": "69e570e93894e268c0c538c4d524067a3e78740ec53d6478e6dd22b4ed9b4173",
++    "src/zone/handoff/zone_prep_ledger.h": "cf56ea1f1e2504fe1f1891cade497e950d1ca1e01ae30c6e32f23de6276914b5",
++    "src/zone/handoff/zone_registry.cpp": "f374deb3e32585054b5b0308d99eeba7cf8e528b5f05656cf0c663d0109f90f1",
++    "src/zone/hooks_internal.h": "b51247b6e76109722f014043ff80cecb94582fffba90d71b27fe79fb24a06674",
++    "src/zone/preload/camera_focus.cpp": "39c8b19f6cce5dc8f8961eda2d7886d8729e342ead7ec8b7067825fba5f885a1",
++    "src/zone/preload/camera_focus.h": "a50dcc0c54548cfb7f474c30feb465a9d47324ec9310ac2784582147e1cb4aa9",
++    "src/zone/preload/coverage_stats.cpp": "f27a0c55063359fc9e7aa277b0fbb779e6ac74b378f67a30907962305e9de5ec",
++    "src/zone/preload/coverage_stats.h": "9a4fa96dfa2abc761391370af3452a78bbeee7f2c92591bcd616134be067aae6",
++    "src/zone/preload/preload.cpp": "302932f3f53e2341e9e46f295a3ed622118867d2d9e542a8b5c7d3ee8826c5b6",
++    "src/zone/preload/preload.h": "0cc896e05252b529130abe3ed1053bcd4bed47678c6ff66a5dd5cadcfef20b7e",
++    "src/zone/preload/preload_internal.h": "ac8a1e8584c51239db53051c7237d52c9e6b6877aded92408a0d362d13a68dec",
++    "src/zone/preload/preload_pipe_stats.cpp": "74c1f0a3f6939ac902041b346ccfb14d8c29195d3dfb1c5f252a2b91558d591f",
++    "src/zone/preload/preload_pipe_stats.h": "5604b8bc5b166a7eb442e3c95b162e7437a7907ea9b8194ba3f722a4e4bc4b50",
++    "src/zone/preload/preload_prepare.cpp": "3f23c8a413510bc3d02d8e76074b398cc160cecdfb01c2ace682d585e47dab78",
++    "src/zone/preload/preload_prepare.h": "3bd535a6f7eb286ee473dc68b8a6c75861e385cc668c794b0844c86fa85505fe",
++    "src/zone/preload/preload_queue.cpp": "cc1f93b371d8bd10086024c0f0c98b566327ecbd4e1b51c796a0cf93eb677d6e",
++    "src/zone/preload/preload_queue.h": "d4520815009f9937adfa577d0ce4a0b0f172dab57628db63ed1d0ff7fbcb9ebe",
++    "src/zone/preload/zone_cycle_math.cpp": "a494c6ff1f194e7a1881f2ea65c35f85494d1cd7dea77da1943b0f5d1bdb1b99",
++    "src/zone/preload/zone_cycle_math.h": "97a66b3f9c2e18754bca410c3a9938150a71e514d911c002be1b830231c052f8",
++    "src/zone/preload/zone_cycle_stats.cpp": "6daffb434ffec1fa4d5b10099bc4bd336d91525564b03ec33bebf53475165975",
++    "src/zone/preload/zone_cycle_stats.h": "82621cd5668f2c9753c4511d53f25cf662efc3af763c8125dcb2648cf8b08b60",
++    "src/zone/preload_bindings.h": "6e90277f60e882f548bf97d834a5399d829f4184e9073fe9c51f12aae6e49c00",
++    "src/zone/readiness/readiness_bindings.h": "575a406fb9fd9d3a39e771cc3fcaac4712fe424e4f3a6e8e4bd2f1cc3a244bd3",
++    "src/zone/readiness/readiness_hook.cpp": "f91256e36c50e56e51032b725f8f606dfa953ed46d334db828f7bdd11925ec3d",
++    "src/zone/readiness/readiness_hook.h": "5dc50655c622bfc2c085fdff175fc8267a0433faaa824d84bd7a4e2289875c69",
++    "src/zone/readiness/zone_readiness_classify.h": "db8d5c57f9836259837ec0bc6dde68fd184db3bb95417ac7cc5f736e12003f5d",
++    "src/zone/readiness/zone_readiness_contract.cpp": "c110fc01b162e737823dba3c3314add5a56652a0b91db244039b6c6109e4038e",
++    "src/zone/readiness/zone_readiness_contract.h": "72f27665dd60dbbce07c6fb2db819ddd59bf8f9082606b14ecffb174ff5dd2d1",
++    "src/zone/readiness/zone_readiness_ledger_bridge.cpp": "d7c7e5cf2db04cf3c8bc5b6258120b180df8bc8e13a87a88685290a751ab466a",
++    "src/zone/readiness/zone_readiness_ledger_bridge.h": "9aead1116026900cdaee4c80c7825dca798f7d65a4506267ebfb4685b320e4e7",
++    "src/zone/reset/preload_saveload.cpp": "fcdbce245829f4631ac4b93ec36aac67e023756efe48f680c7e6d3735eaa3a67",
++    "src/zone/reset/preload_saveload.h": "6a9f50faced9a319b73dfe70f26689727393251cb5c7e8ff4da51de2d19ff3e9",
++    "src/zone/reset/save_load_bindings.h": "30978974ce417cf0f288a2bfc3024a7caae13b255ff7ca8181aca811248aa496",
++    "src/zone/reset/zone_reset_fence.cpp": "94d522265cc44d0ae0bbec4b6432af3e5315533166c9ad74af4b8309398ad7de",
++    "src/zone/reset/zone_reset_fence.h": "46dc64df5575806adc34080733292c219255fba6594cf2b8f35f36229ac64838",
++    "src/zone/reset/zone_reset_gate.cpp": "c6aeb130d9a419d15cbbf55bc89179e25e274c83e493feb23ec2310dcafc3dcd",
++    "src/zone/reset/zone_reset_gate.h": "840deedc5233dd86943f40e65ff02d81ae14e7cb6e36adc24d0c35f3d6227cfa",
++    "src/zone/reset/zone_reset_sequence.cpp": "af64c44ee5956b920abb7dc9eeb71ee2bf1c219690f67d9102cb825666fbaffa",
++    "src/zone/reset/zone_reset_sequence.h": "2c0bc209a744e21c43a28bc39478b96af72c1fd73ab7fcdbe7b4de194666a462",
++    "src/zone/retention/zone_evict.cpp": "16553fb66345a6b902a38a2242014750dc8269bbfb6573c4668fa2caf6434d61",
++    "src/zone/retention/zone_expiry_guard.cpp": "5301898a78a462d1edba90484da0a5e73346f17271ac7a1e31c1693c891111df",
++    "src/zone/retention/zone_expiry_guard.h": "f7e5577d041d2e9549f445551f40e4fd831c6026812f163e0cc466c101f8a6d8",
++    "src/zone/retention/zone_expiry_guard_policy.cpp": "7cf6a02861cd143b6a1223ae9eb11b23e23b6b8b866e85f16a2e2d260cc7db68",
++    "src/zone/retention/zone_expiry_guard_policy.h": "5e6d0a071be14cf1f4fb169b5d2323c4d50e52c95e1179a917e0614cfa6ab99c",
++    "src/zone/retention/zone_leak_report.cpp": "62e448335b4e917007054cfd49b75a8562b10e7fd7194565183750ee5882580f",
++    "src/zone/retention/zone_retention.cpp": "553f3a4bc7adaad6fcfda9821d3dfacb7399d751da16367c5c81a2b3f338f30d",
++    "src/zone/retention/zone_retention.h": "91011dc01a59faeec1daa12febc9287ae8e2d7bf6506cb18276e7095e611bad7",
++    "src/zone/retention/zone_retention_ledger.cpp": "fad458dc5cfb7eaa50c6d412419f6c3cf5750116cb87aa4ec3146f5d85263c0e",
++    "src/zone/retention/zone_retention_ledger.h": "1b1a9f6cab91a4663b70a52c2ebd3e029113dc8186aacce74af66771ef35aaa7",
++    "src/zone/retention/zone_retention_policy.cpp": "fb6398d773c4b461391859bfa5f19626914f43cae4df722805abfb15e8963017",
++    "src/zone/retention/zone_retention_policy.h": "67f0b74bc554b9dd7c0d6066cb04ddaedfb99c325b790a782c0532dc9fa4b196",
++    "src/zone/retention/zone_save_rule.cpp": "e4d0a1bc035fb7072947fd98ee7dec77b400850f1db31c70132fdee3c44ec875",
++    "src/zone/retention/zone_save_rule.h": "d9b7c1a80ed51a278d98e08d2d10fbfc77a01003e4662a53d7e977067c124ab0",
++    "src/zone/retention/zone_unload.cpp": "1142dfb06cd2f18bfdd4ef40de11b86b6b024dad014c8eb09ffc0bb45ba6278b",
++    "src/zone/transition.h": "3355ecb694c723e916132c271cddb6252d025c32f64766bcc2483ae5a910d977",
++    "src/zone/transition_hook.cpp": "7abe0c6b145083ce8267cf2aae706b13a38bbb89fb026dbe7e0ccc5e6cb25ca7",
++    "src/zone/transition_hook.h": "80395d84f50de2738ca1ef875021c703e8403a184fecdb36efbd9cfae0c7d462",
++    "src/zone/zone_config.cpp": "45d9594d784a5b31cc99f628c3f0a98dbba8fd0629a9bc1a6e45d4bb9a725c1f",
++    "src/zone/zone_config.h": "838fa231290ed4642105d5aac5c4b4c34ded37bc8091048c7c6f879df817c323",
++    "src/zone/zone_helpers.h": "4ac7e034df7ca5612d0a8f71679a9a7798fc999e2743c3d40c1d16f6a835a9df",
++    "src/zone/zone_ledger.h": "a160a40e185de6f1e3c01920d72b7b9a1fec4e4cb4833f6d42d072227c4c2389",
++    "src/zone/zone_ledger_core.cpp": "95f01920e742074ccddbae962a885da19f6584d2fe79987d78c8d26680f1a5da",
++    "src/zone/zone_ledger_core.h": "fd4858880ef65e0c9e7052249704b2973ea27e58c394e13ead604d413b60bc30",
++    "src/zone/zone_life.cpp": "7ada9749d8a4f0305e8d11a62ca9b638f2df65929a5e4565fb8447319c36ac73",
++    "src/zone/zone_life.h": "05955936392e37f2debf7598f5a9ff6063c0b4cdd2998f002ad437e7740b244e",
++    "src/zone/zone_life_internal.h": "8613b4856b84ca1a83525a4f3296c0bcd3911b831c2b4c27e983d44c8754e190",
++    "src/zone/zone_pause.cpp": "87bc71d8923c828a7242638d37257c2e5469b809e9bc5f9d43df8923ff769c26",
++    "src/zone/zone_pause.h": "823ce5dc5c0624ae6840003ad72206aeba46af200ed4bd7ae8068513fb0b72e4",
++    "tools/build/coresrc.txt": "53cdc5dd1b297a72a3c687eb3de65605c13b47ff5961ee4680b70570004eb55f",
++    "tools/build/variant.bat": "317b202a29422e62510a281b827304896eb36d7ce3a13c40a8233164df83979f",
++    "tools/localization/compile_catalogs.py": "5905c07fdf56fc7a582587a4efe7b78c3bd86ba131a07e26882cff247982bfe3",
++    "tools/tests/config_table_checks.h": "702c6ecd434c963d0884c253ddceab5a9bebdfb69ac751c43abc6722e575a3fb",
++    "tools/tests/mem_diag_units.cpp": "2a91c1e4d1513dc0f0b854789215f9a9ea69513f2f7db9ca61d10faac53b01ab",
++    "tools/tests/path_priority_units.cpp": "f1ffbbd8ad6f74e9c9106c503ed3819a644da08b433ca7c080a6f64f60fd8546",
++    "tools/tests/suites.txt": "b36ce4f6355e2d48b557759ea6993ba50f0ae5468808b7f71a68b637c29542ce"
++  },
++  "changedFiles": [
++    "README.md",
++    "leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp",
++    "leopard/fixtures/priority_publication_6e15/publication_fixture.cpp",
++    "leopard/test_module_census_notice.py",
++    "leopard/test_path_budget.py",
++    "leopard/test_path_priority_publication.py",
++    "src/pathfind/path_pool_bindings.h",
++    "src/pathfind/path_pool_hooks.cpp",
++    "src/pathfind/path_priority_hooks.h",
++    "src/pathfind/path_priority_publication.cpp",
++    "src/pathfind/path_priority_publication.h",
++    "src/pathfind/pathfind_cache.h",
++    "src/pathfind/pathfind_hooks.cpp",
++    "src/planner/planner_water_table.cpp",
++    "src/planner/planner_water_table.h",
++    "src/plugin/crash_record.cpp",
++    "src/plugin/hook_manifest.cpp",
++    "src/plugin/hook_manifest_rows.inc",
++    "tools/build/coresrc.txt",
++    "tools/tests/path_priority_units.cpp",
++    "tools/tests/suites.txt"
++  ],
++  "candidateComposition": {
++    "dev": {
++      "KEO.dll": "4369038da9944e1b042b72967c69a39d305e52907286d338446ab6308c936f7e",
++      "KEO.ini": "3a9c5b74b52503f5a6d6f94fbc7a23808306c5f3fa67546af3dc59249362e595",
++      "KEO.ini.template": "3a9c5b74b52503f5a6d6f94fbc7a23808306c5f3fa67546af3dc59249362e595",
++      "locale/en_GB/LC_MESSAGES/keo.mo": "42ab3e53215639d16dabad9e6f504b01ef9632003c904bb78c5520abcd62fe91",
++      "locale/ru_RU/LC_MESSAGES/keo.mo": "e4b5548d42dabddec8ff0648808f015c108eae2c401291d6c8af4f10364e3c4b",
++      "locale/zh_CN/LC_MESSAGES/keo.mo": "c64ac378cda3f2cf2fc655e5591089b6a4ef0c221aee234514b72c420196e2de",
++      "RE_Kenshi.json": "84fd987ad40531cb01bc35fb8c54adff11be12bd2d2f2a8badc6e0c67ed4fea3",
++      "README.md": "4fbbd4c6ec130d46b4ba225d0d8c4fe080419f567d30dad7628bd24ed2b36745"
++    },
++    "prod": {
++      "KEO.dll": "d396c05a64dfa45eb8ea515782cb7c0327d00e7ceb86108881a4e2e21f767ca2",
++      "KEO.ini": "3a9c5b74b52503f5a6d6f94fbc7a23808306c5f3fa67546af3dc59249362e595",
++      "KEO.ini.template": "3a9c5b74b52503f5a6d6f94fbc7a23808306c5f3fa67546af3dc59249362e595",
++      "locale/en_GB/LC_MESSAGES/keo.mo": "42ab3e53215639d16dabad9e6f504b01ef9632003c904bb78c5520abcd62fe91",
++      "locale/ru_RU/LC_MESSAGES/keo.mo": "e4b5548d42dabddec8ff0648808f015c108eae2c401291d6c8af4f10364e3c4b",
++      "locale/zh_CN/LC_MESSAGES/keo.mo": "c64ac378cda3f2cf2fc655e5591089b6a4ef0c221aee234514b72c420196e2de",
++      "RE_Kenshi.json": "84fd987ad40531cb01bc35fb8c54adff11be12bd2d2f2a8badc6e0c67ed4fea3",
++      "README.md": "4fbbd4c6ec130d46b4ba225d0d8c4fe080419f567d30dad7628bd24ed2b36745"
++    }
++  },
++  "evidenceFiles": {
++    "build/priority-publication-host.log": "cb2ae206576c3b0a3faa49490d69174f971b1dbebfdbf64f63ef9c83a6575088",
++    "build/priority-publication-guards.log": "18f8916dbc959a985b392a2e1265d96e68cb746171bae0bf1ba2de82bb67fbcd",
++    "build/priority-publication-native.log": "821d9f90f20d71a54f6f8cf437ee188ae2dd7f8381cd32d1b3feebe1be0371a7",
++    "build/priority-publication-actual.log": "ca20f45306ddff68974a2c28c31673e6459c23e8e77130d08f15c6e8978f2d17",
++    "build/priority-publication-budget.log": "a285459c8aa79e1cbd0547c8c6d324e7d493f4550f3e6ea5707e08bfdafc3eaf",
++    "build/priority-publication-census.log": "3c2ad68a57756189992544a7a8599dd66e4dc5863a9ef87cd413a0fc3f91d498"
++  },
++  "readOnlyResearch": {
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\report.md": "a37bc35b51ff947c16a059decb5f9a0ad45f19a9e2fbe2fe0c01690383f1de6a",
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\evidence.json": "2adcb76d5a65dadfcb6f9973ada4e8b40679e0d51fc0cbf2f1b7172fd6681a62",
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\source-before.json": "23b1633fab9e55b637a25d8b8d9af0c37e3cdffb93efc5410ce0f55011f4460b",
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\native-evidence.json": "35cffa9ceb22575dfb3aed10c392d230400f82e073be31b958f45f977e214c8a",
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\publication-contract.json": "cfe80c30b49a6926956afe297ab720da628b3c7d86e8bd1a6fa3a4816ca4feee",
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\sdk_abi.cpp": "ca0d46aedabc139acfd82133e5a071dfdfc13f16b244ded57a3bc6e510da2b5d",
++    "D:\\DEV\\Kenshi\\research\\keo-priority-publication-20261103\\sdk_abi-build.log": "de0bdb72667c649c3d12d964960721d4a3e6998cfdfe235d91ce8eaa77dd39cf"
++  },
++  "offlineExeSha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
++  "results": {
++    "hostSuites": 127,
++    "nativeSourcesEach": 341,
++    "actualPublicationChecks": 195,
++    "publicationMutantsRejected": 9,
++    "budgetChecks": 3151,
++    "budgetMutantsRejected": 10,
++    "censusMutantsRejected": 2,
++    "guards": "PASS",
++    "nativeVariants": "DEV+PROD PASS"
++  }
++}
+diff --git a/leopard/priority-publication-20261103.md b/leopard/priority-publication-20261103.md
+new file mode 100644
+index 0000000..48f96b0
+--- /dev/null
++++ b/leopard/priority-publication-20261103.md
+@@ -0,0 +1,157 @@
++# KEO pre-publication priority fix — source freeze, 2026-11-03
++
++Base: `6e15b3a6926040de19f0418df10e5f1c47c0dc2a` on `leopard`, uncommitted local patch.
++No game calls, memory inspection, UI, installation, INI writes, commits or pushes
++were performed by this task. The original jacobericson/KEO origin is untouched.
++
++## Result and exact boundary
++
++The old submit wrapper wrote tier45 only after native submit returned. The native
++producer publishes into NavMesh.characterMessages before then, and the consumer's
++mutex is different. The consumer can read10/20 while the producer still holds its
++submit mutex. This is distinct from the request-local 4x budget repair already in
++6e15b3a: its current-native-player predicate and original budget values are kept.
++
++The new bridge runs before the original enqueue call, before every optional
++pool-diagnostic branch. It accepts only the current synchronous submit's request,
++its manager-derived SDK input queue, native enqueue return3AAF60, kind0 and the
++expected native10/20 supplied by that submit's high-priority argument. It consumes
++its POD TLS context once and writes45 before native publication. Cancellation at
++3AAFD5, result queues, foreign requests/returns, NPC tiers and reused contexts
++refuse without borrowing an outer tier. No request read/write occurs after the
++original enqueue/submit transfers ownership; finally only restores context.
++
++The submit wrapper and requestPath wrapper save and restore exact previous TLS
++through POD __try/__finally, including nested NPC calls, C++ unwind and SEH. The
++requestPath wrapper also restores the real planner water requester; the existing
++water write still runs before native submit. No native call is repeated. Existing
++formation notification, group/water decisions, OFF behavior, planner clocks,
++original worker concurrency and request-local search-budget predicate are kept.
++
++A fixed28-window/edge Steam504b contract validates the actual caller, native
++initialization, input publication, cancellation, consumer priority reads and
++relevant rel32 thunks BEFORE hooks modify entries. Capability is finalized only
++AFTER all install steps: routing wanted, profile, requestPath, submit, enqueue and
++all three originals must be present. Partial admission leaves native priorities;
++there is no post-submit fallback. Native profile/refusal errors remain visible.
++The SDK-derived input queue uses NavMesh_characterMessages with its compile-time
++offset check; no private address or inferred diagnostic manager owns the write.
++A foreign chained hook can conservatively lose admission through exact return
++matching; no speculative adjustment is attempted.
++
++## Read-only native proof / TDD
++
++The pre-edit research snapshot remains frozen at
++`D:/DEV/Kenshi/research/keo-priority-publication-20261103/report.md`, SHA
++`a37bc35b51ff947c16a059decb5f9a0ad45f19a9e2fbe2fe0c01690383f1de6a`.
++That report deliberately describes the old defect as still present at its stage.
++Its evidence.json is `2adcb76d5a65dadfcb6f9973ada4e8b40679e0d51fc0cbf2f1b7172fd6681a62`.
++It pins675 original production inputs at clean6e15 before this patch. Offline EXE
++SHA504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e;
++no executable code from the game is called. SDK ABI and13 original native critical
++windows/13mutants pass in that independently reproduced research stage.
++
++The actual old6e15 submit body and owned queue fixture are copied unchanged into
++leopard/fixtures/priority_publication_6e15. The final actual-body test retains an
++expected RED: old code observes20/10; current code observes45 before publication.
++A separate consumer thread executes while the producer mutex flag remains held.
++The consumer can protect/retire its owned request page before submit returns:
++old code faults C0000005, current code returns safely. This is a host lifetime
++stress, not a claim that real Kenshi necessarily frees the object at that point.
++The final fixture extracts the actual production wrappers/bridge and links the
++actual policy, player-tier decision and real planner water table. It checks all
++28profile windows, missing reader/originals, partial hook masks, OFF/NPC, exact
++queue/request/return,10/20/kind, one-shot, nested/TLS/thread isolation and both
++exception paths. Independent review must validate this frozen source rather than
++accepting only the earlier prototype.
++
++## Separate optional module census hunk
++
++Only SnapshotModuleBases' bounded curated-truncation notice changes LogError to
++LogDetail, with DetailedLogEnabled before its formatting. Census collection,
++curated cap48, raw cap256, self/RE priority pinning and crash attribution remain
++unchanged. The actual function is extracted into a fake152-entry enumeration:
++OFF collects152raw/48curated with zero formatting/logs; ON does the same and logs
++one detail, zero errors. Attribution through a raw entry outside the curated list
++still works, and each handle closes. Compiled severity/producer mutants fail.
++No actual process enumeration or game process API is used in this fixture.
++
++## Verification commands and results
++
++From `D:/DEV/Kenshi/forks/KEO` with VS2010x64 compiler/SDK environment:
++
++- `python leopard/test_path_priority_publication.py`:195 actual checks PASS,
++  frozen old expected RED confirmed,9 compiled negative controls rejected.
++- `python leopard/test_path_budget.py`:3151 actual budget/caller checks PASS,
++ 10 compiled negative controls rejected. Submit setup now uses the real
++ pre-publication policy; no obsolete post-submit write assumption remains.
++- `python leopard/test_module_census_notice.py`: actual fake census PASS,
++ 2 compiled negative controls rejected.
++- `python tools/tests/run_suites.py`:127 suites all PASS, including the new pure
++ policy suite and existing planner/water/budget/lifecycle suites.
++- `python tools/tests/check_test_guards.py`: all checks PASS. An initial invocation
++ without the VS PATH failed compiler-dependent guard self-tests; rerunning with
++ the same compiler environment as the127host run passed. No false green claimed.
++- `STEP4_SUFFIX=_prioritypub STEP4_VARIANTS="dev prod" BUILD_CACHE=off` then
++ `cmd /c build_leopard.bat`: clean native DEV341/341 compiled26.6s and
++ PROD341/341 compiled32.4s, both build OK. No cache objects restored.
++- `git diff --check`: PASS.
++
++Scripts set their own VS compiler paths except the standard full host/guard
++runner. For those, INCLUDE is VC/include;WindowsSDK/Include, LIB is VC/lib/amd64;
++WindowsSDK/Lib/x64, PATH begins VC/bin/amd64;WindowsSDK/Bin. VC root is
++C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC; WindowsSDK root is
++C:/Program Files/Microsoft SDKs/Windows/v7.1. KENSHI_ROOT is the game folder for
++existing offline SDK/fixtures, never process access. Full compiler output and
++per-case outputs are under build/path-priority-tests, build/leopard-budget-tests,
++build/module-census-tests and build/tests; compact logs are hashed in manifest.
++
++## Performance / lifetime / limits
++
++Steady path adds bounded POD stack/TLS state, scalar metadata checks and at most
++two4-byte reads/one4-byte priority write before ownership transfer. No heap, cache,
++world scan, queued request retention, timer, INI polling or worker serialization
++is introduced. The fixed28-window check runs once before install, only if wanted.
++OFF exits before native profile reads and request payload access. Existing pool
++instrumentation is unchanged. The water getter reads only current-thread cached
++ownership; its existing arm/live contract is once at startup. Exact prior-state
++restoration replaces destructive clears and is tested for both exception modes.
++
++This corrects the confirmed priority-publication interleaving only. Static/host
++proof does not establish live route quality, route acceptance, FPS or absence of
++all leaks. No game ON movement QA was performed here. No release/version bump,
++new language, packaging, current installed candidate alteration or publication.
++The existing three MO catalogs and default INI are byte-identical to base.
++
++## Frozen source and native candidate
++
++Manifest SHA256: `1ad61306dc04114b807068d290198f5416e03ec839c3fff3071e2b335d591144`
++
++`leopard/priority-publication-20261103.json` pins 704 source/test/doc inputs plus exact DEV/PROD compositions and evidence.
++
++- `dev`: `build/KEO_step4_prioritypub_dev/KEO.dll`, SHA256 `4369038da9944e1b042b72967c69a39d305e52907286d338446ab6308c936f7e`.
++- `prod`: `build/KEO_step4_prioritypub_prod/KEO.dll`, SHA256 `d396c05a64dfa45eb8ea515782cb7c0327d00e7ceb86108881a4e2e21f767ca2`.
++
++Exact changed files relative to base (all other frozen production sources preserved):
++
++- `README.md`
++- `leopard/fixtures/priority_publication_6e15/current-submit.extract.cpp`
++- `leopard/fixtures/priority_publication_6e15/publication_fixture.cpp`
++- `leopard/test_module_census_notice.py`
++- `leopard/test_path_budget.py`
++- `leopard/test_path_priority_publication.py`
++- `src/pathfind/path_pool_bindings.h`
++- `src/pathfind/path_pool_hooks.cpp`
++- `src/pathfind/path_priority_hooks.h`
++- `src/pathfind/path_priority_publication.cpp`
++- `src/pathfind/path_priority_publication.h`
++- `src/pathfind/pathfind_cache.h`
++- `src/pathfind/pathfind_hooks.cpp`
++- `src/planner/planner_water_table.cpp`
++- `src/planner/planner_water_table.h`
++- `src/plugin/crash_record.cpp`
++- `src/plugin/hook_manifest.cpp`
++- `src/plugin/hook_manifest_rows.inc`
++- `tools/build/coresrc.txt`
++- `tools/tests/path_priority_units.cpp`
++- `tools/tests/suites.txt`
+diff --git a/leopard/test_module_census_notice.py b/leopard/test_module_census_notice.py
+new file mode 100644
+index 0000000..ef405f7
+--- /dev/null
++++ b/leopard/test_module_census_notice.py
+@@ -0,0 +1,86 @@
++"""Run the real startup census against owned fake entries, never a live process.
++The 48-entry curated cap remains independent from the 256-entry raw crash table.
++"""
++from pathlib import Path
++import os
++import subprocess
++
++ROOT = Path(__file__).resolve().parents[1]
++OUT = ROOT / 'build/module-census-tests'
++OUT.mkdir(parents=True, exist_ok=True)
++s = (ROOT / 'src/plugin/crash_record.cpp').read_text(encoding='utf-8')
++a = s.index('void SnapshotModuleBases()')
++b = s.index('{', a)
++e, depth = b + 1, 1
++while depth:
++    depth += (s[e] == '{') - (s[e] == '}')
++    e += 1
++body = s[a:e]
++prefix = r'''
++#include <Windows.h>
++#include <TlHelp32.h>
++#include <stdint.h>
++#include <cstdio>
++#include <cstring>
++#include <cstdarg>
++#include "diag/module_bases.h"
++#include "check.h"
++ModuleBaseEntry g_moduleBases[kMaxModuleBases],g_rawModuleBases[256];
++int g_moduleBaseCount=0,g_rawModuleCount=0;
++const int kRawModuleCap=256;
++bool g_rawModuleListValid=false,debug=false;
++unsigned cursor=0,total=152,details=0,errors=0,formats=0,closes=0;
++bool DetailedLogEnabled(){return debug;}
++void LogDetail(const char*line){++details;Check(std::strstr(line,"152 modules, kept 48")!=NULL,"summary keeps actual count and original cap");}
++void LogError(const char*){++errors;}
++BOOL FakeSelf(DWORD,LPCSTR,HMODULE*out){*out=(HMODULE)(uintptr_t)(0x100000+150*0x10000);return TRUE;}
++HMODULE FakeRe(LPCSTR){return (HMODULE)(uintptr_t)(0x100000+151*0x10000);}
++HANDLE FakeSnapshot(DWORD,DWORD){return (HANDLE)1;}
++DWORD FakePid(){return 42;}
++void Entry(MODULEENTRY32*e){std::memset(e,0,sizeof(*e));e->dwSize=sizeof(*e);sprintf_s(e->szModule,sizeof(e->szModule),"owned%u.dll",cursor);e->modBaseAddr=(BYTE*)(uintptr_t)(0x100000+cursor*0x10000);e->modBaseSize=0x10000;}
++BOOL FakeFirst(HANDLE,MODULEENTRY32*e){cursor=0;if(!total)return FALSE;Entry(e);return TRUE;}
++BOOL FakeNext(HANDLE,MODULEENTRY32*e){if(++cursor>=total)return FALSE;Entry(e);return TRUE;}
++BOOL FakeClose(HANDLE){++closes;return TRUE;}
++int Format(char*out,size_t cap,size_t,const char*fmt,...){++formats;va_list ap;va_start(ap,fmt);int n=vsnprintf_s(out,cap,_TRUNCATE,fmt,ap);va_end(ap);return n;}
++#define GetModuleHandleExA FakeSelf
++#define GetModuleHandleA FakeRe
++#define CreateToolhelp32Snapshot FakeSnapshot
++#define GetCurrentProcessId FakePid
++#define Module32First FakeFirst
++#define Module32Next FakeNext
++#define CloseHandle FakeClose
++#define _snprintf_s Format
++'''
++suffix = r'''
++int main(){
++ for(int on=0;on<2;++on){debug=on!=0;SnapshotModuleBases();
++ Check(g_rawModuleListValid&&g_rawModuleCount==152,"all owned raw census entries retained regardless of log");
++ Check(g_moduleBaseCount==48,"original curated cap unchanged");
++ Check(g_moduleBases[0].base==0x100000+150*0x10000&&g_moduleBases[1].base==0x100000+151*0x10000,"self and RE stay pinned beyond normal curated fill");
++ Check(details==(unsigned)on&&errors==0,"optional curated truncation detail only, never error");
++ Check(formats==(unsigned)on,"OFF avoids optional formatting before producer");
++ Check(ResolveModuleForAddress(g_rawModuleBases,g_rawModuleCount,0x100000+149*0x10000+7,NULL)==149,"raw attribution survives curated truncation");}
++ Check(closes==2,"each snapshot closes its owned handle");return CheckExit("actual_module_census");}
++'''
++vc = Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC')
++sdk = Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
++env = dict(os.environ, INCLUDE=f'{vc}/include;{sdk}/Include;{ROOT}/src;{ROOT}/tools/tests', LIB=f'{vc}/lib/amd64;{sdk}/Lib/x64')
++
++def run(name, actual, green):
++    folder = OUT / name
++    folder.mkdir(exist_ok=True)
++    cpp = folder / 'actual.cpp'
++    cpp.write_text(prefix + actual + suffix, encoding='utf-8')
++    exe = folder / 'actual.exe'
++    cmd = [str(vc / 'bin/amd64/cl.exe'), '/nologo', '/EHsc', '/D_MBCS', str(cpp), str(ROOT / 'src/diag/module_bases.cpp'), '/Fe' + str(exe), '/link', '/MACHINE:X64']
++    p = subprocess.run(cmd, cwd=str(folder), env=env, capture_output=True, text=True)
++    (folder / 'build.log').write_text(p.stdout + p.stderr, encoding='utf-8')
++    assert p.returncode == 0, (name, p.stdout, p.stderr)
++    p = subprocess.run([str(exe)], capture_output=True, text=True)
++    (folder / 'run.log').write_text(p.stdout + p.stderr, encoding='utf-8')
++    assert (p.returncode == 0) == green, (name, p.returncode, p.stdout)
++    print(name + ': ' + ('PASS' if green else 'negative control rejected'))
++
++run('production', body, True)
++run('severity-mutant', body.replace('LogDetail(line)', 'LogError(line)'), False)
++run('producer-mutant', body.replace(' && DetailedLogEnabled()', ''), False)
+diff --git a/leopard/test_path_budget.py b/leopard/test_path_budget.py
+index afb4d85..d5d47a8 100644
+--- a/leopard/test_path_budget.py
++++ b/leopard/test_path_budget.py
+@@ -1,4 +1,7 @@
+-"""Actual fallback/resolve/budget/submit bodies at native boundaries; no game calls."""
++"""Actual fallback/resolve/budget bodies at native boundaries; no game calls.
++Submit setup uses the actual prepublication policy; native wrappers are verified
++separately by test_path_priority_publication.py. No post-submit write assumption.
++"""
+ from pathlib import Path
+ import os,subprocess
+ ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/leopard-budget-tests';OUT.mkdir(parents=True,exist_ok=True)
+@@ -15,6 +18,7 @@ code=r"""
+ #include <cstring>
+ #include <stdexcept>
+ #include "pathfind/path_budget_policy.h"
++#include "pathfind/path_priority_publication.h"
+ typedef UINT_PTR uintptr_t;
+ static __declspec(thread) PathBudgetRequest*t_pathBudgetRequest=NULL;
+ static __declspec(thread) bool currentRequestIsPlayer=false;
+@@ -33,7 +37,6 @@ CONTEXT;
+ CAPTURE
+ RESOLVE
+ BOOST
+-SUBMIT
+ FALLBACK
+ void TagNext(){TAG}
+ void Check(bool yes,const char*what){InterlockedIncrement(&checks);if(!yes){std::printf("FAIL %s\n",what);throw 1;}}
+@@ -50,13 +53,21 @@ char NativeFallback(void*manager,unsigned start,void*startPos,unsigned goal,void
+  if(mode==5&&depth==0){++depth;int saved=mode;mode=0;char r=Call(*child,0,1);mode=saved;--depth;Check(r==1&&!last.boosted&&last.owner==0,"nested NPC retains native caps");Check(t_waveAuth==(npc?1:2),"nested owner stamp restored");}
+  last=Invoke(ASTAR_RET_CHARACTER_FINDPATH);if(mode==6){Outcome second=Invoke(ASTAR_RET_CHARACTER_FINDPATH);Check(second.owner==-1&&!second.boosted&&!second.request,"current request consumed once");}
+  return 1;}
+-void NativeSubmit(void*,void*request,bool high){*reinterpret_cast<int*>(static_cast<unsigned char*>(request)+44)=high?20:10;}
++
+ char Call(Request&r,int which,int npc){mode=which;return hook_csFindPathFallback(reinterpret_cast<void*>(1),2,reinterpret_cast<void*>(3),4,reinterpret_cast<void*>(5),6,7,char(npc),r.Result());}
+ bool CallSeh(Request&r){__try{Call(r,2);return false;}__except(GetExceptionCode()==EXCEPTION_ACCESS_VIOLATION?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){return true;}}
+-void Submit(Request&r,bool repath){squadBoostTier=45;squadBoostFromRepathTier=repath;hook_pathReqSubmit(NULL,r.bytes,!repath);}
++void Submit(Request&r,bool repath){
++ // Native10/20 followed by the real pre-publication policy, not a late write.
++ *reinterpret_cast<int*>(r.bytes+44)=repath?10:20;void*item=r.bytes;unsigned char queue;
++ PathPriorityContext*slot=NULL;PathPriorityFrame frame;PathPriorityDecision decision;
++ PathPriorityEnter(&frame,slot,r.bytes,&queue,(void*)0x3AAF60,45,repath,!repath,true);
++ Check(PathPriorityApply(slot,&queue,&item,(void*)0x3AAF60,&decision)&&r.Priority()==45,"submit setup applies tier before publication");
++ if(!decision.repath)InterlockedIncrement(&pathfind::g_pathDiag.playerRequestsInFlight);
++ PathPriorityLeave(&frame,slot);
++}
+ struct ThreadInput{bool npc;volatile LONG*failed;};
+ DWORD WINAPI Thread(void*arg){ThreadInput*t=static_cast<ThreadInput*>(arg);try{for(int i=0;i<128;++i){Request r(t->npc?10:45);currentRequestIsPlayer=t->npc;Call(r,4,t->npc?1:0);Check(last.boosted==!t->npc&&!t_pathBudgetRequest,"thread-local owner isolation");}}catch(...){InterlockedIncrement(t->failed);}return 0;}
+-int main(){try{game::g_hookOrig.orig_csFindPathFallback=NativeFallback;game::g_hookOrig.orig_pathReqSubmit=NativeSubmit;
++int main(){try{game::g_hookOrig.orig_csFindPathFallback=NativeFallback;
+  Request old,fresh;Submit(old,true);Submit(fresh,false);TagNext();Check(currentRequestIsPlayer,"older repath stole old diagnostic token");Call(old,0);Check(last.request==old.bytes&&last.boosted&&last.open==524288&&last.state==2361344,"older current player repath gets original expanded caps");TagNext();Check(!currentRequestIsPlayer,"fresh order has no old diagnostic token");Call(fresh,0);Check(last.request==fresh.bytes&&last.boosted,"fresh current player budget independent of stolen token");
+  currentRequestIsPlayer=true;g_pathPoolLastCsFindPathReq=reinterpret_cast<void*>(1);Outcome outside=Invoke(ASTAR_RET_CHARACTER_FINDPATH);Check(!outside.boosted&&!outside.request&&outside.owner==-1,"no fallback context ignores leftover diagnostic pointers/tags");
+  const unsigned other[]={ASTAR_RET_GATE_FINDPATH,ASTAR_RET_GENERATION_EDGECOST,ASTAR_RET_HAVOK_CE62B0,0x123456};for(unsigned k=0;k<4;++k){g_pathPoolLastCsFindPathReq=reinterpret_cast<void*>(1);outside=Invoke(other[k]);Check(!outside.boosted&&!outside.request,"unowned/generation/gate calls retain native sizes");}
+@@ -69,12 +80,12 @@ int main(){try{game::g_hookOrig.orig_csFindPathFallback=NativeFallback;game::g_h
+  volatile LONG failed=0;ThreadInput args[4];HANDLE threads[4];for(unsigned i=0;i<4;++i){args[i].npc=(i&1)!=0;args[i].failed=&failed;threads[i]=CreateThread(NULL,0,Thread,args+i,0,NULL);Check(threads[i]!=NULL,"host thread created");}Check(WaitForMultipleObjects(4,threads,TRUE,30000)==WAIT_OBJECT_0&&!failed,"simultaneous current player/NPC contexts never cross threads");for(unsigned i=0;i<4;++i)CloseHandle(threads[i]);
+  Check(originalCalls==fallbackInvocations,"original called exactly once per fallback including exceptions/cancel");Check(!t_pathBudgetRequest&&t_waveAuth==77,"main context remains clear after worker fixtures");std::printf("Actual path budget caller %ld checks PASS\n",checks);return 0;}catch(...){return 1;}}
+ """
+-for name,marker in [('CONTEXT','struct FindPathFullCtx'),('CAPTURE','static bool CapturePathBudgetRequest('),('RESOLVE','static void ResolveFindPathRequest('),('BOOST','static void BoostFindPathBudget('),('SUBMIT','void hook_pathReqSubmit('),('FALLBACK','char hook_csFindPathFallback(')]:code=code.replace(name,body(marker))
++for name,marker in [('CONTEXT','struct FindPathFullCtx'),('CAPTURE','static bool CapturePathBudgetRequest('),('RESOLVE','static void ResolveFindPathRequest('),('BOOST','static void BoostFindPathBudget('),('FALLBACK','char hook_csFindPathFallback(')]:code=code.replace(name,body(marker))
+ code=code.replace('TAG',tag)
+ env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
+ policy=(ROOT/'src/pathfind/path_budget_policy.cpp').read_text()
+ def run(name,cpp,pol=policy,passes=True):
+- folder=OUT/name;folder.mkdir(exist_ok=True);unit=folder/'caller.cpp';unit.write_text(cpp,encoding='utf-8');p=folder/'policy.cpp';p.write_text(pol);r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3',str(unit),str(p),str(ROOT/'src/pathfind/astar_cost_policy.cpp'),'/Fo'+str(folder)+'/', '/Fe'+str(folder/'test.exe')],env=env,capture_output=True,text=True);(folder/'build.log').write_text(r.stdout+r.stderr)
++ folder=OUT/name;folder.mkdir(exist_ok=True);unit=folder/'caller.cpp';unit.write_text(cpp,encoding='utf-8');p=folder/'policy.cpp';p.write_text(pol);r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3',str(unit),str(p),str(ROOT/'src/pathfind/astar_cost_policy.cpp'),str(ROOT/'src/pathfind/path_priority_publication.cpp'),'/Fo'+str(folder)+'/', '/Fe'+str(folder/'test.exe')],env=env,capture_output=True,text=True);(folder/'build.log').write_text(r.stdout+r.stderr)
+  if r.returncode:raise RuntimeError(r.stdout+r.stderr)
+  r=subprocess.run([str(folder/'test.exe')],capture_output=True,text=True);(folder/'run.log').write_text(r.stdout+r.stderr)
+  if (r.returncode==0)!=passes:raise AssertionError(name+': '+r.stdout+r.stderr)
+diff --git a/leopard/test_path_priority_publication.py b/leopard/test_path_priority_publication.py
+new file mode 100644
+index 0000000..f679c36
+--- /dev/null
++++ b/leopard/test_path_priority_publication.py
+@@ -0,0 +1,85 @@
++"""Actual production submit/request/queue bridge and policy against owned native boundaries.
++Legacy RED is frozen6e15b3a; no game code is called. Fixture queue observer runs
++before the native stub returns, and may retire its owned page at publication.
++"""
++from pathlib import Path
++import os,subprocess,re,struct,importlib.util,sys
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/path-priority-tests';OUT.mkdir(exist_ok=True)
++RESEARCH=ROOT/'leopard/fixtures/priority_publication_6e15'
++s=(ROOT/'src/pathfind/pathfind_hooks.cpp').read_text(encoding='utf-8')
++def body(marker):
++ a=s.index(marker);b=s.index('{',a);e=b+1;d=1
++ while d:d+=(s[e]=='{')-(s[e]=='}');e+=1
++ return s[a:e]
++code=(RESEARCH/'publication_fixture.cpp').read_text(encoding='utf-8')
++legacy=(RESEARCH/'current-submit.extract.cpp').read_text(encoding='utf-8').strip();assert legacy in code
++code=code.replace(legacy,legacy.replace('hook_pathReqSubmit','LegacySubmit'))
++code=code.replace('#include <stdexcept>','#include <stdexcept>\n#include "pathfind/path_priority_publication.h"\n#include "pathfind/player_repath_tier_policy.h"\n#include "planner/planner_water_table.h"\n#include "planner/plan_policy.h"')
++code=code.replace('namespace planner{void PlannerWaterOnSubmit(float*){}}','')
++code=code.replace('volatile LONG playerRequestsInFlight;','volatile LONG playerRequestsInFlight,diagPlayerRequests,diagNPCRequests;').replace('Diag g_pathDiag={};}','Diag g_pathDiag={};struct Cfg{bool playerRepathTierEnabled;};Cfg g_pathfindCfg={true};}')
++code=code.replace('void(*orig_pathReqSubmit)(void*,void*,bool);','void(*orig_pathReqSubmit)(void*,void*,bool);void(*orig_requestPath)(void*,float*,int);')
++a=code.index('struct Context {');b=code.index('unsigned checks=0',a);code=code[:a]+'typedef PathPriorityContext Context;\n#define t_submit t_pathPriority\n'+code[b:]
++a=code.index('bool TryPriorityBeforePublish(');b=code.index('void Observe(',a)
++policy=(ROOT/'src/pathfind/path_priority_publication.cpp').read_text();records=re.findall(r'\{0x([0-9A-F]+),\{[^}]+\},(\d+)\}',policy)
++spec=importlib.util.spec_from_file_location('pe',ROOT/'tools/kenshilib/check_imports.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);pe=mod.PE(Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/Kenshi_x64.exe'))
++fake='struct FakeWindow{uintptr_t rva;unsigned char bytes[24];size_t count;};\nFakeWindow fakeWindows[]={\n'
++for r,n in records:
++ r=int(r,16);n=int(n);data=pe.data[pe.offset(r):pe.offset(r)+n];fake+=' {0x%X,{%s},%d},\n'%(r,','.join('0x%02x'%x for x in data),n)
++fake+='};\n'
++fake+='''uintptr_t gameBase=0x140000000ULL;unsigned fakeReads=0,errorLines=0;bool missingRead=false;
++void*GameAddr(size_t rva){++fakeReads;if(rva==PATH_PRIORITY_ENQUEUE_RETURN)return (void*)(gameBase+rva);if(missingRead)return NULL;for(size_t i=0;i<sizeof(fakeWindows)/sizeof(fakeWindows[0]);++i)if(fakeWindows[i].rva==rva)return fakeWindows[i].bytes;return NULL;}
++#define KLIB_MEMBER(g,p,n,o) ((uintptr_t)(p)+(o))
++void LogError(const std::string&){++errorLines;}
++'''
++start=s.index('static __declspec(thread) PathPriorityContext* t_pathPriority');end=s.index(body('void PathPriorityBeforeEnqueue('))+len(body('void PathPriorityBeforeEnqueue('))
++actual=s[start:end]+'\n'+body('void hook_pathReqSubmit(')+'\n'
++bridge='''
++void Configure(int mask,bool on,bool originals=true){PathPriorityPrepare(on);PathPriorityFinalize((mask&1)!=0,(mask&2)!=0,(mask&4)!=0,originals);}
++bool TryPriorityBeforePublish(void*q,void**item,uintptr_t caller){Context*c=t_pathPriority;const bool previous=c&&c->consumed;PathPriorityBeforeEnqueue(q,item,(void*)(gameBase+caller));bool applied=c&&!previous&&c->consumed;if(applied&&harness)++harness->writes;return applied;}
++void ProposalSubmit(void*m,void*r,bool high){hook_pathReqSubmit(m,r,high);}
++'''
++code=code[:a]+fake+actual+bridge+code[b:]
++code=code.replace('else hook_pathReqSubmit(manager,request,highPriority);','else LegacySubmit(manager,request,highPriority);')
++code=code.replace('Context outer={NULL,&request,q,45,20,false,true,false};','Context outer={&request,q,(void*)(gameBase+NativeSubmitEnqueueReturn),45,20,false,true,false};')
++code=code.replace('Context outer={NULL,NULL,NULL,0,0,false,false,false};','Context outer={NULL,NULL,NULL,0,0,false,false,false};')
++code=code.replace('harness=&h;capabilityMask=mask;routingEnabled=on;','harness=&h;capabilityMask=mask;routingEnabled=on;Configure(mask,on!=0);')
++code=code.replace('capabilityMask=7;routingEnabled=1;harness=NULL;','capabilityMask=7;routingEnabled=1;Configure(7,true);harness=NULL;')
++code=code.replace('game::g_hookOrig.orig_pathReqSubmit=NativeSubmit;','game::g_hookOrig.orig_pathReqSubmit=NativeSubmit;Configure(7,true);')
++code=code.replace('hook_pathReqSubmit(&mgr,&req,true);C(h.observed==45','LegacySubmit(&mgr,&req,true);C(h.observed==45')
++# Actual requestPath body + real water table, including nested original calls.
++requestTests=r'''
++bool nestedRequest=false,throwRequest=false,sehRequest=false;void*parentRequester=NULL;unsigned requestCalls=0;
++bool PlayerRepathTierIsPlayerOwned(uintptr_t){return false;}void FormationFollowNoteRequest(void*){}
++REQUEST_BODY
++void NativeRequest(void*hc,float*destination,int priority){++requestCalls;C(planner::PlannerWaterCurrentRequester()==hc,"actual water table carries current requester");if(throwRequest)throw std::runtime_error("request unwind");if(sehRequest)RaiseException(0xe0424242,0,0,NULL);if(nestedRequest){nestedRequest=false;void*saved=hc;int tier=squadBoostTier;bool source=squadBoostFromRepathTier;hook_requestPath((void*)0x2222,destination,0);C(planner::PlannerWaterCurrentRequester()==saved&&squadBoostTier==tier&&squadBoostFromRepathTier==source,"actual nested requestPath restores tier source and water requester");}}
++unsigned InvokeRequest(){__try{hook_requestPath((void*)0x1111,NULL,2);return 0;}__except(GetExceptionCode()==0xe0424242?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){return GetExceptionCode();}}
++void RequestScopes(){planner::PlannerWaterTableArm(1,planner::PWE_MATCH);planner::PlannerWaterNoteRequester((void*)0x7777);game::g_hookOrig.orig_requestPath=NativeRequest;squadBoostTier=17;squadBoostFromRepathTier=true;nestedRequest=true;hook_requestPath((void*)0x1111,NULL,2);C(requestCalls==2&&squadBoostTier==17&&squadBoostFromRepathTier&&planner::PlannerWaterCurrentRequester()==(void*)0x7777,"normal request scope restores exact preexisting state");throwRequest=true;bool caught=false;try{hook_requestPath((void*)0x1111,NULL,2);}catch(const std::runtime_error&){caught=true;}throwRequest=false;C(caught&&squadBoostTier==17&&squadBoostFromRepathTier&&planner::PlannerWaterCurrentRequester()==(void*)0x7777,"C++ request unwind restores all exact TLS");sehRequest=true;C(InvokeRequest()==0xe0424242&&squadBoostTier==17&&squadBoostFromRepathTier&&planner::PlannerWaterCurrentRequester()==(void*)0x7777,"SEH request unwind restores all exact TLS");sehRequest=false;planner::PlannerWaterTableArm(0,planner::PWE_MATCH);}
++void ProfileAdmission(){unsigned before=fakeReads;PathPriorityPrepare(false);C(fakeReads==before,"OFF does not read native profile");for(size_t i=0;i<sizeof(fakeWindows)/sizeof(fakeWindows[0]);++i){fakeWindows[i].bytes[0]^=1;Configure(7,true);C(!s_priorityReady,"each altered native contract window fails closed");fakeWindows[i].bytes[0]^=1;}missingRead=true;Configure(7,true);C(!s_priorityReady,"unreadable native profile fails closed");missingRead=false;Configure(7,true,false);C(!s_priorityReady,"missing original trampoline fails closed");Configure(7,true);C(s_priorityReady!=0,"full unchanged native profile and pair accepted");}
++'''.replace('REQUEST_BODY',body('void hook_requestPath('))
++code=code.replace('int main(int argc,char**argv)',requestTests+'\nint main(int argc,char**argv)')
++code=code.replace('Predicates();NestedAndUnwind();Threads();','Predicates();NestedAndUnwind();Threads();ProfileAdmission();RequestScopes();')
++code=code.replace('\"prototype\"','\"PRODUCTION\"').replace('publication characterization/prototype','publication actual legacy/production')
++(OUT/'actual.cpp').write_text(code,encoding='utf-8')
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++def run(name,text,pol=policy,success=True):
++ folder=OUT/name;folder.mkdir(exist_ok=True);cpp=folder/'actual.cpp';cpp.write_text(text,encoding='utf-8');p=folder/'policy.cpp';p.write_text(pol,encoding='utf-8')
++ r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3',str(cpp),str(p),str(ROOT/'src/pathfind/player_repath_tier_policy.cpp'),str(ROOT/'src/planner/planner_water_table.cpp'),str(ROOT/'src/planner/plan_policy.cpp'),'/Fo'+str(folder)+'/', '/Fe'+str(folder/'test.exe')],env=env,capture_output=True,text=True);(folder/'build.log').write_text(r.stdout+r.stderr);assert not r.returncode,r.stdout+r.stderr
++ r=subprocess.run([str(folder/'test.exe')],capture_output=True,text=True);(folder/'run.log').write_text(r.stdout+r.stderr);print(name,r.stdout[-2000:]);assert (r.returncode==0)==success,(name,r.returncode,r.stdout,r.stderr);return folder/'test.exe'
++exe=run('actual',code)
++r=subprocess.run([str(exe),'--require-current-priority'],capture_output=True,text=True);(OUT/'legacy-RED.log').write_text(r.stdout+r.stderr);assert r.returncode==1 and 'known RED' in r.stdout;print('Frozen6e15 actual legacy RED confirmed')
++if '--skip-mutants' not in sys.argv:
++ for name,old,new,target in [
++ ('wrong-queue','queue!=c->queue ||','', 'policy'),('wrong-request','if (*item!=c->request) return false;','', 'policy'),
++ ('wrong-callsite','ret!=c->enqueueReturn ||','', 'policy'),('repeat-consume','c->consumed ||','', 'policy'),
++ ('missing-admission','!c->admitted ||','', 'policy'),('no-submit-leave','PathPriorityLeave(&frame,t_pathPriority);','', 'caller'),
++ ('lost-request-tier','squadBoostTier=previousTier;','squadBoostTier=0;', 'caller'),('lost-request-source','squadBoostFromRepathTier=previousSource;','squadBoostFromRepathTier=false;', 'caller'),
++ ('lost-water-requester','planner::PlannerWaterNoteRequester(previousRequester);','planner::PlannerWaterNoteRequester(NULL);', 'caller')]:
++  text=code if target=='caller' else policy;assert old in text,name;run(name,code.replace(old,new) if target=='caller' else code,policy.replace(old,new) if target=='policy' else policy,False)
++# The functionally relevant native enqueue call is first, not hidden in the
++# original diagnostic manager/result-queue branch. It still calls original once.
++q=(ROOT/'src/pathfind/path_pool_hooks.cpp').read_text();owner=q[q.index('void hook_enqueueThreadSafe('):q.index('__int64 hook_gatesUpdateCodes')]
++assert owner.index('PathPriorityBeforeEnqueue(queueBase,itemPtr,_ReturnAddress());')<owner.index('void* mgr = g_sectionMgrPtr;')<owner.index('orig_enqueueThreadSafe(queueBase, itemPtr);')
++assert owner.count('orig_enqueueThreadSafe(queueBase, itemPtr);')==1
++m=(ROOT/'src/plugin/hook_manifest.cpp').read_text();owner=m[m.index('void InstallHooks('):]
++assert owner.index('PathPriorityPrepare(')<owner.index('kInstallSteps[i]')<owner.index('PathPriorityFinalize(')
++print('Actual functional enqueue/startup owner ordering PASS')
+diff --git a/src/pathfind/path_pool_bindings.h b/src/pathfind/path_pool_bindings.h
+index 1665af1..f101ebd 100644
+--- a/src/pathfind/path_pool_bindings.h
++++ b/src/pathfind/path_pool_bindings.h
+@@ -34,8 +34,10 @@ extern dequeueWork_t orig_dequeueWork;
+ // PathRequestQueue::submitCancel (+0x50, no callers in this build) and
+ // SectionManager::contentStream twice (+0x5E2 the section-add sentinel,
+ // +0xC1A the serve-block completion -- both mgr+0xF8, the result queue, path
+-// thread). Filtered at runtime to the result queue; the input-queue call
+-// passes through untouched. Same RVA as RVA_ENQUEUE_PATH_REQ / fn_enqueuePathReq.
++// thread). Result instrumentation remains filtered to the result queue. The
++// exact admitted submit context initializes priority on the input queue BEFORE
++// the original publishes it; unrelated input calls pass through unchanged.
++// Same RVA as RVA_ENQUEUE_PATH_REQ / fn_enqueuePathReq.
+ const size_t RVA_ENQUEUE_THREAD_SAFE = 0x3B6110;
+ typedef void (*enqueueThreadSafe_t)(void* queueBase, void** itemPtr);
+ extern enqueueThreadSafe_t orig_enqueueThreadSafe;
+diff --git a/src/pathfind/path_pool_hooks.cpp b/src/pathfind/path_pool_hooks.cpp
+index 240491c..7a3fa05 100644
+--- a/src/pathfind/path_pool_hooks.cpp
++++ b/src/pathfind/path_pool_hooks.cpp
+@@ -1,7 +1,10 @@
+ // path_pool_hooks.cpp - timed pass-through path and gate hooks.
+ // Path-thread passes and any-thread queue detours add no lock, allocation or log.
++// A current submit context may initialize its own priority before publication.
+ 
+ #include "pathfind/path_pool_internal.h"
++#include "pathfind/path_priority_hooks.h"
++#pragma intrinsic(_ReturnAddress)
+ 
+ namespace path_pool_hooks_detail {
+ // Sets t_inContentStreamPass or t_inGatePass for the lifetime of a hook call
+@@ -187,6 +190,8 @@ void* hook_dequeueWork(void* queueBase)
+ 
+ void hook_enqueueThreadSafe(void* queueBase, void** itemPtr)
+ {
++	// Functional priority admission precedes every optional diagnostic branch.
++	PathPriorityBeforeEnqueue(queueBase,itemPtr,_ReturnAddress());
+ 	void* mgr = g_sectionMgrPtr;
+ 	void* req = itemPtr ? *itemPtr : NULL;
+ 
+diff --git a/src/pathfind/path_priority_hooks.h b/src/pathfind/path_priority_hooks.h
+new file mode 100644
+index 0000000..077c7c6
+--- /dev/null
++++ b/src/pathfind/path_priority_hooks.h
+@@ -0,0 +1,8 @@
++#pragma once
++// Startup-only preparation/finalization around the ordinary install sequence.
++// The capability stays false until the internal profile and all three original
++// trampolines are ready. No hot uninstall or late-write fallback.
++void PathPriorityPrepare(bool wanted);
++void PathPriorityFinalize(bool requestHook,bool submitHook,bool enqueueHook,bool originals);
++// Any original caller thread, before native enqueue publishes the pointer.
++void PathPriorityBeforeEnqueue(void* queue,void** item,const void* nativeReturn);
+diff --git a/src/pathfind/path_priority_publication.cpp b/src/pathfind/path_priority_publication.cpp
+new file mode 100644
+index 0000000..9c48c3e
+--- /dev/null
++++ b/src/pathfind/path_priority_publication.cpp
+@@ -0,0 +1,77 @@
++#include "pathfind/path_priority_publication.h"
++#include <cstring>
++
++void PathPriorityEnter(PathPriorityFrame* f, PathPriorityContext*& slot, void* request,
++    void* queue, const void* ret, int tier, bool repath, bool high, bool admitted)
++{
++    f->previous=slot;
++    f->current.request=request; f->current.queue=queue; f->current.enqueueReturn=ret;
++    f->current.tier=tier; f->current.nativePriority=high?20:10;
++    f->current.repath=repath; f->current.admitted=admitted; f->current.consumed=false;
++    slot=&f->current;
++}
++void PathPriorityLeave(const PathPriorityFrame* f, PathPriorityContext*& slot) { slot=f->previous; }
++bool PathPriorityApply(PathPriorityContext* c, void* queue, void** item,
++    const void* ret, PathPriorityDecision* decision)
++{
++    if (!decision) return false;
++    decision->repath=false;
++    if (!c || !c->admitted || c->consumed || c->tier<=0 || !c->request || !c->queue
++        || !c->enqueueReturn || queue!=c->queue || ret!=c->enqueueReturn || !item) return false;
++    if (*item!=c->request) return false;
++    if (c->nativePriority!=10 && c->nativePriority!=20) return false;
++    unsigned char* request=static_cast<unsigned char*>(c->request);
++    int kind=0, priority=0;
++    std::memcpy(&kind,request+0x28,sizeof(kind));
++    std::memcpy(&priority,request+0x2C,sizeof(priority));
++    if (kind!=0 || priority!=c->nativePriority || c->tier<=priority) return false;
++    c->consumed=true;
++    std::memcpy(request+0x2C,&c->tier,sizeof(c->tier));
++    decision->repath=c->repath;
++    return true;
++}
++bool PathPriorityCapability(bool wanted,bool profile,bool requestHook,bool submitHook,bool enqueueHook,bool originals)
++{ return wanted && profile && requestHook && submitHook && enqueueHook && originals; }
++
++namespace {
++struct Window { uintptr_t rva; unsigned char expected[24]; size_t count; };
++const Window windows[]={
++    {0x145D39,{0x83,0xFD,0x02,0x41,0x0F,0x94,0xC0},7},
++    {0x3AAF14,{0x48,0x8D,0xA9,0xE0,0x01,0x00,0x00},7},
++    {0x3AAF36,{0xC7,0x46,0x28,0x00,0x00,0x00,0x00},7},
++    {0x3AAF3D,{0xB8,0x0A,0x00,0x00,0x00,0xB9,0x14,0x00,0x00,0x00,0x84,0xDB,0x0F,0x45,0xC1,0x89,0x46,0x2C},18},
++    {0x3AAF4F,{0x48,0x8D,0x8F,0xB8,0x00,0x00,0x00,0x48,0x8D,0x54,0x24,0x58},12},
++    {0x3B6132,{0x48,0x8B,0x17,0x48,0xC7,0x40,0x08,0x00,0x00,0x00,0x00,0x48,0x89,0x10},14},
++    {0x3B6145,{0x48,0x8B,0x43,0x18,0x4C,0x89,0x58,0x08},8},
++    {0x3BEE67,{0x48,0x8D,0x4E,0x20,0x48,0x8B,0xD0},7},
++    {0x3AAFBD,{0xC7,0x46,0x2C,0xFF,0xFF,0xFF,0xFF},7},
++    {0x3AAFC4,{0x48,0x8D,0x8B,0xB8,0x00,0x00,0x00,0x48,0x8D,0x54,0x24,0x58},12},
++    {0x3AEC2F,{0x8B,0x56,0x2C},3},
++    {0x3AEC42,{0x3B,0x51,0x2C,0x7E,0x58},5},
++    {0x3AEC59,{0x39,0x50,0x2C,0x7C,0x16},5},
++    {0x145DC7,{0xE8,0x36,0x4E,0xEE,0xFF},5},
++    {0x2AC02,{0xE9,0xE9,0x02,0x38,0x00},5},
++    {0x3AAF30,{0xE8,0x79,0x49,0xCA,0xFF},5},
++    {0x4F8AE,{0xE9,0x3D,0xFD,0x20,0x00},5},
++    {0x3AAF5B,{0xE8,0xCE,0x53,0xC7,0xFF},5},
++    {0x2032E,{0xE9,0xDD,0x5D,0x39,0x00},5},
++    {0x3AAF70,{0xE9,0xCE,0x38,0xC8,0xFF},5},
++    {0x2E843,{0xE9,0x88,0xDB,0x22,0x00},5},
++    {0x3AAFD0,{0xE8,0x59,0x53,0xC7,0xFF},5},
++    {0x3BEE6E,{0xE8,0x3B,0x0A,0xC9,0xFF},5},
++    {0x3BEE83,{0xE8,0xBB,0xF9,0xC6,0xFF},5},
++    {0x3AEB98,{0xE8,0x81,0x0C,0xC9,0xFF},5},
++    {0x3F81E,{0xE9,0x1D,0xF6,0x37,0x00},5},
++    {0x3AE932,{0xE8,0xF7,0x19,0xC7,0xFF},5},
++    {0x3AEF6A,{0xE8,0xBF,0x13,0xC7,0xFF},5},
++};
++}
++bool PathPriorityProfile(PathPriorityReadBytes reader,void* user)
++{
++    if (!reader) return false;
++    unsigned char bytes[24];
++    for (size_t i=0;i<sizeof(windows)/sizeof(windows[0]);++i)
++        if (!reader(windows[i].rva,bytes,windows[i].count,user)
++            || std::memcmp(bytes,windows[i].expected,windows[i].count)!=0) return false;
++    return true;
++}
+diff --git a/src/pathfind/path_priority_publication.h b/src/pathfind/path_priority_publication.h
+new file mode 100644
+index 0000000..d2137a3
+--- /dev/null
++++ b/src/pathfind/path_priority_publication.h
+@@ -0,0 +1,27 @@
++#pragma once
++#include <stddef.h>
++#include <stdint.h>
++// Current synchronous native submit only; no pointer survives the wrapper.
++struct PathPriorityContext
++{
++    void* request;
++    void* queue;
++    const void* enqueueReturn;
++    int tier, nativePriority;
++    bool repath, admitted, consumed;
++};
++struct PathPriorityFrame { PathPriorityContext current; PathPriorityContext* previous; };
++struct PathPriorityDecision { bool repath; };
++void PathPriorityEnter(PathPriorityFrame* frame, PathPriorityContext*& slot, void* request,
++    void* inputQueue, const void* enqueueReturn, int tier, bool repath, bool highPriority, bool admitted);
++void PathPriorityLeave(const PathPriorityFrame* frame, PathPriorityContext*& slot);
++// Metadata admission precedes all request reads. Call immediately before native
++// enqueue; a true result has already written the scalar tier exactly once.
++bool PathPriorityApply(PathPriorityContext* context, void* queue, void** item,
++    const void* enqueueReturn, PathPriorityDecision* decision);
++bool PathPriorityCapability(bool wanted, bool profile, bool requestHook, bool submitHook,
++    bool enqueueHook, bool originals);
++// Fixed Steam1.0.65 byte contract, verified BEFORE any entry is patched.
++typedef bool (*PathPriorityReadBytes)(uintptr_t rva, unsigned char* out, size_t count, void* user);
++bool PathPriorityProfile(PathPriorityReadBytes reader, void* user);
++const uintptr_t PATH_PRIORITY_ENQUEUE_RETURN = 0x3AAF60;
+diff --git a/src/pathfind/pathfind_cache.h b/src/pathfind/pathfind_cache.h
+index 8519540..6769a91 100644
+--- a/src/pathfind/pathfind_cache.h
++++ b/src/pathfind/pathfind_cache.h
+@@ -14,7 +14,7 @@
+ // =========================================================================
+ 
+ // The tier hook_requestPath picked for the request hook_pathReqSubmit is
+-// about to write. Thread-local: requestPath can run on the main thread or
++// about to publish, before native enqueue. Thread-local: requestPath can run on the main thread or
+ // the AI back thread depending on the caller, and a plain global hand-off
+ // between hook_requestPath and hook_pathReqSubmit would let one thread's
+ // tier leak into the other's submit. 0 = leave the game's own priority alone.
+diff --git a/src/pathfind/pathfind_hooks.cpp b/src/pathfind/pathfind_hooks.cpp
+index 2cfeb19..fd58dba 100644
+--- a/src/pathfind/pathfind_hooks.cpp
++++ b/src/pathfind/pathfind_hooks.cpp
+@@ -16,6 +16,8 @@
+ #include "pathfind/player_repath_tier.h"
+ #include "pathfind/player_repath_tier_policy.h"
+ #include "pathfind/path_budget_policy.h"
++#include "pathfind/path_priority_publication.h"
++#include "pathfind/path_priority_hooks.h"
+ #include "planner/planner_water_table.h"
+ #include "pathfind/path_result_trace.h"
+ #include "pathfind/npc_cap_requester.h"
+@@ -38,6 +40,62 @@ static __declspec(thread) bool currentRequestIsPlayer = false;
+ // This points only into an active fallback hook's stack, never a queued job.
+ static __declspec(thread) PathBudgetRequest* t_pathBudgetRequest = NULL;
+ 
++// Submit scopes live only on the calling thread's stack. Never use the path
++// reporter's last manager as an ownership/lifetime token for this input queue.
++static __declspec(thread) PathPriorityContext* t_pathPriority = NULL;
++static volatile LONG s_priorityProfile = 0, s_priorityReady = 0;
++static bool s_priorityWanted = false; // startup writer only
++static const void* s_priorityEnqueueReturn = NULL;
++
++static bool ReadPathPriorityBytes(uintptr_t rva,unsigned char* out,size_t count,void*)
++{
++    __try { memcpy(out,GameAddr(rva),count); return true; }
++    __except(GetExceptionCode()==EXCEPTION_ACCESS_VIOLATION || GetExceptionCode()==EXCEPTION_IN_PAGE_ERROR
++        || GetExceptionCode()==EXCEPTION_DATATYPE_MISALIGNMENT ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
++    { return false; }
++}
++void PathPriorityPrepare(bool wanted)
++{
++    InterlockedExchange(&s_priorityReady,0);
++    InterlockedExchange(&s_priorityProfile,0);
++    s_priorityWanted=wanted;
++    s_priorityEnqueueReturn=NULL;
++    if (!wanted) return;
++    if (!PathPriorityProfile(ReadPathPriorityBytes,NULL))
++    {
++        LogError("Path priority: publication profile refused; requests keep native priority");
++        return;
++    }
++    s_priorityEnqueueReturn=GameAddr(PATH_PRIORITY_ENQUEUE_RETURN);
++    InterlockedExchange(&s_priorityProfile,1);
++}
++void PathPriorityFinalize(bool requestHook,bool submitHook,bool enqueueHook,bool originals)
++{
++    const bool profile=InterlockedCompareExchange(&s_priorityProfile,0,0)!=0;
++    const bool ready=PathPriorityCapability(s_priorityWanted,profile,requestHook,submitHook,enqueueHook,originals);
++    InterlockedExchange(&s_priorityReady,ready?1:0);
++    if (s_priorityWanted && profile && !ready)
++        LogError("Path priority: required pre-publication hooks unavailable; requests keep native priority");
++}
++void PathPriorityBeforeEnqueue(void* queue,void** item,const void* nativeReturn)
++{
++    PathPriorityDecision decision;
++    if (!PathPriorityApply(t_pathPriority,queue,item,nativeReturn,&decision)) return;
++    // Account before publication too. These are diagnostics only; budget
++    // eligibility comes from the exact current native fallback owner.
++    if (decision.repath)
++    {
++        InterlockedIncrement(&p12DiagSubmitBoostsState6);
++        PlayerRepathTierNoteTiered();
++    }
++    else
++    {
++        InterlockedIncrement(&p12DiagSubmitBoostsOrder);
++        InterlockedIncrement(&pathfind::g_pathDiag.playerRequestsInFlight);
++    }
++}
++
++
+ 
+ // =========================================================================
+ // Hook 1: ContentStream::findPath (primary "direct path" check)
+@@ -629,29 +687,27 @@ void hook_findPathFull(void* streamingCollection, void* searchState, void* findP
+ 
+ void hook_requestPath(void* havokChar, float* destination, int priority)
+ {
+-	// Player vs NPC tracking
+-	if (priority >= 2)
+-		InterlockedIncrement(&pathfind::g_pathDiag.diagPlayerRequests);
+-	else
+-		InterlockedIncrement(&pathfind::g_pathDiag.diagNPCRequests);
+-
+-
+-	// The match is checked -- and counted by PlayerRepathTierIsPlayerOwned --
+-	// whether or not playerRepathTierEnabled arms it, so observe mode still
+-	// reports what it would do. Only checked for priority < 2; the order path
+-	// (priority >= 2) never needs it.
+-	bool matchedPlayerSet = (priority < 2) && PlayerRepathTierIsPlayerOwned((uintptr_t)havokChar);
+-	PlayerRepathTierDecision decision = PlayerRepathTierDecide(priority, matchedPlayerSet, pathfind::g_pathfindCfg.playerRepathTierEnabled);
+-	squadBoostTier = decision.tier;
+-	squadBoostFromRepathTier = (decision.source == PRT_SOURCE_STATE6 && decision.tier > 0);
+-
+-	FormationFollowNoteRequest(havokChar);
+-	planner::PlannerWaterNoteRequester(havokChar);
+-	game::g_hookOrig.orig_requestPath(havokChar, destination, priority);
+-
+-	squadBoostTier = 0;
+-	planner::PlannerWaterNoteRequester(NULL);
+-
++    const int previousTier=squadBoostTier;
++    const bool previousSource=squadBoostFromRepathTier;
++    void* previousRequester=planner::PlannerWaterCurrentRequester();
++    __try
++    {
++        if (priority>=2) InterlockedIncrement(&pathfind::g_pathDiag.diagPlayerRequests);
++        else InterlockedIncrement(&pathfind::g_pathDiag.diagNPCRequests);
++        const bool matchedPlayerSet=(priority<2) && PlayerRepathTierIsPlayerOwned((uintptr_t)havokChar);
++        const PlayerRepathTierDecision decision=PlayerRepathTierDecide(priority,matchedPlayerSet,pathfind::g_pathfindCfg.playerRepathTierEnabled);
++        squadBoostTier=decision.tier;
++        squadBoostFromRepathTier=(decision.source==PRT_SOURCE_STATE6 && decision.tier>0);
++        FormationFollowNoteRequest(havokChar);
++        planner::PlannerWaterNoteRequester(havokChar);
++        game::g_hookOrig.orig_requestPath(havokChar,destination,priority);
++    }
++    __finally
++    {
++        squadBoostTier=previousTier;
++        squadBoostFromRepathTier=previousSource;
++        planner::PlannerWaterNoteRequester(previousRequester);
++    }
+ }
+ 
+ 
+@@ -659,40 +715,22 @@ void hook_requestPath(void* havokChar, float* destination, int priority)
+ // Hook 5: PathRequestQueue::submit (same thread as its only caller,
+ // requestPath -- main thread or the AI back thread)
+ // =========================================================================
+-// RVA 0x3AAEF0. Writes the planner's water multiplier before orig; overwrites req+44 after.
+-
+-
+-void hook_pathReqSubmit(void* sectionMgr, void* requestObj, bool highPriority)
++// RVA 0x3AAEF0. Native10/20 is replaced only inside the exact enqueue
++// callback before publication, never after the original submit has returned.
++void hook_pathReqSubmit(void* sectionMgr,void* requestObj,bool highPriority)
+ {
+-	planner::PlannerWaterOnSubmit(requestObj ? (float*)((uintptr_t)requestObj + OFF_REQ_WATER_COST_MULT) : NULL);
+-	game::g_hookOrig.orig_pathReqSubmit(sectionMgr, requestObj, highPriority);
+-
+-	if (squadBoostTier > 0)
+-	{
+-		int gamePri = *(int*)((uintptr_t)requestObj + 44);
+-		if (squadBoostTier > gamePri)
+-		{
+-			*(int*)((uintptr_t)requestObj + 44) = squadBoostTier;
+-			if (squadBoostFromRepathTier)
+-			{
+-				InterlockedIncrement(&p12DiagSubmitBoostsState6);
+-				PlayerRepathTierNoteTiered();
+-				// Not counted into playerRequestsInFlight: that counter feeds
+-				// the 4x A* search-budget boost in hook_findPathFull, a
+-				// separate lever this change does not touch. Only the queue
+-				// tier (req+44) changes here.
+-			}
+-			else
+-			{
+-				InterlockedIncrement(&p12DiagSubmitBoostsOrder);
+-				InterlockedIncrement(&pathfind::g_pathDiag.playerRequestsInFlight);
+-			}
+-		}
+-	}
+-
+-
+-	squadBoostTier = 0;
+-	squadBoostFromRepathTier = false;
++    PathPriorityFrame frame;
++    void* queue=sectionMgr ? (void*)KLIB_MEMBER(5,(char*)sectionMgr,NavMesh_characterMessages,0xB8) : NULL;
++    PathPriorityEnter(&frame,t_pathPriority,requestObj,queue,s_priorityEnqueueReturn,
++        squadBoostTier,squadBoostFromRepathTier,highPriority,
++        InterlockedCompareExchange(&s_priorityReady,0,0)!=0);
++    __try
++    {
++        planner::PlannerWaterOnSubmit(requestObj ? (float*)((uintptr_t)requestObj+OFF_REQ_WATER_COST_MULT) : NULL);
++        game::g_hookOrig.orig_pathReqSubmit(sectionMgr,requestObj,highPriority);
++    }
++    __finally { PathPriorityLeave(&frame,t_pathPriority); }
++    // The original has published/transferred the pointer. Do not touch it.
+ }
+ 
+ 
+diff --git a/src/planner/planner_water_table.cpp b/src/planner/planner_water_table.cpp
+index 855fcda..edab207 100644
+--- a/src/planner/planner_water_table.cpp
++++ b/src/planner/planner_water_table.cpp
+@@ -95,6 +95,8 @@ float PlannerWaterTableFind(uintptr_t havokChar)
+ 	return 0.0f;
+ }
+ 
++void* PlannerWaterCurrentRequester() { return (void*)t_requester; }
++
+ void PlannerWaterNoteRequester(void* havokChar)
+ {
+ 	if (!s_live)
+diff --git a/src/planner/planner_water_table.h b/src/planner/planner_water_table.h
+index 5488475..de5e3b3 100644
+--- a/src/planner/planner_water_table.h
++++ b/src/planner/planner_water_table.h
+@@ -27,6 +27,8 @@ float PlannerWaterTableFind(uintptr_t havokChar);
+ // Any thread, from the requestPath detour: the requesting HavokCharacter* before the original, NULL
+ // after it. Returns at once while the write is not armed live.
+ void PlannerWaterNoteRequester(void* havokChar);
++// Cached current-thread owner, for exact nested/unwind restoration.
++void* PlannerWaterCurrentRequester();
+ // Any thread, from the submit detour before its original, with the fresh request's water field: writes
+ // the requester's value when PlanWaterRequestValue gives one, else leaves the field. Returns at once
+ // while the write is not armed live. No lock, no allocation, no log.
+diff --git a/src/plugin/crash_record.cpp b/src/plugin/crash_record.cpp
+index ffeeb9a..57566bc 100644
+--- a/src/plugin/crash_record.cpp
++++ b/src/plugin/crash_record.cpp
+@@ -206,13 +206,13 @@ void SnapshotModuleBases()
+ 	g_moduleBaseCount = SelectModuleBases(raw, rawCount, priority, priorityCount,
+ 		g_moduleBases, kMaxModuleBases);
+ 
+-	if (seen > kMaxModuleBases)
++	if (seen > kMaxModuleBases && DetailedLogEnabled())
+ 	{
+ 		char line[96];
+ 		_snprintf_s(line, sizeof(line), _TRUNCATE,
+ 			"Module bases: snapshot saw %d modules, kept %d (kMaxModuleBases)",
+ 			seen, kMaxModuleBases);
+-		LogError(line);
++		LogDetail(line);
+ 	}
+ }
+ 
+diff --git a/src/plugin/hook_manifest.cpp b/src/plugin/hook_manifest.cpp
+index 5b39d87..7a815da 100644
+--- a/src/plugin/hook_manifest.cpp
++++ b/src/plugin/hook_manifest.cpp
+@@ -35,6 +35,7 @@
+ #include "movement/islands.h"
+ #include "pathfind/pathfinding.h"
+ #include "pathfind/path_pool.h"
++#include "pathfind/path_priority_hooks.h"
+ #include "pathfind/astar_cost.h"
+ #include "pathfind/astar_hier_policy.h"
+ #include "pathfind/gate_pass.h"
+@@ -723,6 +724,8 @@ void InstallHooks(int* installed, int* total)
+ 	// The total is the wanted set as the config stands before any install, so
+ 	// a failed install lowers *installed and never the total, even where the
+ 	// failure clears a key a later want reads.
++	// Internal publication bytes must be read before any entry is patched.
++	PathPriorityPrepare(movement::g_movementCfg.routingEnabled && HookRowWanted(HOOK_REQUEST_PATH) && HookRowWanted(HOOK_PATH_REQ_SUBMIT));
+ 	const HookWantInputs wantedAtStart = HookWantInputsNow();
+ 	for (int i = 0; i < HOOK_ROW_COUNT; ++i)
+ 	{
+@@ -732,4 +735,7 @@ void InstallHooks(int* installed, int* total)
+ 
+ 	for (size_t i = 0; i < sizeof(kInstallSteps) / sizeof(kInstallSteps[0]); ++i)
+ 		kInstallSteps[i](installed, total);
++	// The enqueue observer installs after submit and is otherwise diagnostic.
++	PathPriorityFinalize(HookRowInstalled(HOOK_REQUEST_PATH),HookRowInstalled(HOOK_PATH_REQ_SUBMIT),
++		HookRowInstalled(HOOK_ENQUEUE_THREAD_SAFE),game::g_hookOrig.orig_requestPath && game::g_hookOrig.orig_pathReqSubmit && orig_enqueueThreadSafe);
+ }
+diff --git a/src/plugin/hook_manifest_rows.inc b/src/plugin/hook_manifest_rows.inc
+index 3dc1f0a..aea9876 100644
+--- a/src/plugin/hook_manifest_rows.inc
++++ b/src/plugin/hook_manifest_rows.inc
+@@ -484,7 +484,9 @@
+ 	// --- hook_manifest.cpp, path-worker-pool instrumentation ---
+ 	// Bytes read from the IDB (ida MCP disassemble).
+ 	// diagnostic = true: these four are the PathPool
+-	// instrumentation only, not a behaviour-affecting hook. A mismatch here
++	// instrumentation, except the enqueue entry also hosts the paired priority
++	// publication bridge. A mismatch disables that tier capability too, not the
++	// rest of the plugin. A mismatch here
+ 	// must turn PathPool off, not refuse the whole plugin -- each install
+ 	// site (hook_manifest.cpp) re-checks its own row via VerifyPrologueByRva anyway,
+ 	// so this row only decides whether a mismatch is fatal to the plugin.
+diff --git a/tools/build/coresrc.txt b/tools/build/coresrc.txt
+index 30125d1..37a35b3 100644
+--- a/tools/build/coresrc.txt
++++ b/tools/build/coresrc.txt
+@@ -338,3 +338,5 @@ src\inventory\operator_trips.cpp
+ src\inventory\job_counters.cpp
+ src\inventory\backpack_window.cpp
+ src\pathfind\path_budget_policy.cpp
++
++src\pathfind\path_priority_publication.cpp
+diff --git a/tools/tests/path_priority_units.cpp b/tools/tests/path_priority_units.cpp
+new file mode 100644
+index 0000000..2b67495
+--- /dev/null
++++ b/tools/tests/path_priority_units.cpp
+@@ -0,0 +1,20 @@
++#include "pathfind/path_priority_publication.h"
++#include "check.h"
++#include <cstring>
++int main()
++{
++    for(int mask=0;mask<64;++mask)
++        Check(PathPriorityCapability((mask&1)!=0,(mask&2)!=0,(mask&4)!=0,(mask&8)!=0,(mask&16)!=0,(mask&32)!=0)==(mask==63),"capability requires every hook/profile/original and wanted state");
++    unsigned char request[160],before[160];std::memset(request,0xA5,sizeof(request));int kind=0,priority=20;std::memcpy(request+40,&kind,4);std::memcpy(request+44,&priority,4);std::memcpy(before,request,sizeof(request));
++    unsigned char queue;void* item=request;PathPriorityContext* slot=NULL;PathPriorityFrame f;PathPriorityDecision d;
++    PathPriorityEnter(&f,slot,request,&queue,(void*)0x3AAF60,45,false,true,true);
++    Check(slot==&f.current&&!slot->consumed,"fresh stack context admitted once");
++    Check(!PathPriorityApply(slot,&queue,&item,(void*)0x3AAFD5,&d),"cancel return cannot borrow submit");
++    Check(PathPriorityApply(slot,&queue,&item,(void*)0x3AAF60,&d)&&!d.repath,"exact input publication applies order tier");
++    int result=0;std::memcpy(&result,request+44,4);Check(result==45,"field carries45 before caller publishes it");std::memcpy(before+44,&result,4);Check(!std::memcmp(before,request,sizeof(request)),"all request/water/handle/result bytes except priority unchanged");
++    Check(!PathPriorityApply(slot,&queue,&item,(void*)0x3AAF60,&d),"same invocation cannot publish boost twice");PathPriorityLeave(&f,slot);Check(slot==NULL,"scope returns to no owner");
++    PathPriorityContext parent={};slot=&parent;PathPriorityEnter(&f,slot,request,&queue,(void*)0x3AAF60,0,false,false,true);slot->request=(void*)1;void*bad=(void*)1;
++    Check(!PathPriorityApply(slot,&queue,&bad,(void*)0x3AAF60,&d),"NPC tier refuses before reading native payload");PathPriorityLeave(&f,slot);Check(slot==&parent,"nested leave restores exact parent");
++    Check(!PathPriorityProfile(NULL,NULL),"missing internal-profile reader fails closed");
++    return CheckExit("path_priority_units");
++}
+diff --git a/tools/tests/suites.txt b/tools/tests/suites.txt
+index e0a3b68..7070c2e 100644
+--- a/tools/tests/suites.txt
++++ b/tools/tests/suites.txt
+@@ -125,3 +125,5 @@ requested_settings_units | tools\tests\requested_settings_units.cpp | src\gui\se
+ mcm_bridge_units | tools\tests\mcm_bridge_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp src\gui\requested_settings.cpp src\gui\mcm_bridge.cpp | /DZONEHAND_STEP=3
+ mcm_bridge_dev_units | tools\tests\mcm_bridge_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp src\gui\requested_settings.cpp src\gui\mcm_bridge.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+ path_budget_units | tools\tests\path_budget_units.cpp | src\pathfind\path_budget_policy.cpp |
++
++path_priority_units | tools\tests\path_priority_units.cpp | src\pathfind\path_priority_publication.cpp |
+-- 
+2.46.0.windows.1
+

@@ -16,8 +16,15 @@ not a public release announcement. Latest instructions override historical notes
    Two actual same-world controls identified geometry-context differences at
    capture boundaries;16px inset does not cure them. Shared global native LOD
    is not approved: quality/cap and viewport/worker ownership remain unresolved.
-   Respect the user's instruction to avoid a fundamental terrain-render rewrite;
-   no blind halo/blur/full-world recapture. See verification/2026-11-03-satellite-overlap-controls.md.
+   Latest user instruction2026-11-03 REVOKES the earlier restriction on a
+   fundamental terrain-render rewrite and explicitly requests better detail at
+   maximum zoom. Build deterministic geometry in shared world coordinates and
+   prove a failing boundary before replacing the full atlas. Add bounded visible
+   fine-detail rendering rather than enlarging every primary tile or stretching
+   the9m source. Preserve current usable atlas until a replacement passes.
+   No blind halo/blur/full-world recapture. See
+   verification/2026-11-03-satellite-overlap-controls.md and
+   GlobalSatelliteMap/PLAN.md for the current replacement plan.
    It is not a finished game feature. Complete actual building/model coverage
    and measured stability/performance. User authorized
    autonomous launch/load/input when away. Latest clarification2026-11-01:
@@ -59,8 +66,9 @@ not a public release announcement. Latest instructions override historical notes
    process loaded the module and MCM registered it; no ordinary diagnostic flood
    with DebugOFF. Personal INI/KEOCompat preserved. One optional module-census
    notice is overclassified as an error; correction is in the next scoped build.
-   Pre-enqueue priority publication race is reproduced and its production fix
-   is under independent review. Do not confuse this with complete routing/spawn
+   Pre-enqueue priority publication race is reproduced; the scoped fix in local
+   commit680a2b5 passed independent review and awaits installation/game checks.
+   Do not confuse this with complete routing/spawn
    repair or GOG support. Origin remains the author's repository; reviewed local
    commits are backed up as exact patches in ours/tools/maintenance/keo and pushed
    to our repository, never to the author's origin.

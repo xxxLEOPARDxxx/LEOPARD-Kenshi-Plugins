@@ -39,3 +39,14 @@ No GOG/spawn/full-routing acceptance or public release is implied. Current
 candidate PROD SHA256 e155894936c0fceaac3813bd88448b64f5dd896a047a66bd369bad3fa51c4324.
 Local game installation and UI/FPS/save-load acceptance are recorded separately;
 this patch remains remotely backed up without pushing to the original author.
+
+Reviewed local commit680a2b5 is preserved in
+0001-Publish-player-request-priority-before-native-queue-.patch.
+It publishes scoped player request priority before native queue ownership
+transfer, with native byte/edge gates and paired hook capability. The former
+post-submit request write is removed. An optional crash-diagnostic module-census
+notice is also gated as detail without changing its bounds. Independent review
+in research/keo-priority-review-20261103 is CLEAR; controlled runtime routing-ON,
+FPS and long-run memory acceptance remain pending. Candidate PROD SHA256
+d396c05a64dfa45eb8ea515782cb7c0327d00e7ceb86108881a4e2e21f767ca2.
+This patch does not establish GOG support or a complete spawn/pathfinding fix.
