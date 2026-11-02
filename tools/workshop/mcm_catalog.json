@@ -729,5 +729,22 @@
       }
     ],
     "dll_export_verified": true
+  },
+  {
+    "package": "KEO",
+    "name": "KEO: Kenshi Engine Optimizations",
+    "id": "KEO",
+    "group": "optional_experimental",
+    "status": "local_development",
+    "author": "jacobericson / Jakematt2004; LEOPARD maintenance",
+    "source": "D:/DEV/Kenshi/forks/KEO",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\forks\\KEO\\src\\gui\\mcm_bridge.cpp",
+        "line": 128,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true
   }
 ]

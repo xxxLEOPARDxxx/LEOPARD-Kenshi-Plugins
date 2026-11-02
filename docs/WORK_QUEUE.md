@@ -1,15 +1,25 @@
 # Active work and next requested tasks
 
-Updated2026-11-02 from the user's current requests. This is a working queue,
+Updated2026-11-03 from the user's current requests. This is a working queue,
 not a public release announcement. Latest instructions override historical notes.
 
 1. **Global satellite map — ACTIVE, unfinished.** Deliver an optional working
    GLOBAL map layer,4x4 primary tiles at8192²; preserve BestMinimap's current map.
-   Current proof covers private near-terrain layers and four native painted
-   pairs with full mip chains in one512 cell and balanced resource counters;
-   see verification/2026-11-01-satellite-painted-full-mips.md. It is not a finished
-   game feature. Complete geographically correct biome mixing, geometry boundaries, building/model
-   coverage, water/shadows/day-night and viewer integration. User authorized
+   The16x8192 geographic terrain atlas and interactive native-map layer are
+   installed. Sun/ambient/water/local-light controls, extended proportional zoom
+   and immediate ready-tile presentation are implemented; the user accepted the
+   zoom and disappearance of vanilla edge strips. Existing distant-town proxies
+   and a bounded cached Hub fallback render, but detailed walls/stalls/lampposts
+   remain incomplete. A native-source instance helper is tested and reviewed,
+   not wired into Main. Its alpha materials need a separate full-RGB HDR stage
+   and dense model-only output; a9m final reduction loses thin walls.
+   Two actual same-world controls identified geometry-context differences at
+   capture boundaries;16px inset does not cure them. Shared global native LOD
+   is not approved: quality/cap and viewport/worker ownership remain unresolved.
+   Respect the user's instruction to avoid a fundamental terrain-render rewrite;
+   no blind halo/blur/full-world recapture. See verification/2026-11-03-satellite-overlap-controls.md.
+   It is not a finished game feature. Complete actual building/model coverage
+   and measured stability/performance. User authorized
    autonomous launch/load/input when away. Latest clarification2026-11-01:
    while the user writes at the PC, do not launch/focus/switch windows; ask the
    user to prepare game scenes, then use file requests/read-only telemetry in
@@ -44,6 +54,16 @@ not a public release announcement. Latest instructions override historical notes
    version to avoid confusing players. Do not promise new independent features.
    Preserve original authorship, license and source links; no withdrawal or
    publication is authorized merely by recording this future release policy.
+   2026-11-03: reviewed local6e15b3a with MCM21player rows, three MO catalogues,
+   debug-last/defaultOFF and request-local path budgets is installed. Current
+   process loaded the module and MCM registered it; no ordinary diagnostic flood
+   with DebugOFF. Personal INI/KEOCompat preserved. One optional module-census
+   notice is overclassified as an error; correction is in the next scoped build.
+   Pre-enqueue priority publication race is reproduced and its production fix
+   is under independent review. Do not confuse this with complete routing/spawn
+   repair or GOG support. Origin remains the author's repository; reviewed local
+   commits are backed up as exact patches in ours/tools/maintenance/keo and pushed
+   to our repository, never to the author's origin.
 3. **Dynamic Factions — PAUSED by user.** Preserve current work and plans;
    resume when requested, after the satellite priority. No publication.
 4. **Save screenshot previews — IMPLEMENTED/USER ACCEPTED2026-11-01.** Capture the
@@ -77,6 +97,14 @@ not a public release announcement. Latest instructions override historical notes
    fallback passes for current and v7 loaders with packaged catalogs, including
    German variants. No production defect/new language added. User accepts this
    result; reopen only with concrete symptoms or logs.
+7. **Item Markers known-location maps — IMPLEMENTED/USER ACCEPTED2026-11-03.**
+   Same lower-left eye as learned blueprints, only when all original listed
+   locations are discovered. Independent MapsKnown setting, three languages,
+   bounded shared visible400ms snapshot and fail-closed unknown/refusal cases.
+   Root and independent tests/native build pass; reviewed DLL and threeMO are
+   installed and the user confirmed the known/unknown map check. Version7 ZIP,
+   bilingual guide and notes are prepared relative to published6. Await user's
+   Nexus upload; no Steam publication or personal release-journal entry yet.
 
 ## Maintenance completed in this continuation
 
