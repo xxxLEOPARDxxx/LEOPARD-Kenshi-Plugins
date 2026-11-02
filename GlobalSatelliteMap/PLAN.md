@@ -323,3 +323,21 @@ explicit limits; do not present the coloured512 picture as a finished global map
 Current probe installed eb159be9e... Side512/PaintedMapsReference1/Request0,
 game user-loaded paused/map. Check process before asking close/load; no focus
 changes while user at PC. User says article finished; no new UI-control grant.
+
+### Optional exploration fog: candidate after the main map (2026-11-02)
+
+User asked about Asur's exploration-fog proposal and requires an option if it is
+implemented. Proposed first scope: MCM toggle OFF by default; a separate small
+exploration mask over the existing map, revealed by player-controlled characters,
+not camera travel. Revealed terrain remains explored. No new terrain capture is
+required. Hidden map markers must not disclose undiscovered settlements.
+
+Persist exploration per actual save, with atomic publication, format/version and
+bounds checks; test overwrite, quicksave/autosave, copying a save and loading
+another world. Existing saves cannot automatically reconstruct every historical
+route: do not invent that history. Disable/re-enable should retain progress.
+Use bounded updates based on character movement, no full terrain/world scans or
+per-frame file writes. Assess actual CPU/GPU/memory cost in game. Terrain/wall
+line-of-sight, temporary tactical visibility and NPC intelligence are outside the
+proposed first scope. This is recorded as a future candidate, not implemented or
+accepted as a completed feature; finish the main map/building work first.
