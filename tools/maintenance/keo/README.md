@@ -24,3 +24,10 @@ User policy: temporary bug/compatibility maintenance only, credit original
 jacobericson / Jakematt2004 and GPLv3; withdraw the maintenance fork if original
 author returns and continues development. Public release follows normal
 three-language/MCM/logging/Nexus-before-Steam requirements.
+
+
+Further reviewed local foundation commit49b1550 is preserved separately in
+mcm-foundation-20261102.patch. It adds the native/host translation boundary and
+requested-settings capture before runtime overrides, without MCM UI/save/apply.
+Later MCM and path-budget changes are separately uncommitted review candidates;
+do not infer they are installed or ready for release from this checkpoint.

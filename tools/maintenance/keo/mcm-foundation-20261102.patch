@@ -1,0 +1,4137 @@
+From 49b1550dc5b270f6c26737659d792b046467976f Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Mon, 2 Nov 2026 21:53:27 +0300
+Subject: [PATCH] Preserve requested KEO settings before runtime overrides
+
+---
+ leopard/mcm-foundation-20261102.md            |   37 +
+ .../mcm-foundation-verification-20261102.json | 3455 +++++++++++++++++
+ leopard/test_requested_settings.py            |   50 +
+ leopard/test_translation_seam.py              |   33 +
+ src/base/config.cpp                           |    2 +
+ src/base/keo_tr.cpp                           |   12 +
+ src/base/keo_tr.h                             |   17 +-
+ src/gui/requested_settings.cpp                |   83 +
+ src/gui/requested_settings.h                  |   24 +
+ tools/build/coresrc.txt                       |    2 +
+ tools/tests/config_golden/dev.txt             |    1 +
+ tools/tests/config_golden/prod.txt            |    1 +
+ tools/tests/config_modules_units.cpp          |    3 +-
+ tools/tests/config_table_checks.h             |   12 +-
+ tools/tests/keo_tr_stub.cpp                   |    6 +
+ tools/tests/requested_settings_units.cpp      |   23 +
+ tools/tests/settings_factory_units.cpp        |    4 +-
+ tools/tests/settings_layout_units.cpp         |   20 +-
+ tools/tests/settings_units_common.h           |    4 +-
+ tools/tests/suites.txt                        |   17 +-
+ 20 files changed, 3767 insertions(+), 39 deletions(-)
+ create mode 100644 leopard/mcm-foundation-20261102.md
+ create mode 100644 leopard/mcm-foundation-verification-20261102.json
+ create mode 100644 leopard/test_requested_settings.py
+ create mode 100644 leopard/test_translation_seam.py
+ create mode 100644 src/base/keo_tr.cpp
+ create mode 100644 src/gui/requested_settings.cpp
+ create mode 100644 src/gui/requested_settings.h
+ create mode 100644 tools/tests/keo_tr_stub.cpp
+ create mode 100644 tools/tests/requested_settings_units.cpp
+
+diff --git a/leopard/mcm-foundation-20261102.md b/leopard/mcm-foundation-20261102.md
+new file mode 100644
+index 0000000..8b32164
+--- /dev/null
++++ b/leopard/mcm-foundation-20261102.md
+@@ -0,0 +1,37 @@
++# KEO MCM foundation: local candidate, 2026-11-02
++
++Source baseline: leopard13953b03cb2f8df1638a9194d58467372f922262. This patch is uncommitted and uninstalled. It implements the planned Task1 host seam/golden repair plus the parent's explicitly requested minimal requested-preference capture slice from Task2. It does not implement the MCM page, callbacks, save/apply adapter, Debug switch, third catalog or Steam/GOG compatibility work.
++
++## Changes and behavior
++
++`base/keo_tr.h` is now a game-free declaration; `base/keo_tr.cpp` retains the exact existing native Localization.h/Tr behavior and null/empty passthrough. Only eight host suites link an explicit English identity stub. Their fixtures no longer drag LocaleInfo into game-free layout/config tests. The extracted actual native wrapper has separate tests; identity translation is not presented as catalog verification. Existing catalogs/loader and their current limitations are unchanged.
++
++The actual table has20 player rows,107 DEV core rows,139 active keys,23 retired keys,115 module keys,43 NDOC keys,137 golden scalar values and108 writer entries. Existing golden assertions now explicitly include keoRouting=true and its module/section. Layout tests now check all four existing routing dependents alongside throwout/backpack groups. The restart-tooltip assertion checks the exact restart suffix followed by the already-existing dependency sentence for grouped rows. No assertions were removed and no UI layout/label/feature behavior changed.
++
++`gui/requested_settings.{h,cpp}` owns one fixed SettingsStaging plus bounded module/key counts. It preflights table count, state size, row termination, kind and field bounds before StageModule reads. It publishes availability only after capture. Read/metadata calls before capture or after invalid capture refuse; copies are independent. Metadata refers only to the static ConfigModule tables, never native/world/UI objects. There is no INI polling, translation, file write, live apply or hook/worker operation in this helper.
++
++FinalizeConfig captures requested preferences before ApplyRoutingSwitch and later hook refusals can clear effective fields. Both existing LoadConfig exits use FinalizeConfig, including missing INI. A capture-bound failure logs an error and keeps editor data unavailable while preserving original runtime finalization. No front end consumes this snapshot yet; Task2 must wire it into getter/persistence and publish post-save edits without serializing effective refusal flags. The existing Options tab and flat atomic INI writer are untouched.
++
++## RED -> GREEN and verification
++
++- Original settings_floor compiled RED at Localization.h: missing kenshi/LocaleInfo.h. After the native/header split, all8 affected suites compile. Separate stale golden/group/restart suffix failures were observed, then corrected against the actual existing table/layout.
++- New requested fixture compiled RED with missing requested_settings.h, then GREEN using actual ConfigModule/StageModule and routing master override. It covers pre-capture refusal, requested masterOFF/childON preservation, independent copies, metadata indices, overflow/state bounds/no terminator and global startup capture.
++- Actual extracted FinalizeConfig runs in both DEV/PROD with actual requested helper and routing policy. Five compiled mutants are rejected: capture too late, live-read copy, state-size overflow, lost readiness and off-by-one metadata bound. The last mutant reaches an invalid metadata read and fails the child process; compilation failure is never counted as a passing mutant.
++- Actual native KeoTr boundary4 checks and3 compiled mutants PASS. Tr itself is a counted catalog boundary double, not a native LocaleManager test.
++- Fresh all123 host C++ suites PASS with KENSHI_ROOT pointing to the installed game's static DLL files. The previous render_units failure was its nonexistent default G: path; no game DLL initialization/native functions are invoked by its DONT_RESOLVE reads.
++- Test guards PASS. Selected Python checks retain one known baseline failure: test_objcache.StaleInputTest.test_a_shadowing_header_created_after_the_restore_refuses_the_link expects1 problem but observes0. This unrelated test/build behavior was not changed; the full gate is not claimed green.
++- Routing regression remains436 actual checks each DEV/PROD plus5 compiled mutants PASS.
++- Fresh native pair:338 source objects per variant;336 cached objects were revalidated/restored and2 compiled. Both link/import gates PASS with startPlugin and143 KenshiLib imports compatible with0.5.0. MCM_Describe is intentionally absent in this foundation stage.
++
++Candidate paths/hashes:
++
++- build/KEO_step4_mcmseam_prod/KEO.dll:1418240B, SHA25619c415510c4d949b91081dafca41bde5f34ea42b1648cdf5079361d41528b897.
++- build/KEO_step4_mcmseam_dev/KEO.dll:1531392B, SHA25689c18cdfb09587af0589c80b51ac212886e2dad78a817c51026473db8b63ee13.
++
++Logs: build/task1/baseline.log, seam-before-goldens.log, requested-red.log, final-full-cpp.log, final-native-pair.log, python-selected.log, test-guards.log, routing-regression.log; actual-body fixture logs under build/task1/{translation,requested}. Source and candidate identities: mcm-foundation-verification-20261102.json.
++
++## Performance/lifetime limits
++
++The added storage is one fixed staging object (under32KiB), captured during startup finalization only. No per-frame work, cache growth, scene/world scan, dynamic allocation, owned widgets or native references were added. Read is one bounded scalar-data copy; metadata lookup is constant bounded indexing. KeoTr retains the original native catalog lifetime and UI-thread contract while concentrating native includes in one translation unit. This source/offline review does not prove live UI compatibility, actual CPU/FPS or leak freedom; those remain future MCM integration acceptance work.
++
++Installed/personal INI remains SHA25670e4d9fab5f3a4584be17d05c931d25c07abe3d12d0e534ba454b7056a545afc. Repository KEO.ini, gameplay/spawn/path hooks, GOG gates and source profiles remain unchanged from13953b0. No game/UI/process/settings/install/publish/commit/push actions were performed. Original jacobericson code/license/feature ownership remain intact; this is maintenance infrastructure for the planned optional MCM migration.
+diff --git a/leopard/mcm-foundation-verification-20261102.json b/leopard/mcm-foundation-verification-20261102.json
+new file mode 100644
+index 0000000..651cc07
+--- /dev/null
++++ b/leopard/mcm-foundation-verification-20261102.json
+@@ -0,0 +1,3455 @@
++{
++  "head": "13953b03cb2f8df1638a9194d58467372f922262",
++  "files": {
++    "src/base/config.cpp": "4392217888808ad60a143d1df3d03dc9b6f0f2892af210260031aadc7276a881",
++    "src/base/keo_tr.h": "7586c5157dc0ca9d247fbca2d94debd03dfa625c7fa4eae6a4a981b324eccbc8",
++    "tools/build/coresrc.txt": "a75c43a685f8de7f57a5defeab92c5fc9a06e84e9bdb2405203e10924f8ab221",
++    "tools/tests/config_golden/dev.txt": "cdf3fac531e12c51592f885d5739682862d6ee97e2ff6230de4c362ed3351590",
++    "tools/tests/config_golden/prod.txt": "40d694e1b0cff3b82e6665470250fe74f9bb1e433a52f357c7d36901d55ff663",
++    "tools/tests/config_modules_units.cpp": "4f1113e04f4d6048a0597a914f7ed5a091f79b0da1451e245e4bfe601a488729",
++    "tools/tests/config_table_checks.h": "6a778597181dd914236b9ab8173625804a5817af1deed55e744432d5d4ef66be",
++    "tools/tests/settings_factory_units.cpp": "f159cc7cd58c7c64c25222e8f5e40172ccef43aa0ab5e95745e795b8c14349c2",
++    "tools/tests/settings_layout_units.cpp": "8ce94b4f6f113769ebf281b7da3f08b37af7bec35e9f3c95857a575c16247ab4",
++    "tools/tests/settings_units_common.h": "12d1f75ef45d3757cd9bf073b807f81521e609c9a946ac44ab1b4be508ee3bb0",
++    "tools/tests/suites.txt": "4af5bd7f297cac6dc11f8d45f05cee0dba0c82f447114628f6602323dae1e371",
++    "leopard/test_requested_settings.py": "2e452efc8a11a042297a9f29b75a6b0f5277fbb1bdda337aa23e53013390414a",
++    "leopard/test_translation_seam.py": "9ea46f5e0749f650b0fbc3e49cd076b0498ddcd0d878b535f48c64f7a0577330",
++    "src/base/keo_tr.cpp": "5bd441217c8a5eafe97c4f84fbfd3eb84d42380782f86461e0d96e7a9bc7a21e",
++    "src/gui/requested_settings.cpp": "d9dddb948f8bf084e95a8f2c092d14c05898120809a38491ea0fdf528699aac5",
++    "src/gui/requested_settings.h": "b53341f4b7d3f4f1daf6cb66e6d3f72a59539128d421896841cfc0a6cab57661",
++    "tools/tests/keo_tr_stub.cpp": "9a71603fc7560fe82144f3960681449799817883037b3ce3f62afa055798ae3a",
++    "tools/tests/requested_settings_units.cpp": "0ddb3de5a581985fc0022f15401df27cf5c95578764d7563e7d847f117e9c275"
++  },
++  "tests": {
++    "hostCppSuites": 123,
++    "testGuards": "PASS",
++    "nativeSources": 338,
++    "nativeKenshiLibImports": 143,
++    "translationChecks": 4,
++    "translationMutants": 3,
++    "actualFinalizeDevProd": "PASS",
++    "requestedMutants": 5,
++    "routingChecksDev": 436,
++    "routingChecksProd": 436,
++    "routingMutants": 5,
++    "selectedPython": "FAIL known baseline objcache shadowing-header test: expected1 actual0"
++  },
++  "dlls": {
++    "dev": {
++      "bytes": 1531392,
++      "sha256": "89c18cdfb09587af0589c80b51ac212886e2dad78a817c51026473db8b63ee13",
++      "exports": [
++        "??0_Mutex@std@@QEAA@W4_Uninitialized@1@@Z",
++        "??4_Init_locks@std@@QEAAAEAV01@AEBV01@@Z",
++        "?startPlugin@@YAXXZ"
++      ],
++      "imports": [
++        [
++          "KenshiLib.dll",
++          "?threadJunkPreBT@PhysicsActual@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_backThreadUpdate@PhysicsActual@@QEAAXM_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_updateUT@PhysicsActual@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?GetKenshiVersion@KenshiLib@@YA?AVBinaryVersion@1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?GetRealAddress@KenshiLib@@YA_JPEAX@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?requestPath@HavokCharacter@@QEAAXAEBVVector3@Ogre@@H@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_activate@ZoneMap@@QEAA_NHW4ZoneActivationType@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isTerrainCollisionLoaded@ZoneMap@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getAreaSector@ZoneMap@@QEAAPEAVAreaSector@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@ZoneMap@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isInIsland@ZoneMap@@QEBA_NPEAV1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?traceAll@UtilityT@@SAXAEAV?$lektor@UPhysHitItem@@@@AEBVVector3@Ogre@@1I@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?trace@UtilityT@@SAXAEAVphysHit@@AEBVVector3@Ogre@@1I@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateThreaded@AnimationClass@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?processKillList@GameWorld@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?threadSafeRagdollUpdates@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?charsUpdatePaused@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?charsUpdateUT@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?charsUpdate@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?processThreadMessages@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_mainLoop_GPUSensitiveStuff@GameWorld@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?destroy@GameWorld@@QEAAXPEAVMovableObject@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setQueuesAreClear@PhysicsInterface@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?load@GameDataContainer@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0HPEAVSerialisable@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?mouseScan@PlayerInterface@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addTaskNearestSelectedCharacter@PlayerInterface@@QEAAXPEAVBuilding@@W4TaskType@@PEAVRootObject@@_NAEBVVector3@Ogre@@3@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?stopCharactersMovement@PlayerInterface@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addJobSelectedCharacters@PlayerInterface@@QEAAXW4TaskType@@PEAVRootObject@@_N2AEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addOrderSelectedCharacters@PlayerInterface@@QEAAXPEAVBuilding@@W4TaskType@@PEAVRootObject@@_N3AEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@PlayerInterface@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCharacterOrPlatoon@PlatoonHandleContainerList@@QEBAPEAVRootObjectBase@@AEBVhand@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?startRunning@ThreadClass@@QEAA_NM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getDestination@AbstractMovementBase@@QEBA?AVVector3@Ogre@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_getPosition@AbstractMovementBase@@QEBAAEBVVector3@Ogre@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@AITaskSytem@@QEAAXVVector3@Ogre@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_DESTRUCTOR@hkMemoryAllocator@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "??1BinaryVersion@KenshiLib@@QEAA@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?GetVersion@BinaryVersion@KenshiLib@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?au@@3PEAVKingOfRenderThread@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateBT@WeatherSystem@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMT@WeatherSystem@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?options@@3PEAVOptionsHolder@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?shou@@3PEAVSharedKing@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?ToString@BinaryVersion@KenshiLib@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?togglePause@GameWorld@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?DebugLog@@YAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?threadJunkPostBT@PhysicsActual@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setup@ZoneManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMainThread@ZoneManager@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateRendertimeThread@ZoneManager@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateGPUSafeThread@ZoneManager@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getZoneMap@ZoneManager@@QEAAPEAVZoneMap@@HH@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?activateZoneMap@ZoneManager@@QEAA_NPEAVZoneMap@@ViVector2@@HW4ZoneActivationType@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?deactivateZoneMap@ZoneManager@@QEAAXPEAVZoneMap@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?deactivateAllActiveZones@ZoneManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getIsland@ZoneManager@@QEBAXPEBVZoneMap@@AEAV?$lektor@PEAVZoneMap@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_calculateIslands@ZoneManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?processLoading@ZoneManager@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?lockZone@NavMeshGenerator@@QEAA_NAEBViVector2@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?unlockZone@NavMeshGenerator@@QEAAXAEBViVector2@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateBT@NavMeshGenerator@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?generateTaskBT@NavMeshGenerator@@QEAAXPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?splice@NavMeshGenerator@@QEAAHPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?stitchInterior@NavMeshGenerator@@QEAAHPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?stitchExterior@NavMeshGenerator@@QEAAHPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSeedPointsFromAdjacentZone@NavMeshGenerator@@QEAAHPEBVZoneMap@@AEBViVector2@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?push@TaskQueue@NavMeshGenerator@@QEAAXPEAUTask@2@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?showLoadingMessage@ForgottenGUI@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@ForgottenGUI@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_update@ZoneMapContent@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?createLoadedItems@ZoneMapContent@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?shutdown@NavMesh@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?create@NavMesh@@QEAAXPEAVZoneMap@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?generate@NavMesh@@QEAAXPEAVZoneMap@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isLoaded@NavMesh@@QEAA_NPEAVZoneMap@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isLoaded@NavMesh@@QEAA_NAEBViVector2@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getZoneEdge@NavMesh@@QEAA?AVVector3@Ogre@@AEBV23@0M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?pathExists@NavMesh@@QEAA_NII@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?postMessage@NavMesh@@QEAAXPEAUHavokCharacterMessage@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@NavMesh@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getFilename@NavMesh@@SA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEBVZoneMap@@W4FileMode@1@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?loadZone@NavMesh@@QEAAPEAUNavMeshSector@@PEBVZoneMap@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?deleteMesh@NavMesh@@QEAAXPEAUNavMeshSector@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSector@NavMesh@@QEAAPEAUNavMeshSector@@AEBViVector2@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?directPath@NavMesh@@QEAA_NIAEBVhkVector4f@@AEAV2@M_NAEAV?$hkArray@UEdgePathNode@@UhkContainerHeapAllocator@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCenter@CameraClass@@QEBA?BVVector3@Ogre@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?manuallySetOrientationAndZoom@CameraClass@@QEAAXVQuaternion@Ogre@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?teleport@CameraClass@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getRootObject@hand@@QEBAPEAVRootObject@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isPaused@ForgottenGUI@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isLoading@ForgottenGUI@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isVisible@OptionsWindow@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSingleton@OptionsWindow@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getTimeStamp_inGameHours@GameWorld@@QEAA?AVTimeOfDay@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?userPause@GameWorld@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setGameSpeed@GameWorld@@QEAAXM_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?startTrackCharacter@PlayerInterface@@QEAAXPEAVRootObject@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?ou@@3PEAVGameWorld@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?key@@3PEAVInputHandler@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getInstance@WeatherSystem@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setupWeather@WeatherInstance@@QEAAXPEAVWeather@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCurrentLocale@LocaleManager@@QEBAPEAVLocaleInfo@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getInstance@LocaleManager@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?DebugLog@@YAXPEBD@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?AddHook@KenshiLib@@YA?AW4HookStatus@1@PEAX0PEAPEAX@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCharacter@hand@@QEBAPEAVCharacter@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isDead@Character@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?ErrorLog@@YAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?pressCallback@DataPanelLine_Button@@QEAAXPEAVWidget@MyGUI@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addAValue@DataPanelLine_DropBox@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setPrecision@DataPanelLine_SliderEditable@@QEAAXH@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?createDatapanel@ForgottenGUI@@QEAAPEAVDatapanelGUI@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEAVWidget@MyGUI@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addSpace@DatapanelGUI@@QEAAXHM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineDropBox@DatapanelGUI@@QEAAPEAVDataPanelLine_DropBox@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HPEAH_NM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineCheckbox@DatapanelGUI@@QEAAPEAVDataPanelLine_CheckBox@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEA_NH@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineSliderEditable@DatapanelGUI@@QEAAPEAVDataPanelLine_SliderEditable@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H_NMMPEAM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineTextButton@DatapanelGUI@@QEAAPEAVDataPanelLine_Button@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0HM0@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLine@DatapanelGUI@@QEAAPEAVDataPanelLine@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0H_N1@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?gui@@3PEAVForgottenGUI@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?create@OptionsWindow@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?saveOptions@OptionsWindow@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_update@CharBody@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?activate@Platoon@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_isDestinationReached@CharMovement@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_pathFailed@CharMovement@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_pathOk@CharMovement@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_update@CharMovement@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@FoliageSystem@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateTownsDiscovery@TownList@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?execute@SaveManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMT@ResourceLoader@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isPlayerCharacter@Character@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_playerMoveOrderDefault@Character@@QEAAXPEAVBuilding@@PEAVRootObject@@AEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateOnScreenCheck@Character@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?delayedSpawningChecks@TownBase@@SAHXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?fileExists@SaveFileSystem@@QEBA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSingleton@SaveFileSystem@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?mainThreadUpdate@RootObjectFactory@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@ParticlePool@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateThreaded@FactionManager@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMT@FactionManager@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?createEdgePath@NavMesh@@QEAAHIAEAV?$hkArray@IUhkContainerHeapAllocator@@@@AEAV?$hkArray@UEdgePathNode@@UhkContainerHeapAllocator@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?findPath@NavMesh@@QEAA_NIAEBVhkVector4f@@I0MM_NAEAV?$hkArray@UEdgePathNode@@UhkContainerHeapAllocator@@@@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0LogStream@MyGUI@@QEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??1LogStream@MyGUI@@QEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getItemCount@TabControl@MyGUI@@QEBA_KXZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?insertItemAt@TabControl@MyGUI@@QEAAPEAVTabItem@2@_KAEBVUString@2@VAny@2@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?removeItem@TabControl@MyGUI@@QEAAXPEAVTabItem@2@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setItemData@TabControl@MyGUI@@QEAAXPEAVTabItem@2@VAny@2@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0UString@MyGUI@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0UString@MyGUI@@QEAA@PEBD@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??1UString@MyGUI@@QEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?Null@Any@MyGUI@@2UAnyEmpty@12@A"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setPosition@Widget@MyGUI@@QEAAXHH@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getParent@Widget@MyGUI@@QEBAPEAV12@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getInstance@LogManager@MyGUI@@SAAEAV12@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?log@LogManager@MyGUI@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@ULogLevel@2@0PEBDH@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0Exception@MyGUI@@QEAA@AEBV01@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0Exception@MyGUI@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0PEBDJ@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??1Exception@MyGUI@@UEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0Any@MyGUI@@QEAA@AEBUAnyEmpty@01@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getType@Any@MyGUI@@QEBAAEBVtype_info@@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??6LogStream@MyGUI@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBUEnd@01@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getUserString@UserData@MyGUI@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBV34@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setUserString@UserData@MyGUI@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?findWidget@Widget@MyGUI@@QEAAPEAV12@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getChildAt@Widget@MyGUI@@QEAAPEAV12@_K@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getChildCount@Widget@MyGUI@@QEAA_KXZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getName@Widget@MyGUI@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?createWidgetT@Widget@MyGUI@@QEAAPEAV12@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0AEBU?$TCoord@H@types@2@UAlign@2@0@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setStateSelected@Button@MyGUI@@QEAAX_N@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getClassTypeName@Button@MyGUI@@SAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "USER32.dll",
++          "GetForegroundWindow"
++        ],
++        [
++          "USER32.dll",
++          "GetWindowThreadProcessId"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0_Lockit@std@@QEAA@H@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Getgloballocale@locale@std@@CAPEAV_Locimp@12@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Fiopen@std@@YAPEAU_iobuf@@PEBDHH@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?id@?$codecvt@DDH@std@@2V0locale@2@A"
++        ],
++        [
++          "MSVCP100.dll",
++          "??_7?$basic_istream@DU?$char_traits@D@std@@@std@@6B@"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Getcat@?$codecvt@DDH@std@@SA_KPEAPEBVfacet@locale@2@PEBV42@@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?widen@?$basic_ios@DU?$char_traits@D@std@@@std@@QEBADD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Init@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?getloc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEBA?AVlocale@2@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?unshift@?$codecvt@DDH@std@@QEBAHAEAHPEAD1AEAPEAD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Ipfx@?$basic_istream@DU?$char_traits@D@std@@@std@@QEAA_N_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_istream@DU?$char_traits@D@std@@@std@@QEAA@PEAV?$basic_streambuf@DU?$char_traits@D@std@@@1@_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sbumpc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?out@?$codecvt@DDH@std@@QEBAHAEAHPEBD1AEAPEBDPEAD3AEAPEAD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?in@?$codecvt@DDH@std@@QEBAHAEAHPEBD1AEAPEBDPEAD3AEAPEAD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_istream@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?snextc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sgetc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?always_noconv@codecvt_base@std@@QEBA_NXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Decref@facet@locale@std@@QEAAPEAV123@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Incref@facet@locale@std@@QEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??Bid@locale@std@@QEAA_KXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@K@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@_K@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@PEBX@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?clear@?$basic_ios@DU?$char_traits@D@std@@@std@@QEAAXH_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?pubsetbuf@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAPEAV12@PEAD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@G@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1_Lockit@std@@QEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Swap_all@_Container_base0@std@@QEAAXAEAU12@@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Orphan_all@_Container_base0@std@@QEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_streambuf@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Lock@?$basic_streambuf@DU?$char_traits@D@std@@@std@@UEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Unlock@?$basic_streambuf@DU?$char_traits@D@std@@@std@@UEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?showmanyc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAA_JXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?uflow@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?xsgetn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAA_JPEAD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?xsputn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAA_JPEBD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setbuf@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAPEAV12@PEAD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sync@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?imbue@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAXAEBVlocale@2@@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_ios@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setstate@?$basic_ios@DU?$char_traits@D@std@@@std@@QEAAXH_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@P6AAEAVios_base@1@AEAV21@@Z@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@H@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@I@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@M@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?flush@?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV12@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sputc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setg@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAAXPEAD00@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Pninc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAAPEADXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_ios@DU?$char_traits@D@std@@@std@@IEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAA@PEAV?$basic_streambuf@DU?$char_traits@D@std@@@1@_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Osfx@?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sputn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAA_JPEBD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?uncaught_exception@std@@YA_NXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Xlength_error@std@@YAXPEBD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Xout_of_range@std@@YAXPEBD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setprecision@std@@YA?AU?$_Smanip@_J@1@_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_BADOFF@std@@3_JB"
++        ],
++        [
++          "MSVCP100.dll",
++          "??_7?$basic_ostream@DU?$char_traits@D@std@@@std@@6B@"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_ostream@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "_snwprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "swscanf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "__CxxFrameHandler3"
++        ],
++        [
++          "MSVCR100.dll",
++          "__C_specific_handler"
++        ],
++        [
++          "MSVCR100.dll",
++          "_unlock"
++        ],
++        [
++          "MSVCR100.dll",
++          "__dllonexit"
++        ],
++        [
++          "MSVCR100.dll",
++          "_lock"
++        ],
++        [
++          "MSVCR100.dll",
++          "_onexit"
++        ],
++        [
++          "MSVCR100.dll",
++          "?terminate@@YAXXZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "__clean_type_info_names_internal"
++        ],
++        [
++          "MSVCR100.dll",
++          "_malloc_crt"
++        ],
++        [
++          "MSVCR100.dll",
++          "_initterm"
++        ],
++        [
++          "MSVCR100.dll",
++          "_initterm_e"
++        ],
++        [
++          "MSVCR100.dll",
++          "_encoded_null"
++        ],
++        [
++          "MSVCR100.dll",
++          "_amsg_exit"
++        ],
++        [
++          "MSVCR100.dll",
++          "__CppXcptFilter"
++        ],
++        [
++          "MSVCR100.dll",
++          "__crt_debugger_hook"
++        ],
++        [
++          "MSVCR100.dll",
++          "?_type_info_dtor_internal_method@type_info@@QEAAXXZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "vswprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_wcsicmp"
++        ],
++        [
++          "MSVCR100.dll",
++          "_wfopen_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_aligned_malloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "_aligned_free"
++        ],
++        [
++          "MSVCR100.dll",
++          "realloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "calloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "ferror"
++        ],
++        [
++          "MSVCR100.dll",
++          "_errno"
++        ],
++        [
++          "MSVCR100.dll",
++          "fseek"
++        ],
++        [
++          "MSVCR100.dll",
++          "ftell"
++        ],
++        [
++          "MSVCR100.dll",
++          "malloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "qsort"
++        ],
++        [
++          "MSVCR100.dll",
++          "free"
++        ],
++        [
++          "MSVCR100.dll",
++          "strcpy_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "??_V@YAXPEAX@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "strtol"
++        ],
++        [
++          "MSVCR100.dll",
++          "strtod"
++        ],
++        [
++          "MSVCR100.dll",
++          "sprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "??8type_info@@QEBA_NAEBV0@@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "fwrite"
++        ],
++        [
++          "MSVCR100.dll",
++          "memcpy_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_lock_file"
++        ],
++        [
++          "MSVCR100.dll",
++          "setvbuf"
++        ],
++        [
++          "MSVCR100.dll",
++          "fsetpos"
++        ],
++        [
++          "MSVCR100.dll",
++          "vsprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "fgetc"
++        ],
++        [
++          "MSVCR100.dll",
++          "fflush"
++        ],
++        [
++          "MSVCR100.dll",
++          "_fseeki64"
++        ],
++        [
++          "MSVCR100.dll",
++          "fgetpos"
++        ],
++        [
++          "MSVCR100.dll",
++          "ungetc"
++        ],
++        [
++          "MSVCR100.dll",
++          "_unlock_file"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0bad_cast@std@@QEAA@AEBV01@@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0bad_cast@std@@QEAA@PEBD@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??1bad_cast@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "fputc"
++        ],
++        [
++          "MSVCR100.dll",
++          "fclose"
++        ],
++        [
++          "MSVCR100.dll",
++          "strspn"
++        ],
++        [
++          "MSVCR100.dll",
++          "strrchr"
++        ],
++        [
++          "MSVCR100.dll",
++          "fread"
++        ],
++        [
++          "MSVCR100.dll",
++          "fgets"
++        ],
++        [
++          "MSVCR100.dll",
++          "fopen_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "sscanf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_vsnprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "atoi"
++        ],
++        [
++          "MSVCR100.dll",
++          "memchr"
++        ],
++        [
++          "MSVCR100.dll",
++          "_stricmp"
++        ],
++        [
++          "MSVCR100.dll",
++          "_snprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_finite"
++        ],
++        [
++          "MSVCR100.dll",
++          "_purecall"
++        ],
++        [
++          "MSVCR100.dll",
++          "??2@YAPEAX_K@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??3@YAXPEAX@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "memmove"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0exception@std@@QEAA@AEBV01@@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0exception@std@@QEAA@AEBQEBD@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??1exception@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "?what@exception@std@@UEBAPEBDXZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "cosf"
++        ],
++        [
++          "MSVCR100.dll",
++          "sinf"
++        ],
++        [
++          "MSVCR100.dll",
++          "tanf"
++        ],
++        [
++          "MSVCR100.dll",
++          "acosf"
++        ],
++        [
++          "MSVCR100.dll",
++          "atan2f"
++        ],
++        [
++          "MSVCR100.dll",
++          "asinf"
++        ],
++        [
++          "MSVCR100.dll",
++          "_CxxThrowException"
++        ],
++        [
++          "MSVCR100.dll",
++          "fmodf"
++        ],
++        [
++          "MSVCR100.dll",
++          "ceilf"
++        ],
++        [
++          "MSVCR100.dll",
++          "floor"
++        ],
++        [
++          "MSVCR100.dll",
++          "sqrt"
++        ],
++        [
++          "MSVCR100.dll",
++          "sqrtf"
++        ],
++        [
++          "MSVCR100.dll",
++          "memcpy"
++        ],
++        [
++          "MSVCR100.dll",
++          "floorf"
++        ],
++        [
++          "MSVCR100.dll",
++          "memset"
++        ],
++        [
++          "MSVCR100.dll",
++          "memcmp"
++        ],
++        [
++          "MSVCR100.dll",
++          "ceil"
++        ],
++        [
++          "KERNEL32.dll",
++          "InterlockedPushEntrySList"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetProcAddress"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleA"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualProtect"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentProcessId"
++        ],
++        [
++          "KERNEL32.dll",
++          "QueryPerformanceCounter"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetLocalTime"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetSystemInfo"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleFileNameA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleExA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesA"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindFirstFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindClose"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindNextFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "MoveFileExA"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualQuery"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentProcess"
++        ],
++        [
++          "KERNEL32.dll",
++          "WaitForSingleObject"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetEvent"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesExA"
++        ],
++        [
++          "KERNEL32.dll",
++          "WriteFile"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateEventA"
++        ],
++        [
++          "KERNEL32.dll",
++          "FlushFileBuffers"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetLastError"
++        ],
++        [
++          "KERNEL32.dll",
++          "ResetEvent"
++        ],
++        [
++          "KERNEL32.dll",
++          "LoadLibraryA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetProcessId"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlCaptureStackBackTrace"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentThreadId"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateThread"
++        ],
++        [
++          "KERNEL32.dll",
++          "GlobalMemoryStatusEx"
++        ],
++        [
++          "KERNEL32.dll",
++          "QueryPerformanceFrequency"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetFilePointer"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlVirtualUnwind"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlLookupFunctionEntry"
++        ],
++        [
++          "KERNEL32.dll",
++          "CloseHandle"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualAlloc"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualFree"
++        ],
++        [
++          "KERNEL32.dll",
++          "FlushInstructionCache"
++        ],
++        [
++          "KERNEL32.dll",
++          "EncodePointer"
++        ],
++        [
++          "KERNEL32.dll",
++          "DecodePointer"
++        ],
++        [
++          "KERNEL32.dll",
++          "RemoveVectoredExceptionHandler"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetUnhandledExceptionFilter"
++        ],
++        [
++          "KERNEL32.dll",
++          "AddVectoredExceptionHandler"
++        ],
++        [
++          "KERNEL32.dll",
++          "DeleteFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetThreadPriority"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetThreadPriority"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateEventW"
++        ],
++        [
++          "KERNEL32.dll",
++          "Sleep"
++        ],
++        [
++          "KERNEL32.dll",
++          "LeaveCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "EnterCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "InitializeCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateDirectoryA"
++        ],
++        [
++          "KERNEL32.dll",
++          "CompareFileTime"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetSystemTimeAsFileTime"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateSemaphoreA"
++        ],
++        [
++          "KERNEL32.dll",
++          "ReleaseSemaphore"
++        ],
++        [
++          "KERNEL32.dll",
++          "TryEnterCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetTickCount"
++        ],
++        [
++          "KERNEL32.dll",
++          "Module32First"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateToolhelp32Snapshot"
++        ],
++        [
++          "KERNEL32.dll",
++          "Module32Next"
++        ],
++        [
++          "KERNEL32.dll",
++          "TlsGetValue"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetProcessHandleCount"
++        ],
++        [
++          "KERNEL32.dll",
++          "ExitProcess"
++        ],
++        [
++          "KERNEL32.dll",
++          "TerminateProcess"
++        ],
++        [
++          "KERNEL32.dll",
++          "WaitForMultipleObjects"
++        ],
++        [
++          "KERNEL32.dll",
++          "InitializeSListHead"
++        ],
++        [
++          "KERNEL32.dll",
++          "InterlockedPopEntrySList"
++        ],
++        [
++          "KERNEL32.dll",
++          "InterlockedFlushSList"
++        ],
++        [
++          "KERNEL32.dll",
++          "SwitchToThread"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFullPathNameW"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindFirstFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "MoveFileExW"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateDirectoryW"
++        ],
++        [
++          "KERNEL32.dll",
++          "WideCharToMultiByte"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesW"
++        ],
++        [
++          "KERNEL32.dll",
++          "ReadFile"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleFileNameW"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "MultiByteToWideChar"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileSizeEx"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentDirectoryW"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindNextFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesExW"
++        ],
++        [
++          "KERNEL32.dll",
++          "DeleteFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "ResumeThread"
++        ],
++        [
++          "KERNEL32.dll",
++          "CopyFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleExW"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleW"
++        ],
++        [
++          "KERNEL32.dll",
++          "UnhandledExceptionFilter"
++        ],
++        [
++          "KERNEL32.dll",
++          "IsDebuggerPresent"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlCaptureContext"
++        ]
++      ]
++    },
++    "prod": {
++      "bytes": 1418240,
++      "sha256": "19c415510c4d949b91081dafca41bde5f34ea42b1648cdf5079361d41528b897",
++      "exports": [
++        "??0_Mutex@std@@QEAA@W4_Uninitialized@1@@Z",
++        "??4_Init_locks@std@@QEAAAEAV01@AEBV01@@Z",
++        "?startPlugin@@YAXXZ"
++      ],
++      "imports": [
++        [
++          "KenshiLib.dll",
++          "?setup@ZoneManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?threadJunkPostBT@PhysicsActual@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?threadJunkPreBT@PhysicsActual@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_backThreadUpdate@PhysicsActual@@QEAAXM_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_updateUT@PhysicsActual@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?GetKenshiVersion@KenshiLib@@YA?AVBinaryVersion@1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?GetRealAddress@KenshiLib@@YA_JPEAX@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?requestPath@HavokCharacter@@QEAAXAEBVVector3@Ogre@@H@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_activate@ZoneMap@@QEAA_NHW4ZoneActivationType@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isTerrainCollisionLoaded@ZoneMap@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getAreaSector@ZoneMap@@QEAAPEAVAreaSector@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@ZoneMap@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isInIsland@ZoneMap@@QEBA_NPEAV1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?traceAll@UtilityT@@SAXAEAV?$lektor@UPhysHitItem@@@@AEBVVector3@Ogre@@1I@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?trace@UtilityT@@SAXAEAVphysHit@@AEBVVector3@Ogre@@1I@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateThreaded@AnimationClass@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?processKillList@GameWorld@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?threadSafeRagdollUpdates@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?charsUpdatePaused@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?charsUpdateUT@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?charsUpdate@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?processThreadMessages@GameWorld@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_mainLoop_GPUSensitiveStuff@GameWorld@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?destroy@GameWorld@@QEAAXPEAVMovableObject@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setQueuesAreClear@PhysicsInterface@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?load@GameDataContainer@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0HPEAVSerialisable@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?mouseScan@PlayerInterface@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addTaskNearestSelectedCharacter@PlayerInterface@@QEAAXPEAVBuilding@@W4TaskType@@PEAVRootObject@@_NAEBVVector3@Ogre@@3@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?stopCharactersMovement@PlayerInterface@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addJobSelectedCharacters@PlayerInterface@@QEAAXW4TaskType@@PEAVRootObject@@_N2AEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addOrderSelectedCharacters@PlayerInterface@@QEAAXPEAVBuilding@@W4TaskType@@PEAVRootObject@@_N3AEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@PlayerInterface@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCharacterOrPlatoon@PlatoonHandleContainerList@@QEBAPEAVRootObjectBase@@AEBVhand@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?startRunning@ThreadClass@@QEAA_NM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getDestination@AbstractMovementBase@@QEBA?AVVector3@Ogre@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_getPosition@AbstractMovementBase@@QEBAAEBVVector3@Ogre@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@AITaskSytem@@QEAAXVVector3@Ogre@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_DESTRUCTOR@hkMemoryAllocator@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "??1BinaryVersion@KenshiLib@@QEAA@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?GetVersion@BinaryVersion@KenshiLib@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?au@@3PEAVKingOfRenderThread@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateBT@WeatherSystem@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMT@WeatherSystem@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?options@@3PEAVOptionsHolder@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?shou@@3PEAVSharedKing@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?ToString@BinaryVersion@KenshiLib@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?togglePause@GameWorld@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?DebugLog@@YAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMainThread@ZoneManager@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateRendertimeThread@ZoneManager@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateGPUSafeThread@ZoneManager@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getZoneMap@ZoneManager@@QEAAPEAVZoneMap@@HH@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?activateZoneMap@ZoneManager@@QEAA_NPEAVZoneMap@@ViVector2@@HW4ZoneActivationType@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?deactivateZoneMap@ZoneManager@@QEAAXPEAVZoneMap@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?deactivateAllActiveZones@ZoneManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getIsland@ZoneManager@@QEBAXPEBVZoneMap@@AEAV?$lektor@PEAVZoneMap@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_calculateIslands@ZoneManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?processLoading@ZoneManager@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?lockZone@NavMeshGenerator@@QEAA_NAEBViVector2@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?unlockZone@NavMeshGenerator@@QEAAXAEBViVector2@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateBT@NavMeshGenerator@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?generateTaskBT@NavMeshGenerator@@QEAAXPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?splice@NavMeshGenerator@@QEAAHPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?stitchInterior@NavMeshGenerator@@QEAAHPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?stitchExterior@NavMeshGenerator@@QEAAHPEAUTask@1@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSeedPointsFromAdjacentZone@NavMeshGenerator@@QEAAHPEBVZoneMap@@AEBViVector2@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?push@TaskQueue@NavMeshGenerator@@QEAAXPEAUTask@2@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?showLoadingMessage@ForgottenGUI@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@ForgottenGUI@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_update@ZoneMapContent@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?createLoadedItems@ZoneMapContent@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?shutdown@NavMesh@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?create@NavMesh@@QEAAXPEAVZoneMap@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?generate@NavMesh@@QEAAXPEAVZoneMap@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isLoaded@NavMesh@@QEAA_NPEAVZoneMap@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isLoaded@NavMesh@@QEAA_NAEBViVector2@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getZoneEdge@NavMesh@@QEAA?AVVector3@Ogre@@AEBV23@0M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?pathExists@NavMesh@@QEAA_NII@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?postMessage@NavMesh@@QEAAXPEAUHavokCharacterMessage@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@NavMesh@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getFilename@NavMesh@@SA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEBVZoneMap@@W4FileMode@1@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?loadZone@NavMesh@@QEAAPEAUNavMeshSector@@PEBVZoneMap@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?deleteMesh@NavMesh@@QEAAXPEAUNavMeshSector@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSector@NavMesh@@QEAAPEAUNavMeshSector@@AEBViVector2@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?directPath@NavMesh@@QEAA_NIAEBVhkVector4f@@AEAV2@M_NAEAV?$hkArray@UEdgePathNode@@UhkContainerHeapAllocator@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?findPath@NavMesh@@QEAA_NIAEBVhkVector4f@@I0MM_NAEAV?$hkArray@UEdgePathNode@@UhkContainerHeapAllocator@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?createEdgePath@NavMesh@@QEAAHIAEAV?$hkArray@IUhkContainerHeapAllocator@@@@AEAV?$hkArray@UEdgePathNode@@UhkContainerHeapAllocator@@@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCenter@CameraClass@@QEBA?BVVector3@Ogre@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?manuallySetOrientationAndZoom@CameraClass@@QEAAXVQuaternion@Ogre@@M@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?teleport@CameraClass@@QEAAXAEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getRootObject@hand@@QEBAPEAVRootObject@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isPaused@ForgottenGUI@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isLoading@ForgottenGUI@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isVisible@OptionsWindow@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSingleton@OptionsWindow@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getTimeStamp_inGameHours@GameWorld@@QEAA?AVTimeOfDay@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?userPause@GameWorld@@QEAAX_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setGameSpeed@GameWorld@@QEAAXM_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?startTrackCharacter@PlayerInterface@@QEAAXPEAVRootObject@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?ou@@3PEAVGameWorld@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?key@@3PEAVInputHandler@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getInstance@WeatherSystem@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setupWeather@WeatherInstance@@QEAAXPEAVWeather@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCurrentLocale@LocaleManager@@QEBAPEAVLocaleInfo@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getInstance@LocaleManager@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?DebugLog@@YAXPEBD@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getCharacter@hand@@QEBAPEAVCharacter@@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isDead@Character@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?ErrorLog@@YAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?pressCallback@DataPanelLine_Button@@QEAAXPEAVWidget@MyGUI@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addAValue@DataPanelLine_DropBox@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setPrecision@DataPanelLine_SliderEditable@@QEAAXH@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?createDatapanel@ForgottenGUI@@QEAAPEAVDatapanelGUI@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEAVWidget@MyGUI@@_N@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?addSpace@DatapanelGUI@@QEAAXHM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineDropBox@DatapanelGUI@@QEAAPEAVDataPanelLine_DropBox@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HPEAH_NM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineCheckbox@DatapanelGUI@@QEAAPEAVDataPanelLine_CheckBox@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEA_NH@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineSliderEditable@DatapanelGUI@@QEAAPEAVDataPanelLine_SliderEditable@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H_NMMPEAM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?gui@@3PEAVForgottenGUI@@EA"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLineTextButton@DatapanelGUI@@QEAAPEAVDataPanelLine_Button@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0HM0@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?setLine@DatapanelGUI@@QEAAPEAVDataPanelLine@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0H_N1@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?create@OptionsWindow@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?saveOptions@OptionsWindow@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?AddHook@KenshiLib@@YA?AW4HookStatus@1@PEAX0PEAPEAX@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_update@CharBody@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?activate@Platoon@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_isDestinationReached@CharMovement@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_pathFailed@CharMovement@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_pathOk@CharMovement@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_update@CharMovement@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@FoliageSystem@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateTownsDiscovery@TownList@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?execute@SaveManager@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMT@ResourceLoader@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?isPlayerCharacter@Character@@QEBA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?_NV_playerMoveOrderDefault@Character@@QEAAXPEAVBuilding@@PEAVRootObject@@AEBVVector3@Ogre@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateOnScreenCheck@Character@@QEAA_NXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?delayedSpawningChecks@TownBase@@SAHXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?fileExists@SaveFileSystem@@QEBA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?getSingleton@SaveFileSystem@@SAPEAV1@XZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?mainThreadUpdate@RootObjectFactory@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?update@ParticlePool@@QEAAXXZ"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateThreaded@FactionManager@@QEAAXM@Z"
++        ],
++        [
++          "KenshiLib.dll",
++          "?updateMT@FactionManager@@QEAAXM@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0LogStream@MyGUI@@QEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??1LogStream@MyGUI@@QEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getItemCount@TabControl@MyGUI@@QEBA_KXZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?insertItemAt@TabControl@MyGUI@@QEAAPEAVTabItem@2@_KAEBVUString@2@VAny@2@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?removeItem@TabControl@MyGUI@@QEAAXPEAVTabItem@2@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setItemData@TabControl@MyGUI@@QEAAXPEAVTabItem@2@VAny@2@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0UString@MyGUI@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0UString@MyGUI@@QEAA@PEBD@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??1UString@MyGUI@@QEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?Null@Any@MyGUI@@2UAnyEmpty@12@A"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setPosition@Widget@MyGUI@@QEAAXHH@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getParent@Widget@MyGUI@@QEBAPEAV12@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getInstance@LogManager@MyGUI@@SAAEAV12@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?log@LogManager@MyGUI@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@ULogLevel@2@0PEBDH@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0Exception@MyGUI@@QEAA@AEBV01@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0Exception@MyGUI@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0PEBDJ@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??1Exception@MyGUI@@UEAA@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??0Any@MyGUI@@QEAA@AEBUAnyEmpty@01@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getType@Any@MyGUI@@QEBAAEBVtype_info@@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "??6LogStream@MyGUI@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBUEnd@01@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getUserString@UserData@MyGUI@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBV34@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setUserString@UserData@MyGUI@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?findWidget@Widget@MyGUI@@QEAAPEAV12@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getChildAt@Widget@MyGUI@@QEAAPEAV12@_K@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getChildCount@Widget@MyGUI@@QEAA_KXZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getName@Widget@MyGUI@@QEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?createWidgetT@Widget@MyGUI@@QEAAPEAV12@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0AEBU?$TCoord@H@types@2@UAlign@2@0@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?setStateSelected@Button@MyGUI@@QEAAX_N@Z"
++        ],
++        [
++          "MyGUIEngine_x64.dll",
++          "?getClassTypeName@Button@MyGUI@@SAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
++        ],
++        [
++          "USER32.dll",
++          "GetForegroundWindow"
++        ],
++        [
++          "USER32.dll",
++          "GetWindowThreadProcessId"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Swap_all@_Container_base0@std@@QEAAXAEAU12@@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1_Lockit@std@@QEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0_Lockit@std@@QEAA@H@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Getgloballocale@locale@std@@CAPEAV_Locimp@12@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Fiopen@std@@YAPEAU_iobuf@@PEBDHH@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?id@?$codecvt@DDH@std@@2V0locale@2@A"
++        ],
++        [
++          "MSVCP100.dll",
++          "??_7?$basic_istream@DU?$char_traits@D@std@@@std@@6B@"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Getcat@?$codecvt@DDH@std@@SA_KPEAPEBVfacet@locale@2@PEBV42@@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?widen@?$basic_ios@DU?$char_traits@D@std@@@std@@QEBADD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Init@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?getloc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEBA?AVlocale@2@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?unshift@?$codecvt@DDH@std@@QEBAHAEAHPEAD1AEAPEAD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Ipfx@?$basic_istream@DU?$char_traits@D@std@@@std@@QEAA_N_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_istream@DU?$char_traits@D@std@@@std@@QEAA@PEAV?$basic_streambuf@DU?$char_traits@D@std@@@1@_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sbumpc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?out@?$codecvt@DDH@std@@QEBAHAEAHPEBD1AEAPEBDPEAD3AEAPEAD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?in@?$codecvt@DDH@std@@QEBAHAEAHPEBD1AEAPEBDPEAD3AEAPEAD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_istream@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?snextc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sgetc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?always_noconv@codecvt_base@std@@QEBA_NXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Decref@facet@locale@std@@QEAAPEAV123@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Incref@facet@locale@std@@QEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??Bid@locale@std@@QEAA_KXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@K@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@_K@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@PEBX@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?clear@?$basic_ios@DU?$char_traits@D@std@@@std@@QEAAXH_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Orphan_all@_Container_base0@std@@QEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_streambuf@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Lock@?$basic_streambuf@DU?$char_traits@D@std@@@std@@UEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Unlock@?$basic_streambuf@DU?$char_traits@D@std@@@std@@UEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?showmanyc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAA_JXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?uflow@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?xsgetn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAA_JPEAD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?xsputn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAA_JPEBD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setbuf@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAPEAV12@PEAD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sync@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAHXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?imbue@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MEAAXAEBVlocale@2@@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_ios@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setstate@?$basic_ios@DU?$char_traits@D@std@@@std@@QEAAXH_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??1?$basic_ostream@DU?$char_traits@D@std@@@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@P6AAEAVios_base@1@AEAV21@@Z@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@H@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@M@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?flush@?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV12@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sputc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAAHD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setg@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAAXPEAD00@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Pninc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAAPEADXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_ios@DU?$char_traits@D@std@@@std@@IEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAA@PEAV?$basic_streambuf@DU?$char_traits@D@std@@@1@_N@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "??0?$basic_streambuf@DU?$char_traits@D@std@@@std@@IEAA@XZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Osfx@?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAXXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?sputn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QEAA_JPEBD_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?uncaught_exception@std@@YA_NXZ"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Xlength_error@std@@YAXPEBD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_Xout_of_range@std@@YAXPEBD@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?setprecision@std@@YA?AU?$_Smanip@_J@1@_J@Z"
++        ],
++        [
++          "MSVCP100.dll",
++          "?_BADOFF@std@@3_JB"
++        ],
++        [
++          "MSVCP100.dll",
++          "??_7?$basic_ostream@DU?$char_traits@D@std@@@std@@6B@"
++        ],
++        [
++          "MSVCP100.dll",
++          "??6?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAAAEAV01@I@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "_wcsicmp"
++        ],
++        [
++          "MSVCR100.dll",
++          "vswprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_snwprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "swscanf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "__CxxFrameHandler3"
++        ],
++        [
++          "MSVCR100.dll",
++          "__C_specific_handler"
++        ],
++        [
++          "MSVCR100.dll",
++          "_unlock"
++        ],
++        [
++          "MSVCR100.dll",
++          "__dllonexit"
++        ],
++        [
++          "MSVCR100.dll",
++          "_lock"
++        ],
++        [
++          "MSVCR100.dll",
++          "_onexit"
++        ],
++        [
++          "MSVCR100.dll",
++          "?terminate@@YAXXZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "__clean_type_info_names_internal"
++        ],
++        [
++          "MSVCR100.dll",
++          "_malloc_crt"
++        ],
++        [
++          "MSVCR100.dll",
++          "_initterm"
++        ],
++        [
++          "MSVCR100.dll",
++          "_initterm_e"
++        ],
++        [
++          "MSVCR100.dll",
++          "_encoded_null"
++        ],
++        [
++          "MSVCR100.dll",
++          "_amsg_exit"
++        ],
++        [
++          "MSVCR100.dll",
++          "__CppXcptFilter"
++        ],
++        [
++          "MSVCR100.dll",
++          "__crt_debugger_hook"
++        ],
++        [
++          "MSVCR100.dll",
++          "?_type_info_dtor_internal_method@type_info@@QEAAXXZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "_wfopen_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_aligned_malloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "_aligned_free"
++        ],
++        [
++          "MSVCR100.dll",
++          "realloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "calloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "ferror"
++        ],
++        [
++          "MSVCR100.dll",
++          "_errno"
++        ],
++        [
++          "MSVCR100.dll",
++          "fseek"
++        ],
++        [
++          "MSVCR100.dll",
++          "ftell"
++        ],
++        [
++          "MSVCR100.dll",
++          "malloc"
++        ],
++        [
++          "MSVCR100.dll",
++          "qsort"
++        ],
++        [
++          "MSVCR100.dll",
++          "free"
++        ],
++        [
++          "MSVCR100.dll",
++          "strcpy_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "??_V@YAXPEAX@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "strtol"
++        ],
++        [
++          "MSVCR100.dll",
++          "strtod"
++        ],
++        [
++          "MSVCR100.dll",
++          "sprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "??8type_info@@QEBA_NAEBV0@@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "fwrite"
++        ],
++        [
++          "MSVCR100.dll",
++          "memcpy_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_lock_file"
++        ],
++        [
++          "MSVCR100.dll",
++          "setvbuf"
++        ],
++        [
++          "MSVCR100.dll",
++          "fsetpos"
++        ],
++        [
++          "MSVCR100.dll",
++          "vsprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "fgetc"
++        ],
++        [
++          "MSVCR100.dll",
++          "fflush"
++        ],
++        [
++          "MSVCR100.dll",
++          "_fseeki64"
++        ],
++        [
++          "MSVCR100.dll",
++          "fgetpos"
++        ],
++        [
++          "MSVCR100.dll",
++          "ungetc"
++        ],
++        [
++          "MSVCR100.dll",
++          "_unlock_file"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0bad_cast@std@@QEAA@AEBV01@@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0bad_cast@std@@QEAA@PEBD@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??1bad_cast@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "fputc"
++        ],
++        [
++          "MSVCR100.dll",
++          "fclose"
++        ],
++        [
++          "MSVCR100.dll",
++          "strspn"
++        ],
++        [
++          "MSVCR100.dll",
++          "strrchr"
++        ],
++        [
++          "MSVCR100.dll",
++          "fread"
++        ],
++        [
++          "MSVCR100.dll",
++          "fgets"
++        ],
++        [
++          "MSVCR100.dll",
++          "fopen_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "sscanf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_vsnprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "atoi"
++        ],
++        [
++          "MSVCR100.dll",
++          "memchr"
++        ],
++        [
++          "MSVCR100.dll",
++          "_stricmp"
++        ],
++        [
++          "MSVCR100.dll",
++          "_snprintf_s"
++        ],
++        [
++          "MSVCR100.dll",
++          "_finite"
++        ],
++        [
++          "MSVCR100.dll",
++          "_purecall"
++        ],
++        [
++          "MSVCR100.dll",
++          "??2@YAPEAX_K@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??3@YAXPEAX@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "memmove"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0exception@std@@QEAA@AEBV01@@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??0exception@std@@QEAA@AEBQEBD@Z"
++        ],
++        [
++          "MSVCR100.dll",
++          "??1exception@std@@UEAA@XZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "?what@exception@std@@UEBAPEBDXZ"
++        ],
++        [
++          "MSVCR100.dll",
++          "cosf"
++        ],
++        [
++          "MSVCR100.dll",
++          "sinf"
++        ],
++        [
++          "MSVCR100.dll",
++          "tanf"
++        ],
++        [
++          "MSVCR100.dll",
++          "acosf"
++        ],
++        [
++          "MSVCR100.dll",
++          "atan2f"
++        ],
++        [
++          "MSVCR100.dll",
++          "asinf"
++        ],
++        [
++          "MSVCR100.dll",
++          "_CxxThrowException"
++        ],
++        [
++          "MSVCR100.dll",
++          "fmodf"
++        ],
++        [
++          "MSVCR100.dll",
++          "ceilf"
++        ],
++        [
++          "MSVCR100.dll",
++          "floor"
++        ],
++        [
++          "MSVCR100.dll",
++          "sqrt"
++        ],
++        [
++          "MSVCR100.dll",
++          "sqrtf"
++        ],
++        [
++          "MSVCR100.dll",
++          "memcpy"
++        ],
++        [
++          "MSVCR100.dll",
++          "floorf"
++        ],
++        [
++          "MSVCR100.dll",
++          "memset"
++        ],
++        [
++          "MSVCR100.dll",
++          "memcmp"
++        ],
++        [
++          "MSVCR100.dll",
++          "ceil"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindFirstFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetProcAddress"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleA"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualProtect"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentProcessId"
++        ],
++        [
++          "KERNEL32.dll",
++          "QueryPerformanceCounter"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetLocalTime"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetSystemInfo"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleFileNameA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleExA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesA"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindFirstFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindClose"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindNextFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentProcess"
++        ],
++        [
++          "KERNEL32.dll",
++          "LoadLibraryA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GlobalMemoryStatusEx"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentThreadId"
++        ],
++        [
++          "KERNEL32.dll",
++          "QueryPerformanceFrequency"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetFilePointer"
++        ],
++        [
++          "KERNEL32.dll",
++          "MoveFileExA"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlVirtualUnwind"
++        ],
++        [
++          "KERNEL32.dll",
++          "WriteFile"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlLookupFunctionEntry"
++        ],
++        [
++          "KERNEL32.dll",
++          "CloseHandle"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualQuery"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualAlloc"
++        ],
++        [
++          "KERNEL32.dll",
++          "VirtualFree"
++        ],
++        [
++          "KERNEL32.dll",
++          "FlushInstructionCache"
++        ],
++        [
++          "KERNEL32.dll",
++          "EncodePointer"
++        ],
++        [
++          "KERNEL32.dll",
++          "DecodePointer"
++        ],
++        [
++          "KERNEL32.dll",
++          "RemoveVectoredExceptionHandler"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetUnhandledExceptionFilter"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetEvent"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateEventA"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetLastError"
++        ],
++        [
++          "KERNEL32.dll",
++          "AddVectoredExceptionHandler"
++        ],
++        [
++          "KERNEL32.dll",
++          "DeleteFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "SetThreadPriority"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetThreadPriority"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateEventW"
++        ],
++        [
++          "KERNEL32.dll",
++          "Sleep"
++        ],
++        [
++          "KERNEL32.dll",
++          "LeaveCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "EnterCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "InitializeCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateDirectoryA"
++        ],
++        [
++          "KERNEL32.dll",
++          "CompareFileTime"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetSystemTimeAsFileTime"
++        ],
++        [
++          "KERNEL32.dll",
++          "WaitForSingleObject"
++        ],
++        [
++          "KERNEL32.dll",
++          "ResetEvent"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateSemaphoreA"
++        ],
++        [
++          "KERNEL32.dll",
++          "ReleaseSemaphore"
++        ],
++        [
++          "KERNEL32.dll",
++          "TryEnterCriticalSection"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetTickCount"
++        ],
++        [
++          "KERNEL32.dll",
++          "FlushFileBuffers"
++        ],
++        [
++          "KERNEL32.dll",
++          "Module32First"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateToolhelp32Snapshot"
++        ],
++        [
++          "KERNEL32.dll",
++          "Module32Next"
++        ],
++        [
++          "KERNEL32.dll",
++          "TlsGetValue"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetProcessHandleCount"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateThread"
++        ],
++        [
++          "KERNEL32.dll",
++          "ExitProcess"
++        ],
++        [
++          "KERNEL32.dll",
++          "TerminateProcess"
++        ],
++        [
++          "KERNEL32.dll",
++          "WaitForMultipleObjects"
++        ],
++        [
++          "KERNEL32.dll",
++          "InitializeSListHead"
++        ],
++        [
++          "KERNEL32.dll",
++          "InterlockedPopEntrySList"
++        ],
++        [
++          "KERNEL32.dll",
++          "InterlockedFlushSList"
++        ],
++        [
++          "KERNEL32.dll",
++          "InterlockedPushEntrySList"
++        ],
++        [
++          "KERNEL32.dll",
++          "SwitchToThread"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFullPathNameW"
++        ],
++        [
++          "KERNEL32.dll",
++          "MoveFileExW"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateDirectoryW"
++        ],
++        [
++          "KERNEL32.dll",
++          "WideCharToMultiByte"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesW"
++        ],
++        [
++          "KERNEL32.dll",
++          "ReadFile"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleFileNameW"
++        ],
++        [
++          "KERNEL32.dll",
++          "CreateFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "MultiByteToWideChar"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileSizeEx"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetCurrentDirectoryW"
++        ],
++        [
++          "KERNEL32.dll",
++          "FindNextFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetFileAttributesExW"
++        ],
++        [
++          "KERNEL32.dll",
++          "DeleteFileW"
++        ],
++        [
++          "KERNEL32.dll",
++          "ResumeThread"
++        ],
++        [
++          "KERNEL32.dll",
++          "CopyFileA"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlCaptureStackBackTrace"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleExW"
++        ],
++        [
++          "KERNEL32.dll",
++          "GetModuleHandleW"
++        ],
++        [
++          "KERNEL32.dll",
++          "UnhandledExceptionFilter"
++        ],
++        [
++          "KERNEL32.dll",
++          "IsDebuggerPresent"
++        ],
++        [
++          "KERNEL32.dll",
++          "RtlCaptureContext"
++        ]
++      ]
++    }
++  },
++  "installed": false,
++  "personalIniSha256": "70e4d9fab5f3a4584be17d05c931d25c07abe3d12d0e534ba454b7056a545afc"
++}
+diff --git a/leopard/test_requested_settings.py b/leopard/test_requested_settings.py
+new file mode 100644
+index 0000000..325b0c8
+--- /dev/null
++++ b/leopard/test_requested_settings.py
+@@ -0,0 +1,50 @@
++"""Compile actual requested-state helper and actual Finalize body; no native calls/files."""
++from pathlib import Path
++import os,subprocess
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/task1/requested';OUT.mkdir(parents=True,exist_ok=True)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
++env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src;{ROOT}/tools/tests',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++line=next(x for x in (ROOT/'tools/tests/suites.txt').read_text().splitlines() if x.startswith('requested_settings_units |'));sources=[ROOT/x for x in line.split('|')[2].split()]
++config=(ROOT/'src/base/config.cpp').read_text(encoding='utf-8');a=config.index('void FinalizeConfig()');b=config.index('{',a);e=b+1;d=1
++while d:d+=(config[e]=='{')-(config[e]=='}');e+=1
++body=config[a:e];assert config.count('FinalizeConfig();')==2
++code=r"""
++#include <Windows.h>
++#include <sstream>
++#include <cstring>
++#include "base/config_values.h"
++#include "base/worker_count.h"
++#include "gui/requested_settings.h"
++#include "check.h"
++unsigned logged=0,clamped=0,errors=0;void LogMsg(const std::string&){++logged;}void LogError(const std::string&){++errors;}void ClampRenderConfig(){++clamped;}void LogRenderConfig(){}
++bool ApplyRenderConfig(const RenderConfig&){return true;}bool BenchWindowInForeground(){return false;}int BenchLoadedZoneCount(){return 0;}
++ACTUAL
++int main(){movement::g_movementCfg.routingEnabled=false;movement::g_movementCfg.groupCohesionEnabled=true;movement::g_movementCfg.formationGatherPaceEnabled=true;pathfind::g_pathfindCfg.playerRepathTierEnabled=true;
++ Check(!RequestedConfig().Ready(),"startup snapshot not captured eagerly");FinalizeConfig();SettingsStaging s;Check(RequestedConfig().Copy(&s)&&!errors&&clamped==1,"actual Finalize captures successfully");
++ int movement=-1,path=-1;for(int i=0;i<kConfigModuleCount;++i){if(!std::strcmp(kConfigModules[i].name,"movement"))movement=i;if(!std::strcmp(kConfigModules[i].name,"pathfind"))path=i;}
++ const movement::MovementConfig&m=*reinterpret_cast<const movement::MovementConfig*>(s.module[movement].state);const pathfind::PathfindConfig&p=*reinterpret_cast<const pathfind::PathfindConfig*>(s.module[path].state);
++ Check(!m.routingEnabled&&m.groupCohesionEnabled&&m.formationGatherPaceEnabled&&p.playerRepathTierEnabled,"capture precedes routing master override");
++ Check(!movement::g_movementCfg.groupCohesionEnabled&&!pathfind::g_pathfindCfg.playerRepathTierEnabled,"effective routing remains original behavior");
++ movement::g_movementCfg.groupCohesionEnabled=false;Check(RequestedConfig().Copy(&s)&&reinterpret_cast<const movement::MovementConfig*>(s.module[movement].state)->groupCohesionEnabled,"later hook refusal cannot overwrite requested copy");
++ return CheckExit("actual_finalize_requested");}
++""".replace('ACTUAL',body)
++helper=(ROOT/'src/gui/requested_settings.cpp').read_text(encoding='utf-8')
++def run(name,unit,changed=None,defines=(),passes=True):
++ folder=OUT/name;folder.mkdir(exist_ok=True);cpp=folder/'unit.cpp';cpp.write_text(unit,encoding='utf-8');selected=list(sources)
++ if changed is not None:
++  h=folder/'requested_settings.cpp';h.write_text(changed,encoding='utf-8');selected=[h if p.name=='requested_settings.cpp' else p for p in selected]
++ r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3',*defines,str(cpp),str(ROOT/'src/base/worker_count.cpp'),*map(str,selected),'/Fo'+str(folder)+'/', '/Fe'+str(folder/'test.exe')],env=env,cwd=ROOT,capture_output=True,text=True)
++ (folder/'build.log').write_text(r.stdout+r.stderr,encoding='utf-8')
++ if r.returncode:raise RuntimeError(r.stdout+r.stderr)
++ r=subprocess.run([str(folder/'test.exe')],capture_output=True,text=True);(folder/'run.log').write_text(r.stdout+r.stderr,encoding='utf-8')
++ if (r.returncode==0)!=passes:raise AssertionError(name+': '+r.stdout+r.stderr)
++ print(name,r.stdout.strip())
++for label,defines in [('prod',('/DZONEHAND_STEP=3',)),('dev',('/DZONEHAND_STEP=3','/DKEO_DEBUG'))]:run(label,code,defines=defines)
++call='if (!CaptureRequestedSettings()) LogError("Requested config snapshot exceeds settings bounds; editor unavailable");'
++assert call in code
++changed=code.replace(call,'').replace('movement::ApplyRoutingSwitch(&LogMsg);','movement::ApplyRoutingSwitch(&LogMsg);'+call)
++run('capture-too-late',changed,passes=False)
++unit=(ROOT/'tools/tests/requested_settings_units.cpp').read_text(encoding='utf-8')
++for name,old,new in [('copy-live','*out = values_;','for(int i=0;i<moduleCount_;++i) StageModule(modules_[i], &out->module[i]);'),('state-overflow','mod.stateSize > CONFIG_STATE_MAX','false'),('lost-readiness','if (!ready_ || !out)','if (!out)'),('lost-key-bounds','module >= moduleCount_','module > moduleCount_')]:
++ assert old in helper;run(name,unit,helper.replace(old,new),passes=False)
++print('5 compiled requested-state/Finalize mutants rejected')
+diff --git a/leopard/test_translation_seam.py b/leopard/test_translation_seam.py
+new file mode 100644
+index 0000000..0365c75
+--- /dev/null
++++ b/leopard/test_translation_seam.py
+@@ -0,0 +1,33 @@
++"""Native KeoTr body extracted at the catalog boundary; host header is game-free.
++This deliberately does not claim native LocaleManager/catalog integration tests.
++"""
++from pathlib import Path
++import os,subprocess
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/task1/translation';OUT.mkdir(parents=True,exist_ok=True)
++source=(ROOT/'src/base/keo_tr.cpp').read_text(encoding='utf-8')
++a=source.index('const char* KeoTr(');b=source.index('{',a);e=b+1;depth=1
++while depth:depth+=(source[e]=='{')-(source[e]=='}');e+=1
++actual=source[a:e]
++code=r"""
++#include "base/keo_tr.h"
++#include <cstdio>
++#include <cstring>
++unsigned calls=0;const char*Tr(const char*){++calls;return "translated";}
++ACTUAL
++unsigned checks=0;
++#define CHECK(x) do{++checks;if(!(x)){printf("FAIL %s\n",#x);return 1;}}while(0)
++int main(){CHECK(!std::strcmp(KeoTr(NULL),"")&&!calls);CHECK(!std::strcmp(KeoTr(""),"")&&!calls);CHECK(!std::strcmp(KeoTr("Squad movement"),"translated")&&calls==1);const char*result=KeoTr("text");CHECK(!std::strcmp(result,"translated")&&calls==2);printf("Actual native translation boundary %u checks PASS\n",checks);return 0;}
++""".replace('ACTUAL',actual)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
++env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++def run(name,text,passes=True):
++ cpp=OUT/(name+'.cpp');cpp.write_text(text,encoding='utf-8');r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/O2',str(cpp),f'/Fo{OUT/name}.obj',f'/Fe{OUT/name}.exe'],env=env,capture_output=True,text=True)
++ (OUT/(name+'.build.log')).write_text(r.stdout+r.stderr,encoding='utf-8')
++ if r.returncode:raise RuntimeError(r.stdout+r.stderr)
++ r=subprocess.run([str(OUT/(name+'.exe'))],capture_output=True,text=True);(OUT/(name+'.run.log')).write_text(r.stdout+r.stderr,encoding='utf-8')
++ if (r.returncode==0)!=passes:raise AssertionError(name+': '+r.stdout)
++ print(name,r.stdout.strip())
++run('actual',code)
++for name,old,new in [('always-English','return Tr(english);','return english;'),('query-empty','if (!english || !*english)','if (!english)'),('query-null','if (!english || !*english)','if (english && !*english)')]:
++ assert old in code;run(name,code.replace(old,new),False)
++print('3 compiled translation-boundary mutants rejected')
+diff --git a/src/base/config.cpp b/src/base/config.cpp
+index 195e57a..d0810d7 100644
+--- a/src/base/config.cpp
++++ b/src/base/config.cpp
+@@ -6,6 +6,7 @@
+ #include "base/legacy_ini_import.h"
+ #include "render/render_config.h"
+ #include "movement/movement_config.h"
++#include "gui/requested_settings.h"
+ #include <cstdio>
+ #include <cstring>
+ 
+@@ -235,6 +236,7 @@ void LoadConfig(const std::string& dllDir)
+ 
+ void FinalizeConfig()
+ {
++	if (!CaptureRequestedSettings()) LogError("Requested config snapshot exceeds settings bounds; editor unavailable");
+ 	movement::ApplyRoutingSwitch(&LogMsg);   // LEOPARD fork: keoRouting=false, before any hook installs
+ 
+ 	SYSTEM_INFO si;
+diff --git a/src/base/keo_tr.cpp b/src/base/keo_tr.cpp
+new file mode 100644
+index 0000000..4568cca
+--- /dev/null
++++ b/src/base/keo_tr.cpp
+@@ -0,0 +1,12 @@
++#include "base/keo_tr.h"
++#include "base/klib_include.h"
++#define KLOC_DOMAIN "keo"
++#include "base/Localization.h"
++#include "base/klib_include_end.h"
++
++const char* KeoTr(const char* english)
++{
++	if (!english || !*english)
++		return english ? english : "";
++	return Tr(english);
++}
+diff --git a/src/base/keo_tr.h b/src/base/keo_tr.h
+index 0b1dc6d..32a6458 100644
+--- a/src/base/keo_tr.h
++++ b/src/base/keo_tr.h
+@@ -3,16 +3,7 @@
+ // locale/<lang>/LC_MESSAGES/keo.po (or .mo) beside KEO.dll, read by the shared
+ // Localization.h (a copy of D:\DEV\Kenshi\shared\Localization.h). UI thread only.
+ #pragma once
+-#include "base/klib_include.h"
+-#define KLOC_DOMAIN "keo"
+-#include "base/Localization.h"
+-#include "base/klib_include_end.h"
+-
+-// Tr() for a string that may be NULL or empty: gettext answers the empty key
+-// with the catalog header, so those pass through untouched.
+-inline const char* KeoTr(const char* english)
+-{
+-	if (!english || !*english)
+-		return english ? english : "";
+-	return Tr(english);
+-}
++// Game-free interface. The native implementation alone owns the localization
++// include; host policy/layout tests link an explicit identity implementation.
++// NULL and empty keys return "", rather than the gettext catalog header.
++const char* KeoTr(const char* english);
+diff --git a/src/gui/requested_settings.cpp b/src/gui/requested_settings.cpp
+new file mode 100644
+index 0000000..c646923
+--- /dev/null
++++ b/src/gui/requested_settings.cpp
+@@ -0,0 +1,83 @@
++#include "gui/requested_settings.h"
++#include <cstring>
++
++RequestedSettingsSnapshot::RequestedSettingsSnapshot()
++	: modules_(NULL), moduleCount_(0), ready_(false)
++{
++	std::memset(&values_, 0, sizeof(values_));
++	std::memset(keyCount_, 0, sizeof(keyCount_));
++}
++
++static size_t RequestedWidth(const ConfigKey& k)
++{
++	switch (k.kind)
++	{
++	case CK_BOOL: return sizeof(bool);
++	case CK_INT: return sizeof(int);
++	case CK_FLOAT: return sizeof(float);
++	case CK_DOUBLE: return sizeof(double);
++	default: return k.size;
++	}
++}
++
++bool RequestedSettingsSnapshot::Capture(const ConfigModule* modules, int count)
++{
++	ready_ = false;
++	modules_ = NULL;
++	moduleCount_ = 0;
++	std::memset(&values_, 0, sizeof(values_));
++	std::memset(keyCount_, 0, sizeof(keyCount_));
++	if (!modules || count <= 0 || count > CONFIG_MODULE_MAX) return false;
++	// Preflight every bound before StageModule can read any value.
++	for (int m = 0; m < count; ++m)
++	{
++		const ConfigModule& mod = modules[m];
++		if (!mod.keys || mod.stateSize > CONFIG_STATE_MAX || (!mod.state && mod.stateSize)) return false;
++		int i = 0;
++		for (; i < CONFIG_STAGE_MAX && mod.keys[i].name; ++i)
++		{
++			const ConfigKey& k = mod.keys[i];
++			if (k.retired) continue;
++			if (k.kind < CK_BOOL || k.kind > CK_CUSTOM) return false;
++			if (!k.target && mod.state)
++			{
++				const size_t width = RequestedWidth(k);
++				if (!width || k.offset > mod.stateSize || width > mod.stateSize - k.offset) return false;
++			}
++		}
++		if (i == CONFIG_STAGE_MAX) return false;
++		keyCount_[m] = i;
++	}
++	for (int m = 0; m < count; ++m) StageModule(modules[m], &values_.module[m]);
++	modules_ = modules;
++	moduleCount_ = count;
++	ready_ = true;
++	return true;
++}
++
++bool RequestedSettingsSnapshot::Copy(SettingsStaging* out) const
++{
++	if (!ready_ || !out) return false;
++	*out = values_;
++	return true;
++}
++
++bool RequestedSettingsSnapshot::Key(int module, int key, const ConfigModule** m, const ConfigKey** k) const
++{
++	if (m) *m = NULL;
++	if (k) *k = NULL;
++	if (!ready_ || !m || !k || module < 0 || module >= moduleCount_ || key < 0 || key >= keyCount_[module]) return false;
++	const ConfigKey& row = modules_[module].keys[key];
++	if (row.retired) return false;
++	*m = &modules_[module];
++	*k = &row;
++	return true;
++}
++
++static RequestedSettingsSnapshot& RequestedStorage()
++{
++	static RequestedSettingsSnapshot snapshot;
++	return snapshot;
++}
++bool CaptureRequestedSettings() { return RequestedStorage().Capture(kConfigModules, kConfigModuleCount); }
++const RequestedSettingsSnapshot& RequestedConfig() { return RequestedStorage(); }
+diff --git a/src/gui/requested_settings.h b/src/gui/requested_settings.h
+new file mode 100644
+index 0000000..ee655dc
+--- /dev/null
++++ b/src/gui/requested_settings.h
+@@ -0,0 +1,24 @@
++#pragma once
++#include "gui/settings_rows.h"
++
++// UI/startup thread only. Owned preferences, never the post-refusal runtime
++// configuration. No save/apply, translation, native lookup or file operations.
++// Metadata tables must have static lifetime, as kConfigModules does.
++class RequestedSettingsSnapshot
++{
++	SettingsStaging values_;
++	const ConfigModule* modules_;
++	int moduleCount_, keyCount_[CONFIG_MODULE_MAX];
++	bool ready_;
++public:
++	RequestedSettingsSnapshot();
++	bool Capture(const ConfigModule* modules, int count);
++	bool Ready() const { return ready_; }
++	bool Copy(SettingsStaging* out) const;
++	bool Key(int module, int key, const ConfigModule** m, const ConfigKey** k) const;
++};
++
++// Called once per LoadConfig path, after parsing/clamping and before runtime
++// routing overrides or hook failures. Future callbacks read owned copies.
++bool CaptureRequestedSettings();
++const RequestedSettingsSnapshot& RequestedConfig();
+diff --git a/tools/build/coresrc.txt b/tools/build/coresrc.txt
+index ada1a9d..12886f9 100644
+--- a/tools/build/coresrc.txt
++++ b/tools/build/coresrc.txt
+@@ -19,6 +19,7 @@ src\bench\bench_weather.cpp
+ src\navmesh\jobs\buildlock_audit.cpp
+ src\zone\preload\camera_focus.cpp
+ src\base\config.cpp
++src\base\keo_tr.cpp
+ src\base\core.cpp
+ src\zone\preload\coverage_stats.cpp
+ src\diag\cpp_exception.cpp
+@@ -200,6 +201,7 @@ src\base\config_keys.cpp
+ src\plugin\hook_manifest.cpp
+ src\plugin\hook_manifest_policy.cpp
+ src\gui\settings_factory.cpp
++src\gui\requested_settings.cpp
+ src\plugin\banner.cpp
+ src\plugin\profiler_image.cpp
+ src\base\log.cpp
+diff --git a/tools/tests/config_golden/dev.txt b/tools/tests/config_golden/dev.txt
+index 3a5bf9e..860bde0 100644
+--- a/tools/tests/config_golden/dev.txt
++++ b/tools/tests/config_golden/dev.txt
+@@ -45,6 +45,7 @@ islandReadinessRule=false
+ k7ArrivalTrigger=true
+ k7DestReadyGate=true
+ k7PostDeathHold=1
++keoRouting=true
+ meshFaceGuard=true
+ movementAware=true
+ movementTrace=0
+diff --git a/tools/tests/config_golden/prod.txt b/tools/tests/config_golden/prod.txt
+index b5e280f..d941884 100644
+--- a/tools/tests/config_golden/prod.txt
++++ b/tools/tests/config_golden/prod.txt
+@@ -45,6 +45,7 @@ islandReadinessRule=false
+ k7ArrivalTrigger=true
+ k7DestReadyGate=true
+ k7PostDeathHold=1
++keoRouting=true
+ meshFaceGuard=true
+ movementAware=true
+ movementTrace=0
+diff --git a/tools/tests/config_modules_units.cpp b/tools/tests/config_modules_units.cpp
+index 4bb804d..2a37703 100644
+--- a/tools/tests/config_modules_units.cpp
++++ b/tools/tests/config_modules_units.cpp
+@@ -27,6 +27,7 @@ static const Owner kOwners[] =
+ 	{ "preload", "zone" },
+ 	{ "movementAware", "zone" },
+ 	{ "caching", "navmesh" },
++	{ "keoRouting", "movement" },
+ 	{ "groupCohesion", "movement" },
+ 	{ "pathfindDiag", "pathfind" },
+ 	{ "islandFix", "movement" },
+@@ -413,7 +414,7 @@ int main()
+ 		}
+ 		if (i == CONFIG_STAGE_MAX) Fail(mod.name, "no table end within stage capacity");
+ 	}
+-	Check(moduleKeys == 114 && activeCore == 2 && retiredCore == 23 && debug == 4, "module and core row counts");
++	Check(moduleKeys == 115 && activeCore == 2 && retiredCore == 23 && debug == 4, "module and core row counts");
+ 	const char* const removed[] = { "npcFailMemo", "rqStructClear", "ogreWorkerPriority", "factionSelfGuard" };
+ 	for (int i = 0; i < 4; ++i)
+ 		Check(FindConfigKey(removed[i], NULL) == NULL, "removed switches have no config row");
+diff --git a/tools/tests/config_table_checks.h b/tools/tests/config_table_checks.h
+index e090bd4..c953083 100644
+--- a/tools/tests/config_table_checks.h
++++ b/tools/tests/config_table_checks.h
+@@ -232,7 +232,7 @@ const char* const kUndocumented[] =
+ 	"formationFollow",
+ 	"gatePassDiag",
+ 	"graphHeuristicGuard", "graphPositionGuard", "groupCohesion", "islandDeletedReissue", "islandFix",
+-	"islandReadinessRule", "movementAware", "movementTrace", "navmeshDiskCacheMaxMB", "navmeshNeighbourSeeds",
++	"islandReadinessRule", "keoRouting", "movementAware", "movementTrace", "navmeshDiskCacheMaxMB", "navmeshNeighbourSeeds",
+ 	"navmeshVanillaPruning", "npcWaitDiag", "pathfindDiag", "plannerAcidCost", "plannerAheadTiles", "plannerBaseBuild",
+ 	"plannerLegAim", "plannerLegSpan", "plannerMergeBias", "plannerMergeDetour", "plannerMode", "plannerPreArrivalMs", "plannerWaitSeconds", "plannerWaterCost", "plannerWaterEngine", "playerHierOnCap", "playerHierarchical",
+ 	"preload", "preloadKeepAliveSeconds",
+@@ -297,7 +297,7 @@ void CheckTemplateAndDefaults(const ConfigModule& core, const ConfigModule& rend
+ 		}
+ 	}
+ 
+-	// 2. The undocumented rows are exactly the known 42.
++	// 2. The undocumented rows are exactly the known 43.
+ 	{
+ 		std::vector<std::string> undoc, want;
+ 		for (int m = 0; m < kConfigModuleCount; ++m)
+@@ -307,7 +307,7 @@ void CheckTemplateAndDefaults(const ConfigModule& core, const ConfigModule& rend
+ 		for (int i = 0; kUndocumented[i]; ++i)
+ 			want.push_back(kUndocumented[i]);
+ 		std::sort(undoc.begin(), undoc.end());
+-		Check(undoc.size() == 42, "undocumented rows: 42");
++		Check(undoc.size() == 43, "undocumented rows: 43");
+ 		for (size_t i = 0; i < undoc.size(); ++i)
+ 			CheckNamed(std::binary_search(want.begin(), want.end(), undoc[i]), "undocumented " + undoc[i]);
+ 		for (size_t i = 0; i < want.size(); ++i)
+@@ -556,7 +556,7 @@ void CheckCoreWriter(const ConfigModule& core)
+ 	for (int m = 0; m < kConfigModuleCount; ++m)
+ 		if (kConfigModules[m].state && strcmp(kConfigModules[m].name, "render"))
+ 			ConfigIniEntries(kConfigModules[m], kConfigModules[m].state, kConfigModules[m].defaults, &e);
+-	Check(e.size() == 107u,
++	Check(e.size() == 108u,
+ 	      "writer: core entries, every active row but the custom rows without choices");
+ 	bool appends = false;
+ 	for (size_t i = 0; i < e.size(); ++i)
+@@ -631,7 +631,7 @@ void CheckGoldenRecord(const ConfigModule& core)
+ 		if (!fl[i].empty() && eq != std::string::npos)
+ 			want.push_back(KeyValue(fl[i].substr(0, eq), fl[i].substr(eq + 1)));
+ 	}
+-	Check(want.size() == 136u, "golden record key count");
++	Check(want.size() == 137u, "golden record key count");
+ 	CheckNamed(got.size() == want.size(), "golden count");
+ 	for (size_t i = 0; i < got.size(); ++i)
+ 	{
+@@ -678,7 +678,7 @@ void CheckTables()
+ 		Check(mod.keys[i].name == NULL, "tables end");
+ 	}
+ 	Check(kConfigModuleCount == 10, "tables end: ten modules");
+-	Check(active == 138 && retired == 23, "tables end: active and retired rows");
++	Check(active == 139 && retired == 23, "tables end: active and retired rows");
+ 	Check(coreActive == 2 && renderActive == 22, "tables end: rows per module");
+ 	std::printf("  tables: %d module(s), %d active row(s) (core %d, render %d), %d retired\n",
+ 	            kConfigModuleCount, active, coreActive, renderActive, retired);
+diff --git a/tools/tests/keo_tr_stub.cpp b/tools/tests/keo_tr_stub.cpp
+new file mode 100644
+index 0000000..d0eb896
+--- /dev/null
++++ b/tools/tests/keo_tr_stub.cpp
+@@ -0,0 +1,6 @@
++// Host tests verify layout/config policy in English, not native catalog loading.
++#include "base/keo_tr.h"
++const char* KeoTr(const char* english)
++{
++	return english ? english : "";
++}
+diff --git a/tools/tests/requested_settings_units.cpp b/tools/tests/requested_settings_units.cpp
+new file mode 100644
+index 0000000..a68546d
+--- /dev/null
++++ b/tools/tests/requested_settings_units.cpp
+@@ -0,0 +1,23 @@
++#include "gui/requested_settings.h"
++#include "base/config_values.h"
++#include "base/keo_tr.h"
++#include "check.h"
++#include <cstring>
++bool ApplyRenderConfig(const RenderConfig&){return true;}bool BenchWindowInForeground(){return false;}int BenchLoadedZoneCount(){return 0;}
++static const ConfigKey*Key(RequestedSettingsSnapshot&s,const char*n,int&index,int&module){const ConfigModule*m=NULL;const ConfigKey*k=FindConfigKey(n,&m);module=int(m-kConfigModules);for(index=0;m->keys+index!=k;++index){}return k;}
++int main(){RequestedSettingsSnapshot s;SettingsStaging copy;std::memset(&copy,0x5a,sizeof(copy));Check(!s.Ready()&&!s.Copy(&copy),"before capture getters refuse");
++ const ConfigModule*m=NULL;const ConfigKey*k=NULL;Check(!s.Key(0,0,&m,&k)&&!m&&!k,"before capture metadata refuses");
++ movement::g_movementCfg.routingEnabled=false;movement::g_movementCfg.groupCohesionEnabled=true;movement::g_movementCfg.formationGatherPaceEnabled=true;pathfind::g_pathfindCfg.playerRepathTierEnabled=true;
++ Check(s.Capture(kConfigModules,kConfigModuleCount)&&s.Ready()&&s.Copy(&copy),"capture owns parsed requested values");int index,module;Key(s,"groupCohesion",index,module);Check(s.Key(module,index,&m,&k)&&!std::strcmp(k->name,"groupCohesion"),"bounded index metadata returns existing key");
++ Check(reinterpret_cast<movement::MovementConfig*>(copy.module[module].state)->groupCohesionEnabled,"requested child ON retained");
++ movement::ApplyRoutingSwitch(NULL);SettingsStaging after;Check(s.Copy(&after)&&!movement::g_movementCfg.groupCohesionEnabled,"effective routing OFF applied separately");
++ Check(reinterpret_cast<movement::MovementConfig*>(after.module[module].state)->groupCohesionEnabled,"effective mutation cannot overwrite snapshot");
++ Check(!reinterpret_cast<movement::MovementConfig*>(after.module[module].state)->routingEnabled,"requested master remains OFF");
++ reinterpret_cast<movement::MovementConfig*>(after.module[module].state)->groupCohesionEnabled=false;Check(s.Copy(&after)&&reinterpret_cast<movement::MovementConfig*>(after.module[module].state)->groupCohesionEnabled,"getter copy is independent");
++ Check(!s.Copy(NULL),"NULL destination refuses");Check(!s.Key(-1,0,&m,&k)&&!s.Key(10,0,&m,&k)&&!s.Key(0,-1,&m,&k)&&!s.Key(0,128,&m,&k),"invalid callback indices refuse");
++ ConfigModule bad=kConfigModules[0];bad.stateSize=CONFIG_STATE_MAX+1;Check(!s.Capture(&bad,1)&&!s.Ready(),"oversized metadata clears availability");
++ Check(!s.Capture(kConfigModules,CONFIG_MODULE_MAX+1)&&!s.Ready(),"module overflow refuses");Check(!s.Capture(NULL,1)&&!s.Capture(kConfigModules,0),"missing module table refuses");
++ bad=kConfigModules[0];ConfigKey rows[CONFIG_STAGE_MAX];for(int i=0;i<CONFIG_STAGE_MAX;++i)rows[i]=bad.keys[0];bad.keys=rows;Check(!s.Capture(&bad,1),"missing row terminator refuses bounded");
++ rows[1].name=NULL;rows[0]=kConfigModules[0].keys[0];rows[0].offset=CONFIG_STATE_MAX;bad.keys=rows;Check(!s.Capture(&bad,1),"out of state offset refuses before StageModule");
++ Check(!RequestedConfig().Ready(),"global snapshot initially unavailable");movement::g_movementCfg.routingEnabled=false;movement::g_movementCfg.groupCohesionEnabled=true;Check(CaptureRequestedSettings()&&RequestedConfig().Copy(&after),"global startup capture shares owned helper");
++ Check(KeoTr(NULL)&&!*KeoTr(NULL)&&!std::strcmp(KeoTr("KEO"),"KEO"),"host identity seam has no catalog header for empty key");return CheckExit("requested_settings_units");}
+diff --git a/tools/tests/settings_factory_units.cpp b/tools/tests/settings_factory_units.cpp
+index 3b8cc36..35d8fa8 100644
+--- a/tools/tests/settings_factory_units.cpp
++++ b/tools/tests/settings_factory_units.cpp
+@@ -34,7 +34,7 @@ static const char* const SUITE_NAME = "settings_factory_units";
+ #else
+ static const char* const SUITE_NAME = "settings_factory_prod_units";
+ #endif
+-static const size_t CORE_ROWS_DEV = 106;
++static const size_t CORE_ROWS_DEV = 107;
+ static const int DEV_ONLY_ROWS = 108;
+ 
+ // ---- Sections --------------------------------------------------------------
+@@ -164,7 +164,7 @@ static void CheckRowCounts()
+ 	Check(ModuleSections(dev).size() == CORE_ROWS_DEV, "core rows dev");
+ 	Check(Section(dev, RENDER_TITLE).size() == 21, "render rows dev");
+ 	Check(Section(prod, "Zone loading").size() == 7 && Section(prod, "Performance").size() == 2
+-	      && Section(prod, "Squad movement").size() == 4 && Section(prod, "Gameplay fixes").size() == 4
++	      && Section(prod, "Squad movement").size() == 5 && Section(prod, "Gameplay fixes").size() == 4
+ 	      && Section(prod, "Backpacks and jobs").size() == 2, "player section rows prod");
+ }
+ 
+diff --git a/tools/tests/settings_layout_units.cpp b/tools/tests/settings_layout_units.cpp
+index 494d8c5..149e7c6 100644
+--- a/tools/tests/settings_layout_units.cpp
++++ b/tools/tests/settings_layout_units.cpp
+@@ -68,7 +68,10 @@ static void CheckSectionOrder()
+ 			if (r.restart)
+ 			{
+ 				anyRestart = true;
+-				tooltips = tooltips && EndsWith(r.tooltip, " Takes effect after restarting the game.");
++				std::string suffix = " Takes effect after restarting the game.";
++				if (r.enabledByRow >= 0 && (size_t)r.enabledByRow < rows.size())
++					suffix += " Works only while \"" + rows[r.enabledByRow].label + "\" is on.";
++				tooltips = tooltips && EndsWith(r.tooltip, suffix.c_str());
+ 			}
+ 			if (i < benchmark && r.enabledByRow < 0)
+ 			{
+@@ -197,17 +200,20 @@ static void CheckGroups()
+ 	SettingsStaging st;
+ 	StageAll(&st);
+ 	std::vector<SettingsRow> prod = Rows(&st, false, NULL);
+-	static const char* const kMembers[2][2] =
++	static const char* const kMembers[6][2] =
+ 	{
+ 		{ "throwOutFix", "throwOutHoldMinutes" },
+-		{ "backpackFixes", "operatorHoldUntil" }
++		{ "backpackFixes", "operatorHoldUntil" },
++		{ "keoRouting", "groupCohesion" }, { "keoRouting", "formationGatherPace" },
++		{ "keoRouting", "k7PostDeathHold" }, { "keoRouting", "plannerMode" }
+ 	};
++	const int memberOffset[] = { 1, 1, 1, 2, 3, 4 };
+ 	bool follows = true;
+-	for (int g = 0; g < 2; ++g)
++	for (int g = 0; g < 6; ++g)
+ 	{
+ 		int head = OnlyRowOf(prod, kMembers[g][0]);
+ 		int member = OnlyRowOf(prod, kMembers[g][1]);
+-		follows = follows && head >= 0 && member == head + 1;
++		follows = follows && head >= 0 && member == head + memberOffset[g];
+ 		std::vector<int> all = RowsOf(prod, kMembers[g][1]);
+ 		for (size_t i = 0; i < all.size(); ++i)
+ 			follows = follows && head >= 0 && prod[all[i]].enabledByRow == head;
+@@ -224,7 +230,7 @@ static void CheckGroups()
+ 			continue;
+ 		++gatedRows;
+ 		bool known = false;
+-		for (int g = 0; g < 2; ++g)
++		for (int g = 0; g < 6; ++g)
+ 		{
+ 			std::vector<int> heads = RowsOf(prod, kMembers[g][0]);
+ 			std::vector<int> members = RowsOf(prod, kMembers[g][1]);
+@@ -238,7 +244,7 @@ static void CheckGroups()
+ 		}
+ 		gated = gated && known && (size_t)h < prod.size() && prod[h].kind == SR_CHECKBOX;
+ 	}
+-	Check(gated && gatedRows == 2, "groups: each member's enabledByRow is its head's row, a checkbox");
++	Check(gated && gatedRows == 6, "groups: each member's enabledByRow is its head's row, a checkbox");
+ 
+ 	// The table with the throw-out slider placed before its checkbox.
+ 	std::vector<keo_gui::SettingsPlace> places;
+diff --git a/tools/tests/settings_units_common.h b/tools/tests/settings_units_common.h
+index 79342fc..887bb25 100644
+--- a/tools/tests/settings_units_common.h
++++ b/tools/tests/settings_units_common.h
+@@ -39,14 +39,14 @@ static const ProdRow kProdPage[] =
+ 	{ "navmeshDiskCacheMaxMB", "Zone loading" },
+ 	{ "particleStepCap", "Performance" },
+ 	{ "foliagePageBudgetMs", "Performance" },
+-	{ "groupCohesion", "Squad movement" }, { "formationGatherPace", "Squad movement" },
++	{ "keoRouting", "Squad movement" }, { "groupCohesion", "Squad movement" }, { "formationGatherPace", "Squad movement" },
+ 	{ "k7PostDeathHold", "Squad movement" }, { "plannerMode", "Squad movement" },
+ 	{ "townClaimFix", "Gameplay fixes" }, { "throwOutFix", "Gameplay fixes" },
+ 	{ "throwOutHoldMinutes", "Gameplay fixes" }, { "wallSpliceFix", "Gameplay fixes" },
+ 	{ "backpackFixes", "Backpacks and jobs" }, { "operatorHoldUntil", "Backpacks and jobs" },
+ 	{ NULL, NULL }
+ };
+-static const int PROD_PAGE_ROWS = 19;
++static const int PROD_PAGE_ROWS = 20;
+ static const char* const PROD_SECTIONS[] = { "Zone loading", "Performance", "Squad movement", "Gameplay fixes",
+ 	"Backpacks and jobs" };
+ 
+diff --git a/tools/tests/suites.txt b/tools/tests/suites.txt
+index c871877..aa98715 100644
+--- a/tools/tests/suites.txt
++++ b/tools/tests/suites.txt
+@@ -1,4 +1,4 @@
+-render_units | tools\tests\render_units.cpp | src\base\worker_count.cpp src\render\pe_imports.cpp src\render\pu_layout.cpp src\render\shadow_reach_math.cpp src\render\gpu_param_cache.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\bench\bench_slots.cpp src\render\id_string.cpp src\render\compositor_layout.cpp src\render\foliage_budget.cpp src\render\upload_shadow.cpp src\render\upload_plan.cpp src\render\pass_visibility.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\gui\settings_factory.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp |
++render_units | tools\tests\render_units.cpp | src\base\worker_count.cpp src\render\pe_imports.cpp src\render\pu_layout.cpp src\render\shadow_reach_math.cpp src\render\gpu_param_cache.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\bench\bench_slots.cpp src\render\id_string.cpp src\render\compositor_layout.cpp src\render\foliage_budget.cpp src\render\upload_shadow.cpp src\render\upload_plan.cpp src\render\pass_visibility.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\gui\settings_factory.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp |
+ hull_units | tools\tests\hull_units.cpp |  |
+ hull_pose_units | tools\tests\hull_pose_units.cpp |  |
+ sync_split_units | tools\tests\sync_split_units.cpp |  |
+@@ -6,8 +6,8 @@ scene_rules_units | tools\tests\scene_rules_units.cpp |  |
+ ogre_worker_units | tools\tests\ogre_worker_units.cpp | src\render\ogre_worker_policy.cpp |
+ bench_units | tools\tests\bench_units.cpp | src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_lever_ab.cpp src\bench\bench_stats.cpp src\bench\bench_report.cpp src\bench\bench_game_math.cpp src\bench\bench_recorders.cpp src\bench\bench_run_report.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\base\ini_text.cpp src\render\render_defaults.cpp | 
+ bench_pin_units | tools\tests\bench_pin_units.cpp | src\bench\bench_pin.cpp src\base\ini_text.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+-bench_group_units | tools\tests\bench_group_units.cpp | src\bench\bench_group.cpp src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+-bench_group_prod_units | tools\tests\bench_group_units.cpp | src\bench\bench_group.cpp src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DZONEHAND_STEP=3
++bench_group_units | tools\tests\bench_group_units.cpp | src\bench\bench_group.cpp src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
++bench_group_prod_units | tools\tests\bench_group_units.cpp | src\bench\bench_group.cpp src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DZONEHAND_STEP=3
+ nm_adjacency_units | tools\tests\nm_adjacency_units.cpp | src\navmesh\scheduling\nm_adjacency_policy.cpp |
+ gate_units | tools\tests\gate_units.cpp | src\pathfind\gate_loop.cpp | 
+ misspar_units | tools\tests\misspar_units.cpp | src\navmesh\generation\misspar_math.cpp src\navmesh\scheduling\nm_inflight.cpp |
+@@ -65,7 +65,7 @@ npc_search_probe_units | tools\tests\npc_search_probe_units.cpp | src\pathfind\n
+ klib_dethunk_units | tools\tests\klib_dethunk_units.cpp |  |
+ nm_busy_bridge_units | tools\tests\nm_busy_bridge_units.cpp | src\navmesh\jobs\nm_busy_bridge_policy.cpp |
+ nm_cache_slot_units | tools\tests\nm_cache_slot_units.cpp | src\navmesh\cache\nm_cache_slot_policy.cpp |
+-settings_floor_units | tools\tests\settings_floor_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
++settings_floor_units | tools\tests\settings_floor_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+ nm_worker_gate_units | tools\tests\nm_worker_gate_units.cpp | src\navmesh\workers\nm_worker_gate_policy.cpp |
+ zone_reset_sequence_units | tools\tests\zone_reset_sequence_units.cpp | src\zone\reset\zone_reset_sequence.cpp src\zone\reset\zone_reset_fence.cpp |
+ zone_reset_gate_units | tools\tests\zone_reset_gate_units.cpp | src\zone\reset\zone_reset_gate.cpp src\zone\reset\zone_reset_fence.cpp |
+@@ -77,10 +77,10 @@ config_table_dev_units | tools\tests\config_table_dev_units.cpp | src\base\confi
+ fixed_log_buf_units | tools\tests\fixed_log_buf_units.cpp |  | 
+ hook_manifest_units | tools\tests\hook_manifest_units.cpp | src\plugin\hook_manifest_policy.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\zone\geometry\zone_geometry_cert.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+ guard_report_units | tools\tests\guard_report_units.cpp |  | 
+-settings_factory_units | tools\tests\settings_factory_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+-settings_layout_units | tools\tests\settings_layout_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+-settings_factory_prod_units | tools\tests\settings_factory_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DZONEHAND_STEP=3
+-settings_layout_prod_units | tools\tests\settings_layout_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp | /DZONEHAND_STEP=3
++settings_factory_units | tools\tests\settings_factory_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
++settings_layout_units | tools\tests\settings_layout_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
++settings_factory_prod_units | tools\tests\settings_factory_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DZONEHAND_STEP=3
++settings_layout_prod_units | tools\tests\settings_layout_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp | /DZONEHAND_STEP=3
+ hook_manifest_prod_units | tools\tests\hook_manifest_units.cpp | src\plugin\hook_manifest_policy.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\zone\geometry\zone_geometry_cert.cpp | /DZONEHAND_STEP=3
+ hook_manifest_zh1_units | tools\tests\hook_manifest_units.cpp | src\plugin\hook_manifest_policy.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\zone\geometry\zone_geometry_cert.cpp | /DKEO_DEBUG /DZONEHAND_STEP=1
+ hook_manifest_zh2_units | tools\tests\hook_manifest_units.cpp | src\plugin\hook_manifest_policy.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\zone\geometry\zone_geometry_cert.cpp | /DKEO_DEBUG /DZONEHAND_STEP=2
+@@ -120,3 +120,4 @@ throwout_policy_units | tools\tests\throwout_policy_units.cpp | src\fixes\world\
+ backpack_sidecar_units | tools\tests\backpack_sidecar_units.cpp | src\inventory\backpack_sidecar_policy.cpp src\inventory\backpack_policy.cpp src\game\hand_key.cpp |
+ dialogue_thunk_units | tools\tests\dialogue_thunk_units.cpp | src\inventory\dialogue_thunk_policy.cpp |
+ operator_policy_units | tools\tests\operator_policy_units.cpp | src\inventory\operator_policy.cpp |
++requested_settings_units | tools\tests\requested_settings_units.cpp | src\gui\settings_factory.cpp src\gui\settings_rows.cpp src\gui\settings_layout.cpp src\base\config_table.cpp src\base\config_keys.cpp src\zone\zone_config.cpp src\navmesh\navmesh_config.cpp src\pathfind\pathfind_config.cpp src\movement\movement_config.cpp src\fixes\fixes_config.cpp src\inventory\inventory_config.cpp src\planner\planner_config.cpp src\gui\gui_config.cpp src\base\ini_text.cpp src\render\render_keys.cpp src\render\render_defaults.cpp src\zone\geometry\zone_geometry_cert.cpp src\bench\bench_lever_ab.cpp src\bench\bench_sweep.cpp src\bench\bench_pin.cpp src\bench\bench_slots.cpp src\bench\bench_scenario.cpp src\bench\bench_recorders.cpp src\bench\bench_stats.cpp tools\tests\keo_tr_stub.cpp src\gui\requested_settings.cpp | /DKEO_DEBUG /DZONEHAND_STEP=3
+-- 
+2.46.0.windows.1
+
