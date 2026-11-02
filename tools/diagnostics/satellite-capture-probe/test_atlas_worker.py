@@ -102,9 +102,35 @@ static void Run(int failPlane,int invalid,bool oom){
  }else{Check(p.ok&&!p.error[0],"complete worker success");Check(io.dataWrites==6144,"exactly three2048row writes");Check(!writer.BaseComplete(),"one capture block is never a complete primary");}
  Check(!p.packed.empty()==(failPlane==0),"raw copy released only after successful material write");
 }
+static void Control(){
+ const char* path="overlap-worker-control.bin";std::remove(path);
+ Recording io;Gst2::Writer writer;Check(writer.Begin(io,0,0,true),"control fixture original writer");
+ ActualWorker::Pixels p;Fill(p,writer);p.writer=NULL;p.controlPath=path;AtlasCapture::OverlapControl(p.block);
+ ActualWorker::WritePixels(&p);Check(p.ok&&!p.error[0],"compact control accepts no GST writer");
+ FILE* file=NULL;Check(fopen_s(&file,path,"rb")==0&&file,"real control file exists");
+ unsigned char header[32];Check(fread(header,1,32,file)==32,"control header readable");
+ Check(std::memcmp(header,"GSOV1\r\n",8)==0,"versioned diagnostic header");
+ unsigned side=0;float minX=0,minZ=0,step=0;std::memcpy(&side,header+8,4);std::memcpy(&minX,header+12,4);std::memcpy(&minZ,header+16,4);std::memcpy(&step,header+20,4);
+ Check(side==2048&&minX==-27648&&minZ==-18432&&step==9,"overlap footprint stored exactly");
+ const unsigned count=2048u*2048u;std::vector<unsigned> plane(count);
+ Check(fread(&plane[0],4,count,file)==count,"packed material plane complete");
+ for(unsigned i=0;i<count;++i)if(plane[i]!=Packed(i)){Check(false,"packed plane exact");break;}
+ Check(fread(&plane[0],4,count,file)==count,"normal plane complete");
+ for(unsigned i=0;i<count;++i)if(plane[i]!=0xff563412u){Check(false,"normal conversion exact");break;}
+ Check(fread(&plane[0],4,count,file)==count,"height plane complete");
+ for(unsigned i=0;i<count;++i){float h;std::memcpy(&h,&plane[i],4);if(!_finite(h)||std::fabs(h-SourceHeight(i))>.02f){Check(false,"world height plane exact");break;}}
+ Check(fgetc(file)==EOF,"compact control exactly48MiB plus32 bytes");Check(fclose(file)==0,"read handle closed");
+ Check(io.dataWrites==0&&writer.Mask()==0,"control never touches atlas writer");std::remove(path);
+ ActualWorker::Pixels bad;Fill(bad,writer);bad.writer=NULL;bad.controlPath="missing-control-directory/control.bin";AtlasCapture::OverlapControl(bad.block);
+ ActualWorker::WritePixels(&bad);Check(!bad.ok&&bad.error[0],"control create failure contained");
+ ActualWorker::Pixels invalid;Fill(invalid,writer);invalid.writer=NULL;invalid.controlPath=path;invalid.depth[0]=0;
+ ActualWorker::WritePixels(&invalid);Check(!invalid.ok&&invalid.error[0],"invalid control refused before file creation");
+ file=NULL;Check(fopen_s(&file,path,"rb")!=0&&!file,"invalid control leaves no evidence file");
+}
 int main(){
  Run(-1,0,false);Run(0,0,false);Run(1,0,false);Run(2,0,false);
  Run(-1,1,false);Run(-1,2,false);Run(-1,3,false);Run(-1,0,true);
+ Control();
  std::printf("PASS %u extracted production AtlasRun::WritePixels checks;8 full-size cases; no Ogre/game calls\n",checks);return 0;
 }
 '''
@@ -116,7 +142,7 @@ cache=HERE.parents[2]/'GlobalSatelliteMap/atlas-cache'
 env=dict(os.environ,INCLUDE=f'{vc}/include;{sdk}/Include;{HERE};{cache}',LIB=f'{vc}/lib/amd64;{sdk}/Lib/x64')
 exe=OUT/'actual_atlas_worker.exe'
 subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W4',str(generated),f'/Fo{OUT}/actual_atlas_worker.obj',f'/Fe{exe}'],env=env,check=True)
-run=subprocess.run([str(exe)],capture_output=True,text=True,check=True)
+run=subprocess.run([str(exe)],cwd=OUT,capture_output=True,text=True,check=True)
 print(run.stdout.strip())
 report=dict(workerSourceSha256=hashlib.sha256((HERE/'AtlasRun.h').read_bytes()).hexdigest(),extractedWorkerSha256=hashlib.sha256(worker.encode()).hexdigest(),pixelsSourceSha256=hashlib.sha256((HERE/'AtlasPixels.h').read_bytes()).hexdigest(),cacheWriterSha256=hashlib.sha256((cache/'Gst2Writer.h').read_bytes()).hexdigest(),result=run.stdout.strip(),limits='Recording RandomFile I/O, actual writer+worker+2048²payload; no real atlas/native GPU/process action')
 (OUT/'verification.json').write_text(json.dumps(report,indent=2)+'\n')

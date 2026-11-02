@@ -174,9 +174,10 @@ struct TerrainExperiment
                <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
         Log(message.str());
     }
-    void BeginAtlas(Ogre::Root* owner,unsigned index,const std::string& heightPath)
+    void BeginAtlas(Ogre::Root* owner,unsigned index,const std::string& heightPath,bool overlapControl=false)
     {
-        if(root||scene||terrain||camera||workspace||active||Side!=2048||!AtlasCapture::Select(index,atlasBlock))
+        if(root||scene||terrain||camera||workspace||active||Side!=2048||
+            !(overlapControl?AtlasCapture::OverlapControl(atlasBlock):AtlasCapture::Select(index,atlasBlock)))
             throw std::runtime_error("atlas capture requires idle2048 private terrain");
         atlas=true;
         Begin(owner,int(atlasBlock.tileX),int(atlasBlock.tileZ),16000,heightPath,false,false,false,"5611-Newwworld.mod",true,true,false);
