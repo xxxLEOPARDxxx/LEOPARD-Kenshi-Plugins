@@ -3,12 +3,13 @@
 #include "PaintedShader.h"
 #include "../../../GlobalSatelliteMap/PaintedMapPolicy.h"
 #include "PaintedMipPolicy.h"
+#include "region-catalog/RegionCatalogData.h"
 struct PrivatePaintedReference
 {
     struct Images {Ogre::Image image[4];std::vector<BYTE> encoded[4];SatelliteGpuMip::Layer layers[4];};
     Images *images[2];Ogre::TexturePtr textures[2];Ogre::HighLevelGpuProgramPtr program;
-    ProbePolicy::FixedProgramCache cache;bool uncertain;
-    PrivatePaintedReference():uncertain(false){images[0]=images[1]=NULL;}
+    ProbePolicy::FixedProgramCache cache;bool uncertain;int primaryX,primaryZ;
+    PrivatePaintedReference():uncertain(false),primaryX(1),primaryZ(1){images[0]=images[1]=NULL;}
     static const char *Name(unsigned kind)
     {return kind?"LEOPARD_PrivatePaintedColour":"LEOPARD_PrivatePaintedOverlay";}
     static const char *ProgramName(){return "LEOPARD_PrivatePaintedFragment";}
@@ -89,9 +90,29 @@ struct PrivatePaintedReference
         if(program.isNull()||!program->isSupported()||program->hasCompileError())throw std::runtime_error("private painted cached shader unsupported");
     }
     void Begin(const std::string &gameRoot,Ogre::CompositorManager2 *owner)
+    {BeginInputs(gameRoot,owner,PrivatePaintedInputs,1,1);}
+    static bool InputsForPrimary(int x,int z,PrivatePaintedInput (&inputs)[8])
     {
+        if(x<0||x>3||z<0||z>3||!SatelliteRegion::Validate(SatelliteRegion::Data))return false;
+        for(unsigned kind=0;kind<2;++kind)for(unsigned layer=0;layer<4;++layer)
+        {
+            const SatelliteRegion::Painted& p=SatelliteRegion::Data.painted[kind*64+(z*2+layer/2)*8+x*2+layer%2];
+            const PrivatePaintedInput value={p.kind,p.x,p.z,p.side,p.bytes,p.path,p.sha256};inputs[kind*4+layer]=value;
+        }
+        return true;
+    }
+    void BeginPrimary(const std::string &gameRoot,Ogre::CompositorManager2 *owner,int x,int z)
+    {
+        PrivatePaintedInput inputs[8];
+        if(!InputsForPrimary(x,z,inputs))throw std::runtime_error("private painted primary catalog refused");
+        BeginInputs(gameRoot,owner,inputs,x,z);
+    }
+    void BeginInputs(const std::string &gameRoot,Ogre::CompositorManager2 *owner,const PrivatePaintedInput (&inputs)[8],int x,int z)
+    {
+        if(x<0||x>3||z<0||z>3)throw std::runtime_error("private painted primary bounds refused");
         if(!OnMain()||!owner||uncertain||images[0]||images[1]||!textures[0].isNull()||!textures[1].isNull()||!program.isNull())
             throw std::runtime_error("private painted reference context/ownership refused");
+        primaryX=x;primaryZ=z;
         PrepareProgram(owner);
         size_t encodedBytes=0,decodedBytes=0,gpuBytes=0;PaintedMipPolicy::Plan plans[2];
         for(unsigned kind=0;kind<2;++kind)
@@ -100,8 +121,8 @@ struct PrivatePaintedReference
             images[kind]=new Images;
             for(unsigned layer=0;layer<4;++layer)
             {
-                const PrivatePaintedInput &input=PrivatePaintedInputs[kind*4+layer];
-                if(input.kind!=kind||input.x!=2+layer%2||input.z!=2+layer/2)
+                const PrivatePaintedInput &input=inputs[kind*4+layer];
+                if(input.kind!=kind||input.x!=unsigned(x*2)+layer%2||input.z!=unsigned(z*2)+layer/2)
                     throw std::runtime_error("private painted fixture order differs");
                 Read(input,gameRoot,images[kind]->encoded[layer],encodedBytes);
                 Ogre::DataStreamPtr stream(new Ogre::MemoryDataStream(&images[kind]->encoded[layer][0],input.bytes,false,true));
@@ -123,6 +144,9 @@ struct PrivatePaintedReference
             if(!PaintedMipPolicy::Select(kind,first.getWidth(),first.getHeight(),first.getFormat(),plans[kind]))
                 throw std::runtime_error("private painted full-mip plan refused");
         }
+        size_t combinedBytes=encodedBytes;
+        if(!SatelliteTextureArray::AddBytes(combinedBytes,decodedBytes))
+            throw std::runtime_error("private painted combined source payload budget refused before allocation");
         if(!PaintedMipPolicy::Budget(plans,gpuBytes))throw std::runtime_error("private painted full-chain GPU budget refused before allocation");
         {std::ostringstream message;message<<"private painted full-mip preflight: levels=11/12 layers=4/4 gpuTexelBytes="<<gpuBytes
             <<" cap="<<PaintedMipPolicy::GpuLimit<<"; manager size is base-level accounting only";Log(message.str());}
@@ -144,7 +168,7 @@ struct PrivatePaintedReference
                 <<" creator=TextureManager notify=1 Loaded=1; native pixel equivalence pending";Log(message.str());
         }
         for(unsigned kind=0;kind<2;++kind){delete images[kind];images[kind]=NULL;}
-        std::ostringstream message;message<<"private painted arrays loaded:4pairs core2,2; RGBA full-chain; sourceBytes="<<encodedBytes
+        std::ostringstream message;message<<"private painted arrays loaded:4pairs core"<<primaryX*2<<','<<primaryZ*2<<"; RGBA full-chain; sourceBytes="<<encodedBytes
             <<" decodedBytes="<<decodedBytes<<" gpuTexelBytes="<<gpuBytes;Log(message.str());
     }
     void Program(const Ogre::MaterialPtr &material)
@@ -166,11 +190,20 @@ struct PrivatePaintedReference
         pass->getTextureUnitState(0)->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
         pass->getTextureUnitState(4)->setTextureFiltering(Ogre::TFO_NONE);
         Ogre::GpuProgramParametersSharedPtr fp=pass->getFragmentProgramParameters();
-        fp->setNamedConstant("paintedTileBase",Ogre::Vector4(-73728,-73728,0,0));
+        BindPrimaryBase(material);
         fp->setNamedAutoConstant("viewport",Ogre::GpuProgramParameters::ACT_VIEWPORT_SIZE);
         fp->setNamedAutoConstant("cameraPos",Ogre::GpuProgramParameters::ACT_CAMERA_POSITION);
         fp->setNamedAutoConstant("farClip",Ogre::GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
         Log("private painted pixel selection configured; four native18m-border maps, explicit SRV/sampler slots; no biome mixing/water/buildings");
+    }
+    bool MatchesPrimary(unsigned x,unsigned z)const
+    {return !textures[0].isNull()&&!textures[1].isNull()&&primaryX==int(x)&&primaryZ==int(z);}
+    void BindPrimaryBase(const Ogre::MaterialPtr& material)
+    {
+        if(primaryX<0||primaryX>3||primaryZ<0||primaryZ>3||material.isNull()||textures[0].isNull()||textures[1].isNull())
+            throw std::runtime_error("private painted primary base unavailable");
+        material->getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("paintedTileBase",
+            Ogre::Vector4(float(-147456+primaryX*73728),float(-147456+primaryZ*73728),0,0));
     }
     void Destroy()
     {
@@ -186,6 +219,7 @@ struct PrivatePaintedReference
             if(!cache.Owns(0,program.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(ProgramName());
             program.setNull();
         }
+        primaryX=primaryZ=1;
     }
 };
 PrivatePaintedReference& PaintedReference()

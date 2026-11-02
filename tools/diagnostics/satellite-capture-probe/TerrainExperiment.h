@@ -56,10 +56,11 @@ struct TerrainExperiment
     int primaryX,primaryZ;
     DWORD started,lastStep;
     std::string heightSource;
-    bool active,geometryOnly,definitionsReady,definitionsFailed,geographic;
+    bool active,geometryOnly,definitionsReady,definitionsFailed,geographic,atlas;
+    AtlasCapture::Block atlasBlock;
     TerrainExperimentPolicy::RecycleState recycle;
     TerrainExperiment():root(NULL),scene(NULL),terrain(NULL),camera(NULL),workspace(NULL),definitionOwner(NULL),
-        peakNativeMemory(0),primaryX(0),primaryZ(0),started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false),geographic(false){}
+        peakNativeMemory(0),primaryX(0),primaryZ(0),started(0),lastStep(0),active(false),geometryOnly(false),definitionsReady(false),definitionsFailed(false),geographic(false),atlas(false){}
     void Define(Ogre::CompositorManager2 *manager)
     {
         if((definitionOwner&&definitionOwner!=manager)||definitionsFailed)
@@ -169,15 +170,22 @@ struct TerrainExperiment
                <<" batchIndex="<<batch.index<<"; Scene/camera/render surfaces retained";
         Log(message.str());
     }
+    void BeginAtlas(Ogre::Root* owner,unsigned index,const std::string& heightPath)
+    {
+        if(root||scene||terrain||camera||workspace||active||Side!=2048||!AtlasCapture::Select(index,atlasBlock))
+            throw std::runtime_error("atlas capture requires idle2048 private terrain");
+        atlas=true;
+        Begin(owner,int(atlasBlock.tileX),int(atlasBlock.tileZ),16000,heightPath,false,false,false,"5611-Newwworld.mod",true,true,false);
+    }
     void Begin(Ogre::Root *owner,int tileX,int tileZ,int altitude,const std::string &heightPath,bool geometryOnlyRequest,bool gridRequest,bool recycleRequest,const std::string &referenceBiome,bool paintedRequest,bool geographicRequest,bool nativeFadeRequest)
     {
         if(root||scene||terrain||camera||workspace||active)
             throw std::runtime_error("private terrain experiment already owns resources");
-        if(!referenceBiome.empty()&&(Side!=512||geometryOnlyRequest||gridRequest||recycleRequest||diagnosticRaster.resolutionOnly))
+        if(!referenceBiome.empty()&&((Side!=512&&!atlas)||geometryOnlyRequest||gridRequest||recycleRequest||diagnosticRaster.resolutionOnly))
             throw std::runtime_error("single-biome material reference requires standalone512 full diagnostics");
-        if(paintedRequest&&(referenceBiome.empty()||tileX!=1||tileZ!=1))
+        if(paintedRequest&&(referenceBiome.empty()||(!atlas&&(tileX!=1||tileZ!=1))))
             throw std::runtime_error("painted reference requires the one guarded biome/primary1,1 fixture");
-        if(geographicRequest&&(!paintedRequest||referenceBiome.empty()||tileX!=1||tileZ!=1))throw std::runtime_error("geographic trial requires standalone512 painted primary1,1");
+        if(geographicRequest&&(!paintedRequest||referenceBiome.empty()||(!atlas&&(tileX!=1||tileZ!=1))))throw std::runtime_error("geographic trial requires standalone512 painted primary1,1");
         geographic=geographicRequest;
         if(diagnosticRaster.resolutionOnly)
         {
@@ -193,6 +201,7 @@ struct TerrainExperiment
         if(batch.enabled&&!batch.Cell(tileX,tileZ))throw std::runtime_error("private grid cursor refused");
         if(!TerrainExperimentPolicy::PrimaryCell(tileX,tileZ,altitude,region))
             throw std::runtime_error("private terrain primary cell/altitude refused");
+        if(atlas){region.x=atlasBlock.centerX;region.z=atlasBlock.centerZ;region.span=atlasBlock.span;}
         primaryX=tileX;primaryZ=tileZ;peakNativeMemory=0;
         api.Bind();root=owner;
         Ogre::SceneManager *fresh=api.createScene(root,Ogre::ST_GENERIC,1,Ogre::INSTANCING_CULLING_SINGLETHREAD,"LEOPARD_PrivateTerrainScene");
@@ -231,10 +240,14 @@ struct TerrainExperiment
             GameData *data=ou->gamedata.getData(referenceBiome);
             if(!data||data->stringID!=referenceBiome)throw std::runtime_error("private biome record lookup differs");
             const std::string gameRoot=heightPath.substr(0,heightPath.size()-std::string("/data/newland/land/fullmap.tif").size());
+            if(atlas)GeographyReference().BeginRegion(gameRoot,root->getCompositorManager2(),SatelliteRegion::Regions[atlasBlock.regionZ*8+atlasBlock.regionX],false);
+            else{
             if(geographic)GeographyReference().Begin(gameRoot,root->getCompositorManager2(),nativeFadeRequest);else BiomeReference().Begin(data,gameRoot);
+            }
             if(paintedRequest)
             {
-                PaintedReference().Begin(gameRoot,root->getCompositorManager2());
+                if(atlas)PaintedReference().BeginPrimary(gameRoot,root->getCompositorManager2(),tileX,tileZ);
+                else PaintedReference().Begin(gameRoot,root->getCompositorManager2());
                 if(!geographic)PaintedReference().Program(material);
             }
             if(!geographic)BiomeReference().Configure(data,material);
@@ -262,7 +275,7 @@ struct TerrainExperiment
         // Allocate auxiliary workspaces outside compositor iteration, including
         // failure paths, so pending registration cannot outlive their materials.
         geometryOnly=geometryOnlyRequest;
-        if(!geometryOnly)
+        if(!geometryOnly&&!atlas)
         {
             PreparePositionPass(manager,scene,camera,gb.textures[2]);
             PrepareSunPass(manager,scene,camera,gb);
@@ -340,6 +353,6 @@ struct TerrainExperiment
         BiomeReference().Destroy();
         if(!output.isNull())
         {Ogre::TextureManager::getSingleton().remove(output->getName());output.setNull();}
-        root=NULL;active=false;recycle.Abort();Log("isolated Terrain destroyed before its camera and scene");
+        root=NULL;active=false;recycle.Abort();atlas=false;Log("isolated Terrain destroyed before its camera and scene");
     }
 } terrainExperiment;

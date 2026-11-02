@@ -1,6 +1,6 @@
 # Active work and next requested tasks
 
-Updated2026-11-01 from the user's current requests. This is a working queue,
+Updated2026-11-02 from the user's current requests. This is a working queue,
 not a public release announcement. Latest instructions override historical notes.
 
 1. **Global satellite map — ACTIVE, unfinished.** Deliver an optional working
@@ -20,7 +20,13 @@ not a public release announcement. Latest instructions override historical notes
    see GlobalSatelliteMap/PLAN.md. Full atlas rerender on every lamp change is
    not an acceptable update strategy. Article finished; still check process and
    avoid taking window focus without a new instruction.
-2. **KEO MCM fork — AFTER satellite.** New user request explicitly authorizes
+2. **KEO research — PARALLEL; implementation AFTER satellite.** User2026-11-02
+   explicitly asks to read current Steam reports/source now: broken pathfinding,
+   town inhabitants spawning outside and slowly returning, excess squads at normal
+   settings, GOG refusal, and possible mouse-input latency (unconfirmed). Keep
+   player reports separate from verified causes; inspect native streaming/spawn
+   readiness, routing and build gates. Research: `research/keo-audit-20261102`.
+   New user request explicitly authorizes
    a fork under MCM, bug fixes and improvements. This supersedes the historical
    local-only KEO intent. Before implementation read current upstream source,
    license and player reports/issues; record actionable reports and reproduction
@@ -78,4 +84,9 @@ full requested geometry/lighting coverage and measured stability/performance.
 
 ## Deferred release batch: detailed localization logs (user, 2026-11-01)
 
-After current satellite work, prepare releases for all 37 affected public packages. Exact list and exclusions: tools/maintenance/localization-release-queue.json. Verify actual published versions, then increment once per package; prepare ZIP/CRC/EN-RU notes and current README. Debug implementation details stay out of player descriptions. Nexus is uploaded by the user first; Steam follows. OTI remains a local-only build and is excluded from publication, preserving the user decision recorded09.10; it is not in the release catalog. DF/global map are private, XP_Overhaul is a local compatibility build. Current public ZIPs have not yet been rebuilt and must not be mistaken for the new DLLs.
+COMPLETE2026-11-02: user uploaded all37 Nexus packages; all37 corresponding Steam
+versions/content/ENRU descriptions/previews and single bilingual notes published.
+Dark UI Advanced/Formations received description-only changes. See
+docs/releases/2026-11-02-steam-publication.md and synchronized published ledger.
+OTI/XP_Overhaul remain local; DF/global map remain private. Do not prepare or
+publish this same batch again or increment versions merely for local fixes.

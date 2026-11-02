@@ -24,7 +24,7 @@ def function(text,needle):
 native_bytes=Path('D:/SteamLibrary/steamapps/common/Kenshi/data/materials/deferred/terrainfp4.hlsl').read_bytes()
 assert hashlib.sha256(native_bytes).hexdigest()=='050de26aa6082155fe95bf027b5783b86d87ae6cc03381d9c761b731a88327d7'
 native=native_bytes.decode().replace('\r\n','\n');owned=(here/'build/GeographyTerrain.hlsl').read_text()
-assert hashlib.sha256((here/'build/GeographyTerrain.hlsl').read_bytes()).hexdigest()=='3cde7fa65e27b76092bb14fd4636172b3f979ac4db830e677c800433ea0d1d98','production shader source must remain unchanged'
+assert hashlib.sha256((here/'build/GeographyTerrain.hlsl').read_bytes()).hexdigest()=='f9326a91f29e1f1644fc0acbb33bc126bce04590faef2cc7b89dabd1292fd9a1','explicit-region production shader source changed'
 wrapper=(here/'geography_fade_fixture.hlsl').read_text()
 structure=function(native,'struct BiomeOutput')+';'
 for kind,body in [('reference',function(native,'BiomeOutput computeBiome(')),('owned',(here/'GeographyDiffuse.hlsl').read_text()+'\n'+function(owned,'BiomeOutput computeGeoBiome('))]:

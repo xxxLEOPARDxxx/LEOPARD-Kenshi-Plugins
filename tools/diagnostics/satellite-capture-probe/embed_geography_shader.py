@@ -21,6 +21,7 @@ declarations='''Texture2D geoBlend : register(t5);
 Texture2D geoSelector : register(t6);
 Texture2DArray geoDiffuse1 : register(t7);
 uniform float4 satBiome[225];
+uniform float4 geoSelectorRegion;
 '''
 declarations+=(here/'GeographyDiffuse.hlsl').read_text(encoding='ascii')
 text=text[:end]+function+text[end:]
@@ -35,7 +36,7 @@ start=text.index('\t// Sample biome',text.index('void main_fs ('));end=text.inde
 body='''    // World-fragment selection, independent of native patch centers/LOD.
     float3 geoDx=ddx(texCoords),geoDy=ddy(texCoords);
     GeographyCliffData geoCliff=GeographyCliffPrepare(texCoordsV,geoCliff1,geoCliff2,geoCliff3);
-    uint4 selected=GeographyCodes(worldPos.xz);
+    uint4 selected=GeographyCodes(worldPos.xz,geoSelectorRegion);
     clip((selected[0]&15u)!=0?1.0:-1.0);
     float2 blendUV=(worldPos.xz+147456.0)/294912.0;
     float4 geoWeights=geoBlend.SampleGrad(Linear,blendUV,ddx(worldPos.xz)/294912.0,ddy(worldPos.xz)/294912.0);

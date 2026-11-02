@@ -35,7 +35,7 @@ for name,needle,replacement in (
 helper=(here/'GeographySampling.hlsl').read_text();wrapper=(here/'geography_sampling_cs.hlsl').read_text()
 for name,needle,replacement,message in (
     ('wrong-channel','blendWeights[selected[i]>>4u]','blendWeights[0]','native blend residual/channel weights'),
-    ('patch-center','(worldXZ+73728.0)','(float2(-36864.0,-36864.0)+73728.0)','actual geographic world SID/channel selection')):
+    ('patch-center','(worldXZ-selectorRegion.xy)','(float2(-36864.0,-36864.0)-selectorRegion.xy)','actual geographic world SID/channel selection')):
     assert helper.count(needle)==1
     hlsl=out/(name+'.hlsl');hlsl.write_text(wrapper.replace('#include "GeographySampling.hlsl"',helper.replace(needle,replacement)))
     compiled=out/(name+'.cso');result=run([fxc,'/nologo','/T','cs_5_0','/E','main','/O3','/Ges','/Fo'+str(compiled),hlsl]);assert result.returncode==0,(result.stdout,result.stderr)

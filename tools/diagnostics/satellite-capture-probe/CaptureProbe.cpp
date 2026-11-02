@@ -68,6 +68,8 @@
 #include "ExposurePolicy.h"
 #include "RasterPolicy.h"
 #include "OwnedRtvDebt.h"
+#include "AtlasCapturePolicy.h"
+#include "AtlasPixels.h"
 #include "../../../GlobalSatelliteMap/TextureArrayPolicy.h"
 #include "../../../GlobalSatelliteMap/GpuMipUpload.h"
 #include "GpuCompressedUpload.h"
@@ -1173,6 +1175,8 @@ void InspectSunPass(Ogre::Camera *camera, const std::string &prefix,bool absolut
 #include "PrivatePaintedReference.h"
 #include "PrivateGeography.h"
 #include "TerrainExperiment.h"
+#include "AtlasRun.h"
+DWORD lastAtlasPoll=0;
 // Explicit exported calls avoid stale SDK inline fields. Diagnostic snapshots only;
 // manager-reported bytes exclude native/driver caches. Never evict game resources.
 void LogResourceTelemetry(const char *phase)
@@ -1382,8 +1386,9 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                     const Ogre::CompositorChannel &gb=terrainExperiment.workspace->getGlobalTexture("global_gbuffer");
                     if(gb.textures.size()!=3)throw std::runtime_error("private Terrain GBuffer structure differs");
                     std::ostringstream prefix;prefix<<"isolated_terrain_"<<GetCurrentProcessId()<<'_'<<GetTickCount()<<'_'<<++serial;
-                    Save(gb.textures[0],prefix.str()+"_gbuffer_raw");
-                    if(!terrainExperiment.geometryOnly)
+                    if(terrainExperiment.atlas)atlasRun.Launch(gb,terrainExperiment.camera);
+                    else Save(gb.textures[0],prefix.str()+"_gbuffer_raw");
+                    if(!terrainExperiment.geometryOnly&&!terrainExperiment.atlas)
                     {
                         std::vector<float> depth(Side*Side);
                         Ogre::PixelBox box(Side,Side,1,Ogre::PF_FLOAT32_R,&depth[0]);
@@ -1391,14 +1396,14 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
                         InspectPositionPass(terrainExperiment.camera,depth);
                         InspectSunPass(terrainExperiment.camera,prefix.str(),true,&isolatedLighting);
                     }
-                    Log("isolated primary-cell diagnostic saved; private Terrain material experiment, not complete atlas");
+                    Log(terrainExperiment.atlas?"atlas block readback copied; bounded file worker launched":"isolated primary-cell diagnostic saved; private Terrain material experiment, not complete atlas");
                     if(!terrainExperiment.AdvancePrimaryCell()){terrainExperiment.active=false;cleanup=true;}
                 }
             }
             catch(const std::exception &e)
-            {terrainExperiment.active=false;cleanup=true;ErrorLog(std::string("SatelliteCaptureProbe: ")+e.what());}
+            {if(atlasRun.active)atlasRun.Cancel();terrainExperiment.active=false;cleanup=true;ErrorLog(std::string("SatelliteCaptureProbe: ")+e.what());}
             catch(...)
-            {terrainExperiment.active=false;cleanup=true;ErrorLog("SatelliteCaptureProbe: isolated Terrain experiment failed");}
+            {if(atlasRun.active)atlasRun.Cancel();terrainExperiment.active=false;cleanup=true;ErrorLog("SatelliteCaptureProbe: isolated Terrain experiment failed");}
             inside=false;
         }
         if (pending && !inside)
@@ -1528,6 +1533,13 @@ void Update(MapScreen *map)
             EnumWindows(FindWindowThread, 0);
         if (!OnMain())
             return;
+        if(atlasRun.active&&(!ou||ou!=atlasRun.world||!map||!map->getVisible()||!chainSafe||!restorationSafe))atlasRun.Cancel();
+        if(atlasRun.active&&static_cast<DWORD>(GetTickCount()-lastAtlasPoll)>=250){
+            lastAtlasPoll=GetTickCount();
+            if(GetPrivateProfileIntA("Probe","AtlasCancel",0,requestIni.c_str()))atlasRun.Cancel();
+        }
+        if(atlasRun.cancelled&&terrainExperiment.atlas){terrainExperiment.active=false;cleanup=true;}
+        if(atlasRun.active||atlasRun.thread||atlasRun.pixels)atlasRun.Poll();
         if ((pending || terrainExperiment.active) && (!au || au->render != renderer || !renderer ||
                         renderer->workspace != gameWorkspace || ou != requestedWorld))
         {
@@ -1557,8 +1569,9 @@ void Update(MapScreen *map)
                     (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('Y') & 0x8000);
         bool press = down && !keyHeld;
         keyHeld = down;
+        if(atlasRun.active&&!atlasRun.thread&&!terrainExperiment.root)press=true;
         if(ProbePolicy::FileRequestAllowed(fileRequests,pid==GetCurrentProcessId(),backgroundFileRequests,
-           map&&map->getVisible(),pending||terrainExperiment.root||inside,chainSafe) &&
+           map&&map->getVisible(),pending||terrainExperiment.root||inside||atlasRun.active,chainSafe) &&
            ProbePolicy::PollDue(lastRequestPoll,GetTickCount()))
         {
             lastRequestPoll=GetTickCount();
@@ -1570,7 +1583,7 @@ void Update(MapScreen *map)
             }
             if(!wasArmed)Log("opt-in request file armed; existing token latched without replay");
         }
-        if (!press || pending || terrainExperiment.root || !map || !map->getVisible() || !chainSafe)
+        if (!press || pending || terrainExperiment.root || atlasRun.thread || atlasRun.pixels || atlasRun.quarantined || !map || !map->getVisible() || !chainSafe)
             return;
         if (!profileOK || !LoadedGuard() || !au || !au->render || !ou)
             throw std::runtime_error("guard/native world unavailable");
@@ -1592,12 +1605,17 @@ void Update(MapScreen *map)
                 base=base.substr(0,base.find_last_of("/\\"));
             LogResourceTelemetry("before-private-terrain");
             const bool geometryOnlyRequest=GetPrivateProfileIntA("Probe","TerrainGeometryOnly",0,ini.c_str())!=0;
-            if(!geometryOnlyRequest)
+            const bool atlasRequest=atlasRun.active||GetPrivateProfileIntA("Probe","AtlasCapture",0,ini.c_str())==1;
+            if(!geometryOnlyRequest&&!atlasRequest)
                 isolatedLighting=ReadLightingSnapshot(GetPrivateProfileIntA("Probe","NativeExposurePreview",0,ini.c_str())!=0,renderer->workspace);
             if(!rtvDebt.Begin())throw std::runtime_error("owned RTV request still active/quarantined");
             char biomeSid[256]={0};
             if(GetPrivateProfileIntA("Probe","BiomeMaterialReference",0,ini.c_str())==1)
                 GetPrivateProfileStringA("Probe","ReferenceBiomeSID","5611-Newwworld.mod",biomeSid,sizeof(biomeSid),ini.c_str());
+            if(atlasRequest){
+                if(!atlasRun.active){unsigned token=GetPrivateProfileIntA("Probe","Request",0,requestIni.c_str());atlasRun.Begin(Folder(),token?token:GetTickCount(),ou,GetPrivateProfileIntA("Probe","AtlasBlocks",256,requestIni.c_str()));}
+                terrainExperiment.BeginAtlas(renderer->root,atlasRun.index,base+"/data/newland/land/fullmap.tif");
+            }else
             terrainExperiment.Begin(renderer->root,
                 GetPrivateProfileIntA("Probe","PrimaryX",1,ini.c_str()),
                 GetPrivateProfileIntA("Probe","PrimaryZ",1,ini.c_str()),
@@ -1712,11 +1730,13 @@ void Update(MapScreen *map)
     }
     catch (const std::exception &e)
     {
+        if(atlasRun.active)atlasRun.Cancel();
         ErrorLog(std::string("SatelliteCaptureProbe: ") + e.what());
         cleanup = true;
     }
     catch (...)
     {
+        if(atlasRun.active)atlasRun.Cancel();
         ErrorLog("SatelliteCaptureProbe: request failed");
         cleanup = true;
     }

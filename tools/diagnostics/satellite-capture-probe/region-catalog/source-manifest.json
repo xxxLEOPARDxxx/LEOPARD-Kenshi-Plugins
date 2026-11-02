@@ -1,0 +1,3572 @@
+{
+  "version": 1,
+  "snapshot_sha256": "5cb085baa67a7100181daf4edf25bdf3e47f5c162f7ef551fa8eb5910e565d60",
+  "active_sha256": "511a8813928114dbf6b2697d5fa46a46e858c46690907cf8493e092c84633d0f",
+  "dds": [
+    {
+      "path": "data/newland/assets/textures/boneloop_dif_white.dds",
+      "bytes": 5592560,
+      "sha256": "ec0e13f7d023eec1ac9842a0553f2caaf28dc0c3ad0622175214b00e4a5d0457",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/assets/textures/boneloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "80e6c4f2c5a3aff403118a587df037cdf2d26e8b9d62c3854d73361b8bb90d4d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/agglomerate_cliff_dif.dds",
+      "bytes": 5592560,
+      "sha256": "de8ae09c7343d4d6c4a4a3d10a1e1294ad1a7f368b4d730b969c4d7b939f27a8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/agglomerate_cliff_nml.dds",
+      "bytes": 2796344,
+      "sha256": "20dbd8ab83b685286e59296177f04e999975d5895bea79139e21bf410f31ff98",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/ashland-snow_dif.dds",
+      "bytes": 5592560,
+      "sha256": "303cca82e3725445bb580101b509f7b96a17948d29a8de8ba025e83e40930383",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/ashland-snow_nml.dds",
+      "bytes": 2796344,
+      "sha256": "83526728187c5d5e4bc8587a699e64667e7493bbdfa04909a5db8e0382088d3b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/ashland_ash_dif.dds",
+      "bytes": 5592560,
+      "sha256": "a03282eb81b0593740efecabca2f91901cf72aaa90040448bed7c437f204fc71",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/ashland_ash_nml.dds",
+      "bytes": 2796344,
+      "sha256": "cd633a505a67fc50ee4f53ebea0b8a6b574347c055ca77676c8ab63de137d8d7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/ashland_ashnoise_dif.dds",
+      "bytes": 5592560,
+      "sha256": "9404baa920e7963e8f37765b23426bb5f7ecf54f6464e3b4f7310e755abd5d0b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/ashland_ashnoise_nml.dds",
+      "bytes": 2796344,
+      "sha256": "2a972dbe57405a5cd9477106249cc037db0263e7b54d41011fd8a9103095fcd2",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/ashloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "7c459fadc30db17da7cc9fe33e733dd515db0883a4fdc4dd8a6a0b2846b1c828",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/ashloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "434f77bdbbbc9b4487c11aff8aad7a8aaae125159155219e827a7edaa87bc708",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/asp-gulchwalls_dif.dds",
+      "bytes": 5592560,
+      "sha256": "119baf8a414c60aa0576b28518d67133a450f5e2c886c10f91830518978f7766",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/asp-gulchwalls_nml.dds",
+      "bytes": 2796344,
+      "sha256": "7541324f3ac8f96718991f00ee2d682ed716846b7123d4b9df9cbb0551351b22",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/bedded_sandstone_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1a8239ebc5e378675c7835f8a3e67a7da3ecf48fa7900eddf344a1f8ce6e40a2",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/bedded_sandstone_nml.dds",
+      "bytes": 2796344,
+      "sha256": "6f3558b7149b0fd0c50b23e5faf57ba20fe78cad13243e5a3a4989ba01d181b1",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/blackrock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "ccce718ba4fc24131835218e8e58ee0806d9cde73d554460a8dfacd18093166b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/blackrock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "9801ebe8f384fccb219555278e0076132053a9658411a0ddd5a71f8fe7199605",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/blockycliff_dif.dds",
+      "bytes": 5592560,
+      "sha256": "dbd613a4ed7e60dc7acee46db5aab7c2fdc15bb575dd4b6bb97370bf1579ae0c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/blockycliff_nml.dds",
+      "bytes": 2796344,
+      "sha256": "41e28140005d42384e21bbec25f8127436d0aeac6d1616d18e99da49825c2b00",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/bluffcliff_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f87e65e1a3e81621c91a130901629fa9410d47cac6720ca8cd2a5fecd8632872",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/bluffcliff_nml.dds",
+      "bytes": 2796344,
+      "sha256": "7e743776d8954a2a76fd770e8026901d911c3ab360d05ef86569d452513641bd",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/branch_mulch_dif.dds",
+      "bytes": 5592560,
+      "sha256": "2459fd9d3d98d3af1a09f26f6c09aafcc40df50363e294f0aea702e79dd90201",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/branch_mulch_nml.dds",
+      "bytes": 2796344,
+      "sha256": "690ff98000298649f5098912c99278310dc5e93560d2a2a19b252e17278a7826",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/burntwoodlike_dif.dds",
+      "bytes": 5592560,
+      "sha256": "b80e852ef0ec2723c72fca2db5db2d540840ec66b496f6a50dac75d15e04f0b4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/burntwoodlike_nml.dds",
+      "bytes": 2796344,
+      "sha256": "2e5d941dc456e4fc41c440afd0f705014a352a315173fdb05f4737e29705c4c8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/canyongrass_dif.dds",
+      "bytes": 5592560,
+      "sha256": "ae59bcf0c9762b6c8adc9d21d42416363f34ea4a433e4c0832d102d74f5791df",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/canyongrass_nml.dds",
+      "bytes": 2796344,
+      "sha256": "6d9eeadf87886708fe4291c77c61499d15a7f69fd55aeb33d1bf4c9be5b6d2ed",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/cement_wall_int_dif.dds",
+      "bytes": 5592560,
+      "sha256": "acb08f0dc61726e971f69ef86b6a70fb7023d10968cc5cd716dbf970a9e41d5f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cement_wall_int_nml.dds",
+      "bytes": 2796344,
+      "sha256": "78bbf6a8a8f37ad63ed46a8726c8337a3f33e943b8b12d9cee623bac25f9422d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/cinderridge-rockloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1cd84cd3af5add91a842f15e031798dd71924716a53d81070b06893f00e7167e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cinderridge-rockloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "9a40abb4ec0f80db5f89b75665754da55e97c9a256b61b234f111d0c8fb75206",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/cindersurface01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "e8bcdb6a2392b4e76dd599505e9a0452efaa155b1ca5ff218dd45d1185b1852e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cindersurface01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "934e5bbb5e834ad8084a67f6e622988f5be4d87b9c6a4577f84ccc1c95b86873",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/circuitrypanel_nml.dds",
+      "bytes": 2796344,
+      "sha256": "277b41d19695aac74100e46994ff97d2cee2c754fb44fc16cac90e251e00006f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/circuitrypanelcliffs_dif.dds",
+      "bytes": 5592560,
+      "sha256": "af3ab154e73b4a495fd55fb8c414863a568dcef52e315b309d0eae8b24f499b3",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cliffchunky_dif.dds",
+      "bytes": 5592560,
+      "sha256": "83a446fb4e6a99aa77df94b14f2338052a4f3e1b10b5b8e543fc2e6091dfcb0b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cliffchunky_nml.dds",
+      "bytes": 2796344,
+      "sha256": "075eaa02b94126e094b1d5712f5d806bba610c9a3acfb1a616d6f2cd89b308bf",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/crumblingrock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "970ce2ba4ef511962317d14c0cccf4b81907ee4cd6a99a063fef3108f5fd9b25",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/crumblingrock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "05459c0fc300a6a0c9f96421d2b6115f7385131fa8cd05892c371921521633d8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/crystaldecay_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f8b8869c3a0d5d45cec6b9494e2b953bdacf4abc7f8a6e67357f54e7aadba84e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/crystaldecay_nml.dds",
+      "bytes": 2796344,
+      "sha256": "3e6ee60ef07c5e392546538aa186742e4ac455d02b11daf0154a9d309cceedba",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/crystaldecayground_dif.dds",
+      "bytes": 5592560,
+      "sha256": "2d6417626cad3ab9e2023d7b77add9e87a896eadd20cdcdec66cefd215bfcc61",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cut-cliffrocks_dif.dds",
+      "bytes": 5592560,
+      "sha256": "c30b67458e11f0470ad5ca9ba66940676fcd13dc945b19bfff6d33ef065f03d9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/cut-cliffrocks_nml.dds",
+      "bytes": 2796344,
+      "sha256": "ab6c851ce176b4792221ccf4e9cb1a8e0449ec9237f0396457bca10afc68cd90",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/darkstone_floor_dif.dds",
+      "bytes": 5592560,
+      "sha256": "19e04e24557f7a735288c676e724a569b5f71cd110e85475d2cc97542825d62e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/darkstone_landbaseloop_dif_hi.dds",
+      "bytes": 5592560,
+      "sha256": "815059b142335dd0fb8f68e473ad41f559a768a977db556a447358c99074d047",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/darkstone_landbaseloop_nml_hi.dds",
+      "bytes": 2796344,
+      "sha256": "95f4c0d93a5f49b07a36252db1518cf07888eb88c4065047fd787f9750dc3845",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/desert_sharpgravel_dif.dds",
+      "bytes": 5592560,
+      "sha256": "020c2769ecbd29d888cd79ac73543823332389a6132a46d6fc505531cd5b6540",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desert_sharpgravel_nml.dds",
+      "bytes": 2796344,
+      "sha256": "2a02a925cfc2d3838f7e7bf8b8f90359fab0ba2c89a6182770f00af429da48cf",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/desertdarkstones_dif.dds",
+      "bytes": 5592560,
+      "sha256": "579cc1d43cefeafcaf7693ff3527e7c7bbf6bcb6f4858e00c1bced77d97c18af",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desertdarkstones_nml.dds",
+      "bytes": 2796344,
+      "sha256": "fe197f18eb8ecddfd082bd3767f25d1555f05a3fc398f27e14798b5037ebf6d7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/desertfloorrock01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "af34539ad9655140b781261955f3462663633e7e316c14dab4774d01ccaa8f05",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desertfloorrock01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "33ab759b86056e40bf60b8969b117ed96be7d3a13b513b064c87e907f1dd702a",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/desertsandloop03_dark_dif.dds",
+      "bytes": 5592560,
+      "sha256": "dec1cb95c10ac6de9c1b8ee241075dc6323663cc5636f968a94eeefc1c6f512b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desertsandloop03_dif.dds",
+      "bytes": 5592560,
+      "sha256": "2b0e97ed88fd57168b2b8389ea72840f73c27bace6cf83661a99b82e2315e464",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desertsandloop03_dif_white.dds",
+      "bytes": 5592560,
+      "sha256": "7212a6fcb084777df9cc5b5aab71a326ba959f5cf3a330924c734252d7e1215d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desertsandloop03_nml.dds",
+      "bytes": 2796344,
+      "sha256": "71aaea0ec9f642e6e516a1244282947dd3b251c4b88b5a7f065ae2f5d7b5e851",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/desertsands_dif.dds",
+      "bytes": 5592560,
+      "sha256": "ae37dc71e2fc4f46c491e7f426de22b384ccc8b571a96e0c79b4d654e5fe60fe",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/desertsands_nml.dds",
+      "bytes": 2796344,
+      "sha256": "d6ed966bed71bcabfd148e4ea0f295caeb65b04f018513e23b14a5090476a6cd",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/driedcracked_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1849d6693315eb5d6827a5d52fd8abaa084a2de64233369a952b6cfc4da877b8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/driedcracked_nml.dds",
+      "bytes": 2796344,
+      "sha256": "36d6170fce4ae743ef8acccd2638bce37f40ed40b68de249bbfa0fa34c72f3ca",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/driedmud_dif.dds",
+      "bytes": 5592560,
+      "sha256": "7c2d6b467e5efe3d8116ceb281888a8780d19abf2706a83b4fe2fe1a850e0ca8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/driedmud_nml.dds",
+      "bytes": 2796344,
+      "sha256": "919bcee5d9ead420d5e3cbbb19aa1b07b596576b60ea833fad12b2ef05f1feb6",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/dryshinerock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "cd92801c4537b8d1ded8c7ff6d8e8bdad61d16a99f80d948efb0cbc1139ac6d9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/dryshinerock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "2f88712a8aa7398304d724f6ec73453dda920171605a093773be4ffab205ef67",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/earthstone_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1075bf4e6e12d9bea711666006f570448597629330d6f3ff63cbd285c50d2589",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/earthstone_nml.dds",
+      "bytes": 2796344,
+      "sha256": "04a5db60d66d8333da0c61c49656da1b6b29ee87ad86bfd535d3fafcafa5a7f7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/easysand_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f54a1c5a6431793eb4f9ed56dffe432e8fbe3366bb7f6f35bf1c847e358ffa2d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/easysand_nml.dds",
+      "bytes": 2796344,
+      "sha256": "2297e4b22051b7afa0470be1be735c59ca4f5691088ac0123c63856c7ef2abd0",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/flat_land_dif.dds",
+      "bytes": 5592560,
+      "sha256": "b218a6d111fcace9509d00a4bfb7e93a05e8d2852807fe994fabb7cd459561bb",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/flat_land_nml.dds",
+      "bytes": 2796344,
+      "sha256": "5011e3768448a3c78ef1efc749fe6159ef32ad2d786d6e115988d3a12fd7597f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/flintcliffs_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f6c2ea64858edd5cc6bf6ed3fee3118fa76530905190ad3e28dd1c8c7de3114f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/flintcliffs_nml.dds",
+      "bytes": 2796344,
+      "sha256": "abb84ea96977144ec8fa71dbd70187938fe8437bc50c5d93202bf6fd334d7bb4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/fluvialribbonslope_dif.dds",
+      "bytes": 5592560,
+      "sha256": "e9bd1702bae1fe8b3ad85b517ab4047192cdbcaac55ba48dc26f64cdf5e7788a",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/fluvialribbonslope_nml.dds",
+      "bytes": 2796344,
+      "sha256": "f3d2cac9b13e04dd4d0e5128d911802df6c5955be6e41f56f3a2c3cb23558086",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/fossil-loop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "0a24c3978919c6181fdcf700bd1931c09a2217b6e8fd2ca7d3d1952f34b24859",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/fossil-loop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "2ca3546fd7e35365c53f305b2f79b16b41d27cc27e50a866e285a4a0aed7c310",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/fractured_rock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "954241f2717b6bd92b74eec029d5eb62db2d048046275d38ece14440d61d354f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/geobased_rockloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "68bb8d082a0d5cdd2d8dca902c29343007eea80db742d133919930d81a74152f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/geobased_rockloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "5f31e4ba149864dae1aa06a0d6bb870c000d1f8a5127b3f4e561054e8a2144c8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/grass-space_z_dif.dds",
+      "bytes": 5592560,
+      "sha256": "5fd8857ae4a3dde4a37e5d3776ff0dddd4159fb8ee132aba3c56aaff3eab57c4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/grass-space_z_nml.dds",
+      "bytes": 2796344,
+      "sha256": "1dd1325252e8170d94c44432b95ba3b1fb907feb32db1125c2fcbe4bbc38dfed",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/grassba-forest__dif.dds",
+      "bytes": 5592560,
+      "sha256": "a36dd2d18ed998f987f7939f3817ac3986d8ea65b19d26acb5c93d70178c8780",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/grassbadtestdif.dds",
+      "bytes": 5592560,
+      "sha256": "ceede2cb10d742fe983fb19f5e08041bb54e79d4f888f8c9682aa262ec4f59e2",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/grassbadtestnml.dds",
+      "bytes": 2796344,
+      "sha256": "6d9eeadf87886708fe4291c77c61499d15a7f69fd55aeb33d1bf4c9be5b6d2ed",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/grasz_dif.dds",
+      "bytes": 5592560,
+      "sha256": "38286f3f9ab1ba46539301980e5eef506a041fce762789eb5aca324b804e126b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/grasz_nml.dds",
+      "bytes": 2796344,
+      "sha256": "25a7e758f50d4897e5d2bc9a6fef60d84a4eba86abf6506aa63d80ddfe52f80e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/gravel-bedder_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1df42ba7263f2d5d8ecaa2003fe467ab94f010f1fe9f312c6b3306124a1aabc6",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/gravel-bedder_nml.dds",
+      "bytes": 2796344,
+      "sha256": "fb10a4540f9dc017d6a2c82e7ba40c41157649b35ba0aafea0e642b9c2cba68d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/gravel_beds_nml.dds",
+      "bytes": 2796344,
+      "sha256": "0ed3274df7791a9833175d7516d599adbb6804ab0288a5d6ab72c1e530f5ae65",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/gravel_beds_nt_dif_hi.dds",
+      "bytes": 5592560,
+      "sha256": "5e8aedc068d1c4fede3094e7eb77fa83864a9c9b42080f2f66f681850ff5dbae",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/gravel_chips_dif.dds",
+      "bytes": 5592560,
+      "sha256": "edb2ce481ceee216d33cb39da5ba9ee38076baeefb05b80f6b119b5a1d1ac27b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/gravel_chips_nml.dds",
+      "bytes": 2796344,
+      "sha256": "66603eff6ab4fd33d13d26719bbc16907053c26861e8090166ef058fb0c74c55",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/gritmudrock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "c421c1a5a92b448055c46256672e82b3c0472a21bf059eed5897321b6b8e822d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/gritmudrock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "b71e81504ba7b4107bc976e1e30884856203e40072144d1c7522555cca60ec8b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/groundrocks01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "081c915369875ffd292fdd4f69381c02caaa4eac33ae4cdbef422a3bc2ded22c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/groundrocks01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "069046770663442fd49636692d518242259afa6839d33e00f6180a2f735726aa",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/hellish_ground_dif.dds",
+      "bytes": 5592560,
+      "sha256": "d601118220c13a08982b40f94c65628630dcf09c7a8f452c29600be8b86dd1a7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/hellish_ground_nml.dds",
+      "bytes": 2796344,
+      "sha256": "3831d9cbeb22c342c4221085a36e1e315defcc87b4b6e5657c7966814f41c5d4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/landtexture_rocksurface01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "c6f56a207d9868415368d109262564b2e4081f713c9aea66f0b2b3bda6b155b4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/landtexture_rocksurface01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "673991440497732ed8dbea7471ff100452afcadc0f3c939cc1e205a87d289bad",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/landtexture_swamp_rocksurface01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "83608ec5b6fe949ce364cd57a5e8611093bee00360daed797975c04ec39f1cf0",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/lichen_rock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "139c3eadf698933c55db7836a407fb533718d93f620649f051d88338017f8720",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/lichen_rock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "0a59eacf3b8a5c51d26e431d5fc3935af7854eaa7f009b59d1759f3fe073e124",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/mechog_dif.dds",
+      "bytes": 5592560,
+      "sha256": "4d85dd22ba4d99c24d73121ab9fe51f8beb9a242aa358200f3100ae4949fb20f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/mechog_nml.dds",
+      "bytes": 2796344,
+      "sha256": "684966686936c4cfe66a76c5f711aa8317fcd746ba8550d7037a9d59ba59176d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/meltingmech_dif.dds",
+      "bytes": 5592560,
+      "sha256": "b1d5f400e56a8084c2ec9ab58f0eac10cf99eac11ad2be3a00d5ef17d0e2d9a9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/meltingmech_nml.dds",
+      "bytes": 2796344,
+      "sha256": "1ca09b3d0f2ff19b589dd224657ac3a0de5dfb8e6e6bfe40dbe8a5c8b979bea6",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/mesa2rockloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1f30b580a90fe3db29f2d1e5b4261555b1784722daa1cf0964e60f52a8b48639",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/mesa2rockloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "910318f3dca706b2c100cefdd2d261aed045d1e5f71cc15afcbd9bbd74019c7f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/mesashales_dif.dds",
+      "bytes": 5592560,
+      "sha256": "450b5bc4d5f6dcf75f19639be2ef46c559dfd8848de10298ad58de76f354c90d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/mesashales_nml.dds",
+      "bytes": 2796344,
+      "sha256": "570c0d7e8ea49010b72dd2ca1356dd11b4defae3c455e9ffdf7945e3f71b2a73",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/moraine-loop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "aeaa93c51af92050141363640b155d810668a755df178baf330ac0574151c980",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/moraine-loop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "559c59685a8a43b568bbef12aee073df39b25ba19ac8841950d54caefaaeaa99",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/mountaingrass_dif.dds",
+      "bytes": 5592560,
+      "sha256": "3f7ce6887601392e6093278a716447d2c41847d93a26bed2970087a4a38f73b7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/mountaingrass_nml.dds",
+      "bytes": 2796344,
+      "sha256": "ecf38e914c8899d26db6f1b499800129b92c1f69d8ec593a7513b0d49ae03b8a",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/mudcrack-complex_dif.dds",
+      "bytes": 5592560,
+      "sha256": "4a1207c7d9c8af707a557cbcc8e0c2236bea6e2d65fee5d1d468ae2888e20952",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/mudcrack-complex_nml.dds",
+      "bytes": 2796344,
+      "sha256": "70952578761d6051420bb09985d7eb2e3c068126d23a2ef6fef65e0ca84acdec",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/mudpool_liquid_dif.dds",
+      "bytes": 5592560,
+      "sha256": "0148dd9e129c92e00c875137f38ee71a8355ed123582aca78e40ae8a659b4fd9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/mudpool_liquid_nml.dds",
+      "bytes": 2796344,
+      "sha256": "a2f5d06f9e693d97c6ccfb7973116a6bf6a73d457a20664487fc99c35b4dc8d4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/newground_dif.dds",
+      "bytes": 5592560,
+      "sha256": "74efef456a22a8b3695f95a309de43af7dd889245f8e21c2aac2230df42167fa",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/newground_nml.dds",
+      "bytes": 2796344,
+      "sha256": "6e9da30cbd24ac7d83a5bf9802a537c43e978c0a6299a9cf11553585f1eb8068",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/newmudwork_dif.dds",
+      "bytes": 5592560,
+      "sha256": "938f0911e0d246fe33a917cade2ae9b347af81d0ca43000b416d6a911c9eaca9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/newmudwork_nml.dds",
+      "bytes": 2796344,
+      "sha256": "4f260b6aaaaf1fbc36bea059129bf09a72d26ddc19ecfb35fb845a745f86bb0a",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/obsidian_dif.dds",
+      "bytes": 5592560,
+      "sha256": "00b625d9aadaf562a3cf0f517c9a53a375e2ae5918072262808ef82a4b5cc33a",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/obsidian_nml.dds",
+      "bytes": 2796344,
+      "sha256": "340a944086ff62c990c176a89faf4738b800c996eb1122e36ad2ee6f41e2833f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/okran_dirt_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1e8380c53f9d9e00f2ed117fc8dee7aa68b8c18b477f19b7e40d1e9d2103099d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/okran_dirt_nml.dds",
+      "bytes": 2796344,
+      "sha256": "91f566d859cd13c7fe93f16352c9e1086c9dafd2d4857b08a88c198264be5244",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/organicrock-gold_dif.dds",
+      "bytes": 5592560,
+      "sha256": "46397414859adea1dd3decbb6a1c494ff623606e9b3b31a4c53d8ba4dc269649",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/organicrock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "140f9bee214ee8457a8d863fadedc68829473952a6ac17bf59378f4b76fd6065",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/organicrock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "d7748fb593531b5ec371d384a650e402705b041a6cede71239a154ed9f993206",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/pahoehoe_nml.dds",
+      "bytes": 2796344,
+      "sha256": "d15177e6498fa053a14af7a043d749614352b0c0f769ede7aa38e3ae9045f5fc",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/pahoehoe_swamp_dif.dds",
+      "bytes": 5592560,
+      "sha256": "6c61bdfb25c8a4456a7dd63ad1c9d4c3737ddbbb04dbcef43f18522958f13821",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/patagonian_dif.dds",
+      "bytes": 5592560,
+      "sha256": "87d2ae70761674432e2169276c8d8ff891b378c3dbcaaa6382efe2b1e770cff9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/patagonian_nml.dds",
+      "bytes": 2796344,
+      "sha256": "0df93c57dec10b43437e37fcac35be73ac00fe068dc7780bdcf062e4db5e0364",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/river_pebbles_dif.dds",
+      "bytes": 5592560,
+      "sha256": "47ff95b83ff73211d1506afcdf89e0751f11c156491c24f2fb629d0694902cd7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/river_pebbles_nml.dds",
+      "bytes": 2796344,
+      "sha256": "7936d13d397c9dd856cde5a59ada4eecc206b2d7073cbf15de20d2d1fe229166",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/road_newtex_sand01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "4ac63a22f32a8ebae78795987ef6c5f56714cba4d213d31c2334c73f1324ff41",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/road_newtex_sand01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "96fc16fb14f3523ec5d5faee6f9151c34928c5ae26373dcaeb401df15fec9c30",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/road_newtex_stones01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "8b69ba3874f50df63d0250fbed59acec6e10b1417be0f11eda4b5cb39c65dddc",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/road_newtex_stones01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "bd6e7fa9b106165c54a89d29965ae10c3b42def3341214e076881e5b26a0abe5",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/road_newtex_stones02_dif.dds",
+      "bytes": 5592560,
+      "sha256": "d6d48f38424fe41f16fff858c4def4254f9ec49b2a86fd6bebd4900d15f733c0",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/road_newtex_stones02_nml.dds",
+      "bytes": 2796344,
+      "sha256": "0fa5ead9e81ca72ec44ba6ed990f7141bf8e51e0085a157ad9108cf151474276",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/roadloop01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "3d9401809663e537657a2605835cacdc7549a87640de147898eb8bff037fbbd5",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/roadloop01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "e1e1912e621184f4406287f7f2cc8b84f5a45d4783b2f72177d5db9e8f4921ab",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/roadloop02_(sand)_dif.dds",
+      "bytes": 5592560,
+      "sha256": "a4e4395ee6802b386207403c91536fa096bd4a337a263b23d6f849b3ee4d1fb3",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/roadloop02_(sand)_nml.dds",
+      "bytes": 2796344,
+      "sha256": "134d9e265ce6b8c6d3a95015f9dd5c3dfef5c6b24521b4e454774d54f6710254",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/rockbed01_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/rockbed01_nml.dds",
+      "bytes": 2796344,
+      "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/rockgravelmix2_dif.dds",
+      "bytes": 5592560,
+      "sha256": "4b63a1dd81625b5c38f897b1e81c3e2b953b1d92717781120b1397153f87a423",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/rockgravelmix2_nml.dds",
+      "bytes": 2796344,
+      "sha256": "6b512a3af5e443b27edea2445e209385c0b80ea569945a5e1a333a46d20dc4c8",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/rockloop09_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f6a3b1a9dfc2801ce537490606f6bb3348a427fb71769530e478fb0d0e386937",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/rockloop09_nml.dds",
+      "bytes": 2796344,
+      "sha256": "9f6d60f4f82333a0f6928b4be6b25997d8112a97ccb113dab5e4c32559032278",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/rockloop10_dif.dds",
+      "bytes": 5592560,
+      "sha256": "19c2847b8468833ed439f0e61574939b77fb0ce726e2d6473f690ee0484a82cc",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/rockloop10_nml.dds",
+      "bytes": 2796344,
+      "sha256": "f631c4aa64a4250e9b925cb6f83b6e2a3bc02d49f06c21e433b64ab322723751",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/rockstack_sides_dif.dds",
+      "bytes": 5592560,
+      "sha256": "5679e09db6106c9e2ac93779b03c8bf6727d7b85339377cd1b71f2fc7bbdb949",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/rockstack_sides_nml.dds",
+      "bytes": 2796344,
+      "sha256": "7c48c67a3d8fdb104a45898bef1eeaba77d1de8dc80d1fd600fadaa70bd0401c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/rubbleloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f3c4436ec00c834e4ef47f997b5a1742c3d64b21539278c713f1c80dc2b66a1e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/rubbleloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "a826ac619d1fc9b4e77dd90c50bf046e3d01e5307e7fe7a58b1d6c52da50e5d2",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/ruin_pavement_dif.dds",
+      "bytes": 5592560,
+      "sha256": "3050c948e1f2ab1682976b992d4480dec6d582bbc55084b46b9eb27c4e48d304",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/ruin_pavement_nml.dds",
+      "bytes": 2796344,
+      "sha256": "97d81d27295ea66166dad9c0181deb251f444a06a4fc5cccaaaf9824719ff040",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sand01bc_darkgrey.dds",
+      "bytes": 5592560,
+      "sha256": "2cdf244ea3958f09b2fb53fecfb5856a46a01b2a600f7e11585039a50e88a6c6",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sand01bc_grey.dds",
+      "bytes": 5592560,
+      "sha256": "70ada8b3ab3d6555dab34916a03737627bf256d7730d190bc8102649c84fdf63",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sand01bc_grey_nml.dds",
+      "bytes": 2796344,
+      "sha256": "8b9e747a498e1359e58a5264c606bc3b8edcba0718e4e09b3a2045244405a4ad",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sand01bc_testred.dds",
+      "bytes": 5592560,
+      "sha256": "9c587c80f825eeaee0c2d337f1a2f58561f5b2f5f699bf49ce99da52d27f9675",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sand3d_dif.dds",
+      "bytes": 5592560,
+      "sha256": "e4f47747ac210107d863c2158bc1f792e84d97f9c1f5eae659ab67657f3c7cdd",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sand3d_nml.dds",
+      "bytes": 2796344,
+      "sha256": "aea8305b50dfdf370e5367273a6d30a66e710cd6c4401341a9aec5715032afc1",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sandripple_rockflat_dif.dds",
+      "bytes": 5592560,
+      "sha256": "be7e1b04f922d093f6a6648d95992331e353cf0b0dc4cc0c491b54a68db3e8dd",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sandripple_rockflat_nml.dds",
+      "bytes": 2796344,
+      "sha256": "83ab6c5a758e3193ee7482db19636ee41a18ea386fb81713a9688132cb0337ed",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sandripples_dif.dds",
+      "bytes": 5592560,
+      "sha256": "79707c8edf079bfbaf9fbdff9fd137b1db24c07282fd780ac822f3f1344a66a4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sandripples_nml.dds",
+      "bytes": 2796344,
+      "sha256": "ca35736ab6468c52f5fdeeda82da30bc7564f2c80f0e046660e22359886c0320",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sandripploop_dark_dif.dds",
+      "bytes": 5592560,
+      "sha256": "3dd8a62b0af8642e4c30745e19f02772d9dea4b4977f2429af2b865ffb812eec",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sandripploop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "7a018c93ad47116bafbacc7595cd944f00a776d9068dc12e2a03c4acac0bd213",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sandripploop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "1a0ef8e48c7c3f899c48d358bfcdb7e1f6735edb07e237a365f5071679f28ac4",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sands_dark_dif.dds",
+      "bytes": 5592560,
+      "sha256": "0d79df87ce087ba29ae2d77d3a9104895bdafe6fb584fdb95d6312baba619eeb",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sands_dif.dds",
+      "bytes": 5592560,
+      "sha256": "96c92dca64b9fd8ff93ec16cb4ddce1080924a6520078fc70afe2fa0a1a42d4d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sands_nml.dds",
+      "bytes": 2796344,
+      "sha256": "5e75d2cc722404826bb3272bfbabb0713dcf95b062b3ff2b717dadcf4c116eb7",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/scarredrock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "46154a0e8fd99710bd5aa9867990d3a32a42eaeac4737c6a307558233e37c108",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/scarredrock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "7bb61e133001f5965e216159d6411e56da9b2f5a15911746e09da6bc6d369f5e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/screeslab_base_dif.dds",
+      "bytes": 5592560,
+      "sha256": "7b147e9ecab2f7880bfe050c2b0821f666a94415d1c24802c45134d296b50f9d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/screeslab_base_nml.dds",
+      "bytes": 2796344,
+      "sha256": "93e01c8918a81b4b8fe64fe6a48ab9ab8bf51636302743e3dbb4ef9a7a37d96c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/seacliff_meltloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "5c03d3597fd4ad78b3e057cd58047cbba734661007891f5e792b4ea274301b73",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/seacliff_meltloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "03e5a492e9a746c02f035270b84a9f202221bfb9fbaf7083c9b7e1100c35917c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/seaweed-tarsand_dif.dds",
+      "bytes": 5592560,
+      "sha256": "8a75ece7201638ce9a46dd81cf0737f5b23b38ec5a5eaa17c823fb8f995aca07",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/seaweedplane_nml.dds",
+      "bytes": 2796344,
+      "sha256": "7e4ba72691988c05fb93fb7f339ca7f8149757f534815554ee1250bdb2076104",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sharpblockloop_darker_dif.dds",
+      "bytes": 5592560,
+      "sha256": "9996e0acdd197da92c3ed0f5b2d58ff4f774634d8d0aafcf45c65102be59bd31",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sharpblockloop_dif.dds",
+      "bytes": 5592560,
+      "sha256": "2d4d7d2ff6cc6374145a05d8711d8102225185925a218c23e5628248e8cce6b5",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sharpblockloop_nml.dds",
+      "bytes": 2796344,
+      "sha256": "6cda77b6d8b88f94afad61cfb0b5169adc752a558c2ad261718e47f6c60f0101",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sharpboulders_dif.dds",
+      "bytes": 5592560,
+      "sha256": "dd10530d438fdcbbe77e48317e16e773d20cc9b40152ea41becb9d5330b1820b",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sharpboulders_nml.dds",
+      "bytes": 2796344,
+      "sha256": "116a307e30f42ede82158744de6ccde9ce983bfca50e68689ff4e37f208225d3",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/sharpgravel-white_dif.dds",
+      "bytes": 5592560,
+      "sha256": "2cf0e233971168761bd8e87fb153ba2eb8487f0cb7da6d4b59203110601cef00",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sharpgravel_dif.dds",
+      "bytes": 5592560,
+      "sha256": "f6aa943f9e49bda71942fdb184df1b6e45504b422745a931ddae9cab86558d84",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/sharpgravel_nml.dds",
+      "bytes": 2796344,
+      "sha256": "9b0410cb8f3ecf3e4d42cb6d937bdcea415669e0a20eef4e899cd4bf82b8772c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/skinnersgravel_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1b0f516c60e781820f511f999f7efd34e156fadbf70023e6e5fbae8bc012631d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/skinnersgravel_nml.dds",
+      "bytes": 2796344,
+      "sha256": "e36b85aafeaaaf10cfd756962739e514a87151f2b6cd6d1be7ec75320c9988e6",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/slabsoilbank_dif.dds",
+      "bytes": 5592560,
+      "sha256": "6e653d62c79aadca2f436cb05054ece5f0baa3e0c90ea66b80f0836ac9f55c6f",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/slabsoilbank_nml.dds",
+      "bytes": 2796344,
+      "sha256": "b8c4aab17a4ef2eb1dd2a5aacf94539946ee54b75e8ff903ba74e75995ad14fa",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/smallish sharpgravel_dif.dds",
+      "bytes": 5592560,
+      "sha256": "1bf95d9662505c793c3fb2faf80f2e4d011efacd4c5d56728b304f3710dfe20e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/smallish sharpgravel_nml.dds",
+      "bytes": 2796344,
+      "sha256": "059c0c741b3113b45d3e8172b7ebbc3eeef984976d0f08c90c228c3d47b1ea4e",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/splattering_dif.dds",
+      "bytes": 5592560,
+      "sha256": "27941e46199c570f69efb020641b0b198b4c853dbeb77b5dabbdda1e914c1a2c",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/splattering_nml.dds",
+      "bytes": 2796344,
+      "sha256": "0a00224a0c67b6de60f2fa7f695eab72abc3d89cfe954af3488e00be23f0cfa0",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/stoneyripples_dif.dds",
+      "bytes": 5592560,
+      "sha256": "ed9253738f5612568d632ee4e12243ae78128f39ddc5c1ac6eaebd7b32125959",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/stoneyripples_nml.dds",
+      "bytes": 2796344,
+      "sha256": "e0a62fd981502e5a027a42546f791629c50ecba26f69bceac98adfb19bd1b71a",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/swamproad_dif.dds",
+      "bytes": 5592560,
+      "sha256": "55f1c557866a69ae584b383489f3cedd4a5dbeb0230dcfc68f59ed8a095d43c3",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/swamproad_nml.dds",
+      "bytes": 2796344,
+      "sha256": "3f904059961d10bec6bb8a7b1d66c8c3973a8fe295ef0ddc1acf4da14445e304",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/tarsandcliff_dif.dds",
+      "bytes": 5592560,
+      "sha256": "c79440631b40b228d6f4a2117bd39b8fff4630b7a346f5899dbb33d42f578f09",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/tarsandcliff_nml.dds",
+      "bytes": 2796344,
+      "sha256": "f35dcaae6851085577a9813b30a3ffbac66b7fb067a7c3c4571c03f5d8030b98",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/toothrock_dif.dds",
+      "bytes": 5592560,
+      "sha256": "651c2ac37eddb97c36cdfb5115e7fd7d106f31e6dee1ec8cf90df3e3ef921338",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/toothrock_nml.dds",
+      "bytes": 2796344,
+      "sha256": "a5f1c0f023d8b3083916c9eaeab4e174407c58a61fdca9f4e3c0402379207678",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/wadigravel-white_dif.dds",
+      "bytes": 5592560,
+      "sha256": "bc712e270d0316ab91e87e3d6c4501f8f7ac8650cd1e21351bd86d42666b860d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/wadigravel_dif_hi.dds",
+      "bytes": 5592560,
+      "sha256": "1826ed5d584340d10ac56140f908e4c9b72fb63f0333c0605790292777e274dd",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/wadigravel_nml.dds",
+      "bytes": 2796344,
+      "sha256": "83270743efca5f1541ecdc4a79a10be1c3b0925f1fed2ba05cbb2e33d3cd578d",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/wavysedimentary_dif.dds",
+      "bytes": 5592560,
+      "sha256": "487bd45eb02ad602de2a2741d738eac36f46c358b4be92b5ac91b64152e90ecc",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/wavysedimentary_nml.dds",
+      "bytes": 2796344,
+      "sha256": "69aef35e939df0e1613b0ab9533a90bdcd8619e22a189e2673ff93499c057396",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/whitestone_floor_dif.dds",
+      "bytes": 5592560,
+      "sha256": "18bfacd2e7483fc71b6f6cdc58c8ccf7b0b50c365fb834b7bc03d2633e4d6f52",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/whitestone_floor_nml.dds",
+      "bytes": 2796344,
+      "sha256": "cf03c4f78de0f521b8b2bc66bf00894f3d43644f4f7c0b97080ba35dab0d2510",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    },
+    {
+      "path": "data/newland/land/textures/wreckage_base_dif.dds",
+      "bytes": 5592560,
+      "sha256": "44b666c97858e78994b4161cfeea27b2738ac6ac9f97e13f10628d269881f7ae",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT5"
+    },
+    {
+      "path": "data/newland/land/textures/wreckage_base_nml.dds",
+      "bytes": 2796344,
+      "sha256": "16a93d3cd78a445569839345d660d6bddfd273b9013bd77971a307d1aa157ea9",
+      "width": 2048,
+      "height": 2048,
+      "mips": 12,
+      "fourcc": "DXT1"
+    }
+  ],
+  "painted": [
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.0.png",
+      "bytes": 1126678,
+      "sha256": "2a1b88eb50f79641cbe855024fd2a425fbac09149bac5287a17a23f5c8aff8f4",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.0.png",
+      "bytes": 3517615,
+      "sha256": "b1109d25e421bf8b791586f681f303a235be3d48f0de7e1a658429954eacd016",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.0.png",
+      "bytes": 1438039,
+      "sha256": "d4e63efd447e1bf5a48265cd7b09825cef4b70898df82e67514d710826022109",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.0.png",
+      "bytes": 6825139,
+      "sha256": "487387ca29e71cfed7165cee9f9b9dfe78b146534fbe3cf5d2885aeb02aea145",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.0.png",
+      "bytes": 1463607,
+      "sha256": "239fdfbabedb8e6427e9db09c5a5efedfac010454140151e39e3ae96892a28f7",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.0.png",
+      "bytes": 7273402,
+      "sha256": "5d82c95d76ba8f050bf837a4ac84f170da0f843d305f1aa1ccc702bb82133cb8",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.0.png",
+      "bytes": 1271859,
+      "sha256": "c9da0c491d4a3e9cd1477525f5db5d36abb936679badf7f2edf1c8fd1d1848d1",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.0.png",
+      "bytes": 6321405,
+      "sha256": "fe9d0653ee297ee175c84ec994627804fd917dabba3e18cc02e7b6e593e08ac6",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.0.png",
+      "bytes": 1253254,
+      "sha256": "5d7d3a4e6013cb25092cc38bb7780450b260bd856b71b478a6373ef4694f0d50",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.0.png",
+      "bytes": 7767466,
+      "sha256": "c6195c76732582a91840d3ca2cc13948f0ec9e289bf4bf693ccce6cc3ba4f433",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.0.png",
+      "bytes": 1142013,
+      "sha256": "320abad2bd9913a6f9554d7d8bcc3dd38c5f6861d69160495f37ce5b0e71da60",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.0.png",
+      "bytes": 4409219,
+      "sha256": "ef7ebee5edc8942d8da04b18e6f9da6ae92080379c7b7b5cadf745246a1dca2d",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.0.png",
+      "bytes": 968625,
+      "sha256": "e21475c7676fb1a0b5bd6e14e367f4f705c6fb49a1739a32c22487f42ab8c76d",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.0.png",
+      "bytes": 3301942,
+      "sha256": "e5235760e107b551a638713550619c23b27d9bbbc7714a31dbc4678ec7ff2b5d",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.0.png",
+      "bytes": 636720,
+      "sha256": "2ea4604de83c9adb9e50fe88ff710eb2db6ed97f178bd37213445d64c9957c55",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.0.png",
+      "bytes": 2693312,
+      "sha256": "7277bc1d41602df94ec037451ce74fcf6e0128ddd96e4f10316af15d2046d27a",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 0
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.1.png",
+      "bytes": 1273509,
+      "sha256": "c4de0da9a15e5ddd83114cfb3ce74f77a96007d35134571f035d6f75101879a7",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.1.png",
+      "bytes": 3046195,
+      "sha256": "876a91f0de051678a62707f27efeee04fddd3ac5e2b9e41538ba6db84946d06b",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.1.png",
+      "bytes": 1725769,
+      "sha256": "77bca7d75bf21786736a08a5f8fc5d9c49c51e3da71234ee7c6344864956b856",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.1.png",
+      "bytes": 7029363,
+      "sha256": "6e8e9c45ad7acd2e8809c2f7ec36f673693cd179b2b74c38f0dea2b84dcb52a8",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.1.png",
+      "bytes": 1953103,
+      "sha256": "b9affa929172ca94904c2f16070481c9ecc4ab53765cecc03873c4e474d312cb",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.1.png",
+      "bytes": 9367658,
+      "sha256": "97cf3175f96569435440119a9483086fcc5df4b9b0684f21d1d840f100b75706",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.1.png",
+      "bytes": 1663506,
+      "sha256": "4df9e154f139a55cccf16ae3ac184342684a1c272ec9c076a46cbee9b3f9e100",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.1.png",
+      "bytes": 8634449,
+      "sha256": "9309ce90f9c159256fce700a8abcb3f70e3fe50342b40521243a20875aa35827",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.1.png",
+      "bytes": 1573154,
+      "sha256": "4b11423ec382986743d6e33c55e1e35c5143995e7859fb8b076275fb84024f7a",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.1.png",
+      "bytes": 8943647,
+      "sha256": "429777a3c605722e9a3d03c141cb6ca185653c73430e1ebc3613156ed90185cf",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.1.png",
+      "bytes": 1384765,
+      "sha256": "15dcd8a9d2df80de414cef54fc979b96f8ef2c8deb9e0606f31f0c93ea7c5db2",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.1.png",
+      "bytes": 5876211,
+      "sha256": "0b154930c8a06efce938359d521c5dab7dd7c63f152d50955886e5c1cc08b6f0",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.1.png",
+      "bytes": 1489570,
+      "sha256": "e39881daaa621548f2d42f7bbea1801db6c74408e194cb9485503006b385cbff",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.1.png",
+      "bytes": 4633444,
+      "sha256": "32561b0c441340fb37f8538104f326c193f6e3d46883b521234b28182b36cc4c",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.1.png",
+      "bytes": 811947,
+      "sha256": "3f8c6dfaddab0774e39f25487d1ea5ce1bfd45322cdcda1cab7577551481b99f",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.1.png",
+      "bytes": 2692616,
+      "sha256": "a7e632709fb77e45b54c04d35a136e42be6a5dcdaf7b119364de494d8af903a0",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 1
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.2.png",
+      "bytes": 1129417,
+      "sha256": "4e3d04cdca56c2a92574c9f1ef9b33795defc0caa40dd3d3547605cfcab63faf",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.2.png",
+      "bytes": 4390758,
+      "sha256": "e4a199247db7a9d3972901ad465ec8e99769b9900964f82bff925e9a51c5cdfc",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.2.png",
+      "bytes": 1691880,
+      "sha256": "2db31b438cd3569f4c089ea733d4d141aaf80e7372bbfd6545b38efd239aae76",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.2.png",
+      "bytes": 9208378,
+      "sha256": "e0f2f6e1f2075658fbda531e0b0422d00f62b8c0e848e52ef28225514c7aacfc",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.2.png",
+      "bytes": 1775769,
+      "sha256": "18f9f8b8369ea96df91ba0659a5e6ed6f278dc5e01f78ec60c20fcb2f6c21262",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.2.png",
+      "bytes": 9867150,
+      "sha256": "a2fb07018b5af3c32a486bbcb215c62f4781084830bee3ebe993ef646b8e6a48",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.2.png",
+      "bytes": 1615819,
+      "sha256": "405b16f51664b34365bd98b740cc43bef0f282123421d92d76c7884d1f658a32",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.2.png",
+      "bytes": 9440955,
+      "sha256": "a5413b5b78c0d0b9c666ffc026a18898f539076fd4140b34f8210c953a30e35c",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.2.png",
+      "bytes": 1512313,
+      "sha256": "abbb5bd1f26cc2f14ec883216f5a09dbd139ab534863c2b796f28815e1bcd6a8",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.2.png",
+      "bytes": 8631346,
+      "sha256": "a89f51755985100613d6681b263c8724c2ef35cba4e35ee69272522b34c33de6",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.2.png",
+      "bytes": 1119485,
+      "sha256": "12fbc359b2f0f8620d6aa904a59c0b01dc2254309adbd1d02714023b4d1592e5",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.2.png",
+      "bytes": 9274734,
+      "sha256": "6b323765933011a723986149b59873addd2db5683a3206b44dcfd5a9c7e4bb54",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.2.png",
+      "bytes": 1497542,
+      "sha256": "ab83422bba555bcd3ffce9e14ca6a1d381959fb9ec3606337ff07b0412a0ea2a",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.2.png",
+      "bytes": 7816363,
+      "sha256": "f7613cff21fb27ffb4124aeae0d259b0e28c51266571bb7c58e7748927b621db",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.2.png",
+      "bytes": 1643569,
+      "sha256": "85d9f95d161864c1d881a11e3fb963628d9499da0332c44d00c961aa1b4b2ae8",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.2.png",
+      "bytes": 3435753,
+      "sha256": "b29b4c47c2116315f034fd97a5d02873d85571a40b0b4b114e5ff5e4013bc058",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 2
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.3.png",
+      "bytes": 1042903,
+      "sha256": "0738a814e9f9366df4507e31d4e2cf2498ddb4e9124d925c6a0693ced23c72bd",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.3.png",
+      "bytes": 4737456,
+      "sha256": "806fb059793e9c050ed069420cd7ed050cfe6f5d457bf22a950ad8ef789f4edd",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.3.png",
+      "bytes": 1410032,
+      "sha256": "376b3e8c1c80e2b37f69f63a4f39d4dc3457362224de1f833649f57300eaaf5b",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.3.png",
+      "bytes": 9893763,
+      "sha256": "5c8ab1a4cd214142565c7f463b213d4ae3ad2f1fafee9a752382fcb48df0614a",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.3.png",
+      "bytes": 1726504,
+      "sha256": "f2646ddbfc65099f7a10198544ef032f83f9653503479fc0666cf2cda70ca04e",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.3.png",
+      "bytes": 9705217,
+      "sha256": "874eb8641abeb59bcdc272fab47a255818286051fb820eed742b82294554a99e",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.3.png",
+      "bytes": 1707240,
+      "sha256": "079e3557b69ba792df738bddefd098ad728482de4a48725bd3585e8ba04186c2",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.3.png",
+      "bytes": 9960925,
+      "sha256": "49154c4aca9bfde375314568f330f665347c8bc2fd8068db6cc7a8c0d5a9a9bd",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.3.png",
+      "bytes": 1494552,
+      "sha256": "44432c1098dbeda38a36d74e62656d12f5ac8cace67b54d88643a46397e800e0",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.3.png",
+      "bytes": 9253190,
+      "sha256": "0786f5062886c66798d5512e6ba17634c2ca2ac1c32efafea5e23e3259b2e88f",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.3.png",
+      "bytes": 1732154,
+      "sha256": "f9a301aa0e6a55e2f0e5da0ada610db8d7085466d76bf4ccad2acb6ae4e204b8",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.3.png",
+      "bytes": 8700387,
+      "sha256": "04225bd15f3d032505e368ad63e59915ebe11fe2b36d09ffce494a93babdd4ff",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.3.png",
+      "bytes": 1682729,
+      "sha256": "60b7e5f3df4598b0cb59f1060c45891c8302ea7ebdee069efd4275e1b54f134f",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.3.png",
+      "bytes": 8404028,
+      "sha256": "c69557c5cb987b60eb4c702511f90b579ff557935b37811e5ea61602378cd3ee",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.3.png",
+      "bytes": 1746225,
+      "sha256": "61ce4cd1e7cc8ba137b0f73543e7686f934dd729ecdd350d3d6b97efa1be667c",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.3.png",
+      "bytes": 6047942,
+      "sha256": "e4ab77c4b2aaa59c3792bfd7f2220aed8ab33f4dc1853e1320e0442310a2e9fd",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 3
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.4.png",
+      "bytes": 1206394,
+      "sha256": "65a08889bf65af006cd7e86ab3412c8294f6378048f7efcc60bca452d0c30fcb",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.4.png",
+      "bytes": 6173386,
+      "sha256": "5dca9f2e9ce11c014bbfc44e341fb00ce4fd67d7c1cac3a1e93d795ca24cdc40",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.4.png",
+      "bytes": 1640446,
+      "sha256": "8f153b30c0ddffa3d69572cc97a4164515d65acc29eed3a25acd7eee914a019b",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.4.png",
+      "bytes": 10362993,
+      "sha256": "b58069c8e85c3e79c4eeb9ec8f6096c2d4ff95a8c56ad8b33fd32b4bcb698a1a",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.4.png",
+      "bytes": 1695611,
+      "sha256": "a36faf1a4eeacf08e22ad6c084bf69a61bc86997e7c27d1a65b50d882638800a",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.4.png",
+      "bytes": 10432342,
+      "sha256": "8c75675054b9c4bac851e2e7340670a64d308ef414b70ca4c031dcad20ee50a0",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.4.png",
+      "bytes": 1621669,
+      "sha256": "ecf3fd6cbf8c7915a6fbf2fd1cd7fa3a6c7bafe8adece941d4e187cfded2f781",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.4.png",
+      "bytes": 8804353,
+      "sha256": "5322009c78ce283613bb2afa15a13c94312ef6379888fc49a671e4813768d85e",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.4.png",
+      "bytes": 1624553,
+      "sha256": "e9055fd7fae423b826217ad36721d5e94d5136433719d07321ddef7b0bdf9ea4",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.4.png",
+      "bytes": 9113626,
+      "sha256": "b9b5e6e1603411f0259a55504fd1c76e1fc8a04c61c157f8432494296ad83cc7",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.4.png",
+      "bytes": 1788328,
+      "sha256": "ee53163da37edf37074e2d02c1dfb08a37a2a3b256d37efee68000733e4541a5",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.4.png",
+      "bytes": 10153783,
+      "sha256": "8642fb23f292a027f3beee94071552fe59214a16289574fa5c2a7e7c94f66c03",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.4.png",
+      "bytes": 1529067,
+      "sha256": "40877ddbc53e07186052f35d122fee962f94ad31dc209f886fb121479c8b3cc6",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.4.png",
+      "bytes": 10577436,
+      "sha256": "0036488f8b580d833afaac84946e02f6fff2dcae7df83ad13fc381698dd52a11",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.4.png",
+      "bytes": 1375993,
+      "sha256": "143152d75529c48b247de4932552ab5972818b3ea0b08678e13c97ec5705fec5",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.4.png",
+      "bytes": 6894785,
+      "sha256": "565e99de8ee42cd4c8215719e86566b5e78fe60875d49e34458b0a7d90e819af",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 4
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.5.png",
+      "bytes": 1828091,
+      "sha256": "67b3875a37cde9bcccfa95845b77fa26f3d85e09df36fad2a08619f771ab0e59",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.5.png",
+      "bytes": 8412812,
+      "sha256": "ad25946e0bd3b866e01190ea68833c2086bd3b0a05d46176a9a5148324ac79fc",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.5.png",
+      "bytes": 2138300,
+      "sha256": "02379eb94ce7d7a99557e17442438208bdeb669c81afbba9da6028e75bf821aa",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.5.png",
+      "bytes": 10731230,
+      "sha256": "ebcd8b3dc56524e09102d1c5a1e285a823ffe0befcbcdae013bbb41999c1cfd4",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.5.png",
+      "bytes": 2157206,
+      "sha256": "8f07b3325c578180a52eb52a7242ef5c1ec2f82d3df9cb18cd7872b64cd8dd93",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.5.png",
+      "bytes": 10260908,
+      "sha256": "a4ef655f61438d7475d5fa189464fcafa823cf0e865455573aed87d5fa3a0312",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.5.png",
+      "bytes": 2124652,
+      "sha256": "b06cd263faa28e1686ba4a881157a56c48cadbececdc1e9c0d1f1149e59576ee",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.5.png",
+      "bytes": 9435648,
+      "sha256": "9e0d145ea49a8a6e8c0e743adf05fd53cf1ceae584e8f227b75960ef29ac27d2",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.5.png",
+      "bytes": 1903860,
+      "sha256": "14fc6be6a329e9f2210d4ae030916d740808d4100f65f231e80c91a1238dba0c",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.5.png",
+      "bytes": 10889713,
+      "sha256": "ef533a9c35a90f954e3646635d6bb52d2e055be5f9552bc0055dcfc71c5068a2",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.5.png",
+      "bytes": 1817009,
+      "sha256": "1324e62880783ef638bc78c5a11d07a277d809836b8efc736118ef403c6b4983",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.5.png",
+      "bytes": 12272535,
+      "sha256": "9d8cc1a755772392bd27939bfd5b1e50df5b0a417d5afc88877aab33d1b0c810",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.5.png",
+      "bytes": 1375024,
+      "sha256": "17b17a488f3e2b28f975aa80a5a630e498d8c935c2d7f648cb9c72fcbc8fec1e",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.5.png",
+      "bytes": 11039318,
+      "sha256": "492162e12c6017bb7cc4203dce11e70624499e48e37e67ef9e59e4f5303195f9",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.5.png",
+      "bytes": 1543497,
+      "sha256": "c7f12be86823166bb3977a2f2fee69d5b274d61559de61952db001725e697684",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.5.png",
+      "bytes": 8701125,
+      "sha256": "feff78aeab50fa4fbe0c6fea04f5e07b275706c39db49e9108e9309eccb783a1",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 5
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.6.png",
+      "bytes": 1593284,
+      "sha256": "940251b319c969fe53d9609b539dc764faf999b5d9f4530de1ce2f02ec4f04b2",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.6.png",
+      "bytes": 8022014,
+      "sha256": "dd177a208669e5292073b0eb50285facc9c3248aca58a53eecba154637240c68",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.6.png",
+      "bytes": 2020258,
+      "sha256": "d655516be3ca4b46f345447012680757f3e68fb4ba1dae88c58e0f954a5ffc36",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.6.png",
+      "bytes": 9944379,
+      "sha256": "207accb4b5cb1d7d6679f93ac34f4d2bdd0032db751c71501b7c1ce220a7da71",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.6.png",
+      "bytes": 2007139,
+      "sha256": "26f57385181b196370aa393815b9245dee766b945cc5ac59533bc2a7c8df0a42",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.6.png",
+      "bytes": 10224097,
+      "sha256": "e9e5bb8faf305d962ecdbb7863dc4f45f5404dd1ecb7be5e49caaeb691078199",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.6.png",
+      "bytes": 1952759,
+      "sha256": "83df04f6cb14e1f57f5a05507431337970eb337bc0157238f447e91ff07c7330",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.6.png",
+      "bytes": 9460097,
+      "sha256": "166233fa2724ea972ca1a5d8dad90eaf307d8a7fc3ddc25dfc2bbeee6b8b2019",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.6.png",
+      "bytes": 1451888,
+      "sha256": "8d448b187f643e94ce3ee34ca18a904da82eb16e2718a263f29501a899bebdd0",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.6.png",
+      "bytes": 11057250,
+      "sha256": "b7645a9ed7d13cf8a706e156602bf9c8c7300d6991e5b3671faa5bc23cebc00c",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.6.png",
+      "bytes": 1117299,
+      "sha256": "6737ded5fa127cc2735c64e0f4ca56c2b6333a3eaa950666f4353d81b55f1adf",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.6.png",
+      "bytes": 11118148,
+      "sha256": "ff4e39d2a4704df408bac5d04f9aa67c4f67c7823ae5e7605d7d8fb270e57199",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.6.png",
+      "bytes": 424245,
+      "sha256": "70701bc6a66e14d296353a50b1fee102c52ee9655ff35b783b6258176a37201f",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.6.png",
+      "bytes": 5222881,
+      "sha256": "757264203682cf5a99e4397230d312e0fd6c21f97c23a0b1398a747ba090bbc7",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.6.png",
+      "bytes": 768079,
+      "sha256": "b5d6039d50209e30e84b2dab634e3a3ace5a00d4a7c7aa28346b3a603a94c5f6",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.6.png",
+      "bytes": 3842479,
+      "sha256": "3910a106b7c91c38c09e7442ff5d4b5c1e6a21120a0c0f0583878191a55505bc",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 6
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.0.7.png",
+      "bytes": 1048857,
+      "sha256": "c0916df370cb8a8d2cce9e65b5e32c9cbcedce8bdb238fefaece42f6a86a8379",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 0,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.0.7.png",
+      "bytes": 2757716,
+      "sha256": "82c1ce9a3e8dfde44c0a7893589f320f7f132dd598e2a2706ae4477b7e44c18a",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 0,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.1.7.png",
+      "bytes": 1804261,
+      "sha256": "90063dbac50b69ee47167e2ced763b8fb50e9d57821f6e6cd9f2b3e27851295f",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 1,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.1.7.png",
+      "bytes": 6501040,
+      "sha256": "830056be2ffd729a79316e0d73b88a0e150de3c0a1df581b00b610225954f369",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 1,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.2.7.png",
+      "bytes": 1268865,
+      "sha256": "9e92de54fb203f7df4adf2798c6674640f9f0f5e33c3c87735b84cf76597bc98",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 2,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.2.7.png",
+      "bytes": 4156307,
+      "sha256": "cc32354186905a8ceb0369d17076d7df5091e9a406653b8de86ce578e3890f80",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 2,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.3.7.png",
+      "bytes": 1437529,
+      "sha256": "d7a9006b49f3081ee1833846c1bad881c6c7c0de74b1db187144f5861866b023",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 3,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.3.7.png",
+      "bytes": 4878954,
+      "sha256": "6d02c33b0822fcce1dcef7573257fb233d30681841db782290943fff854a9b60",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 3,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.4.7.png",
+      "bytes": 1248188,
+      "sha256": "f6f7f03de3ce0697cb2caacd8453603ae58da3e027f2ea9cf2938002b6c2ab27",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 4,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.4.7.png",
+      "bytes": 5374594,
+      "sha256": "41568b85dc82193f179ca0037c221b8e5451b841d15f9dfde0b09718fd7195ed",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 4,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.5.7.png",
+      "bytes": 1140279,
+      "sha256": "db985c92569e037ab730894584d62617e07b15241c7f9c56c47b4f094fc657b7",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 5,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.5.7.png",
+      "bytes": 5102030,
+      "sha256": "0b3aa1f0ea4130041bb5accdf93f630782365bb0334697a3e39bd7b608d372cc",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 5,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.6.7.png",
+      "bytes": 84103,
+      "sha256": "68b9625ec3da033c3be6676d75c9dd46c72d56eee3b4cde47bc0c49bbfbe790c",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 6,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.6.7.png",
+      "bytes": 3265607,
+      "sha256": "4dc49a4bb03b79f7f61e2c0d9ddbdb2937088ba53f680c907f171031beb5f775",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 6,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/new_overlay.7.7.png",
+      "bytes": 449946,
+      "sha256": "089ac765da66eda99d34345c607b461a972113580a939cb819daa743e03accc4",
+      "width": 1024,
+      "height": 1024,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 0,
+      "x": 7,
+      "z": 7
+    },
+    {
+      "path": "data/newland/land/overlaymaps/colour.7.7.png",
+      "bytes": 3177456,
+      "sha256": "ffb3164661f9d1b8f8d1346e4fd44a998a47fe35989a23146226115ff05f5a2b",
+      "width": 2048,
+      "height": 2048,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "kind": 1,
+      "x": 7,
+      "z": 7
+    }
+  ],
+  "identities": [
+    {
+      "name": "blend",
+      "path": "data/newland/land/blendmap.png",
+      "bytes": 51948,
+      "sha256": "db1b67238c5639f1791079b092c4d1a4cd66897c5a33093f07c781fa7d7ce907"
+    },
+    {
+      "name": "fullmap",
+      "path": "data/newland/land/fullmap.tif",
+      "bytes": 536980180,
+      "sha256": "6f7d4bc7baaf80dbf8db91e6f367db71f87fe38f053a34108f192584c9637b18"
+    },
+    {
+      "name": "executable",
+      "path": "RE_Kenshi/Kenshi_x64.exe",
+      "bytes": 36713984,
+      "sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e"
+    },
+    {
+      "name": "deferred/terrain.hlsl",
+      "path": "data/materials/deferred/terrain.hlsl",
+      "bytes": 4116,
+      "sha256": "7bde0c5f6aa81d542b5c25925b28508a937d5086effeb959a9b0c5b96f11eb07"
+    },
+    {
+      "name": "deferred/terrainfp4.hlsl",
+      "path": "data/materials/deferred/terrainfp4.hlsl",
+      "bytes": 12605,
+      "sha256": "050de26aa6082155fe95bf027b5783b86d87ae6cc03381d9c761b731a88327d7"
+    },
+    {
+      "name": "deferred/gbuffer.hlsl",
+      "path": "data/materials/deferred/gbuffer.hlsl",
+      "bytes": 2460,
+      "sha256": "d6a525658f224379269369c9adaa928fc82a72285aed5cffb21d077df4c9c943"
+    },
+    {
+      "name": "ogre",
+      "path": "OgreMain_x64.dll",
+      "bytes": 10207744,
+      "sha256": "7d3888d21398647519f10a89b1f300d8606f761ad159e6021a797b1b9b3df5f6"
+    },
+    {
+      "name": "terrain",
+      "path": "Plugin_Terrain_x64.dll",
+      "bytes": 330240,
+      "sha256": "53afd1e4faf35020556d33f57007d51c2a9d2330b630e39a67161ee850b7a239"
+    },
+    {
+      "name": "d3d11",
+      "path": "RenderSystem_Direct3D11_x64.dll",
+      "bytes": 760320,
+      "sha256": "5f224882ded5b6d3f68f14d6bb4e1762267bbb602b7b9733bd153663d1541bb9"
+    }
+  ]
+}

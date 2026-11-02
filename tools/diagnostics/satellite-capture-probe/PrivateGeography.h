@@ -1,4 +1,4 @@
-// Fixed primary1,1 geography trial. No shared ZoneMap callbacks or resource edits.
+// Legacy primary1,1 and immutable regional geography. No shared ZoneMap mutation.
 #include "GeographyInputs.h"
 #include "GeographyShader.h"
 bool ReadGeographicCell(unsigned index,void* (&ids)[5],BYTE (&tree)[2048],unsigned &bytes)
@@ -20,15 +20,43 @@ bool ReadGeographicCell(unsigned index,void* (&ids)[5],BYTE (&tree)[2048],unsign
     }
     __except(EXCEPTION_EXECUTE_HANDLER){return false;}
 }
+bool ReadGeographicRegionCell(const SatelliteRegion::Region& region,unsigned index,void* (&ids)[5],BYTE (&tree)[2048],unsigned &bytes)
+{
+    if(index>=16||region.x>=8||region.z>=8)return false;
+    __try
+    {
+        const BYTE* base=reinterpret_cast<const BYTE*>(GetModuleHandleA(NULL));
+        for(unsigned n=0;n<sizeof(GeoNativeChecks)/sizeof(GeoNativeChecks[0]);++n)
+            if(std::memcmp(base+GeoNativeChecks[n].rva,GeoNativeChecks[n].code,24))return false;
+        const BYTE* world=*reinterpret_cast<const BYTE*const*>(base+0x2133960);
+        const BYTE* map=*reinterpret_cast<const BYTE*const*>(world+0x168220);
+        if(*reinterpret_cast<const unsigned*>(map+0x50)!=32||*reinterpret_cast<const unsigned*>(map+0x54)!=32)return false;
+        const BYTE* table=*reinterpret_cast<const BYTE*const*>(map+0x58);
+        const BYTE* cell=table+(((region.z*4+index/4)*32)+(region.x*4+index%4))*48;
+        const BYTE* source=*reinterpret_cast<const BYTE*const*>(cell+40);
+        std::memcpy(ids,cell,40);bytes=((*source&0xe0)>0x20)?2048:1;std::memcpy(tree,source,bytes);
+        return world==*reinterpret_cast<const BYTE*const*>(base+0x2133960)&&map==*reinterpret_cast<const BYTE*const*>(world+0x168220)&&
+            table==*reinterpret_cast<const BYTE*const*>(map+0x58)&&source==*reinterpret_cast<const BYTE*const*>(cell+40)&&!std::memcmp(ids,cell,40);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
 struct PrivateGeography
 {
     Ogre::TexturePtr textures[5];Ogre::HighLevelGpuProgramPtr program,vertexProgram;ProbePolicy::FixedProgramCache cache;
-    bool uncertain,active;float parameters[900],distortion[60];
-    PrivateGeography():uncertain(false),active(false){std::memset(parameters,0,sizeof(parameters));std::memset(distortion,0,sizeof(distortion));}
+    bool uncertain,active;const SatelliteRegion::Region* selectedRegion;float parameters[900],distortion[60];
+    PrivateGeography():uncertain(false),active(false),selectedRegion(NULL){std::memset(parameters,0,sizeof(parameters));std::memset(distortion,0,sizeof(distortion));}
     static const char* Name(unsigned bank)
     {static const char* names[]={"LEOPARD_GeographyDiffuse0","LEOPARD_GeographyDiffuse1","LEOPARD_GeographyNormal","LEOPARD_GeographyBlend","LEOPARD_GeographySelector"};return names[bank];}
     static const char* ProgramName(){return "LEOPARD_GeographyFragment";}
     static const char* VertexName(){return "LEOPARD_GeographyVertex";}
+    GeoFile Input(unsigned f)const
+    {
+        if(f>=92)throw std::runtime_error("geography upload index refused");
+        if(!selectedRegion)return GeoFiles[f];
+        const SatelliteRegion::Asset& a=SatelliteRegion::Data.assets[selectedRegion->banks[f]];
+        const unsigned bank=f<24?0:f<46?1:2;
+        const GeoFile result={a.path,a.sha256,a.bytes,bank,f-(bank==0?0:bank==1?24:46),a.format};return result;
+    }
     static void Read(const GeoFile& f,const std::string& root,std::vector<BYTE>& bytes)
     {
         if(!f.bytes||f.bytes>SatelliteGeography::CpuLimit)throw std::runtime_error("geography source CPU bound refused");
@@ -42,14 +70,28 @@ struct PrivateGeography
         SatelliteGeography::Mip mips[9];
         if(f.format&&!SatelliteGeography::Dds(&bytes[0],bytes.size(),f.format,mips))throw std::runtime_error("geography strict DDS shape/layout refused");
     }
-    void Parameters(const std::string& root,bool nativeFadeRequest)
+    void FillRecord(GameData* data,unsigned b,bool nativeFadeRequest)
     {
-        GameData* records[15];static const char* roles[]={"base","slope","vertical","grass","dirt","road"};
         static const char* keys[10][4]={{"tiling X 1","tiling Y 1","tiling X 2","tiling Y 2"},{"tiling X 0","tiling Y 0","tiling X grass","tiling Y grass"},
             {"tiling X dirt","tiling Y dirt","tiling X road","tiling Y road"},{"slope min 1","slope min 2","slope min 3","slope min grass"},
             {"slope max 1","slope max 2","slope max 3","slope max grass"},{"slope fade 1","slope fade 2","slope fade 3","slope fade grass"},
             {"overlay mult vertical","overlay mult grass","overlay mult dirt","overlay mult road"},{NULL,NULL,NULL,NULL},
             {"absorbance 0","absorbance 1","absorbance 2","absorbance grass"},{"absorbance dirt","absorbance road",NULL,NULL}};
+        for(unsigned row=0;row<10;++row)for(unsigned c=0;c<4;++c)
+            if(keys[row][c])parameters[b*60+row*4+c]=PrivateBiomeReference::Float(data,keys[row][c])*((row>=3&&row<=5)?0.01f:1.0f);
+        parameters[b*60+40]=PrivateBiomeReference::Float(data,"brightness fix");
+        // Native fade row: this exact adapter is extracted by route tests.
+        float fade[4];if(!SatelliteGeography::FadeRow(nativeFadeRequest,data->idata,data->fdata,fade))
+            throw std::runtime_error("geography native fade fields/derived coefficient refused before allocation");
+        std::memcpy(parameters+b*60+28,fade,sizeof(fade));
+        // Native fade row end.
+        float values[4];if(!SatelliteGeography::Distortion(PrivateBiomeReference::Float(data,"distort wavelength"),PrivateBiomeReference::Float(data,"distort amplitude"),values))
+            throw std::runtime_error("geography nonfinite derived distortion refused before allocation");
+        std::memcpy(distortion+b*4,values,sizeof(values));
+    }
+    void Parameters(const std::string& root,bool nativeFadeRequest)
+    {
+        GameData* records[15];static const char* roles[]={"base","slope","vertical","grass","dirt","road"};
         std::memset(parameters,0,sizeof(parameters));
         for(unsigned b=0;b<15;++b)
         {
@@ -64,17 +106,7 @@ struct PrivateGeography
                 if(path.empty()||_stricmp(PrivateBiomeReference::Canonical(root+"/"+path).c_str(),PrivateBiomeReference::Canonical(root+"/"+GeoFiles[index].path).c_str()))
                     throw std::runtime_error("geography active biome asset mapping differs");
             }
-            for(unsigned row=0;row<10;++row)for(unsigned c=0;c<4;++c)
-                if(keys[row][c])parameters[b*60+row*4+c]=PrivateBiomeReference::Float(data,keys[row][c])*((row>=3&&row<=5)?0.01f:1.0f);
-            parameters[b*60+40]=PrivateBiomeReference::Float(data,"brightness fix");
-            // Native fade row: this exact adapter is extracted by route tests.
-            float fade[4];if(!SatelliteGeography::FadeRow(nativeFadeRequest,data->idata,data->fdata,fade))
-                throw std::runtime_error("geography native fade fields/derived coefficient refused before allocation");
-            std::memcpy(parameters+b*60+28,fade,sizeof(fade));
-            // Native fade row end.
-            float values[4];if(!SatelliteGeography::Distortion(PrivateBiomeReference::Float(data,"distort wavelength"),PrivateBiomeReference::Float(data,"distort amplitude"),values))
-                throw std::runtime_error("geography nonfinite derived distortion refused before allocation");
-            std::memcpy(distortion+b*4,values,sizeof(values));
+            FillRecord(data,b,nativeFadeRequest);
             for(unsigned role=0;role<6;++role){parameters[b*60+44+role]=float(GeoBiomes[b].diffuse[role]);parameters[b*60+52+role]=float(GeoBiomes[b].normal[role]);}
         }
         for(unsigned c=0;c<64;++c)
@@ -85,6 +117,63 @@ struct PrivateGeography
                 if(ids[slot]!=(GeoSlots[c][slot]?records[GeoSlots[c][slot]-1]:NULL))throw std::runtime_error("geography active coarse SID/channel table differs");
             std::vector<BYTE> mask(tree,tree+count);
             if(PrivateBiomeReference::Hash(mask)!=GeoTreeHashes[c])throw std::runtime_error("geography active fine mask tree differs");
+        }
+    }
+    void ParametersRegion(const std::string& root,bool nativeFadeRequest)
+    {
+        const SatelliteRegion::Region& region=*selectedRegion;
+        GameData* records[57]={0};bool needed[57]={0};
+        std::memset(parameters,0,sizeof(parameters));std::memset(distortion,0,sizeof(distortion));
+        for(unsigned c=0;c<16;++c)for(unsigned slot=0;slot<5;++slot)
+            if(region.cells[c].slots[slot])needed[region.cells[c].slots[slot]-1]=true;
+        for(unsigned source=0;source<57;++source)if(needed[source])
+        {
+            const char* sid=SatelliteRegion::Data.biomes[source].sid;GameData* data=ou->gamedata.getData(sid);
+            if(!data||data->type!=BIOMES||data->stringID!=sid)throw std::runtime_error("geography regional native SID identity missing");records[source]=data;
+        }
+        static const char* roles[]={"base","slope","vertical","grass","dirt","road"};
+        for(unsigned b=0;b<region.biomeCount;++b)
+        {
+            const SatelliteRegion::Binding& binding=region.biomes[b];GameData* data=records[binding.source];
+            if(!data)throw std::runtime_error("geography regional referenced source absent");
+            for(unsigned kind=0;kind<2;++kind)for(unsigned role=0;role<6;++role)
+            {
+                const std::string suffix=kind?" normal":"";
+                std::string path=PrivateBiomeReference::File(data,"texture "+std::string(roles[role])+suffix);
+                if(path.empty())path=PrivateBiomeReference::File(data,"texture base"+suffix);
+                const unsigned source=SatelliteRegion::Data.biomes[binding.source].sources[kind][role];
+                if(path.empty()||_stricmp(PrivateBiomeReference::Canonical(root+"/"+path).c_str(),
+                    PrivateBiomeReference::Canonical(root+"/"+SatelliteRegion::Data.assets[source].path).c_str()))
+                    throw std::runtime_error("geography regional native asset path differs");
+            }
+            FillRecord(data,b,nativeFadeRequest);
+            for(unsigned role=0;role<6;++role){parameters[b*60+44+role]=float(binding.layers[0][role]);parameters[b*60+52+role]=float(binding.layers[1][role]);}
+        }
+        for(unsigned c=0;c<16;++c)
+        {
+            void* ids[5];BYTE tree[2048];unsigned count=0;
+            if(!ReadGeographicRegionCell(region,c,ids,tree,count))throw std::runtime_error("geography regional guarded native cell read refused");
+            for(unsigned slot=0;slot<5;++slot)
+                if(ids[slot]!=(region.cells[c].slots[slot]?records[region.cells[c].slots[slot]-1]:NULL))throw std::runtime_error("geography regional ordered native source slots differ");
+            const std::vector<BYTE> mask(tree,tree+count);
+            if(count!=region.cells[c].treeBytes||PrivateBiomeReference::Hash(mask)!=region.cells[c].treeSha256)
+                throw std::runtime_error("geography regional native mask identity differs");
+        }
+    }
+    void PreflightRoleSources(const std::string& root)
+    {
+        // A native role may name an alias of the canonical uploaded hash. Check
+        // that actual file too, not only the representative upload source.
+        bool verified[219]={0};const SatelliteRegion::Region& region=*selectedRegion;
+        // All92 representative upload slots were already hashed immediately
+        // before this call. Only additional native alias paths need another read.
+        for(unsigned f=0;f<92;++f)verified[region.banks[f]]=true;
+        for(unsigned b=0;b<region.biomeCount;++b)for(unsigned kind=0;kind<2;++kind)for(unsigned role=0;role<6;++role)
+        {
+            const unsigned source=SatelliteRegion::Data.biomes[region.biomes[b].source].sources[kind][role];
+            if(verified[source])continue;
+            const SatelliteRegion::Asset& a=SatelliteRegion::Data.assets[source];const GeoFile file={a.path,a.sha256,a.bytes,0,0,a.format};
+            std::vector<BYTE> bytes;Read(file,root,bytes);verified[source]=true;
         }
     }
     ID3D11ShaderResourceView* View(unsigned bank)
@@ -134,14 +223,15 @@ struct PrivateGeography
             stage="GPU upload";
             if(bank>=3)
             {const unsigned side=bank==3?1024:8,levels=bank==3?11:1;const Ogre::PixelFormat format=bank==3?blend.getFormat():Ogre::PF_A8B8G8R8;
-             result=SatelliteGeography::UploadRgba2D(owner.View(bank),side,levels,format==Ogre::PF_A8R8G8B8?87:28,bank==3?blend.getData():GeoSelector,bank==3?blend.getSize():sizeof(GeoSelector));return SUCCEEDED(result);}
+             result=SatelliteGeography::UploadRgba2D(owner.View(bank),side,levels,format==Ogre::PF_A8R8G8B8?87:28,bank==3?blend.getData():(owner.selectedRegion?owner.selectedRegion->selector:GeoSelector),bank==3?blend.getSize():sizeof(GeoSelector));return SUCCEEDED(result);}
             unsigned uploaded=0;const unsigned slices=bank==0?24:bank==1?22:46;
-            for(unsigned f=0;f<92;++f)if(GeoFiles[f].bank==bank)
+            for(unsigned f=0;f<92;++f)
             {
-                layer=GeoFiles[f].layer;stage="source hash/layout";
-                std::vector<BYTE> source;Read(GeoFiles[f],root,source);SatelliteGeography::Mip mips[9];
-                if(!SatelliteGeography::Dds(&source[0],source.size(),GeoFiles[f].format,mips)){result=E_INVALIDARG;return false;}
-                stage="GPU upload";result=SatelliteGeography::UploadCompressedLayer(owner.View(bank),slices,layer,GeoFiles[f].format,mips);
+                const GeoFile input=owner.Input(f);if(input.bank!=bank)continue;
+                layer=input.layer;stage="source hash/layout";
+                std::vector<BYTE> source;Read(input,root,source);SatelliteGeography::Mip mips[9];
+                if(!SatelliteGeography::Dds(&source[0],source.size(),input.format,mips)){result=E_INVALIDARG;return false;}
+                stage="GPU upload";result=SatelliteGeography::UploadCompressedLayer(owner.View(bank),slices,layer,input.format,mips);
                 if(FAILED(result))return false;
                 ++uploaded;
             }
@@ -160,21 +250,32 @@ struct PrivateGeography
         }
     };
     void Begin(const std::string& root,Ogre::CompositorManager2* owner,bool nativeFadeRequest)
+    {BeginImpl(root,owner,nativeFadeRequest,NULL);}
+    void BeginRegion(const std::string& root,Ogre::CompositorManager2* owner,const SatelliteRegion::Region& region,bool nativeFadeRequest)
     {
-        if(uncertain||active||!OnMain()||!LoadedGuard()||!RenderAbiMatches())throw std::runtime_error("geography context/quarantine refused");
+        if(region.x>=8||region.z>=8||&region!=&SatelliteRegion::Data.regions[region.z*8+region.x]||!SatelliteRegion::Validate(SatelliteRegion::Data))
+            throw std::runtime_error("geography immutable region catalog refused");
+        BeginImpl(root,owner,nativeFadeRequest,&region);
+    }
+    void BeginImpl(const std::string& root,Ogre::CompositorManager2* owner,bool nativeFadeRequest,const SatelliteRegion::Region* region)
+    {
+        if(uncertain||active||selectedRegion||!OnMain()||!LoadedGuard()||!RenderAbiMatches())throw std::runtime_error("geography context/quarantine refused");
         for(unsigned b=0;b<5;++b)if(!textures[b].isNull()||Ogre::TextureManager::getSingleton().resourceExists(Name(b)))throw std::runtime_error("geography name/ownership collision");
         MEMORYSTATUSEX memory={sizeof(MEMORYSTATUSEX)};
         if(!GlobalMemoryStatusEx(&memory)||memory.ullAvailPhys<2*SatelliteGeography::GpuLimit||memory.ullAvailPageFile<2*SatelliteGeography::GpuLimit||
             !SatelliteGeography::Combined(0,64ULL*1024*1024))throw std::runtime_error("geography host/combined budget refused before allocation");
+        selectedRegion=region;
+        if(selectedRegion)ParametersRegion(root,nativeFadeRequest);else
         Parameters(root,nativeFadeRequest);
         unsigned expectedLayers[3]={0,0,0};
         for(unsigned f=0;f<92;++f)
         {
-            const GeoFile& input=GeoFiles[f];
+            const GeoFile input=Input(f);
             if(input.bank>=3||input.layer!=expectedLayers[input.bank]++||input.format!=(input.bank==2?71u:77u))throw std::runtime_error("geography bank manifest order differs");
         }
         if(expectedLayers[0]!=24||expectedLayers[1]!=22||expectedLayers[2]!=46)throw std::runtime_error("geography incomplete bank manifest refused before allocation");
-        for(unsigned f=0;f<92;++f){std::vector<BYTE> source;Read(GeoFiles[f],root,source);}
+        for(unsigned f=0;f<92;++f){std::vector<BYTE> source;Read(Input(f),root,source);}
+        if(selectedRegion)PreflightRoleSources(root);
         std::vector<BYTE> blendBytes;Read(GeoBlend,root,blendBytes);Ogre::Image blend;
         Ogre::DataStreamPtr stream(new Ogre::MemoryDataStream(&blendBytes[0],blendBytes.size(),false,true));blend.load(stream,"png");
         if(!SatellitePaintedMap::ImageShape(0,blend.getWidth(),blend.getHeight(),blend.getDepth(),blend.getNumFaces(),blend.getNumMipmaps(),blend.getFormat(),blend.getSize()))
@@ -214,7 +315,12 @@ struct PrivateGeography
             if(vertexProgram->hasCompileError()||!vertexProgram->isSupported())throw std::runtime_error("geography vertex shader compilation failed");
             if(reusePrivateShaders&&!cache.Record(owner,1,vertexProgram.get(),GeographyVertexSource))throw std::runtime_error("geography vertex shader cache refused");
         }
-        active=true;Log(std::string("geography pools loaded:15SIDs 92DDS 39ordered layouts 3banks levels9; DDSgpuBytes=385874496; native per-SID vertex distortion; ")+(nativeFadeRequest?"native-fade=1 literal actual-camera distance":"native-fade=0 zero-fade isolation"));
+        active=true;
+        if(selectedRegion)
+        {std::ostringstream message;message<<"geography regional pools loaded: region="<<selectedRegion->x<<','<<selectedRegion->z<<" primary="<<selectedRegion->primaryX<<','<<selectedRegion->primaryZ
+            <<" SIDs="<<selectedRegion->biomeCount<<" usedDIF/NML="<<selectedRegion->diffuseCount<<'/'<<selectedRegion->normalCount
+            <<" uploadSlots=92 3banks levels9 DDSgpuBytes=385874496; native-fade="<<nativeFadeRequest;Log(message.str());}
+        else Log(std::string("geography pools loaded:15SIDs 92DDS 39ordered layouts 3banks levels9; DDSgpuBytes=385874496; native per-SID vertex distortion; ")+(nativeFadeRequest?"native-fade=1 literal actual-camera distance":"native-fade=0 zero-fade isolation"));
     }
     void Bind(const Ogre::MaterialPtr& material)
     {
@@ -224,7 +330,7 @@ struct PrivateGeography
         pass->setFragmentProgram(ProgramName());pass->getTextureUnitState(0)->setTexture(textures[0]);pass->getTextureUnitState(1)->setTexture(textures[2]);
         for(unsigned kind=0;kind<2;++kind)
         {
-            if(PaintedReference().textures[kind].isNull())throw std::runtime_error("geography painted array absent");
+            if(!PaintedReference().MatchesPrimary(selectedRegion?selectedRegion->primaryX:1,selectedRegion?selectedRegion->primaryZ:1))throw std::runtime_error("geography painted array absent");
             Ogre::TextureUnitState* unit=pass->getTextureUnitState(kind+2);unit->setContentType(Ogre::TextureUnitState::CONTENT_NAMED);
             unit->setTexture(PaintedReference().textures[kind]);unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_WRAP);unit->setTextureFiltering(Ogre::TFO_TRILINEAR);
         }
@@ -237,7 +343,8 @@ struct PrivateGeography
         vp->setNamedConstant("biomeData",Ogre::Vector4(-147456,-147456,147456,147456));vp->setNamedConstant("overlayData",Ogre::Vector4(-147456,-147456,147456,147456));
         Ogre::GpuProgramParametersSharedPtr fp=pass->getFragmentProgramParameters();fp->removeAllSharedParameters();fp->setNamedConstant("satBiome",parameters,225,4);
         fp->setNamedAutoConstant("viewport",Ogre::GpuProgramParameters::ACT_VIEWPORT_SIZE);fp->setNamedAutoConstant("cameraPos",Ogre::GpuProgramParameters::ACT_CAMERA_POSITION);fp->setNamedAutoConstant("farClip",Ogre::GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
-        fp->setNamedConstant("paintedTileBase",Ogre::Vector4(-73728,-73728,0,0));fp->setNamedConstant("waterHeightRel",-100000.0f);fp->setNamedConstant("wetness",0.0f);
+        PaintedReference().BindPrimaryBase(material);
+        fp->setNamedConstant("geoSelectorRegion",selectedRegion?Ogre::Vector4(float(selectedRegion->worldX),float(selectedRegion->worldZ),4,4):Ogre::Vector4(-73728,-73728,8,8));fp->setNamedConstant("waterHeightRel",-100000.0f);fp->setNamedConstant("wetness",0.0f);
         Log("geographic per-fragment coarse root/channel selection bound; 8SRVs native residual weights; no patch-center substitution");
     }
     void Destroy()
@@ -247,7 +354,7 @@ struct PrivateGeography
         {Ogre::TextureManager::getSingleton().remove(Name(b));if(nativeApi.useCount(&textures[b])!=1)throw std::runtime_error("geography texture still borrowed");textures[b].setNull();}
         if(!program.isNull()){if(!cache.Owns(0,program.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(ProgramName());program.setNull();}
         if(!vertexProgram.isNull()){if(!cache.Owns(1,vertexProgram.get()))Ogre::HighLevelGpuProgramManager::getSingleton().remove(VertexName());vertexProgram.setNull();}
-        active=false;
+        active=false;selectedRegion=NULL;
     }
 };
 PrivateGeography& GeographyReference(){static PrivateGeography* owned=new PrivateGeography;return *owned;}
