@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-02",
+  "scope": "new atlas-models helper only; no main integration/game calls/install/commit",
+  "review": "independent read-only CLEAR by trader_language_fallback; fresh full suite and native ABI compile, no live Town/GST claim",
+  "tests": {
+    "graphics": 8,
+    "nativeSourceDxbc": 32,
+    "policy": 15,
+    "productionAdmission": 18,
+    "warp": 450,
+    "compiledMutantsRejected": 17,
+    "nativeGbuffer": "exact bytes in matching fixture formats",
+    "radialTolerance": 1e-06
+  },
+  "nativeExportPins": 53,
+  "nativeModules": {
+    "OgreMain_x64.dll": "7d3888d21398647519f10a89b1f300d8606f761ad159e6021a797b1b9b3df5f6",
+    "RenderSystem_Direct3D11_x64.dll": "5f224882ded5b6d3f68f14d6bb4e1762267bbb602b7b9733bd153663d1541bb9",
+    "RE_Kenshi/Kenshi_x64.exe": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e"
+  },
+  "shaders": [
+    {
+      "symbol": "AtlasModelVertexShader",
+      "bytes": 1328,
+      "sha256": "d56d3d413fb0d830067e89438ca7f25f4985a1f971de020d8d4debdaaad394e1"
+    },
+    {
+      "symbol": "AtlasModelPixelShader",
+      "bytes": 1764,
+      "sha256": "3785b8a95bbe625b7396cec7bcf81fa9fbcf2cb7b64ed86e39dee3b3d72d818b"
+    }
+  ],
+  "ownedPrivateBytes": 1048720,
+  "sharedCapBytes": 201326592,
+  "currentCallerBytes": 192414256,
+  "combinedOwnedBytes": 193462976,
+  "headroomBytes": 7863616,
+  "borrowedBufferCapBytes": 33554432,
+  "borrowedDiffuse": "one existing native resource, all retained native mips, separate from owned ledger",
+  "runtime": {
+    "candidateAvailable": "unverified",
+    "gstFrameConversion": "unverified",
+    "nativeCalls": false
+  },
+  "files": {
+    ".gitignore": "f3fbb8a529970ea51a197ae5cca6b1bf73cb0241790a28abc41df57f2b5a705b",
+    "admission_tests.cpp": "4edd225f135afe5f289a8e948792f9b7a9d081041851ffa79ff65a6cd2cee511",
+    "AtlasModel.h": "2fdee7f4817e2085f2a9c4c7709ea761b505c43e50a06bd62a6d12356c920c63",
+    "audit_backend.py": "74892868304e4aa9caf00491affa2cbaaafc628a045a17e01803131baad18462",
+    "generate_models.py": "b4763a50c53e9af4e6d735ecf351a81abec9cf4764005a09decda786e83b97d2",
+    "GraphicsState.h": "c5f3e311d81d88181882232fd85c337c1dbfb2cb6399d366853abece58ae58ac",
+    "ModelAdmission.h": "82b07d3a934d70693417da7061b4fa3fd0402fed9ed5affdf3fd4018c17cdf79",
+    "ModelPolicy.h": "877de82c76a9de00ef372768c4ec6b0b70c0a912aa2ca6fdf1133c1208850646",
+    "native_compile.cpp": "bf72dd75fd58d247b81ec84c217103617db74d9dfb8a6aeb9f60b26019a03d02",
+    "NativeModel.h": "1c5e77f83d8e8e5051e5bdeb38bf970e3030891c15111737bb0a8953f6837d40",
+    "plan.md": "d208d2302d956117cbe8d3222c0153cca822239e4699ea8c8a7c0eb428071c40",
+    "policy_tests.cpp": "c38d8da046dfd342b0c978a80aceaf3062b66f80770c10415284737d95385ab4",
+    "README.md": "72687699312d2ebb3bb040fd7b6c12a64f9365945ab841a8354889b49c2408a3",
+    "run_tests.ps1": "fea7bcb39e1c137e5ef62c22a1d4bc7606082b6a4e5975f5cd5b6e51dee571de",
+    "state_tests.cpp": "afb0de6bdc8a66bf86deb293a29cbfd85e029899570345773bdcc85a287cbdeb",
+    "StateSentinels.hlsl": "072733ff84efb7a36f3f05d8ea082f3a2e70d7b15f087fb2509066421ec4143d",
+    "test_mutants.py": "5c4c06dbe1d980ff53988a570bd13e825ef72f6a157cff9f09d83c7543e5c538",
+    "verify_contract.py": "eb3ebe8352d5317fd71928da0cbe06a4bf4a1f05c7c42b07b07c66ed947ccbf0",
+    "warp_tests.cpp": "1f8d56f681b2d9b5f330b1b934520e75118946fc8770878e0032229a33b1e099"
+  },
+  "generated": {
+    "ModelShaders.h": "1d15ab8ef19a32166b392788783d30e7200794ec4158301dc949ad41e62d5bdd",
+    "ModelProfile.h": "ac4737be5ce0ef380d2296e48791618beb20113a87c9a483dc6a77054f90c54d",
+    "models.json": "056d0f6205eebe200b1c7bf25aa631737d0a5691cff963239070b79e72a94a9e",
+    "full.log": "8c069d56e1bc04970ea959095ec83c02a69f71d6b454d43d293db0878e39b2b8"
+  }
+}
