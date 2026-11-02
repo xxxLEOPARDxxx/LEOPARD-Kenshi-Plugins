@@ -341,3 +341,31 @@ per-frame file writes. Assess actual CPU/GPU/memory cost in game. Terrain/wall
 line-of-sight, temporary tactical visibility and NPC intelligence are outside the
 proposed first scope. This is recorded as a future candidate, not implemented or
 accepted as a completed feature; finish the main map/building work first.
+
+
+### Optional map overlays requested 2026-11-02: after core coverage
+
+Direct user request: besides exploration fog, add drawing of biome zones,
+diplomatic zones, and roads/paths. Record all three as separate optional MCM
+layers, default OFF, independently switchable from satellite view and fog.
+Do not add these into the terrain atlas or require a new capture for toggling.
+
+- Biome zones: draw the game's actual biome boundaries/areas with a readable
+  translucent fill or outline and legend. Keep biome identity separate from
+  the existing terrain-material blend used for rendering; inspect native data
+  before treating a blended paint pixel as an authoritative region boundary.
+- Diplomatic zones: inspect actual faction/territory/diplomacy data and define
+  the supported meaning of the layer from that evidence. Do not invent hard
+  ownership boundaries or claim native jurisdiction where the game has none.
+  Colour/legend must make the supported meaning clear and reflect real changes.
+- Roads/paths: draw the existing game road/path network from verified native
+  data. Avoid silently turning this into a new pathfinding system or showing
+  straight lines as traversable roads. Marker alignment must follow the same
+  native global-map projection at all zoom and pan positions.
+
+All overlays must obey exploration visibility when fog is enabled, so they do
+not disclose intentionally hidden information. Bounded geometry/cache updates,
+no per-frame world scans or file writes, clipping/zoom/skin checks, three locales
+and lifecycle/performance review are required. These are future tasks only:
+no implementation or public release is claimed. Current priority remains city
+coverage and the reported fast-zoom edge display defect.

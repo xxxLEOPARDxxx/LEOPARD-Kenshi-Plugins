@@ -101,3 +101,9 @@ Dark UI Advanced/Formations received description-only changes. See
 docs/releases/2026-11-02-steam-publication.md and synchronized published ledger.
 OTI/XP_Overhaul remain local; DF/global map remain private. Do not prepare or
 publish this same batch again or increment versions merely for local fixes.
+
+
+2026-11-02 user follow-up: optional global-map biome zones, diplomatic zones,
+and road/path overlay layers, alongside the previously planned exploration fog.
+Separate MCM toggles; native source evidence and no atlas recapture. See
+GlobalSatelliteMap/PLAN.md. Future work after the active core coverage fixes.
