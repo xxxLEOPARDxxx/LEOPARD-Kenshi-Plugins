@@ -68,4 +68,3 @@ int main(){try{
  before=f.d.p->AddRef();f.d.p->Release();for(unsigned i=0;i<4;++i){AtlasModelSurface::Layer repeat;Hr(repeat.Init(true,f.d.p,AtlasView::GpuCap-1048576),"exact budget Init");repeat.Clear();Check(FAILED(repeat.Init(true,f.d.p,AtlasView::GpuCap-1048575)),"Init plus1 refused");Check(!repeat.Texture(0),"failed Init leaves no outputs");}after=f.d.p->AddRef();f.d.p->Release();Check(before==after,"repeated lifecycle COM balance");
  std::printf("model surface WARP %u checks PASS\n",checks);return 0;
 }catch(...){return 1;}}
-

@@ -57,3 +57,12 @@ msgstr "火把和灯具"
 
 msgid "Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."
 msgstr "使用已加载区域中现有的点光源和聚光灯照亮地形。不会为未加载的区域虚构灯光。"
+
+msgid "Existing city models"
+msgstr "现有城镇模型"
+
+msgid "Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."
+msgstr "显示现有的静态远景城镇模型。此开发选项暂不包含已完全加载的建筑和没有现成缓存模型的城镇。"
+
+msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."
+msgstr "开发中的地形视图，使用当前阳光和环境光，可选水面及已加载区域的灯光。城镇模型仍处于实验阶段。"

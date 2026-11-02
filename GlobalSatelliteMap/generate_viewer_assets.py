@@ -68,6 +68,14 @@ for relative,pinned_hash in water_pins:
  assert hashlib.sha256((game_root/relative).read_bytes()).hexdigest()==pinned_hash,relative
  lines += ['{'+json.dumps(relative)+','+json.dumps(pinned_hash)+'},']
 lines += ['};']
+lines += ['static const GsmShaderInput GsmModelShaderInputs[]={']
+for relative, expected in (
+ ('data/materials/deferred/distant_town.hlsl','ea54dc4c8361e0b300ce34cefe1a26d927ebb5082942642ca769824ddd75c066'),
+ ('data/materials/deferred/distant_town.material','eaa612b91dad500c9f77dc253019363d2dffea5653a43ed660bd0cc5e4450259'),
+ ('data/materials/deferred/gbuffer.hlsl','d6a525658f224379269369c9adaa928fc82a72285aed5cffb21d077df4c9c943')):
+ assert hashlib.sha256((game_root/relative).read_bytes()).hexdigest()==expected,relative
+ lines += ['{'+json.dumps(relative)+','+json.dumps(expected)+'},']
+lines += ['};']
 (out/'GsmNativeProfile.h').write_text('\n'.join(lines)+'\n')
 game=Path('D:/SteamLibrary/steamapps/common/Kenshi/data/materials')
 fxc=Path('C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe')

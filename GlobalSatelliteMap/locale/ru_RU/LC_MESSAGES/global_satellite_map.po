@@ -57,3 +57,12 @@ msgstr "Факелы и фонари"
 
 msgid "Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."
 msgstr "Освещать рельеф существующими точечными источниками света и прожекторами в загруженных областях. Для непрогруженных областей свет не выдумывается."
+
+msgid "Existing city models"
+msgstr "Существующие модели городов"
+
+msgid "Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."
+msgstr "Показывать существующие статичные дальние модели городов. Полностью загруженные здания и города без готовой модели пока не входят в эту экспериментальную опцию."
+
+msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."
+msgstr "Экспериментальная спутниковая карта с текущим солнечным и фоновым светом, водой и освещением загруженных областей. Модели городов пока экспериментальные."

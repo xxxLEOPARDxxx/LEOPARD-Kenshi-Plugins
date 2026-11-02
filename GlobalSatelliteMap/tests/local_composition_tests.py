@@ -52,8 +52,16 @@ static const void*localProofScene=NULL;static const void*fakeScene=reinterpret_c
 static AtlasLocalLights::Layer localLayer;static AtlasLocalLights::ProvenMapping localMapping;
 static GsmLocalRevision::State<NativeLocalLights::LightValue,NativeLocalLights::Limit> localRevision;
 static GsmLocalDiagnostic::Bridge<NativeLocalLights::NativeSnapshot> localDiagnostic;
-struct Output{ID3D11Texture2D*p;Output():p(NULL){}};struct Entry{AtlasView::Cell gpu;Output output;AtlasView::WindowKey key;unsigned shaded,waterStamp,localStamp,localChecked;bool localAffects,localApplied,waterApplied;Entry():shaded(0),waterStamp(0),localStamp(0),localChecked(0),localAffects(false),localApplied(false),waterApplied(false){}};
+struct Output{ID3D11Texture2D*p;Output():p(NULL){}};struct Entry{AtlasView::Cell gpu;Output output;AtlasView::WindowKey key;unsigned shaded,waterStamp,localStamp,localChecked,modelStamp;bool localAffects,localApplied,waterApplied,modelApplied;Entry():shaded(0),waterStamp(0),localStamp(0),localChecked(0),modelStamp(0),localAffects(false),localApplied(false),waterApplied(false),modelApplied(false){}};
 static Entry cache[AtlasView::WindowSlots];static AtlasView::Uniforms lighting={};
+static bool modelGpuReady=false,modelsOn=false,modelError=false;
+static const AtlasView::U64 ModelGpuBytes=3145936;
+static AtlasView::Cell modelCell;
+struct ModelFixture{unsigned revision;ModelFixture():revision(1){}unsigned Revision()const{return revision;}}models;
+bool ModelsAvailable(){return modelsOn;}
+HRESULT PrepareModelCell(const Entry&e,const AtlasView::Uniforms&,bool&applied){modelCell=e.gpu;applied=modelsOn&&!modelError;return modelError?E_FAIL:S_OK;}
+void ModelFailure(const char*){modelsOn=false;modelError=false;}
+
 static void ErrorLog(const std::string&){++errors;}static void Diagnostic(const std::string&){}
 bool DiagnosticScene(const void*&scene,const void*&camera){scene=fakeScene;camera=reinterpret_cast<void*>(12);return scene!=NULL;}
 void WindowBounds(const AtlasView::WindowKey&,double&x,double&z,double&sx,double&sz){x=z=0;sx=sz=2304;}
@@ -66,7 +74,7 @@ struct Relighter{HRESULT Render(const AtlasView::Cell&,const AtlasView::Uniforms
 BODIES
 static bool useWaterFixture=false;bool WantsWater(const Entry&){return useWaterFixture&&!waterFailed;}bool Superseded(const AtlasView::WindowKey&,unsigned){return false;}struct Plan{unsigned level;Plan():level(0){}bool Contains(const AtlasView::WindowKey&)const{return true;}};
 SHADE
-void Reset(){errors=reads=localInit=pipelineInit=localCalls=terrainStage=waterStage=terrainFallback=writes=0;nextRead=nextLocalInit=nextPipelineInit=nextLocal=nextWater=S_OK;debug=false;localOption=true;localFailed=localLayerReady=localDiagnosticLogged=originDiagnosticLogged=waterFailed=waterPipelineReady=useWaterFixture=false;ready=true;observedGeneration=7;GSM::generation=7;localVersion=1;lightVersion=2;waterVersion=1;shadeCursor=0;localProofScene=NULL;fakeScene=reinterpret_cast<void*>(11);localMapping=AtlasLocalLights::ProvenMapping();localRevision.Reset();localDiagnostic.Reset();NativeLocalLights::nextCount=1;NativeLocalLights::nextGeneration=7;NativeLocalLights::nextInfo=NativeLocalLights::Information();std::memset(NativeLocalLights::lights,0,sizeof(NativeLocalLights::lights));NativeLocalLights::LightValue&v=NativeLocalLights::lights[0];v.worldPosition[0]=v.worldPosition[2]=100;v.range=200;v.basePower=v.effectivePower=1;v.diffuse[0]=1;v.type=0;
+void Reset(){modelGpuReady=modelsOn=modelError=false;models.revision=1;errors=reads=localInit=pipelineInit=localCalls=terrainStage=waterStage=terrainFallback=writes=0;nextRead=nextLocalInit=nextPipelineInit=nextLocal=nextWater=S_OK;debug=false;localOption=true;localFailed=localLayerReady=localDiagnosticLogged=originDiagnosticLogged=waterFailed=waterPipelineReady=useWaterFixture=false;ready=true;observedGeneration=7;GSM::generation=7;localVersion=1;lightVersion=2;waterVersion=1;shadeCursor=0;localProofScene=NULL;fakeScene=reinterpret_cast<void*>(11);localMapping=AtlasLocalLights::ProvenMapping();localRevision.Reset();localDiagnostic.Reset();NativeLocalLights::nextCount=1;NativeLocalLights::nextGeneration=7;NativeLocalLights::nextInfo=NativeLocalLights::Information();std::memset(NativeLocalLights::lights,0,sizeof(NativeLocalLights::lights));NativeLocalLights::LightValue&v=NativeLocalLights::lights[0];v.worldPosition[0]=v.worldPosition[2]=100;v.range=200;v.basePower=v.effectivePower=1;v.diffuse[0]=1;v.type=0;
  for(unsigned i=0;i<AtlasView::WindowSlots;++i){cache[i]=Entry();cache[i].key=AtlasView::WindowKey(i%16,5,0,0);cache[i].shaded=lightVersion;cache[i].output.p=reinterpret_cast<ID3D11Texture2D*>(ULONG_PTR(i+1));for(unsigned j=0;j<3;++j)cache[i].gpu.view[j].p=reinterpret_cast<ID3D11ShaderResourceView*>(ULONG_PTR(j+1));}
 }
 void Admit(){LocalDiagnostic(1000);localMapping.verified=true;localMapping.generation=7;std::memcpy(localMapping.sourceSceneOrigin,NativeLocalLights::nextInfo.SourceSceneOrigin,12);localProofScene=fakeScene;}
@@ -78,15 +86,18 @@ int main(){try{
  Reset();Admit();localMapping.verified=false;Check(!WantsLocal(cache[0]),"unproven mapping refuses");localMapping.verified=true;++observedGeneration;Check(!WantsLocal(cache[0]),"stale generation refuses mapping");observedGeneration=7;localMapping.sourceSceneOrigin[0]=1;Check(!WantsLocal(cache[0]),"source origin mismatch refuses");
  Reset();Admit();fakeScene=reinterpret_cast<void*>(13);LocalDiagnostic(2000);Check(!localMapping.verified&&!localProofScene,"scene replacement invalidates coordinate proof before reuse");
  Reset();Admit();NativeLocalLights::lights[0].worldPosition[0]=100000;NativeLocalLights::lights[0].worldPosition[2]=100000;LocalDiagnostic(2000);Check(!WantsLocal(cache[0]),"outside radius skips local stage");
- Reset();Admit();AtlasView::Uniforms u={};u.tileBounds[2]=u.tileBounds[3]=2304;Check(RenderLayers(cache[0],u,false,true)==S_OK&&localInit==1&&pipelineInit==1&&localCalls==1&&terrainStage==1&&!waterStage,"waterOFF locals use terrain HDR stage");Check(lastLocalCaller==AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes&&lastPipelineCaller==AtlasView::WindowGpuBytes()+AtlasLocalLights::PrivateBytes&&lastApplyCaller==lastLocalCaller,"actual Init/Render ledgers include external private resources once");
- Reset();Admit();Check(RenderLayers(cache[0],u,true,false)==S_OK&&!localInit&&!localCalls&&waterStage==1,"localOFF water uses null HDR callback");
- Reset();Admit();Check(RenderLayers(cache[0],u,true,true)==S_OK&&localCalls==1&&waterStage==1,"waterON locals pass callback once");
- Reset();Admit();nextLocalInit=E_FAIL;Check(FAILED(RenderLayers(cache[0],u,false,true))&&!pipelineInit&&!writes,"local init failure stops before display/pipeline");
- Reset();Admit();nextPipelineInit=E_FAIL;Check(FAILED(RenderLayers(cache[0],u,false,true))&&!localCalls&&!writes,"pipeline init failure stops before stage/display");
+ Reset();Admit();AtlasView::Uniforms u={};u.tileBounds[2]=u.tileBounds[3]=2304;Check(RenderLayers(cache[0],cache[0].gpu,u,false,true)==S_OK&&localInit==1&&pipelineInit==1&&localCalls==1&&terrainStage==1&&!waterStage,"waterOFF locals use terrain HDR stage");Check(lastLocalCaller==AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes&&lastPipelineCaller==AtlasView::WindowGpuBytes()+AtlasLocalLights::PrivateBytes&&lastApplyCaller==lastLocalCaller,"actual Init/Render ledgers include external private resources once");
+ Reset();Admit();Check(RenderLayers(cache[0],cache[0].gpu,u,true,false)==S_OK&&!localInit&&!localCalls&&waterStage==1,"localOFF water uses null HDR callback");
+ Reset();Admit();Check(RenderLayers(cache[0],cache[0].gpu,u,true,true)==S_OK&&localCalls==1&&waterStage==1,"waterON locals pass callback once");
+ Reset();Admit();nextLocalInit=E_FAIL;Check(FAILED(RenderLayers(cache[0],cache[0].gpu,u,false,true))&&!pipelineInit&&!writes,"local init failure stops before display/pipeline");
+ Reset();Admit();nextPipelineInit=E_FAIL;Check(FAILED(RenderLayers(cache[0],cache[0].gpu,u,false,true))&&!localCalls&&!writes,"pipeline init failure stops before stage/display");
  Reset();Admit();Check(Shade()<=4&&writes==4&&cache[0].localApplied,"actual Draw four-window local budget");localOption=false;unsigned total=0;for(unsigned i=0;i<(AtlasView::WindowSlots+3)/4;++i)total+=Shade();Check(total==4&&terrainFallback==4&&!cache[0].localApplied,"OFF dirties old applied locals then restores only affected outputs");
  Reset();Admit();nextLocal=E_FAIL;Check(Shade()<=4&&localFailed&&errors==1&&terrainFallback>0&&!cache[0].localApplied,"stage failure latches and restores terrain sameiteration");
  Reset();Admit();useWaterFixture=true;nextLocal=E_FAIL;Check(Shade()<=4&&localFailed&&!waterFailed&&waterStage>1&&cache[0].waterApplied&&!cache[0].localApplied,"local failure retries water with null stage retaining water");
  Reset();Admit();useWaterFixture=true;nextWater=E_FAIL;Check(Shade()<=4&&localFailed&&waterFailed&&terrainFallback>0&&!cache[0].localApplied&&!cache[0].waterApplied,"all composition failures fall back bounded terrain");
+ Reset();Admit();modelsOn=true;modelGpuReady=true;Check(Shade()==4&&cache[0].modelApplied&&cache[0].modelStamp==models.Revision(),"model revision shades actual caller with reused model cell");Check(lastPipelineCaller==AtlasView::WindowGpuBytes()+AtlasLocalLights::PrivateBytes+ModelGpuBytes,"model working resources charged to pipeline");
+ modelsOn=false;shadeCursor=0;Check(Shade()==4&&!cache[0].modelApplied,"disabling models redraws cached outputs");
+ Reset();Admit();modelsOn=true;modelError=true;Check(Shade()==4&&!cache[0].modelApplied&&!modelsOn,"model preparation failure restores pristine terrain and keeps light layer");
  Check(AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes+AtlasLocalLights::PrivateBytes<AtlasView::GpuCap,"combined declared private ledger remains under shared cap");
  std::printf("PASS %u extracted production local-composition checks\n",checks);return 0;
  }catch(...){return 1;}}
@@ -107,7 +118,7 @@ int main(){try{
  ('omit external caller ledger','(localLayerReady?AtlasLocalLights::PrivateBytes:0)','0'),
  ('omit pipeline in stage ledger','AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes','AtlasView::WindowGpuBytes()'),
  ('omit local failure fallback','if(FAILED(hr)&&useLocal)','if(false)'),
- ('omit water retry','if(useWater)hr=RenderLayers(e,u,true,false);',''),
+ ('omit water retry','if(useWater)hr=RenderLayers(e,cell,u,true,false);',''),
  ('ignore paused version','(useLocal&&e.localStamp!=localVersion)','false'),
  ('inherit stale scene proof','if(localProofScene&&localProofScene!=scene)','if(false)'),
  ('exceed four window budget','shaded<4','shaded<5')]

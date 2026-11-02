@@ -47,6 +47,9 @@
 #include "build/GsmLocalShader.h"
 #include "GsmModelDiagnostic.h"
 #include "GsmTownValues.h"
+#include "GsmModelCache.h"
+#include "atlas-models/surface/AtlasModelSurface.h"
+#include "atlas-models/decode/_generated/ModelDecodeShader.h"
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
@@ -70,6 +73,14 @@ const void*localProofScene=NULL;
 GsmLocalRevision::State<NativeLocalLights::LightValue,NativeLocalLights::Limit> localRevision;
 GsmModelDiagnostic::Once distantModelDiagnostic,loadedModelDiagnostic;
 bool townValuesLogged=false;
+bool modelOption=false,modelAttempted=false,modelFailed=false,modelGpuReady=false;
+DWORD modelCatalogAt=0;bool modelCatalogReady=false;
+GsmModels::Cache models;AtlasModels::Raster modelRaster;AtlasModelDecode::Layer modelDecode;AtlasModelSurface::Layer modelSurface;AtlasView::Cell modelCell;
+AtlasModelDecode::ProvenMapping modelMapping;const void*modelProofScene=NULL;
+unsigned modelRenders=0;
+void ModelFailure(const char*why);
+const AtlasView::U64 ModelGpuBytes=AtlasModels::PrivateBytes+AtlasModelDecode::PrivateBytes+AtlasModelSurface::PrivateBytes;
+void ResetModels(){modelCell.Clear();modelSurface.Clear();modelDecode.Clear();modelRaster.Clear();models.Clear();modelGpuReady=false;modelMapping=AtlasModelDecode::ProvenMapping();modelProofScene=NULL;modelCatalogReady=false;modelCatalogAt=0;}
 unsigned localRenders=0,localBatches=0;
 void ResetLocal(){localLayer.Clear();localLayerReady=localFailed=false;localMapping=AtlasLocalLights::ProvenMapping();localProofScene=NULL;localRevision.Reset();if(++localVersion==0)localVersion=1;}
 int projectedWidth=0,projectedHeight=0;
@@ -79,7 +90,7 @@ WidgetRef layer,status,tiles[AtlasView::WindowSlots];
 WidgetRef diskWarning;
 AtlasView::Relighter relighter;GsmNative::Light nativeLight;
 AtlasView::Uniforms lighting={};bool haveLighting=false;
-struct Entry {Ogre::TexturePtr texture;std::string name;AtlasView::Cell gpu;AtlasView::Com<ID3D11Texture2D>output;AtlasView::WindowKey key;unsigned shaded,age,waterStamp,localStamp,localChecked;float minHeight;bool hasHeight,waterApplied,localApplied,localAffects;Entry():shaded(0),age(0),waterStamp(0),localStamp(0),localChecked(0),minHeight(0),hasHeight(false),waterApplied(false),localApplied(false),localAffects(false){}};
+struct Entry {Ogre::TexturePtr texture;std::string name;AtlasView::Cell gpu;AtlasView::Com<ID3D11Texture2D>output;AtlasView::WindowKey key;unsigned shaded,age,waterStamp,localStamp,localChecked,modelStamp;float minHeight;bool hasHeight,waterApplied,localApplied,localAffects,modelApplied;Entry():shaded(0),age(0),waterStamp(0),localStamp(0),localChecked(0),modelStamp(0),minHeight(0),hasHeight(false),waterApplied(false),localApplied(false),localAffects(false),modelApplied(false){}};
 Entry cache[AtlasView::WindowSlots];
 void(*originalUpdate)(MapScreen*)=NULL;void(*originalLoad)(SaveFileSystem*,const std::string&)=NULL;void(*originalNew)(SaveFileSystem*)=NULL;
 std::string Folder(){wchar_t p[MAX_PATH]={0};DWORD n=GetModuleFileNameW(reinterpret_cast<HMODULE>(&__ImageBase),p,MAX_PATH);if(!n||n>=MAX_PATH)return std::string();std::wstring w(p,n);size_t at=w.find_last_of(L"/\\");return at==w.npos?std::string():GsmAtlas::Utf8(w.substr(0,at+1));}
@@ -113,6 +124,8 @@ void Settings(){
     if(w!=waterOption){waterOption=w;waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=false;waterClock.Reset();if(waterFailed){waterAttempted=false;manifest.waterVerified=false;}waterFailed=false;}
     bool l=GetPrivateProfileIntA(ID,"LocalLights",0,ini.c_str())!=0;
     if(l!=localOption){localOption=l;ResetLocal();localDiagnostic.Reset();originDiagnosticLogged=false;}
+    bool m=GetPrivateProfileIntA(ID,"CityModels",0,ini.c_str())!=0;
+    if(m!=modelOption){modelOption=m;ResetModels();modelAttempted=modelFailed=false;manifest.modelVerified=false;originDiagnosticLogged=false;}
     debug=GetPrivateProfileIntA(ID,"Debug",0,ini.c_str())!=0;KLocLog::SetEnabled(debug);
 }
 void Diagnostic(const std::string&s){if(debug)DebugLog("GlobalSatelliteMap: "+s);}
@@ -143,7 +156,7 @@ void SetStage(ID3D11DeviceContext*c,unsigned stage,unsigned slot,ID3D11ShaderRes
 void RetireReads(ID3D11Texture2D*output){if(!output)return;AtlasView::Com<ID3D11Device>d;output->GetDevice(&d.p);AtlasView::Com<ID3D11DeviceContext>c;d.p->GetImmediateContext(&c.p);for(unsigned stage=0;stage<6;++stage){ID3D11ShaderResourceView*v[128]={0};switch(stage){case 0:c.p->VSGetShaderResources(0,128,v);break;case 1:c.p->HSGetShaderResources(0,128,v);break;case 2:c.p->DSGetShaderResources(0,128,v);break;case 3:c.p->GSGetShaderResources(0,128,v);break;case 4:c.p->PSGetShaderResources(0,128,v);break;default:c.p->CSGetShaderResources(0,128,v);}for(unsigned i=0;i<128;++i)if(v[i]){if(AtlasView::SameResource(v[i],output))SetStage(c.p,stage,i,NULL);v[i]->Release();}}}
 void DropEntry(int i){Entry&e=cache[i];if(!e.key.Valid())return;if(tiles[i].get()){MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());w->setImageTexture("");w->setVisible(false);}MyGUI::RenderManager*rm=MyGUI::RenderManager::getInstancePtr();if(rm&&!e.name.empty()){MyGUI::ITexture*t=rm->getTexture(e.name);if(t)rm->destroyTexture(t);}RetireReads(e.output.p);e.output.Reset();e.gpu.Clear();e.texture.setNull();Ogre::TextureManager*tm=Ogre::TextureManager::getSingletonPtr();if(tm&&!e.name.empty()&&!tm->getByName(e.name).isNull())tm->remove(e.name);e.name.clear();e.key=AtlasView::WindowKey();e.shaded=e.age=0;}
 void Cancel(){if(job)InterlockedExchange(&job->read.cancel,1);if(completed){delete completed;completed=NULL;}}
-void Clear(){Cancel();townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
+void Clear(){Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
 void Notice(MapScreen*map,bool drawFailure){if(!map||status.get()||!map->mainWidget)return;MyGUI::Widget*p=map->mainWidget;MyGUI::TextBox*w=p->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(12,12,p->getWidth()>24?p->getWidth()-24:300,56),MyGUI::Align::Default,"");status.set(w);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setCaption(MyGUI::UString(drawFailure?Tr("Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."):Tr("Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible.")));statusUntil=GetTickCount()+12000;}
 void Fail(MapScreen*map,const std::string&why){bool drawFailure=ready;Clear();attempted=failed=true;ErrorLog("GlobalSatelliteMap: "+why);Notice(map,drawFailure);}
 std::string ModulePath(const char*name){wchar_t path[MAX_PATH]={0};HMODULE h=GetModuleHandleA(name);DWORD n=h?GetModuleFileNameW(h,path,MAX_PATH):0;if(!n||n>=MAX_PATH)throw std::runtime_error("native renderer module path missing");return GsmAtlas::Utf8(std::wstring(path,n));}
@@ -156,6 +169,7 @@ void Poll(MapScreen*map){
     job->thread=NULL;GsmAtlas::Job*j=job;job=NULL;
     bool current=j->generation==InterlockedCompareExchange(&GSM::generation,0,0)&&!InterlockedCompareExchange(&j->read.cancel,0,0);
     if(!current){delete j;return;}
+    if(j->modelValidation){manifest.modelVerified=j->ok&&j->manifest.modelVerified;if(!manifest.modelVerified){modelFailed=true;ErrorLog(std::string("GlobalSatelliteMap: city models disabled; terrain retained: ")+j->error);}else Diagnostic("native city model sources verified in bounded worker");delete j;return;}
     if(j->waterValidation){
         manifest.waterVerified=j->ok&&j->manifest.waterVerified;
         if(!manifest.waterVerified){waterFailed=true;ErrorLog(std::string("GlobalSatelliteMap: water disabled; terrain retained: ")+j->error);}
@@ -271,7 +285,7 @@ void LocalDiagnostic(DWORD now){
     Diagnostic(s.str());
 }
 void OriginDiagnostic(MapScreen*map,DWORD now){
-    if(!debug&&(!localOption||localFailed)){originDiagnosticLogged=false;return;}
+    if(!debug&&(!localOption||localFailed)&&(!modelOption||modelFailed)){originDiagnosticLogged=false;return;}
     if(originDiagnosticLogged&&DWORD(now-originDiagnosticAt)<5000)return;
     originDiagnosticLogged=true;originDiagnosticAt=now;
     const void*scene=NULL,*camera=NULL;if(!DiagnosticScene(scene,camera))return;
@@ -290,11 +304,12 @@ void OriginDiagnostic(MapScreen*map,DWORD now){
         town=static_cast<Town*>(const_cast<void*>(candidate));
     }
     NativeOriginProof::Values value;HRESULT hr=originReader.Read(true,observedGeneration,scene,camera,town,ready,&GSM::generation,value);
-    if(hr!=S_OK){if(FAILED(hr)){if(localOption&&!localFailed){ErrorLog(std::string("GlobalSatelliteMap: local light coordinate proof refused: ")+value.error);localFailed=true;}else Diagnostic(std::string("origin paired read unavailable: ")+value.error);}return;}
+    if(hr!=S_OK){if(FAILED(hr)){if(localOption&&!localFailed){ErrorLog(std::string("GlobalSatelliteMap: local light coordinate proof refused: ")+value.error);localFailed=true;}else Diagnostic(std::string("origin paired read unavailable: ")+value.error);if(modelOption&&!modelFailed)ModelFailure(value.error);}return;}
     if(localOption&&!localFailed){
-        if(!GsmLocalMapping::Adopt(value,observedGeneration,localMapping)){ErrorLog("GlobalSatelliteMap: inconsistent native town/origin pair; local lights retained OFF");localFailed=true;return;}
+        if(!GsmLocalMapping::Adopt(value,observedGeneration,localMapping)){ErrorLog("GlobalSatelliteMap: inconsistent native town/origin pair; local lights retained OFF");localFailed=true;if(modelOption&&!modelFailed)ModelFailure("coordinate proof refused");return;}
         localProofScene=scene;
     }
+    if(modelOption&&!modelFailed){AtlasModelDecode::ProvenMapping next;if(!GsmLocalMapping::Adopt(value,observedGeneration,next)){ModelFailure("coordinate proof refused");return;}if(modelProofScene&&modelProofScene!=scene)ResetModels();if(!modelMapping.verified||modelMapping.generation!=next.generation||modelProofScene!=scene||std::memcmp(modelMapping.sourceSceneOrigin,next.sourceSceneOrigin,12)||std::memcmp(modelMapping.sceneToCacheTranslation,next.sceneToCacheTranslation,12))models.Invalidate();modelMapping=next;modelProofScene=scene;}
     const float*rows[]={value.townStored,value.proxyNodeLocal,value.proxyNodeDerived,value.sceneOrigin,value.cameraDerived,value.sharedCamera,value.sharedWorldOffset};
     const char*names[]={"town","nodeLocal","nodeDerived","origin","camera","sharedCamera","sharedOffset"};std::ostringstream s;s<<"origin proof";
     for(unsigned r=0;r<7;++r){s<<' '<<names[r]<<'=';for(unsigned c=0;c<3;++c)s<<(c?",":"")<<rows[r][c];}
@@ -340,26 +355,64 @@ bool WantsLocal(Entry&e){
     for(unsigned i=0;i<s.Count();++i){AtlasLocalLights::GpuLight light;if(AtlasLocalLights::Pack(*s.Light(i),localMapping,light)&&AtlasLocalLights::Intersects(light,r,256,256)){e.localAffects=true;break;}}
     e.localChecked=localVersion;return e.localAffects;
 }
+void ModelFailure(const char*why){if(!modelFailed)ErrorLog(std::string("GlobalSatelliteMap: city models disabled; terrain retained: ")+why);ResetModels();modelFailed=true;}
+void ModelSourceError(unsigned id,const char*why){std::ostringstream s;s<<"GlobalSatelliteMap: existing town model "<<id<<" unavailable: "<<(why&&*why?why:"invalid model bounds");ErrorLog(s.str());}
+void ModelState(DWORD now){
+    if(!modelOption||modelFailed||!manifest.modelVerified||!modelMapping.verified)return;
+    const void*scene=NULL,*camera=NULL;if(!DiagnosticScene(scene,camera)||scene!=modelProofScene){ModelFailure("scene identity changed");return;}
+    try{
+        if(!modelCatalogReady||DWORD(now-modelCatalogAt)>=1000){
+            GsmTownValues::Result values;HRESULT hr=GsmTownValues::Read(true,ready,shou,GetModuleHandleA(NULL),observedGeneration,&GSM::generation,values);
+            if(hr!=S_OK||!models.Catalog(values)){ModelFailure("coherent town catalog or fixed model capacity refused");return;}
+            modelCatalogReady=true;modelCatalogAt=now;
+        }
+        if(!models.Refresh(shou,GetModuleHandleA(NULL),static_cast<Ogre::SceneManager*>(const_cast<void*>(scene)),observedGeneration,&GSM::generation,&ModelSourceError))ModelFailure("world changed or global retained model budget exceeded");
+    }catch(const std::exception&e){ModelFailure(e.what());}catch(...){ModelFailure("model admission exception");}
+}
+bool ModelsAvailable(){return modelOption&&!modelFailed&&manifest.modelVerified&&modelMapping.verified&&modelMapping.generation==unsigned(observedGeneration);}
+HRESULT PrepareModelCell(const Entry&e,const AtlasView::Uniforms&u,bool&applied){
+    applied=false;if(!ModelsAvailable())return S_FALSE;
+    AtlasModelDecode::Footprint footprint;footprint.minX=u.tileBounds[0];footprint.minZ=u.tileBounds[1];footprint.width=u.tileBounds[2];footprint.height=u.tileBounds[3];
+    bool intersects=false;for(unsigned i=0;i<GsmModels::Slots;++i){const GsmModels::Item&m=models.At(i);if(m.source.Valid(unsigned(observedGeneration))&&!std::memcmp(modelMapping.sourceSceneOrigin,m.source.Geometry().SourceSceneOrigin(),12)&&AtlasModelRegion::Intersects(m.bounds,footprint)){intersects=true;break;}}
+    if(!intersects)return S_FALSE;
+    const AtlasView::U64 other=AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes+AtlasLocalLights::PrivateBytes;
+    if(!modelGpuReady){
+        HRESULT hr=modelRaster.Init(nativeLight.device.p,AtlasModelVertexShader,sizeof(AtlasModelVertexShader),AtlasModelPixelShader,sizeof(AtlasModelPixelShader),other+AtlasModelDecode::PrivateBytes+AtlasModelSurface::PrivateBytes);
+        if(SUCCEEDED(hr))hr=modelDecode.Init(true,nativeLight.device.p,AtlasModelDecodeShader,sizeof(AtlasModelDecodeShader),other+AtlasModels::PrivateBytes+AtlasModelSurface::PrivateBytes);
+        if(SUCCEEDED(hr))hr=modelSurface.Init(true,nativeLight.device.p,other+AtlasModels::PrivateBytes+AtlasModelDecode::PrivateBytes);
+        if(FAILED(hr))return hr;
+        for(unsigned p=0;p<3;++p){modelCell.texture[p].p=modelSurface.Texture(p);modelCell.texture[p].p->AddRef();modelCell.view[p].p=modelSurface.Output(p);modelCell.view[p].p->AddRef();}modelCell.side=256;modelGpuReady=true;
+    }
+    ID3D11ShaderResourceView*pristine[3]={e.gpu.view[0].p,e.gpu.view[1].p,e.gpu.view[2].p};HRESULT hr=modelSurface.Copy(true,pristine,other+AtlasModels::PrivateBytes+AtlasModelDecode::PrivateBytes);if(FAILED(hr))return hr;
+    for(unsigned i=0;i<GsmModels::Slots;++i){const GsmModels::Item&m=models.At(i);if(!m.source.Valid(unsigned(observedGeneration))||std::memcmp(modelMapping.sourceSceneOrigin,m.source.Geometry().SourceSceneOrigin(),12)||!AtlasModelRegion::Intersects(m.bounds,footprint))continue;
+        const AtlasModels::Packet&p=m.source.Geometry();AtlasModels::View view;if(!AtlasModelRegion::View(m.bounds,p.SourceSceneOrigin(),footprint,unsigned(observedGeneration),view))return E_INVALIDARG;
+        hr=modelRaster.Render(true,p,view,other+AtlasModelDecode::PrivateBytes+AtlasModelSurface::PrivateBytes);if(FAILED(hr))return hr;
+        ID3D11ShaderResourceView*inputs[6]={modelRaster.Output(0),modelRaster.Output(1),modelRaster.Output(2),modelSurface.Output(0),modelSurface.Output(1),modelSurface.Output(2)};
+        ID3D11Texture2D*outputs[3]={modelSurface.Texture(0),modelSurface.Texture(1),modelSurface.Texture(2)};
+        hr=modelDecode.Render(true,p,view,footprint,modelMapping,inputs,outputs,other+AtlasModels::PrivateBytes+AtlasModelSurface::PrivateBytes);if(FAILED(hr))return hr;
+        ++modelRenders;applied=true;
+    }return S_OK;
+}
 HRESULT ApplyLocal(void*,const AtlasView::Cell&cell,const AtlasView::Uniforms&u,ID3D11ShaderResourceView*hdrView,ID3D11Texture2D*hdr){
     ID3D11ShaderResourceView*source[4]={hdrView,cell.view[0].p,cell.view[1].p,cell.view[2].p};
-    HRESULT hr=localLayer.Render(true,localDiagnostic.Values(),observedGeneration,localMapping,LocalRegion(u),source,hdr,AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes);
+    HRESULT hr=localLayer.Render(true,localDiagnostic.Values(),observedGeneration,localMapping,LocalRegion(u),source,hdr,AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes+(modelGpuReady?ModelGpuBytes:0));
     if(SUCCEEDED(hr)){++localRenders;localBatches+=localLayer.LastBatches();}return hr;
 }
-HRESULT RenderLayers(Entry&e,const AtlasView::Uniforms&u,bool useWater,bool useLocal){
+HRESULT RenderLayers(Entry&e,const AtlasView::Cell&cell,const AtlasView::Uniforms&u,bool useWater,bool useLocal){
     if(useLocal&&!localLayerReady){
-        HRESULT hr=localLayer.Init(nativeLight.device.p,GsmLocalShader,sizeof(GsmLocalShader),AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes);
+        HRESULT hr=localLayer.Init(nativeLight.device.p,GsmLocalShader,sizeof(GsmLocalShader),AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes+(modelGpuReady?ModelGpuBytes:0));
         if(FAILED(hr))return hr;localLayerReady=true;
     }
-    AtlasView::U64 caller=AtlasView::WindowGpuBytes()+(localLayerReady?AtlasLocalLights::PrivateBytes:0);
+    AtlasView::U64 caller=AtlasView::WindowGpuBytes()+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0);
     if(!waterPipelineReady){
         HRESULT hr=waterPipeline.Init(nativeLight.device.p,AtlasTerrainHdrShader,sizeof(AtlasTerrainHdrShader),AtlasWaterMaterialShader,sizeof(AtlasWaterMaterialShader),AtlasWaterToneShader,sizeof(AtlasWaterToneShader),caller);
         if(FAILED(hr))return hr;waterPipelineReady=true;
     }
     AtlasWater::HdrStage stage={NULL,&ApplyLocal};
-    if(!useWater)return waterPipeline.RenderTerrainWithStage(e.gpu,u,nativeLight.views,nativeLight.samplers,e.output.p,caller,useLocal?&stage:NULL);
+    if(!useWater)return waterPipeline.RenderTerrainWithStage(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,caller,useLocal?&stage:NULL);
     AtlasWater::Uniforms w=waterSnapshot.Values();std::memcpy(w.tileBounds,u.tileBounds,16);w.sourceWindow[0]=256;w.sourceWindow[1]=w.sourceWindow[2]=w.sourceWindow[3]=0;
     ID3D11ShaderResourceView*views[5];ID3D11SamplerState*samplers[5];for(unsigned i=0;i<5;++i){views[i]=waterSnapshot.Inputs().View(i);samplers[i]=waterSnapshot.Inputs().Sampler(i);}
-    return waterPipeline.RenderWithStage(e.gpu,u,nativeLight.views,nativeLight.samplers,w,views,samplers,e.output.p,caller,useLocal?&stage:NULL);
+    return waterPipeline.RenderWithStage(cell,u,nativeLight.views,nativeLight.samplers,w,views,samplers,e.output.p,caller,useLocal?&stage:NULL);
 }
 int FindWindow(const AtlasView::WindowKey&key){for(unsigned i=0;i<AtlasView::WindowSlots;++i)if(cache[i].key==key)return int(i);return -1;}
 bool Superseded(const AtlasView::WindowKey&key,unsigned desired){
@@ -372,7 +425,7 @@ void Touch(Entry&e){if(++cacheAge==0){cacheAge=1;for(unsigned i=0;i<AtlasView::W
 void Upload(int slot,const AtlasView::WindowKey&key,GsmAtlas::Job&j){
     if(slot<0||slot>=int(AtlasView::WindowSlots)||!key.Valid()||j.read.level!=5||AtlasView::WindowGpuBytes()>AtlasView::GpuCap)throw std::runtime_error("terrain window GPU resource budget refused");
     if(cache[slot].key.Valid())DropEntry(slot);
-    Entry&e=cache[slot];e.key=key;e.hasHeight=j.windowHasFiniteHeight;e.minHeight=j.windowMinHeight;e.waterApplied=e.localApplied=e.localAffects=false;e.waterStamp=e.localStamp=e.localChecked=0;
+    Entry&e=cache[slot];e.key=key;e.hasHeight=j.windowHasFiniteHeight;e.minHeight=j.windowMinHeight;e.waterApplied=e.localApplied=e.localAffects=e.modelApplied=false;e.waterStamp=e.localStamp=e.localChecked=e.modelStamp=0;
     try{
         HRESULT hr=e.gpu.Upload(nativeLight.device.p,j.read);
         if(FAILED(hr))throw std::runtime_error("terrain window GPU upload failed");
@@ -434,7 +487,7 @@ void Draw(MapScreen*map,DWORD now){
         }
         delete completed;completed=NULL;
     }
-    TownValueDiagnostic();Lighting(now);WaterState(now);LocalDiagnostic(now);OriginDiagnostic(map,now);
+    TownValueDiagnostic();Lighting(now);WaterState(now);LocalDiagnostic(now);OriginDiagnostic(map,now);ModelState(now);
     // Four256 windows have the same pixel budget as one former512 tile.
     unsigned shaded=0,next=shadeCursor;
     for(unsigned pass=0;pass<3&&shaded<4;++pass)for(unsigned k=0;k<AtlasView::WindowSlots&&shaded<4;++k){unsigned i=(shadeCursor+k)%AtlasView::WindowSlots;Entry&e=cache[i];
@@ -442,22 +495,26 @@ void Draw(MapScreen*map,DWORD now){
         bool onScreen=AtlasView::WindowVisible(AtlasView::SubWindow(cells[e.key.tile],e.key),clip);
         bool useWater=WantsWater(e),useLocal=WantsLocal(e);
         bool waterDirty=e.waterApplied!=useWater||(useWater&&e.waterStamp!=waterVersion),localDirty=e.localApplied!=useLocal||(useLocal&&e.localStamp!=localVersion);
-        if(!AtlasView::NeedsWindowShade(onScreen,plan.Contains(e.key),e.shaded,(waterDirty||localDirty)?0:lightVersion,pass))continue;
+        bool modelDirty=ModelsAvailable()?e.modelStamp!=models.Revision():e.modelApplied;
+        if(!AtlasView::NeedsWindowShade(onScreen,plan.Contains(e.key),e.shaded,(waterDirty||localDirty||modelDirty)?0:lightVersion,pass))continue;
         AtlasView::Uniforms u=lighting;double x,z,sx,sz;WindowBounds(e.key,x,z,sx,sz);
         u.referenceSide[3]=float(AtlasView::WindowSide);u.tileBounds[0]=float(x);u.tileBounds[1]=float(z);u.tileBounds[2]=float(sx);u.tileBounds[3]=float(sz);
-        unsigned refusal=0;HRESULT hr=E_FAIL;
+        unsigned refusal=0;HRESULT hr=E_FAIL;bool useModels=false;
+        HRESULT modelHr=PrepareModelCell(e,u,useModels);if(FAILED(modelHr)){ModelFailure("native model raster/decode refused");useModels=false;}
+        const AtlasView::Cell&cell=useModels?modelCell:e.gpu;
         if(useWater||useLocal){
-            hr=RenderLayers(e,u,useWater,useLocal);
-            if(FAILED(hr)&&useLocal){ErrorLog("GlobalSatelliteMap: local light composition refused; terrain/water retained");localFailed=true;localLayer.Clear();localLayerReady=false;useLocal=false;if(useWater)hr=RenderLayers(e,u,true,false);}
+            hr=RenderLayers(e,cell,u,useWater,useLocal);
+            if(FAILED(hr)&&useLocal){ErrorLog("GlobalSatelliteMap: local light composition refused; terrain/water retained");localFailed=true;localLayer.Clear();localLayerReady=false;useLocal=false;if(useWater)hr=RenderLayers(e,cell,u,true,false);}
             if(FAILED(hr)&&useWater){std::ostringstream error;error<<"water composition HRESULT="<<std::hex<<unsigned(hr);WaterFailure(error.str().c_str());useWater=false;}
         }
-        if(!useWater&&!useLocal)hr=relighter.Render(e.gpu,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);
+        if(!useWater&&!useLocal)hr=relighter.Render(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);
         if(FAILED(hr)){std::ostringstream error;error<<"terrain window relight failed HRESULT="<<std::hex<<unsigned(hr)<<" stage="<<refusal;throw std::runtime_error(error.str());}
-        e.shaded=lightVersion;e.waterApplied=useWater;e.waterStamp=useWater?waterVersion:0;e.localApplied=useLocal;e.localStamp=useLocal?localVersion:0;next=(i+1)%AtlasView::WindowSlots;++shaded;
+        e.shaded=lightVersion;e.waterApplied=useWater;e.waterStamp=useWater?waterVersion:0;e.localApplied=useLocal;e.localStamp=useLocal?localVersion:0;e.modelApplied=useModels;e.modelStamp=ModelsAvailable()?models.Revision():0;next=(i+1)%AtlasView::WindowSlots;++shaded;
     }shadeCursor=next;
     if(!job&&!completed){
         bool requested=false;
-        if(waterOption&&!waterFailed&&!waterAttempted){std::auto_ptr<GsmAtlas::Job>owned(new GsmAtlas::Job());owned->waterValidation=true;owned->game=Game();Launch(owned.release());waterAttempted=true;requested=true;}
+        if(modelOption&&!modelFailed&&!modelAttempted){std::auto_ptr<GsmAtlas::Job>owned(new GsmAtlas::Job());owned->modelValidation=true;owned->game=Game();Launch(owned.release());modelAttempted=true;requested=true;}
+        if(!requested&&waterOption&&!waterFailed&&!waterAttempted){std::auto_ptr<GsmAtlas::Job>owned(new GsmAtlas::Job());owned->waterValidation=true;owned->game=Game();Launch(owned.release());waterAttempted=true;requested=true;}
         for(unsigned t=0;t<16&&!requested;++t){AtlasView::WindowKey key(t,5,0,0);if(plan.visible[t]&&FindWindow(key)<0){RequestWindow(key);requested=true;}}
         if(!requested){
             // Center-first refinement, bounded56 keys, no world or filesystem scan.
@@ -479,12 +536,12 @@ void Draw(MapScreen*map,DWORD now){
         statsAt=now;unsigned resident=0,detailReady=0;
         for(unsigned i=0;i<AtlasView::WindowSlots;++i)if(cache[i].key.Valid())++resident;
         for(unsigned i=0;i<plan.visibleCount;++i){int slot=FindWindow(plan.keys[i]);if(slot>=0&&cache[slot].shaded)++detailReady;}
-        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" gpuCapBytes="<<AtlasView::WindowGpuBytes()<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;Diagnostic(message.str());
+        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" modelReady="<<modelGpuReady<<" modelCount="<<models.Valid(unsigned(observedGeneration))<<" modelRenders="<<modelRenders<<" modelBufferBytes="<<models.BorrowedBuffers()<<" modelTextureBytes="<<models.BorrowedTextures()<<" ownedGpuBytes="<<(AtlasView::WindowGpuBytes()+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0)+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0))<<" gpuCapBytes="<<AtlasView::GpuCap<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;Diagnostic(message.str());
     }
 }
 void Tick(MapScreen*map){LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined)StartValidation();if(!ready)return;Draw(map,now);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
 void UpdateHook(MapScreen*map){originalUpdate(map);try{Tick(map);}catch(const std::exception&e){Fail(map,e.what());}catch(...){Fail(map,"terrain overlay failed; normal map retained");}}
 void LoadHook(SaveFileSystem*self,const std::string&path){InterlockedIncrement(&GSM::generation);originalLoad(self,path);}void NewHook(SaveFileSystem*self){InterlockedIncrement(&GSM::generation);originalNew(self);}
 }
-extern "C" __declspec(dllexport)void MCM_Describe(MCM_Api*api){static std::string ini=Ini();api->beginMod(api,ID,"Global Satellite Map (development)",ini.c_str(),&Settings);if(api->version>=2){std::string info=Tr("Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. Buildings are not included yet.");if(api->version<4){info+="\n";info+=DiskWarningText();}api->info(api,info.c_str());}if(api->version>=4&&api->customArea)api->customArea(api,&AttachDiskWarning,&DetachDiskWarning,NULL,15);api->section(api,Tr("Global map"));api->toggle(api,ID,"Enabled",Tr("Satellite view"),Tr("Show prepared satellite terrain on the global map. The minimap keeps its existing map source."),0,0);api->toggle(api,ID,"Sunlight",Tr("Sunlight"),Tr("Use the current sun direction and brightness."),1,0);api->toggle(api,ID,"AmbientLight",Tr("Sky and ambient light"),Tr("Use the current sky and ambient illumination."),1,0);api->toggle(api,ID,"Water",Tr("Water"),Tr("Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."),0,0);api->toggle(api,ID,"LocalLights",Tr("Torches and lamps"),Tr("Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."),0,0);api->section(api,Tr("Diagnostics"));api->toggle(api,ID,"Debug",Tr("Detailed log"),Tr("Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."),0,0);}
+extern "C" __declspec(dllexport)void MCM_Describe(MCM_Api*api){static std::string ini=Ini();api->beginMod(api,ID,"Global Satellite Map (development)",ini.c_str(),&Settings);if(api->version>=2){std::string info=Tr("Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental.");if(api->version<4){info+="\n";info+=DiskWarningText();}api->info(api,info.c_str());}if(api->version>=4&&api->customArea)api->customArea(api,&AttachDiskWarning,&DetachDiskWarning,NULL,15);api->section(api,Tr("Global map"));api->toggle(api,ID,"Enabled",Tr("Satellite view"),Tr("Show prepared satellite terrain on the global map. The minimap keeps its existing map source."),0,0);api->toggle(api,ID,"Sunlight",Tr("Sunlight"),Tr("Use the current sun direction and brightness."),1,0);api->toggle(api,ID,"AmbientLight",Tr("Sky and ambient light"),Tr("Use the current sky and ambient illumination."),1,0);api->toggle(api,ID,"Water",Tr("Water"),Tr("Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."),0,0);api->toggle(api,ID,"LocalLights",Tr("Torches and lamps"),Tr("Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."),0,0);api->toggle(api,ID,"CityModels",Tr("Existing city models"),Tr("Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."),0,0);api->section(api,Tr("Diagnostics"));api->toggle(api,ID,"Debug",Tr("Detailed log"),Tr("Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."),0,0);}
 __declspec(dllexport)void startPlugin(){Settings();if(!GsmNative::Engine()){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: exact engine profile unavailable; inert");return;}if(KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),LoadHook,&originalLoad)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),NewHook,&originalNew)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&MapScreen::update),UpdateHook,&originalUpdate)){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: required hooks unavailable; terrain overlay disabled");}}

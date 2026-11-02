@@ -6,6 +6,10 @@ $python='C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/
     (Join-Path $PSScriptRoot 'locale/ru_RU/LC_MESSAGES/global_satellite_map.po') `
     (Join-Path $PSScriptRoot 'locale/zh_CN/LC_MESSAGES/global_satellite_map.po')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $python (Join-Path $PSScriptRoot 'atlas-models/generate_models.py')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $python (Join-Path $PSScriptRoot 'atlas-models/decode/generate_shader.py')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & $python (Join-Path $PSScriptRoot 'generate_viewer_assets.py')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & (Join-Path (Split-Path $PSScriptRoot -Parent) 'build.ps1') -SrcDir $PSScriptRoot -Name GlobalSatelliteMap

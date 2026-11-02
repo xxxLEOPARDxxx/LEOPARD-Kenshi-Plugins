@@ -1,98 +1,80 @@
-Global Satellite Map - private GST2 terrain viewer / закрытый просмотр рельефа GST2
-
-Current development path (2026-11-02) / Текущий вариант разработки
-
-Disk-space notice / Предупреждение о месте на диске
-EN: MCM shows a red, wrapped warning at the top of this development page: before rendering all4x4 tiles at8192x8192, allow at least24GB free. The uncompressed GST2 terrain set is22,900,916,224bytes (about23GB); the24GB allowance includes a1GiB reserve. No compression saving is assumed. MCM v4+ uses its supported custom area; older v2/v3 shows plain text in the list tooltip. One child widget is reused and destroyed on page detach; no disk-space polling or new setting is added. In-game appearance on vanilla/modded skins remains to be checked after the next closed-game installation.
-RU: Вверху страницы этого разрабатываемого мода MCM показано красное предупреждение с переносом строк: перед рендером всей сетки4x4 по8192x8192 нужно не менее24ГБ свободного места. Несжатый набор GST2 занимает22 900 916 224байта (около23ГБ); запас до24ГБ включает1ГиБ. Экономия от сжатия не предполагается. В MCM v4+ используется штатная пользовательская область; в старых v2/v3 обычный текст добавлен в подсказку списка. Один дочерний виджет используется повторно и удаляется при уходе со страницы; опроса диска и новых настроек нет. Вид в игре на ванильном и изменённых скинах предстоит проверить после установки при закрытой игре.
+Global Satellite Map (development)
 
 EN
-Private, unfinished and not published. The current viewer consumes a complete GST2 terrain atlas in captures/ready.json plus its pinned capture.json identity. All16 genuine cells, all18 descriptors per cell and the current terrain/mod/source profile must validate before any overlay is accepted. Source files are hashed only in one cancellable background job, never per frame. This terrain profile can be reused across saves; it does not represent unsaved buildings or local-light state.
+Private development plugin, not a public release. Best Minimap keeps its existing
+map source. The global-map overlay uses one verified4x4 grid of8192x8192 tiles.
+Terrain capture is reused: zooming, sunlight and lamps do not recapture the world.
 
-The separate global-map overlay relights decoded half-float material/gloss and world-normal terrain with current native sun, sky/ambient maps, IBL and exposure. The native mapImage, markers, input and BestMinimap source remain intact. Visible details are streamed as256-square windows from the existing8192..256 source levels. Sixteen coarse fallback images and128 detail LRU slots retain ready images during zoom/pan; old detail is hidden only after the appropriate ancestor is ready. No capture is repeated. The144 slots,256-square compute scratch and constants occupy189,006,000bytes, below the bounded192MiB cap; driver overhead/retirement is separate. One worker reads and verifies at most1MiB of window planes plus a roughly2MiB pinned checksum index. At most one completed window is uploaded per200ms; four windows can be relit in that interval, with a fair cursor. Current-light snapshots remain limited to1Hz. A first visit refines progressively; revisiting resident windows needs no file read. Very large viewports can select a coarser level to keep the128-detail limit. Bilinear window-edge appearance, game timing/FPS and long-session memory require live acceptance.
+MCM: Satellite view, Sunlight, Sky and ambient light, Water, Torches and lamps,
+Existing city models, Detailed log. Main view and optional layers default OFF;
+sun/ambient default ON. Detailed log is last and defaults OFF. Errors always log.
+No restart is required for these settings.
 
-MCM: Satellite view defaults OFF; Sunlight and Sky/ambient light default ON; Detailed log defaults OFF and is last. These settings apply live. Errors are always logged. Missing, partial, changed or unsupported input leaves the normal map visible with a localized notice. Optional water is described below; building models, shadows and unsaved building changes remain unfinished. Local lights are described below. The native-shader profile is audited; third-party runtime program replacement is not claimed compatible. Shared MCM/INI paths retain Windows ACP conventions; capture/source paths use UTF8 and Windows wide APIs.
+Current renderer: geographic terrain materials, current native sun/ambient/HDR
+exposure, optional distant water, native point/spot lights in loaded areas.
+A paused unchanged light snapshot does not repeatedly dirty all windows. View
+streaming keeps16coarse fallbacks plus up to128detail windows. At most4windows
+are shaded per200ms map tick. The original map remains available on refusal.
 
-RU
-Закрытая незавершённая разработка, не опубликована. Текущий просмотр использует полный атлас рельефа GST2: captures/ready.json и закреплённую в нём идентичность capture.json. До показа проверяются все16 настоящих ячеек, дескрипторы и текущий профиль рельефа, модов и исходных файлов. Хеширование выполняется только в одном отменяемом рабочем потоке. Атлас относится к профилю рельефа и модов, а не к конкретному сохранению; несохранённые постройки и местное освещение в него не входят.
+City-model development subset: already registered static DistantTown proxies,
+up to64towns;2source admissions per200ms and coherent1Hz town catalog. No zone
+activation, original Entity clone, native model unload or per-window GPU-state
+creation. Packet COM references are retired on OFF/load/world/scene transitions.
+Each refresh starts from pristine terrain planes, so removed models leave no
+accumulated silhouettes. Fully loaded buildings, towns without a registered
+proxy, private cached-town imports, player construction and shadows are not yet
+covered. The separate loaded-windmill/private-LOD helpers are not active features.
 
-Отдельный слой глобальной карты освещает материалы и мировые нормали рельефа текущим солнцем, небом и рассеянным светом, используя штатные формулы и экспозицию игры. Оригинальное изображение карты, метки, управление и источник BestMinimap не меняются. Детали подгружаются участками256x256 из существующих уровней8192..256. Сохраняются16 обзорных изображений и128 участков с деталями; масштабирование не удаляет весь готовый слой и не повторяет рендер мира. Более мелкие детали скрываются при отдалении только после готовности подходящего уменьшенного изображения. Полезные данные собственных GPU-ресурсов составляют189 006 000байт при ограниченном лимите192МиБ. Один рабочий поток читает до1МиБ данных участка; индекс контрольных сумм занимает около2МиБ. За200мс принимается не более одного участка и освещается не более четырёх, параметры света считываются не чаще раза в секунду. Первый просмотр постепенно уточняется; готовые участки повторно не читаются. На очень большом окне уровень может уменьшаться ради ограничения128 участков. Швы при фильтрации, время загрузки, FPS и длительное удержание памяти требуют проверки в игре.
+Owned texture/constant payload is capped at192MiB (driver/native overhead is
+separate). With terrain/water/local lights/model working surfaces it is196086608
+bytes. Borrowed native model buffers have a separate32MiB steady-state cap;
+diffuse resources64MiB. A single incoming packet can temporarily retain up to
+another32MiB of existing native buffers before global admission/refusal. These
+are resource payload bounds, not an absolute VRAM or process-memory guarantee.
+Native model imports and long-run FPS/memory still require game measurements.
 
-MCM: спутниковый вид по умолчанию выключен; солнечный свет и свет неба включены; подробный журнал выключен и расположен последним. Настройки применяются сразу. Ошибки записываются всегда. При отсутствии, неполноте или несовпадении данных остаётся обычная карта с пояснением. Дополнительный слой воды описан ниже; здания, тени и несохранённые изменения построек пока не закончены. Местный свет описан ниже. Совместимость с произвольной заменой шейдерных программ другими модами не заявлена.
+Before full terrain generation allow at least24GB free: the current raw grid is
+about23GB. Only one current grid is needed. Existing diagnostic captures are not
+release content. The display requires matching captures/ready.json/capture.json,
+windows.gsi and16GSTtiles; changed game/mod sources refuse the old data.
 
-Current private checkpoint: the first whole-map display worked, but live feedback exposed destructive zoom eviction and an artificial2048-source cap. The window viewer removes both limitations without recapturing the256 terrain passes. It retains the audited native output descriptor and single Loaded completion. See zoom-window-plan.md and docs/verification/2026-11-02-satellite-window-viewer.md for evidence and acceptance limits.
-Текущий закрытый этап: вся карта уже появилась в игре, но проверка выявила удаление кэша при масштабировании и ограничение исходного уровня до2048. Новый просмотрщик устраняет обе причины без повторной съёмки рельефа. Проверки и оставшиеся ограничения приведены в указанном отчёте.
-
-Pan stability follow-up / Устойчивость при перемещении карты
-EN: Source level is chosen from global projected scale and worst viewport phase, independent of pan position. Spare slots prefetch a one-window edge apron after visible misses. Newly visible unshaded windows get priority over lighting refresh and offscreen prefetch. This prevents a one-pixel pan from changing the selected source mip; new distant areas still need bounded streaming time.
-RU: Уровень детализации теперь зависит от общего масштаба и размера окна, а не от положения карты. После видимых участков заранее загружаются соседние области в свободные слоты. Новые видимые участки освещаются раньше фоновых обновлений. Сдвиг на один пиксель больше не переключает уровень; для совершенно новых областей по-прежнему требуется время загрузки.
-
-Optional water integration / Дополнительный слой воды
-EN: The private Water option is off by default. It reads the already loaded native distant-water material, absolute sea height, game time, five textures and their actual samplers. Five shader/material sources are verified once in the background. Terrain and water are combined in linear HDR before one native exposure step; the existing terrain path remains available on failure. Reusable private GPU payload is3,408,256bytes in addition to the terrain cache, keeping the current combined payload at192,414,256bytes under192MiB. Snapshots are sampled at most5Hz while the map is open; the existing four-window update budget remains shared, so this does not claim simultaneous animation of every visible window. An unavailable water resource disables only water until the option is switched again or the world changes. Native source loading, a new atlas capture and invented water parameters are not used. Live coastline/animation appearance and long-run resource behavior still require separate verification. Building geometry, distant-town models and shadows remain unfinished. Local lights are described below.
-RU: Закрытая опция «Вода» по умолчанию выключена. Используются уже загруженный штатный материал дальней воды, настоящий уровень моря, игровое время, пять текстур и их параметры фильтрации. Пять файлов материала и шейдеров однократно проверяются в фоне. Рельеф и вода смешиваются до общего применения штатной экспозиции; при ошибке остаётся прежний рельеф. Дополнительные повторно используемые ресурсы GPU занимают3 408 256байт, суммарный объём остаётся меньше96МиБ. Данные воды читаются не чаще пяти раз в секунду при открытой карте; общий предел обновления четырёх участков сохраняется, поэтому одновременная анимация всей видимой области пока не заявлена. Если ресурс воды недоступен, отключается только её слой до переключения опции или смены мира. Принудительная загрузка ресурсов, повторный рендер атласа и выдуманные параметры воды не используются. Береговую линию, анимацию и длительное удержание ресурсов ещё нужно проверить в игре. Модели зданий, дальних городов, местные источники света и тени пока не закончены.
-
-Historical GSM1 static-preview notes (not selected by the current runtime)
-Исторический справочник статического просмотра GSM1 (текущая версия его не использует)
-
-Global Satellite Map - development prototype / прототип разработки
-
-EN
-This module is not a released or complete satellite-map feature. It is not installed by this source task. No capture images are bundled. Enabled=0 and Debug=0 by default. MCM can request a verified static capture preview; without a genuine manifest/resources the overlay remains absent and the map shows a localized unavailable notice once per attempt. BestMinimap's source texture is untouched.
-
-Implemented: native global-map hook, separate child overlay below markers, no input focus, lifetime-tracked widgets, bounded capture parser, background file/hash validation, one visible BC1 level upload per 200 ms, 96 MiB compressed GPU payload / 16 cached textures. Mips are independent files; only requested levels are uploaded. CPU staging includes one compressed Ogre image plus loader/backend copies; 96 MiB is not a claim about total process/VRAM consumption. Native disk/GPU upload may still stall: measurement remains pending.
-
-Required format (not a supplied capture): captures/manifest.gsm is UTF-8/ASCII with magic GSM1. Records: world SHA256; save SHA256; bounds minX minZ maxX maxZ; grid 4 4 8192; lighting static; source relative-game-path SHA256; asset x z level size filename.dds SHA256. Paths with spaces are quoted. All 16 tiles require levels 0..5 (8192,4096,2048,1024,512,256). Exactly 96 uniquely named, single-level, opaque BC1/DXT1 DDS files. Other formats/native-lighting claims are rejected. No path traversal, extra fields, duplicate tiles, incomplete atlas or oversized manifest. Manifest maximum 64 KiB; maximum 512 dependency sources. Runtime deliberately accepts only sources under the game directory; external Workshop-only dependencies need capture-tool resolution/staging before this preview can be used.
-
-World identity = SHA256 of "engine\n<current executable SHA256>\n" followed, in manifest source order, by "<relative path>\n<SHA256>\n". Required sources: data/mods.cfg, data/gamedata.base, data/Dialogue.mod; every enabled .mod filename must be represented. A future real capture tool must additionally enumerate ALL terrain/mesh/material/texture dependencies; this prototype cannot discover complete dependency closure automatically. File worker validates at most 1 GiB of source bytes, 1 GiB of capture bytes and 512 MiB native save data, with cancellation between 64 KiB reads. It never calls game/Ogre/MyGUI or writes world/save files.
-
-Save identity = SHA256 of sorted "<relative native file>\n<SHA256>\n" records for quick.save and all files recursively inside zone/ and platoon/. Maximum 4096 files / 4096 total directory entries (including empty directories) / 8 subdirectory levels; reparse points are rejected. Enumeration checks generation cancellation before traversal and every entry. Hash reads share read/write/delete access so they never obstruct game saves, bound each physical read to the initial file size and actual remaining byte budget, and reject changed handle snapshots. Hash, DDS header and timestamp are returned from the same verified handle; a later pathname lookup cannot attach a replacement timestamp to old content. Save data is hashed again after asset verification; a concurrent change rejects the preview. Plugin sidecars and portraits are not native geometry identity. Active-save path/live world pointer/load-new-game generation also clear owned state; same-slot reload cancels old workers. Only one worker exists and stale results are discarded. No persistent cache is written. Asset timestamps are rechecked during streaming. This first viewer represents a specific saved snapshot; unsaved live building changes require the later dynamic layer/invalidation stage.
-
-Pending: native dynamic sun/shadows/lamps, geometry-only DistantTown/render proxy audit, loaded/unloaded/player/modded building coverage, real orthographic/global capture, fixed exposure, overlap and seam-safe mip generation/sampling, capture generation tool, UI skin/input/marker acceptance and actual CPU/FPS/memory tests. Two day/night screenshots are NOT a substitute for native lighting. Never force-activate the world for this renderer. Existing DistantTown models are promising but complete/updated coverage has not been proved.
-
-Build: powershell -ExecutionPolicy Bypass -File D:/DEV/Kenshi/ours/GlobalSatelliteMap/build.ps1
-Separate private diagnostic proof now includes a real4x4 grid of16 tiles at8192²,
-with frozen native sun/exposure and recycled native Terrain. Its geometry retains
-the2048 control detail and distant colour texture; no complete buildings/water/
-shadows or map integration. This is not bundled/installed by the viewer. Memory
-retention and final quality remain open. See docs/verification/2026-11-01-satellite-8192-control.md.
-
-The scoped build and test runner inspect the actual resulting PE export table: RE_Kenshi Plugins.cpp:43 requires ?startPlugin@@YAXXZ (C++), while MCM requires MCM_Describe (C). Native imports are checked against installed DLL exports. An undecorated C startPlugin does not initialize under this loader, even if linking succeeds.
-Tests: powershell -ExecutionPolicy Bypass -File GlobalSatelliteMap/tests/run_tests.ps1
-Then: python GlobalSatelliteMap/tests/source_contracts.py
-VC10 x64 /GL + /LTCG, official local KenshiLib bindings. No installer/release package is supplied. Runtime MO catalogs only; PO files remain source material.
+Build: GlobalSatelliteMap/build.ps1 (VC10 x64 /GL and /LTCG).
+Checks: tests/run_viewer_tests.ps1 and tests/run_local_composition_tests.ps1;
+atlas-models/run_tests.ps1, decode/run_tests.ps1 and surface/run_tests.ps1.
+UI catalogs are en_GB/ru_RU/zh_CN; runtime packages use MO only.
 
 RU
-Отдельный закрытый диагностический стенд уже снял настоящую сетку4x4 из16 плиток
-по8192×8192 с единым освещением. Детализация геометрии пока как в контрольном2048,
-используется грубая цветовая текстура дальнего рельефа. Полные здания, вода, тени
-и подключение к карте ещё не готовы; удержание памяти исследуется. Эти снимки
-не входят в установленный мод и не означают завершение спутниковой карты.
+Закрытая разработка спутникового слоя глобальной карты, не публичный выпуск.
+Миникарта сохраняет прежний источник карты. Используется одна проверенная сетка
+4x4 из16плиток8192x8192. При масштабе и смене освещения мир повторно не снимается.
 
-Это незавершённый прототип отдельного спутникового слоя глобальной карты, не публичный выпуск. Он не установлен и не содержит выдуманных снимков. По умолчанию выключен; подробный журнал тоже выключен. Без настоящих проверенных снимков текущего сохранения слой не появляется: остаётся обычная карта и один раз показывается понятное уведомление. Исходная текстура BestMinimap не меняется.
+В MCM: спутниковый вид, солнце, фоновое освещение, вода, факелы и фонари,
+существующие модели городов, подробный журнал. Основной слой и дополнительные
+слои по умолчанию выключены, солнце и фоновый свет включены. Подробный журнал
+последний и выключен; ошибки видны всегда. Перезапуск для этих настроек не нужен.
 
-Реализованы отдельный слой под метками без перехвата мыши, учёт удаления виджетов, строгий манифест 4x4 по 8192, проверка файлов в рабочем потоке, ограниченная загрузка видимых уровней и сброс при смене/повторной загрузке сохранения. Не более одной загрузки уровня за 200 мс; полезные сжатые текстуры ограничены 96 МиБ и 16 записями. Это не оценка полной видеопамяти: драйвер и движок создают дополнительные данные. Игровые замеры ещё не выполнены.
+Реализованы географические материалы рельефа, текущее солнце и фоновый свет,
+экспозиция, необязательная вода и реальные источники света загруженных областей.
+При неизменном освещении на паузе участки не перерисовываются без причины.
+Сохраняются16грубых подложек и до128детальных участков; не более4перерисовок за
+200мс при открытой карте. При отказе слоя остаётся обычная карта.
 
-Настоящие динамические солнце, тени и фонари, модели загруженных и выгруженных зданий, изменения построек игрока, полноценная съёмка с единой проекцией и проверка швов остаются следующим этапом. Статический предварительный просмотр не заменяет эти требования. Два снимка дня и ночи не выдаются за живое освещение. Все зоны мира принудительно не активируются. Подробные ограничения формата, проверки идентичности и команды сборки приведены выше.
+Экспериментальные модели городов используют уже зарегистрированные статичные
+дальние модели: до64городов, две проверки источников за200мс, список раз в секунду.
+Зоны не активируются, оригинальные модели не клонируются и не выгружаются.
+Ресурсы повторно используются, очищаются при отключении и смене мира/сцены.
+Перед каждой отрисовкой моделей копируется чистый рельеф, чтобы удалённые здания
+не оставляли силуэтов. Полностью загруженные здания, города без готовой модели,
+частная загрузка дальних моделей, стройка игрока и тени ещё не подключены.
+Подготовленные отдельно модули мельницы и частных LOD пока не активны.
 
+Собственные текстуры и константы ограничены192МиБ; все текущие слои требуют
+196086608байт. Удерживаемые родные буферы моделей ограничены32МиБ, текстуры64МиБ;
+временно принимаемый пакет может удерживать ещё до32МиБ существующих буферов.
+Это границы полезных ресурсов, а не оценка полной памяти драйвера и процесса.
+Игровые замеры FPS и длительного роста памяти проверяются отдельно.
 
-Localization diagnostics / Журнал локализации (2026-11-01)
-Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
-Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.
-Local torches and lamps (development, default OFF)
-Optional local lighting uses the current native point/spot lights from loaded areas.
-There are no invented lights in unloaded towns. Lighting remains in linear HDR
-before optional water and the single final exposure. The minimap is unaffected.
-If native light data or its coordinate proof is unavailable, terrain remains visible.
-The local layer owns 526416 bytes of texture/constant payload, within the shared
-192 MiB bound. Copied light values are sampled at most once per second while the
-map is open; an exact unchanged snapshot does not dirty the resident windows.
-No local-light shadows or loaded/unloaded building coverage is promised yet.
-
-Факелы и фонари (разработка, по умолчанию выключено)
-Местное освещение использует существующие точечные источники и прожекторы из
-загруженных областей. Для непрогруженных городов источники света не выдумываются.
-Освещение складывается до воды и окончательной экспозиции. Миникарта не меняется.
-Если данные света или проверка координат недоступны, рельеф остаётся видимым.
-Снимок света обновляется не чаще раза в секунду при открытой карте. Неизменившиеся
-данные не вызывают повторную перерисовку участков. Тени от фонарей и полное покрытие
-постройками загруженных/непрогруженных городов ещё не готовы.
+Перед полной съёмкой нужно хотя бы24ГБ свободного места: сырая сетка занимает
+около23ГБ. Достаточно одной текущей сетки. Диагностические захваты не входят в
+релиз. При несовпадении источников игры/сборки старая сетка не используется.
+Три языка интерфейса: русский, английский, китайский; в игре нужны только MO.

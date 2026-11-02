@@ -22,18 +22,25 @@ def run():
 #include "GsmViewerClock.h"
 #include "atlas-water/AtlasWater.h"
 #include <cstdio>
+#include <new>
 static unsigned checks=0,errors=0,terrainFailures=0,waterRenders[AtlasView::WindowSlots]={0},terrainRenders[AtlasView::WindowSlots]={0};
 static const char*ID="GlobalSatelliteMap";
 static void Check(bool x,const char*s){++checks;if(!x){std::fprintf(stderr,"FAIL %s\n",s);throw 1;}}
 namespace GSM {volatile LONG generation=7;}
-namespace GsmAtlas {struct Job{HANDLE thread;LONG generation;bool waterValidation,validation,ok;char error[512];Manifest manifest;AtlasView::ReadRequest read;Job():thread(reinterpret_cast<HANDLE>(1)),generation(7),waterValidation(false),validation(false),ok(false){std::strcpy(error,"fixture source error");}};}
+namespace GsmAtlas {struct Job{HANDLE thread;LONG generation;bool waterValidation,modelValidation,validation,ok;char error[512];Manifest manifest;AtlasView::ReadRequest read;Job():thread(reinterpret_cast<HANDLE>(1)),generation(7),waterValidation(false),modelValidation(false),validation(false),ok(false){std::strcpy(error,"fixture source error");}};}
 struct MapScreen{};struct Output{ID3D11Texture2D*p;Output():p(NULL){}};
-struct Entry{AtlasView::WindowKey key;unsigned shaded,waterStamp,localStamp;bool waterApplied,hasHeight,localApplied;float minHeight;int gpu;Output output;Entry():shaded(0),waterStamp(0),localStamp(0),waterApplied(false),hasHeight(true),localApplied(false),minHeight(90),gpu(0){}};
+struct Entry{AtlasView::WindowKey key;unsigned shaded,waterStamp,localStamp,modelStamp;bool waterApplied,hasHeight,localApplied,modelApplied;float minHeight;AtlasView::Cell gpu;Output output;Entry():shaded(0),waterStamp(0),localStamp(0),modelStamp(0),waterApplied(false),hasHeight(true),localApplied(false),modelApplied(false),minHeight(90){}};
 static Entry cache[AtlasView::WindowSlots];static unsigned shadeCursor=0,lightVersion=5,waterVersion=1,localVersion=1;
 static bool localOption=false,localFailed=false,localLayerReady=false,originDiagnosticLogged=false;
 static void ResetLocal(){}
 struct LocalStub{void Reset(){}void Clear(){}};static LocalStub localDiagnostic,localLayer;
 static bool WantsLocal(Entry&){return false;}
+static bool modelOption=false,modelAttempted=false,modelFailed=false;
+static void ResetModels(){}static bool ModelsAvailable(){return false;}
+struct Models{unsigned Revision()const{return 1;}};static Models models;
+static AtlasView::Cell modelCell;
+static HRESULT PrepareModelCell(const Entry&,const AtlasView::Uniforms&,bool&applied){applied=false;return S_FALSE;}
+static void ModelFailure(const char*){modelFailed=true;}
 static bool enabled=true,hookFailure=false,sunlight=true,ambient=true,debug=false,haveLighting=true,ready=true,waterOption=true,waterFailed=false,waterAttempted=true,waterPipelineReady=true,jobQuarantined=false;
 static LONG observedGeneration=7;static GsmViewer::LightClock lightClock,waterClock;
 static GsmAtlas::Manifest manifest;static GsmAtlas::Job*job=NULL,*completed=NULL;
@@ -46,7 +53,7 @@ static NativeWater::Snapshot waterSnapshot;
 struct Pipeline{void Clear(){++pipelineClears;}};static Pipeline waterPipeline;
 struct Device{ID3D11Device*p;Device():p(NULL){}};
 struct NativeLight{Device device;ID3D11ShaderResourceView*views[3];ID3D11SamplerState*samplers[3];void Init(){}};static NativeLight nativeLight;
-struct Relighter{HRESULT Init(ID3D11Device*,const void*,size_t,unsigned,AtlasView::U64){return S_OK;}HRESULT Render(int,const AtlasView::Uniforms&,ID3D11ShaderResourceView*const*,ID3D11SamplerState*const*,ID3D11Texture2D*p,unsigned*){++terrainRenders[reinterpret_cast<ULONG_PTR>(p)-1];return S_OK;}};static Relighter relighter;
+struct Relighter{HRESULT Init(ID3D11Device*,const void*,size_t,unsigned,AtlasView::U64){return S_OK;}HRESULT Render(const AtlasView::Cell&,const AtlasView::Uniforms&,ID3D11ShaderResourceView*const*,ID3D11SamplerState*const*,ID3D11Texture2D*p,unsigned*){++terrainRenders[reinterpret_cast<ULONG_PTR>(p)-1];return S_OK;}};static Relighter relighter;
 static unsigned char GsmRelightShader[1]={0};static AtlasView::Uniforms lighting={};
 static void ErrorLog(const std::string&){++errors;}static void Diagnostic(const std::string&){}
 static void Fail(MapScreen*,const std::string&){++terrainFailures;ready=false;}
@@ -61,11 +68,11 @@ BODIES
 static bool Superseded(const AtlasView::WindowKey&,unsigned){return false;}
 static void WindowBounds(const AtlasView::WindowKey&,double&x,double&z,double&sx,double&sz){x=z=0;sx=sz=2304;}
 struct Plan{unsigned level;Plan():level(0){}bool Contains(const AtlasView::WindowKey&)const{return true;}};
-static HRESULT RenderLayers(Entry&e,const AtlasView::Uniforms&,bool,bool){++waterRenders[reinterpret_cast<ULONG_PTR>(e.output.p)-1];return nextRender;}
+static HRESULT RenderLayers(Entry&e,const AtlasView::Cell&,const AtlasView::Uniforms&,bool,bool){++waterRenders[reinterpret_cast<ULONG_PTR>(e.output.p)-1];return nextRender;}
 SHADE
 static void Reset(){
- errors=terrainFailures=readCalls=pipelineClears=0;enabled=ready=sunlight=ambient=haveLighting=waterOption=waterAttempted=waterPipelineReady=true;hookFailure=debug=waterFailed=jobQuarantined=false;nextRead=nextRender=S_OK;iniWater=true;shadeCursor=0;lightVersion=5;waterVersion=1;observedGeneration=7;InterlockedExchange(&GSM::generation,7);waterClock.Reset();lightClock.Reset();manifest=GsmAtlas::Manifest();manifest.waterVerified=true;manifest.header[0][0]=42;waterSnapshot=NativeWater::Snapshot();waterSnapshot.valid=true;
- for(unsigned i=0;i<AtlasView::WindowSlots;++i){cache[i]=Entry();cache[i].key=i<16?AtlasView::WindowKey(i,5,0,0):AtlasView::WindowKey((i-16)%16,0,(i-16)/16,0);cache[i].shaded=lightVersion;cache[i].waterStamp=waterVersion;cache[i].waterApplied=true;cache[i].output.p=reinterpret_cast<ID3D11Texture2D*>(ULONG_PTR(i+1));waterRenders[i]=terrainRenders[i]=0;}
+ errors=terrainFailures=readCalls=pipelineClears=0;enabled=ready=sunlight=ambient=haveLighting=waterOption=waterAttempted=waterPipelineReady=true;hookFailure=debug=waterFailed=jobQuarantined=false;nextRead=nextRender=S_OK;modelOption=modelAttempted=modelFailed=false;iniWater=true;shadeCursor=0;lightVersion=5;waterVersion=1;observedGeneration=7;InterlockedExchange(&GSM::generation,7);waterClock.Reset();lightClock.Reset();manifest=GsmAtlas::Manifest();manifest.waterVerified=true;manifest.header[0][0]=42;waterSnapshot=NativeWater::Snapshot();waterSnapshot.valid=true;
+ for(unsigned i=0;i<AtlasView::WindowSlots;++i){cache[i].~Entry();new(&cache[i])Entry();cache[i].key=i<16?AtlasView::WindowKey(i,5,0,0):AtlasView::WindowKey((i-16)%16,0,(i-16)/16,0);cache[i].shaded=lightVersion;cache[i].waterStamp=waterVersion;cache[i].waterApplied=true;cache[i].output.p=reinterpret_cast<ID3D11Texture2D*>(ULONG_PTR(i+1));waterRenders[i]=terrainRenders[i]=0;}
 }
 int main(){try{
  Reset();waterOption=false;WaterState(200);Check(readCalls==0,"OFF does not query snapshot");waterOption=true;manifest.waterVerified=false;WaterState(400);Check(readCalls==0,"unverified profile never queries native snapshot");manifest.waterVerified=true;waterFailed=true;WaterState(600);Check(readCalls==0,"failed water remains latched without retries");

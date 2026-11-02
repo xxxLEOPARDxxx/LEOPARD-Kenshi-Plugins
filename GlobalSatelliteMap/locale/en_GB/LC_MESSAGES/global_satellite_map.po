@@ -57,3 +57,12 @@ msgstr "Torches and lamps"
 
 msgid "Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."
 msgstr "Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."
+
+msgid "Existing city models"
+msgstr "Existing city models"
+
+msgid "Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."
+msgstr "Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."
+
+msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."
+msgstr "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."

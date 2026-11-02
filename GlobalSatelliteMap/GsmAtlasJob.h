@@ -13,8 +13,8 @@ inline std::wstring Canonical(const std::string&s){
     return w;
 }
 struct Job {
-    HANDLE thread;LONG generation;bool validation,waterValidation,ok;std::string folder,game,engine,module[2];char error[512];Manifest manifest;AtlasView::ReadRequest read;AtlasView::WindowKey window;unsigned char windowHashes[3][32];float windowMinHeight;bool windowHasFiniteHeight;
-    Job():thread(NULL),generation(0),validation(false),waterValidation(false),ok(false),windowMinHeight(0),windowHasFiniteHeight(false){error[0]=0;}
+    HANDLE thread;LONG generation;bool validation,waterValidation,modelValidation,ok;std::string folder,game,engine,module[2];char error[512];Manifest manifest;AtlasView::ReadRequest read;AtlasView::WindowKey window;unsigned char windowHashes[3][32];float windowMinHeight;bool windowHasFiniteHeight;
+    Job():thread(NULL),generation(0),validation(false),waterValidation(false),modelValidation(false),ok(false),windowMinHeight(0),windowHasFiniteHeight(false){error[0]=0;}
 };
 inline void ObserveGeneration(void*input){Job&job=*static_cast<Job*>(input);if(job.generation!=InterlockedCompareExchange(&GSM::generation,0,0))InterlockedExchange(&job.read.cancel,1);}
 inline bool Cancelled(Job&job){ObserveGeneration(&job);return AtlasView::Cancelled(job.read);}
@@ -89,6 +89,12 @@ inline void ValidateWaterSources(Job&job){
     if(Cancelled(job))throw std::runtime_error("water source validation cancelled");
     job.manifest.waterVerified=true;
 }
+inline void ValidateModelSources(Job&job){
+    job.manifest.modelVerified=false;AtlasView::U64 remaining=16ULL*1024*1024;
+    for(unsigned i=0;i<sizeof(GsmModelShaderInputs)/sizeof(GsmModelShaderInputs[0]);++i)
+        if(!HashFile(job.game+GsmModelShaderInputs[i].path,GsmModelShaderInputs[i].sha256,job,remaining))throw std::runtime_error("native city model source differs from viewer build");
+    if(Cancelled(job))throw std::runtime_error("model source validation cancelled");job.manifest.modelVerified=true;
+}
 // Worker-only scalar summary of the already verified256-square window. No
 // extra arrays or reinterpret-cast float loads; coverage0 never invents sea.
 inline bool WindowMinimum(Job&job){
@@ -105,5 +111,5 @@ inline bool WindowMinimum(Job&job){
     if(Cancelled(job))return false;
     job.windowMinHeight=minimum;job.windowHasFiniteHeight=found;return true;
 }
-inline DWORD WINAPI Run(void*input){Job&job=*static_cast<Job*>(input);job.ok=false;job.error[0]=0;job.windowMinHeight=0;job.windowHasFiniteHeight=false;if(job.waterValidation)job.manifest.waterVerified=false;job.read.afterChunk=ObserveGeneration;job.read.observer=&job;try{if(Cancelled(job))throw std::runtime_error("GST2 job cancelled");if(job.validation&&job.waterValidation)throw std::runtime_error("GST2 worker validation mode is ambiguous");if(job.waterValidation){ValidateWaterSources(job);job.ok=!Cancelled(job);}else if(job.validation){Validate(job);job.ok=!Cancelled(job);}else{job.ok=AtlasView::ReadWindow(job.read,job.window,job.windowHashes);if(job.ok)job.ok=WindowMinimum(job);}if(!job.ok&&!job.error[0])sprintf_s(job.error,sizeof(job.error),"GST2 window worker failed win32=%lu tile=%u level=%u x=%u z=%u",job.read.error,job.window.tile,job.window.level,job.window.x,job.window.z);}catch(const std::exception&e){strncpy_s(job.error,sizeof(job.error),e.what(),_TRUNCATE);}catch(...){strcpy_s(job.error,sizeof(job.error),"GST2 file worker exception");}if(!job.ok&&job.waterValidation)job.manifest.waterVerified=false;return job.ok?0:1;}
+inline DWORD WINAPI Run(void*input){Job&job=*static_cast<Job*>(input);job.ok=false;job.error[0]=0;job.windowMinHeight=0;job.windowHasFiniteHeight=false;if(job.waterValidation)job.manifest.waterVerified=false;if(job.modelValidation)job.manifest.modelVerified=false;job.read.afterChunk=ObserveGeneration;job.read.observer=&job;try{if(Cancelled(job))throw std::runtime_error("GST2 job cancelled");if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)>1)throw std::runtime_error("GST2 worker validation mode is ambiguous");if(job.modelValidation){ValidateModelSources(job);job.ok=!Cancelled(job);}else if(job.waterValidation){ValidateWaterSources(job);job.ok=!Cancelled(job);}else if(job.validation){Validate(job);job.ok=!Cancelled(job);}else{job.ok=AtlasView::ReadWindow(job.read,job.window,job.windowHashes);if(job.ok)job.ok=WindowMinimum(job);}if(!job.ok&&!job.error[0])sprintf_s(job.error,sizeof(job.error),"GST2 window worker failed win32=%lu tile=%u level=%u x=%u z=%u",job.read.error,job.window.tile,job.window.level,job.window.x,job.window.z);}catch(const std::exception&e){strncpy_s(job.error,sizeof(job.error),e.what(),_TRUNCATE);}catch(...){strcpy_s(job.error,sizeof(job.error),"GST2 file worker exception");}if(!job.ok&&job.waterValidation)job.manifest.waterVerified=false;if(!job.ok&&job.modelValidation)job.manifest.modelVerified=false;return job.ok?0:1;}
 }

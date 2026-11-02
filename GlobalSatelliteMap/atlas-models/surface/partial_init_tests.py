@@ -68,4 +68,3 @@ for name,old,new,reason in [
 ]:
     assert old in header,name
     run(header.replace(old,new),name,reason)
-
