@@ -7,7 +7,7 @@ def main():
     assert log.russian('v2 English\nEnglish text\n\nv2 - Русский\n- Исправлена ошибка.')=='- Исправлена ошибка.'
     assert log.russian('v1: English.\n\nv1: Добавлено меню.')=='Добавлено меню.'
     with tempfile.TemporaryDirectory() as directory:
-        path=Path(directory)/'ALL_CHANGELOG_MODS'
+        path=Path(directory)/'ALL_CHANGELOG_MODS.txt'
         first=datetime(2026,11,2,10,20,tzinfo=timezone.utc)
         assert log.record('Мод А','2','Исправлена ошибка.',when=first,target=path)
         before=path.read_text(encoding='utf-8');assert '02.11.2026 13:20:00 МСК' in before
@@ -27,6 +27,11 @@ def main():
         try:log.record('Мод','1','English only',target=path)
         except ValueError:pass
         else:raise AssertionError('Пропущен нерусский текст')
+        try:log.record('Мод','1','Проверка сборки.',status='Разработка',target=path)
+        except ValueError:pass
+        else:raise AssertionError('В журнал попала разработка')
+        assert not log.gameplay('- Чистый пакет обновления. Каталоги подготовлены.')
+        assert 'SDK' not in log.gameplay('Исправлена ошибка сортировки. Для авторов плагинов: API и SDK обновлены.')
     print('Личный журнал: порядок, МСК, повторы, заметки владельца и защита истории проверены')
 
 if __name__=='__main__':main()

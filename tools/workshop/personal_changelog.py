@@ -1,7 +1,7 @@
 """Local Russian-only owner journal. Never included in release content.
 
-One writer at a time, called after successful release verification or directly
-for a completed development change. Existing owner text is retained verbatim.
+One writer at a time, called only after confirmed publication. Development,
+build/test steps and release preparation are deliberately excluded.
 """
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -9,7 +9,7 @@ import argparse, json, os, re, subprocess, tempfile
 
 WORKSHOP=Path('D:/DEV/Kenshi/workshop')
 REPOSITORY=Path('D:/DEV/Kenshi/ours')
-JOURNAL=WORKSHOP/'ALL_CHANGELOG_MODS'
+JOURNAL=WORKSHOP/'ALL_CHANGELOG_MODS.txt'
 MOSCOW=timezone(timedelta(hours=3))
 SEPARATOR='\n'+'='*72+'\n'
 HEADER='''ОБЩИЙ ЛИЧНЫЙ ЖУРНАЛ ИЗМЕНЕНИЙ МОДОВ KENSHI
@@ -19,8 +19,8 @@ HEADER='''ОБЩИЙ ЛИЧНЫЙ ЖУРНАЛ ИЗМЕНЕНИЙ МОДОВ KEN
 
 Начальная история восстановлена из русских журналов выпусков. Для неё указано
 время фиксации записи в репозитории, а не выдуманное время старой публикации.
-Пометка «Подготовлено локально» не означает, что обновление уже опубликовано.
-Дальнейшие готовые правки и проверки добавляются отдельными записями.
+Только выпущенные обновления: возможности, исправления ошибок и производительность.
+Разработка, планы, сборки и внутренние технические этапы сюда не записываются.
 '''
 
 
@@ -38,6 +38,24 @@ def russian(text):
 
 def normalized(text):
     return re.sub(r'\s+',' ',re.sub(r'\[/?(?:b|i|u)\]','',text)).strip()
+
+
+def gameplay(text):
+    """Keep player-facing results; the full technical notes stay elsewhere."""
+    result=[]
+    for line in text.splitlines():
+        line=line.strip()
+        if not line:continue
+        if re.match(r'-?\s*(Чист[а-яё]* (?:пакет|обновление)|Ошибки остаются видимыми|В подробный журнал добавлены ограниченные сводки)',line):continue
+        if 'Необязательная диагностика языка.' in line:
+            result.append('- Подробные сообщения появляются только при включённом журнале отладки; ошибки видны всегда.');continue
+        if '.defaults.ini' in line:
+            line=line.split(':',1)[0].rstrip('.')+'.'
+        sentences=re.split(r'(?<=[.!?])\s+(?=[А-ЯЁ])',line)
+        sentences=[x for x in sentences if not re.search(r'\b(?:SDK|ABI|API|CRC|VC10|PNG|JPEG)\b|1600x900|невиртуальн|виртуального сравнения|рабоч[а-я]+ каталог|скомпилированн|\bhand\b|/LTCG',x)]
+        line=' '.join(sentences).strip()
+        if line and line not in result:result.append(line)
+    return '\n'.join(result)
 
 
 def block(mod,version,text,when,status):
@@ -58,7 +76,10 @@ def atomic_write(path,text):
         if os.path.exists(name):os.unlink(name)
 
 
-def record(mod,version,text,status='Подготовлено локально',when=None,target=JOURNAL):
+def record(mod,version,text,status='Выпущено',when=None,target=JOURNAL):
+    if status!='Выпущено':raise ValueError('В личный журнал входят только выпущенные обновления')
+    text=gameplay(text)
+    if not text:raise ValueError('Нет изменений для игрока')
     target=Path(target);old=target.read_text(encoding='utf-8') if target.exists() else HEADER
     title=f'Мод: {mod} | Версия: {version}'
     for entry in old.split(SEPARATOR):
@@ -94,23 +115,32 @@ def initialize(repository=REPOSITORY,target=JOURNAL):
                 if known.get(key)!=ru:dates[key]=datetime.fromisoformat(stamp)
                 known[key]=ru
     order=sorted(known,key=lambda k:(dates[k],int(k[1]) if k[1].isdigit() else 0,k[0]),reverse=True)
-    entries=[block(mod,ver,known[(mod,ver)],dates[(mod,ver)],'История: запись зафиксирована в репозитории') for mod,ver in order]
+    # Confirmed latest publication times override retrospective metadata dates.
+    publication_log=repository/'tools/maintenance/steam-publication-37-2026-11-02.jsonl'
+    if publication_log.exists():
+        for row in publication_log.read_text(encoding='utf-8-sig').splitlines():
+            event=json.loads(row)
+            if event.get('kind')=='item_complete':dates[(event['package'],str(event['version']))]=datetime.fromisoformat(event['time_utc'])
+    order=sorted(known,key=lambda k:(dates[k],int(k[1]) if k[1].isdigit() else 0,k[0]),reverse=True)
+    entries=[]
+    for mod,ver in order:
+        body=gameplay(known[(mod,ver)])
+        if body:entries.append(block(mod,ver,body,dates[(mod,ver)],'Выпущено'))
     atomic_write(target,HEADER.rstrip()+'\n'+SEPARATOR+SEPARATOR.join(entries))
     return len(entries)
 
 
-def record_releases(items,here):
+def record_published(mod,version,here):
     history=json.loads((Path(here)/'changelog.json').read_text(encoding='utf-8-sig'))
-    for item in items:
-        mod=item['mod'];version=str(item['version'])
-        record(mod,version,russian(history[mod][version]))
+    return record(mod,str(version),russian(history[mod][str(version)]))
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description='Личный общий журнал изменений модов')
     parser.add_argument('--initialize',action='store_true')
-    parser.add_argument('--mod');parser.add_argument('--version',default='Разработка');parser.add_argument('--text')
+    parser.add_argument('--mod');parser.add_argument('--version',required=False);parser.add_argument('--text')
+    parser.add_argument('--published',action='store_true',help='Подтверждённый выпуск, не подготовка')
     args=parser.parse_args()
     if args.initialize:print('Восстановлено записей:',initialize())
-    elif args.mod and args.text:print('Запись добавлена:',record(args.mod,args.version,args.text))
-    else:parser.error('Нужны --initialize либо --mod и --text')
+    elif args.published and args.mod and args.version and args.text:print('Запись добавлена:',record(args.mod,args.version,args.text))
+    else:parser.error('Нужны --initialize либо --published, --mod, --version и --text')

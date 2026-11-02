@@ -216,6 +216,11 @@ def upload(st, mod, note):
         raise SystemExit("%s: русский перевод: EResult %d" % (mod, r2.result))
     print("  русский перевод загружен")
     write_fcs_info(meta)
+    if note and not r.needs_agreement:
+        # A released version only: preparation/preview/description updates do
+        # not create entries in the owner's personal release journal.
+        from personal_changelog import record_published
+        record_published(mod, meta['version'], HERE)
     print("  готово: https://steamcommunity.com/sharedfiles/filedetails/?id=%d%s"
           % (meta["workshop_id"], " (НУЖНО ПРИНЯТЬ СОГЛАШЕНИЕ МАСТЕРСКОЙ)" if r.needs_agreement else ""))
 
