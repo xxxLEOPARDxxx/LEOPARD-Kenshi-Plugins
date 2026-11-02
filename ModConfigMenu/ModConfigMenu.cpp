@@ -2405,6 +2405,42 @@ namespace
 
     extern OptionsWindow* g_captionFor;     // заголовок окна - см. UpdateWindowCaption
 
+    // После задания холста скин уже отвёл место под вертикальную полосу.
+    // Центрируем этот родной желоб между рамкой кнопок и разделителем,
+    // меняя только ширину ScrollView: Client/VScroll скин сдвигает сам.
+    // В Dark UI полоса уже желоба, но её внутренние поля сохраняются.
+    void CenterModListScrollbar(int dividerX)
+    {
+        if (g_list == NULL || g_buttons.empty()) return;
+        const MyGUI::IntSize size = g_list->getSize();
+        const MyGUI::IntCoord view = g_list->getViewCoord();
+        const MyGUI::IntSize canvas = g_list->getCanvasSize();
+        if (size.width <= 0 || view.left < 0 || view.width <= 0 ||
+            view.left >= size.width || view.width > size.width - view.left ||
+            canvas.width <= 0 || dividerX < size.width || canvas.height <= view.height) return;
+        const int gutter = size.width - view.left - view.width;
+        if (gutter <= 0) return;
+        const int contentRight = std::min(canvas.width, view.width);
+        if (dividerX - contentRight - view.left < gutter) return;
+        for (size_t k = 0; k < g_buttons.size(); ++k)
+        {
+            if (g_buttons[k] == NULL) return;
+            const MyGUI::IntCoord c = g_buttons[k]->getCoord();
+            if (c.left < 0 || c.left >= contentRight || c.width <= 0) return;
+        }
+        const int targetRight = contentRight + view.left + (dividerX - contentRight - view.left - gutter) / 2;
+        const int width = size.width + targetRight - view.left - view.width;
+        if (width != size.width) g_list->setSize(width, size.height);
+        for (size_t k = 0; k < g_buttons.size(); ++k)
+        {
+            MyGUI::Button* b = g_buttons[k];
+            const MyGUI::IntCoord c = b->getCoord();
+            const int width = std::min(c.width, contentRight - c.left);
+            if (c.width != width) b->setSize(width, c.height);
+        }
+        if (canvas.width != contentRight) g_list->setCanvasSize(contentRight, canvas.height);
+    }
+
     void BuildTab(OptionsWindow* w)
     {
         g_captionFor = NULL;                // окно строится заново - заголовок ищем снова
@@ -2457,6 +2493,7 @@ namespace
         // Модов больше, чем влезает, - холст выше окна, и справа появляется
         // полоса прокрутки скина; листать можно и колесом.
         g_list->setCanvasSize(listW - 20, std::max(y + (BUTTON_H - BUTTON_STEP) + 4, g_list->getViewCoord().height));
+        CenterModListScrollbar(listW + LIST_GAP / 2 - 2);
 
         // Разделитель между списком и настройками: две линии в пиксель,
         // тёмная и светлая, - как вдавленная кайма рамок игры. Готового

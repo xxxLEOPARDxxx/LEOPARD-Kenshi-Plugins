@@ -5,6 +5,7 @@ Run from the repository root after production changes:
 ```powershell
 python .\ModConfigMenu\tests\wheel_probe.py
 python .\ModConfigMenu\tests\capture_probe.py
+python .\ModConfigMenu\tests\list_layout_tests.py
 ```
 
 Each runner compiles the **current** `ModConfigMenu.cpp` helper bodies with
@@ -24,6 +25,11 @@ header. All paths to project sources are relative to this tests directory.
 - `capture_probe.py`: initial selecting click, mouse opt-in and modifiers,
   matching press/release, keyboard repeats, NONE/Escape, legacy click-cancel
   and ordinary text input are covered.
+- `list_layout_tests.py`: compiles the actual BuildTab mod-list block and
+  scrollbar layout helper. Current vanilla/Dark UI template measurements,
+  wider/narrower skin gutters, client insets, odd widths, hidden scrolling,
+  clipping, repeat/refusal paths and four compiled mutants are covered.
+  See `scrollbar-layout.md` for the scoped native/fixture evidence.
 
 Generated C++, object files, executables and link outputs stay in `generated/`
 and are ignored. Neither runner accesses a live game, installs DLLs, writes
