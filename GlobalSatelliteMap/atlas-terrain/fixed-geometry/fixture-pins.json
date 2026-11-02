@@ -1,0 +1,26 @@
+{
+  "sourceTiffSha256": "6f7d4bc7baaf80dbf8db91e6f367db71f87fe38f053a34108f192584c9637b18",
+  "sourceStep": 18,
+  "sourceOrigin": [
+    -147456,
+    -147456
+  ],
+  "fixtures": {
+    "height-window.u16": {
+      "bytes": 52544,
+      "sha256": "9dcdaf8f8d73105861fe88d38cd496ef365678b7b49539935a7d2ea547fad68f"
+    },
+    "raster-window.u16": {
+      "bytes": 35394,
+      "sha256": "5faef118b6476b6c87eb52425483872fded07d6481bfefb96cfab5cc76005ed3"
+    },
+    "expected-patch.f32": {
+      "bytes": 169000,
+      "sha256": "100568ef85e501c9362790248b66daf0fdeb29fc0b08ae9944f0f65d9b5d8be2"
+    },
+    "expected-indices.u16": {
+      "bytes": 17144,
+      "sha256": "973598c68ed5c2fe5771dca5dd58ed8335c7c1a423082cafcc1c3f545e8701ac"
+    }
+  }
+}

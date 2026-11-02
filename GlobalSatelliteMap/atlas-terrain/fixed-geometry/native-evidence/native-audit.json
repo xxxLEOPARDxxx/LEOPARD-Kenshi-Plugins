@@ -1,0 +1,89 @@
+{
+  "terrainConstants": {
+    "0x35d9c": -1.0,
+    "0x35cd0": 1.0,
+    "0x37200": 65535.0
+  },
+  "patch-vertices": {
+    "module": "terrain",
+    "rva": "0x47a0",
+    "bytes": 4800,
+    "sha256": "3fc89b1c8948602127c6074c94143971b4e1199b4a0e4b989d543662e58da308",
+    "decodedInstructions": 851
+  },
+  "base-indices": {
+    "module": "terrain",
+    "rva": "0x5aa0",
+    "bytes": 468,
+    "sha256": "19c2ad357681420e0c97ce9bf9a4bd8ca21a7488b8ca97fb5490cca8cd6ac7d6",
+    "decodedInstructions": 105
+  },
+  "native-height": {
+    "module": "terrain",
+    "rva": "0x14430",
+    "bytes": 530,
+    "sha256": "6ad0d621e5549f5f0aaf25b299311b14093eb6a8b8733862beff7bec399b8ef7",
+    "decodedInstructions": 117
+  },
+  "world-height-scale": {
+    "module": "terrain",
+    "rva": "0x14070",
+    "bytes": 282,
+    "sha256": "084e02550d267e30f5dbbeefa67adb5c752d99fb121eb18d6e5c020db942e0a9",
+    "decodedInstructions": 49
+  },
+  "terrain-height-stream-open": {
+    "module": "terrain",
+    "rva": "0x141c0",
+    "bytes": 384,
+    "sha256": "1543ee8db6a56594d46ef9d3cf9f1230f3ad9b879fcdb0abddb6cf950dc0a48b",
+    "decodedInstructions": 68
+  },
+  "gpu-patch-upload": {
+    "module": "terrain",
+    "rva": "0x1f5c0",
+    "bytes": 880,
+    "sha256": "aeb3d5872c2ce4e6f8582e49f74604d7bd3afcaea2213a14be138ead58f2ab4f",
+    "decodedInstructions": 170
+  },
+  "border-indices": {
+    "module": "terrain",
+    "rva": "0x5e10",
+    "bytes": 1376,
+    "sha256": "aa71a62f59956887661048f887dacce1ba2524b9a908afdb67512f05012c4226",
+    "decodedInstructions": 337
+  },
+  "native-leaf-export": {
+    "module": "terrain",
+    "rva": "0x3960",
+    "bytes": 192,
+    "sha256": "bae316244a23f504143c134b2ff85c47f3e173026a09b9bd96433569839d606c",
+    "decodedInstructions": 52
+  },
+  "terrainProfile": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\Plugin_Terrain_x64.dll",
+    "sha256": "53afd1e4faf35020556d33f57007d51c2a9d2330b630e39a67161ee850b7a239"
+  },
+  "ogre-normalise": {
+    "module": "ogre",
+    "rva": "0x67070",
+    "bytes": 160,
+    "sha256": "d0b1adb12999544abe7454942d82f9cdfe3c9aa78a7380902157222d3ddd677b",
+    "decodedInstructions": 50
+  },
+  "ogreProfile": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\OgreMain_x64.dll",
+    "sha256": "7d3888d21398647519f10a89b1f300d8606f761ad159e6021a797b1b9b3df5f6"
+  },
+  "water-plane-constructor": {
+    "module": "exe",
+    "rva": "0x9d6000",
+    "bytes": 1984,
+    "sha256": "6ad5b9364413d041d470843d114be45ae72014b73c2c549a6b0c950804352fc5",
+    "decodedInstructions": 451
+  },
+  "exeProfile": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\Kenshi_x64.exe",
+    "sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e"
+  }
+}

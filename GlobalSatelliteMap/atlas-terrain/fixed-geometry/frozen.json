@@ -1,0 +1,130 @@
+{
+  "utc": "2026-11-02T23:12:13.339564+00:00",
+  "repoHead": "40039768e9728526005f1b35dd634d8ccd4e1f84",
+  "scope": "isolated CPU fixed-global18m geometry; no renderer/Main/probe/game/install/commit",
+  "sourceFiles": {
+    "budget.json": {
+      "bytes": 1967,
+      "sha256": "f7b9437bd4c8f9df290f9313bdf91d277dd64d94c174b98c877d376e0974fd7e"
+    },
+    "expected-indices.u16": {
+      "bytes": 17144,
+      "sha256": "973598c68ed5c2fe5771dca5dd58ed8335c7c1a423082cafcc1c3f545e8701ac"
+    },
+    "expected-patch.f32": {
+      "bytes": 169000,
+      "sha256": "100568ef85e501c9362790248b66daf0fdeb29fc0b08ae9944f0f65d9b5d8be2"
+    },
+    "FixedTerrainGeometry.h": {
+      "bytes": 3646,
+      "sha256": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698"
+    },
+    "fixture-pins.json": {
+      "bytes": 770,
+      "sha256": "02881f6d4cdc8837387c152960689c8a15caf7d27e0cb670192692a1f0865905"
+    },
+    "geometry-contract.json": {
+      "bytes": 939,
+      "sha256": "a41b431475e4c303e84185641383b96a4fc7bfce82233ca0a966cfd8220d711c"
+    },
+    "geometry_contract.py": {
+      "bytes": 6463,
+      "sha256": "210ea39eb8c15791713abc137d267c1c4e7117ad6186bbd0d35ca2625b74442a"
+    },
+    "geometry_tests.cpp": {
+      "bytes": 5176,
+      "sha256": "e52946f28e1a280802d0330e990e5c5666a5419c1b5e720a2483a448c102dc58"
+    },
+    "height-window.u16": {
+      "bytes": 52544,
+      "sha256": "9dcdaf8f8d73105861fe88d38cd496ef365678b7b49539935a7d2ea547fad68f"
+    },
+    "native-audit.log": {
+      "bytes": 73,
+      "sha256": "9a0a5abf94121755981f1859e8344d04bb87fb6cdf15eb7da75d287bba1d87a2"
+    },
+    "native-evidence/audit_native.py": {
+      "bytes": 2978,
+      "sha256": "5a818802024a3f56ae4dd7314c75d4ed71a3b6b4a93c2cbbfd7d7f64ba0ffe11"
+    },
+    "native-evidence/base-indices.asm": {
+      "bytes": 7186,
+      "sha256": "021bf0e48f870166ef8b131fb69b931219af3785e9dedcebded36f55624c1307"
+    },
+    "native-evidence/border-indices.asm": {
+      "bytes": 22018,
+      "sha256": "b6860ebab3efaeb637ff8b566875948d2dea277a46c5db37ba37d3e997082b5a"
+    },
+    "native-evidence/gpu-patch-upload.asm": {
+      "bytes": 12331,
+      "sha256": "05ec48ebdd26c395e39a8aeffdd97d6bd524bcf2147f7356c306493c355fa55c"
+    },
+    "native-evidence/native-audit.json": {
+      "bytes": 2815,
+      "sha256": "690af36665ed3dc0c2cbd936a6ed817ffb5153bdb27fda273194d56ebb8a3fcd"
+    },
+    "native-evidence/native-height.asm": {
+      "bytes": 8100,
+      "sha256": "f91e554c89bcf07a0143c1c9ab2967d7a7a8dea275c8a9093ed0c0ba564d6550"
+    },
+    "native-evidence/native-leaf-export.asm": {
+      "bytes": 3271,
+      "sha256": "b8c3fd2647dd8d74666d14d2646ff2e84d2f0a853b1ba1d48fbe74b7b18df768"
+    },
+    "native-evidence/ogre-normalise.asm": {
+      "bytes": 2860,
+      "sha256": "b90908d2e5b8c4169bc31a3515d3521a8244f775368fb08256165b591c7d4dfc"
+    },
+    "native-evidence/patch-vertices.asm": {
+      "bytes": 58884,
+      "sha256": "3d6e22d9f9995f271e3b42c1fafe37a8ad756a283ed934c6f6f2b48d8e184aa1"
+    },
+    "native-evidence/terrain-height-stream-open.asm": {
+      "bytes": 4442,
+      "sha256": "9e9985571f00fe44163c792b27074b284141d633b2e1efcdd2853362315d5bbe"
+    },
+    "native-evidence/water-plane-constructor.asm": {
+      "bytes": 31135,
+      "sha256": "ee2f9db7a088c091fd343efcbabc4a6a041fd49bb3af0254d7410c1f9ed7287f"
+    },
+    "native-evidence/world-height-scale.asm": {
+      "bytes": 3603,
+      "sha256": "e1d8cf6e25c324b64a48a984c905d5457feb12f89f7f55a71a92d9f0feeed897"
+    },
+    "raster-window.u16": {
+      "bytes": 35394,
+      "sha256": "5faef118b6476b6c87eb52425483872fded07d6481bfefb96cfab5cc76005ed3"
+    },
+    "README.md": {
+      "bytes": 10992,
+      "sha256": "effbdd2abaf39d78c7cdb30ef708f719ed29eadcc3360b4256cebe17e8752eb7"
+    },
+    "regeneration.log": {
+      "bytes": 939,
+      "sha256": "a41b431475e4c303e84185641383b96a4fc7bfce82233ca0a966cfd8220d711c"
+    },
+    "run_geometry.py": {
+      "bytes": 2312,
+      "sha256": "c89268f1b4750b4049f4b83f17187b2df8881aa8a0e44e9fe2112175dbb3ba4f"
+    },
+    "verification.log": {
+      "bytes": 471,
+      "sha256": "85a74a72b2d460a0b3414905f827aeaf93d1019e23195577c5869c2994a4c178"
+    }
+  },
+  "externalReadOnlyInputs": {
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\geography_vertex_source.py": "ea1e5c6ec1229435bb6c87a2cfcddff71a5369ac6da9e42b35d21e525d8e5df2",
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\GeographyCliff.hlsl": "82c2aa889e99ec4f02e45bc5f70ec531d2fabbc637f23195bf07b060dd50af25",
+    "D:\\DEV\\Kenshi\\deps\\KenshiLib\\Include\\ogre\\OgreHardwareVertexBuffer.h": "ebfea9dfbafeb949e901383ea41b0f488c9f8977c8298e8a74e98b3b57150eb6",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\deferred\\terrain.hlsl": "7bde0c5f6aa81d542b5c25925b28508a937d5086effeb959a9b0c5b96f11eb07"
+  },
+  "verification": {
+    "optimizedChecks": 4507,
+    "unoptimizedChecks": 4507,
+    "compiledNegativeControlsRejected": 6,
+    "actualRawVerticesCompared": 4225,
+    "nativeStripBytesCompared": 17144,
+    "rasterControlFixture": "133-square global7358..7490;256-square3m centre(-13824,-13824);at most4patches"
+  },
+  "formatOnlyMaintenance": "Root trimmed trailing disassembler text padding and made generator trim it; native code-byte pins, production helper, fixtures and numerical tests unchanged."
+}

@@ -1,0 +1,64 @@
+{
+  "scope": "conservative planned owned inventories, not observed driver/process peaks",
+  "captureCapUnchanged": 1073741824,
+  "visibleTriangleCapUnchanged": 16000000,
+  "baseBlockPixels": 2048,
+  "basePixelMeters": 9,
+  "baseBlockSourceIntervals": 1024,
+  "baseBlockPatches": 256,
+  "baseBlockTriangles": 2097152,
+  "baseInventoriesBytes": {
+    "ddsAndPaintAndSelectorsGpu": 503315252,
+    "rgbFp16NormalRadialDepthTargetsGpu": 100663296,
+    "verticesGpu": 43264000,
+    "sharedIndicesGpu": 17144,
+    "readbackStaging": 67108864,
+    "verticesCpu": 43264000,
+    "singleUploadMirrorReserve": 43264000,
+    "copiedWriterBlockCpu": 67108864,
+    "source1029SquareU16Cpu": 2117682,
+    "fineNormalScratchCpu": 53868,
+    "oneEncodedDdsCpu": 5592560,
+    "fixedMetadataReserve": 4194304,
+    "driverUnmeasuredHeadroomReserve": 134217728,
+    "sharedIndicesCpu": 17144,
+    "uniformsGpuReserve": 65536
+  },
+  "basePlannedPeakBytes": 1014264242,
+  "basePlannedHeadroomBytes": 59477582,
+  "wholeWorld18mMeshRejected": {
+    "triangles": 536870912,
+    "rawCpuVertices65Chunks": 11075584000
+  },
+  "first256Square3m": {
+    "worldSpan": 768,
+    "maxPatches": 4,
+    "verticesCpu": 676000,
+    "verticesGpu": 676000,
+    "sharedIndicesGpu": 17144,
+    "source133SquareWithHeader": 35394
+  },
+  "viewerCurrent": {
+    "cap": 201326592,
+    "windows": 144,
+    "reserved": 189006000,
+    "headroom": 12320592
+  },
+  "viewerExplicit48WindowOption": {
+    "fallback": 16,
+    "detail": 32,
+    "reserve": 63176880,
+    "remaining": 138149712
+  },
+  "baseDisk": {
+    "tiles": 16,
+    "tileBytes": 1431307264,
+    "newLogicalBytes": 22900916224,
+    "oldLogicalRetained": 22900916224,
+    "oldAndNewLogicalBytes": 45801832448,
+    "sameFormat": true,
+    "wholeWorld3mLogicalApprox": 206108246016,
+    "wholeWorld1mLogicalApprox": 1854974214144
+  },
+  "baseBlockStripPrimitivesIncludingDegenerates": 2193920
+}

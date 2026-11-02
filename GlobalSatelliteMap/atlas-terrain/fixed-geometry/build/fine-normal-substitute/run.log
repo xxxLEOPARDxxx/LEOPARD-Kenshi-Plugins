@@ -1,0 +1,2 @@
+FAIL literal native raw/GPU normal is not silently replaced by fineXYZ
+geometry helper 4507 checks, 1 failures

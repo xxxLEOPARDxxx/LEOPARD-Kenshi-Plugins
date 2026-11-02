@@ -1,0 +1,3 @@
+FAIL all17144 bytes match independently generated native strip
+FAIL degenerate joins excluded from real triangle count
+geometry helper 4507 checks, 2 failures

@@ -1,0 +1,8 @@
+actual: geometry helper 4507 checks, 0 failures
+debug: geometry helper 4507 checks, 0 failures
+fine-normal-substitute: geometry helper 4507 checks, 1 failures
+single-halo: geometry helper 4507 checks, 1 failures
+wrong-global-parity: geometry helper 4507 checks, 3200 failures
+missing-corner-diagonal: geometry helper 4507 checks, 1024 failures
+wrong-strip-columns: geometry helper 4507 checks, 2 failures
+clamp-world-edge: geometry helper 4507 checks, 1 failures

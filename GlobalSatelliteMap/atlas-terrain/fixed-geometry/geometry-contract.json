@@ -1,0 +1,47 @@
+{
+  "scope": "offline owned arithmetic contract, not native image/float-bit parity",
+  "tiffSha256": "6f7d4bc7baaf80dbf8db91e6f367db71f87fe38f053a34108f192584c9637b18",
+  "readBytesAfterFullIdentityHash": 52528,
+  "sourceWindow": [
+    7102,
+    7358,
+    196,
+    134
+  ],
+  "overlapVertices": 10449,
+  "sharedEdgeVertices": 65,
+  "clampedNormalNegativeControlMaxDegrees": 13.709296235822963,
+  "indicesPer65Square": 8572,
+  "trianglesPer65Square": 8192,
+  "bilinearNegativeControlMaxMeters": 14.523914337158203,
+  "oppositeDiagonalNegativeControlMaxMeters": 19.365219116210938,
+  "sampleRing": [
+    [
+      0,
+      -1
+    ],
+    [
+      1,
+      -1
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -1,
+      0
+    ]
+  ],
+  "sourceStepMeters": 18,
+  "sourceHeightScaleFloat": 0.14953841269016266,
+  "outputBasePixelMeters": 9
+}
