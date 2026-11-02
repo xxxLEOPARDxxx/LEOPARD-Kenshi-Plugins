@@ -20,7 +20,7 @@ unsigned checks=0;void C(bool b,const char*s){++checks;if(!b){std::fprintf(stder
 int main(){try{
  unsigned __int64 town[0x500/8]={0},proxy[3]={0};BYTE*t=reinterpret_cast<BYTE*>(town),*p=reinterpret_cast<BYTE*>(proxy);const void*owner=town,*ptr=proxy,*entity=reinterpret_cast<const void*>(0x12340);std::memcpy(t+0x4f8,&ptr,8);std::memcpy(p,&owner,8);unsigned state=3;std::memcpy(p+8,&state,4);std::memcpy(p+16,&entity,8);float position[3]={12345,0,-54321};std::memcpy(t+0x48,position,12);BYTE before[sizeof(town)];std::memcpy(before,t,sizeof(before));Header h;
  C(HeaderRead(town,h)&&h.proxy==proxy&&h.entity==entity,"existing state3 proxy identity admitted");C(h.town[0]==12345&&h.town[1]==0&&h.town[2]==-54321,"stored town position copied including lazy-height sentinel");C(!std::memcmp(before,t,sizeof(before)),"passive town copy performs no lazy height write");
- const void*wrong=reinterpret_cast<const void*>(0x999);std::memcpy(p,&wrong,8);C(!HeaderRead(town,h),"wrong owner refused");std::memcpy(p,&owner,8);state=2;std::memcpy(p+8,&state,4);C(!HeaderRead(town,h),"nonresident proxy state refused");state=3;std::memcpy(p+8,&state,4);entity=NULL;std::memcpy(p+16,&entity,8);C(!HeaderRead(town,h),"missing existing entity refused");entity=reinterpret_cast<const void*>(0x12340);std::memcpy(p+16,&entity,8);
+ const void*wrong=reinterpret_cast<const void*>(0x999);std::memcpy(p,&wrong,8);C(!HeaderRead(town,h),"wrong owner refused");std::memcpy(p,&owner,8);state=2;std::memcpy(p+8,&state,4);C(HeaderRead(town,h)&&h.entity==entity,"native completed-cache state2 proxy admitted");state=1;std::memcpy(p+8,&state,4);C(!HeaderRead(town,h),"pending state1 proxy refused");state=3;std::memcpy(p+8,&state,4);entity=NULL;std::memcpy(p+16,&entity,8);C(!HeaderRead(town,h),"missing existing entity refused");entity=reinterpret_cast<const void*>(0x12340);std::memcpy(p+16,&entity,8);
  unsigned nan=0x7fc00000;std::memcpy(t+0x48,&nan,4);C(!HeaderRead(town,h),"nonfinite stored coordinate refused");C(!HeaderRead(NULL,h),"missing town refused");C(!HeaderRead(reinterpret_cast<const void*>(8),h),"invalid town pointer contained");ptr=reinterpret_cast<const void*>(8);std::memcpy(t+0x4f8,&ptr,8);C(!HeaderRead(town,h),"invalid existing proxy pointer contained");std::printf("Origin passive-header PASS %u checks; actual production body/owned memory/no native calls\n",checks);return 0;
 }catch(...){return 1;}}
 '''.replace('BODY',body)
@@ -28,3 +28,12 @@ int main(){try{
 vc=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');sdk=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{vc}/include;{sdk}/Include',LIB=f'{vc}/lib/amd64;{sdk}/Lib/x64')
 subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W4','/Fe'+str(OUT/'test.exe'),'/Fo'+str(OUT/'test.obj'),str(OUT/'test.cpp')],env=env,check=True)
 subprocess.run([str(OUT/'test.exe')],check=True)
+for name,condition in [('reject-completed-state2','state!=3'),('accept-pending-state1','state!=1&&state!=2&&state!=3')]:
+    assert source.count('state!=2&&state!=3')==1
+    cpp=OUT/(name+'.cpp');cpp.write_text(source.replace('state!=2&&state!=3',condition));exe=OUT/(name+'.exe')
+    with (OUT/(name+'-compile.log')).open('w') as log:
+        subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W4','/Fe'+str(exe),'/Fo'+str(OUT/(name+'.obj')),str(cpp)],env=env,check=True,stdout=log,stderr=subprocess.STDOUT)
+    result=subprocess.run([str(exe)],capture_output=True,text=True)
+    (OUT/(name+'-run.log')).write_text(result.stdout+result.stderr)
+    assert result.returncode and 'FAIL ' in result.stderr,(name,result.stdout,result.stderr)
+    print('Origin compiled functional state mutant rejected:',name)

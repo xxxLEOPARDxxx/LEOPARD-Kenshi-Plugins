@@ -34,8 +34,9 @@ inline bool Header(const BYTE*king,ListHeader&h){
     return h.count<=Limit&&(!h.count||(h.array&&!(reinterpret_cast<ULONG_PTR>(h.array)%sizeof(void*))&&reinterpret_cast<ULONG_PTR>(h.array)<=ULONG_PTR(-1)-SIZE_T(h.count)*sizeof(void*)));
 }
 inline bool SameHeader(const ListHeader&a,const ListHeader&b){return a.list==b.list&&a.array==b.array&&a.count==b.count;}
+inline bool LoadedState(unsigned state){return state==2||state==3;}
 inline bool SameCandidate(const BYTE*town,const BYTE*proxy,const void*entity,const BYTE*engine){
-    return Pointer(town)==engine+TownVtable&&Pointer(town+0x4f8)==proxy&&Pointer(proxy)==town&&Number(proxy+8)==3&&Pointer(proxy+16)==entity;
+    return Pointer(town)==engine+TownVtable&&Pointer(town+0x4f8)==proxy&&Pointer(proxy)==town&&LoadedState(Number(proxy+8))&&Pointer(proxy+16)==entity;
 }
 // S_OK publishes a coherent census, even when no candidate exists. The borrowed
 // candidate is for immediate synchronous use only. No native pointer is cached.
@@ -53,7 +54,7 @@ inline HRESULT Read(bool enabled,const void*sharedKing,const void*engineBase,boo
             const BYTE*proxy=static_cast<const BYTE*>(Pointer(town+0x4f8));if(!proxy){++next.missingProxy;continue;}
             if(Pointer(proxy)!=town){++next.ownerMismatch;continue;}
             unsigned state=Number(proxy+8);if(state<4)++next.state[state];else ++next.otherState;
-            if(state!=3)continue;
+            if(!LoadedState(state))continue;
             const void*entity=Pointer(proxy+16);if(!entity){++next.nullEntity;continue;}
             ++next.candidates;if(!chosen){chosen=town;chosenProxy=proxy;chosenEntity=entity;}
         }

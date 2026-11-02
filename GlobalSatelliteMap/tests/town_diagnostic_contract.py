@@ -33,6 +33,8 @@ env = os.environ.copy()
 env['INCLUDE'] = str(vc/'include')+';'+str(sdk/'Include')
 env['LIB'] = str(vc/'lib/amd64')+';'+str(sdk/'Lib/x64')
 mutations = [
+    ('reject-completed-state2', 'return state==2||state==3;', 'return state==3;'),
+    ('accept-pending-state1', 'return state==2||state==3;', 'return state>=1&&state<=3;'),
     ('query-off', 'if(!enabled)return S_FALSE;', ''),
     ('query-unverified', 'if(!sourceVerified)return E_ACCESSDENIED;', ''),
     ('capacity4097', 'Limit=4096', 'Limit=4097'),

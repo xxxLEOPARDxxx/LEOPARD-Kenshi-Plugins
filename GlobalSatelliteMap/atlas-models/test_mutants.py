@@ -4,6 +4,8 @@ import os, subprocess, json
 HERE=Path(__file__).resolve().parent;OUT=HERE/'_generated'
 CL=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/bin/amd64/cl.exe')
 CASES=[
+ ('reject-completed-state2','ModelAdmission.h','state!=2&&state!=3','state!=3','admission'),
+ ('accept-pending-state1','ModelAdmission.h','state!=2&&state!=3','state!=1&&state!=2&&state!=3','admission'),
  ('index-start','AtlasModel.h','d.shape.indexCount,d.shape.indexStart,INT(d.shape.vertexStart)','d.shape.indexCount,0,INT(d.shape.vertexStart)','warp'),
  ('base-vertex','AtlasModel.h','INT(d.shape.vertexStart)','0','warp'),
  ('matrix-transpose','ModelPolicy.h','out[c*4+r]=q;','out[r*4+c]=q;','warp'),

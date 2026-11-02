@@ -13,7 +13,7 @@ struct Header {const void*proxy;const void*entity;float town[3];};
 inline bool HeaderRead(const void*town,Header&out){
     __try{
         if(!town)return false;const BYTE*t=static_cast<const BYTE*>(town);const BYTE*p=*reinterpret_cast<const BYTE*const*>(t+0x4f8);
-        if(!p||*reinterpret_cast<const void*const*>(p)!=town||*reinterpret_cast<const unsigned*>(p+8)!=3)return false;
+        if(!p||*reinterpret_cast<const void*const*>(p)!=town)return false;const unsigned state=*reinterpret_cast<const unsigned*>(p+8);if(state!=2&&state!=3)return false;
         const void*entity=*reinterpret_cast<const void*const*>(p+16);if(!entity)return false;
         out.proxy=p;out.entity=entity;std::memcpy(out.town,t+0x48,12);return _finite(out.town[0])&&_finite(out.town[1])&&_finite(out.town[2]);
     }__except(NativeLocalLights::NativeFault(GetExceptionCode())){return false;}
@@ -43,7 +43,7 @@ public:
         if(!sourceVerified)return Fail(out,E_ACCESSDENIED,"origin proof source profile not verified");
         if(!scene||!camera||!NativeLocalLights::Generation(liveGeneration,generation)||!Current(scene,camera))return Fail(out,E_ABORT,"origin proof current scene/camera/generation differs");
         try{
-            Initialize(generation);Header first;if(!HeaderRead(town,first))return Fail(out,S_FALSE,"existing state3 native proxy unavailable");
+            Initialize(generation);Header first;if(!HeaderRead(town,first))return Fail(out,S_FALSE,"existing state2/3 native proxy unavailable");
             if(Pointer(manager_,first.entity)!=scene)return Fail(out,E_ABORT,"origin proof proxy belongs to another scene");const void*node=Pointer(parent_,first.entity);if(!node)return Fail(out,E_ABORT,"origin proof proxy node missing");
             Values v;v.generation=generation;std::memcpy(v.townStored,first.town,12);v.townYWouldRefresh=first.town[1]<=1;
             if(!Vector(origin_,scene,v.sceneOrigin)||!Camera(camera_,camera,v.cameraDerived)||!Vector(local_,node,v.proxyNodeLocal)||!Vector(position_,node,v.proxyNodeDerived))return Fail(out,E_FAIL,"origin proof scalar getter failed");

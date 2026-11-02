@@ -28,7 +28,7 @@ static LONG CALLBACK ChangeDuringRead(EXCEPTION_POINTERS*e){
     if(kind==5)PutPointer(mutationProxy,16,NULL);
     if(kind==6)PutPointer(mutationTown,0x4f8,NULL);
     if(kind==7)PutPointer(mutationTown,0,mutationEngine+0x1733fa8);
-    if(kind==8){unsigned s=2;std::memcpy(mutationProxy+8,&s,4);}
+    if(kind==8){unsigned s=1;std::memcpy(mutationProxy+8,&s,4);}
     return EXCEPTION_CONTINUE_EXECUTION;
 }
 int main(){try{
@@ -46,6 +46,8 @@ int main(){try{
     Check(GsmTownDiagnostic::Read(false,reinterpret_cast<void*>(1),reinterpret_cast<void*>(1),false,stats,candidate)==S_FALSE&&!candidate&&!stats.total,"OFF no native queries");
     Check(GsmTownDiagnostic::Read(true,reinterpret_cast<void*>(1),reinterpret_cast<void*>(1),false,stats,candidate)==E_ACCESSDENIED&&!candidate&&!stats.total,"unverified source no native queries");
     Check(GsmTownDiagnostic::Read(true,king,engine,true,stats,candidate)==S_OK&&candidate==town&&stats.total==1&&stats.primary==1&&stats.state[3]==1&&stats.candidates==1,"actual owned state3 census and first candidate");
+    state=2;std::memcpy(proxy+8,&state,4);Check(GsmTownDiagnostic::Read(true,king,engine,true,stats,candidate)==S_OK&&candidate==town&&stats.state[2]==1&&stats.candidates==1,"completed cache state2 is an existing candidate");
+    state=1;std::memcpy(proxy+8,&state,4);Check(GsmTownDiagnostic::Read(true,king,engine,true,stats,candidate)==S_OK&&!candidate&&!stats.candidates&&stats.state[1]==1,"pending state1 never becomes candidate");state=3;std::memcpy(proxy+8,&state,4);
     BYTE towns[11][0x500]={0},proxies[11][24]={0};
     for(unsigned i=0;i<11;++i){array[i]=towns[i];PutPointer(towns[i],0,engine+0x1734c08);PutPointer(towns[i],0x4f8,proxies[i]);PutPointer(proxies[i],0,towns[i]);PutPointer(proxies[i],16,reinterpret_cast<void*>(99));}
     array[0]=NULL;PutPointer(towns[1],0,engine+0x1733fa8);PutPointer(towns[1],0x4f8,reinterpret_cast<void*>(1));PutPointer(towns[2],0x4f8,NULL);PutPointer(proxies[3],0,town);
@@ -54,7 +56,7 @@ int main(){try{
     Check(stats.total==11&&stats.primary==9&&stats.nullTown==1&&stats.otherType==1,"only exact primary Town vtable admitted");
     Check(stats.missingProxy==1&&stats.ownerMismatch==1,"missing proxy and wrong owner counted separately");
     Check(stats.state[0]==1&&stats.state[1]==1&&stats.state[2]==1&&stats.state[3]==3&&stats.otherState==1,"native states counted without clamping");
-    Check(stats.nullEntity==1&&stats.candidates==2&&candidate==towns[9],"state3 null entity unavailable and first valid candidate retained");
+    Check(stats.nullEntity==1&&stats.candidates==3&&candidate==towns[6],"loaded state2or3 candidates preserve first valid entry");
     for(unsigned i=0;i<4096;++i)array[i]=town;PutCount(list,4096);
     Check(GsmTownDiagnostic::Read(true,king,engine,true,stats,candidate)==S_OK&&stats.total==4096&&stats.candidates==4096&&candidate==town,"maximum4096 actual pointers copied and examined");
     PutCount(list,4097);PutPointer(list,0x60,bad);

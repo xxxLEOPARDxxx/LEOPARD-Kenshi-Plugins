@@ -27,7 +27,7 @@ class Snapshot {
     void Error(const char*s){size_t i=0;if(s)for(;i<255&&s[i];++i)error_[i]=s[i];error_[i]=0;}
     void Current(){
         Profile();if(!au||!au->render||!scene_||au->render->scene!=scene_||!town_)throw std::runtime_error("model current world/scene unavailable");
-        void*raw=NULL;if(!OwnerEntity(town_,raw))throw std::runtime_error("existing DistantTown state3 Entity unavailable");HMODULE ogre=GetModuleHandleA(GsmOgreFile);if(!Typed(raw,ogre,ModelEntityVtable))throw std::runtime_error("model Entity type differs");
+        void*raw=NULL;if(!OwnerEntity(town_,raw))throw std::runtime_error("existing DistantTown state2/3 Entity unavailable");HMODULE ogre=GetModuleHandleA(GsmOgreFile);if(!Typed(raw,ogre,ModelEntityVtable))throw std::runtime_error("model Entity type differs");
         Ogre::Entity*e=static_cast<Ogre::Entity*>(raw);if(Get<Ogre::SceneManager*>(e,"?_getManager@MovableObject")!=scene_)throw std::runtime_error("model Entity scene creator differs");
         typedef const void*(__fastcall*Collection)(const Ogre::SceneManager*,const Ogre::String&);Ogre::String type("Entity");const void*collection=reinterpret_cast<Collection>(Pin("?getMovableObjectCollection@SceneManager@Ogre@@IEB"))(scene_,type);if(!Registered(collection,e))throw std::runtime_error("model Entity is not currently registered");
         Ogre::SceneNode*node=Get<Ogre::SceneNode*>(e,"?getParentSceneNode@MovableObject");if(!Typed(node,ogre,ModelSceneNodeVtable)||Get<Ogre::SceneManager*>(node,"?getCreator@SceneNode")!=scene_)throw std::runtime_error("model parent SceneNode type/creator differs");
