@@ -8,7 +8,11 @@ Terrain capture is reused: zooming, sunlight and lamps do not recapture the worl
 MCM: Satellite view, Sunlight, Sky and ambient light, Water, Torches and lamps,
 Existing city models, Detailed log. Main view and optional layers default OFF;
 sun/ambient default ON. Detailed log is last and defaults OFF. Errors always log.
-No restart is required for these settings.
+No restart is required for these settings. Maximum map zoom is an optional1..8
+multiplier, default1, active with satellite view;2shows native terrain pixels at
+1:1 in the tested interface. Higher values enlarge the captured pixels. Normal
+input and marker thresholds stay native; reducing the limit recentres/clamps
+through the native zoom method. The original maximum is restored on disable.
 
 Current renderer: geographic terrain materials, current native sun/ambient/HDR
 exposure, optional distant water, native point/spot lights in loaded areas.
@@ -52,6 +56,11 @@ RU
 существующие модели городов, подробный журнал. Основной слой и дополнительные
 слои по умолчанию выключены, солнце и фоновый свет включены. Подробный журнал
 последний и выключен; ошибки видны всегда. Перезапуск для этих настроек не нужен.
+Добавлен множитель максимального зума1..8, по умолчанию1, для спутникового вида.
+В проверяемом интерфейсе2позволяет показывать пиксели рельефа1:1. Большие значения
+увеличивают сами пиксели снимка. Штатные ввод и метки сохраняются; при уменьшении
+предела масштаб и центр обновляются штатным способом. Отключение возвращает
+прежний предел.
 
 Реализованы географические материалы рельефа, текущее солнце и фоновый свет,
 экспозиция, необязательная вода и реальные источники света загруженных областей.

@@ -77,6 +77,14 @@ for relative, expected in (
  lines += ['{'+json.dumps(relative)+','+json.dumps(expected)+'},']
 lines += ['};']
 (out/'GsmNativeProfile.h').write_text('\n'.join(lines)+'\n')
+engine=PE(game_root/'RE_Kenshi/Kenshi_x64.exe')
+assert hashlib.sha256(engine.data).hexdigest()=='504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e'
+zoom=['#pragma once','static const DWORD GsmZoomInRva=0x48bb50;','static const GsmCodeWindow GsmZoomWindows[]={']
+for rva in (0x490328,0x490332,0x490347,0x490367,0x49037f,0x48bb50,0x48bb65,0x48bc90,0x48ba7c,0x4907e0,0x49080c,0x4908fc,0x48d246):
+ code=engine.data[engine.offset(rva):engine.offset(rva)+24]
+ zoom+=['{0x'+format(rva,'x')+',{'+','.join('0x'+format(b,'02x') for b in code)+'}},']
+zoom+=['};']
+(out/'GsmZoomProfile.h').write_text('\n'.join(zoom)+'\n')
 game=Path('D:/SteamLibrary/steamapps/common/Kenshi/data/materials')
 fxc=Path('C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe')
 subprocess.run([str(fxc),'/nologo','/T','cs_5_0','/E','main','/O3','/Gec','/D','DX11=1','/I',str(game/'common'),'/I',str(game/'post'),'/Fo'+str(out/'GsmRelight.cso'),str(here/'atlas-view/AtlasRelight.hlsl')],check=True)

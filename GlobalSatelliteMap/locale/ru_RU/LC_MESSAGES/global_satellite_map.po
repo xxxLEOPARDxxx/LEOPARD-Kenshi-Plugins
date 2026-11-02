@@ -66,3 +66,9 @@ msgstr "Показывать существующие статичные дал�
 
 msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."
 msgstr "Экспериментальная спутниковая карта с текущим солнечным и фоновым светом, водой и освещением загруженных областей. Модели городов пока экспериментальные."
+
+msgid "Maximum map zoom, multiplier"
+msgstr "Максимальный зум, множитель"
+
+msgid "Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."
+msgstr "Увеличивает предел приближения при включённом спутниковом виде. 1 возвращает обычный предел. Увеличение не добавляет рельефу деталей сверх разрешения снимков."

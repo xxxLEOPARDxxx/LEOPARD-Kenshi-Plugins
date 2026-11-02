@@ -66,3 +66,9 @@ msgstr "显示现有的静态远景城镇模型。此开发选项暂不包含已
 
 msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."
 msgstr "开发中的地形视图，使用当前阳光和环境光，可选水面及已加载区域的灯光。城镇模型仍处于实验阶段。"
+
+msgid "Maximum map zoom, multiplier"
+msgstr "最大地图缩放倍数"
+
+msgid "Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."
+msgstr "启用卫星视图时提高最大放大倍数。1恢复正常上限。进一步放大不会增加超出地形截图分辨率的细节。"

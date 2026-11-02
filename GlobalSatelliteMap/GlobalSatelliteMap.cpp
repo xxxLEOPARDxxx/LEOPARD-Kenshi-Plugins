@@ -50,12 +50,15 @@
 #include "GsmModelCache.h"
 #include "atlas-models/surface/AtlasModelSurface.h"
 #include "atlas-models/decode/_generated/ModelDecodeShader.h"
+#include "GsmZoomPolicy.h"
+#include "build/GsmZoomProfile.h"
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace {
 const char*const ID="GlobalSatelliteMap";
 const char*const Group="LEOPARD_GlobalSatelliteMap_Development";
+int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;bool zoomFailed=false;
 bool enabled=false,debug=false,sunlight=true,ambient=true,attempted=false,ready=false,failed=false,groupCreated=false,hookFailure=false,jobQuarantined=false;
 LONG observedGeneration=-1;DWORD statusUntil=0;GsmViewer::TickClock tickClock;GsmViewer::LightClock lightClock;
 unsigned serial=0,lightVersion=0,shadeCursor=0,cacheAge=0;
@@ -118,7 +121,9 @@ std::string Ini(){char p[MAX_PATH]={0};DWORD n=GetModuleFileNameA(reinterpret_ca
 void Settings(){
     std::string ini=Ini();bool on=!hookFailure&&GetPrivateProfileIntA(ID,"Enabled",0,ini.c_str())!=0;
     bool s=GetPrivateProfileIntA(ID,"Sunlight",1,ini.c_str())!=0,a=GetPrivateProfileIntA(ID,"AmbientLight",1,ini.c_str())!=0;
-    if(on!=enabled){enabled=on;InterlockedIncrement(&GSM::generation);}
+    if(on!=enabled){enabled=on;InterlockedIncrement(&GSM::generation);zoomLease.AllowRequest();zoomFailed=false;}
+    int factor=GetPrivateProfileIntA(ID,"ZoomMultiplier",1,ini.c_str());factor=(std::max)(1,(std::min)(8,factor));
+    if(factor!=zoomMultiplier){zoomMultiplier=factor;zoomLease.AllowRequest();zoomFailed=false;}
     if(s!=sunlight||a!=ambient){sunlight=s;ambient=a;lightClock.Reset();haveLighting=false;waterClock.Reset();}
     bool w=GetPrivateProfileIntA(ID,"Water",0,ini.c_str())!=0;
     if(w!=waterOption){waterOption=w;waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=false;waterClock.Reset();if(waterFailed){waterAttempted=false;manifest.waterVerified=false;}waterFailed=false;}
@@ -540,8 +545,37 @@ void Draw(MapScreen*map,DWORD now){
     }
 }
 void Tick(MapScreen*map){LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined)StartValidation();if(!ready)return;Draw(map,now);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
-void UpdateHook(MapScreen*map){originalUpdate(map);try{Tick(map);}catch(const std::exception&e){Fail(map,e.what());}catch(...){Fail(map,"terrain overlay failed; normal map retained");}}
+bool ZoomNativeProfile(){
+    static int checked=0;if(checked)return checked>0;checked=-1;
+    if(!GsmNative::Engine())return false;
+    __try{const BYTE*engine=reinterpret_cast<const BYTE*>(GetModuleHandleA(NULL));for(unsigned i=0;i<sizeof(GsmZoomWindows)/sizeof(GsmZoomWindows[0]);++i)if(std::memcmp(engine+GsmZoomWindows[i].rva,GsmZoomWindows[i].code,24))return false;checked=1;return true;}
+    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+}
+typedef char ZoomFieldLayout[(offsetof(MapScreen,zoomValueBase)==0x3c&&offsetof(MapScreen,zoomValueMax)==0x40&&offsetof(MapScreen,zoomValueCurrent)==0x44&&offsetof(MapScreen,zoomLevels)==0x80)?1:-1];
+void ApplyZoomLimit(MapScreen*map){
+    if((!enabled||zoomMultiplier==1)&&!zoomLease.Owned())return;
+    if(!map||!map->mainWidget||!map->mapImage||!map->mapScrollView||!map->getVisible())return;
+    // Native clear/zoom input updates scalar zoom before resizing the widget.
+    // Let originalUpdate consume that dirty state before inferring canvas size.
+    if(map->zoomUpdated)return;
+    if(zoomOwner.get()!=map->mainWidget){zoomOwner.set(map->mainWidget);zoomLease.Reset();zoomFailed=false;if(zoomOwner.get()!=map->mainWidget)return;}
+    if(zoomFailed)return;
+    if(!ZoomNativeProfile()){zoomFailed=true;ErrorLog("GlobalSatelliteMap: map zoom native profile differs; extension inactive");return;}
+    const GsmZoom::Lease before=zoomLease;
+    GsmZoom::Action action;GsmZoom::Result result=zoomLease.Plan(enabled,zoomMultiplier,map->zoomValueBase,map->zoomLevels[2],map->zoomValueMax,map->zoomValueCurrent,map->mapImage->getWidth(),map->mapImage->getHeight(),action);
+    if(result==GsmZoom::Refused){zoomFailed=true;ErrorLog("GlobalSatelliteMap: map zoom geometry refused; native values retained");return;}
+    if(result==GsmZoom::ForeignChange){Diagnostic("map zoom maximum changed by another owner; further override suspended until settings change");return;}
+    if(result!=GsmZoom::Apply)return;
+    const float oldMaximum=map->zoomValueMax,oldCurrent=map->zoomValueCurrent;const Ogre::Vector4 oldCenter=map->zoomCenterOffset;const bool oldDirty=map->zoomUpdated;
+    map->zoomValueMax=action.maximum;
+    // This audited native method ignores sender, clamps through zoomValueMax
+    // and rebuilds the viewport-centre anchor. It does not inject input.
+    try{if(action.clamp){typedef void(__fastcall*Clamp)(MapScreen*,MyGUI::Widget*);reinterpret_cast<Clamp>(reinterpret_cast<BYTE*>(GetModuleHandleA(NULL))+GsmZoomInRva)(map,NULL);}}
+    catch(...){map->zoomValueMax=oldMaximum;map->zoomValueCurrent=oldCurrent;map->zoomCenterOffset=oldCenter;map->zoomUpdated=oldDirty;zoomLease=before;throw;}
+    std::ostringstream s;s<<"map maximum zoom="<<action.maximum<<" multiplier="<<(enabled?zoomMultiplier:1);Diagnostic(s.str());
+}
+void UpdateHook(MapScreen*map){try{ApplyZoomLimit(map);}catch(...){zoomFailed=true;ErrorLog("GlobalSatelliteMap: zoom extension failed; further changes suspended");}originalUpdate(map);try{Tick(map);}catch(const std::exception&e){Fail(map,e.what());}catch(...){Fail(map,"terrain overlay failed; normal map retained");}}
 void LoadHook(SaveFileSystem*self,const std::string&path){InterlockedIncrement(&GSM::generation);originalLoad(self,path);}void NewHook(SaveFileSystem*self){InterlockedIncrement(&GSM::generation);originalNew(self);}
 }
-extern "C" __declspec(dllexport)void MCM_Describe(MCM_Api*api){static std::string ini=Ini();api->beginMod(api,ID,"Global Satellite Map (development)",ini.c_str(),&Settings);if(api->version>=2){std::string info=Tr("Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental.");if(api->version<4){info+="\n";info+=DiskWarningText();}api->info(api,info.c_str());}if(api->version>=4&&api->customArea)api->customArea(api,&AttachDiskWarning,&DetachDiskWarning,NULL,15);api->section(api,Tr("Global map"));api->toggle(api,ID,"Enabled",Tr("Satellite view"),Tr("Show prepared satellite terrain on the global map. The minimap keeps its existing map source."),0,0);api->toggle(api,ID,"Sunlight",Tr("Sunlight"),Tr("Use the current sun direction and brightness."),1,0);api->toggle(api,ID,"AmbientLight",Tr("Sky and ambient light"),Tr("Use the current sky and ambient illumination."),1,0);api->toggle(api,ID,"Water",Tr("Water"),Tr("Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."),0,0);api->toggle(api,ID,"LocalLights",Tr("Torches and lamps"),Tr("Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."),0,0);api->toggle(api,ID,"CityModels",Tr("Existing city models"),Tr("Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."),0,0);api->section(api,Tr("Diagnostics"));api->toggle(api,ID,"Debug",Tr("Detailed log"),Tr("Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."),0,0);}
+extern "C" __declspec(dllexport)void MCM_Describe(MCM_Api*api){static std::string ini=Ini();api->beginMod(api,ID,"Global Satellite Map (development)",ini.c_str(),&Settings);if(api->version>=2){std::string info=Tr("Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental.");if(api->version<4){info+="\n";info+=DiskWarningText();}api->info(api,info.c_str());}if(api->version>=4&&api->customArea)api->customArea(api,&AttachDiskWarning,&DetachDiskWarning,NULL,15);api->section(api,Tr("Global map"));api->toggle(api,ID,"Enabled",Tr("Satellite view"),Tr("Show prepared satellite terrain on the global map. The minimap keeps its existing map source."),0,0);api->toggle(api,ID,"Sunlight",Tr("Sunlight"),Tr("Use the current sun direction and brightness."),1,0);api->toggle(api,ID,"AmbientLight",Tr("Sky and ambient light"),Tr("Use the current sky and ambient illumination."),1,0);api->toggle(api,ID,"Water",Tr("Water"),Tr("Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."),0,0);api->toggle(api,ID,"LocalLights",Tr("Torches and lamps"),Tr("Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."),0,0);api->toggle(api,ID,"CityModels",Tr("Existing city models"),Tr("Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."),0,0);api->integer(api,ID,"ZoomMultiplier",Tr("Maximum map zoom, multiplier"),Tr("Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."),1,1,8,0);api->section(api,Tr("Diagnostics"));api->toggle(api,ID,"Debug",Tr("Detailed log"),Tr("Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."),0,0);}
 __declspec(dllexport)void startPlugin(){Settings();if(!GsmNative::Engine()){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: exact engine profile unavailable; inert");return;}if(KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),LoadHook,&originalLoad)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),NewHook,&originalNew)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&MapScreen::update),UpdateHook,&originalUpdate)){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: required hooks unavailable; terrain overlay disabled");}}

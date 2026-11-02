@@ -20,11 +20,13 @@ def run():
  code=r'''
 #include "GsmAtlasManifest.h"
 #include "GsmViewerClock.h"
+#include "GsmZoomPolicy.h"
 #include "atlas-water/AtlasWater.h"
 #include <cstdio>
 #include <new>
 static unsigned checks=0,errors=0,terrainFailures=0,waterRenders[AtlasView::WindowSlots]={0},terrainRenders[AtlasView::WindowSlots]={0};
 static const char*ID="GlobalSatelliteMap";
+static GsmZoom::Lease zoomLease;static bool zoomFailed=false;static int zoomMultiplier=1;
 static void Check(bool x,const char*s){++checks;if(!x){std::fprintf(stderr,"FAIL %s\n",s);throw 1;}}
 namespace GSM {volatile LONG generation=7;}
 namespace GsmAtlas {struct Job{HANDLE thread;LONG generation;bool waterValidation,modelValidation,validation,ok;char error[512];Manifest manifest;AtlasView::ReadRequest read;Job():thread(reinterpret_cast<HANDLE>(1)),generation(7),waterValidation(false),modelValidation(false),validation(false),ok(false){std::strcpy(error,"fixture source error");}};}
