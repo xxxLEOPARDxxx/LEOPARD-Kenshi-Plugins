@@ -27,12 +27,19 @@ not a public release announcement. Latest instructions override historical notes
    player reports separate from verified causes; inspect native streaming/spawn
    readiness, routing and build gates. Research: `research/keo-audit-20261102`.
    New user request explicitly authorizes
-   a fork under MCM, bug fixes and improvements. This supersedes the historical
+   a fork under MCM, bug fixes and compatibility. This supersedes the historical
    local-only KEO intent. Before implementation read current upstream source,
    license and player reports/issues; record actionable reports and reproduction
    cases. Fix verified causes with performance/lifecycle review and game checks.
    Do not claim every unknown report fixed merely because it was read. Apply
    normal three-language, debug-last, release/credit and Nexus→Steam rules.
+   User clarification2026-11-02: this is a temporary maintenance fork, not an
+   independent development project. At release explicitly explain in EN/RU that
+   the fork is a necessary interim measure to fix bugs and let more players try
+   KEO. If the original author returns and continues development, withdraw our
+   version to avoid confusing players. Do not promise new independent features.
+   Preserve original authorship, license and source links; no withdrawal or
+   publication is authorized merely by recording this future release policy.
 3. **Dynamic Factions — PAUSED by user.** Preserve current work and plans;
    resume when requested, after the satellite priority. No publication.
 4. **Save screenshot previews — IMPLEMENTED/USER ACCEPTED2026-11-01.** Capture the
