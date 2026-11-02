@@ -1,0 +1,35 @@
+{
+  "scope": "Optional isolated native distant-water helper; no installed/existing files changed; live integration pending",
+  "results": {
+    "sourceTests": 2,
+    "policyChecks": 11,
+    "warpChecks": 163,
+    "compiledFunctionalMutantsRejected": 8,
+    "maximumAbsoluteNativeHdrDelta": 0.0009765625,
+    "absoluteDeltaLimit": 0.001,
+    "offline504bWaterAudit": "PASS"
+  },
+  "review": {
+    "status": "CLEAR within source/offline WARP scope",
+    "report": "D:/DEV/Kenshi/research/atlas-water-review-20261102/report.md",
+    "reportSha256": "ae0771110eaa96ddd13c34d7122e489cff135ecdcd0fc0f6d912298207d92d8c"
+  },
+  "files": {
+    ".gitignore": "5db0aced9132d0bfd3f66b534f57db5da873cde09985ec2a2a2a1cd6ee492718",
+    "AtlasWater.h": "9d480011856d9b79a4694621a2ea7c8f1069e5565b7674020132af6632516836",
+    "AtlasWater.hlsl": "5fd5e44c80409955ee8300719fac229af24802527937e6231b3292095e93aec6",
+    "audit_native.py": "2faffa1ab990032b81d0e5aff23933d5bc568d16f2e14c71cacce735628dc33d",
+    "generate_water.py": "21f727a86542ad76dc01b948de6779d3b1c3ef19acc007c19ab855182906c580",
+    "policy_tests.cpp": "7e9648fd14bb3afe0c8417c80fa8367e379c92e3967d323a8713c70cbaefa15b",
+    "README.md": "34c0087808916903c80ca4237577c1f47dbeac3f9d59406f3665df41e368d756",
+    "ReferenceTerrainPS.hlsl": "2ddbe713ef48c2dc37069e8574489b7c751ada6d41d94e8dd3e25421b559b374",
+    "ReferenceVS.hlsl": "9aa07b27786aa5b28f75dc6de42d593a1c5a00f755a61d3dc49c7b5add9c4e5e",
+    "run_tests.ps1": "d5b10ff064ae83f8d8fb13173077e089ac431989181482e45134d461ad2f811c",
+    "test_mutations.py": "0b732b3f3c958e5f62c3997010b6cf3849476219ed984cd7a5aa769c2033f1d9",
+    "test_sources.py": "8cf55a068e8e7298a8d667c7aa036e19995c4bf40acc74f1dc7258f1084e5f7c",
+    "verify_shaders.py": "01ee59f4fdc54645e134361366fb6f087172ea68268be85a25ccef72f276e641",
+    "warp_tests.cpp": "f8372721bd332d5264991d07484d51efa5ba4893072234596da3c113ce76a5cd",
+    "WaterUniforms.hlsl": "60a81bdb46bdb5ac512b4aac61a7f212f3e351a7c36a36d087fce4f5935dc9bb"
+  },
+  "bytecodeSha256": "9c5b41477ec29d1663dc58fb1242e09ac80f1b7209d90ce1f3055328be13b5d3"
+}
