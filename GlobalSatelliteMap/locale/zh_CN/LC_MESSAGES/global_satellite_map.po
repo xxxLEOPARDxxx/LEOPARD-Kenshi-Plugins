@@ -7,8 +7,8 @@ msgstr ""
 msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
 msgstr "卫星地形不可用。缺少预先准备的地形数据，或数据与当前游戏不匹配。普通地图仍然可见。"
 
-msgid "Development terrain view with current sunlight, sky lighting and optional water. Buildings and local lights are not included."
-msgstr "开发中的地形视图，使用当前太阳光、天空光和可选水面。尚不包含建筑及局部光源。"
+msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. Buildings are not included yet."
+msgstr "开发中的地形视图，可使用当前太阳、天空光照，并可选水面和已加载区域的灯光。暂不包含建筑。"
 
 msgid "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
 msgstr "注意：生成 4x4 块 8192x8192 图块需要至少 24 GB 可用磁盘空间。\n未压缩的地形数据约占 23 GB。"
@@ -51,3 +51,9 @@ msgstr "水面"
 
 msgid "Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."
 msgstr "使用当前海平面和光照显示水面。若水面资源不可用，仍显示地形。"
+
+msgid "Torches and lamps"
+msgstr "火把和灯具"
+
+msgid "Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."
+msgstr "使用已加载区域中现有的点光源和聚光灯照亮地形。不会为未加载的区域虚构灯光。"

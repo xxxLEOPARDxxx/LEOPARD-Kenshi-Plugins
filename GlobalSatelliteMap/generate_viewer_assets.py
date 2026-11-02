@@ -78,3 +78,11 @@ print('GSM native profile and shader generated; source manifest',sha)
 sys.path.insert(0,str(here/'atlas-water'))
 from generate_pipeline import generate as generate_water_pipeline
 generate_water_pipeline()
+local=here/'atlas-lights/terrain-hdr'
+subprocess.run([sys.executable,str(local/'generate_shader.py')],check=True)
+subprocess.run([str(fxc),'/nologo','/T','cs_5_0','/E','main','/O3','/Gec','/Fo'+str(out/'GsmLocal.cso'),str(local/'_generated/LocalLights.generated.hlsl')],check=True)
+code=(out/'GsmLocal.cso').read_bytes()
+(out/'GsmLocalShader.h').write_text('static const unsigned char GsmLocalShader[]={\n'+',\n'.join(','.join(str(b) for b in code[i:i+24]) for i in range(0,len(code),24))+'\n};\n')
+
+subprocess.run([sys.executable,str(here/"atlas-models/generate_models.py")],check=True)
+subprocess.run([sys.executable,str(here/"atlas-models/loaded-census/generate_profile.py")],check=True)

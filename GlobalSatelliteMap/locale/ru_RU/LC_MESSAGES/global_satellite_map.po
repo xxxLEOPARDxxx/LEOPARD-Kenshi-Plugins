@@ -7,8 +7,8 @@ msgstr ""
 msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
 msgstr "Спутниковый рельеф недоступен. Подготовленные данные отсутствуют или не соответствуют этой сборке игры. Обычная карта остаётся видимой."
 
-msgid "Development terrain view with current sunlight, sky lighting and optional water. Buildings and local lights are not included."
-msgstr "Разрабатываемый вид рельефа с текущим солнечным светом, светом неба и водой по выбору. Здания и местные источники света пока не включены."
+msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. Buildings are not included yet."
+msgstr "Разрабатываемый вид рельефа с текущим солнечным светом, светом неба, водой и освещением загруженных областей по выбору. Здания пока не включены."
 
 msgid "WARNING: Before rendering 4x4 tiles at 8192x8192, allow at least 24 GB free.\nUncompressed terrain data: about 23 GB."
 msgstr "ВНИМАНИЕ: Перед рендером 4x4 плиток по 8192x8192 нужно не менее 24 ГБ свободного места.\nНесжатые данные рельефа: около 23 ГБ."
@@ -51,3 +51,9 @@ msgstr "Вода"
 
 msgid "Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."
 msgstr "Показывать воду с текущим уровнем моря и освещением. Если её ресурсы недоступны, рельеф остаётся видимым."
+
+msgid "Torches and lamps"
+msgstr "Факелы и фонари"
+
+msgid "Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."
+msgstr "Освещать рельеф существующими точечными источниками света и прожекторами в загруженных областях. Для непрогруженных областей свет не выдумывается."

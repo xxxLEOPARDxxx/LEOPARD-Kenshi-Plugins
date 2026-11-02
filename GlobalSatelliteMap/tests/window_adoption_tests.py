@@ -13,8 +13,9 @@ def fun(marker):
    depth-=1
    if not depth:return source[a:p+1]
  raise ValueError(marker)
-draw=source.index('void Draw(');a=source.index('    if(completed){',draw);b=source.index('    Lighting(now);',a)
-adopt=source[a:b]
+draw=source.index('void Draw(')
+assert source.index('    if(completed){') > draw
+adopt=fun('    if(completed){')
 a=source.index('bool current=j->generation==');b=source.index(';',a)+1
 guard=source[a:b]
 cpp=r'''

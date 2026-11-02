@@ -7,7 +7,7 @@ base = Path(__file__).resolve().parents[1]
 out = base / 'build/diagnostic-guard-review'
 out.mkdir(exist_ok=True)
 main = (base / 'GlobalSatelliteMap.cpp').read_text()
-guards = main[main.index('bool DiagnosticScene('):main.index('void LocalDiagnostic(')]
+guards = main[main.index('bool DiagnosticScene('):main.index('bool DiagnosticTownPosition(')]
 local = main[main.index('void LocalDiagnostic('):main.index('void OriginDiagnostic(')]
 origin = (base / 'atlas-lights/OriginProof.h').read_text()
 shared = origin[origin.index('inline void SharedImpl('):origin.index('class Reader {')]
@@ -49,6 +49,15 @@ static bool debug=false,ready=true,localDiagnosticLogged=false;
 static DWORD localDiagnosticAt=0;static LONG observedGeneration=1;
 static struct {float referenceSide[4],worldOffset[4];}lighting={};
 static GsmLocalDiagnostic::Bridge<NativeLocalLights::NativeSnapshot>localDiagnostic;
+// Unused local-render integration seams; this fixture exercises diagnostic
+// guards with the optional layer OFF, without replacing the actual caller.
+namespace AtlasLocalLights {struct ProvenMapping{};}
+namespace AtlasView {const unsigned WindowSlots=1;}
+static bool localOption=false,localFailed=false,localLayerReady=false,originDiagnosticLogged=false;
+static const void*localProofScene=NULL;static AtlasLocalLights::ProvenMapping localMapping;
+static struct {void Clear(){}}localLayer;
+static struct {bool Observe(const NativeLocalLights::NativeSnapshot&,LONG){return false;}}localRevision;
+static struct {unsigned localStamp,localChecked;}cache[1];static unsigned localVersion=1;
 static void ErrorLog(const std::string&){++errors;}
 static void Diagnostic(const std::string&){++logs;}
 '''
