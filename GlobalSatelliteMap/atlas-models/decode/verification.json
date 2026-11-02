@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-02",
+  "status": "independent offline review CLEAR",
+  "warpChecks": 360471,
+  "compiledFunctionalMutants": 9,
+  "completeAdapterCompile": "PASS not invoked",
+  "privatePayloadBytes": 1048640,
+  "gpuCap": "AtlasView::GpuCap",
+  "maxTestedRadialYError": 6.103515625e-05,
+  "cameras": [
+    32,
+    1024,
+    16384
+  ],
+  "runtimeAccepted": false,
+  "files": {
+    "AtlasModelDecode.h": "c941b7c589e82aa7917c001aaae3770537fa3495bd6a4221f8fde65e33653a5e",
+    "compile_adapter.cpp": "e5a09a7616d3940a986ff869217f306133d55cd5c90c029a1df996560648498c",
+    "generate_shader.py": "dae8184c516d7e00228c96924894901e0a1a48b33928b60a3e75874e1d35bf5e",
+    "ModelDecode.hlsl": "4cdec16d309d1df70809523e32570d779eed307bdd9b10fb1b137bba3c0c020d",
+    "mutation_tests.py": "1e55b87812327d80ce70add7269786521fafa2de27032b2cb1437ff8153dbd61",
+    "plan.md": "68312143d5ce4758788aaa3cd17af58ac506acc8f4c1a0949372d04858a81ba9",
+    "README.md": "d0cab52eeaba3d4118085d9d077be6c911185546e338a8e5ea5123a155b7105b",
+    "run_tests.ps1": "160c22b0e04a91990c6a9daa82aa9c004a83b15da65b53237ae7e08e7aefa996",
+    "warp_tests.cpp": "2582461fe54828f29545b69eabba55631aa4de0ac0838cf3ba01df97298872e3"
+  },
+  "computeSha256": "23d75af996cbfa959571eeb75b986374d22ced7aab27909795cb3b3b060a5c20",
+  "obliqueNormalTolerance": "1UNORM after intended normalization",
+  "independentReviewReport": "D:/DEV/Kenshi/research/gsm-model-decode-review-20261102/report.md"
+}
