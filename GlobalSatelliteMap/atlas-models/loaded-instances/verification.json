@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-02",
+  "scope": "isolated native-source instanced building prototype; not wired or invoked in game",
+  "status": "offline tests PASS; independent review pending",
+  "production": {
+    "admission_tests.cpp": "dd21cfc23ab4db0243485d5a056e916e7746f2c53ecebfa464355e07f0ba3bd4",
+    "generate.py": "ea000588331ecdbd3dd4dca5b6d6f4f1e9dc0f76937f7216b0f81cb24ccf683b",
+    "InstanceAdmission.h": "20fa13ebcd4eaded0e8c7cd96265196b18696c6c76c86c981a4c254a39dcbf9c",
+    "InstancePolicy.h": "656546bd14032f9d3c35e2e35a03703927b7f32fc4d31932b0e9d8e772651023",
+    "InstanceRaster.h": "c61674322e97ff3c660480166ca274f5405fe4d968746efc33f1ea39f6eb3b5f",
+    "NativeInstances.h": "2ad6343db67badd8c9b4f7277f030ea5673cebb7c8f6b72f9fae4cfd77f7e666",
+    "native_compile.cpp": "74dcf72736879d266151776322343b31a56f73c5ce369e1a386cb38c48945d42",
+    "policy_tests.cpp": "14c80d997e9512b2a75158a99d3c806d026b51cf92722563deacdddb9cecd928",
+    "run_tests.ps1": "18f46b45b79fdb0595695a7d17d81c0fc9da3f96909f1cc21cd291d37bdea12e",
+    "run_tests.py": "57ef086d851c1dab0dc651cdb810c4e44d69b890de42ae26ab3dcd1678fd8748",
+    "test_mutants.py": "71e966c9fe25de5c3f781dd847d3cef6b9ac37d731eca6c12e6b9b4547ebcb46",
+    "test_native_extracted.py": "1a2284709d027ad2fe8c0c848eb2b57f8232e70f2c218cca12f708afbb9ca46a",
+    "warp_tests.cpp": "1de965fff9a8f5b2de79b8403956f6406ece2ac98c02c69c4a78c0827a6e4d12"
+  },
+  "results": {
+    "policy": 17,
+    "productionAdmissionRoute": 8,
+    "nativeSourceWarpChecks": 4718646,
+    "maxByteDelta": 0,
+    "maxRadialDepthDelta": 0,
+    "actualNativeExtractedControls": 116,
+    "compiledMutantsRejected": 41,
+    "nativeSdkCompile": "VC10 /O2 /GL; dynamic-input entrypoint; not invoked",
+    "nativeWindows24Bytes": 47,
+    "sourceAssets": 21
+  },
+  "shaders": [
+    {
+      "name": "InstanceVP80",
+      "defines": [
+        "INSTANCED"
+      ],
+      "bytes": 1888,
+      "sha256": "f525c5c53f7b7ad28e60317f5d5411a8db57b117b31ceef9be6ccf02de86308e"
+    },
+    {
+      "name": "InstanceVP83",
+      "defines": [
+        "COLOURING",
+        "INSTANCED"
+      ],
+      "bytes": 1988,
+      "sha256": "f8d083b1e5fddc822d6627687d1befacb69c39350b2ceb1ac3197b62fdc280b6"
+    },
+    {
+      "name": "InstanceFP43",
+      "defines": [
+        "DX11",
+        "DUST",
+        "DUAL_TEXTURE",
+        "COLOURING"
+      ],
+      "bytes": 4820,
+      "sha256": "d5c9b80e47b4209db8ff0c51cc418d141950540a823ebfd8a29bca66f1a08064"
+    },
+    {
+      "name": "InstanceFP48",
+      "defines": [
+        "DX11",
+        "DUST",
+        "TRANSPARENCY"
+      ],
+      "bytes": 4452,
+      "sha256": "abdcaea7ed5b68990187f3e82962b29d5196e2fce73140fc0b3e73c4330acae9"
+    }
+  ],
+  "logs": {
+    "full.log": "8fcc94e44a6fac86b1ccae4038ab651c597bf251d323f04b6435d021ba65375c",
+    "native-build.log": "6b1b6c0bf6f2b12d8ec93b7483f43ddf14ffe3dfc2196bd629687d55ea0dcd2e"
+  },
+  "limits": {
+    "records": 256,
+    "batches": 64,
+    "materials": 16,
+    "registryFloorEntries": 4096,
+    "physicalSourceEntries": 4096,
+    "physicalEndRereads": 4096,
+    "totalMemberSourceAndEnd": 4096,
+    "ownedRasterPayload": 1048848,
+    "borrowedBufferCombined": 33554432,
+    "borrowedTextureCombined": 67108864,
+    "nativeCaptureCpuCompileBound": 2097152,
+    "packetDrawArrayCpuCompileBound": 262144
+  },
+  "limitations": [
+    "No native Snapshot Read/game render called.",
+    "Saved eligible131 is not a current-admission count.",
+    "Current resident native DXBC was not retrieved.",
+    "Alpha requires native HDR lighting; not GST decode.",
+    "Native resolution of21 assets must be independently verified by caller.",
+    "No game FPS/all-leaks/shutdown acceptance claim."
+  ]
+}
