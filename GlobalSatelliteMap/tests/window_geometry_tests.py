@@ -21,7 +21,7 @@ namespace Ogre {struct Vector3 {float x,y,z;Vector3(float a,float b,float c):x(a
 namespace MyGUI {struct IntPoint {int left,top;IntPoint(int a,int b):left(a),top(b){}};struct IntCoord {int left,top,width,height;IntCoord(int a,int b,int c,int d):left(a),top(b),width(c),height(d){}};}
 struct MapScreen {double a,b,sx,sz;MyGUI::IntPoint worldToMapCoords(const Ogre::Vector3&v){return MyGUI::IntPoint(int(std::floor(a+v.x*sx)),int(std::floor(b+v.z*sz)));}};
 struct Manifest {double minX,minZ,maxX,maxZ;Manifest():minX(-147456),minZ(-147456),maxX(147456),maxZ(147456){}}manifest;
-struct Entry {AtlasView::WindowKey key;unsigned shaded;Entry():shaded(0){}}cache[64];
+struct Entry {AtlasView::WindowKey key;unsigned shaded;Entry():shaded(0){}}cache[AtlasView::WindowSlots];
 PARTS
 static unsigned checks=0;static void Check(bool value,const char*msg){++checks;if(!value){std::printf("FAIL %s\n",msg);throw 1;}}
 int main(){try {
@@ -57,7 +57,7 @@ int main(){try {
    }
   }
  }
- Check(AtlasView::WindowGpuBytes()==84148400ULL,"64window payload ledger");
+ Check(AtlasView::WindowGpuBytes()==94634160ULL,"72window payload ledger");
  std::printf("PASS %u extracted production bounds/geometry/supersession checks\n",checks);return 0;
 }catch(...){return 1;}}
 '''.replace('PARTS',parts)

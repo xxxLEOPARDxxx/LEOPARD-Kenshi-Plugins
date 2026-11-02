@@ -246,8 +246,10 @@ void Draw(MapScreen*map,DWORD now){
     Lighting(now);
     // Four256 windows have the same pixel budget as one former512 tile.
     unsigned shaded=0,next=shadeCursor;
-    for(unsigned k=0;k<AtlasView::WindowSlots&&shaded<4;++k){unsigned i=(shadeCursor+k)%AtlasView::WindowSlots;Entry&e=cache[i];
-        if(!e.key.Valid()||Superseded(e.key,plan.level)||!AtlasView::WindowVisible(AtlasView::SubWindow(cells[e.key.tile],e.key),clip)||e.shaded==lightVersion)continue;
+    for(unsigned pass=0;pass<3&&shaded<4;++pass)for(unsigned k=0;k<AtlasView::WindowSlots&&shaded<4;++k){unsigned i=(shadeCursor+k)%AtlasView::WindowSlots;Entry&e=cache[i];
+        if(!e.key.Valid()||Superseded(e.key,plan.level))continue;
+        bool onScreen=AtlasView::WindowVisible(AtlasView::SubWindow(cells[e.key.tile],e.key),clip);
+        if(!AtlasView::NeedsWindowShade(onScreen,plan.Contains(e.key),e.shaded,lightVersion,pass))continue;
         AtlasView::Uniforms u=lighting;double x,z,sx,sz;WindowBounds(e.key,x,z,sx,sz);
         u.referenceSide[3]=float(AtlasView::WindowSide);u.tileBounds[0]=float(x);u.tileBounds[1]=float(z);u.tileBounds[2]=float(sx);u.tileBounds[3]=float(sz);
         unsigned refusal=0;HRESULT hr=relighter.Render(e.gpu,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);
@@ -258,9 +260,12 @@ void Draw(MapScreen*map,DWORD now){
         bool requested=false;
         for(unsigned t=0;t<16&&!requested;++t){AtlasView::WindowKey key(t,5,0,0);if(plan.visible[t]&&FindWindow(key)<0){RequestWindow(key);requested=true;}}
         if(!requested){
-            // Center-first refinement, bounded48 keys, no world or filesystem scan.
+            // Center-first refinement, bounded56 keys, no world or filesystem scan.
             int best=-1;double nearest=1e100;
-            for(unsigned i=0;i<plan.count;++i)if(FindWindow(plan.keys[i])<0){AtlasView::WindowRect r=AtlasView::SubWindow(cells[plan.keys[i].tile],plan.keys[i]);double dx=r.x+r.w*.5-clip.x-clip.w*.5,dz=r.y+r.h*.5-clip.y-clip.h*.5,d=dx*dx+dz*dz;if(d<nearest){nearest=d;best=int(i);}}
+            for(unsigned priority=0;priority<2&&best<0;++priority){
+                unsigned begin=priority?plan.visibleCount:0,end=priority?plan.count:plan.visibleCount;
+                for(unsigned i=begin;i<end;++i)if(FindWindow(plan.keys[i])<0){AtlasView::WindowRect r=AtlasView::SubWindow(cells[plan.keys[i].tile],plan.keys[i]);double dx=r.x+r.w*.5-clip.x-clip.w*.5,dz=r.y+r.h*.5-clip.y-clip.h*.5,d=dx*dx+dz*dz;if(d<nearest){nearest=d;best=int(i);}}
+            }
             if(best>=0)RequestWindow(plan.keys[best]);
         }
     }
@@ -273,8 +278,8 @@ void Draw(MapScreen*map,DWORD now){
     if(debug&&now-statsAt>=5000){
         statsAt=now;unsigned resident=0,detailReady=0;
         for(unsigned i=0;i<AtlasView::WindowSlots;++i)if(cache[i].key.Valid())++resident;
-        for(unsigned i=0;i<plan.count;++i){int slot=FindWindow(plan.keys[i]);if(slot>=0&&cache[slot].shaded)++detailReady;}
-        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" detailReady="<<detailReady<<'/'<<plan.count<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" gpuCapBytes="<<AtlasView::WindowGpuBytes();Diagnostic(message.str());
+        for(unsigned i=0;i<plan.visibleCount;++i){int slot=FindWindow(plan.keys[i]);if(slot>=0&&cache[slot].shaded)++detailReady;}
+        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" gpuCapBytes="<<AtlasView::WindowGpuBytes();Diagnostic(message.str());
     }
 }
 void Tick(MapScreen*map){LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined)StartValidation();if(!ready)return;Draw(map,now);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}

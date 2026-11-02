@@ -17,7 +17,7 @@ assert 'AtlasView::WindowGpuBytes()>AtlasView::GpuCap' in s
 assert 'plan.Contains(key)&&FindWindow(key)<0' in s
 assert 'WindowVictim(keys,age,plan)' in s
 assert 'WindowKey' in s and 'cache[i].level!=desiredLevel' not in s
-assert 'next=(i+1)%AtlasView::WindowSlots' in s and 'e.shaded==lightVersion' in s
+assert 'next=(i+1)%AtlasView::WindowSlots' in s and 'NeedsWindowShade(onScreen,plan.Contains(e.key),e.shaded,lightVersion,pass)' in s
 assert 'shaded<4' in s and 'manifest.windows.Hashes(key,j->windowHashes)' in s
 assert 'GsmAtlas::Run' in s and 'GsmNative::Srv(e.texture.get())' in s
 assert 'getActiveSave' not in s and 'manifest.gsm' not in s

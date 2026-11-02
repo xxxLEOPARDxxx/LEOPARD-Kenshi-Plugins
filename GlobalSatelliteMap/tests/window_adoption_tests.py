@@ -29,14 +29,14 @@ namespace GsmAtlas{
 struct Read{volatile LONG cancel;AtlasView::U64 readBytes;Read():cancel(0),readBytes(1049600){}};
 struct Job{LONG generation;Read read;AtlasView::WindowKey window;Job():generation(7){}~Job(){++destroyed;}};
 }
-struct Entry{AtlasView::WindowKey key;unsigned age,shaded;Entry():age(0),shaded(0){}}cache[64];
+struct Entry{AtlasView::WindowKey key;unsigned age,shaded;Entry():age(0),shaded(0){}}cache[AtlasView::WindowSlots];
 GsmAtlas::Job*job=NULL,*completed=NULL;unsigned windowReads=0;AtlasView::U64 windowBytes=0;
 FIND
 CANCEL
 static void Upload(int slot,const AtlasView::WindowKey&key,GsmAtlas::Job&){++uploads;selected=slot;cache[slot].key=key;}
 static void Adopt(const AtlasView::WindowPlan&plan){ADOPT}
 static bool Current(GsmAtlas::Job*j){GUARD return current;}
-static void Reset(){for(unsigned i=0;i<64;++i)cache[i]=Entry();uploads=destroyed=0;selected=-1;windowReads=0;windowBytes=0;}
+static void Reset(){for(unsigned i=0;i<AtlasView::WindowSlots;++i)cache[i]=Entry();uploads=destroyed=0;selected=-1;windowReads=0;windowBytes=0;}
 static void Completion(AtlasView::WindowKey key){completed=new GsmAtlas::Job();completed->window=key;}
 int main(){try{
  AtlasView::WindowPlan plan;AtlasView::WindowKey fine(0,0,7,3),coarse(0,1,3,1);
@@ -47,11 +47,11 @@ int main(){try{
  Check(!completed&&destroyed==1&&uploads==0&&cache[16].key==fine,"duplicate completed key does not recreate live texture");
  Reset();plan=AtlasView::WindowPlan();plan.visible[9]=true;Completion(AtlasView::WindowKey(9,5,0,0));Adopt(plan);
  Check(uploads==1&&selected==9,"coarse window uses its pinned fallback slot");
- Reset();plan=AtlasView::WindowPlan();plan.level=0;plan.count=48;
+ Reset();plan=AtlasView::WindowPlan();plan.level=0;plan.count=AtlasView::DetailSlots;
  for(unsigned i=0;i<16;++i)cache[i].key=AtlasView::WindowKey(i,5,0,0);
- for(unsigned i=0;i<47;++i){plan.keys[i]=AtlasView::WindowKey(i%16,0,i/16,0);cache[16+i].key=plan.keys[i];cache[16+i].age=i+1;}
- cache[63].key=AtlasView::WindowKey(15,4,1,1);cache[63].age=0;plan.keys[47]=fine;Completion(fine);Adopt(plan);
- Check(uploads==1&&selected==63&&cache[63].key==fine,"new key evicts only obsolete detail after current-plan check");
+ for(unsigned i=0;i<AtlasView::DetailSlots-1;++i){plan.keys[i]=AtlasView::WindowKey(i%16,0,i/16,0);cache[16+i].key=plan.keys[i];cache[16+i].age=i+1;}
+ cache[AtlasView::WindowSlots-1].key=AtlasView::WindowKey(15,4,1,1);cache[AtlasView::WindowSlots-1].age=0;plan.keys[AtlasView::DetailSlots-1]=fine;Completion(fine);Adopt(plan);
+ Check(uploads==1&&selected==int(AtlasView::WindowSlots-1)&&cache[AtlasView::WindowSlots-1].key==fine,"new key evicts only obsolete detail after current-plan check");
  for(unsigned i=0;i<16;++i)Check(cache[i].key==AtlasView::WindowKey(i,5,0,0),"pinned fallback retained during detail admission");
  Reset();plan=AtlasView::WindowPlan();Completion(AtlasView::WindowKey(9,5,0,0));Adopt(plan);
  Check(uploads==0&&!completed&&destroyed==1,"offscreen fallback completion cannot overwrite current view");
