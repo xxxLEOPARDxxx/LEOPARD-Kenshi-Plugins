@@ -1,0 +1,11 @@
+{
+  "time_utc": "2026-11-01T23:54:28.023038+00:00",
+  "key": "HKCU/Software\\Valve\\Steam\\ActiveProcess",
+  "name": "pid",
+  "old": 16328,
+  "type": 4,
+  "candidate": 28080,
+  "restored": false,
+  "running_after": true,
+  "init_after": true
+}

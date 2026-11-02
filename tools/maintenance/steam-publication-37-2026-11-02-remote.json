@@ -1,0 +1,1301 @@
+{
+  "response": {
+    "result": 1,
+    "resultcount": 39,
+    "publishedfiledetails": [
+      {
+        "publishedfileid": "3812150807",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "209960",
+        "file_url": "",
+        "hcontent_file": "5829206490608391276",
+        "preview_url": "https://images.steamusercontent.com/ugc/12425629290862812275/C023A5D8E4EFE626AED71FFF68A07D6C32539F04/",
+        "hcontent_preview": "12425629290862812275",
+        "title": "Assigned Workers (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] See who is assigned to a building, select idle characters and spot switched-off or unpowered player machines by red lightning markers.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 8 · Nexus: https://www.nexusmods.com/kenshi/mods/2191\n\n[h2]WHAT IT DOES[/h2]\n\nSelect a machine, ore deposit, storage, research bench, turret - any building people work at - and hold ALT. A panel appears next to the building window:\n\n[code]Assigned\nMaus     priority 2, working now\nColby    priority 1[/code]\n\n[list]\n[*][b]who[/b] of your characters is assigned to the building;\n[*][b]priority[/b] - the number of this job in their job list;\n[*][b]\"working now\"[/b] - they are at this building right now.\n[/list]\n\nThe vanilla game only shows \"Workers: 5/5\", not who. On a big base you have to open every character's job list to find out.\n\nJobs bound to a building are shown (\"Operate machinery\" and the like); \"Medic\" or \"Engineer\" are not bound to any building. On your own building with nobody assigned the panel says \"nobody\".\n\nChoose another key or combination, or show the panel permanently. Works with any interface mod.\n\n[h2]SELECT IDLE CHARACTERS[/h2]\n\nCTRL+SHIFT+I selects all of your characters who have nothing to do right now: \"Goal: No goal\" and no action. A notice at the top of the screen shows how many were found. Handy on a big base: you see at once whom to put to work. By default only those not assigned to a bench or machine; optionally also assigned ones standing idle (nothing to craft, the spot is taken).\n\n[h2]SWITCHED-OFF MACHINES[/h2]\n\n[list]\n[*][b]A red lightning bolt[/b] above a completed player machine shows that it is switched off. Missing required power can also be marked.\n[*][b]The same show key[/b] as the worker panel, ALT by default. You do not need to select each machine first.\n[*][b]Size, range and height[/b] are adjustable independently of the panel. Warnings can be disabled in MCM.\n[/list]\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Assigned Workers\". Each row has a tooltip, changes apply at once; no restart needed. Without MCM - AssignedWorkers.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1790974430,
+        "time_updated": 1793577297,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 426,
+        "favorited": 59,
+        "lifetime_subscriptions": 507,
+        "lifetime_favorited": 61,
+        "views": 1524,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3824087152",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "375057",
+        "file_url": "",
+        "hcontent_file": "1853801002632376755",
+        "preview_url": "https://images.steamusercontent.com/ugc/16851008599783036453/B05ED6AC3CDFEB3607EADEAADB1A93B5D96762DB/",
+        "hcontent_preview": "16851008599783036453",
+        "title": "Best Minimap (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] A minimap in the corner of the screen on the game's own map picture: characters nearby, discovered towns, attack alerts, Map-markers and WantedMap marks, camera range; right click to send the selected, double click to move the camera.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2242\n\n[h2]WHAT IT DOES[/h2]\n\nA minimap in the corner of the screen, on the same picture as the game's big map (map mods are picked up by themselves).\n\n[list]\n[*][b]Characters nearby[/b] as dots: your squad, allies, neutrals, enemies, animals; the selected ones are bigger, small noses show where they look.\n[*][b]Towns and places[/b] you have discovered, with the big map's icons and names; hover for the faction and relations.\n[*][b]Alert[/b]: when your people are attacked - a pulsing ring where it happens (at the edge if out of view) and a line in the game's messages.\n[*][b]Marks[/b] of Map-markers and WantedMap targets, if those mods are installed; out of view they stick to the edge and point the way.\n[*][b]Camera arrow[/b] — viewing direction with independent colour and size. An absolute 4-64 pixel size can be reduced independently of marker size.\n[*][b]Camera reach[/b] — dotted or solid boundary with adjustable width and colour. Range 0 reads the game limit, avoiding the old incorrect observation. Height and terrain can slightly reduce actual reach compared with the map outline.\n[*][b]Right click on the minimap[/b] - the selected go there; [b]double click[/b] - the camera moves there, if it can reach.\n[/list]\n\n[h2]CONTROLS[/h2]\n\n[list]\n[*]CTRL+M - show / hide;\n[*]= and - (or the mouse wheel over the minimap) - zoom, up to the whole map;\n[*]CTRL+= and CTRL+- (or CTRL+wheel) - size of the minimap itself;\n[*]right click on the minimap - the selected go to that spot;\n[*]double click on the minimap - the camera moves to that spot, if the game lets it go that far from your characters (up to the camera range line);\n[*]left button - drag the minimap, by the corner - resize it.\n[/list]\n\nShape (circle, square, rectangle), frame, rotation with the camera, who to show and the colours are in the settings. Position, size and zoom are remembered. While the big map is open or the interface is hidden (F7), the minimap is hidden.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM → Best Minimap: map shape, size, opacity and position, zoom, character categories and colours, markers, alerts, camera arrow size and boundary width. The new controls apply immediately. Without MCM use BestMinimap.ini.\n\n[h2]COMPATIBILITY[/h2]\n\nUses the game's map, including replacement images and interface themes. Automatic reach checks the camera restriction; if another camera modification prevents detection, enter the distance manually. Personal settings are preserved. Text follows English, Russian or Chinese.\n",
+        "time_created": 1792600060,
+        "time_updated": 1793577305,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 168,
+        "favorited": 26,
+        "lifetime_subscriptions": 210,
+        "lifetime_favorited": 31,
+        "views": 543,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813761881",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "166357",
+        "file_url": "",
+        "hcontent_file": "1366187976305155372",
+        "preview_url": "https://images.steamusercontent.com/ugc/10552470345855013575/309EB69BB72FDD6B29C9476EC6B580FBEBBE8846/",
+        "hcontent_preview": "10552470345855013575",
+        "title": "Build Mode Gizmo (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Select your own building site that is not built yet and move or rotate it with the editor's arrows - no dismantling, no developer menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nexusmods.com/kenshi/mods/2204\n\n[h2]WHAT IT DOES[/h2]\n\nYou placed a building, confirmed it - and the spot turned out bad. Before, you had to dismantle the site and place it again, or dig into the developer menu.\n\nNow just select your own building site that is not built yet: editor-style arrows appear on it. Drag an arrow to move the building; a button in the transform window switches to rotation, lets you type coordinates or reset.\n\n[list]\n[*][b]after a move[/b] the whole building moves - including the spot where builders work;\n[*][b]the selection box[/b] does not get in the way while you drag;\n[*][b]optionally[/b] a building raised with the arrow stays at that height instead of settling on the ground;\n[*][b]the arrows stay[/b] while the site is selected and go away when you select something else, the site is finished or dismantled, the window is closed with its cross, or you start placing a new building;\n[*][b]if something goes wrong[/b], the plugin turns the arrows off until restart instead of crashing the game.\n[/list]\n\n[h2]DEVELOPER MENU[/h2]\n\nIn the developer menu (Shift+F12) the game lets you move buildings with the arrows only in the interior mode. With the plugin - in the normal build mode too: place your buildings, confirm, click any building - yours or not, built or not - and move it with the arrows right away. Click closer to the middle of a building: right at the edge of a large house a click may miss.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Build Mode Gizmo\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - BuildModeGizmo.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1791158606,
+        "time_updated": 1793577312,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 272,
+        "favorited": 51,
+        "lifetime_subscriptions": 331,
+        "lifetime_favorited": 53,
+        "views": 839,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3831174166",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "187332",
+        "file_url": "",
+        "hcontent_file": "2349418072766165165",
+        "preview_url": "https://images.steamusercontent.com/ugc/10335472836966681889/D7AD633E9D379647F3F2BAE1857AA25E8DB27170/",
+        "hcontent_preview": "10335472836966681889",
+        "title": "Gate Push Guard (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2264\n\n[h2]WHAT IT DOES[/h2]\n\nHelps prevent crowd pressure from pushing characters from outside to inside through closed player-owned gates and doors. Applies to your characters, allies and NPCs.\n\n[list]\n[*][b]Observed crossings.[/b] Tracks movement across the actual door opening while the door stays closed. A confirmed crossing returns the character to its last observed outside position.\n[*][b]Existing occupants.[/b] Closing a gate starts fresh observation. Characters already inside can remain inside and leave normally.\n[*][b]Normal activity.[/b] Carried, unconscious, seated, turret-using and other occupied characters are excluded. Loading and teleports clear movement history.\n[/list]\n\n[h2]CONTROLS AND SETTINGS[/h2]\n\nWorks automatically while enabled. With Mod Config Menu installed, open Options > MCM > Gate Push Guard. Enabled and Detailed log apply during play. Without MCM, use GatePushGuard.ini. Detailed logging is off by default; errors are always recorded.\n\n[h2]COMPATIBILITY[/h2]\n\nUse this instead of the original Gate Push Fix; enable one crowd-push protection plugin. Works with vanilla and modified interface skins. It addresses observed crossings of closed player-owned doors, rather than replacing the game's collision and pathfinding systems.\n\n[h2]AUTHORSHIP[/h2]\n\nIndependently written by LEOPARD. Thank you to [b]requizm[/b] for the idea and original [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3730136323]Gate Push Fix[/url]. Its source was not provided with the original package or found in the author's public links; no original code or DLL is included here.\n\nGPL-3.0-or-later.\n",
+        "time_created": 1793481129,
+        "time_updated": 1793577318,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 54,
+        "favorited": 6,
+        "lifetime_subscriptions": 58,
+        "lifetime_favorited": 6,
+        "views": 219,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3812150687",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "283282",
+        "file_url": "",
+        "hcontent_file": "166409479284146655",
+        "preview_url": "https://images.steamusercontent.com/ugc/16638340177575146478/9F0C07839C48722B0A2D896BAF690EE9564F7DC4/",
+        "hcontent_preview": "16638340177575146478",
+        "title": "Gear Compare Alt (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Hover armour or a weapon and hold ALT: a second panel next to the tooltip shows what is worn in that slot now, what changes, and a verdict - better, worse or mixed.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 8 · Nexus: https://www.nexusmods.com/kenshi/mods/2190\n\n[h2]WHAT IT DOES[/h2]\n\nHover armour or a weapon - in the inventory, a backpack, a shop - and hold ALT. A second panel appears next to the item tooltip: what is worn in that slot now and how the hovered item differs.\n\nFor every property that differs - \"worn → new → difference\": green if it gets better, red if worse. Equal properties are not shown. The difference is always \"new\" minus \"worn\". Armour also shows cut resistance efficiency, weapons - armour penetration, length and damage against races (robots, humans, animals, skeletons, hives...).\n\nAt the bottom - a summary on three axes and a verdict:\n\n[list]\n[*][b]protection (with coverage)[/b] - with the covered body parts taken into account; for weapons - [b]damage (cut + blunt)[/b], in percent of the worn one;\n[*][b]properties[/b] - a count of rows: \"5 better / 4 worse\";\n[*][b]weight[/b] - how much is added;\n[*][b]verdict[/b] - better, worse, mixed or equal.\n[/list]\n\n[h2]WHAT IT COMPARES WITH[/h2]\n\n[list]\n[*][b]armour[/b] - with what is worn in the same slot;\n[*][b]weapons[/b] - with a worn weapon of the same type, otherwise with the weapon in the slot the item would go to, and if that slot is free - with the weapon in the other slot;\n[*][b]empty slot[/b] - no panel (comparing with \"nothing\" can be turned on);\n[*][b]whose gear[/b] - the character who carries the item; in a shop, chest or on the ground - the selected one.\n[/list]\n\nThe key can be changed to CTRL or SHIFT, or the panel can be always on.\n\n[h2]COMPARING ON THE CRAFTING TAB[/h2]\n\nNot sure what to craft? On the Crafting tab, right-click a line of the Items list - it lights up green (A). Right-click another line - blue (B), and the same panel appears next to the list: every property of A and B, the difference and a verdict \"B against A\".\n\n[list]\n[*][b]armour and robotic limbs[/b] - at masterwork grade, the best that can be made;\n[*][b]weapons[/b] - at exactly the model written in the line (weapon models are separate lines);\n[*][b]limbs[/b] - durability, unarmed damage and skill multipliers;\n[*]right-click a marked line to unmark it, a third line replaces B; close the window - the marks are gone.\n[/list]\n\nWorks with the list search from Organize the Crafting Stations: the highlight stays on its item.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Gear Compare Alt\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - GearCompare.ini in the mod folder, every line there is commented.\n\n[h2]COMPATIBILITY[/h2]\n\nThe game's tooltip is left untouched, so it works with LtEast's Rarity Backgrounds and KEP.\n",
+        "time_created": 1790974419,
+        "time_updated": 1793577326,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 919,
+        "favorited": 79,
+        "lifetime_subscriptions": 1085,
+        "lifetime_favorited": 81,
+        "views": 1689,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3816608451",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "185959",
+        "file_url": "",
+        "hcontent_file": "4555419158063699879",
+        "preview_url": "https://images.steamusercontent.com/ugc/11110275319834683434/31995C01EA2F5043690A4EC3BB76DF65CA1120D8/",
+        "hcontent_preview": "11110275319834683434",
+        "title": "Item Markers (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Item grade colours, stolen goods and faction uniforms right on the item icons - a heavily optimised replacement for LtEast's Rarity Backgrounds and Item Status Indicators.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nexusmods.com/kenshi/mods/2224\n\n[h2]WHAT IT DOES[/h2]\n\nMarks right on item icons - in the inventory, at traders, in containers and on the character's gear:\n\n[list]\n[*][b]grade colour[/b] on armour, weapons, crossbows and limbs - the same as in the item tooltip (armour that covers nothing has no grade, as in the game). Four styles: frame with a glow, fill, gradient from the bottom, star in a corner;\n[*][b]stolen goods[/b] - the steal badge on stolen items;\n[*][b]faction uniform[/b] - a badge on armour that makes you look like one of them;\n[*][b]learned blueprints[/b] - an eye on a blueprint you already know: at a trader you see at once what is not worth buying;\n[*][b]items of this trade[/b] - a bag in the corner: gold - you sold it, green - you bought it, stacks included;\n[*][b]Meitou[/b] - a colour of its own, apart from the masterwork class, on the icon and in the tooltip.\n[/list]\n\nGrade colours come from the game's interface - and from interface mods, Workshop subscriptions included - so the interface changes them by itself. By default only items better than ordinary stand out - from the blue grade up.\n\n[h2]A HEAVILY OPTIMISED VERSION[/h2]\n\nA replacement for [b]LtEast's Rarity Backgrounds[/b], [b]LtEast's Item Status Indicators[/b] and [b]LtEast's Mod Settings Core[/b] - one mod instead of three. LtEast's mods re-processed the icons every frame in every open inventory window: at a trader with hundreds of items FPS dropped by about half, and selling stuttered.\n\nHere a mark is put once, when the game draws the icon, and goes away with it. The rest of the time the mod does almost nothing: 160 items at a trader take a few milliseconds, once, when the window opens, and during a trade it only checks a few times a second which visible items changed hands.\n\n[b]Disable LtEast's mods[/b], or the marks will be doubled.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Item Markers\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - ItemMarkers.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1791572611,
+        "time_updated": 1793577333,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 1800,
+        "favorited": 159,
+        "lifetime_subscriptions": 2041,
+        "lifetime_favorited": 170,
+        "views": 3724,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3812150449",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "214181",
+        "file_url": "",
+        "hcontent_file": "1386907928451844810",
+        "preview_url": "https://images.steamusercontent.com/ugc/16219164873505806592/3D54D4A328B49EA0923EF0C9EBBE2EED6EA7EEF3/",
+        "hcontent_preview": "16219164873505806592",
+        "title": "Live Xp Bars (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Live XP bars for the skills that are levelling right now: name, level, progress to the next level. Nothing to pick or click - a bar appears when a skill grows and fades out when it stops.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 12 · Nexus: https://www.nexusmods.com/kenshi/mods/2188\n\n[h2]WHAT IT DOES[/h2]\n\nA skill starts growing - its line appears on screen: name, level, percent to the next level and a bar. It stops growing - the line fades out. Nothing to pick, nothing to click.\n\n[list]\n[*][b]nothing is levelling[/b] - the screen is clean;\n[*][b]optionally[/b] the lines stay while the same character is selected;\n[*][b]several characters selected[/b] - no bars, to avoid a mess;\n[*][b]out of the way:[/b] clicks go through the bars to the world, F7 hides them with the interface.\n[/list]\n\nLevel, percent and fill share one colour scale: dull brick for low values, muted green near a hundred, purple above it.\n\n[h2]BACKGROUND[/h2]\n\nOn bright ground the text is harder to read - you can put a background under the bars: the game's framed panel, like item tooltips, or a flat fill in your own colour, with adjustable opacity. No background by default.\n\n[h2]POSITION ON SCREEN[/h2]\n\nSHIFT+B shows a frame with sample lines - drag it where you want and press SHIFT+B again. The position is remembered. The row width, the space between rows, the width of the name column (how close the level is to the name) and the space between columns are set in the settings.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Live Xp Bars\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - LiveXpBars.ini in the mod folder, every line there is commented.\n\n[h2]WHY, IF THERE IS XpBars[/h2]\n\nXpBars (DougTownsend) also draws XP bars, but there you tick the skills by hand in a separate window. Here there is nothing to pick - whatever grows is shown. No need to run both.\n",
+        "time_created": 1790974393,
+        "time_updated": 1793577340,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 374,
+        "favorited": 38,
+        "lifetime_subscriptions": 461,
+        "lifetime_favorited": 38,
+        "views": 821,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813761584",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "345520",
+        "file_url": "",
+        "hcontent_file": "6072180914648463972",
+        "preview_url": "https://images.steamusercontent.com/ugc/10071181867837378565/1FE4D06DBE9A6BE45742004C652063A4EB78ADAF/",
+        "hcontent_preview": "10071181867837378565",
+        "title": "Mod Config Menu (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] In-game settings for RE_Kenshi plugins, with tooltips, page scrolling and keyboard or mouse binding support.\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 11 · Nexus: https://www.nexusmods.com/kenshi/mods/2202\n\n[h2]WHAT IT DOES[/h2]\n\nEvery mod setting - right in the game. The Options window (main menu or Esc in game) gets an MCM tab:\n\n[list]\n[*][b]left[/b] - the mods that have settings;\n[*][b]right[/b] - the settings of the selected mod, drawn with the same rows as the rest of the game: check boxes, sliders with a number field, choice and key buttons, text fields, colours - from a palette or as a code;\n[*][b]bottom[/b] - a tooltip for the row under the cursor;\n[*][b]window caption[/b] - the name of the selected mod.\n[/list]\n\nA change is saved and applied at once. Rows marked with an asterisk (*) take effect after a game restart. The \"Reset to defaults\" button at the bottom of the page returns all values of the mod.\n\n[h2]SCROLLING AND KEY BINDINGS[/h2]\n\nThe wheel over ordinary settings scrolls the page without changing values. Click a binding button, then press a key or a supported mouse button with CTRL/SHIFT/ALT. The first click starts waiting for input; Esc cancels and Backspace clears the binding. Lists on a mod page have their own scrolling. Long text settings retain complete values.\n\n[h2]COMPATIBILITY[/h2]\n\nWorks with RE_Kenshi plugins that support MCM. Supported mods appear automatically in the list. MCM is optional for our plugins and forks: without it, their settings remain available in their configuration files.\n\n[h2]SOURCE CODE[/h2]\n\nThe source code of MCM and our other plugins - [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins]LEOPARD-Kenshi-Plugins[/url], of our forks of Emkej8's and other authors' mods - [url=https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks]LEOPARD-Kenshi-Forks[/url] (GitHub).\n\n[h2]SUPPORTED PLUGINS AND FORKS[/h2]\n\n[list]\n[*][b]Our plugins:[/b] AI Fixed, Assigned Workers, Best Minimap, Build Mode Gizmo, Gear Compare Alt, Item Markers, Live Xp Bars, Multi XP Mining, Patient Self Aid, Quick Start Select, Ranged Damage Xp, Recruit Markers, Skill Level Up Info, Stat Colours, UI Tweaks, Wanted Map, Gate Push Guard.\n[*][b]Our Emkej8 forks:[/b] Auto Pause on Load, Container Highlight, Hidden Faction Relations, Job-B-Gone, Loot-Scoot-Execute, Map-markers, Organize the Crafting Stations, Organize the Inventory, Organize the Trader, Vital Read, Vital Sense, Wall-B-Gone.\n[*][b]Our forks of other authors:[/b] Better Looting (XxAtreuSSxX), Character Highlight (BFrizzleFoShizzle), Character Inspector (shutori), Formations (Slinkysalmon03), Kenshi Job Management (SirixKC), Rotate Items (jacobericson), Kill Counter (Rokeshi), Stack Sort (Jakematt2004), Taunt Expansion (tata / Tata-Gari).\n[/list]\n\nMod Config Menu also has its own settings page. The list includes prepared and disabled builds; Organize the Inventory is currently a local build. Dynamic Factions supports MCM but remains in development. Global Satellite Map is a local prototype for a satellite world-map layer. XP Overhaul (Asur) is a separate local build. These mods are installed separately.",
+        "time_created": 1791158574,
+        "time_updated": 1793577347,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 6266,
+        "favorited": 264,
+        "lifetime_subscriptions": 7040,
+        "lifetime_favorited": 278,
+        "views": 5854,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3829848414",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "248162",
+        "file_url": "",
+        "hcontent_file": "3711105177956385094",
+        "preview_url": "https://images.steamusercontent.com/ugc/18076275918202146880/33E95E5A232CCF56819FF3B128E5357C813C2246/",
+        "hcontent_preview": "18076275918202146880",
+        "title": "Multi XP Mining (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2258\n\n[h2]WHAT IT DOES[/h2]\n\nAdds Strength, Toughness and Dexterity XP while characters actually mine resources. Each source can have its own training rate and cap, while normal Labouring XP continues to work.\n\n[list]\n[*][b]Resources from your mod list[/b]: supports veins, mines and mining machines, including tin, coal and other modded resources.\n[*][b]Separate source settings[/b]: enable, XP and cap for Strength, Toughness and Dexterity.\n[*][b]Shared multipliers[/b] raise or lower additional training across all sources.\n[*][b]Zero XP[/b] disables additional training of that skill. Caps affect this mod's extra XP rather than preventing normal skill growth.\n[/list]\n\n[h2]CHOOSE AND CONFIGURE A SOURCE[/h2]\n\nOpen Multi XP Mining in MCM: the source list is above the selected source's settings. Search by name or ID, then use the wheel or scrollbar for long lists. A tooltip shows the full shortened name, and the current source's name and ID appear above its parameters.\n\nAutomatically detected sources default to 0.25 extra Strength XP up to level 15, with Toughness and Dexterity initially disabled (0). Some sources can have different initial values or be disabled by default. Matching starting values do not link their settings: each source can be adjusted separately. Identically named sources are distinguished by ID.\n\n[h2]HOW ADDITIONAL XP WORKS[/h2]\n\nThe XP value controls the rate of additional training: 0.25 is a quarter of the rate at 1. Normal racial modifiers and XP Overhaul, if installed, also apply. Shared multipliers adjust XP and caps, and caps can be disabled. Other workstations are not automatically treated as mining.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM tab → \"Multi XP Mining\". Changes apply immediately. Tables can be reloaded after manual editing; resetting a source restores its initial parameters. Do not enable alongside another MultiXPMining version. Updates preserve your personal settings.\n",
+        "time_created": 1793319372,
+        "time_updated": 1793577354,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 135,
+        "favorited": 15,
+        "lifetime_subscriptions": 155,
+        "lifetime_favorited": 16,
+        "views": 281,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3812149895",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "133883",
+        "file_url": "",
+        "hcontent_file": "8548463624519109674",
+        "preview_url": "https://images.steamusercontent.com/ugc/12803683011563952377/64FB33BD357D96EDDF1D67725FA2E5CD5357B071/",
+        "hcontent_preview": "12803683011563952377",
+        "title": "Patient Self Aid (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Let a conscious patient help with their own treatment, including repair of robotic limbs on biological characters.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nexusmods.com/kenshi/mods/2193\n\n[h2]WHAT IT DOES[/h2]\n\nWhen one character gives first aid to another, in the vanilla game the patient just stands and waits - even with their own first aid kit in the bag.\n\nWith the plugin the patient treats their own wounds meanwhile, and a skeleton repairs itself with its repair kit. Healer and patient work on the same body at once, so treatment goes faster. It is the same as doing it by hand - select the patient and point them at themselves. The plugin does it for you.\n\n[h2]WHEN IT TRIGGERS[/h2]\n\n[list]\n[*][b]yours:[/b] both the healer and the patient are your characters;\n[*][b]treatment is on:[/b] the healer treats the patient - by order or as a medic job;\n[*][b]the patient waits:[/b] standing, conscious and on their feet;\n[*][b]has the means:[/b] there is something to treat, and they have a kit (a skeleton - a repair kit).\n[/list]\n\nA patient who is treating someone else or fighting is left alone.\n\n[h2]PROSTHETICS AND REPAIRS[/h2]\n\nDamaged robotic limbs are recognized on humans and other biological characters too. A patient with their own repair kit can repair prosthetics while being assisted. Wounds and prosthetics are checked separately: first aid treats wounds, repair kits fix robotic limbs. Wear requiring a repair bed is not removed by this self-repair. The same consciousness, patient-state and helper requirements still apply.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Patient Self Aid\". Each row has a tooltip, changes apply at once; no restart needed. Without MCM - PatientSelfAid.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1790974345,
+        "time_updated": 1793577361,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 280,
+        "favorited": 28,
+        "lifetime_subscriptions": 320,
+        "lifetime_favorited": 30,
+        "views": 563,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813761725",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "294216",
+        "file_url": "",
+        "hcontent_file": "321722965680287065",
+        "preview_url": "https://images.steamusercontent.com/ugc/18024794446776708708/EBAB45E5F134E3498DD3A7DC6FD70FE1CBC2406D/",
+        "hcontent_preview": "18024794446776708708",
+        "title": "Quick Start Select (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] The 'Choose your beginning' window as a list of all starts: two layouts, sorting by name and difficulty, search, race filter, the game's advanced options inside with right-click reset.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 7 · Nexus: https://www.nexusmods.com/kenshi/mods/2201\n\nOur own take on \"Choose Your Beginning Quicker\" by Redronn, written from scratch.\n\n[h2]WHAT IT DOES[/h2]\n\nInstead of the \"Choose your beginning\" window, where starts are flipped one by one with arrows, a list of all starts opens:\n\n[list]\n[*][b]two layouts:[/b] wide (list on the left, description on the right) and compact - switched with the first button and remembered;\n[*][b]sorting[/b] by name (A-Z / Z-A) and by difficulty (EASY-HARD / HARD-EASY);\n[*][b]search[/b] by name;\n[*][b]race filter[/b], with the number of starts for each race;\n[*][b]about the start:[/b] name, difficulty, cash, play style and description of the start;\n[*][b]the game's advanced options[/b] (hunger, chance of death, damage, speeds, nests, bandits, prospecting) right in the window, with the game's tooltips; right click a row - back to the default;\n[*][b]\"Random start\"[/b] - a random start among those in the list; only the start choice changes, other settings stay as they were;\n[*][b]\"Begin\"[/b] or a double click on a row - with a confirmation (can be turned off).\n[/list]\n\nDifficulty in the list is coloured from green (easy) to red (very hard) and sorted by meaning, however the mod author wrote it - in English or Russian. An unusual difficulty (\"Beep!!\") can be put under any of the six colours in Mod Config Menu. Empty starts without a squad (leftovers of translations for mods you do not have) are hidden.\n\nThe list opens from the top with the first start selected. The window adapts to any screen resolution.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Quick Start Select\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - QuickStartSelect.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1791158585,
+        "time_updated": 1793577368,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 143,
+        "favorited": 20,
+        "lifetime_subscriptions": 195,
+        "lifetime_favorited": 22,
+        "views": 376,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813761935",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "120997",
+        "file_url": "",
+        "hcontent_file": "5446859171688155728",
+        "preview_url": "https://images.steamusercontent.com/ugc/9473047637166823205/70267324F4C75C3E693C359B907DDD5470C560EC/",
+        "hcontent_preview": "9473047637166823205",
+        "title": "Ranged Damage Xp (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Crossbow (and turret) experience for the damage a hit actually dealt after armour, on top of the vanilla XP for shooting; a share goes to Perception.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2205\n\n[h2]WHAT IT DOES[/h2]\n\nIn the game a crossbowman gets experience for shooting itself, no matter what the shot did - scratched the armour or took the enemy's arm off. The plugin adds a bonus for the damage dealt - after the target's armour, so a shot into heavy armour gives less than one into a naked target:\n\n[list]\n[*][b]Crossbows[/b] - the main bonus;\n[*][b]Perception[/b] - a share of it;\n[*][b]Turrets[/b] - instead of Crossbows when the shooter mans a turret.\n[/list]\n\nThe usual shooting experience stays as it was, the bonus goes on top. Everything that normally affects experience applies: racial multiplier, XP_Overhaul, LiveXpBars.\n\nHits on your own people, on unconscious targets and tiny scratches do not count (all adjustable). The XP per damage and the cap per hit are adjustable too.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Ranged Damage Xp\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - RangedDamageXp.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1791158613,
+        "time_updated": 1793577375,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 110,
+        "favorited": 14,
+        "lifetime_subscriptions": 124,
+        "lifetime_favorited": 14,
+        "views": 330,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3820514162",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "190000",
+        "file_url": "",
+        "hcontent_file": "7218092359510554115",
+        "preview_url": "https://images.steamusercontent.com/ugc/17066215459628618310/E14BD5A7C4AEC96938E3AF5F62A8E0DBC35D21AA/",
+        "hcontent_preview": "17066215459628618310",
+        "title": "Recruit Markers (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Recruit bubbles, trader coins and gold squad-leader stars, with a shared show key and independent star size.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nexusmods.com/kenshi/mods/2232\n\n[h2]WHAT IT DOES[/h2]\n\nA speech-bubble marker over the heads of characters you can recruit, a stack of coins over traders, and a gold star over squad leaders. By default the markers show while ALT is held; the key can be changed or the markers made permanent.\n\n[list]\n[*][b]unique characters[/b] - a light yellow marker that gently pulses;\n[*][b]ordinary recruits and animals[/b] - orange;\n[*][b]only those you can recruit right now[/b] - the mod reads the character's own dialogue and its conditions (money, relations, imprisonment and so on) for your nearest selected character. So it works with mods that add recruitable characters too;\n[*][b]traders[/b] - shopkeepers, barmen, caravan traders, surgeons - a stack of coins in a colour of its own; a trader you can also recruit gets both markers side by side. Shop and caravan guards get no coins.\n[*][b]squad leaders[/b] - a gold star above the actual leader when the same loaded squad has at least one other living member. Solo characters receive no star; player leaders have a separate option. Stars have independent size (20 pixels by default) and colour.\n[/list]\n\nColours, size, opacity, height above the head, distance and the number of markers are adjustable.\n\n[h2]A REPLACEMENT FOR LTEAST'S MOD[/h2]\n\nA replacement for [b]LtEast's Recruitable NPC Highlighter[/b] and its Mod Settings Core: the same markers, settings in Mod Config Menu. Markers stay hidden while the show key is not held, unless permanent display is enabled.\n\n[b]Disable LtEast's mod[/b], or the markers will be doubled.\n\nWorks with Kenshi 1.0.65 and 1.0.68 (Steam and GOG).\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Recruit Markers\". Each row has a tooltip, changes apply at once; no restart needed. Without MCM - RecruitMarkers.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1792106935,
+        "time_updated": 1793577382,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 523,
+        "favorited": 63,
+        "lifetime_subscriptions": 624,
+        "lifetime_favorited": 65,
+        "views": 1233,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3829848328",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "240655",
+        "file_url": "",
+        "hcontent_file": "5609755332827512289",
+        "preview_url": "https://images.steamusercontent.com/ugc/13316114823909245876/8CD53A7694F0C972214542872437C75A90BD4DCC/",
+        "hcontent_preview": "13316114823909245876",
+        "title": "Skill Level Up Info (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Full XP Info displays: blue experience gains, gold level increases and recent-training bars, configured through MCM.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2257\n\n[h2]WHAT IT DOES[/h2]\n\nFull XP feedback following XP Info: see small training gains, new levels and skills the character has trained recently. Each display can be enabled independently.\n\n[list]\n[*][b]Blue XP text[/b] appears above the character, rises and fades. Small gains accumulate into one notification; several skills are grouped with a short summary of the remainder.\n[*][b]Gold level increases[/b] are separate from fractional XP. The blue-message threshold and interval do not delay a new level.\n[*][b]Training bars[/b] below the normal character statistics show progress in recently trained skills. One or two rows follow the font and style of the normal stats, with a divider between them. With six normal stats, the row count automatically drops to fit the panel. Old activity expires.\n[*][b]All or selected characters[/b] can be included. Messages can optionally be copied to the game log.\n[/list]\n\n[h2]CONTROLS[/h2]\n\nFeedback appears automatically when XP is gained; no separate key is needed. Each display can be enabled independently.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM → Skill Level Up Info. Separate switches for XP text, levels and bars; a maximum of one or two rows, minimum XP percentage, announcement interval, recent-activity duration and detailed logging (off by default). Settings apply during play. Interface text follows the game language: Russian, English or Chinese.\n\n[h2]COMPATIBILITY[/h2]\n\nUses the existing SkillLevelUpInfo folder and updates the previous release. Do not run the original xp_info alongside it. Live Xp Bars can run alongside this mod; each display can be enabled independently. The floating text starting position depends on the character model.\n\n[h2]ORIGINAL AND SOURCE CODE[/h2]\n\nOriginal design and behaviour: [url=https://www.nexusmods.com/kenshi/mods/2160]XP Info[/url] by [b]semper1dem (Alexander)[/b]. Thank you for the original mod!\n\n[b]Original source code:[/b] the author identifies a source archive on the original release page; no separate verified repository was found. This is an independent implementation of the behaviour; the original DLL is not redistributed.\n\nGPLv3 licence.\n",
+        "time_created": 1793319364,
+        "time_updated": 1793577389,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 97,
+        "favorited": 12,
+        "lifetime_subscriptions": 110,
+        "lifetime_favorited": 12,
+        "views": 345,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3812150560",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "249251",
+        "file_url": "",
+        "hcontent_file": "2723034376265880177",
+        "preview_url": "https://images.steamusercontent.com/ugc/15241348864309452397/673B4F5BAF4C87867026DD499BB151C2EA8EB388/",
+        "hcontent_preview": "15241348864309452397",
+        "title": "Stat Colours (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Colours the numbers in the character stats window by value, shows what gear, injuries and fighting indoors add to a skill, racial XP multipliers (hold ALT) and the current XP rate of the selected skill.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 13 · Nexus: https://www.nexusmods.com/kenshi/mods/2189\n\n[h2]WHAT IT DOES[/h2]\n\n[list]\n[*][b]Colour by value.[/b] Attribute and skill numbers go from dull brick at zero to muted green at a hundred; above a hundred (with a gear bonus) - purple.\n[*][b]Modifier next to the number[/b] - \"(+8) 1\": everything currently added to or taken from the skill - gear, injuries, hunger, carried weight, fighting indoors, combat stance for defence. Bonus in green, penalty in red.\n[*][b]Where the modifier comes from.[/b] Click a skill - a breakdown appears next to the description: the skill, robotic limbs, gear, injuries, and for combat skills also fighting indoors, combat stance and carried weight - and the final value. The rows always add up to it. Every number comes from the game itself.\n[*][b]Racial XP multipliers.[/b] Hold ALT in the stats window to see which skills this race levels faster (green) and slower (red).\n[*][b]Racial multipliers of a recruit.[/b] Select someone in the world who can be recruited and hold ALT: their race's XP multipliers appear above the name plate. Handy before recruiting, when there are too many races to remember.\n[*][b]Levelling speed.[/b] The skill description shows \"(Current XP rate: 0.510)\": how much the skill's XP is multiplied right now, by race and level. The higher the skill, the lower the number.\n[/list]\n\nHelper colours follow the interface theme if you use an interface mod. Every step of the scale can be changed.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Stat Colours\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart, the rest at once. Without MCM - StatColours.ini in the mod folder, every line there is commented.\n\n[h2]COMPATIBILITY[/h2]\n\nKillCounter lines (\"Kills\", \"Knockouts\", \"Limbs severed\") are coloured too. With XP_Overhaul the levelling speed follows its curve if its version supports that; otherwise the game's curve.\n",
+        "time_created": 1790974406,
+        "time_updated": 1793577396,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 315,
+        "favorited": 44,
+        "lifetime_subscriptions": 378,
+        "lifetime_favorited": 48,
+        "views": 855,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3812150876",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "404699",
+        "file_url": "",
+        "hcontent_file": "2731651235329464575",
+        "preview_url": "https://images.steamusercontent.com/ugc/16941771694022943838/7F4CFFFBA420354F3B7DFA8BD2DFE83EFC35BDB0/",
+        "hcontent_preview": "16941771694022943838",
+        "title": "UI Tweaks (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Interface fixes for queues, descriptions, squad panels and tooltips, plus fewer redundant name-label and status-bar updates. Works with vanilla and modded interfaces.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 13 · Nexus: https://www.nexusmods.com/kenshi/mods/2192\n\n[h2]WHAT IT DOES[/h2]\n\nImproves the readability and convenience of research, crafting, squad and character windows. Most changes can be turned on and off separately; the trade-window right-click fix is always active.\n\n[list]\n[*][b]Taller research and crafting queue rows[/b] - text no longer overlaps itself with larger fonts.\n[*][b]Full-width queue bars.[/b] In the game the fill never reached the end of the row.\n[*][b]Scrolling descriptions on the Research and Crafting tabs[/b] - long descriptions (armour) now fit.\n[*][b]Taller squad cells on the Squads tab[/b] - portraits are no longer cut at a row and a half; optionally the cells grow to the largest squad.\n[*][b]A proper \"Next level\" bar in the skill description[/b] - a neat frame, fill inside the border, centred caption.\n[*][b]Faction relation by the selected character's name[/b] - \"Nomads (+15)\", like in the factions window: green above zero, red from -10 down; characters only, optionally while a key is held.\n[*][b]Item icon in the crafting list[/b] - hold ALT over a recipe on the Crafting tab to see what the item looks like (the key can be changed or turned off in Mod Config Menu).\n[*][b]The trader's money at the centre of the window[/b] - with interfaces that stretch the money line across the whole window (like Dark UI); the vanilla window stays as it is. When Organize the Trader provides its own header, its layout is preserved: trader money on the left and the deal in the centre.\n[*][b]A right click on the trade window stays in the window[/b] - in the game a click on your own backpack in the trade window sent the character to the point under the window, and they ran there once it was closed. This fix is always on.\n[*][b]A \"Random\" button by the name in the character editor[/b] - at a new game start, when recruiting or at the surgeon: a random name from the game's name lists, male or female by the character. Mods that extend the name lists (like Expanded Name Set) are used too.\n[*][b]The Dialogues tab log on a dark interface[/b] - NPC lines are no longer black on black.\n[*][b]Less interface overhead[/b] - reduces unnecessary work when displaying character names and status bars. Their appearance and movement stay the same; the setting applies immediately.\n[*][b]Draw icons of all items[/b] - an MCM action generates missing item icons in a loaded game without first putting each item into an inventory.\n\n[*][b]Save previews.[/b] Optional screenshots of the selected save in the Save and Load menus.\n[*][b]Save list height.[/b] An MCM setting lets you show more saves.\n[/list]\n\n[h2]WHICH INTERFACE IT WORKS WITH[/h2]\n\nPreviously called Dark Ui Tweaks. Works with the vanilla interface and interface mods, including Dark UI. If your chosen interface uses different frames, adjust the bar insets in the settings to fit them.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"UI Tweaks\". Each row has a tooltip, changes apply at once; \"Enabled\", description scrolling and the random name button take effect after a game restart. Without MCM - UITweaks.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1790974440,
+        "time_updated": 1793577403,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 414,
+        "favorited": 44,
+        "lifetime_subscriptions": 502,
+        "lifetime_favorited": 45,
+        "views": 1022,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813761812",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "273247",
+        "file_url": "",
+        "hcontent_file": "3254810171138806533",
+        "preview_url": "https://images.steamusercontent.com/ugc/17387297602185583529/0CF452FD00F12F004E4E6A49190C376C1BDDCC7E/",
+        "hcontent_preview": "17387297602185583529",
+        "title": "Wanted Map (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Select a character carrying 'Wanted' posters and the world map shows where the targets are: exact, approximate, at their home town, imprisoned or recently dead.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 7 · Nexus: https://www.nexusmods.com/kenshi/mods/2203\n\n[h2]WHAT IT DOES[/h2]\n\nSelect a character who carries \"Wanted\" posters - in the inventory or a backpack - and the world map shows markers with the targets' names where they are. Handy to keep all posters on one \"navigator\". Optionally the posters of all your characters count, whoever is selected.\n\n[list]\n[*][b]red[/b] - the target itself, exact spot;\n[*][b]orange[/b] - their squad is far away, approximate spot;\n[*][b]yellow[/b] - the squad has not appeared yet, the marker is on the town or camp where it lives;\n[*][b]blue[/b] - the target is a prisoner;\n[*][b]grey[/b] - the target is dead: the marker stays at the place of death for a game day.\n[/list]\n\nRemove a poster from the inventory - its marker is gone.\n\nThe poster itself in the inventory shows how its targets are: a green tick - all dead, a lock - the rest imprisoned, \"2/3\" - how many are done.\n\n[h2]HOW IT FINDS TARGETS[/h2]\n\nThe plugin matches posters to targets by itself, from the data of the game and all enabled mods, in any language. On a 200-mod build the targets of 97 posters out of 100 are found. For rare cases there is WantedMap_overrides.txt with manual pairs - you can add your own.\n\nOnly live targets are shown. The plugin learns about a target's death even with the map closed, and remembers it per playthrough: load a save where the target is still alive - the marker comes back.\n\nThe plugin works only while the world map is open, so it does not affect the game otherwise.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Wanted Map\". Each row has a tooltip, changes apply at once; \"Enabled\" takes effect after a game restart. Without MCM - WantedMap.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1791158597,
+        "time_updated": 1793577410,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 1548,
+        "favorited": 184,
+        "lifetime_subscriptions": 1832,
+        "lifetime_favorited": 187,
+        "views": 4821,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852014",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "372155",
+        "file_url": "",
+        "hcontent_file": "6509814710059220381",
+        "preview_url": "https://images.steamusercontent.com/ugc/16984588969983606082/F42A378F1F1A62E01A57F966D8CCA64663CF082F/",
+        "hcontent_preview": "16984588969983606082",
+        "title": "Container Highlight (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Hold a key to mark nearby lootable containers - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2207\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1953]Container-Highlight[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Container-Highlight]Emkej/Container-Highlight[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Highlighting now clears correctly after releasing the key, with lower background overhead.\n[*]The key and Ctrl/Shift/Alt use one binding, with reduced always-on diagnostic overhead.\n[*][b]Safer highlight removal.[/b] Clearing container colour is safer after its model changes or unloads; replacement colours from other mods are preserved.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nWhile the highlight key is held, nearby lootable containers are marked on screen:\n\n[list]\n[*]a marker with an icon and a short outlined label - readable on any background;\n[*]optionally the containers themselves are tinted in the world;\n[*]scan distance, colours, label and key (SHIFT, ALT or CTRL work too) are adjustable.\n[/list]\n\nMade for vanilla and vanilla-like containers; storage from building mods may not be highlighted. Adds nothing to save files.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Container Highlight\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173741,
+        "time_updated": 1793577417,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 153,
+        "favorited": 16,
+        "lifetime_subscriptions": 187,
+        "lifetime_favorited": 17,
+        "views": 317,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852288",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "478959",
+        "file_url": "",
+        "hcontent_file": "5462546117659990802",
+        "preview_url": "https://images.steamusercontent.com/ugc/16249294069112559506/EF343A54BB8922E57665AD29FE83E4BC5B2CAFDC/",
+        "hcontent_preview": "16249294069112559506",
+        "title": "Vital Sense (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Hold ALT for state and bounty markers over visible characters - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 7 · Nexus: https://www.nexusmods.com/kenshi/mods/2214\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1873]Vital Sense[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Vital-Sense]Emkej/Vital-Sense[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Icons stay behind overlapping windows; neutral characters have a separate color.\n[*]An 8–256 marker budget prioritizes visible targets nearest the camera center.\n[*]Bounty targets use tier colors; tint coexists with Character Highlight and is not baked into portraits.\n[*]The show key is assigned as one binding with modifiers.\n[*][b]Optional icons.[/b] Settings explain when a custom icon falls back to the standard game icon; unavailable files no longer cause misleading texture messages.\n[*][b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nHold ALT - state markers appear over visible characters; release - they are gone:\n\n[list]\n[*]unconscious, coma, dying, playing dead, dead - as an icon and short text;\n[*]colour by relation: enemy, neutral, ally, your squad;\n[*]a bounty icon over wanted characters, coloured by the bounty amount;\n[*]optionally a body highlight on downed characters, so they are visible from afar.\n[/list]\n\nEvery state, colours, sizes, the key and the number of markers on screen are adjustable. Readability only: no balance, AI or content changes.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Vital Sense\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173813,
+        "time_updated": 1793577423,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 1191,
+        "favorited": 50,
+        "lifetime_subscriptions": 1530,
+        "lifetime_favorited": 54,
+        "views": 1300,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852230",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "455799",
+        "file_url": "",
+        "hcontent_file": "8263820899924563178",
+        "preview_url": "https://images.steamusercontent.com/ugc/11821345672652296217/CDD62230B13A7C7B1E5BB592F57056E921A02E24/",
+        "hcontent_preview": "11821345672652296217",
+        "title": "Vital Read (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] State icons on squad portraits: downed, dying, starving, crippled - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nexusmods.com/kenshi/mods/2213\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1910]Vital Read[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Vital-Read]Emkej/Vital-Read[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Icons remain attached to portraits and behind overlapping windows, with fixes for disappearing icons and transparency.\n[*]Dying follows the native status, including skeletons and bandaged characters.\n[*]Added blue ordinary-bed and repair-bed indicators.\n[*][b]Optional icons.[/b] If custom icon textures are unavailable, the standard icon remains available without misleading missing-texture messages.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nState icons on squad portraits - see at a glance who is in trouble:\n\n[list]\n[*]unconscious, coma, dying, playing dead;\n[*]starving, crippled arm, crippled leg;\n[*]resting in a bed - a blue plus; a skeleton in a repair bed - a blue wrench;\n[*]optionally a short text next to the icon;\n[*]size, portrait corner and margins are adjustable.\n[/list]\n\nReadability only: medical rules, AI and balance are not changed.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Vital Read\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173801,
+        "time_updated": 1793577431,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 294,
+        "favorited": 33,
+        "lifetime_subscriptions": 347,
+        "lifetime_favorited": 36,
+        "views": 634,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852087",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "312755",
+        "file_url": "",
+        "hcontent_file": "3302344173869232363",
+        "preview_url": "https://images.steamusercontent.com/ugc/17577835138118254939/E7BF0DA2319A07B37BBCC07E6B627465A5823CB9/",
+        "hcontent_preview": "17577835138118254939",
+        "title": "Job B Gone (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] A panel to clear job queues for yourself, the selection, the squad or everyone - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nexusmods.com/kenshi/mods/2209\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1870]Job-B-Gone[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Job-B-Gone]Emkej/Job-B-Gone[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]The panel respects localized pause menus and remembers hotkey hiding across restarts.\n[*]One binding replaces separate modifier controls, with readable colors and fewer repeated panel updates.\n[*]The confirmation mode is fully translated.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nA panel above the squad panel for quick job queue cleanup:\n\n[list]\n[*]delete all jobs for yourself, the selected characters, the whole squad or everyone;\n[*]delete one specific job - in the same scopes;\n[*]for \"squad\" and \"all\" - a two-step confirmation with the number of characters and jobs affected, so nothing is removed by accident;\n[*]the panel collapses, can be dragged by its header and remembers its position;\n[*]CTRL+B hides and shows the panel.\n[/list]\n\nNo balance or content changes - only easier queue management.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Job-B-Gone\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173757,
+        "time_updated": 1793577438,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 110,
+        "favorited": 16,
+        "lifetime_subscriptions": 159,
+        "lifetime_favorited": 18,
+        "views": 478,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852189",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "753622",
+        "file_url": "",
+        "hcontent_file": "7958164836031860336",
+        "preview_url": "https://images.steamusercontent.com/ugc/17834641150581017328/A8DA6ABC7327E73E4667580F10DD792777BE1164/",
+        "hcontent_preview": "17834641150581017328",
+        "title": "Organize the Trader (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Search and sorting in the trader window - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 8 · Nexus: https://www.nexusmods.com/kenshi/mods/2212\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1886]Organize the Trader[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Organize-the-Trader]Emkej/Organize-the-Trader[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Matching items are packed at the start of the grid, with lower overhead during sales.\n[*]Search and the full preset list adapt to the game font and window size, with evenly aligned controls.\n[*]Trader money appears on the left and an optional deal balance in the centre; updated UI Tweaks preserves this layout.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nAdds search and sorting to the trader window so you can find goods and compare their value more easily.\n\n[list]\n[*][b]Search while typing[/b] packs matching items at the start of the grid without empty rows. Blueprints are found by what they unlock; \"b:\" selects blueprints only.\n[*][b]Full preset names[/b] cover name, unit price, stack value, unit weight, stack weight and value per weight. The order can be reversed.\n[*][b]Controls that fit the window[/b] account for translated captions and the active game font. Narrow windows place search and sorting on separate rows; buttons and fields share the same height and alignment.\n[*][b]Trader money on the left, deal balance in the centre, player money on the right.[/b] The balance tracks this open window, using the active interface palette for gains and costs. The row retains the theme's own background. The deal balance can be hidden separately.\n[*][b]Steady updates[/b] refresh searches and amounts when they change, without unnecessary interface rebuilding.\n[/list]\n\n[h2]CONTROLS[/h2]\n\nType in the lower search field. Ctrl+F or / focuses it; the clear button resets the query. Choose a sorting preset and direction. Ctrl+Shift+F8 enables or disables the controls.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM → Organize the Trader: enable, matching-item and quantity counters, clear button, auto-focus, preferred search and list widths, and deal balance. Changes apply immediately. Detailed logging is last and off by default. Without MCM use mod-config.json. The interface follows Russian, English or Chinese.\n\n[h2]COMPATIBILITY[/h2]\n\nRequires RE_Kenshi. Install this fork instead of the original; Mod Hub is not required. Supports the vanilla interface and Dark UI; the updated UI Tweaks preserves the mod's custom header. Very narrow windows may use smaller text; full names remain available in the list or tooltip. Prices, stock, money and trade rules are unchanged. The normal trader-window binding for GOG was corrected and checked against game files; GOG runtime testing has not been performed.\n",
+        "time_created": 1791173787,
+        "time_updated": 1793577446,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 167,
+        "favorited": 19,
+        "lifetime_subscriptions": 210,
+        "lifetime_favorited": 19,
+        "views": 574,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3816121254",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "586675",
+        "file_url": "",
+        "hcontent_file": "5689553557960033784",
+        "preview_url": "https://images.steamusercontent.com/ugc/18146450376245931837/CE327BE15DDDF70C366BF417E9BD521E682B5D43/",
+        "hcontent_preview": "18146450376245931837",
+        "title": "Organize the Crafting Stations (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] A search bar in crafting and research windows - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2219\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1900]Organize the Crafting Stations[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Organize-the-Crafting-Stations]Emkej/Organize-the-Crafting-Stations[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]The search hint is translated; the counter is measured correctly and does not overlap the frame.\n[*]Reduced overhead while the search panel is open.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nCrafting and research windows get a search bar:\n\n[list]\n[*]recipes and blueprints are filtered by name as you type;\n[*]the found rows gather at the top, with no empty gaps;\n[*]next to it - a \"found / total\" counter and a clear button;\n[*]the search panel is dragged by its \"::\" handle, the position is remembered;\n[*]field width and height, autofocus and the counter are adjustable.\n[/list]\n\nRecipes, research and the stations themselves are not changed - only how the list is shown. Works alongside Organize the Trader: it does not touch trader windows.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Organize the Crafting Stations\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791503044,
+        "time_updated": 1793577453,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 843,
+        "favorited": 35,
+        "lifetime_subscriptions": 1070,
+        "lifetime_favorited": 38,
+        "views": 591,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813851956",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "183299",
+        "file_url": "",
+        "hcontent_file": "1204255321921701742",
+        "preview_url": "https://images.steamusercontent.com/ugc/15370135996820665811/B367B20AA5F922433A44A39D2C4896410975EB4D/",
+        "hcontent_preview": "15370135996820665811",
+        "title": "Auto-Pause on Load (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Pauses the game after a save loads, on trade and on inventory - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nexusmods.com/kenshi/mods/2206\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1867]Auto-Pause on Load[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Auto-Pause-on-Load]Emkej/Auto-Pause-on-Load[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Fixed pause ownership when switching characters between trade and inventory.\n[*]Added a stable save-import pause that stops holding when the player provides input.\n[*]Added pausing when an unselected squad is hit, with a 0–300 second interval.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nPauses the game at the right moment:\n\n[list]\n[*]after a save is loaded or imported - the world does not start moving while you look around;\n[*]when trading starts;\n[*]when an inventory opens;\n[*]optionally when a character of a squad that is not selected takes a hit.\n[/list]\n\nAfter trading and inventory the game can unpause by itself - configurable. Each pause can be turned on separately. No balance or content changes.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Auto-Pause on Load\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173726,
+        "time_updated": 1793577460,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 217,
+        "favorited": 20,
+        "lifetime_subscriptions": 257,
+        "lifetime_favorited": 22,
+        "views": 448,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852124",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "316524",
+        "file_url": "",
+        "hcontent_file": "133019499283723820",
+        "preview_url": "https://images.steamusercontent.com/ugc/11890529641255005442/C2091E29451B89CB92EF5C8965157AE14CBEDE2F/",
+        "hcontent_preview": "11890529641255005442",
+        "title": "Loot Scoot Execute (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Execute and Execute All for downed enemies in the context menu - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 6 · Nexus: https://www.nexusmods.com/kenshi/mods/2210\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1871]Loot-Scoot-Execute[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Loot-Scoot-Execute]Emkej/Loot-Scoot-Execute[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Action buttons are translated; multiple executioners take separate nearest targets, and a new player order cancels execution.\n[*]Corrected task flicker and sounds for people, animals and skeletons.\n[*]Actions are integrated into the native context menu, retaining the separate panel as fallback.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nThe context menu of a downed enemy gets \"Execute\" and \"Execute All\" among the game's own options:\n\n[list]\n[*][b]Execute[/b] - the selected character walks up and finishes this enemy;\n[*][b]Execute All[/b] - finishes all downed enemies nearby, nearest first; several selected characters each run to their own target; hovering highlights the targets in red;\n[*]cancel an execution with any order, e.g. a click on the ground;\n[*]works only on unconscious enemies, never on your own people;\n[*]selection works like the game's own menu: hover and release the right mouse button.\n[/list]\n\nDistance, the Execute All radius and the button size are adjustable.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Loot-Scoot-Execute\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173768,
+        "time_updated": 1793577467,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 366,
+        "favorited": 39,
+        "lifetime_subscriptions": 453,
+        "lifetime_favorited": 41,
+        "views": 1028,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852362",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "219043",
+        "file_url": "",
+        "hcontent_file": "5140392918820479247",
+        "preview_url": "https://images.steamusercontent.com/ugc/16260713508463606055/B5A71A11FB47F10D8C0CF3541E36CA152E19F80B/",
+        "hcontent_preview": "16260713508463606055",
+        "title": "Wall B Gone (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] A key to dismantle your walls, beds and furniture - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nexusmods.com/kenshi/mods/2215\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1863]Wall-B-Gone[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Wall-B-Gone]Emkej/Wall-B-Gone[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]Added optional dismantling of other player buildings and item unloading, with contents and occupancy checks.\n[*]Added Enter/Esc confirmation and removed the duplicate reset-key control.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nA dismantle key (X by default): select your own wall, bed, sleeping bag, chair, bench, table or throne and press it - the object is dismantled exactly like with the game's button, materials are refunded as usual. Handy when redesigning a base: no need to click the \"Dismantle\" button every time.\n\n[list]\n[*]an occupied bed or sleeping bag is never dismantled;\n[*]a wall - only if nothing is built on or in it;\n[*]optionally the key dismantles any of your buildings - storage, workbenches, houses; with nobody inside and no furniture. Items in a storage either block dismantling or (a separate option) are put on the ground first;\n[*]optionally a question before dismantling: Enter - dismantle, Esc - cancel;\n[*]the key can be changed, with CTRL, SHIFT or ALT if you like.\n[/list]\n\nNo balance changes: it is the game's own dismantling, just faster.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Wall-B-Gone\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173828,
+        "time_updated": 1793577474,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 140,
+        "favorited": 24,
+        "lifetime_subscriptions": 171,
+        "lifetime_favorited": 25,
+        "views": 690,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852055",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "236664",
+        "file_url": "",
+        "hcontent_file": "6280952475771420067",
+        "preview_url": "https://images.steamusercontent.com/ugc/17170801014056435789/DD38898C9176D1C7F859413D2F7ABCCE729A2918/",
+        "hcontent_preview": "17170801014056435789",
+        "title": "Hidden Faction Relations (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Your relations with every faction, hidden ones included, in the Options window - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2208\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1915]Hidden-Faction-Relations[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Hidden-Faction-Relations]Emkej/Hidden-Faction-Relations[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]The list opens from MCM; the nonworking Ctrl+Alt+G shortcut and search-size controls were removed.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nThe game's Options window gets a tab with the list of factions and your relation to each - including hidden factions the game never shows.\n\n[list]\n[*]search by name;\n[*]sort by relation or alphabetically;\n[*]all factions or hidden only; you can keep only non-zero relations;\n[*]colour: hostile in red, friendly in green, neutral in yellow.\n[/list]\n\nNo balance or content changes.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Hidden Faction Relations\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173748,
+        "time_updated": 1793577481,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 334,
+        "favorited": 16,
+        "lifetime_subscriptions": 533,
+        "lifetime_favorited": 17,
+        "views": 435,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3813852161",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "294881",
+        "file_url": "",
+        "hcontent_file": "7199368353810909304",
+        "preview_url": "https://images.steamusercontent.com/ugc/10014922868860129078/FC9FA0573DE879611DC6CB5ED20BF4C21A9CA9A2/",
+        "hcontent_preview": "10014922868860129078",
+        "title": "Map markers (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Your own markers with labels on the world map, per save - a fork of Emkej8's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 4 · Nexus: https://www.nexusmods.com/kenshi/mods/2211\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/1887]Map markers[/url]. Author: [b]Emkej8[/b].\n\n[b]Thank you, Emkej8, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Emkej/Map-markers]Emkej/Map-markers[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Settings moved from Mod Hub to MCM, with Russian and Chinese translations.\n[*]The translated editor is wider and above map icons, with Delete, save-and-close and label-color controls.\n[*]Labels and the button no longer clip; reduced map-marker overhead.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nYour own markers on the world map - for notes: where the ore is, where it is dangerous, where to come back.\n\n[list]\n[*]middle-click empty map space - a new marker, you can type a label right away (Enter saves);\n[*]left-click a marker to select it, empty space to move the selected one; remove it with the Delete button in the marker window or the Delete key;\n[*]markers have types and short labels;\n[*]the \"Markers: On/Off\" button at the bottom of the map hides and shows them;\n[*]markers are kept per save.\n[/list]\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Map markers\". Each row has a tooltip, changes apply at once. Without MCM - mod-config.json in the mod folder.\n",
+        "time_created": 1791173775,
+        "time_updated": 1793577488,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 285,
+        "favorited": 45,
+        "lifetime_subscriptions": 344,
+        "lifetime_favorited": 47,
+        "views": 1025,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3818460323",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "2853635",
+        "file_url": "",
+        "hcontent_file": "4807607043771208335",
+        "preview_url": "https://images.steamusercontent.com/ugc/9702450458974845757/E2180E66E564A9714620455918781F4E0DF82EF9/",
+        "hcontent_preview": "9702450458974845757",
+        "title": "Kenshi Job Management (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] A window for squad job queues and work stations: who does what, in which order and who works where. A fork of SirixKC's mod with the game's own interface, translations and settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nexusmods.com/kenshi/mods/2225\n\nOriginal mod: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3785306982]Kenshi Job Management[/url]. Author: [b]SirixKC[/b].\n\n[b]Thank you, SirixKC, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/SirixKC/KenshiJobManagement]SirixKC/KenshiJobManagement[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]The window uses native game skins, fonts and palette with scaling, including Workshop themes.\n[*]Added MCM and Russian/English/Chinese text, and fixed wheel scrolling in the Stations tab and worker window.\n[*]Clearer icons and fixes for moving jobs and applying group actions.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nOne window for all permanent jobs of your squads: who does what, in which order and who works where. Opens with Ctrl+J or the JM button next to the Jobs button on the bottom panel; the game is paused while the window is open.\n\n[list]\n[*][b]Squad jobs[/b] - each character's queue as cards by priority. Drag and drop, copy and paste, several jobs and characters at once (Ctrl), clear a queue with one button;\n[*][b]all squads[/b] - switch with TAB or the buttons at the bottom, squads collapse;\n[*][b]healing in one click[/b] - add the missing Medic, Robotics, Rescue, Put in Bed and Splint jobs and move healing to the top of the queue;\n[*][b]remove invalid jobs[/b] - drop jobs that can no longer be done (for example, resource nodes after an import);\n[*][b]stations[/b] - every workstation of your base in a grid by category: name, area, how many are assigned and what stops the work (for example, no power);\n[*][b]assigning workers[/b] - click a station to open a window: who is assigned, who can work there, workers sorted by the skill it needs.\n[/list]\n\n[h2]SETTINGS[/h2]\n\nWith Mod Config Menu installed (optional): Options window → MCM tab → \"Kenshi Job Management\". Mod on/off, the open key, the panel button and the window size. Without MCM - KenshiJobManagement.ini in the mod folder. Which station categories are shown - the Options button in the window itself.\n\n[h2]IMPORTANT[/h2]\n\n[list]\n[*]do not enable it together with the original - they share the folder and the window;\n[*]save before the first use: there is no undo button.\n[/list]\n",
+        "time_created": 1791805635,
+        "time_updated": 1793577496,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 432,
+        "favorited": 79,
+        "lifetime_subscriptions": 528,
+        "lifetime_favorited": 81,
+        "views": 1658,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3820546396",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "170236",
+        "file_url": "",
+        "hcontent_file": "9190526276108681537",
+        "preview_url": "https://images.steamusercontent.com/ugc/17136524923897435977/DBE5B2957A17B33525EE2E4AED193314A49BF9B1/",
+        "hcontent_preview": "17136524923897435977",
+        "title": "Character Highlight (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Hold ALT to tint characters by how they stand to you - squad, enemies, allies, neutrals, diplomats. A heavily optimised fork of BFrizzleFoShizzle's mod with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2233\n\nOriginal mod: [url=https://github.com/BFrizzleFoShizzle/KenshiLib_Examples]Character Highlight[/url]. Author: [b]BFrizzleFoShizzle[/b].\n\n[b]Thank you, BFrizzleFoShizzle, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/BFrizzleFoShizzle/KenshiLib_Examples]BFrizzleFoShizzle/KenshiLib_Examples[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Added MCM and Russian/English/Chinese text, separate category toggles, range and tint settings.\n[*]Reduced background highlighting overhead, especially in large settlements.\n[*]Added a separate diplomat color, including modded envoys, and fixed highlighting for factionless characters.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nWhile the key is held (ALT by default), characters are tinted by how they stand to you:\n\n[list]\n[*][b]your squad[/b] - blue;\n[*][b]enemies[/b] - red;\n[*][b]allies[/b] - green;\n[*][b]neutrals[/b] - red through yellow to green by their faction's relation to you (or one colour);\n[*][b]faction diplomats[/b] - purple, whatever their faction's relation; diplomats from mods too.\n[/list]\n\nEach kind can be turned off; colours, the key, distance and see-through-walls are adjustable.\n\n[h2]A HEAVILY OPTIMISED VERSION[/h2]\n\nThe original ate FPS all the time - even when it highlighted nobody: every frame it walked every character around and reset their tint. With the key held, every frame it worked out again how every character stands to every one of yours - in a town that is hundreds of characters times dozens of yours.\n\nHere the relation is remembered and re-checked once a second, the colour is written only when it changes, and while the key is not held the mod does nothing.\n\nWorks together with Vital Sense: its tint of downed and wanted characters stays on top.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Character Highlight\". Each row has a tooltip, changes apply at once; no restart needed. Without MCM - CharacterHighlight.ini in the mod folder, every line there is commented.\n",
+        "time_created": 1792111962,
+        "time_updated": 1793577503,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 121,
+        "favorited": 14,
+        "lifetime_subscriptions": 172,
+        "lifetime_favorited": 16,
+        "views": 443,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3829848451",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "646435",
+        "file_url": "",
+        "hcontent_file": "8796696988366289157",
+        "preview_url": "https://images.steamusercontent.com/ugc/14486509808742482605/D62C25ADF2FAC38832D54CBC43A223F2B83A599B/",
+        "hcontent_preview": "14486509808742482605",
+        "title": "Character Inspector (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2259\n\nOriginal mod: [url=https://github.com/shutori/Shutori_Re_Kenshi_Source]Character Inspector[/url]. Author: [b]shutori[/b].\n\n[b]Thank you, shutori, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/shutori/Shutori_Re_Kenshi_Source]shutori/Shutori_Re_Kenshi_Source[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]MCM controls enable inspection and the inventory button; the separate open binding is removed.\n[*]Interface and settings support Russian, English and Chinese; earlier community translations and LEOPARD fixes are retained.\n[*]Reduced inventory-window overhead; inspecting armour does not interfere with opening and closing other windows.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nOpen a character's inventory and click STATS to inspect their protection by body part.\n\n[list]\n[*][b]Armour coverage[/b] - which equipped pieces can protect the chosen body part.\n[*][b]Protective layers[/b] - details of equipment covering that area.\n[*][b]Resistances[/b] - information about protection from environmental hazards.\n[*][b]The inventory's character[/b] is inspected, rather than an unrelated selected character.\n[/list]\n\n[h2]HOW TO USE[/h2]\n\nOpen the desired inventory, click STATS and select a body part. No separate inspection hotkey is needed: the button stays in the familiar inventory window. Inspection shows equipment information without changing stats or balance. Combined protection is an estimate for comparing equipment, rather than an exact prediction of the next hit's damage.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM tab → \"Character Inspector\". Enable the plugin and inventory button in game; changes apply immediately. The old separate open binding is no longer used. Updates preserve your personal settings.\n\nDo not enable alongside the original DLL. Existing LEOPARD fixes and community localization are preserved. GNU GPL v3.\n",
+        "time_created": 1793319383,
+        "time_updated": 1793577510,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 112,
+        "favorited": 23,
+        "lifetime_subscriptions": 126,
+        "lifetime_favorited": 23,
+        "views": 453,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3816121198",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "278670",
+        "file_url": "",
+        "hcontent_file": "7280000240551577421",
+        "preview_url": "https://images.steamusercontent.com/ugc/18352843434796888824/DD589DD01BB4D24D1192D6D77C6A6361BC3A5F10/",
+        "hcontent_preview": "18352843434796888824",
+        "title": "Better Looting (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Rule-based looting, required-item lists, protected player storage, optional ground pickup and deposit to base storage.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 5 · Nexus: https://www.nexusmods.com/kenshi/mods/2218\n\nOriginal mod: [url=https://github.com/XxAtreuSSxX/BetterLooting]Better Looting[/url]. Author: [b]XxAtreuSSxX[/b].\n\n[b]Thank you, XxAtreuSSxX, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/XxAtreuSSxX/BetterLooting]XxAtreuSSxX/BetterLooting[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.\n[*]Required items, protected player storage and nearest-first ground pickup. Details and settings are below.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nOpen your character's main inventory and press Insert to collect suitable nearby loot without clicking every item. A corpse or container window alone is not enough.\n\n[list]\n[*][b]Value and value per weight[/b] leave cheap, heavy junk behind.\n[*][b]Choose categories[/b]: weapons, armour, materials, food, medicine, tools, ammunition, blueprints, books, robotics, drugs, severed limbs and miscellaneous items.\n[*][b]Most valuable first in bodies and containers[/b], with optional backpack priority. Inventory capacity still limits what can be collected.\n[*][b]Stolen items are optional[/b]. Required items do not bypass theft restrictions.\n[*][b]Ready-made profiles[/b]: balanced, money and resources.\n[/list]\n\n[h2]ALWAYS TAKE REQUIRED ITEMS[/h2]\n\nAdd exact names or IDs to the required-item list, for example crafting skins or inexpensive first aid kits. They bypass category, value and value-per-weight filters, while capacity and theft rules still apply. Separate entries with semicolons; name:Animal Skin or id:identifier can make the match explicit. Mod Config Menu 10 or newer is needed to edit the full long list.\n\n[h2]YOUR BASE AND LOOSE GROUND ITEMS[/h2]\n\nPlayer storage protection is on by default: the loot key ignores items in your own buildings, even when their inventory window is open. Loose ground pickup is optional. The character walks to suitable items and picks them up normally rather than receiving them instantly; loot range and rules still apply. The character keeps their previous orders and receives up to 32 pickup orders per press. The open main inventory determines who collects; if several are open, the first suitable window is used. Collection starts with the nearest suitable item and continues to the next nearest, so high prices do not send the character past closer loot. Ground pickup is off by default.\n\n[h2]DEPOSIT TO STORAGE[/h2]\n\nALT+INSERT puts the character's items, except equipped gear, into nearby storage on your base that accepts them: ore into ore boxes, armour into armour storage and the rest into chests. If no space is available the item stays with the character. Optionally deposit only items that pass the loot rules. Storage protection does not block deposit.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM tab → \"Better Looting\". Loot and deposit bindings, range, values, categories, profiles and the new rules apply immediately. Updates preserve your personal settings.\n\nDo not enable alongside the original. GNU GPL v3.\n",
+        "time_created": 1791503035,
+        "time_updated": 1793577517,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 260,
+        "favorited": 37,
+        "lifetime_subscriptions": 324,
+        "lifetime_favorited": 42,
+        "views": 954,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3829848599",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "153452",
+        "file_url": "",
+        "hcontent_file": "422015658174561801",
+        "preview_url": "https://images.steamusercontent.com/ugc/10506647841368776118/9A1C58D42384C0407E6A219DDE4402A1B39FC86F/",
+        "hcontent_preview": "10506647841368776118",
+        "title": "Kill Counter (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2261\n\nOriginal mod: [url=https://www.nexusmods.com/kenshi/mods/2103]Kill Counter[/url]. Author: [b]Rokeshi[/b].\n\n[b]Thank you, Rokeshi, for the original mod![/b]\n\n[b]Original source code:[/b] Source code shipped with the installed original; a public repository and author permission to redistribute a modified version have not been verified. No explicit license was present locally. [url=https://www.nexusmods.com/kenshi/mods/2103]Original mod page[/url].\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]MCM adds a tracking enable switch and independent row visibility; hiding a row does not stop counting, and disabling retains totals.\n[*]Labels and settings support Russian, English and Chinese, retaining community fixes and StatColours compatibility.\n[*]Reduced unnecessary counter updates to improve interface performance.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nAdds counters to the character stats window so you can see their combat record.\n\n[list]\n[*][b]Kills[/b] - a separate counter row.\n[*][b]Knockouts[/b] - can be displayed independently of kills.\n[*][b]Severed limbs[/b] - a third separate statistic.\n[/list]\n\n[h2]HOW TO USE[/h2]\n\nOpen the character stats window. No extra window or hotkey is needed: the counters sit beside the character's other information. Keep only the rows you want in MCM: hidden rows continue counting. Disabling the plugin stops new tracking while preserving accumulated values. Original counter behavior is retained while controls and labels move to the shared settings interface.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM tab → \"Kill Counter\". Enable and each of the three row-visibility settings apply immediately. Updates preserve your personal settings.\n\nDo not enable alongside the original. Local build: author permission for public distribution of this derivative version has not been established.\n",
+        "time_created": 1793319403,
+        "time_updated": 1793577524,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 77,
+        "favorited": 16,
+        "lifetime_subscriptions": 88,
+        "lifetime_favorited": 17,
+        "views": 190,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3829848534",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "215817",
+        "file_url": "",
+        "hcontent_file": "7734006184234714827",
+        "preview_url": "https://images.steamusercontent.com/ugc/11290560039492952697/ABB87E30DB90738EE6E3C5BAB53FC3A34616397C/",
+        "hcontent_preview": "11290560039492952697",
+        "title": "Rotate Items (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2260\n\nOriginal mod: [url=https://github.com/jacobericson/KenshiRotate]Rotate Items[/url]. Author: [b]jacobericson[/b].\n\n[b]Thank you, jacobericson, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/jacobericson/KenshiRotate]jacobericson/KenshiRotate[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]MCM replaces the old MODS controls: one keyboard or mouse binding with modifiers, MMB by default; NONE disables input. Mouse assignment requires MCM 10 or newer.\n[*]The first active legacy binding migrates automatically; an existing new binding and personal settings are preserved.\n[*]Repeated rotation after inventory focus was fixed; editable fields and the Options window block rotation.\n[*]Added Russian, English and Chinese, with lower inventory-icon update overhead.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nRotate items in inventories and backpacks to fit the grid more conveniently. Hover over an item and press the assigned button; middle mouse is the default. An item already held by the cursor can also be rotated; the new orientation needs enough free space.\n\n[list]\n[*][b]Repeated rotations[/b] without closing and reopening the inventory.\n[*][b]One binding[/b] replaces two separate control modes: keyboard or mouse, optionally with CTRL, SHIFT and ALT.\n[*][b]Saved rotations[/b] survive saving and loading; original stack behavior is retained.\n[*][b]Text entry stays safe[/b]: typing in an editable field or changing options does not rotate items.\n[/list]\n\n[h2]BINDINGS AND UPDATES[/h2]\n\nOpen Rotate Items in MCM, click the binding row, then press the desired key or mouse button. Esc cancels capture; Backspace clears the binding and disables rotation input. Mouse assignment requires MCM 10 or newer. Updating keeps your existing binding or carries over the previous rotation control automatically.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM tab → \"Rotate Items\". Enable and one rotation binding apply immediately. Disabling stops new rotations while preserving the display of already rotated items. Updates preserve your personal settings.\n\nDo not enable alongside the original Rotate Items. GNU GPL v3.\n",
+        "time_created": 1793319393,
+        "time_updated": 1793577531,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 156,
+        "favorited": 26,
+        "lifetime_subscriptions": 179,
+        "lifetime_favorited": 27,
+        "views": 449,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3831174059",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "176318",
+        "file_url": "",
+        "hcontent_file": "138573641109704793",
+        "preview_url": "https://images.steamusercontent.com/ugc/12354943584813590433/4F30626BC0732DB7785B2FBA22670A6F0CB41DCD/",
+        "hcontent_preview": "12354943584813590433",
+        "title": "Taunt Expansion (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Adjust the native Taunt bonus and enemy retargeting strength through optional MCM settings.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2265\n\nOriginal mod: [url=https://steamcommunity.com/workshop/filedetails/?id=3771499164]Taunt Expansion[/url]. Author: [b]tata / Tata-Gari[/b].\n\n[b]Thank you, tata / Tata-Gari, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/Tata-Gari/RE_Kenshi_Plugins_Source]Tata-Gari/RE_Kenshi_Plugins_Source[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Optional live MCM settings.\n[*]English, Russian and Simplified Chinese interface.\n[*]Consistent Taunt strength during simultaneous target evaluations.\n[*]Original package defaults preserved.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n[list]\n[*][b]A stronger tank role.[/b] The original mod strengthens Kenshi's normal Taunt button, helping a taunting character attract enemy attention.\n[*][b]Adjustable Taunt strength.[/b] The vanilla +2 score bonus is multiplied by 5 by default, giving +10.\n[*][b]Help drawing enemies away from allies.[/b] If an enemy already has a valid target, the default additional multiplier of 2 gives a total Taunt bonus of +20.\n[*][b]Normal combat decisions remain.[/b] Kenshi still checks valid targets, distance, reachability and its normal target-retention rules. Taunt is stronger but does not guarantee a forced target switch. Several taunting characters still compete normally.\n[/list]\n\n[h2]CONTROLS[/h2]\n[list]\n[*][b]Taunt:[/b] enable the existing Taunt button for the character who should draw attention. There is no additional hotkey.\n[*][b]Settings:[/b] open Mod Config Menu and select [b]Taunt Expansion[/b]. Without MCM, edit TauntExpansion.ini beside the DLL while the game is closed.\n[/list]\n\n[h2]SETTINGS[/h2]\n[list]\n[*][b]Enabled:[/b] on by default. Turning it off immediately restores normal Taunt strength.\n[*][b]Taunt multiplier:[/b] 0-100; default 5. Value 1 is vanilla strength, 0 removes the Taunt-specific bonus.\n[*][b]Retarget multiplier:[/b] 0-10; default 2. The additional factor applies when an enemy already has a valid target. Value 1 adds no extra retarget enhancement.\n[/list]\nThe README contains the full settings and diagnostic reference.\n\n[h2]INSTALLATION AND COMPATIBILITY[/h2]\n[list]\n[*][b]Requirements:[/b] Kenshi 1.0.65 x64, RE_Kenshi and KenshiLib. Mod Config Menu is optional. This build targets the matching Steam 1.0.65 executable.\n[*][b]Installation:[/b] copy the TauntExpansion folder to Kenshi/mods and enable TauntExpansion.mod in the launcher.\n[*][b]Replace the original:[/b] keep one active Taunt Expansion copy. Plugins changing the same Taunt or target-selection behavior may conflict.\n[*][b]Saves:[/b] no import is required. The fork stores no separate gameplay data in saves.\n[*][b]Combat:[/b] pathfinding, attack slots, animations, damage, dodge and guard are unchanged.\n[*][b]Balance:[/b] the original author notes less testing for ranged enemies, turrets, animals and law-enforcement AI. Very high multipliers remain a player balance choice.\n[/list]\n",
+        "time_created": 1793481121,
+        "time_updated": 1793577538,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 47,
+        "favorited": 10,
+        "lifetime_subscriptions": 50,
+        "lifetime_favorited": 10,
+        "views": 194,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3830285370",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "520143",
+        "file_url": "",
+        "hcontent_file": "785490665715705927",
+        "preview_url": "https://images.steamusercontent.com/ugc/15899763666001417031/1C4B8171634341E9805F9D0571E9F0B92C2F2EA3/",
+        "hcontent_preview": "15899763666001417031",
+        "title": "Stack Sort (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Pack inventories, consolidate compatible stacks and reserve free space, with Rotate Items support and MCM settings.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 3 · Nexus: https://www.nexusmods.com/kenshi/mods/2262\n\nOriginal mod: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813810734]StackSort[/url]. Author: [b]Jakematt2004[/b].\n\n[b]Thank you, Jakematt2004, for the original mod![/b]\n\n[b]Original source code:[/b] [url=https://github.com/jacobericson/StackSort]jacobericson/StackSort[/url]\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Moved settings into MCM and added Russian, English and Chinese interface text.\n[*]Fixed compatible-stack consolidation, including partially used medical and repair kits.\n[*]Removed extra controls from storage that can hold only one stack.\n[*]Controls replace Arrange; backpack controls share one centred row with the KEO checkbox.\n[*]Rotate Items works in either mod-list order, retaining position undo even after late detection.\n[*]Splitting stacks or changing contents is respected on the next sort without reopening the window.\n[*][b]Compatible inventory windows.[/b] Windows without the native Arrange button are skipped quietly, preserving their normal controls.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nPacks inventory and backpack items tightly, combines compatible stacks and helps leave a useful area free.\n\n[list]\n[*][b]Several arrangements[/b] — prepared when the inventory opens; repeated clicks on Sort cycle the best options.\n[*][b]H/W free space[/b] — choose the height or width of the area to leave free with the H/W button and arrows.\n[*][b]Compatible stacks[/b] combine when sorted, including partially used medical and repair kits. Quality, material, manufacturer and ownership follow the game's rules.\n[*][b]Rotation through Rotate Items[/b] is considered when finding arrangements. Either mod-list order works. Without a compatible Rotate Items, existing rotations remain intact and no new rotations are introduced.\n[*][b]Replaces Arrange[/b] with four controls in body and backpack inventories. Backpack controls form one centred row beneath the grid together with KEO's backpack-first checkbox, when present; its selection and action are preserved.\n[*][b]Narrow windows[/b] use a compact caption or [N] with a tooltip. If there is no room, the original button remains; other neighbouring widgets keep their positions.\n[/list]\n\n[h2]CONTROLS[/h2]\n\nLeft-click Sort for the next arrangement. Right-click restores positions after the initial stack merge; merged stacks cannot be split again. H/W switches the free-space direction, and the arrows change its size.\n\n[h2]SETTINGS[/h2]\n\nOptions → MCM → Stack Sort: enable, stack merging, number of arrangements, initial direction and background worker count. Initial direction and worker count require restart and carry *. Detailed logging defaults to off. Without MCM use StackSort.ini; advanced tuning is in StackSort.cfg. Interface text is Russian, English or Chinese.\n\n[h2]COMPATIBILITY[/h2]\n\nRequires RE_Kenshi; MCM provides in-game settings. Install our Rotate Items for rotation. Use one StackSort: this fork replaces the original. Traders, single-slot storage and specialised containers with room for only one stack retain their normal controls. Closing or disabling restores native controls and the KEO checkbox position.\n",
+        "time_created": 1793382419,
+        "time_updated": 1793577545,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 133,
+        "favorited": 19,
+        "lifetime_subscriptions": 148,
+        "lifetime_favorited": 19,
+        "views": 502,
+        "tags": [
+          {
+            "tag": "GUI"
+          },
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3829845490",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "265017",
+        "file_url": "",
+        "hcontent_file": "1013560015078138294",
+        "preview_url": "https://images.steamusercontent.com/ugc/17596415646616929694/A8AD810493EA54DA14604FFEDEFEFA922C3F70E3/",
+        "hcontent_preview": "17596415646616929694",
+        "title": "AI Fixed (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] A modular AI collection with robotic care, optional rest and own-gate assistance, configured through MCM.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2256\n\n[h2]WHAT IT DOES[/h2]\n\nAI Fixed is a growing collection of AI improvements by different authors. Its modules can be enabled separately.\n\n[list]\n[*][b]Robotic care.[/b] Rescuers prefer suitable repair beds for wounded skeletons. Robotic parts, including prosthetics, can finish their health and wear repairs before the character returns to work.\n[*][b]Optional rest.[/b] Wounded characters can use a nearby ordinary bed after their wounds are treated. Hungry characters give food priority. Manual travel, Stop and queued orders take precedence.\n[*][b]Beds nearby.[/b] Choose a search radius and use your own faction's free beds, or optionally allied beds. The bed must suit the treatment, and repair beds need power.\n[*][b]Optional own-gate passage.[/b] A character stopped at your closed gate can open it and continue to the selected destination. Opening locked gates, closing after passage and restoring the lock are separate choices.\n[*][b]Return to normal work.[/b] Our rest order ends after recovery. Pausing does not spend the waiting time, and ongoing healing can continue until it finishes.\n[/list]\n\n[h2]SETTINGS[/h2]\n\nUse Options → MCM → AI Fixed, or AIFixed.ini without MCM. New automatic sleep, robotic-health repair and gate assistance are off by default. Existing robotic wear repair remains enabled. Health thresholds, bed ownership, search radii and gate closing can be adjusted separately. Detailed log is last and off by default. Settings that need a restart are marked in MCM.\n\n[h2]AUTHORS AND SOURCES[/h2]\n\nLEOPARD's robotic-repair fixes are joined by adaptations of [b]Basusu's GateFix and SleepFix[/b]. [b]Thank you, Basusu, for the original mods, open source and investigations![/b] Further modules may include other authors, credited separately.\n\n[b]Original mods:[/b] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3787399736]GateFix by Basusu[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3787375792]SleepFix by Basusu[/url].\n[b]Original source code:[/b] [url=https://github.com/Basusu0/Basusu-kenshi-plugins]Basusu-kenshi-plugins[/url].\nGPLv3; LICENSE and UPSTREAM.md are included.\n\n[h2]COMPATIBILITY[/h2]\n\nOriginal SleepFix and GateFix are not required: their adapted functions are included in AI Fixed. Do not enable the same mechanics in the originals alongside this collection. Gate Push Guard handles a separate anti-push problem. Other AI mods, custom beds and races may change the result. Manual orders and gate actions take priority; cancelling passage assistance may leave a gate open or unlocked. Food availability and a usable path are still required.\n",
+        "time_created": 1793319117,
+        "time_updated": 1793577553,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 180,
+        "favorited": 39,
+        "lifetime_subscriptions": 196,
+        "lifetime_favorited": 40,
+        "views": 908,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3820974078",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "505088",
+        "file_url": "",
+        "hcontent_file": "7068002658633392914",
+        "preview_url": "https://images.steamusercontent.com/ugc/12058315567961245248/1C6FD4BB4FF68DAECA9150555B076B717D7F3A38/",
+        "hcontent_preview": "12058315567961245248",
+        "title": "Dark UI Advanced",
+        "description": "A dark interface for Kenshi - a hybrid of Dark UI by Eldryn and Russian Dark UI simplistic by FG, with layout fixes. Works with any game language.\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2213\n\nA dark interface for Kenshi - a hybrid of [b]Dark UI[/b] by Eldryn and [b]Russian Dark UI simplistic[/b] by FG, with our improvements.\n\n[h2]WHAT IT IS[/h2]\n\nDark windows and panels instead of the game's light parchment. The window layouts are made for the Russian translation, so long Russian captions fit without overlapping. English and other languages work too - there is simply more room.\n\n[h2]WHAT IS IMPROVED[/h2]\n\n[list]\n[*][b]trader window[/b] - the money line stretches with the window, so the amount no longer sticks in the middle (with UI Tweaks - right at the centre);\n[*][b]Research tab[/b] - the description box is about a third taller, long armour descriptions fit in full;\n[*][b]skills window[/b] - all six rows of the Crafting column are visible again;\n[*][b]research and crafting queues[/b] - a neat remove button in the row;\n[*][b]Meitou weapons[/b] - a grade colour of their own, purple (with Item Markers); masterwork stays yellow.\n[/list]\n\n[h2]SOURCES[/h2]\n\n[list]\n[*][b]Dark UI[/b] by Eldryn ([url=https://steamcommunity.com/sharedfiles/filedetails/?id=1200632417]Steam[/url]) - the base;\n[*][b]Russian Dark UI simplistic[/b] by FG - Dark UI reworked for the Russian translation.\n[/list]\n\nThanks to the authors - this mod would not exist without them.\n\n[h2]COMPATIBILITY[/h2]\n\nInterface files only: window layouts, skins and the palette. Saves are not affected, it can be turned on and off at any time. It replaces Dark UI and Russian Dark UI simplistic - do not enable it together with them. Place it below other interface mods in the load order.\n",
+        "time_created": 1792176190,
+        "time_updated": 1792621069,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 119,
+        "favorited": 17,
+        "lifetime_subscriptions": 169,
+        "lifetime_favorited": 17,
+        "views": 491,
+        "tags": [
+          {
+            "tag": "GUI"
+          }
+        ]
+      },
+      {
+        "publishedfileid": "3821113149",
+        "result": 1,
+        "creator": "76561198098571264",
+        "creator_app_id": 233860,
+        "consumer_app_id": 233860,
+        "filename": "",
+        "file_size": "355706",
+        "file_url": "",
+        "hcontent_file": "5035909628180224222",
+        "preview_url": "https://images.steamusercontent.com/ugc/13691403995313971578/98D72DDE72A00D61369BB30E17C3454EE1C1A53E/",
+        "hcontent_preview": "13691403995313971578",
+        "title": "Formations Extended (MCM fork) (QoL)",
+        "description": "[b]Requires RE_Kenshi.[/b] Bannerlord-style squad formations: drag a shape, march in order, and keep a formation while following the leader - 13 follow shapes, a shape of its own for every squad. A fork of Slinkysalmon03's Formations with settings in Mod Config Menu.\nIn-game settings with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584]Mod Config Menu[/url] (optional).\n[i]In-game text follows the game language: English, Russian or Chinese.[/i]\n\nVersion 2 · Nexus: https://www.nexusmods.com/kenshi/mods/2235\n\nOriginal mod: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3795714050]Formations - Squad Formations[/url]. Author: [b]Slinkysalmon03[/b].\n\n[b]Thank you, Slinkysalmon03, for the original mod![/b]\n\n[b]Original source code:[/b] The author shipped source code with the original Steam Workshop mod; no separate public repository has been verified. [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3795714050]Original mod page[/url].\n\n[h2]CHANGES IN OUR FORK[/h2]\n\n[list]\n[*]Added follow formations with 13 offered shapes: 3 native and 10 new; each squad selection is stored with the save.\n[*]Seven shapes join the four original drag formations, for 11 in total.\n[*]Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages.\n[/list]\n\n[h2]WHAT IT DOES[/h2]\n\nBannerlord-style formations. Select your people, hold the modifier (ALT by default) and:\n\n[list]\n[*][b]right-drag across the ground[/b] - the squad lines up in a shape along the line;\n[*][b]right-click[/b] - a march: the slowest leads to the point, the rest follow in formation and form up there; nobody is left behind;\n[*][b]shape keys[/b] - line, circle, rectangle, wedge, square, rhombus, column of two, pincers, diamond, moth, chevron (1-4, 6-9, 0, -, =); 5 - tight or loose ranks;\n[*][b]V[/b] - a rally point (its flag shows while the modifier is held), [b]X[/b] - retreat to it, picking up the wounded on the way. People with the Medic job carry the wounded to the rally point on their own and heal them.\n[/list]\n\n[h2]FORMATIONS WHILE FOLLOWING[/h2]\n\nIn the game a squad follows its leader in one of three layouts: random, military or caravan. This adds ten more - chevron, column of two, diamond, line, moth, pincers, rhombus, ring, square, wedge. The list on the AI tab of the map window sets the formation for every squad, and Mod Config Menu can give each squad its own.\n\nThe squad moves by itself, as in the plain game: the mod only changes where each fighter keeps relative to the leader. The choice is saved with the game.\n\n[h2]SETTINGS[/h2]\n\nEvery setting is right in the game with Mod Config Menu installed (optional): Options window → MCM tab → \"Formations\". The modifier (any key or combination), spacing, default shape, loose ranks, Hold after forming up, marching in formation, the shape keys and each squad's formation. Changes apply at once; a squad's own formation needs Mod Config Menu version 7 or newer. Without MCM - Formations_settings.txt in the mod folder.\n\n[h2]COMPATIBILITY[/h2]\n\nNo game data is changed; uses the game's native following behavior. Remove the mod and squads go back to the game's own layouts.\n",
+        "time_created": 1792191725,
+        "time_updated": 1793455071,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 324,
+        "favorited": 81,
+        "lifetime_subscriptions": 391,
+        "lifetime_favorited": 84,
+        "views": 1112,
+        "tags": [
+          {
+            "tag": "Gameplay"
+          },
+          {
+            "tag": "RE_Kenshi"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,628 @@
+{
+  "verified_at_utc": "2026-11-01T23:59:57.920597+00:00",
+  "content_updates": 37,
+  "description_only_updates": 2,
+  "successful_callbacks": 78,
+  "bilingual_notes_submitted": 37,
+  "russian_notes_submitted": 0,
+  "remote_english_exact": 39,
+  "remote_square_previews_exact": 37,
+  "limitations": [
+    "Steam public API returns English. Russian submission is verified by each successful result1 callback; rendered RU pages were rate limited HTTP429.",
+    "Uploaded payload identity is pinned locally and upload callbacks plus remote content byte counts match. Remote Workshop payload files were not separately downloaded."
+  ],
+  "items": [
+    {
+      "package": "AssignedWorkers",
+      "version": "8",
+      "id": 3812150807,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577297,
+      "remote_file_size": 209960,
+      "content_size_matches": true,
+      "preview_sha256": "82a22a68719f19fbd1c38e27040681cc921b93d71446d16269818e4c31ffa29c",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "BestMinimap",
+      "version": "3",
+      "id": 3824087152,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577305,
+      "remote_file_size": 375057,
+      "content_size_matches": true,
+      "preview_sha256": "593f7757622053f5a0025a65778e358ad2967b4b8a692d3d62779e63bfa1109c",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "BuildModeGizmo",
+      "version": "5",
+      "id": 3813761881,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577312,
+      "remote_file_size": 166357,
+      "content_size_matches": true,
+      "preview_sha256": "fa828b2cddd998a12e7241bb10ccfe83201a81f1f7e0bdbc335c111a58bf52b1",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "GatePushGuard",
+      "version": "2",
+      "id": 3831174166,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577318,
+      "remote_file_size": 187332,
+      "content_size_matches": true,
+      "preview_sha256": "539cc9e19d54ce16b6c06586478b2bb98f4a43c25ef7dc3167d8b300c82eefe7",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "GearCompare",
+      "version": "8",
+      "id": 3812150687,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577326,
+      "remote_file_size": 283282,
+      "content_size_matches": true,
+      "preview_sha256": "a91c55a873234c80865f5eec36345dc6e1f51c8cc4fa1cf9b2a72795cac69a75",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "ItemMarkers",
+      "version": "6",
+      "id": 3816608451,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577333,
+      "remote_file_size": 185959,
+      "content_size_matches": true,
+      "preview_sha256": "dd2833888460b17e2514be76264997bd74cc7a7ae1851780f7f614ea905a63cc",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "LiveXpBars",
+      "version": "12",
+      "id": 3812150449,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577340,
+      "remote_file_size": 214181,
+      "content_size_matches": true,
+      "preview_sha256": "9462d34871927d4bcff55465833ef4275c04d605936ff1c3a19ead9683951a6d",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "ModConfigMenu",
+      "version": "11",
+      "id": 3813761584,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577347,
+      "remote_file_size": 345520,
+      "content_size_matches": true,
+      "preview_sha256": "101db0087d6fcf241a0e258cabcfbecc767fef1877ec0099b37c8f77820da1e3",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "MultiXPMining",
+      "version": "2",
+      "id": 3829848414,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577354,
+      "remote_file_size": 248162,
+      "content_size_matches": true,
+      "preview_sha256": "15a0ea1c05437d271aa85d3061320f48aef1ba6a79daf9f1c7c89878589b1319",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "PatientSelfAid",
+      "version": "5",
+      "id": 3812149895,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577361,
+      "remote_file_size": 133883,
+      "content_size_matches": true,
+      "preview_sha256": "ae51c53fed3d5b58ce7169ad651f72523c3a3d0e592e6c52bdd5199efdea2856",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "QuickStartSelect",
+      "version": "7",
+      "id": 3813761725,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577368,
+      "remote_file_size": 294216,
+      "content_size_matches": true,
+      "preview_sha256": "150bd13a4c19b98a64258659329d240358d27eb5e264cd7085a724fe83a39a32",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "RangedDamageXp",
+      "version": "3",
+      "id": 3813761935,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577375,
+      "remote_file_size": 120997,
+      "content_size_matches": true,
+      "preview_sha256": "d5ec61a1cd112c6b2a140a383272b2a22c023207c090a1d369786c16857df80c",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "RecruitMarkers",
+      "version": "5",
+      "id": 3820514162,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577382,
+      "remote_file_size": 190000,
+      "content_size_matches": true,
+      "preview_sha256": "72e189d3751684e2c48dd2ceb4b48330cd973b01b76ad3b8520ea8798b39ae68",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "SkillLevelUpInfo",
+      "version": "3",
+      "id": 3829848328,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577389,
+      "remote_file_size": 240655,
+      "content_size_matches": true,
+      "preview_sha256": "9d90d87c05f873a51469cd4df6fbffa36f6912c90feadd1337ab228023447787",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "StatColours",
+      "version": "13",
+      "id": 3812150560,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577396,
+      "remote_file_size": 249251,
+      "content_size_matches": true,
+      "preview_sha256": "cced2b785c83ec707789e622cf88ff2bb627fcab137826a084014776ea237ac5",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "UITweaks",
+      "version": "13",
+      "id": 3812150876,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577403,
+      "remote_file_size": 404699,
+      "content_size_matches": true,
+      "preview_sha256": "d465f4beb78c7c46eb3c287e7451fabed8ad86dd946aa060c8c5269ef4a845ce",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "WantedMap",
+      "version": "7",
+      "id": 3813761812,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577410,
+      "remote_file_size": 273247,
+      "content_size_matches": true,
+      "preview_sha256": "d818dde6d93c686cae2f11958df55927181c08209b4acb6122a44af55b50bac9",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Container-Highlight",
+      "version": "3",
+      "id": 3813852014,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577417,
+      "remote_file_size": 372155,
+      "content_size_matches": true,
+      "preview_sha256": "0d779fc3a8f08ccd8b59aaf13aa965b5cd87937c98e8296ffd41d3116650be98",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Vital-Sense",
+      "version": "7",
+      "id": 3813852288,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577423,
+      "remote_file_size": 478959,
+      "content_size_matches": true,
+      "preview_sha256": "ac4c9c9b54bab45d7bb9759524efc9f937e1307bf7f44f297406b9ab0a8c94f9",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Vital-Read",
+      "version": "6",
+      "id": 3813852230,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577431,
+      "remote_file_size": 455799,
+      "content_size_matches": true,
+      "preview_sha256": "752314c23a20922c492335e6bf65aba173d3b687425801c50ac30e1c03423fb7",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Job-B-Gone",
+      "version": "6",
+      "id": 3813852087,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577438,
+      "remote_file_size": 312755,
+      "content_size_matches": true,
+      "preview_sha256": "8463b5add783fda687229d5d3de1eaa628f0bcc321b5ef121caac89e8a42945d",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Organize-the-Trader",
+      "version": "8",
+      "id": 3813852189,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577446,
+      "remote_file_size": 753622,
+      "content_size_matches": true,
+      "preview_sha256": "fd283f3ea5b362fff3ef97b8d8331aef3da2b25b48b8d746e55fe64a973f6382",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Organize-the-Crafting-Stations",
+      "version": "2",
+      "id": 3816121254,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577453,
+      "remote_file_size": 586675,
+      "content_size_matches": true,
+      "preview_sha256": "7b5ae938e1c6e0ee68d193977a7b7faca7a61b76f3b2989537db4939dcff28b2",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Auto-Pause-on-Load",
+      "version": "6",
+      "id": 3813851956,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577460,
+      "remote_file_size": 183299,
+      "content_size_matches": true,
+      "preview_sha256": "293b756ec32d46d4bc5aeae891ce212a732f56e370d14392af5f174f5f952080",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Loot-Scoot-Execute",
+      "version": "6",
+      "id": 3813852124,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577467,
+      "remote_file_size": 316524,
+      "content_size_matches": true,
+      "preview_sha256": "3561b9faf1dd06e89465c580cb5f03dcab6dffe591ae0246b27f6d9f82135f79",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Wall-B-Gone",
+      "version": "5",
+      "id": 3813852362,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577474,
+      "remote_file_size": 219043,
+      "content_size_matches": true,
+      "preview_sha256": "0b34f69e35c7a6afa9e065b94266185a942c7a99f5a94496e4f06ae813ff7ded",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Hidden-Faction-Relations",
+      "version": "3",
+      "id": 3813852055,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577481,
+      "remote_file_size": 236664,
+      "content_size_matches": true,
+      "preview_sha256": "14596f098c64e68de0f1ffc37db463274dffa2cb77e28d9a3a014106cbff9788",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Map-markers",
+      "version": "4",
+      "id": 3813852161,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577488,
+      "remote_file_size": 294881,
+      "content_size_matches": true,
+      "preview_sha256": "9a61c14c2741d9e2150843e95dac6ca278b9717a83b2fff7f76e27670a3ac6c5",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "KenshiJobManagement",
+      "version": "5",
+      "id": 3818460323,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577496,
+      "remote_file_size": 2853635,
+      "content_size_matches": true,
+      "preview_sha256": "ebb78a5c0e347d79aedb957db31e113ef1410a508d9bf16c01010f928f12a95d",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Character-Highlight",
+      "version": "3",
+      "id": 3820546396,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577503,
+      "remote_file_size": 170236,
+      "content_size_matches": true,
+      "preview_sha256": "ad4a789753ca8278b316bd4835b8cd770b347f4906ba4e3c7b40eeb9acf4cf6d",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Character Inspector",
+      "version": "3",
+      "id": 3829848451,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577510,
+      "remote_file_size": 646435,
+      "content_size_matches": true,
+      "preview_sha256": "2080e8d2b95caebab272cae70324b6a4a8db54ae9abe434ff16ae753b3da40ec",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "BetterLooting",
+      "version": "5",
+      "id": 3816121198,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577517,
+      "remote_file_size": 278670,
+      "content_size_matches": true,
+      "preview_sha256": "e38bcf5f6b4f66ab71ab4371df1791ca8c188fe877ac845ca13798bfe29908d1",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "KillCounter",
+      "version": "2",
+      "id": 3829848599,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577524,
+      "remote_file_size": 153452,
+      "content_size_matches": true,
+      "preview_sha256": "9c77c918a29f3ecee34bbda2aa85c06d633ddaa199dde7f2869b5422584909f4",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "KenshiRotate",
+      "version": "2",
+      "id": 3829848534,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577531,
+      "remote_file_size": 215817,
+      "content_size_matches": true,
+      "preview_sha256": "91dd00d7030c77e37cec50759346c18286f3d842ee5889d051f2f14351b55e5f",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "TauntExpansion",
+      "version": "2",
+      "id": 3831174059,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577538,
+      "remote_file_size": 176318,
+      "content_size_matches": true,
+      "preview_sha256": "a64df22b7e44a1d8f22f56dc75f1e3f3934f82ee5989a3b297a6657e3b111fb6",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "StackSort",
+      "version": "3",
+      "id": 3830285370,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577545,
+      "remote_file_size": 520143,
+      "content_size_matches": true,
+      "preview_sha256": "6adddbb43f5dc4c0aaf86c265c78c5db3392e3b09024829e8052fea9236f1adc",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "AIFixed",
+      "version": "2",
+      "id": 3829845490,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793577553,
+      "remote_file_size": 265017,
+      "content_size_matches": true,
+      "preview_sha256": "634c32c6d9de81c59f61dc72b309c0402881038a07f5620f3d6ff0c22a26c6c9",
+      "preview_dimensions": [
+        1254,
+        1254
+      ],
+      "preview_matches": true
+    },
+    {
+      "package": "Dark UI Advanced",
+      "version": "2",
+      "id": 3820974078,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1792621069,
+      "remote_file_size": 505088,
+      "description_only": true
+    },
+    {
+      "package": "Formations",
+      "version": "2",
+      "id": 3821113149,
+      "english_description_exact": true,
+      "russian_submission_success": true,
+      "time_updated": 1793455071,
+      "remote_file_size": 355706,
+      "description_only": true
+    }
+  ]
+}
