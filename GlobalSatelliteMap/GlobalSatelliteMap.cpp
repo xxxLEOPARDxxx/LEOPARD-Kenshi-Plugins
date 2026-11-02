@@ -51,6 +51,7 @@
 #include "atlas-models/surface/AtlasModelSurface.h"
 #include "atlas-models/decode/_generated/ModelDecodeShader.h"
 #include "GsmZoomPolicy.h"
+#include "GsmZoomStep.h"
 #include "build/GsmZoomProfile.h"
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -59,6 +60,10 @@ namespace {
 const char*const ID="GlobalSatelliteMap";
 const char*const Group="LEOPARD_GlobalSatelliteMap_Development";
 int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;bool zoomFailed=false;
+void(*originalZoomIn)(MapScreen*,MyGUI::Widget*)=NULL;
+void(*originalZoomOut)(MapScreen*,MyGUI::Widget*)=NULL;
+void(*originalZoomWheel)(MapScreen*,MyGUI::Widget*,int)=NULL;
+bool zoomStepHooksReady=false;unsigned zoomStepDepth=0;
 bool enabled=false,debug=false,sunlight=true,ambient=true,attempted=false,ready=false,failed=false,groupCreated=false,hookFailure=false,jobQuarantined=false;
 LONG observedGeneration=-1;DWORD statusUntil=0;GsmViewer::TickClock tickClock;GsmViewer::LightClock lightClock;
 unsigned serial=0,lightVersion=0,shadeCursor=0,cacheAge=0;
@@ -146,10 +151,13 @@ void __cdecl AttachDiskWarning(void*,void*parent)
     if(!p||p->getWidth()<=8||p->getHeight()<=4)return;
     // MCM refreshes custom areas periodically. Keep one child, with native
     // stretch layout; no repeated allocations, translation or disk polling.
-    if(diskWarning.get()&&diskWarning.get()->getParent()==p)return;
+    const int inset=(std::max)(4,int(p->getWidth()*.03f));
+    const int top=(std::min)(10,(p->getHeight()-2)/2);
+    const MyGUI::IntCoord position(inset,top,p->getWidth()-inset*2,p->getHeight()-top-2);
+    if(diskWarning.get()&&diskWarning.get()->getParent()==p){if(diskWarning.get()->getCoord()!=position)diskWarning.get()->setCoord(position);return;}
     DetachDiskWarning(NULL);
     MyGUI::EditBox*w=p->createWidget<MyGUI::EditBox>("Kenshi_WordWrapEmpty",
-        MyGUI::IntCoord(4,2,p->getWidth()-8,p->getHeight()-4),MyGUI::Align::Stretch,"");
+        position,MyGUI::Align::Stretch,"");
     diskWarning.set(w);
     w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);
     w->setEditMultiLine(true);w->setEditWordWrap(true);w->setEditStatic(true);
@@ -545,6 +553,19 @@ void Draw(MapScreen*map,DWORD now){
     }
 }
 void Tick(MapScreen*map){LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined)StartValidation();if(!ready)return;Draw(map,now);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
+bool RelativeZoomEnabled(MapScreen*map){return zoomStepHooksReady&&enabled&&zoomMultiplier>1&&!zoomFailed&&!zoomStepDepth&&zoomLease.Owned()&&map&&zoomOwner.get()==map->mainWidget&&GsmZoom::StepValues(map->zoomValueBase,map->zoomValueCurrent);}
+void ZoomInHook(MapScreen*map,MyGUI::Widget*sender){
+    if(!RelativeZoomEnabled(map)){originalZoomIn(map,sender);return;}
+    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::StepScope step(map->zoomValueBase,GsmZoom::ButtonStep(map->zoomValueBase,map->zoomValueCurrent));originalZoomIn(map,sender);
+}
+void ZoomOutHook(MapScreen*map,MyGUI::Widget*sender){
+    if(!RelativeZoomEnabled(map)){originalZoomOut(map,sender);return;}
+    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::StepScope step(map->zoomValueBase,GsmZoom::ButtonStep(map->zoomValueBase,map->zoomValueCurrent));originalZoomOut(map,sender);
+}
+void ZoomWheelHook(MapScreen*map,MyGUI::Widget*sender,int relative){
+    if(!RelativeZoomEnabled(map)){originalZoomWheel(map,sender,relative);return;}
+    GsmZoom::DepthScope depth(zoomStepDepth);originalZoomWheel(map,sender,GsmZoom::WheelStep(relative,map->zoomValueBase,map->zoomValueCurrent));
+}
 bool ZoomNativeProfile(){
     static int checked=0;if(checked)return checked>0;checked=-1;
     if(!GsmNative::Engine())return false;
@@ -552,6 +573,17 @@ bool ZoomNativeProfile(){
     __except(EXCEPTION_EXECUTE_HANDLER){return false;}
 }
 typedef char ZoomFieldLayout[(offsetof(MapScreen,zoomValueBase)==0x3c&&offsetof(MapScreen,zoomValueMax)==0x40&&offsetof(MapScreen,zoomValueCurrent)==0x44&&offsetof(MapScreen,zoomLevels)==0x80)?1:-1];
+void InstallZoomSteps(){
+    // Validate before patching the native entry windows. Partial installation
+    // remains a native pass-through until every returned trampoline is ready.
+    if(!ZoomNativeProfile()){ErrorLog("GlobalSatelliteMap: relative zoom profile unavailable; original input retained");return;}
+    BYTE*engine=reinterpret_cast<BYTE*>(GetModuleHandleA(NULL));
+    KenshiLib::HookStatus a=KenshiLib::AddHook(engine+GsmZoomInRva,ZoomInHook,&originalZoomIn);
+    KenshiLib::HookStatus b=KenshiLib::AddHook(engine+GsmZoomOutRva,ZoomOutHook,&originalZoomOut);
+    KenshiLib::HookStatus c=KenshiLib::AddHook(engine+GsmZoomWheelRva,ZoomWheelHook,&originalZoomWheel);
+    zoomStepHooksReady=a==KenshiLib::SUCCESS&&b==KenshiLib::SUCCESS&&c==KenshiLib::SUCCESS&&originalZoomIn&&originalZoomOut&&originalZoomWheel;
+    if(!zoomStepHooksReady)ErrorLog("GlobalSatelliteMap: relative zoom hooks incomplete; original input retained");
+}
 void ApplyZoomLimit(MapScreen*map){
     if((!enabled||zoomMultiplier==1)&&!zoomLease.Owned())return;
     if(!map||!map->mainWidget||!map->mapImage||!map->mapScrollView||!map->getVisible())return;
@@ -570,7 +602,7 @@ void ApplyZoomLimit(MapScreen*map){
     map->zoomValueMax=action.maximum;
     // This audited native method ignores sender, clamps through zoomValueMax
     // and rebuilds the viewport-centre anchor. It does not inject input.
-    try{if(action.clamp){typedef void(__fastcall*Clamp)(MapScreen*,MyGUI::Widget*);reinterpret_cast<Clamp>(reinterpret_cast<BYTE*>(GetModuleHandleA(NULL))+GsmZoomInRva)(map,NULL);}}
+    try{if(action.clamp){if(originalZoomIn)originalZoomIn(map,NULL);else{typedef void(__fastcall*Clamp)(MapScreen*,MyGUI::Widget*);reinterpret_cast<Clamp>(reinterpret_cast<BYTE*>(GetModuleHandleA(NULL))+GsmZoomInRva)(map,NULL);}}}
     catch(...){map->zoomValueMax=oldMaximum;map->zoomValueCurrent=oldCurrent;map->zoomCenterOffset=oldCenter;map->zoomUpdated=oldDirty;zoomLease=before;throw;}
     std::ostringstream s;s<<"map maximum zoom="<<action.maximum<<" multiplier="<<(enabled?zoomMultiplier:1);Diagnostic(s.str());
 }
@@ -578,4 +610,4 @@ void UpdateHook(MapScreen*map){try{ApplyZoomLimit(map);}catch(...){zoomFailed=tr
 void LoadHook(SaveFileSystem*self,const std::string&path){InterlockedIncrement(&GSM::generation);originalLoad(self,path);}void NewHook(SaveFileSystem*self){InterlockedIncrement(&GSM::generation);originalNew(self);}
 }
 extern "C" __declspec(dllexport)void MCM_Describe(MCM_Api*api){static std::string ini=Ini();api->beginMod(api,ID,"Global Satellite Map (development)",ini.c_str(),&Settings);if(api->version>=2){std::string info=Tr("Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental.");if(api->version<4){info+="\n";info+=DiskWarningText();}api->info(api,info.c_str());}if(api->version>=4&&api->customArea)api->customArea(api,&AttachDiskWarning,&DetachDiskWarning,NULL,15);api->section(api,Tr("Global map"));api->toggle(api,ID,"Enabled",Tr("Satellite view"),Tr("Show prepared satellite terrain on the global map. The minimap keeps its existing map source."),0,0);api->toggle(api,ID,"Sunlight",Tr("Sunlight"),Tr("Use the current sun direction and brightness."),1,0);api->toggle(api,ID,"AmbientLight",Tr("Sky and ambient light"),Tr("Use the current sky and ambient illumination."),1,0);api->toggle(api,ID,"Water",Tr("Water"),Tr("Show water using the current sea level and lighting. If its resources are unavailable, terrain remains visible."),0,0);api->toggle(api,ID,"LocalLights",Tr("Torches and lamps"),Tr("Light terrain with existing point and spot lights in loaded areas. Unloaded areas do not gain invented lights."),0,0);api->toggle(api,ID,"CityModels",Tr("Existing city models"),Tr("Show existing static distant-town models. Fully loaded buildings and missing cached towns are not included in this development option."),0,0);api->integer(api,ID,"ZoomMultiplier",Tr("Maximum map zoom, multiplier"),Tr("Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."),1,1,8,0);api->section(api,Tr("Diagnostics"));api->toggle(api,ID,"Debug",Tr("Detailed log"),Tr("Write detailed diagnostics to RE_Kenshi_log.txt. Errors are always logged."),0,0);}
-__declspec(dllexport)void startPlugin(){Settings();if(!GsmNative::Engine()){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: exact engine profile unavailable; inert");return;}if(KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),LoadHook,&originalLoad)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),NewHook,&originalNew)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&MapScreen::update),UpdateHook,&originalUpdate)){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: required hooks unavailable; terrain overlay disabled");}}
+__declspec(dllexport)void startPlugin(){Settings();if(!GsmNative::Engine()){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: exact engine profile unavailable; inert");return;}if(KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),LoadHook,&originalLoad)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),NewHook,&originalNew)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&MapScreen::update),UpdateHook,&originalUpdate)){enabled=false;hookFailure=true;ErrorLog("GlobalSatelliteMap: required hooks unavailable; terrain overlay disabled");}if(!hookFailure)InstallZoomSteps();}

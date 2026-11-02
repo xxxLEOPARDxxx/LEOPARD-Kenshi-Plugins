@@ -33,6 +33,7 @@ namespace Ogre {struct Vector4{float v[4];Vector4(){v[0]=.3f;v[1]=.4f;v[2]=443;v
 struct MapScreen {MyGUI::Widget*mainWidget,*mapImage,*mapScrollView;float zoomValueBase,zoomValueMax,zoomValueCurrent,zoomLevels[3];Ogre::Vector4 zoomCenterOffset;bool zoomUpdated,visible;MapScreen(MyGUI::Widget*m,MyGUI::Widget*i,MyGUI::Widget*s):mainWidget(m),mapImage(i),mapScrollView(s),zoomValueBase(.1209716796875f),zoomValueMax(2),zoomValueCurrent(2),zoomUpdated(false),visible(true){zoomLevels[0]=.2f;zoomLevels[1]=.53333336f;zoomLevels[2]=1;}bool getVisible(){++visibilityQueries;return visible;}};
 struct WidgetRef {MyGUI::Widget*p;WidgetRef():p(NULL){}MyGUI::Widget*get(){return p;}void set(MyGUI::Widget*w){++ownerWrites;if(!managerReady)return;p=w;}void unlink(MyGUI::Widget*w){if(p==w)p=NULL;}void reset(){p=NULL;}};
 bool enabled=false,zoomFailed=false;int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;
+void(*originalZoomIn)(MapScreen*,MyGUI::Widget*)=NULL;
 bool ZoomNativeProfile(){++profileQueries;return profileOK;}void ErrorLog(const std::string&){++errors;}void Diagnostic(const std::string&){++diagnostics;}
 void FakeClamp(MapScreen*m,MyGUI::Widget*){++clamps;m->zoomValueCurrent=(std::min)(m->zoomValueCurrent+m->zoomValueBase,m->zoomValueMax);m->zoomCenterOffset.v[0]=.5f;m->zoomCenterOffset.v[1]=.5f;m->zoomCenterOffset.v[2]=1080;m->zoomCenterOffset.v[3]=522;m->zoomUpdated=true;if(throwClamp)throw std::runtime_error("native clamp edge failure");}
 void Original(MapScreen*m){++originals;if(m&&m->zoomUpdated){m->mapImage->width=m->mapImage->height=int(m->zoomValueCurrent*8192+.5f);m->zoomUpdated=false;}}void(*originalUpdate)(MapScreen*)=&Original;void Tick(MapScreen*){++ticks;}void Fail(MapScreen*,const char*){++errors;}
@@ -65,8 +66,8 @@ if not args.skip_mutants:
         ('pendingresize','if(map->zoomUpdated)return;',''),
         ('rollbackdirty','map->zoomUpdated=oldDirty;','map->zoomUpdated=true;'),
         ('untrackedowner','if(zoomOwner.get()!=map->mainWidget)return;',''),
-        ('missingclamp','if(action.clamp){typedef void(__fastcall*Clamp)','if(false){typedef void(__fastcall*Clamp)'),
-        ('profilebypass','if(!ZoomNativeProfile())','if(false)'),
+        ('missingclamp','if(action.clamp){if(originalZoomIn)','if(false){if(originalZoomIn)'),
+        ('profilebypass','if(!ZoomNativeProfile()){zoomFailed=true;','if(false){zoomFailed=true;'),
         ('profilehotretry','if(zoomFailed)return;',''),
         ('wrongthreshold','map->zoomLevels[2],map->zoomValueMax','map->zoomLevels[1],map->zoomValueMax'),
     ]
