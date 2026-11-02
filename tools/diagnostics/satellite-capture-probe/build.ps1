@@ -105,5 +105,7 @@ if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/test_painted_inputs.py"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+& $python "$PSScriptRoot/test_atlas_lod.py"
+if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python "$PSScriptRoot/source_contracts.py"
 exit $LASTEXITCODE

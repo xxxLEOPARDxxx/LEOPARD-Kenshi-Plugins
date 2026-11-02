@@ -76,7 +76,7 @@ assert 'api.scale(terrain,294912,9800)' in ec and 'api.limits(terrain,32,8)' in 
 assert ec.index('api.destroyObject(scene,terrain)') < ec.index('scene->destroyCamera(camera)') < ec.index('api.destroyScene(root,scene)')
 assert 'setMaterialCallbacks' not in experiment and 'new Terrain' not in experiment
 assert ec.index('RasterPolicy::HostFits(')<ec.index('api.createScene(')
-assert 'api.detail(terrain,diagnosticRaster.detail,diagnosticRaster.detail,0)' in ec
+assert 'api.detail(terrain,atlas?32.0f:diagnosticRaster.detail,atlas?32.0f:diagnosticRaster.detail,0)' in ec
 assert ec.index('workspace->_update();')<ec.index('RasterPolicy::ViewportMatches(')<ec.index('warmup.Observe(')
 assert 'if(!last||!RasterPolicy::ViewportMatches(' in ec
 assert 'activation' not in experiment and 'loadGame' not in experiment

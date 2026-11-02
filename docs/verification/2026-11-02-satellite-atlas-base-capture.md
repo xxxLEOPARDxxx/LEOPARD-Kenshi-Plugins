@@ -60,3 +60,37 @@ The independent source collector froze221 local inputs/44835metadata bytes in
 the new viewer wrapper; regenerate before the full capture if mods.cfg changes.
 Never publish this unfinished private module/cache with the37 completed public
 updates. DF remains paused; KEO research is parallel, implementation follows map.
+
+## Live control and bounded full-run refusal
+
+PID32116 loaded the new viewer wrapper and unchanged222-input profile, metadata
+SHA2569817601d14e50ed0d35a4557f5d584d7e6fad3d8862f3ffa370546df2f33e3f8.
+Control1517 produced4,194,304 valid height/coverage samples and no invalids.
+All four owned RTV references returned0, Terrain/Scene were destroyed and native
+texture/material counters returned2286514623/14146655 exactly. This proves the
+bounded control cleanup, not whole-map quality or long-session leak freedom.
+
+Full1518 stopped after11/256 blocks, at a more complex portion of region1,1.
+Mesh grew to462281472B atstep14; the next step exceeded the unchanged1GiB combined
+limit. Cleanup again returned the same counters and the game remained alive.
+The partial atlas has no ready manifest and must not be finalized/displayed.
+
+Native error calculation uses viewportHeight/max(1,AABBdistance)*patchError;
+it does not include the orthographic window span. Atlas2048/T8 therefore
+requested substantially finer geometry than the accepted512/T8 control.
+The narrow repair uses equal32/32 thresholds only in atlas capture. At the same
+camera/patch this preserves512/T8 refinement decisions, while texture raster
+remains2048 and9m per pixel. It deliberately coarsens the failed2048/T8 mesh;
+it does not prove lossless height/normals, seam quality or memory fit everywhere.
+Fixed textures/targets leave503317708B for native mesh; the1GiB cap is unchanged.
+
+The extracted actual api.detail call failed before the repair, then passed184
+checks;196 pinned native arithmetic vectors independently passed. Full probe
+build and159 imports passed after updating the old exact-call source assertion.
+Review: research/atlas-lod-budget-20261102/report.md. Latest candidate557056B
+SHA25647b93cee1a095b786cc8561cca20b0b6fb34bc72c10d42eee981c7d2d05cd3ae.
+Installed with Kenshi verified closed, together with viewer a1ea4055...f6a6;
+personal viewer INI unchanged and all222 source hashes reverified. Backup:
+game/_codex_work/global-satellite-20261102/before-atlas-lod32/installation.json.
+Next request1519 remains pending a fresh loaded scene. Full256 runtime fit and
+whole-map display remain unaccepted.

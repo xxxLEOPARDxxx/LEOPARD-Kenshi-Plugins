@@ -100,7 +100,11 @@ struct TerrainExperiment
         if(!object->getParentNode())scene->getRootSceneNode(Ogre::SCENE_STATIC)->attachObject(object);
         object->setRenderQueueGroup(25);
         api.scale(terrain,294912,9800);api.patch(terrain,64);
-        api.detail(terrain,diagnosticRaster.detail,diagnosticRaster.detail,0);api.limits(terrain,32,8);
+        // Native refinement uses viewport height/distance, without an ortho-window
+        // factor. Atlas2048/T32 preserves the accepted512/T8 geometric decisions;
+        // material sampling remains2048 at9m/pixel. Equal thresholds keep the
+        // native distance-fade ratio1. Do not relax the combined memory cap.
+        api.detail(terrain,atlas?32.0f:diagnosticRaster.detail,atlas?32.0f:diagnosticRaster.detail,0);api.limits(terrain,32,8);
         api.material(terrain,material->getName());
         if(!api.stream(terrain,heightSource))throw std::runtime_error("private fullmap stream failed");
     }
@@ -282,9 +286,10 @@ struct TerrainExperiment
         }
         started=GetTickCount();lastStep=started-100;warmup=TerrainExperimentPolicy::Warmup();active=true;
         std::ostringstream dimensions;
-        dimensions<<"isolated native Terrain ready; one 73728m primary cell,"<<Side<<" output; no simulation zones activated";
+        dimensions<<"isolated native Terrain ready; "<<region.span<<"m footprint,"<<Side<<" output; no simulation zones activated";
         Log(dimensions.str());
-        Log(geometryOnly?"private Terrain A/B mode: GBuffer only; no Position/Sun programs or readback":"private Terrain A/B mode: full Position/Sun diagnostics");
+        Log(atlas?"private Terrain atlas mode: material/normal/depth only; no Position/Sun workspaces":
+            geometryOnly?"private Terrain A/B mode: GBuffer only; no Position/Sun programs or readback":"private Terrain A/B mode: full Position/Sun diagnostics");
         if(batch.enabled)Log(recycle.enabled?"private primary-grid batch started:16cells,Terrain recycled between cells,oneScene,120s total deadline":"private primary-grid batch started:16cells,oneTerrain,120s total deadline");
     }
     // Return false while bounded native stream/build work remains. Root calls only at
@@ -303,17 +308,17 @@ struct TerrainExperiment
             if(!last||!RasterPolicy::ViewportMatches(diagnosticRaster,api.viewportHeight(last)))
                 throw std::runtime_error("private Terrain actual viewport height differs from raster control");
             std::ostringstream lod;
-            lod<<"private Terrain LOD viewport height="<<api.viewportHeight(last)<<" detail="<<diagnosticRaster.detail
+            lod<<"private Terrain LOD viewport height="<<api.viewportHeight(last)<<" detail="<<(atlas?32.0f:diagnosticRaster.detail)
                <<" resolutionOnly="<<diagnosticRaster.resolutionOnly;Log(lod.str());
         }
         TerrainExperimentPolicy::Stats stats={0};
         if(api.info(terrain,&stats)!=&stats)throw std::runtime_error("native Terrain Info aggregate ABI differs");
         peakNativeMemory=(std::max)(peakNativeMemory,stats.memory);
-        if(geographic&&!SatelliteGeography::Combined(stats.memory,64ULL*1024*1024))throw std::runtime_error("geography combined private GPU/mesh budget exceeded");
         const TerrainExperimentPolicy::Result result=warmup.Observe(started,now,stats);
         std::ostringstream s;s<<"isolated terrain step="<<warmup.frames<<" memory="<<stats.memory
           <<" patches="<<stats.patches<<" visible="<<stats.visible<<" triangles="<<stats.triangles
           <<" ogre="<<stats.ogre<<" unbuilt="<<stats.unbuilt;Log(s.str());
+        if(geographic&&!SatelliteGeography::Combined(stats.memory,64ULL*1024*1024))throw std::runtime_error("geography combined private GPU/mesh budget exceeded");
         if(result==TerrainExperimentPolicy::Exceeded)throw std::runtime_error("isolated terrain geometry budget exceeded");
         if(result==TerrainExperimentPolicy::Expired)throw std::runtime_error("isolated terrain did not stabilize before deadline");
         if(result==TerrainExperimentPolicy::Ready)
