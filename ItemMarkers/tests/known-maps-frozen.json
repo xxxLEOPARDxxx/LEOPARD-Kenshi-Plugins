@@ -56,8 +56,8 @@
     "sha256": "5500fd1d226f2a86876c23d9a06af96b130d3504d0556bd7ea1f5b88f4023035"
   },
   "README.txt": {
-    "bytes": 13314,
-    "sha256": "dace2505785ff312b0288b0fb28dbc9642fbba899e7f1076b38ef6b68a03c687"
+    "bytes": 14121,
+    "sha256": "2120bdaa39908e72e450103b56e9ee831d42ae775f51fbe63141cf640a232d6a"
   },
   "tests/.gitignore": {
     "bytes": 32,
@@ -72,8 +72,8 @@
     "sha256": "27fa20edb9413b238623b627a4a5ce4b9a1b32dab853ad355e58e5e9ba60c681"
   },
   "tests/known-maps-review.md": {
-    "bytes": 4085,
-    "sha256": "e5421b4aa8e7d1561cdb4e19f2a27dd423dc6a507fa89bfff7ba03a896a5c16a"
+    "bytes": 4525,
+    "sha256": "b48c5226c44ab98af0c0ef6979f9d22e2ca4e067eaed52cdfab09921feb9ee58"
   },
   "tests/known_maps_tests.py": {
     "bytes": 15040,

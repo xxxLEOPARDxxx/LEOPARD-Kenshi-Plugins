@@ -186,7 +186,7 @@ ITEMS = [
          tags=["GUI"], lang=False, plugin=False, drop=[],
          en="A dark interface for Kenshi - a hybrid of Dark UI by Eldryn and Russian Dark UI "
             "simplistic by FG, with layout fixes. Works with any game language."),
-    dict(mod="ItemMarkers", title="Item Markers (QoL)", nexus=2224, version="6",
+    dict(mod="ItemMarkers", title="Item Markers (QoL)", nexus=2224, version="7",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Item grade colours, stolen goods and faction uniforms right on the item icons - "
             "a heavily optimised replacement for LtEast's Rarity Backgrounds and Item Status "

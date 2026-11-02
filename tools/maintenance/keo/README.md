@@ -29,5 +29,13 @@ three-language/MCM/logging/Nexus-before-Steam requirements.
 Further reviewed local foundation commit49b1550 is preserved separately in
 mcm-foundation-20261102.patch. It adds the native/host translation boundary and
 requested-settings capture before runtime overrides, without MCM UI/save/apply.
-Later MCM and path-budget changes are separately uncommitted review candidates;
-do not infer they are installed or ready for release from this checkpoint.
+Reviewed local commit6e15b3a (2026-11-03) is preserved in
+0001-Integrate-MCM-controls-request-local-path-budgets-an.patch.
+It integrates the MCM requested-settings/atomic-file adapter, request-local
+player path budgets and optional producer-gated diagnostics with three MO
+catalogues. Root and separate reviewers verified native DEV/PROD builds,
+126 host suites, boundary/corruption/lifecycle and compiled regression fixtures.
+No GOG/spawn/full-routing acceptance or public release is implied. Current
+candidate PROD SHA256 e155894936c0fceaac3813bd88448b64f5dd896a047a66bd369bad3fa51c4324.
+Local game installation and UI/FPS/save-load acceptance are recorded separately;
+this patch remains remotely backed up without pushing to the original author.

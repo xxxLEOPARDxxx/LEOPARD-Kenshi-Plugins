@@ -294,19 +294,15 @@
     ]
   },
   "ItemMarkers": {
-    "version": "6",
-    "published_version": "5",
+    "version": "7",
+    "published_version": "6",
     "en": [
-      "[b]Native stolen-item indication.[/b] The game's stolen-item indicator remains visible while dragging. Item ownership and stack-merging rules are unchanged.",
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "[b]Known location maps.[/b] An eye marks a map when all locations listed on it have already been discovered. The marker has its own setting.",
+      "[b]Up-to-date markers.[/b] Open inventory and merchant windows reflect newly discovered locations and learned blueprints."
     ],
     "ru": [
-      "[b]Штатная отметка краденого.[/b] Значок краденой вещи сохраняется при перетаскивании. Правила владения и объединения стопок не меняются.",
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "[b]Карты открытых мест.[/b] Глаз отмечает карту, все перечисленные места которой уже открыты. Для метки есть отдельная настройка.",
+      "[b]Актуальные пометки.[/b] Уже открытые окна инвентаря и торговли учитывают новые открытые места и изученные чертежи."
     ]
   },
   "LiveXpBars": {

@@ -61,3 +61,10 @@ No live process access or game acceptance was performed. Vanilla/modded-skin
 presentation, actual maps in merchant stock/containers, save/load behavior,
 game FPS and memory growth still require root's live acceptance. Static bounds
 and short fixtures do not establish absence of every possible leak.
+
+## Root integration acceptance, 2026-11-03
+
+Reviewed DLL and all three MO installed with personal INI preserved. User
+confirmed the known/unknown map marker check: "Всё чётко там!". This is visual
+acceptance, not a measured game FPS or long-session memory test. Prepared release7
+is separate from the already published6; no Nexus/Steam publication occurred.

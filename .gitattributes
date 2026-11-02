@@ -1,0 +1,2 @@
+# Mail-format patches contain significant context prefixes and signature spaces.
+tools/maintenance/keo/*.patch -text -whitespace
