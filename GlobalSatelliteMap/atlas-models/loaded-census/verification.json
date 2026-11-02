@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-02",
+  "review": "CLEAR: independent container_restore_audit source/fresh-tests and read-only live code-window validation",
+  "tests": {
+    "nativeCodeWindows": 14,
+    "sourceContracts": 49,
+    "sharedRoute": 52,
+    "nativeExtracted": 21,
+    "compiledMutants": 19,
+    "nativeAdapterCompile": "VC10/SDK7.1 /O2 /GL PASS"
+  },
+  "scope": "new files only; no main/GPU/COM/game/install/commit",
+  "files": {
+    "CensusRoute.h": "1261976c85480ec1b82239519faadea3b8968a5e101107e7fe045598d0ee0510",
+    "NativeCensus.h": "292e46ff265f7e9a483ede15876502ff0e4cf1902c5c8c88f327ece5937285d0",
+    "native_compile.cpp": "6d836b197b773b40862e8635d4e69453c0d9cf3e42954ecd26f5110b83b2b188",
+    "generate_profile.py": "41aa3fd90d4085f672487d50e1e9cbb953e486735d2545daac4ef36183bd01b8",
+    "route_tests.cpp": "1d5335266f2c1ced6a9f599515d4803b583974574424b93d5fb75ff82766526f",
+    "test_native_extracted.py": "79dd780ab92880353d1b487cb2f5a8dc7358e588c63e0544aba8ab678d277211",
+    "test_mutants.py": "b50dc32679f04e95ecc2c53e5261c23c7649b9f1cfa8e8eaad4a62b63f74ce80",
+    "verify_contract.py": "d533c146fb0544f803c09218039fac0319e866c7805f1438df93625b41c58ed1",
+    "run_tests.ps1": "481491329e36b3c195230f9aa900cadadd11a5413d3809e1dc027d9b5047882a",
+    "plan.md": "354dfbf6e52e875a5b2f2de1d73b1d1c246fd2c678235d9de8ea7d651053ce13",
+    "README.md": "87e2ff904f1f66aa2abcd959626caaec0dc8e3c1635bb0ab2ce0e7bc13639924"
+  },
+  "logs": {
+    "_generated/full.log": "1dea331e470d8867c6e21ec2dde5b5dcf0f91f4cb79ce77ecd1b262ffaaf6b89"
+  },
+  "independentReview": {
+    "path": "D:/DEV/Kenshi/research/gsm-loaded-census-review-20261102/report.md",
+    "sha256": "4b802e9acb8b0f7190db8181777e0476e65a572c899bc060e0e99da6fdb67249",
+    "liveGetterExecution": false,
+    "actualHubCensus": false
+  }
+}
