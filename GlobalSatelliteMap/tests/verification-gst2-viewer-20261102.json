@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-02",
+  "candidate": {
+    "path": "D:/DEV/Kenshi/build/GlobalSatelliteMap/GlobalSatelliteMap.dll",
+    "bytes": 474624,
+    "sha256": "a1ea4055124018d844d065ad30729cccf5570d78f4c2dbf73022ad250ec7f6a6",
+    "nativeImports": 72
+  },
+  "checks": {
+    "manifest": 13,
+    "worker": 55,
+    "geometry": 17,
+    "nativeSampler": 128,
+    "catalogMessagesPerLanguage": 12,
+    "languages": [
+      "en_GB",
+      "ru_RU",
+      "zh_CN"
+    ],
+    "helperChecks": 163,
+    "helperMutants": 6,
+    "schedulingClocks": 13
+  },
+  "independentReview": "CLEAR: fresh timer viewer suite and72-import validation on a1ea4055...f6a6",
+  "sourceSha256": {
+    "GlobalSatelliteMap.cpp": "3c0ae4f72cc4e50b007ce44cf01e21889fea72a51f5c0e72ad8fa0e2b872373d",
+    "GsmAtlasManifest.h": "a8820d0d89012ea72cfdeecfe304349c13e081264acf19771b04f719b07a857b",
+    "GsmAtlasJob.h": "affdde2bca53d1fe3301197c556384ca8f1adc5ac4e8aaacae3620e5185948b1",
+    "GsmNativeLight.h": "7eac91acddd8cf33ee9cd587f295bd87d1f5f6af6bc616ca50767611b1d07837",
+    "generate_viewer_assets.py": "edbe49767b2a2f6975fe786321ea08885cf70a18f510558e5188749f4d059462",
+    "build.ps1": "f74bcdfee321dab871e12c6951bf09851cad855d80870cc7b5933e5140363a47",
+    "GlobalSatelliteMap.ini": "d17a4e7904ba894429031e705ee1a296687992abea1bb02626afaf39e87f4e58",
+    "GsmViewerClock.h": "bf38cb044e25449f12e35041be8d4cb0e9cddc545a8eb243a3e94bf66f79dd89"
+  },
+  "liveAcceptance": "pending root capture/install/runtime proof",
+  "installedByThisSubtask": false,
+  "historicalTemporaryInstallSha256": "4974200d2629546a7c7905dbcb4831df91beb1d5e4082706a9bc6b8b256789ad",
+  "timerCorrection": "initialized unsigned elapsed200/1000ms; hidden/world reset; old source-extracted fixture RED highbit startup",
+  "peerLogs": [
+    "D:/DEV/Kenshi/research/gsm-integration-review-20261102/fresh-clock-viewer-suite.log",
+    "D:/DEV/Kenshi/research/gsm-integration-review-20261102/fresh-clock-import-contract.log"
+  ]
+}

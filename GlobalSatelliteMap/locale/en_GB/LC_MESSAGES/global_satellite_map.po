@@ -4,11 +4,11 @@ msgstr ""
 "Language: en_GB\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "Satellite view is unavailable: genuine captures for this saved world are missing or invalid. The normal map remains visible."
-msgstr "Satellite view is unavailable: genuine captures for this saved world are missing or invalid. The normal map remains visible."
+msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
+msgstr "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
 
-msgid "Development prototype: displays verified static captures on the global map. Native dynamic lighting and unloaded buildings are still under development."
-msgstr "Development prototype: displays verified static captures on the global map. Native dynamic lighting and unloaded buildings are still under development."
+msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
+msgstr "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
 
 msgid "Global map"
 msgstr "Global map"
@@ -16,8 +16,20 @@ msgstr "Global map"
 msgid "Satellite view"
 msgstr "Satellite view"
 
-msgid "Optional global-map layer. Requires genuine captures for this saved world; the minimap keeps its existing map source."
-msgstr "Optional global-map layer. Requires genuine captures for this saved world; the minimap keeps its existing map source."
+msgid "Show prepared satellite terrain on the global map. The minimap keeps its existing map source."
+msgstr "Show prepared satellite terrain on the global map. The minimap keeps its existing map source."
+
+msgid "Sunlight"
+msgstr "Sunlight"
+
+msgid "Use the current sun direction and brightness."
+msgstr "Use the current sun direction and brightness."
+
+msgid "Sky and ambient light"
+msgstr "Sky and ambient light"
+
+msgid "Use the current sky and ambient illumination."
+msgstr "Use the current sky and ambient illumination."
 
 msgid "Diagnostics"
 msgstr "Diagnostics"

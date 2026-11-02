@@ -1,3 +1,26 @@
+Global Satellite Map - private GST2 terrain viewer / закрытый просмотр рельефа GST2
+
+Current development path (2026-11-02) / Текущий вариант разработки
+
+EN
+Private, unfinished and not published. The current viewer consumes a complete GST2 terrain atlas in captures/ready.json plus its pinned capture.json identity. All16 genuine cells, all18 descriptors per cell and the current terrain/mod/source profile must validate before any overlay is accepted. Source files are hashed only in one cancellable background job, never per frame. This terrain profile can be reused across saves; it does not represent unsaved buildings or local-light state.
+
+The separate global-map overlay relights decoded half-float material/gloss and world-normal terrain with current native sun, sky/ambient maps, IBL and exposure. The native mapImage, markers, input and BestMinimap source remain intact. At most one visible cell is uploaded/relit per200ms; current-light snapshots are sampled at most once per second. A fair cursor prevents later cells starving during continuous light changes. Sixteen512-square overview cells occupy81MiB+176B of owned resource payload including scratch/constants; admission is limited to96MiB. Driver overhead/retirement is separate. One selected CPU level is at most64MiB; no full1.43GB cell or22.9GB atlas is expanded in memory.
+
+MCM: Satellite view defaults OFF; Sunlight and Sky/ambient light default ON; Detailed log defaults OFF and is last. These settings apply live. Errors are always logged. Missing, partial, changed or unsupported input leaves the normal map visible with a localized notice. Models, buildings, water, local lights, shadows and unsaved world changes are separate unfinished work. The native-shader profile is audited; third-party runtime program replacement is not claimed compatible. Shared MCM/INI paths retain Windows ACP conventions; capture/source paths use UTF8 and Windows wide APIs.
+
+RU
+Закрытая незавершённая разработка, не опубликована. Текущий просмотр использует полный атлас рельефа GST2: captures/ready.json и закреплённую в нём идентичность capture.json. До показа проверяются все16 настоящих ячеек, дескрипторы и текущий профиль рельефа, модов и исходных файлов. Хеширование выполняется только в одном отменяемом рабочем потоке. Атлас относится к профилю рельефа и модов, а не к конкретному сохранению; несохранённые постройки и местное освещение в него не входят.
+
+Отдельный слой глобальной карты освещает материалы и мировые нормали рельефа текущим солнцем, небом и рассеянным светом, используя штатные формулы и экспозицию игры. Оригинальное изображение карты, метки, управление и источник BestMinimap не меняются. За200мс обрабатывается не более одной видимой ячейки; параметры света считываются не чаще раза в секунду. Полезные данные собственных GPU-ресурсов ограничены96МиБ; рабочие данные CPU содержат только один выбранный уровень, до64МиБ. Это не игровой замер всей видеопамяти или FPS.
+
+MCM: спутниковый вид по умолчанию выключен; солнечный свет и свет неба включены; подробный журнал выключен и расположен последним. Настройки применяются сразу. Ошибки записываются всегда. При отсутствии, неполноте или несовпадении данных остаётся обычная карта с пояснением. Здания, вода, фонари, тени и несохранённые изменения мира остаются отдельными незавершёнными слоями. Совместимость с произвольной заменой шейдерных программ другими модами не заявлена.
+
+Offline verification: 13 manifest checks,55 production worker checks,17 extracted geometry checks,13 production scheduling-clock checks,128 exact native sampler-conversion cases,12 MCM messages in each of3 locales. The separate atlas-view helper has163 real file/WARP/policy checks and6 deliberately broken variants rejected. Independent source and fresh-suite review CLEAR. DLL474624B SHA256a1ea4055124018d844d065ad30729cccf5570d78f4c2dbf73022ad250ec7f6a6;72 native imports resolved. Live whole-map appearance, skins, sustained FPS and long-session memory remain unverified. See tests/verification-gst2-viewer-20261102.md.
+
+Historical GSM1 static-preview notes (not selected by the current runtime)
+Исторический справочник статического просмотра GSM1 (текущая версия его не использует)
+
 Global Satellite Map - development prototype / прототип разработки
 
 EN

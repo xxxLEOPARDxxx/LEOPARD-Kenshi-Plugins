@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-02",
+  "scope": "helper only; not integrated or installed by this subtask",
+  "tests": {
+    "policy": 29,
+    "reader": 53,
+    "warp": 81,
+    "total": 163,
+    "rejectedMutants": 6,
+    "nativeSunProbeFixtureMaxChannelDelta": 1,
+    "earlierConstantAmbientFixtureMaxChannelDelta": 0,
+    "writerIndependent": 101,
+    "cachePythonIndependent": 18
+  },
+  "gpuBudgetBytes": 100663296,
+  "gpuPayloadOne2048AndSixteen512EachBytes": 84934832,
+  "maxCpuPlanePayloadBytes": 67108864,
+  "compiledShaderSha256": "e9d39a51c87a02b4dffe81b40c41a48e549dbf17fc0cf504d34d0a77b3e485b6",
+  "sourceSha256": {
+    ".gitignore": "5db0aced9132d0bfd3f66b534f57db5da873cde09985ec2a2a2a1cd6ee492718",
+    "AtlasPolicy.h": "8b959a82b17d8fc91d33f14638ddd9406e36ab22ae49ab851d611cacca030ed9",
+    "AtlasReader.h": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed",
+    "AtlasRelight.h": "3162783a1ac459a2bcbb013ee00ca1b97a9a4206a5ae4b7f0c7eb3c6742fbcc2",
+    "AtlasRelight.hlsl": "a8ac4b78461f34b13c3527cce6ecf1f49644e7d27d9f9185cf3daa79617b87b5",
+    "ContextFixture.h": "8e6fa3e0a8ec2c2abc9b6bc1f2ba537f5f2054711f284211e9c5ff95402427e9",
+    "integration.md": "070c3f710b1f3037ab73cada03b9bd91afb82b126dd0da4374508d0fd6d27e4e",
+    "policy_tests.cpp": "b4f62426c9a6a8a4719223b8b42df257ce37da1db6c3f2bb223e0296461c2a24",
+    "reader_tests.cpp": "f0d5de298c7e8a617869bb030f8e693c46e06cd0579197ec13a6e6b79b0c4cf3",
+    "reference_cs.hlsl": "a96d7c40ab275969d84539171818751917010a8d40456ed436a5a5613d3754e2",
+    "run_tests.ps1": "53b25a769a0c0be0ada1017ad49f74d9694bd1ce0f0f6b22b894f4dc2e8c1ffd",
+    "warp_tests.cpp": "95247eb3961bb07b10e29de3c045cbc8881c54f5a86edeced62e028a33e273a7"
+  },
+  "nativeShaderInputsSha256": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\shaders\\SunProbe.hlsl": "f4cc2501f27acfa78ff5ea94afabcdc6ff2276ba599d4d0ccd66ba3ff31c45b8",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\shaders\\NativeExposure.hlsl": "4c67cdfcadf5b6ae89542c63a37c834456fe3fd69309a4d17c395a9447795418",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\common\\constants.hlsl": "724c4b4f370ce4fa6a14d16e3cf7b2a82c076f8ff623110fd1d8ab25ab920530",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\common\\lightingFunctions.hlsl": "51dd7cec6f898b3a79352067dbfbe586c1d364967154609ed821667d22966f9f",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\post\\hdrutils.hlsl": "417ab4436dfe30966597937fa1f5002fe846670dbd72b29bdafde13e83cd4075"
+  },
+  "limits": [
+    "No full22.9GB production cache build",
+    "No native game whole-map parity or live integration",
+    "No FPS or long-session leak claim",
+    "Root owns manifest/world identity and one worker lifetime",
+    "Read-only verified-owned output SRV slots scoped across6stages; write-bound output always refused",
+    "GPU count is live owned payload, not driver allocation/residency measurement"
+  ]
+}

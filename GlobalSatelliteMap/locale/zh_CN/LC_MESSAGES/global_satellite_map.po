@@ -4,11 +4,11 @@ msgstr ""
 "Language: zh_CN\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "Satellite view is unavailable: genuine captures for this saved world are missing or invalid. The normal map remains visible."
-msgstr "卫星视图不可用：缺少此存档的真实截图，或截图未通过验证。普通地图仍然可见。"
+msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
+msgstr "卫星地形不可用。缺少预先准备的地形数据，或数据与当前游戏不匹配。普通地图仍然可见。"
 
-msgid "Development prototype: displays verified static captures on the global map. Native dynamic lighting and unloaded buildings are still under development."
-msgstr "开发原型：在世界地图上显示经过验证的静态截图。原生动态光照和未加载建筑仍在开发中。"
+msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
+msgstr "开发中的地形视图，使用当前阳光和天空光照。尚不包括建筑、水面和局部光源。"
 
 msgid "Global map"
 msgstr "世界地图"
@@ -16,8 +16,20 @@ msgstr "世界地图"
 msgid "Satellite view"
 msgstr "卫星视图"
 
-msgid "Optional global-map layer. Requires genuine captures for this saved world; the minimap keeps its existing map source."
-msgstr "可选的世界地图图层。需要此存档的真实截图；小地图继续使用原有地图来源。"
+msgid "Show prepared satellite terrain on the global map. The minimap keeps its existing map source."
+msgstr "在世界地图上显示预先准备的卫星地形。小地图继续使用原有地图来源。"
+
+msgid "Sunlight"
+msgstr "阳光"
+
+msgid "Use the current sun direction and brightness."
+msgstr "使用当前太阳方向和亮度。"
+
+msgid "Sky and ambient light"
+msgstr "天空与环境光"
+
+msgid "Use the current sky and ambient illumination."
+msgstr "使用当前天空和环境照明。"
 
 msgid "Diagnostics"
 msgstr "诊断"

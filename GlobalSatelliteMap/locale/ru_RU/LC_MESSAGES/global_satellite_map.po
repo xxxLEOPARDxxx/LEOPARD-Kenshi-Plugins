@@ -4,11 +4,11 @@ msgstr ""
 "Language: ru_RU\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "Satellite view is unavailable: genuine captures for this saved world are missing or invalid. The normal map remains visible."
-msgstr "Спутниковый вид недоступен: настоящие снимки этого сохранения отсутствуют или не прошли проверку. Обычная карта остаётся видимой."
+msgid "Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible."
+msgstr "Спутниковый рельеф недоступен. Подготовленные данные отсутствуют или не соответствуют этой сборке игры. Обычная карта остаётся видимой."
 
-msgid "Development prototype: displays verified static captures on the global map. Native dynamic lighting and unloaded buildings are still under development."
-msgstr "Прототип разработки: показывает проверенные статические снимки на глобальной карте. Живое освещение и выгруженные здания ещё в разработке."
+msgid "Development terrain view with current sunlight and sky lighting. Buildings, water and local lights are not included."
+msgstr "Разрабатываемый вид рельефа с текущим солнечным светом и освещением неба. Здания, вода и местные источники света не включены."
 
 msgid "Global map"
 msgstr "Глобальная карта"
@@ -16,8 +16,20 @@ msgstr "Глобальная карта"
 msgid "Satellite view"
 msgstr "Спутниковый вид"
 
-msgid "Optional global-map layer. Requires genuine captures for this saved world; the minimap keeps its existing map source."
-msgstr "Дополнительный слой глобальной карты. Нужны настоящие снимки этого сохранения; источник изображения миникарты не меняется."
+msgid "Show prepared satellite terrain on the global map. The minimap keeps its existing map source."
+msgstr "Показывать подготовленный спутниковый рельеф на глобальной карте. Источник изображения миникарты не меняется."
+
+msgid "Sunlight"
+msgstr "Солнечный свет"
+
+msgid "Use the current sun direction and brightness."
+msgstr "Использовать текущее направление и яркость солнца."
+
+msgid "Sky and ambient light"
+msgstr "Свет неба"
+
+msgid "Use the current sky and ambient illumination."
+msgstr "Использовать текущее освещение неба и рассеянный свет."
 
 msgid "Diagnostics"
 msgstr "Диагностика"
