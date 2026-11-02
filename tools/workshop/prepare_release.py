@@ -29,5 +29,9 @@ def main():
     env=dict(os.environ,PYTHONIOENCODING='utf-8')
     for script in ['desc/make_desc.py','build.py','nexus_desc.py','validate_descriptions.py','nexus_pack.py']:
         subprocess.run([sys.executable,str(HERE/script),*names],check=True,env=env)
+    # Personal local journal only after descriptions and checked archives pass.
+    # Never copy this owner file into any mod/content or public description.
+    from personal_changelog import record_releases
+    record_releases(items,HERE)
     return 0
 if __name__=='__main__':sys.exit(main())
