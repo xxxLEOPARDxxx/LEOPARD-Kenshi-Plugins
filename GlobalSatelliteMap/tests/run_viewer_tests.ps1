@@ -21,7 +21,7 @@ if($LASTEXITCODE -ne 0){throw 'Extracted managed image completion failed'}
 & $python "$PSScriptRoot/source_contracts.py"
 if($LASTEXITCODE -ne 0){throw 'Viewer source/catalog contracts failed'}
 
-foreach($test in @('window_geometry_tests.py','window_adoption_tests.py','window_mutation_tests.py','window_reposition_tests.py')){
+foreach($test in @('window_geometry_tests.py','window_adoption_tests.py','window_mutation_tests.py','presentation_caller_tests.py')){
     & $python "$PSScriptRoot/$test"
     if($LASTEXITCODE -ne 0){throw "Window integration failed: $test"}
 }

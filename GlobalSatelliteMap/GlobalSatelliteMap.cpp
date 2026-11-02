@@ -92,6 +92,7 @@ void ResetModels(){modelCell.Clear();modelSurface.Clear();modelDecode.Clear();mo
 unsigned localRenders=0,localBatches=0;
 void ResetLocal(){localLayer.Clear();localLayerReady=localFailed=false;localMapping=AtlasLocalLights::ProvenMapping();localProofScene=NULL;localRevision.Reset();if(++localVersion==0)localVersion=1;}
 int projectedWidth=0,projectedHeight=0;
+MyGUI::IntCoord projectedClip;bool presentationCurrent=false;
 GSM::Session session;GsmAtlas::Manifest manifest;
 GsmAtlas::Job*job=NULL,*completed=NULL;
 WidgetRef layer,status,tiles[AtlasView::WindowSlots];
@@ -169,7 +170,7 @@ void SetStage(ID3D11DeviceContext*c,unsigned stage,unsigned slot,ID3D11ShaderRes
 void RetireReads(ID3D11Texture2D*output){if(!output)return;AtlasView::Com<ID3D11Device>d;output->GetDevice(&d.p);AtlasView::Com<ID3D11DeviceContext>c;d.p->GetImmediateContext(&c.p);for(unsigned stage=0;stage<6;++stage){ID3D11ShaderResourceView*v[128]={0};switch(stage){case 0:c.p->VSGetShaderResources(0,128,v);break;case 1:c.p->HSGetShaderResources(0,128,v);break;case 2:c.p->DSGetShaderResources(0,128,v);break;case 3:c.p->GSGetShaderResources(0,128,v);break;case 4:c.p->PSGetShaderResources(0,128,v);break;default:c.p->CSGetShaderResources(0,128,v);}for(unsigned i=0;i<128;++i)if(v[i]){if(AtlasView::SameResource(v[i],output))SetStage(c.p,stage,i,NULL);v[i]->Release();}}}
 void DropEntry(int i){Entry&e=cache[i];if(!e.key.Valid())return;if(tiles[i].get()){MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());w->setImageTexture("");w->setVisible(false);}MyGUI::RenderManager*rm=MyGUI::RenderManager::getInstancePtr();if(rm&&!e.name.empty()){MyGUI::ITexture*t=rm->getTexture(e.name);if(t)rm->destroyTexture(t);}RetireReads(e.output.p);e.output.Reset();e.gpu.Clear();e.texture.setNull();Ogre::TextureManager*tm=Ogre::TextureManager::getSingletonPtr();if(tm&&!e.name.empty()&&!tm->getByName(e.name).isNull())tm->remove(e.name);e.name.clear();e.key=AtlasView::WindowKey();e.shaded=e.age=0;}
 void Cancel(){if(job)InterlockedExchange(&job->read.cancel,1);if(completed){delete completed;completed=NULL;}}
-void Clear(){Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
+void Clear(){presentationCurrent=false;Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
 void Notice(MapScreen*map,bool drawFailure){if(!map||status.get()||!map->mainWidget)return;MyGUI::Widget*p=map->mainWidget;MyGUI::TextBox*w=p->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(12,12,p->getWidth()>24?p->getWidth()-24:300,56),MyGUI::Align::Default,"");status.set(w);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setCaption(MyGUI::UString(drawFailure?Tr("Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."):Tr("Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible.")));statusUntil=GetTickCount()+12000;}
 void Fail(MapScreen*map,const std::string&why){bool drawFailure=ready;Clear();attempted=failed=true;ErrorLog("GlobalSatelliteMap: "+why);Notice(map,drawFailure);}
 std::string ModulePath(const char*name){wchar_t path[MAX_PATH]={0};HMODULE h=GetModuleHandleA(name);DWORD n=h?GetModuleFileNameW(h,path,MAX_PATH):0;if(!n||n>=MAX_PATH)throw std::runtime_error("native renderer module path missing");return GsmAtlas::Utf8(std::wstring(path,n));}
@@ -224,6 +225,7 @@ void EnsureLayer(MapScreen *map)
     }
     if (!layer.get())
     {
+        presentationCurrent=false;
         MyGUI::Widget *w = image->createWidget<MyGUI::Widget>(
             "PanelEmpty", MyGUI::IntCoord(0, 0, image->getWidth(), image->getHeight()),
             MyGUI::Align::Default, "");
@@ -462,18 +464,35 @@ MyGUI::IntCoord WindowGeometry(MapScreen*map,const AtlasView::WindowKey&key){
     MyGUI::IntPoint b=map->worldToMapCoords(Ogre::Vector3(float(x+sx),0,float(z+sz)));
     return MyGUI::IntCoord(a.left,a.top,b.left-a.left,b.top-a.top);
 }
-// Native map resizing is immediate. Reposition resident children on a zoom
-// event even between streaming ticks; this does no IO, allocation or relighting.
-void RepositionZoom(MapScreen*map){
-    if(!map||!map->mapImage||!layer.get())return;
-    int width=map->mapImage->getWidth(),height=map->mapImage->getHeight();
-    if(width==projectedWidth&&height==projectedHeight)return;
-    if(width<=0||height<=0||width>1000000||height>1000000)return;
-    projectedWidth=width;projectedHeight=height;layer.get()->setSize(map->mapImage->getSize());
-    for(unsigned i=0;i<AtlasView::WindowSlots;++i)if(cache[i].key.Valid()&&tiles[i].get()){
-        MyGUI::IntCoord rect=WindowGeometry(map,cache[i].key);
-        if(tiles[i].get()->getCoord()!=rect)tiles[i].get()->setCoord(rect);
+// Share ready-texture presentation with Draw. A formerly offscreen resident
+// may still be hidden or unbound; resizing its rectangle alone leaves a hole.
+void PresentWindows(MapScreen*map,const AtlasView::WindowRect cells[16],const AtlasView::WindowRect&clip,const AtlasView::WindowPlan&plan){
+    if(layer.get()->getSize()!=map->mapImage->getSize())layer.get()->setSize(map->mapImage->getSize());
+    for(unsigned i=0;i<AtlasView::WindowSlots;++i){
+        MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());if(!w)continue;Entry&e=cache[i];
+        bool show=e.key.Valid()&&e.shaded!=0&&!Superseded(e.key,plan.level)&&AtlasView::WindowVisible(AtlasView::SubWindow(cells[e.key.tile],e.key),clip);
+        if(show){MyGUI::IntCoord rect=WindowGeometry(map,e.key);if(w->getCoord()!=rect)w->setCoord(rect);if(w->_getTextureName()!=e.name){w->setDepth(int(e.key.level));w->setImageTexture(e.name);}}
+        if(w->getVisible()!=show)w->setVisible(show);
     }
+    projectedWidth=map->mapImage->getWidth();projectedHeight=map->mapImage->getHeight();
+    projectedClip=MyGUI::IntCoord(int(clip.x),int(clip.y),int(clip.w),int(clip.h));presentationCurrent=true;
+}
+// Native resize/pan has completed before Tick. Refresh only presentation on
+// geometry/clip changes, independently of the streaming cadence and save/load
+// busy gate. The unchanged frame path reads scalar geometry, without scanning
+// windows; this path never reads source files, uploads or relights textures.
+void RepositionZoom(MapScreen*map){
+    if(!map||!map->mapImage||!map->mapScrollView||!layer.get()||layer.get()->getParent()!=map->mapImage){presentationCurrent=false;return;}
+    int width=map->mapImage->getWidth(),height=map->mapImage->getHeight();
+    if(width<=0||height<=0||width>1000000||height>1000000)return;
+    MyGUI::IntCoord view=map->mapScrollView->getAbsoluteCoord();MyGUI::IntPoint origin=map->mapImage->getAbsolutePosition();
+    MyGUI::IntCoord clip(view.left-origin.left,view.top-origin.top,view.width,view.height);
+    if(presentationCurrent&&width==projectedWidth&&height==projectedHeight&&!(clip!=projectedClip))return;
+    GSM::Rect coords[16];if(!Geometry(map,coords))return;
+    AtlasView::WindowRect cells[16];for(unsigned i=0;i<16;++i)cells[i]=AtlasView::WindowRect(coords[i].x,coords[i].y,coords[i].w,coords[i].h);
+    AtlasView::WindowRect windowClip(clip.left,clip.top,clip.width,clip.height);
+    AtlasView::WindowPlan plan=AtlasView::PlanWindows(cells,windowClip);
+    PresentWindows(map,cells,windowClip,plan);
 }
 void RequestWindow(const AtlasView::WindowKey&key){
     std::auto_ptr<GsmAtlas::Job>owned(new GsmAtlas::Job());GsmAtlas::Job*j=owned.get();j->window=key;
@@ -539,17 +558,18 @@ void Draw(MapScreen*map,DWORD now){
             if(best>=0)RequestWindow(plan.keys[best]);
         }
     }
-    for(unsigned i=0;i<AtlasView::WindowSlots;++i){
-        MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());if(!w)continue;Entry&e=cache[i];
-        bool show=e.key.Valid()&&e.shaded!=0&&!Superseded(e.key,plan.level)&&AtlasView::WindowVisible(AtlasView::SubWindow(cells[e.key.tile],e.key),clip);
-        if(show){MyGUI::IntCoord rect=WindowGeometry(map,e.key);if(w->getCoord()!=rect)w->setCoord(rect);if(w->_getTextureName()!=e.name){w->setDepth(int(e.key.level));w->setImageTexture(e.name);}}
-        if(w->getVisible()!=show)w->setVisible(show);
-    }
+    PresentWindows(map,cells,clip,plan);
     if(debug&&now-statsAt>=5000){
         statsAt=now;unsigned resident=0,detailReady=0;
         for(unsigned i=0;i<AtlasView::WindowSlots;++i)if(cache[i].key.Valid())++resident;
         for(unsigned i=0;i<plan.visibleCount;++i){int slot=FindWindow(plan.keys[i]);if(slot>=0&&cache[slot].shaded)++detailReady;}
-        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" modelReady="<<modelGpuReady<<" modelCount="<<models.Valid(unsigned(observedGeneration))<<" modelRenders="<<modelRenders<<" modelBufferBytes="<<models.BorrowedBuffers()<<" modelTextureBytes="<<models.BorrowedTextures()<<" ownedGpuBytes="<<(AtlasView::WindowGpuBytes()+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0)+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0))<<" gpuCapBytes="<<AtlasView::GpuCap<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;Diagnostic(message.str());
+        unsigned coarseValid=0,coarseShaded=0,coarseBound=0,coarseVisible=0;
+        for(unsigned i=0;i<AtlasView::FallbackSlots;++i)if(cache[i].key==AtlasView::WindowKey(i,5,0,0)){
+            coarseValid|=1u<<i;if(cache[i].shaded)coarseShaded|=1u<<i;
+            MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());if(w){if(w->_getTextureName()==cache[i].name)coarseBound|=1u<<i;if(w->getVisible())coarseVisible|=1u<<i;}
+        }
+        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" modelReady="<<modelGpuReady<<" modelCount="<<models.Valid(unsigned(observedGeneration))<<" modelRenders="<<modelRenders<<" modelBufferBytes="<<models.BorrowedBuffers()<<" modelTextureBytes="<<models.BorrowedTextures()<<" ownedGpuBytes="<<(AtlasView::WindowGpuBytes()+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0)+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0))<<" gpuCapBytes="<<AtlasView::GpuCap<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;
+        message<<" coarseValid=0x"<<std::hex<<coarseValid<<" coarseShaded=0x"<<coarseShaded<<" coarseBound=0x"<<coarseBound<<" coarseVisible=0x"<<coarseVisible<<std::dec;Diagnostic(message.str());
     }
 }
 void Tick(MapScreen*map){LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined)StartValidation();if(!ready)return;Draw(map,now);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
