@@ -7,14 +7,18 @@ s=re.sub(r'\s+','',raw)
 assert 'mapImage->setImageTexture' not in s and 'map->mapImage=' not in s
 assert 'w->setDepth(1000000)' in s
 assert 'w->setNeedMouseFocus(false)' in s and 'w->setNeedKeyFocus(false)' in s
-assert 'WidgetReflayer,status,tiles[16]' in s
+assert 'WidgetReflayer,status,tiles[AtlasView::WindowSlots]' in s
 assert 'SaveFileSystem::loadGame' in s and 'SaveFileSystem::newGame' in s
 assert 'j->generation==InterlockedCompareExchange' in s
 assert 'WaitForSingleObject(job->thread,0)' in s and 'CloseHandle(job->thread)' in s
 assert 'tickClock.Due(now,200)' in s and 'lightClock.Due(now,1000)' in s
 assert 'tickClock.Reset();lightClock.Reset();if(layer.get())' in s
-assert 'budget.Set(tile,level)' in s and 'budget.Remove(i)' in s
-assert 'shadeCursor=(i+1)%16' in s and 'cache[i].shaded!=lightVersion' in s
+assert 'AtlasView::WindowGpuBytes()>AtlasView::GpuCap' in s
+assert 'plan.Contains(key)&&FindWindow(key)<0' in s
+assert 'WindowVictim(keys,age,plan)' in s
+assert 'WindowKey' in s and 'cache[i].level!=desiredLevel' not in s
+assert 'next=(i+1)%AtlasView::WindowSlots' in s and 'e.shaded==lightVersion' in s
+assert 'shaded<4' in s and 'manifest.windows.Hashes(key,j->windowHashes)' in s
 assert 'GsmAtlas::Run' in s and 'GsmNative::Srv(e.texture.get())' in s
 assert 'getActiveSave' not in s and 'manifest.gsm' not in s
 assert 'GetModuleFileNameW' in s and 'SharedIniDefaults/MCMuseWindowsACP' in s

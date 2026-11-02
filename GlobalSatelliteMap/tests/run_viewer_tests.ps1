@@ -8,7 +8,7 @@ $env:INCLUDE="$vc/include;$sdk/Include;D:/DEV/Kenshi/deps/boost_1_60_0"
 $env:LIB="$vc/lib/amd64;$sdk/Lib/x64"
 & $python -c "from pathlib import Path; p=Path(r'$base/GlobalSatelliteMap.cpp').read_text(); a=p.index('bool Geometry('); b=p.index('void EnsureLayer(',a); Path(r'$out/ExtractedGeometry.h').write_text(p[a:b])"
 if($LASTEXITCODE -ne 0){throw 'Production geometry extraction failed'}
-foreach($test in @('atlas_manifest_tests','atlas_job_tests','atlas_geometry_tests','atlas_clock_tests')){
+foreach($test in @('atlas_manifest_tests','atlas_job_tests','atlas_geometry_tests','atlas_clock_tests','atlas_window_policy_tests')){
     & "$vc/bin/amd64/cl.exe" /nologo /EHsc /MD /O2 /W3 "/Fe$out/$test.exe" "/Fo$out/$test.obj" "$PSScriptRoot/$test.cpp" /link advapi32.lib user32.lib
     if($LASTEXITCODE -ne 0){throw "Compile failed: $test"}
     & "$out/$test.exe" "$out/worker-fixture.bin"
@@ -20,3 +20,8 @@ if($LASTEXITCODE -ne 0){throw 'Native sampler contract failed'}
 if($LASTEXITCODE -ne 0){throw 'Extracted managed image completion failed'}
 & $python "$PSScriptRoot/source_contracts.py"
 if($LASTEXITCODE -ne 0){throw 'Viewer source/catalog contracts failed'}
+
+foreach($test in @('window_geometry_tests.py','window_adoption_tests.py','window_mutation_tests.py','window_reposition_tests.py')){
+    & $python "$PSScriptRoot/$test"
+    if($LASTEXITCODE -ne 0){throw "Window integration failed: $test"}
+}

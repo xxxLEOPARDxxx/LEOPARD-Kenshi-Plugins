@@ -1,5 +1,6 @@
 #pragma once
 #include "atlas-view/AtlasReader.h"
+#include "atlas-view/AtlasWindowReader.h"
 #include "SatellitePolicy.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -8,8 +9,9 @@ namespace GsmAtlas {
 struct Manifest {
     unsigned char header[16][32];
     unsigned char captureMetadata[32];
+    unsigned char windowIndexHash[32];AtlasView::WindowIndex windows;
     double minX,minZ,maxX,maxZ;
-    Manifest():minX(0),minZ(0),maxX(0),maxZ(0){std::memset(header,0,sizeof(header));std::memset(captureMetadata,0,32);}
+    Manifest():minX(0),minZ(0),maxX(0),maxZ(0){std::memset(header,0,sizeof(header));std::memset(captureMetadata,0,32);std::memset(windowIndexHash,0,32);}
 };
 inline bool Hex(const std::string&s,unsigned char*out){if(!GSM::Hash(s))return false;for(unsigned i=0;i<32;++i){unsigned a=s[i*2],b=s[i*2+1];out[i]=static_cast<unsigned char>(((a<='9'?a-'0':a-'a'+10)<<4)|(b<='9'?b-'0':b-'a'+10));}return true;}
 inline bool Json(const std::string&s,boost::property_tree::ptree&tree){
@@ -29,7 +31,10 @@ inline bool Ready(const std::string&text,Manifest&out){
         bool seen[16]={false};unsigned count=0;Manifest m;if(!Hex(t.get<std::string>("captureMetadataSha256"),m.captureMetadata))return false;
         const boost::property_tree::ptree&tiles=t.get_child("tiles");
         for(boost::property_tree::ptree::const_iterator i=tiles.begin();i!=tiles.end();++i){const boost::property_tree::ptree&v=i->second;unsigned x=v.get<unsigned>("x"),z=v.get<unsigned>("z");if(!i->first.empty()||x>=4||z>=4||seen[z*4+x]||v.get<AtlasView::U64>("bytes")!=AtlasView::FileBytes())return false;std::ostringstream n;n<<"tile_"<<x<<'_'<<z<<".gst";if(v.get<std::string>("file")!=n.str()||!Hex(v.get<std::string>("headerSha256"),m.header[z*4+x]))return false;seen[z*4+x]=true;++count;}
-        if(count!=16)return false;out=m;return true;
+        if(count!=16)return false;
+        const std::string windowHash=t.get<std::string>("windowIndexSha256","");
+        if(!windowHash.empty()&&!Hex(windowHash,m.windowIndexHash))return false;
+        out=m;return true;
     }catch(...){return false;}
 }
 inline bool Small(const std::string&path,std::string&out,bool allowEmpty=false){
