@@ -3,3 +3,5 @@ tools/maintenance/keo/*.patch -text -whitespace
 # Byte-pinned terrain fixtures, shader snapshots and their audit manifests.
 GlobalSatelliteMap/atlas-terrain/fixed-geometry/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/atlas-terrain/compact-material/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/raster/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/raw-rgb/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
