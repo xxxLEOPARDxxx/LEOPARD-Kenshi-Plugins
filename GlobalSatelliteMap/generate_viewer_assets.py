@@ -53,6 +53,12 @@ while pending:
 lines += ['struct GsmShaderInput {const char*path;const char*sha256;};','static const GsmShaderInput GsmShaderInputs[]={']
 lines += ['{'+json.dumps(p.relative_to(game_root).as_posix())+','+json.dumps(h)+'},' for p,h in sorted(shader_files.items())]
 lines += ['};']
+local_profile=(here/'atlas-lights/NativeLocalLightProfile.h').read_text()
+local_body=re.search(r'static const SourcePin SourcePins\[\]=\{(.*?)\};',local_profile,re.S).group(1)
+local_pins=re.findall(r'\{"([^"]+)","([0-9a-f]{64})"\}',local_body)
+assert len(local_pins)==7 and len({p for p,h in local_pins})==7
+for relative,pinned_hash in local_pins:
+ assert shader_files.get(game_root/relative)==pinned_hash,('local-light pin not covered by terrain worker',relative)
 water_pins_raw=(here/'atlas-water/NativeWaterSnapshot.h').read_text()
 water_pin_body=re.search(r'static const SourcePin SourcePins\[\]=\{(.*?)\};',water_pins_raw,re.S).group(1)
 water_pins=re.findall(r'\{"([^"]+)","([0-9a-f]{64})"\}',water_pin_body)

@@ -1,0 +1,79 @@
+{
+  "dateUtc": "2026-11-02T05:55:05.054772+00:00",
+  "status": "4335 checks PASS;16 functional mutants rejected;coherent-origin independent review CLEAR",
+  "scope": "Value-only snapshot plus private Debug-only viewer acquisition; local HDR rendering remains unconnected",
+  "checks": {
+    "clockAndCollector": 4277,
+    "extractedNativeBackend": 58,
+    "total": 4335,
+    "functionalMutants": 16,
+    "fullAdapterAndEveryMutantCompile": true,
+    "exactModules": 2,
+    "exports": 19,
+    "engineWindows": 28,
+    "sourceClosureFiles": 7,
+    "originWindows": 3
+  },
+  "runtime": {
+    "gameCalls": 0,
+    "gameModuleLoadedByTests": false,
+    "nativeGetterDiagnostic": false,
+    "rendererIntegration": false,
+    "fpsOrLongSessionMemoryVerified": false
+  },
+  "payloadBytes": {
+    "twoValueBuffers": 917504,
+    "synchronousPointerScratch": 32768
+  },
+  "files": {
+    "NativeLocalLightSnapshot.h": "e682c05eb79cf2021de75d2110285841d9d1df12ae13a8b9a5f0e65e135fe275",
+    "NativeLocalLightProfile.h": "229d5c39b8e0c330893ef81b45e249d97a3fc8dfd430c9f98d4ef5efa119ca5d",
+    "audit_profile.py": "44e7be364affc6c4b9c8a9a81646db567a65c237db29463e45f2547349639e65",
+    "snapshot_tests.cpp": "7e309671a31ebab5c587f74636f28b5a16d22f3b2bf4d26853f14be6b44092c8",
+    "backend_tests.cpp": "91f8efa0e4f8683b56b8b40c050cd5a4b8a7e3123b84e793ee4a21f733be4fd8",
+    "run_tests.ps1": "af49a707e34904563858e994354584d160594adb73d424dcd232c31804d87d02",
+    "extract_backend.py": "3e3c4b24745f147d72401c5746005920ab83fbfa818f1f48a2b9f471e4fd8c95",
+    "compile_adapter.cpp": "bf84293168f322e4ee48a7187478d101ec3f65f55b0805e8d5b8a92ea0c4791c",
+    "README.md": "f625d2a073fb1e7a6024eb72c4a0212ce2f9eb35740fca20e7559b532c75d29a",
+    "plan.md": "837f945bb4ecf6127754c622b999213e248753e4c6125bf293a671e437983026",
+    "origin_fixture.h": "9060a46136414322ce0ad5f7a8e786297b5d44ff249bf39053efa272b907686f"
+  },
+  "independentReview": {
+    "status": "CLEAR4335checks/16functionalmutants",
+    "precedingRawOnlyCandidate": "CLEAR4309checks/12mutants",
+    "limitations": [
+      "caller Reset on scene replacement",
+      "native-frame coordinate/HDR proof before atlas-space rendering",
+      "no runtime getter/frame/FPS proof"
+    ],
+    "report": "D:/DEV/Kenshi/research/gsm-local-light-review-20261102/coherent-origin-review.md"
+  },
+  "originMetadata": {
+    "fields": "RegistryState and Information.SourceSceneOrigin[3]",
+    "getterRva": "0x2c7af0",
+    "abi": "RCX same expected SceneManager,RDX12byte output,RAX output",
+    "nativeProof": "negative root0 local XYZ; distinct synthetic root1 and nonzero SoA lane",
+    "finiteValidated": true,
+    "recheckedBeforePublication": true,
+    "sameSceneIdentityRequired": true,
+    "halfway4096RebaseRefuses": true,
+    "cachedOriginTuplePreserved": true,
+    "rawPositionsUnchanged": true,
+    "automaticAbsoluteConversion": false,
+    "publicationRedLog": "_generated/origin-red.log"
+  },
+  "rootIntegration": {
+    "installedDllSha256": "3a4b1635c7c27c28fd88dc2bd7c293ce31d1ad617d5d497e93cba16e5f82793b",
+    "registered": 52,
+    "active": 31,
+    "hidden": 21,
+    "nativeTime": 8709,
+    "sourceOrigin": [
+      -51296.7,
+      0,
+      3071.81
+    ],
+    "coordinateMappingProved": false,
+    "report": "docs/verification/2026-11-02-satellite-quality-local-snapshot.md"
+  }
+}
