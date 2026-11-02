@@ -1,0 +1,75 @@
+?getAllTowsByGameData@TownList@@QEAAXAEAV?$lektor@PEAVTown@@@@PEAVGameData@@@Z slot=6929 Steam=0x927c60
+927c60 48895c2420 mov qword ptr [rsp + 0x20], rbx
+927c65 57 push rdi
+927c66 4154 push r12
+927c68 4155 push r13
+927c6a 4883ec20 sub rsp, 0x20
+927c6e 33db xor ebx, ebx
+927c70 4d8be8 mov r13, r8
+927c73 488bfa mov rdi, rdx
+927c76 4c8be1 mov r12, rcx
+927c79 395958 cmp dword ptr [rcx + 0x58], ebx
+927c7c 0f868c000000 jbe 0x140927d0e
+927c82 48896c2440 mov qword ptr [rsp + 0x40], rbp
+927c87 4c89742450 mov qword ptr [rsp + 0x50], r14
+927c8c 4c8d3565195101 lea r14, [rip + 0x1511965]
+927c93 4889742448 mov qword ptr [rsp + 0x48], rsi
+927c98 8beb mov ebp, ebx
+927c9a 660f1f440000 nop word ptr [rax + rax]
+927ca0 498b442460 mov rax, qword ptr [r12 + 0x60]
+927ca5 488b0c28 mov rcx, qword ptr [rax + rbp]
+927ca9 498bc6 mov rax, r14
+927cac 4885c9 test rcx, rcx
+927caf 7404 je 0x140927cb5
+927cb1 488d4158 lea rax, [rcx + 0x58]
+927cb5 8378080d cmp dword ptr [rax + 8], 0xd
+927cb9 7537 jne 0x140927cf2
+927cbb 488b01 mov rax, qword ptr [rcx]
+927cbe ff9068020000 call qword ptr [rax + 0x268]
+927cc4 488bf0 mov rsi, rax
+927cc7 4885c0 test rax, rax
+927cca 7426 je 0x140927cf2
+927ccc 4c396840 cmp qword ptr [rax + 0x40], r13
+927cd0 7520 jne 0x140927cf2
+927cd2 8b570c mov edx, dword ptr [rdi + 0xc]
+927cd5 395708 cmp dword ptr [rdi + 8], edx
+927cd8 720a jb 0x140927ce4
+927cda 03d2 add edx, edx
+927cdc 488bcf mov rcx, rdi
+927cdf e835fc6dff call 0x140007919
+927ce4 8b4f08 mov ecx, dword ptr [rdi + 8]
+927ce7 488b4710 mov rax, qword ptr [rdi + 0x10]
+927ceb 488934c8 mov qword ptr [rax + rcx*8], rsi
+927cef ff4708 inc dword ptr [rdi + 8]
+927cf2 ffc3 inc ebx
+927cf4 4883c508 add rbp, 8
+927cf8 413b5c2458 cmp ebx, dword ptr [r12 + 0x58]
+927cfd 72a1 jb 0x140927ca0
+927cff 4c8b742450 mov r14, qword ptr [rsp + 0x50]
+927d04 488b742448 mov rsi, qword ptr [rsp + 0x48]
+927d09 488b6c2440 mov rbp, qword ptr [rsp + 0x40]
+927d0e 488b5c2458 mov rbx, qword ptr [rsp + 0x58]
+927d13 4883c420 add rsp, 0x20
+927d17 415d pop r13
+927d19 415c pop r12
+927d1b 5f pop rdi
+927d1c c3 ret
+927d1d cc int3
+927d1e cc int3
+927d1f cc int3
+927d20 cc int3
+927d21 cc int3
+927d22 cc int3
+927d23 cc int3
+927d24 cc int3
+927d25 cc int3
+927d26 cc int3
+927d27 cc int3
+927d28 cc int3
+927d29 cc int3
+927d2a cc int3
+927d2b cc int3
+927d2c cc int3
+927d2d cc int3
+927d2e cc int3
+927d2f cc int3

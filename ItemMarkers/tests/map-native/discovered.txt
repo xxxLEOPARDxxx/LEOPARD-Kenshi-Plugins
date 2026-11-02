@@ -1,0 +1,11 @@
+?isDiscovered@TownBase@@UEBA_NXZ slot=6832 Steam=0x950320
+950320 0fb68180010000 movzx eax, byte ptr [rcx + 0x180]
+950327 c3 ret
+950328 cc int3
+950329 cc int3
+95032a cc int3
+95032b cc int3
+95032c cc int3
+95032d cc int3
+95032e cc int3
+95032f cc int3

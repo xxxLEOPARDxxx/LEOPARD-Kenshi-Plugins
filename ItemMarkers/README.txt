@@ -10,7 +10,9 @@ ITEM MARKERS (QoL)
   - курсор кражи игры на краденых вещах;
   - курсор-рука игры на броне, которая является формой фракции;
   - глаз на изученных чертежах: у торговца сразу видно, какой чертёж
-    покупать незачем (раньше был в Dark Ui Tweaks).
+    покупать незачем (раньше был в Dark Ui Tweaks);
+  - такой же глаз на картах мест, если ВСЕ перечисленные места уже
+    открыты. Карты без списка мест и карты с неизвестным местом не помечаются.
 
 Один плагин вместо LtEast's Rarity Backgrounds, LtEast's Item Status
 Indicators и LtEast's Mod Settings Core. Их нужно ОТКЛЮЧИТЬ, иначе
@@ -23,8 +25,9 @@ Indicators и LtEast's Mod Settings Core. Их нужно ОТКЛЮЧИТЬ, и
 каждый кадр для каждого открытого окна - и оттуда обходят иконки. В
 торговле открыто несколько окон с сотнями вещей: падение FPS, при
 продаже - рывки. Здесь пометки ставятся один раз, когда игра создаёт
-иконку, и уходят вместе с ней. В кадре работы нет; есть только опрос
-клавиши показа, если она задана.
+иконку, и уходят вместе с ней. Между обновлениями проверяется клавиша
+показа, если она задана. Состояние видимых чертежей и карт обновляется
+раз в 0,4 с; в торговле с той же частотой проверяются мешочки сделок.
 
 
 СОРТ
@@ -44,7 +47,8 @@ ItemGrade5 в ванили нет - берётся цвет сорта 4, как
 ModConfigMenu): включение, клавиша показа (NONE - всегда), стиль и
 яркость цвета сорта (шаг 10%), с какого сорта красить (MinGrade), угол
 звезды, значки краденого и формы фракции (размер, заметность), глаз на
-изученных чертежах (Blueprint), подробный журнал.
+изученных чертежах (Blueprint), глаз на известных картах мест (MapsKnown),
+подробный журнал.
 Меняется сразу, без перезапуска. Те же настройки - в ItemMarkers.ini.
 
 
@@ -94,6 +98,36 @@ ItemMarkers.ini — ваши настройки: обновление мода �
 Localization diagnostics / Журнал локализации (2026-11-01)
 Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
 Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.
+
+Known location maps (unreleased) / Известные карты мест (ещё не выпущено)
+
+English
+- The same lower-left eye as learned blueprints marks a location map only
+  when every location from its original list is discovered. A map with no
+  listed locations, a missing location or an unreadable location stays unmarked.
+- MapsKnown is enabled by default and independent of Blueprint. Both settings
+  apply without restarting. Existing visible icons refresh within 0.4 seconds,
+  including inventory, containers and merchant stock.
+
+Русский
+- Тот же глаз слева снизу, что у изученных чертежей, отмечает карту мест,
+  только если открыты все места из её исходного списка. Карты без мест,
+  с отсутствующим или недоступным для проверки местом остаются без глаза.
+- MapsKnown включён по умолчанию и не зависит от Blueprint. Перезапуск
+  не нужен. Уже видимые иконки обновляются в пределах 0,4 с, в том числе
+  в инвентаре, контейнерах и товарах торговца.
+
+Implementation / Реализация
+The marker never calls selectTowns, consume or tooltip helpers and never writes
+town discovery or item references. Native selectTowns removes discovered towns
+and randomizes candidates; its handles and the consumed counter are unsuitable.
+Only the visible-icon 400 ms cadence may build one ephemeral 32 KiB table,
+shared by that update's icons. Creation and MCM redraw defer map checks to this
+cadence. Limits: 8192 world entries, 2048 distinct town data records, 256 source
+references per map; saturation, missing data and read faults fail closed.
+All native pointers in the table die at return; there is no world cache or
+per-frame world traversal. Unchanged state does not create/delete widgets.
+Native/host tests are not game FPS, memory-growth or skin acceptance measurements.
 
 Prepared release 6 / Подготовленный выпуск 6 (2026-11-02)
 

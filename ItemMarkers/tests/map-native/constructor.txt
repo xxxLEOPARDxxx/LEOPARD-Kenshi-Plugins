@@ -1,0 +1,77 @@
+?_CONSTRUCTOR@MapItem@@QEAAPEAV1@PEAVGameData@@Vhand@@@Z slot=4781 Steam=0x7619e0
+7619e0 4053 push rbx
+7619e2 4883ec70 sub rsp, 0x70
+7619e6 48c7442438feffffff mov qword ptr [rsp + 0x38], 0xfffffffffffffffe
+7619ef 488b05c2499b01 mov rax, qword ptr [rip + 0x19b49c2]
+7619f6 4833c4 xor rax, rsp
+7619f9 4889442468 mov qword ptr [rsp + 0x68], rax
+7619fe 488bd9 mov rbx, rcx
+761a01 48894c2430 mov qword ptr [rsp + 0x30], rcx
+761a06 488d05c328f200 lea rax, [rip + 0xf228c3]
+761a0d 4889442440 mov qword ptr [rsp + 0x40], rax
+761a12 418b4008 mov eax, dword ptr [r8 + 8]
+761a16 89442448 mov dword ptr [rsp + 0x48], eax
+761a1a 418b400c mov eax, dword ptr [r8 + 0xc]
+761a1e 8944244c mov dword ptr [rsp + 0x4c], eax
+761a22 418b4010 mov eax, dword ptr [r8 + 0x10]
+761a26 89442450 mov dword ptr [rsp + 0x50], eax
+761a2a 418b4014 mov eax, dword ptr [r8 + 0x14]
+761a2e 89442454 mov dword ptr [rsp + 0x54], eax
+761a32 418b4018 mov eax, dword ptr [r8 + 0x18]
+761a36 89442458 mov dword ptr [rsp + 0x58], eax
+761a3a 488d442440 lea rax, [rsp + 0x40]
+761a3f 4889442420 mov qword ptr [rsp + 0x20], rax
+761a44 4533c9 xor r9d, r9d
+761a47 4533c0 xor r8d, r8d
+761a4a e8f4b48cff call 0x14002cf43
+761a4f 90 nop
+761a50 488d0541b7fa00 lea rax, [rip + 0xfab741]
+761a57 488903 mov qword ptr [rbx], rax
+761a5a 33c0 xor eax, eax
+761a5c 8983e8010000 mov dword ptr [rbx + 0x1e8], eax
+761a62 668983ec010000 mov word ptr [rbx + 0x1ec], ax
+761a69 488983f0010000 mov qword ptr [rbx + 0x1f0], rax
+761a70 488983f8010000 mov qword ptr [rbx + 0x1f8], rax
+761a77 48898300020000 mov qword ptr [rbx + 0x200], rax
+761a7e c7833c01000066000000 mov dword ptr [rbx + 0x13c], 0x66
+761a88 c7831001000007000000 mov dword ptr [rbx + 0x110], 7
+761a92 48c74424580f000000 mov qword ptr [rsp + 0x58], 0xf
+761a9b 4889442450 mov qword ptr [rsp + 0x50], rax
+761aa0 88442440 mov byte ptr [rsp + 0x40], al
+761aa4 448d4005 lea r8d, [rax + 5]
+761aa8 488d157541f300 lea rdx, [rip + 0xf34175]
+761aaf 488d4c2440 lea rcx, [rsp + 0x40]
+761ab4 e80cbd8eff call 0x14004d7c5
+761ab9 90 nop
+761aba 488b4b40 mov rcx, qword ptr [rbx + 0x40]
+761abe 4881c178010000 add rcx, 0x178
+761ac5 488d542440 lea rdx, [rsp + 0x40]
+761aca e82f668eff call 0x1400480fe
+761acf 8b4828 mov ecx, dword ptr [rax + 0x28]
+761ad2 898be8010000 mov dword ptr [rbx + 0x1e8], ecx
+761ad8 48837c245810 cmp qword ptr [rsp + 0x58], 0x10
+761ade 720d jb 0x140761aed
+761ae0 488b4c2440 mov rcx, qword ptr [rsp + 0x40]
+761ae5 e83e3b7700 call 0x140ed5628
+761aea 90 nop
+761aeb eb00 jmp 0x140761aed
+761aed 488bc3 mov rax, rbx
+761af0 488b4c2468 mov rcx, qword ptr [rsp + 0x68]
+761af5 4833cc xor rcx, rsp
+761af8 e8b3427700 call 0x140ed5db0
+761afd 4883c470 add rsp, 0x70
+761b01 5b pop rbx
+761b02 c3 ret
+761b03 cc int3
+761b04 cc int3
+761b05 cc int3
+761b06 cc int3
+761b07 cc int3
+761b08 cc int3
+761b09 cc int3
+761b0a cc int3
+761b0b cc int3
+761b0c cc int3
+761b0d cc int3
+761b0e cc int3
+761b0f cc int3

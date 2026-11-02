@@ -131,6 +131,12 @@ msgstr "按住此键时显示标记。NONE（设定时按 Backspace）- 始终�
 msgid "Eye on learned blueprints"
 msgstr "已学蓝图显示眼睛"
 
+msgid "Eye on known location maps"
+msgstr "已知地点地图显示眼睛"
+
+msgid "An eye in the lower left corner of a map icon when all listed locations are already discovered. Maps without locations are not marked."
+msgstr "地图列出的所有地点都已被发现时，在地图图标左下角显示眼睛。没有列出地点的地图不作标记。"
+
 msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 msgstr "如果蓝图已学会，其图标左下角显示一只眼睛，无需再买。"
 

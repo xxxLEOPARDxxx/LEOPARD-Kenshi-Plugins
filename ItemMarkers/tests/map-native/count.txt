@@ -1,0 +1,11 @@
+?getTownsDiscovered@MapItem@@QEBAHXZ slot=4778 Steam=0x70c080
+70c080 0fb781ec010000 movzx eax, word ptr [rcx + 0x1ec]
+70c087 c3 ret
+70c088 cc int3
+70c089 cc int3
+70c08a cc int3
+70c08b cc int3
+70c08c cc int3
+70c08d cc int3
+70c08e cc int3
+70c08f cc int3

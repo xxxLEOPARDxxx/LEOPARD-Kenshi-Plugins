@@ -1,0 +1,168 @@
+?getTown@hand@@QEBAPEAVTownBase@@XZ slot=3826 Steam=0x791de0
+791de0 4053 push rbx
+791de2 4883ec20 sub rsp, 0x20
+791de6 8379080b cmp dword ptr [rcx + 8], 0xb
+791dea 488bd9 mov rbx, rcx
+791ded 750a jne 0x140791df9
+791def 33c9 xor ecx, ecx
+791df1 8bc1 mov eax, ecx
+791df3 4883c420 add rsp, 0x20
+791df7 5b pop rbx
+791df8 c3 ret
+791df9 488b0568119a01 mov rax, qword ptr [rip + 0x19a1168]
+791e00 488bd1 mov rdx, rcx
+791e03 488d0d5e119a01 lea rcx, [rip + 0x19a115e]
+791e0a ff5050 call qword ptr [rax + 0x50]
+791e0d 3b0565119a01 cmp eax, dword ptr [rip + 0x19a1165]
+791e13 73da jae 0x140791def
+791e15 4863d0 movsxd rdx, eax
+791e18 488b0551119a01 mov rax, qword ptr [rip + 0x19a1151]
+791e1f 48897c2430 mov qword ptr [rsp + 0x30], rdi
+791e24 488b3cd0 mov rdi, qword ptr [rax + rdx*8]
+791e28 4885ff test rdi, rdi
+791e2b 7437 je 0x140791e64
+791e2d 483b3ddc109a01 cmp rdi, qword ptr [rip + 0x19a10dc]
+791e34 742e je 0x140791e64
+791e36 488b052b119a01 mov rax, qword ptr [rip + 0x19a112b]
+791e3d 488d5758 lea rdx, [rdi + 0x58]
+791e41 488d0d20119a01 lea rcx, [rip + 0x19a1120]
+791e48 4c8bc3 mov r8, rbx
+791e4b ff5060 call qword ptr [rax + 0x60]
+791e4e 33c9 xor ecx, ecx
+791e50 84c0 test al, al
+791e52 480f45cf cmovne rcx, rdi
+791e56 488b7c2430 mov rdi, qword ptr [rsp + 0x30]
+791e5b 488bc1 mov rax, rcx
+791e5e 4883c420 add rsp, 0x20
+791e62 5b pop rbx
+791e63 c3 ret
+791e64 488b7c2430 mov rdi, qword ptr [rsp + 0x30]
+791e69 33c9 xor ecx, ecx
+791e6b 8bc1 mov eax, ecx
+791e6d 4883c420 add rsp, 0x20
+791e71 5b pop rbx
+791e72 c3 ret
+791e73 cc int3
+791e74 cc int3
+791e75 cc int3
+791e76 cc int3
+791e77 cc int3
+791e78 cc int3
+791e79 cc int3
+791e7a cc int3
+791e7b cc int3
+791e7c cc int3
+791e7d cc int3
+791e7e cc int3
+791e7f cc int3
+791e80 c20000 ret 0
+791e83 cc int3
+791e84 cc int3
+791e85 cc int3
+791e86 cc int3
+791e87 cc int3
+791e88 cc int3
+791e89 cc int3
+791e8a cc int3
+791e8b cc int3
+791e8c cc int3
+791e8d cc int3
+791e8e cc int3
+791e8f cc int3
+791e90 448b91a8010000 mov r10d, dword ptr [rcx + 0x1a8]
+791e97 4533c9 xor r9d, r9d
+791e9a 4c8bc1 mov r8, rcx
+791e9d 418bc1 mov eax, r9d
+791ea0 4585d2 test r10d, r10d
+791ea3 7463 je 0x140791f08
+791ea5 488b89b0010000 mov rcx, qword ptr [rcx + 0x1b0]
+791eac 0f1f4000 nop dword ptr [rax]
+791eb0 483911 cmp qword ptr [rcx], rdx
+791eb3 740d je 0x140791ec2
+791eb5 ffc0 inc eax
+791eb7 4883c108 add rcx, 8
+791ebb 413bc2 cmp eax, r10d
+791ebe 72f0 jb 0x140791eb0
+791ec0 eb46 jmp 0x140791f08
+791ec2 418bca mov ecx, r10d
+791ec5 413bc2 cmp eax, r10d
+791ec8 733e jae 0x140791f08
+791eca 448d5801 lea r11d, [rax + 1]
+791ece 4d63d3 movsxd r10, r11d
+791ed1 443bd9 cmp r11d, ecx
+791ed4 732b jae 0x140791f01
+791ed6 49c1e203 shl r10, 3
+791eda 660f1f440000 nop word ptr [rax + rax]
+791ee0 498b88b0010000 mov rcx, qword ptr [r8 + 0x1b0]
+791ee7 41ffc3 inc r11d
+791eea 4983c208 add r10, 8
+791eee 4a8b4411f8 mov rax, qword ptr [rcx + r10 - 8]
+791ef3 4a894411f0 mov qword ptr [rcx + r10 - 0x10], rax
+791ef8 453b98a8010000 cmp r11d, dword ptr [r8 + 0x1a8]
+791eff 72df jb 0x140791ee0
+791f01 41ff88a8010000 dec dword ptr [r8 + 0x1a8]
+791f08 458b90c0010000 mov r10d, dword ptr [r8 + 0x1c0]
+791f0f 418bc1 mov eax, r9d
+791f12 4585d2 test r10d, r10d
+791f15 7461 je 0x140791f78
+791f17 498b88c8010000 mov rcx, qword ptr [r8 + 0x1c8]
+791f1e 6690 nop
+791f20 483911 cmp qword ptr [rcx], rdx
+791f23 740d je 0x140791f32
+791f25 ffc0 inc eax
+791f27 4883c108 add rcx, 8
+791f2b 413bc2 cmp eax, r10d
+791f2e 72f0 jb 0x140791f20
+791f30 eb46 jmp 0x140791f78
+791f32 418bca mov ecx, r10d
+791f35 413bc2 cmp eax, r10d
+791f38 733e jae 0x140791f78
+791f3a 448d5801 lea r11d, [rax + 1]
+791f3e 4d63d3 movsxd r10, r11d
+791f41 443bd9 cmp r11d, ecx
+791f44 732b jae 0x140791f71
+791f46 49c1e203 shl r10, 3
+791f4a 660f1f440000 nop word ptr [rax + rax]
+791f50 498b88c8010000 mov rcx, qword ptr [r8 + 0x1c8]
+791f57 41ffc3 inc r11d
+791f5a 4983c208 add r10, 8
+791f5e 498b440af8 mov rax, qword ptr [r10 + rcx - 8]
+791f63 4989440af0 mov qword ptr [r10 + rcx - 0x10], rax
+791f68 453b98c0010000 cmp r11d, dword ptr [r8 + 0x1c0]
+791f6f 72df jb 0x140791f50
+791f71 41ff88c0010000 dec dword ptr [r8 + 0x1c0]
+791f78 418b88d8010000 mov ecx, dword ptr [r8 + 0x1d8]
+791f7f 85c9 test ecx, ecx
+791f81 7465 je 0x140791fe8
+791f83 498b80e0010000 mov rax, qword ptr [r8 + 0x1e0]
+791f8a 660f1f440000 nop word ptr [rax + rax]
+791f90 483910 cmp qword ptr [rax], rdx
+791f93 740e je 0x140791fa3
+791f95 41ffc1 inc r9d
+791f98 4883c008 add rax, 8
+791f9c 443bc9 cmp r9d, ecx
+791f9f 72ef jb 0x140791f90
+791fa1 f3c3 repz ret
+791fa3 443bc9 cmp r9d, ecx
+791fa6 7340 jae 0x140791fe8
+791fa8 41ffc1 inc r9d
+791fab 4963d1 movsxd rdx, r9d
+791fae 443bc9 cmp r9d, ecx
+791fb1 732e jae 0x140791fe1
+791fb3 48c1e203 shl rdx, 3
+791fb7 660f1f840000000000 nop word ptr [rax + rax]
+791fc0 498b88e0010000 mov rcx, qword ptr [r8 + 0x1e0]
+791fc7 41ffc1 inc r9d
+791fca 4883c208 add rdx, 8
+791fce 488b4411f8 mov rax, qword ptr [rcx + rdx - 8]
+791fd3 48894411f0 mov qword ptr [rcx + rdx - 0x10], rax
+791fd8 453b88d8010000 cmp r9d, dword ptr [r8 + 0x1d8]
+791fdf 72df jb 0x140791fc0
+791fe1 41ff88d8010000 dec dword ptr [r8 + 0x1d8]
+791fe8 f3c3 repz ret
+791fea cc int3
+791feb cc int3
+791fec cc int3
+791fed cc int3
+791fee cc int3
+791fef cc int3

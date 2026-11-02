@@ -1,0 +1,31 @@
+?getPtr@GameDataReference@@QEBAPEAVGameData@@PEAVGameDataContainer@@@Z slot=3473 Steam=0x6beac0
+6beac0 4053 push rbx
+6beac2 4883ec20 sub rsp, 0x20
+6beac6 4883793800 cmp qword ptr [rcx + 0x38], 0
+6beacb 488bc2 mov rax, rdx
+6beace 488bd9 mov rbx, rcx
+6bead1 7516 jne 0x1406beae9
+6bead3 488d5110 lea rdx, [rcx + 0x10]
+6bead7 488bc8 mov rcx, rax
+6beada e8b15c95ff call 0x140014790
+6beadf 48894338 mov qword ptr [rbx + 0x38], rax
+6beae3 4883c420 add rsp, 0x20
+6beae7 5b pop rbx
+6beae8 c3 ret
+6beae9 488b4138 mov rax, qword ptr [rcx + 0x38]
+6beaed 4883c420 add rsp, 0x20
+6beaf1 5b pop rbx
+6beaf2 c3 ret
+6beaf3 cc int3
+6beaf4 cc int3
+6beaf5 cc int3
+6beaf6 cc int3
+6beaf7 cc int3
+6beaf8 cc int3
+6beaf9 cc int3
+6beafa cc int3
+6beafb cc int3
+6beafc cc int3
+6beafd cc int3
+6beafe cc int3
+6beaff cc int3

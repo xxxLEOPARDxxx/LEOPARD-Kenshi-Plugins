@@ -131,6 +131,12 @@ msgstr "The marks are shown while this key is held. NONE (Backspace when assigni
 msgid "Eye on learned blueprints"
 msgstr "Eye on learned blueprints"
 
+msgid "Eye on known location maps"
+msgstr "Eye on known location maps"
+
+msgid "An eye in the lower left corner of a map icon when all listed locations are already discovered. Maps without locations are not marked."
+msgstr "An eye in the lower left corner of a map icon when all listed locations are already discovered. Maps without locations are not marked."
+
 msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 msgstr "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 

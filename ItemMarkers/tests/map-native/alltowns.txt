@@ -1,0 +1,3 @@
+?getAllTowns@TownList@@QEAAAEAV?$lektor@PEAVRootObject@@@@XZ slot=6925 Steam=0xb85f0
+b85f0 488d4150 lea rax, [rcx + 0x50]
+b85f4 c3 ret

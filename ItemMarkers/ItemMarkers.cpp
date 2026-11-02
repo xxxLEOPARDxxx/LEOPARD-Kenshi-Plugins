@@ -1,4 +1,4 @@
-// ItemMarkers - пометки на иконках вещей: цвет сорта, краденое, форма
+﻿// ItemMarkers - пометки на иконках вещей: цвет сорта, краденое, форма
 // фракции, глаз на изученных чертежах (перенесён из DarkUiTweaks). Один плагин вместо LtEast's Rarity Backgrounds + Item Status
 // Indicators + Mod Settings Core (09.10.2026).
 //
@@ -61,6 +61,8 @@
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/Research.h>
 #include <kenshi/Character.h>
+#include <kenshi/SharedKing.h>
+#include <kenshi/Town.h>
 #include <kenshi/util/StringPair.h>
 
 #include <GameTheme.h>
@@ -98,6 +100,7 @@ namespace
     float g_stolenAlpha = 0.85f;
     bool g_faction = true;
     bool g_blueprint = true;           // глаз на изученных чертежах (перенесён из DarkUiTweaks)
+    bool g_knownMaps = true;           // все перечисленные места карты уже открыты
     int g_factionSize = 16;
     float g_factionAlpha = 0.85f;
     HoldKey::Key g_holdKey;            // назначена - видно, пока зажата; NONE (vk 0) - всегда
@@ -166,6 +169,7 @@ namespace
         g_factionSize = ReadInt(ini, "FactionSize", 16, 8, 40);
         g_factionAlpha = ReadInt(ini, "FactionStrength", 9, 1, 10) / 10.0f;
         g_blueprint = ReadInt(ini, "Blueprint", 1, 0, 1) != 0;
+        g_knownMaps = ReadInt(ini, "MapsKnown", 1, 0, 1) != 0;
         char key[64] = {};
         GetPrivateProfileStringA("ItemMarkers", "HoldKey", "NONE", key, sizeof(key), ini.c_str());
         g_holdKey = HoldKey::Parse(key);
@@ -334,7 +338,9 @@ namespace
         std::vector<MyGUI::Widget*> marks;     // дети корня иконки
         hand handle;                           // вещь по ссылке игры: удалена - пусто
         bool bag;                              // нарисован мешочек сделки
-        IconEntry() : item(NULL), bag(false) {}
+        bool known, knowledgeItem;
+        MyGUI::Widget* eye;
+        IconEntry() : item(NULL), bag(false), known(false), knowledgeItem(false), eye(NULL) {}
     };
     std::map<MyGUI::Widget*, IconEntry> g_icons;   // корень иконки -> вещь
     // пометка -> корень её иконки. Игра может удалить детей иконки сама
@@ -350,6 +356,7 @@ namespace
         for (size_t k = 0; k < entry.marks.size(); ++k)
             g_markRoot.erase(entry.marks[k]);
         entry.marks.clear();
+        entry.eye = NULL;
     }
 
     // MyGUI сообщает о каждом удаляемом виджете: корень иконки ушёл -
@@ -369,6 +376,8 @@ namespace
                     if (icon != g_icons.end())
                     {
                         std::vector<MyGUI::Widget*>& marks = icon->second.marks;
+                        if (icon->second.eye == widget)
+                            icon->second.eye = NULL;
                         for (size_t k = 0; k < marks.size(); ++k)
                             if (marks[k] == widget)
                             {
@@ -467,7 +476,127 @@ namespace
         return tech->isFinished(research) || tech->hasPaidFor(research);
     }
 
-    void Decorate(MyGUI::Widget* root, IconEntry& entry)
+    // BEGIN known location maps
+    // selectTowns rebuilds an UNKNOWN-only/random subset and mutates the item;
+    // its handles and getTownsDiscovered consume counter cannot answer this.
+    // One lazy, bounded scratch snapshot per refresh, never retained native
+    // pointers. No town traversal or allocation on intervening GUI frames.
+    struct MapKnowledgeBatch
+    {
+        enum { CAPACITY = 2048, MAX_TOWNS = 8192, MAX_REFERENCES = 256 };
+        struct Fact { GameData* data; bool allKnown; } facts[CAPACITY];
+        bool built, valid, allowBuild;
+        explicit MapKnowledgeBatch(bool allow = true) : built(false), valid(false), allowBuild(allow) {}
+    };
+
+    unsigned MapFactSlot(GameData* data)
+    {
+        const size_t value = reinterpret_cast<size_t>(data) >> 4;
+        return static_cast<unsigned>((value ^ (value >> 11)) & (MapKnowledgeBatch::CAPACITY - 1));
+    }
+
+    void BuildMapKnowledge(MapKnowledgeBatch& batch)
+    {
+        batch.built = true;
+        batch.valid = false;
+        if (shou == NULL || shou->townList == NULL)
+            return;
+        std::memset(batch.facts, 0, sizeof(batch.facts));
+        const lektor<RootObject*>& towns = shou->townList->getAllTowns();
+        if (towns.size() > MapKnowledgeBatch::MAX_TOWNS)
+            return;
+        for (unsigned i = 0; i < towns.size(); ++i)
+        {
+            RootObject* const root = towns[i];
+            if (root == NULL || root->getHandle().type != TOWN)
+                continue;
+            // Same genuine Town admission as native getAllTowsByGameData.
+            Town* const town = static_cast<TownBase*>(root)->isTown();
+            if (town == NULL || town->data == NULL)
+                return;                     // genuine-town read refused: whole batch stays invalid
+            unsigned slot = MapFactSlot(town->data), probe = 0;
+            while (batch.facts[slot].data != NULL && batch.facts[slot].data != town->data)
+            {
+                if (++probe == MapKnowledgeBatch::CAPACITY)
+                    return;
+                slot = (slot + 1) & (MapKnowledgeBatch::CAPACITY - 1);
+            }
+            MapKnowledgeBatch::Fact& fact = batch.facts[slot];
+            if (fact.data == NULL)
+            {
+                fact.data = town->data;
+                fact.allKnown = true;
+            }
+            fact.allKnown = fact.allKnown && town->isDiscovered();
+        }
+        batch.valid = true;
+    }
+
+    bool MapLocationsKnown(Item* item, MapKnowledgeBatch& batch)
+    {
+        if (item == NULL || item->data == NULL || item->getClassType() != MAP_ITEM || ou == NULL)
+            return false;
+        static const std::string townsName("towns");
+        const Ogre::vector<GameDataReference>::type* const refs = item->data->getReferenceListIfExists(townsName);
+        if (refs == NULL || refs->empty() || refs->size() > MapKnowledgeBatch::MAX_REFERENCES)
+            return false;                    // ordinary maps are not vacuously known
+        if (!batch.built && !batch.allowBuild)
+            return false;                    // creation/MCM wait for the shared periodic batch
+        if (!batch.built)
+            BuildMapKnowledge(batch);
+        if (!batch.valid)
+            return false;
+        for (size_t i = 0; i < refs->size(); ++i)
+        {
+            // getPtr caches into the reference even though its method is const.
+            // Query current world data by SID instead: no mutation/stale cache.
+            GameData* const data = ou->gamedata.getData((*refs)[i].sid);
+            if (data == NULL || data->type != TOWN)
+                return false;
+            unsigned slot = MapFactSlot(data), probe = 0;
+            while (batch.facts[slot].data != NULL && batch.facts[slot].data != data)
+            {
+                if (++probe == MapKnowledgeBatch::CAPACITY)
+                    return false;
+                slot = (slot + 1) & (MapKnowledgeBatch::CAPACITY - 1);
+            }
+            if (batch.facts[slot].data == NULL || !batch.facts[slot].allKnown)
+                return false;
+        }
+        return true;                         // every reference resolved to genuine current towns
+    }
+
+    bool WantedKnownEye(Item* item, MapKnowledgeBatch& batch)
+    {
+        return (g_blueprint && BlueprintLearned(item)) || (g_knownMaps && MapLocationsKnown(item, batch));
+    }
+
+    bool SafeKnownEye(Item* item, MapKnowledgeBatch& batch)
+    {
+        __try { return WantedKnownEye(item, batch); }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            batch.valid = false;
+            static bool told = false;
+            if (!told)
+            {
+                told = true;
+                ErrorLog("ItemMarkers: item knowledge could not be read - eye skipped");
+            }
+            return false;
+        }
+    }
+
+    MyGUI::IntCoord KnownEyeCoord(const MyGUI::IntSize& size)
+    {
+        int side = (size.width < size.height ? size.width : size.height) * 2 / 5;
+        if (side < 14) side = 14;
+        if (side > 28) side = 28;
+        return MyGUI::IntCoord(2, size.height - side - 2, side, side);
+    }
+    // END known location maps
+
+    void Decorate(MyGUI::Widget* root, IconEntry& entry, MapKnowledgeBatch& maps)
     {
         Item* const item = entry.item;
         if (root == NULL || item == NULL || item->data == NULL)
@@ -625,15 +754,13 @@ namespace
 
         // Глаз на изученном чертеже - в левом нижнем углу: у торговца сразу
         // видно, что покупать незачем (перенесено из DarkUiTweaks 09.10.2026).
-        if (g_blueprint && BlueprintLearned(item))
+        entry.known = SafeKnownEye(item, maps);
+        if (entry.known)
         {
             const std::string& texture = Texture("itemmarkers_known.png");
             if (!texture.empty())
             {
-                int side = (size.width < size.height ? size.width : size.height) * 2 / 5;
-                if (side < 14) side = 14;
-                if (side > 28) side = 28;
-                MyGUI::ImageBox* const eye = MakeImage(root, MyGUI::IntCoord(2, size.height - side - 2, side, side),
+                MyGUI::ImageBox* const eye = MakeImage(root, KnownEyeCoord(size),
                                                        MyGUI::Align::Left | MyGUI::Align::Bottom);
                 if (eye != NULL)
                 {
@@ -641,6 +768,7 @@ namespace
                     SetDepthLast(eye, FRONT_DEPTH);
                     entry.marks.push_back(eye);
                     g_markRoot[eye] = root;
+                    entry.eye = eye;
                 }
             }
         }
@@ -660,11 +788,11 @@ namespace
     // Перерисовка из MCM идёт по уже открытым иконкам: вещь могла уйти
     // раньше иконки - сбой одной иконки не должен ронять игру (ревью
     // 09.10.2026; при создании иконки та же защита - SafeOnIcon).
-    bool SafeDecorate(MyGUI::Widget* root, IconEntry* entry)
+    bool SafeDecorate(MyGUI::Widget* root, IconEntry* entry, MapKnowledgeBatch* maps)
     {
         __try
         {
-            Decorate(root, *entry);
+            Decorate(root, *entry, *maps);
             return true;
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
@@ -673,14 +801,25 @@ namespace
         }
     }
 
+    Item* ResolveIconItem(IconEntry& entry)
+    {
+        __try
+        {
+            Item* const live = entry.handle.getItem();
+            return live == entry.item ? live : NULL;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) { return NULL; }
+    }
+
     void RefreshAll()
     {
         g_coloursRead = false;
         unsigned failed = 0;
+        MapKnowledgeBatch maps(false);
         for (std::map<MyGUI::Widget*, IconEntry>::iterator it = g_icons.begin(); it != g_icons.end(); ++it)
         {
             Undecorate(it->second);
-            if (g_enabled && !SafeDecorate(it->first, &it->second))
+            if (g_enabled && ResolveIconItem(it->second) != NULL && !SafeDecorate(it->first, &it->second, &maps))
                 ++failed;
         }
         if (failed > 0)
@@ -708,8 +847,11 @@ namespace
         IconEntry& entry = g_icons[root];
         entry.item = item;
         entry.handle = item->getHandle();
+        const itemType kind = item->getClassType();
+        entry.knowledgeItem = kind == BLUEPRINT || kind == MAP_ITEM;
         ForgetMarks(entry);
-        Decorate(root, entry);
+        MapKnowledgeBatch maps(false);
+        Decorate(root, entry, maps);
         if (g_debug && item->getClassType() == BLUEPRINT)
         {
             static unsigned s_blueprints = 0;
@@ -878,31 +1020,36 @@ namespace
     // открыты окна, раз в 0,4 с видимые иконки спрашиваются заново; сменилось
     // - пометки иконки рисуются заново. Вещь - по ссылке игры, не по
     // указателю: слитая в стопку вещь удалена, ссылка тогда пустая.
-    void RecheckTradeBags(ForgottenGUI* gui)
+    void RecheckDynamicMarks(ForgottenGUI* gui)
     {
-        if (!g_enabled || !g_tradeBags || !g_shown || g_icons.empty() || gui == NULL)
-            return;
-        // Только пока идёт торговля (участники окна торговли заданы): вне
-        // торговли «вещей сделки» не бывает (ревью 15.10.2026).
-        if (gui->tradeA.getRootObject() == NULL && gui->tradeB.getRootObject() == NULL)
+        if (!g_enabled || (!g_tradeBags && !g_blueprint && !g_knownMaps) || !g_shown || g_icons.empty() || gui == NULL)
             return;
         static DWORD s_last = 0;
         const DWORD now = GetTickCount();
         if (now - s_last < 400)
             return;
         s_last = now;
+        const bool trade = g_tradeBags && (gui->tradeA.getRootObject() != NULL || gui->tradeB.getRootObject() != NULL);
+        MapKnowledgeBatch maps;
         for (std::map<MyGUI::Widget*, IconEntry>::iterator it = g_icons.begin(); it != g_icons.end(); ++it)
         {
             IconEntry& entry = it->second;
-            if (!it->first->getInheritedVisible())
+            if ((!trade && !entry.knowledgeItem) || !it->first->getInheritedVisible())
                 continue;
-            Item* const live = entry.handle.getItem();
-            if (live == NULL || live != entry.item)
+            Item* const live = ResolveIconItem(entry);
+            if (live == NULL)
+            {
+                // Deleted/merged item or old-world handle: no stale knowledge eye.
+                if (!entry.marks.empty())
+                    Undecorate(entry);
+                entry.known = false;
                 continue;
-            if (TradedNow(live) == entry.bag)
+            }
+            const bool known = entry.knowledgeItem && SafeKnownEye(live, maps);
+            if ((!trade || TradedNow(live) == entry.bag) && known == entry.known && (!known || entry.eye != NULL))
                 continue;
             Undecorate(entry);
-            SafeDecorate(it->first, &entry);
+            SafeDecorate(it->first, &entry, &maps);
         }
     }
 
@@ -912,7 +1059,7 @@ namespace
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
-        RecheckTradeBags(self);
+        RecheckDynamicMarks(self);
         if (g_debug && g_statIcons > 0)
         {
             static DWORD s_last = 0;
@@ -981,6 +1128,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->integer(api, "ItemMarkers", "FactionSize", Tr("Uniform badge size"), Tr("In pixels."), 16, 8, 40, 0);
     api->integer(api, "ItemMarkers", "FactionStrength", Tr("Uniform badge strength"), Tr("How visible the badge is, 1-10 (10% steps)."), 9, 1, 10, 0);
     api->toggle(api, "ItemMarkers", "Blueprint", Tr("Eye on learned blueprints"), Tr("An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."), 1, 0);
+    api->toggle(api, "ItemMarkers", "MapsKnown", Tr("Eye on known location maps"), Tr("An eye in the lower left corner of a map icon when all listed locations are already discovered. Maps without locations are not marked."), 1, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "ItemMarkers", "Debug", Tr("Detailed log"), Tr("In RE_Kenshi_log.txt: the first 200 marked items (kind, level, grade) and how long marking takes."), 0, 0);
 }

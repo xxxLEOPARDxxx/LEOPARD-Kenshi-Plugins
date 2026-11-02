@@ -131,6 +131,12 @@ msgstr "Пометки видны, пока зажата эта клавиша. 
 msgid "Eye on learned blueprints"
 msgstr "Глаз на изученных чертежах"
 
+msgid "Eye on known location maps"
+msgstr "Глаз на известных картах мест"
+
+msgid "An eye in the lower left corner of a map icon when all listed locations are already discovered. Maps without locations are not marked."
+msgstr "Глаз в левом нижнем углу значка карты, если все перечисленные места уже открыты. Карты без мест не помечаются."
+
 msgid "An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."
 msgstr "Глаз в левом нижнем углу значка чертежа, если он уже изучен - покупать незачем."
 

@@ -1,0 +1,194 @@
+{
+  "gui/gfx/itemmarkers_bag.png": {
+    "bytes": 5258,
+    "sha256": "60258c7e51622d17f66fb3506379c5d0b746002c6a0699daaef55173705df086"
+  },
+  "gui/gfx/itemmarkers_fill.png": {
+    "bytes": 79,
+    "sha256": "38fb43fbd4b078237a94650903231de41f9ac8ed0c2550b3581cd41b6e9ff501"
+  },
+  "gui/gfx/itemmarkers_glow_bottom.png": {
+    "bytes": 122,
+    "sha256": "f53140d8bdb67985db0a40ac819f0889047b13a13db0c4bce87cfffa8dac1534"
+  },
+  "gui/gfx/itemmarkers_glow_left.png": {
+    "bytes": 118,
+    "sha256": "cf0260fee2037bcef2ab7df014594dd83bf7b68ee755977700b0cf95bcd2ad46"
+  },
+  "gui/gfx/itemmarkers_glow_right.png": {
+    "bytes": 115,
+    "sha256": "5be696890af35e7c5c8b5ed6115e9809c0cce3570f35a4ee4801bbffd000408b"
+  },
+  "gui/gfx/itemmarkers_glow_top.png": {
+    "bytes": 125,
+    "sha256": "f40faaeed3445a87a0197ad86543a30d50a83422f7376bc9ad09c481adaa1bda"
+  },
+  "gui/gfx/itemmarkers_gradient.png": {
+    "bytes": 162,
+    "sha256": "839a9e7a9f6cbc1aa43bfbaaf4fcd8ad0fedf3e23b20f6ead6b75646c39b6138"
+  },
+  "gui/gfx/itemmarkers_known.png": {
+    "bytes": 4381,
+    "sha256": "c565417c1a4856e6ad3b887c0bc1a0f4f0e5129a3778286e992a76bcb5281b9b"
+  },
+  "gui/gfx/itemmarkers_star.png": {
+    "bytes": 2859,
+    "sha256": "55f7c1e6510c394321640fd80f7d2372598a2e25294dbef2ea8e8a9e2806bd81"
+  },
+  "ItemMarkers.cpp": {
+    "bytes": 56047,
+    "sha256": "b16fd03c6d156ab029923e1e15aca0dff11e15c522ad6f71de72b72f5c8fe983"
+  },
+  "ItemMarkers.ini": {
+    "bytes": 2607,
+    "sha256": "32eea20b723623d0847826b4c7f36b5a9bb338d106f6a75bff94ee8bf2da3a2c"
+  },
+  "locale/en_GB/LC_MESSAGES/item_markers.po": {
+    "bytes": 4731,
+    "sha256": "aac4bed4e21dc2d5f6f98cc63b71f18c8ffd6d4a6569deb91caf5c0bd6c72618"
+  },
+  "locale/ru_RU/LC_MESSAGES/item_markers.po": {
+    "bytes": 5823,
+    "sha256": "c3d33142036c11e25db2bf01fa9507df803bfe9e816d996559ee16ee567bffab"
+  },
+  "locale/zh_CN/LC_MESSAGES/item_markers.po": {
+    "bytes": 4613,
+    "sha256": "5500fd1d226f2a86876c23d9a06af96b130d3504d0556bd7ea1f5b88f4023035"
+  },
+  "README.txt": {
+    "bytes": 13314,
+    "sha256": "dace2505785ff312b0288b0fb28dbc9642fbba899e7f1076b38ef6b68a03c687"
+  },
+  "tests/.gitignore": {
+    "bytes": 32,
+    "sha256": "0786b5e2061d30d914550f96c58aab24e094791409017cfb234afffbce6bdb20"
+  },
+  "tests/known-maps-native-report.json": {
+    "bytes": 4727,
+    "sha256": "bf278a908b41305be759924b3a499f1d5a3f53987d77b4bf735a923e7256bb89"
+  },
+  "tests/known-maps-plan.md": {
+    "bytes": 2840,
+    "sha256": "27fa20edb9413b238623b627a4a5ce4b9a1b32dab853ad355e58e5e9ba60c681"
+  },
+  "tests/known-maps-review.md": {
+    "bytes": 4085,
+    "sha256": "e5421b4aa8e7d1561cdb4e19f2a27dd423dc6a507fa89bfff7ba03a896a5c16a"
+  },
+  "tests/known_maps_tests.py": {
+    "bytes": 15040,
+    "sha256": "ea149ed61b5f0712c7bf2433184ab526d79844689ed4d8e287441b310a2e5e46"
+  },
+  "tests/map-native/alltowns.txt": {
+    "bytes": 135,
+    "sha256": "a20a9c9fb6e882b3adfb3737814e92666d98a5c18560c2e55e99ff744309e3a9"
+  },
+  "tests/map-native/class-type.txt": {
+    "bytes": 282,
+    "sha256": "78698bade3e4e6d0c149b4a6e2036de002fed7c242c5423e7a04d91b5c5d7b2f"
+  },
+  "tests/map-native/constructor.txt": {
+    "bytes": 2873,
+    "sha256": "28ac5682de0ab7a8900e9a9a43afbfcb9ddc3498700762640756e0e44c69fc2f"
+  },
+  "tests/map-native/consume.txt": {
+    "bytes": 2467,
+    "sha256": "4dcd0704e06e04543549f48e936a4f2ec71f591df01684aece82ea8d8d206937"
+  },
+  "tests/map-native/count.txt": {
+    "bytes": 252,
+    "sha256": "d07dc4f8c7e0f09b0285441fc743b0e9a576a31bcc3cd1911d200a99f66c531d"
+  },
+  "tests/map-native/discovered.txt": {
+    "bytes": 248,
+    "sha256": "2d330d3cd05c1292f21d1362568e262ed44f52eee37e22d5611f481801ff58ac"
+  },
+  "tests/map-native/getptr.txt": {
+    "bytes": 792,
+    "sha256": "2d7cbee139c4d5ffa4dd01d0fa3dbd10a8cf3ccbb139e6a227e989f6e42d84e4"
+  },
+  "tests/map-native/refs.txt": {
+    "bytes": 104684,
+    "sha256": "fd56f379768e17f8caab0a8736baf26eccbe4445a76bad14ff8db84a6ee6fe8f"
+  },
+  "tests/map-native/select.txt": {
+    "bytes": 28669,
+    "sha256": "2306d18753778975a94a36be3426f3eba2f9d260ed569a81b15811eaeb2641cf"
+  },
+  "tests/map-native/tooltip.txt": {
+    "bytes": 28571,
+    "sha256": "bba023049a49ec164c36efff66e896f0bf89aee9f9a0eafa7f7387dbb0861505"
+  },
+  "tests/map-native/town-handle.txt": {
+    "bytes": 5141,
+    "sha256": "db59c57b966e01c8c48323dbcf2b5077918c8da60139af59279bb7ce662cb455"
+  },
+  "tests/map-native/townsbydata.txt": {
+    "bytes": 2328,
+    "sha256": "e174f53e2e87c25d17baac3d37d2a34294887627cf351d17c63bd12e86fbd322"
+  },
+  "tests/native-proof/gui-callback-object.txt": {
+    "bytes": 1004,
+    "sha256": "416d20518589e65b2d01825ecc85db3d0249e3258d934b62d15c45b0a46cb14d"
+  },
+  "tests/native-proof/gui-character.txt": {
+    "bytes": 364,
+    "sha256": "67921242bbcc1566d3832ad5db1f0e6563a2515f255606ca30d763b9a3a0a845"
+  },
+  "tests/native-proof/inventory-character.txt": {
+    "bytes": 2303,
+    "sha256": "4bdfa4ee7a2c1747e8ebc671f771f7c373c01a889d257cda34bf980ae94f024c"
+  },
+  "tests/native-proof/is-stolen.txt": {
+    "bytes": 3774,
+    "sha256": "edc4ab3bf04b626bb0c34b03835ec6e2feca8ae01f641948c80adcdb12edeac8"
+  },
+  "tests/native-proof/manifest.json": {
+    "bytes": 2804,
+    "sha256": "d2b836bd029f2f7bc50e2db03b910faf486d2e5fc6609b04708ea984945786c6"
+  },
+  "tests/native-proof/mouse-refresh.txt": {
+    "bytes": 1349,
+    "sha256": "f40f03ad90a1b5ac8a59be3bf185d807805e3a9b3778206e6051e97cd91a9fbd"
+  },
+  "tests/native-proof/mouse-set.txt": {
+    "bytes": 3321,
+    "sha256": "484cee95c154b7b1cab90826796d85721d4b4ebe769624a3305c0ad4a6921669"
+  },
+  "tests/native-proof/pickup.txt": {
+    "bytes": 9829,
+    "sha256": "f94160734d9ba63a337f7f2196feb1510a1c3979ce99291e5465053b44f37514"
+  },
+  "tests/native-proof/player-character.txt": {
+    "bytes": 278,
+    "sha256": "ffe2189a8450b1053e9af647f2aa7e83a84ba9ee7e011fa5bd36692e1806c3bc"
+  },
+  "tests/native-proof/section-remove.txt": {
+    "bytes": 3268,
+    "sha256": "c3f6fe2ca884f7fd84ff3e55668a8bb8e5c279b0d85ade5c4a766be0fe096f49"
+  },
+  "tests/native-proof/selected-item.txt": {
+    "bytes": 2926,
+    "sha256": "763e21bfa0d2e9ea98129de6c573dbb8a24ef7e5b1c6e3f3592065ac7ed6cec8"
+  },
+  "tests/native-proof/set-current-holder.txt": {
+    "bytes": 511,
+    "sha256": "6b3490aef8222e009353578bc51d43a8992b55400819420885ccdd46d163c5cc"
+  },
+  "tests/native-proof/split-remove-callback.txt": {
+    "bytes": 483,
+    "sha256": "ea183cd692273b7c76ebc57342b31d933396bd88eb6d43c35e5d07ceea1ba3d2"
+  },
+  "tests/native-proof/split.txt": {
+    "bytes": 895,
+    "sha256": "096607555de97d16f93c06ca7a9ae822a4c38223e6a92de1014f8afdeb6ffca2"
+  },
+  "tests/verify_known_maps_native.py": {
+    "bytes": 4651,
+    "sha256": "16baaee942c7d364a70db282b66addb18423ae847d5de2973d671535f530b13b"
+  },
+  "D:\\DEV\\Kenshi\\build\\ItemMarkers\\ItemMarkers.dll": {
+    "bytes": 148480,
+    "sha256": "1ae3cea68a4260f671ee2fe655a71762867791abb67a6fce388f45b274cd8b9c"
+  }
+}

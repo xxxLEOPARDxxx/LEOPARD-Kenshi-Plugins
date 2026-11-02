@@ -1,0 +1,72 @@
+?consume@MapItem@@QEAA_NXZ slot=4777 Steam=0x75ea10
+75ea10 4057 push rdi
+75ea12 4883ec30 sub rsp, 0x30
+75ea16 48c7442420feffffff mov qword ptr [rsp + 0x20], 0xfffffffffffffffe
+75ea1f 48895c2448 mov qword ptr [rsp + 0x48], rbx
+75ea24 48896c2450 mov qword ptr [rsp + 0x50], rbp
+75ea29 4889742458 mov qword ptr [rsp + 0x58], rsi
+75ea2e 488bd9 mov rbx, rcx
+75ea31 e822d38eff call 0x14004bd58
+75ea36 33ed xor ebp, ebp
+75ea38 6689abec010000 mov word ptr [rbx + 0x1ec], bp
+75ea3f 488b83f8010000 mov rax, qword ptr [rbx + 0x1f8]
+75ea46 4885c0 test rax, rax
+75ea49 0f84b5000000 je 0x14075eb04
+75ea4f 8bfd mov edi, ebp
+75ea51 4885c0 test rax, rax
+75ea54 7465 je 0x14075eabb
+75ea56 488bc5 mov rax, rbp
+75ea59 0f1f8000000000 nop dword ptr [rax]
+75ea60 48c1e005 shl rax, 5
+75ea64 480383f0010000 add rax, qword ptr [rbx + 0x1f0]
+75ea6b 4c8b05f681ae01 mov r8, qword ptr [rip + 0x1ae81f6]
+75ea72 488bd0 mov rdx, rax
+75ea75 488d0db4449d01 lea rcx, [rip + 0x19d44b4]
+75ea7c e8ee968bff call 0x14001816f
+75ea81 488bf0 mov rsi, rax
+75ea84 4885c0 test rax, rax
+75ea87 7424 je 0x14075eaad
+75ea89 488b00 mov rax, qword ptr [rax]
+75ea8c b201 mov dl, 1
+75ea8e 488bce mov rcx, rsi
+75ea91 ff9030030000 call qword ptr [rax + 0x330]
+75ea97 4c8b1e mov r11, qword ptr [rsi]
+75ea9a b201 mov dl, 1
+75ea9c 488bce mov rcx, rsi
+75ea9f 41ff9320030000 call qword ptr [r11 + 0x320]
+75eaa6 66ff83ec010000 inc word ptr [rbx + 0x1ec]
+75eaad ffc7 inc edi
+75eaaf 4863c7 movsxd rax, edi
+75eab2 483b83f8010000 cmp rax, qword ptr [rbx + 0x1f8]
+75eab9 72a5 jb 0x14075ea60
+75eabb 488b0526fa9c01 mov rax, qword ptr [rip + 0x19cfa26]
+75eac2 4885c0 test rax, rax
+75eac5 7528 jne 0x14075eaef
+75eac7 b9d8020000 mov ecx, 0x2d8
+75eacc e8696b7700 call 0x140ed563a
+75ead1 4889442440 mov qword ptr [rsp + 0x40], rax
+75ead6 4885c0 test rax, rax
+75ead9 740a je 0x14075eae5
+75eadb 488bc8 mov rcx, rax
+75eade e8a0d48eff call 0x14004bf83
+75eae3 eb03 jmp 0x14075eae8
+75eae5 488bc5 mov rax, rbp
+75eae8 488905f9f99c01 mov qword ptr [rip + 0x19cf9f9], rax
+75eaef 33d2 xor edx, edx
+75eaf1 488bc8 mov rcx, rax
+75eaf4 e862708eff call 0x140045b5b
+75eaf9 6683bbec01000000 cmp word ptr [rbx + 0x1ec], 0
+75eb01 0f97c0 seta al
+75eb04 488b5c2448 mov rbx, qword ptr [rsp + 0x48]
+75eb09 488b6c2450 mov rbp, qword ptr [rsp + 0x50]
+75eb0e 488b742458 mov rsi, qword ptr [rsp + 0x58]
+75eb13 4883c430 add rsp, 0x30
+75eb17 5f pop rdi
+75eb18 c3 ret
+75eb19 cc int3
+75eb1a cc int3
+75eb1b cc int3
+75eb1c cc int3
+75eb1d cc int3
+75eb1e cc int3
+75eb1f cc int3

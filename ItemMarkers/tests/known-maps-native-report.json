@@ -1,0 +1,131 @@
+{
+  "native_exe_sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
+  "native_windows": [
+    {
+      "file": "alltowns.txt",
+      "sha256": "a20a9c9fb6e882b3adfb3737814e92666d98a5c18560c2e55e99ff744309e3a9",
+      "symbol": "?getAllTowns@TownList@@QEAAAEAV?$lektor@PEAVRootObject@@@@XZ",
+      "slot": 6925,
+      "rva": "0xb85f0",
+      "instructions": 2
+    },
+    {
+      "file": "class-type.txt",
+      "sha256": "78698bade3e4e6d0c149b4a6e2036de002fed7c242c5423e7a04d91b5c5d7b2f",
+      "symbol": "?getClassType@Item@@UEBA?AW4itemType@@XZ",
+      "slot": 4444,
+      "rva": "0xd2170",
+      "instructions": 11
+    },
+    {
+      "file": "constructor.txt",
+      "sha256": "28ac5682de0ab7a8900e9a9a43afbfcb9ddc3498700762640756e0e44c69fc2f",
+      "symbol": "?_CONSTRUCTOR@MapItem@@QEAAPEAV1@PEAVGameData@@Vhand@@@Z",
+      "slot": 4781,
+      "rva": "0x7619e0",
+      "instructions": 76
+    },
+    {
+      "file": "consume.txt",
+      "sha256": "4dcd0704e06e04543549f48e936a4f2ec71f591df01684aece82ea8d8d206937",
+      "symbol": "?consume@MapItem@@QEAA_NXZ",
+      "slot": 4777,
+      "rva": "0x75ea10",
+      "instructions": 71
+    },
+    {
+      "file": "count.txt",
+      "sha256": "d07dc4f8c7e0f09b0285441fc743b0e9a576a31bcc3cd1911d200a99f66c531d",
+      "symbol": "?getTownsDiscovered@MapItem@@QEBAHXZ",
+      "slot": 4778,
+      "rva": "0x70c080",
+      "instructions": 10
+    },
+    {
+      "file": "discovered.txt",
+      "sha256": "2d330d3cd05c1292f21d1362568e262ed44f52eee37e22d5611f481801ff58ac",
+      "symbol": "?isDiscovered@TownBase@@UEBA_NXZ",
+      "slot": 6832,
+      "rva": "0x950320",
+      "instructions": 10
+    },
+    {
+      "file": "getptr.txt",
+      "sha256": "2d7cbee139c4d5ffa4dd01d0fa3dbd10a8cf3ccbb139e6a227e989f6e42d84e4",
+      "symbol": "?getPtr@GameDataReference@@QEBAPEAVGameData@@PEAVGameDataContainer@@@Z",
+      "slot": 3473,
+      "rva": "0x6beac0",
+      "instructions": 30
+    },
+    {
+      "file": "refs.txt",
+      "sha256": "fd56f379768e17f8caab0a8736baf26eccbe4445a76bad14ff8db84a6ee6fe8f",
+      "symbol": "?getReferenceListIfExists@GameData@@QEBAPEBV?$vector@VGameDataReference@@V?$STLAllocator@VGameDataReference@@V?$CategorisedAllocPolicy@$0A@@Ogre@@@Ogre@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@3@@Z",
+      "slot": 3395,
+      "rva": "0x2d0900",
+      "instructions": 4138
+    },
+    {
+      "file": "select.txt",
+      "sha256": "2306d18753778975a94a36be3426f3eba2f9d260ed569a81b15811eaeb2641cf",
+      "symbol": "?selectTowns@MapItem@@QEAAHXZ",
+      "slot": 4776,
+      "rva": "0x75de40",
+      "instructions": 768
+    },
+    {
+      "file": "tooltip.txt",
+      "sha256": "bba023049a49ec164c36efff66e896f0bf89aee9f9a0eafa7f7387dbb0861505",
+      "symbol": "?_NV_getTooltipData1@MapItem@@QEAAXAEAV?$vector@VStringPair@@V?$STLAllocator@VStringPair@@V?$CategorisedAllocPolicy@$0A@@Ogre@@@Ogre@@@std@@@Z",
+      "slot": 4774,
+      "rva": "0x7b42b0",
+      "instructions": 782
+    },
+    {
+      "file": "town-handle.txt",
+      "sha256": "db59c57b966e01c8c48323dbcf2b5077918c8da60139af59279bb7ce662cb455",
+      "symbol": "?getTown@hand@@QEBAPEAVTownBase@@XZ",
+      "slot": 3826,
+      "rva": "0x791de0",
+      "instructions": 167
+    },
+    {
+      "file": "townsbydata.txt",
+      "sha256": "e174f53e2e87c25d17baac3d37d2a34294887627cf351d17c63bd12e86fbd322",
+      "symbol": "?getAllTowsByGameData@TownList@@QEAAXAEAV?$lektor@PEAVTown@@@@PEAVGameData@@@Z",
+      "slot": 6929,
+      "rva": "0x927c60",
+      "instructions": 74
+    }
+  ],
+  "instruction_pins": 6139,
+  "call_edges": 5,
+  "locales": [
+    {
+      "language": "en_GB",
+      "messages": 49,
+      "po_sha256": "aac4bed4e21dc2d5f6f98cc63b71f18c8ffd6d4a6569deb91caf5c0bd6c72618",
+      "mo_sha256": "8cedc016c19881df33fcbd65f2247379024f6353aec59db32582374c08b25cdf"
+    },
+    {
+      "language": "ru_RU",
+      "messages": 49,
+      "po_sha256": "c3d33142036c11e25db2bf01fa9507df803bfe9e816d996559ee16ee567bffab",
+      "mo_sha256": "f2cce9766c8bb5acffd0662e0fda6f37596b850fecbc73a31e58acdeb56b4a5e"
+    },
+    {
+      "language": "zh_CN",
+      "messages": 49,
+      "po_sha256": "5500fd1d226f2a86876c23d9a06af96b130d3504d0556bd7ea1f5b88f4023035",
+      "mo_sha256": "67d0415a6d2768467f89acce238eb30026452f7e9351ad04a6b0a05527b566e3"
+    }
+  ],
+  "candidate": {
+    "path": "D:\\DEV\\Kenshi\\build\\ItemMarkers\\ItemMarkers.dll",
+    "bytes": 148480,
+    "sha256": "1ae3cea68a4260f671ee2fe655a71762867791abb67a6fce388f45b274cd8b9c",
+    "game_imports": 55
+  },
+  "no_install": true,
+  "no_live_process_access": true
+}

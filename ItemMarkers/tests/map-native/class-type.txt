@@ -1,0 +1,12 @@
+?getClassType@Item@@UEBA?AW4itemType@@XZ slot=4444 Steam=0xd2170
+d2170 488b4140 mov rax, qword ptr [rcx + 0x40]
+d2174 8b4050 mov eax, dword ptr [rax + 0x50]
+d2177 c3 ret
+d2178 cc int3
+d2179 cc int3
+d217a cc int3
+d217b cc int3
+d217c cc int3
+d217d cc int3
+d217e cc int3
+d217f cc int3
