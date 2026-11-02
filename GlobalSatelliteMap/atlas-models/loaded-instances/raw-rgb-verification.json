@@ -1,0 +1,153 @@
+{
+  "date": "2026-11-03",
+  "base": "6c4d9cc",
+  "scope": "isolated raw RGB material-output primitive; no Main/game/install/INI/commit",
+  "status": "implementer offline verification PASS; independent review pending",
+  "production": {
+    "InstancePolicy.h": "913b56f5c6c0ba32a47a74357d284eb8453db72405cf9c306b80ed62a3cabdbb",
+    "InstanceRaster.h": "598c53bbc01ab7e4e9676d54b6cb757882d0ceab0b80ce9c8cb74652959aeb72",
+    "InstanceRawRgbShaders.h": "23055a2b180878ec10bd8747e26a5fb4e61ce84c68d19753b46bd6b784f7bdab",
+    "generate.py": "816b98aacd239cd4fee3eba059e809abe274b3bfd30214e2d02143e2972dbc26",
+    "prepare_rgb_oracle.py": "dc966f033bc9af52ba39af95a939a4175269b74ab135ff043f57c2a7f06631b7",
+    "rgb_warp_tests.cpp": "79ad3a8e5c1ee8b723c3c346c1c87e0c53a518be3250e0320459ffac39f07492",
+    "test_rgb_contract.py": "abad5b42bcd458365730952cc9c9b8db7e8bd852f8f14fa0ee23902d72f0e53e",
+    "test_rgb_mutants.py": "d66ae70ebfe156c668e2e5983ab1d1615134fff340e2d6c3e248fa0e5bfa7bae",
+    "run_tests.py": "c7c6ecd1b85359f04844669958704b3217e8ee8e21be59df7bbeb209a45e5ec3",
+    "README.md": "d735a9af2366c5b3c2ad9c07301054e07fe4cff35e50e6bc81c37c8f3109c410",
+    "raw-rgb-verification.md": "14cbed0d33a871d1355ea6ec82c9b7ac7a28a5a0e7f793c06fac4dd02d7b7550",
+    "NativeInstances.h": "2ad6343db67badd8c9b4f7277f030ea5673cebb7c8f6b72f9fae4cfd77f7e666",
+    "InstanceAdmission.h": "20fa13ebcd4eaded0e8c7cd96265196b18696c6c76c86c981a4c254a39dcbf9c",
+    "native_compile.cpp": "74dcf72736879d266151776322343b31a56f73c5ce369e1a386cb38c48945d42",
+    "warp_tests.cpp": "1de965fff9a8f5b2de79b8403956f6406ece2ac98c02c69c4a78c0827a6e4d12",
+    "test_mutants.py": "71e966c9fe25de5c3f781dd847d3cef6b9ac37d731eca6c12e6b9b4547ebcb46"
+  },
+  "generated": {
+    "source-contract.json": "b1ddcfd90f0f04de72d21cf4677819eed30f809facd00052b29865f610410f36",
+    "prewrite-rgb-oracle.json": "269efbdf2eb9ead8692016ee49299d72942119ea002f1f6f440ee4a9d1b16a0b",
+    "InstanceShaders.h": "c18470bd266089c8a81cf12d96706fa1a62aa0479ee7a16abae08bd1fbf082ff",
+    "InstanceRgbShaders.h": "a961aaece64c9d0992933b1eadc93ecd0cfb59db0bef7cf69e20e2fa8211bdfb",
+    "InstanceRawRgb.hlsl": "96a8a3860d48baa085ab90448b90275b797d59079ababd44e4216dbc5b36a753",
+    "InstanceFP43Rgb.cso": "261d6c3900923866bed19c2ae463bb9cde4838f1ebe5d4ff24b647e6792703c1",
+    "InstanceFP48Rgb.cso": "64f0e2daab51de744e33209bbc8d47c7bd2118fdb5b3a6629624371f60981bae",
+    "rgb_warp-run.log": "5cdf607ac4214a358a7e0398778eff65b0495f54d52428970426ab9df57f3bdc",
+    "rgb_warp-build.log": "d8ac72c63764174d695d637ddb420061ca623d087c287cdf4de4ae7e93260417",
+    "rgb-contract.log": "ee5c094156cb53777ea7b25c7e35ad9097b1b90e6fa4d92ba269ea1b370b08ce",
+    "mutants.log": "d0d500a8fa5baf7f83db02390e0c5c291d7a227fb6ea44918322e69acf3139cb",
+    "rgb-mutants.log": "e4b85d96e8537f991b780171c645052dfaa3ba47617c35ccaf7121fd58ae9981",
+    "native-build.log": "6b1b6c0bf6f2b12d8ec93b7483f43ddf14ffe3dfc2196bd629687d55ea0dcd2e",
+    "native-extracted.log": "c84a077a666eec15c298ff77b49ee47fd667edb59663de490d88cea5c8b21241",
+    "full.log": "1444f581c59f65c6eca712e26841d24ecd6cda122f586b555e5313ea2962cd5b"
+  },
+  "results": {
+    "policy": 17,
+    "admission": 8,
+    "packedWarp": 4718646,
+    "packedMaxByte": 0,
+    "packedMaxDepth": 0,
+    "rgbWarp": 13762792,
+    "rgbScenarios": 10,
+    "singlePixelInteriorColoredEdge": 3,
+    "rgbMaxAbs": 0.000487685204,
+    "float32ShaderTolerance": 2e-06,
+    "halfStorageTolerance": "one half-storage quantum +2e-6",
+    "normalAndRadial": "exact",
+    "nativeExtracted": 116,
+    "originalMutants": 41,
+    "rgbMutants": 17,
+    "nativeSdkCompile": "PASS VC10 /O2 /GL; not invoked"
+  },
+  "limits": {
+    "packedOwned": 1048848,
+    "rgbOwned": 1310992,
+    "extra": 262144,
+    "ownedCap": 201326592,
+    "borrowedBufferCap": 33554432,
+    "borrowedTextureCap": 67108864,
+    "perRenderResources": 0,
+    "nativeScansAdded": 0
+  },
+  "defaultShaders": [
+    {
+      "name": "InstanceVP80",
+      "defines": [
+        "INSTANCED"
+      ],
+      "bytes": 1888,
+      "sha256": "f525c5c53f7b7ad28e60317f5d5411a8db57b117b31ceef9be6ccf02de86308e"
+    },
+    {
+      "name": "InstanceVP83",
+      "defines": [
+        "COLOURING",
+        "INSTANCED"
+      ],
+      "bytes": 1988,
+      "sha256": "f8d083b1e5fddc822d6627687d1befacb69c39350b2ceb1ac3197b62fdc280b6"
+    },
+    {
+      "name": "InstanceFP43",
+      "defines": [
+        "DX11",
+        "DUST",
+        "DUAL_TEXTURE",
+        "COLOURING"
+      ],
+      "bytes": 4820,
+      "sha256": "d5c9b80e47b4209db8ff0c51cc418d141950540a823ebfd8a29bca66f1a08064"
+    },
+    {
+      "name": "InstanceFP48",
+      "defines": [
+        "DX11",
+        "DUST",
+        "TRANSPARENCY"
+      ],
+      "bytes": 4452,
+      "sha256": "abdcaea7ed5b68990187f3e82962b29d5196e2fce73140fc0b3e73c4330acae9"
+    }
+  ],
+  "rgbShaders": [
+    {
+      "name": "InstanceFP43Rgb",
+      "defines": [
+        "DX11",
+        "DUST",
+        "DUAL_TEXTURE",
+        "COLOURING"
+      ],
+      "bytes": 4252,
+      "sha256": "261d6c3900923866bed19c2ae463bb9cde4838f1ebe5d4ff24b647e6792703c1"
+    },
+    {
+      "name": "InstanceFP48Rgb",
+      "defines": [
+        "DX11",
+        "DUST",
+        "TRANSPARENCY"
+      ],
+      "bytes": 3900,
+      "sha256": "64f0e2daab51de744e33209bbc8d47c7bd2118fdb5b3a6629624371f60981bae"
+    }
+  ],
+  "source": {
+    "nativeSha256": "e8511d4bf9d5cf17b7b4dadec33bc6b6a52a9c4b37353f3c206c349c65e70cb8",
+    "sha256": "96a8a3860d48baa085ab90448b90275b797d59079ababd44e4216dbc5b36a753",
+    "writerChanges": [
+      {
+        "before": "writeAlbedo   ( buffer, diffuse.rgb, fragCoord.xy );",
+        "after": "buffer.buf0.rgb = diffuse.rgb;"
+      },
+      {
+        "before": "writeMetalness( buffer, metalness );",
+        "after": "/* Verified black metalness is not stored over full RGB. */"
+      }
+    ]
+  },
+  "limitations": [
+    "Active resolution of all21 original assets remains prerequisite; no new trusted source assertion.",
+    "No Main/native Snapshot/game invocation; no actual feature/install/GUI/FPS/leak claim.",
+    "Native wetness=-0.7 singularity/arbitrary finite inputs and FP16 overflow remain possible; no clamps or alternate formula.",
+    "Later accepted coverage stage must refuse/mask nonfinite output and establish scoped native material/weather domain.",
+    "Raw RGB alone is not native HDR lighting/accepted coverage/height/composition; Alpha48 CanDecode unchanged false."
+  ]
+}

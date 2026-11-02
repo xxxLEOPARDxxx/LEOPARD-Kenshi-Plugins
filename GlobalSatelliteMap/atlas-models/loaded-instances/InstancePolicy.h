@@ -5,6 +5,7 @@ namespace LoadedInstances {
 typedef AtlasView::U64 U64;typedef AtlasModels::View View;
 const unsigned MaxRecords=256,MaxBatches=64,MaxMaterials=16,EntryLimit=4096;
 const U64 PrivateBytes=1048576+160+64+48,BufferCap=32ULL*1024*1024,TextureCap=64ULL*1024*1024;
+const U64 RawRgbPrivateBytes=PrivateBytes+262144; // RT0 RGBA16F instead of RGBA8; other surfaces unchanged.
 const unsigned MaxTotalIndices=2097152,MaxTotalVertices=2097152;
 enum Kind {Dual43,Alpha48};enum Layout {Coloured64,Plain60,Plain56};
 inline bool AllowsFamily(unsigned family,unsigned mask){return family<5&&mask&&!(mask&~3u)&&(mask&(family<2?1u:2u));}
@@ -43,6 +44,7 @@ inline bool Pack(const float*world,const View&v,const Surface&s,Kind kind,Vertex
  return AtlasModels::Finite(reinterpret_cast<const float*>(&vc),40)&&AtlasModels::Finite(reinterpret_cast<const float*>(&pc),16);
 }
 inline bool Fits(U64 caller){return caller<=AtlasView::GpuCap-PrivateBytes;}
+inline bool FitsRawRgb(U64 caller){return caller<=AtlasView::GpuCap-RawRgbPrivateBytes;}
 inline unsigned TextureCount(Kind k){return k==Dual43?7:k==Alpha48?4:0;}
 inline U64 TextureBytes(const D3D11_TEXTURE2D_DESC&d){U64 total=0;unsigned w=d.Width,h=d.Height;for(unsigned n=0;n<d.MipLevels;++n){if(d.Format==DXGI_FORMAT_BC1_UNORM)total+=U64((w+3)/4)*((h+3)/4)*8;else if(d.Format==DXGI_FORMAT_BC3_UNORM)total+=U64((w+3)/4)*((h+3)/4)*16;else if(d.Format==DXGI_FORMAT_R8G8B8A8_UNORM)total+=U64(w)*h*4;else return 0;w=(std::max)(w/2,1u);h=(std::max)(h/2,1u);}return total;}
 }
