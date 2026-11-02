@@ -107,7 +107,9 @@ def generate():
   vertexMapping[number]=struct.unpack_from('<I',d3d.data,at+1)[0]
  assert {i:vertexMapping[i] for i in [0,1,2,3,4,10,11]}=={0:41,1:16,2:6,3:2,4:28,10:28,11:28}
  metadata['nativeVertexFormats']=vertexMapping
- exe=pes['RE_Kenshi/Kenshi_x64.exe'];exeWindows={r:list(exe.data[exe.offset(r):exe.offset(r)+24]) for r in [0xd5fd0,0x92ced0,0x92cf0e]}
+ # Never call the ctor; its entry may be KEP's visibility-init detour.
+ # Preserve the unchanged native state/entity-write tail evidence instead.
+ exe=pes['RE_Kenshi/Kenshi_x64.exe'];exeWindows={r:list(exe.data[exe.offset(r):exe.offset(r)+24]) for r in [0xd5fd5,0x92ced0,0x92cf0e]}
  data=exe.data[exe.offset(0x92ced0):exe.offset(0x92ced0)+0x200]
  (OUT/'native-showDistantTown.asm').write_text('\n'.join(f'{i.address:x}: {i.bytes.hex():24} {i.mnemonic} {i.op_str}' for i in md.disasm(data,0x92ced0))+'\n')
  metadata.update(nativeExports=pins,types=types,ogreWindows=windows,d3dWindows=d3dWindows)

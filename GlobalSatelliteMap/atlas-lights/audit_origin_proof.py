@@ -15,7 +15,9 @@ def run(write=False):
     for label,name,rva in [('Camera','?getDerivedPosition@Camera@Ogre@@QEBAAEBVVector3@2@XZ',0x82c40),('Local','?getPosition@Node@Ogre@@QEBA?AVVector3@2@XZ',0x1de1c0)]:
         if exports.get(name)!=rva:raise ValueError('origin caller export differs: '+name)
         at=pe.get_offset_from_rva(rva);data=raw[at:at+24];generated+='static const NativeLocalLights::FunctionPin '+label+'Pin={0x%x,"%s",{%s}};\n'%(rva,name,','.join('0x%02x'%v for v in data));pins.append({'label':label,'name':name,'rva':hex(rva),'first24':data.hex()})
-    ex,ep=modules['RE_Kenshi/Kenshi_x64.exe'];windows=[0x926408,0x926425,0xd5fd0,0xd83f1,0xd8414,0xd8792]
+    # The unused constructor entry is detoured by KEP's visibility-init fix.
+    # Pin its original state/entity-write tail; owner+0 use remains at D8792.
+    ex,ep=modules['RE_Kenshi/Kenshi_x64.exe'];windows=[0x926408,0x926425,0xd5fd5,0xd83f1,0xd8414,0xd8792]
     generated+='static const GsmCodeWindow TownWindows[]={\n'+',\n'.join('{0x%x,{%s}}'%(r,','.join('0x%02x'%v for v in ex[ep.get_offset_from_rva(r):ep.get_offset_from_rva(r)+24])) for r in windows)+'\n};\n'
     p=HERE/'OriginProofProfile.h'
     if write:p.write_text(generated)
