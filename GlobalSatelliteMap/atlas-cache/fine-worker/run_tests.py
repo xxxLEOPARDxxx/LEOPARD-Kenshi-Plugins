@@ -30,4 +30,4 @@ def build(opt,source='tests.cpp',arguments=[]):
         p=subprocess.run([str(exe),str(root)]+([]if arg is None else[str(arg)]),cwd=HERE,env=ENV,capture_output=True,text=True);(OUT/(label+'-run.log')).write_text(p.stdout+p.stderr);print(p.stdout+p.stderr,end='',flush=True)
         cleanup(root,label);assert not p.returncode
 if __name__=='__main__':
-    build('/Od');build('/O2');build('/Od','faults.cpp',range(1,8));build('/O2','faults.cpp',range(1,8))
+    build('/Od');build('/O2');build('/Od','faults.cpp',range(1,9));build('/O2','faults.cpp',range(1,9))

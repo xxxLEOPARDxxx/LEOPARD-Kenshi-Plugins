@@ -82,6 +82,23 @@ owners it consumes. SubmitGet's external ledger must include the still-retained
 producer and all unrelated base/model/read allocations. FineStore also counts
 its output Blob object conservatively; there is no unbounded queue or second Blob.
 
+## Healthy terminal cache cleanup
+
+The128-record file index cannot be reused after its Session ends. Before Close,
+the worker therefore discards known closed indexed payloads for a normal stop or
+graceful cancellation while the Session is still healthy. This prevents every
+map reopening from leaving another128MiB of unusable session payloads.
+FineStore performs the bounded physical-identity inventory and HANDLE-relative
+deletions **on this worker**, never Main. Empty session directories remain.
+
+An active Borrow or exposed/held Blob cannot reach this cleanup: the consumer
+must finish and Main must acknowledge its read first. Unknown close/wait/join,
+poisoned partial writes/corruption and abnormal worker failures preserve forensic
+data and their existing retention/quarantine rules. Cleanup errors remain errors;
+a newly uncertain cleanup close retains the whole Session rather than freeing it.
+Graceful cancellation before a Get opens its file still cleans prior known
+records even though the worker keeps the cancellation HRESULT.
+
 ## Verification
 
 Run bundled Python `run_tests.py`. VC10/Od and/O2 compile and execute the actual
@@ -96,7 +113,10 @@ held-read ownership, cancellation and known join. Runtime syscall faults cover:
 - actual blocked WriteFile: cancel must retain the producer through known join;
 - unknown Main join while that write is blocked: debt persists after later exit;
 - Get's final actual close racing cancel before its read publication.
-- explicit teardown Join while a completed read remains unreleased.
+- explicit teardown Join while a completed read remains unreleased;
+- healthy closed-cache removal only after explicit held-read release;
+- cancellation at Get's preopen check, retaining the cancellation error while
+  removing earlier known closed payloads on its owning worker.
 
 Quarantine scenarios execute in separate child processes because unresolved
 ownership intentionally prevents restart. Those processes keep fixture producer

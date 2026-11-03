@@ -53,6 +53,25 @@ worker `Close` must have run and `NeedsRetention()` must be false.
   remains quarantined. The destructor cannot implement this outer ownership
   policy; calling it while retention is required violates the caller contract.
 
+## Closed-session payload cleanup
+
+`DiscardKnownClosed()` is a terminal **owning-worker-only** operation. The fixed
+private index is its bounded ownership inventory: it checks at most128 recorded
+physical file IDs, exact sizes and nonreparse directory/file guards before
+deleting anything. It then rechecks each indexed file through the existing
+HANDLE-relative Remove path. It never enumerates a directory, follows a filename
+pattern, recursively deletes a folder or touches a source/unindexed file.
+An old receipt no longer passes Check after successful deletion.
+
+The operation requires an active healthy Session with no uncertain close.
+Foreign/replaced files, failed preflight/close or failed deletion poison the
+Session and preserve remaining files for inspection. A failed live handle close
+still requires retaining the complete owner. Close alone does not discard data;
+the FineWorker invokes this operation only during normal/gracefully cancelled
+terminal shutdown, after every producer borrow and Main-held read is released.
+The empty session directory is left in place; historical/forensic directories
+are not swept. No file I/O is added to Main or a normal rendering frame.
+
 ## Disk and CPU limits
 
 There are128 fixed slot names, each exactly1,049,600B (1024B header plus
@@ -96,6 +115,9 @@ file corruption, and Windows syscall faults (zero/short writes, read EOF,
 flush failure and live-handle close failure in Put/Get/eviction/directory
 teardown, followed by known-close recovery). Every fixture is inventoried and gets
 a cleanup manifest before deletion. Generated binaries/data stay ignored.
+Focused cleanup controls additionally cover exact known-record removal, stale
+receipt invalidation, all-record preflight before mutation, a foreign last file,
+live failed preflight close retention and deletion refusal without a sweep.
 
 Raw fixture color and normal values are deliberately synthetic finite/HDR data;
 their radial values are calculated against the actual authenticated canonical

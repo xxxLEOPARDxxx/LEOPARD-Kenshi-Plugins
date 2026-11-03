@@ -13,14 +13,19 @@
       "sha256": "5db0aced9132d0bfd3f66b534f57db5da873cde09985ec2a2a2a1cd6ee492718"
     },
     {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-store/cleanup.cpp",
+      "bytes": 4353,
+      "sha256": "4630e3683ac43335ea0738eae2dc084e7a59ac4eda48997759220211a136c421"
+    },
+    {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/faults.cpp",
       "bytes": 4346,
       "sha256": "243fae2ea3b405899d9fac53399285019b0b62cfba31a45415d0ab1aaa0d5eca"
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/FineStore.h",
-      "bytes": 17781,
-      "sha256": "0083e461be3c94ad1c18a3c4818376f9ee0d0c76b45c2d75e22248798e75dc58"
+      "bytes": 18942,
+      "sha256": "3559a2ef54febd597b0419d03a31237fdabd5b5d6117bf33533bb03bee3e7cb9"
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/freeze.py",
@@ -29,13 +34,13 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/README.md",
-      "bytes": 6875,
-      "sha256": "b8a008ff3c56935c656f46aec1faa8fe7aba6ab21ffff89af56de74c0c53eced"
+      "bytes": 8297,
+      "sha256": "25b499b2978dd10765ad952722acbc60809795a9cf2c4cc30ad14557379e7251"
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/run_tests.py",
-      "bytes": 2623,
-      "sha256": "31ca4066393998032b9bfac95fab40bec3f7af004f76aa4aa6c1868c6119c1ca"
+      "bytes": 2677,
+      "sha256": "49f65b256081f03c0d50b6636cb6df134a4377e7dbb2b5e35af9b481183ce8f2"
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/tests.cpp",

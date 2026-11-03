@@ -29,4 +29,4 @@ def build(opt,source='tests.cpp'):
     p=subprocess.run([str(exe),str(root)],cwd=HERE,env=ENV,capture_output=True,text=True);(OUT/(name+'-run.log')).write_text(p.stdout+p.stderr);print(p.stdout+p.stderr,end='',flush=True)
     cleanup(root,name);assert not p.returncode
 if __name__=='__main__':
-    build('/Od');build('/O2');build('/Od','faults.cpp');build('/O2','faults.cpp')
+    build('/Od');build('/O2');build('/Od','faults.cpp');build('/O2','faults.cpp');build('/Od','cleanup.cpp');build('/O2','cleanup.cpp')

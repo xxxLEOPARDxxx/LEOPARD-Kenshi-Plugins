@@ -40,6 +40,10 @@ class Worker {
    std::memset(&w.borrow,0,sizeof(w.borrow));
    // A worker EOF/exception while Main could be reading cannot reclaim Blob.
    if(w.blob.OwnedBytes())InterlockedExchange(&w.retained,1);
+   // A normal/graceful-cancel terminal session cannot reuse its private cache.
+   // Remove only known closed indexed payloads here on the worker. Poisoned or
+   // uncertain owners retain forensic data; active Main reads never reach here.
+   if(!InterlockedCompareExchange(&w.retained,0,0)&&w.session&&w.session->Healthy()&&(SUCCEEDED(w.error)||w.error==E_ABORT||w.error==HRESULT_FROM_WIN32(ERROR_CANCELLED))){HRESULT hr=w.session->DiscardKnownClosed();if(FAILED(hr))w.error=hr;if(w.session->NeedsRetention())InterlockedExchange(&w.retained,1);}
    if(!InterlockedCompareExchange(&w.retained,0,0)&&w.session){HRESULT hr=w.session->Close();if(FAILED(hr)&&SUCCEEDED(w.error))w.error=hr;if(w.session->NeedsRetention())InterlockedExchange(&w.retained,1);else{delete w.session;w.session=NULL;}}
    if(InterlockedCompareExchange(&w.retained,0,0)&&SUCCEEDED(w.error))w.error=E_FAIL;
    InterlockedExchange(&w.finished,1);InterlockedExchange(&w.state,FAILED(w.error)?Failed:Stopped);return FAILED(w.error)?1:0;
