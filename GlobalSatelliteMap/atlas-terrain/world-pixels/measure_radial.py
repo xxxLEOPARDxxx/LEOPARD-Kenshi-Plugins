@@ -1,0 +1,6 @@
+from pathlib import Path
+import json,numpy as np
+HERE=Path(__file__).resolve().parent;OUT=HERE/'_generated';j=json.loads((OUT/'fixtures.json').read_text());h=np.fromfile(HERE.parent/'world-raster/_generated/height-two.u16',dtype='<u2').reshape(261,261).astype('f4')*np.float32(9800/65535);rows=[]
+for c in j['cases']:
+ side=c['side'];position=c['center']+(np.arange(side,dtype='f8')+.5-side/2)*c['spacing'];sx=(position+147456)/18;ix=np.floor(sx).astype('i4');fraction=sx-ix;x,z=np.meshgrid(ix-7294,ix-7294);fx,fz=np.meshgrid(fraction,fraction);a,b,d,e=h[z,x].astype('f8'),h[z,x+1].astype('f8'),h[z+1,x].astype('f8'),h[z+1,x+1].astype('f8');height=np.where(fx+fz<=1,a+(b-a)*fx+(d-a)*fz,e+(d-e)*(1-fx)+(b-e)*(1-fz));dx,dz=np.meshgrid(position-c['center'],position-c['center']);expected=np.sqrt((10000-height)**2+dx**2+dz**2);actual=np.fromfile(c['prefix']+'-radial.r32f',dtype='<f4').reshape(side,side).astype('f8')*20000;error=np.abs(expected-actual);row=dict(name=c['name'],maxDistanceErrorMetres=float(error.max()),p999=float(np.quantile(error,.999)),mean=float(error.mean()));rows.append(row);print(row)
+(OUT/'radial-evidence.json').write_text(json.dumps(dict(scope='CPU authenticated-source triangle vs actual WARP radial distance; no inversion used for height',cases=rows,maxDistanceErrorMetres=max(r['maxDistanceErrorMetres']for r in rows)),indent=2)+'\n')
