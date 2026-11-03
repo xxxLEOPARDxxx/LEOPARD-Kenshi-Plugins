@@ -1,5 +1,6 @@
 #pragma once
 #include "RegionMaterial.h"
+#include "GeoRootChain.h"
 #include "../source-receipts/NativeMetadata.h"
 #include <kenshi/Globals.h>
 #include <kenshi/GameWorld.h>
@@ -21,24 +22,25 @@ inline bool NativeRoot(const char*gameRoot){
  try{return !_stricmp(Helpers::Canonical(gameRoot).c_str(),Helpers::Canonical(path).c_str());}catch(...){return false;}
 }
 struct NativeAccess{
- typedef GameData Record;SourceReceipts::Scope scope;
- explicit NativeAccess(const SourceReceipts::Scope&s):scope(s){}
+ typedef GameData Record;SourceReceipts::Scope scope;GeoRootChain roots;
+ struct Reader {bool Read(const void*p,void*out,size_t n){return SourceReceipts::ReadMemory(p,out,n);}};
+ explicit NativeAccess(const SourceReceipts::Scope&s):scope(s){Reader read;if(SourceReceipts::ScopeValid(s)&&s.thread==GetCurrentThreadId()&&ou&&reinterpret_cast<U64>(ou)==s.world&&EngineProfile())roots.Capture(read,ou,reinterpret_cast<const BYTE*>(GetModuleHandleA(NULL))+0x2133960);}
+ typedef char GameWorldZoneOffset[(offsetof(GameWorld,zoneMgr)==0x8b0)?1:-1];
  bool Current(const SourceReceipts::Scope&now)const{
   if(!SourceReceipts::ScopeValid(now)||now.thread!=GetCurrentThreadId()||!SourceReceipts::SameScope(scope,now)||!ou||reinterpret_cast<U64>(ou)!=now.world||!EngineProfile())return false;
-  const BYTE*base=reinterpret_cast<const BYTE*>(GetModuleHandleA(NULL));const void*world=NULL;
-  return SourceReceipts::ReadMemory(base+0x2133960,&world,sizeof(world))&&world==ou;
+  Reader read;const BYTE*base=reinterpret_cast<const BYTE*>(GetModuleHandleA(NULL));
+  return roots.Current(read,ou,base+0x2133960);
  }
  Record*GetData(const char*sid){return Current(scope)?ou->gamedata.getData(sid):NULL;}
  bool IsBiome(const Record*record)const{return record&&record->type==BIOMES;}
  bool Cell(const SatelliteRegion::Region&region,unsigned index,void*(&ids)[5],BYTE(&tree)[2048],unsigned&bytes){
   bytes=0;if(index>=16||region.x>=8||region.z>=8||!Current(scope))return false;
-  const BYTE*base=reinterpret_cast<const BYTE*>(GetModuleHandleA(NULL));const BYTE*world=NULL,*map=NULL,*table=NULL,*source=NULL;unsigned width=0,height=0;
-  if(!SourceReceipts::ReadMemory(base+0x2133960,&world,sizeof(world))||world!=reinterpret_cast<const BYTE*>(ou)||!SourceReceipts::ReadMemory(world+0x168220,&map,sizeof(map))||!SourceReceipts::ReadMemory(map+0x50,&width,4)||!SourceReceipts::ReadMemory(map+0x54,&height,4)||width!=32||height!=32||!SourceReceipts::ReadMemory(map+0x58,&table,sizeof(table)))return false;
+  const BYTE*table=static_cast<const BYTE*>(roots.Values().table);const BYTE*source=NULL;
   const BYTE*cell=table+(((region.z*4+index/4)*32)+(region.x*4+index%4))*48;BYTE first=0;
   if(!SourceReceipts::ReadMemory(cell,ids,40)||!SourceReceipts::ReadMemory(cell+40,&source,sizeof(source))||!SourceReceipts::ReadMemory(source,&first,1))return false;
   const unsigned count=((first&0xe0)>0x20)?2048:1;if(!SourceReceipts::ReadMemory(source,tree,count))return false;
-  const BYTE*afterWorld=NULL,*afterMap=NULL,*afterTable=NULL,*afterSource=NULL;void*afterIds[5];
-  if(!SourceReceipts::ReadMemory(base+0x2133960,&afterWorld,sizeof(afterWorld))||afterWorld!=world||!SourceReceipts::ReadMemory(world+0x168220,&afterMap,sizeof(afterMap))||afterMap!=map||!SourceReceipts::ReadMemory(map+0x58,&afterTable,sizeof(afterTable))||afterTable!=table||!SourceReceipts::ReadMemory(cell+40,&afterSource,sizeof(afterSource))||afterSource!=source||!SourceReceipts::ReadMemory(cell,afterIds,sizeof(afterIds))||std::memcmp(ids,afterIds,sizeof(afterIds))||!Current(scope))return false;
+  const BYTE*afterSource=NULL;void*afterIds[5];
+  if(!Current(scope)||!SourceReceipts::ReadMemory(cell+40,&afterSource,sizeof(afterSource))||afterSource!=source||!SourceReceipts::ReadMemory(cell,afterIds,sizeof(afterIds))||std::memcmp(ids,afterIds,sizeof(ids)))return false;
   bytes=count;return true;
  }
 };

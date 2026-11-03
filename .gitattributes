@@ -70,6 +70,7 @@ GlobalSatelliteMap/atlas-terrain/native-region-material/** -text whitespace=blan
 GlobalSatelliteMap/GsmFine*.h -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/tests/fine_viewer_gpu.cpp -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/tests/run_fine_viewer_tests.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/tests/fallback-retention/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 tools/diagnostics/satellite-capture-probe/finalize_world_build.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/diagnostics/satellite-capture-probe/test_finalize_world_build.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

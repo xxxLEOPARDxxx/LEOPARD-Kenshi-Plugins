@@ -123,7 +123,7 @@ AtlasView::U64 ViewerGpuBytes(){return BaseGpuBytes()+(ready?GsmFineGpu::Relight
 AtlasView::U64 AggregateGpuBytes(){return ViewerGpuBytes()+FineGpuBytes()+gpuRetired.Bytes()+ProducerGpuBytes();}
 AtlasView::U64 OtherGpuBytes(AtlasView::U64 excluded){AtlasView::U64 total=AggregateGpuBytes();return total>=excluded?total-excluded:AtlasView::GpuCap;}
 bool AdmitGpu(AtlasView::U64 bytes){return !gpuRetirementFailed&&!gpuRetired.Failed()&&GsmFineGpu::Fits(ViewerGpuBytes()+FineGpuBytes(),gpuRetired.Bytes(),ProducerGpuBytes(),bytes);}
-unsigned BaseDetailCapacity(){return FineQualified()?4:AtlasView::DetailSlots;}
+unsigned BaseDetailCapacity(){return FineQualified()?0:AtlasView::DetailSlots;}
 void(*originalUpdate)(MapScreen*)=NULL;void(*originalLoad)(SaveFileSystem*,const std::string&)=NULL;void(*originalNew)(SaveFileSystem*)=NULL;
 std::string Folder(){wchar_t p[MAX_PATH]={0};DWORD n=GetModuleFileNameW(reinterpret_cast<HMODULE>(&__ImageBase),p,MAX_PATH);if(!n||n>=MAX_PATH)return std::string();std::wstring w(p,n);size_t at=w.find_last_of(L"/\\");return at==w.npos?std::string():GsmAtlas::Utf8(w.substr(0,at+1));}
 std::string Exe(){wchar_t p[MAX_PATH]={0};DWORD n=GetModuleFileNameW(NULL,p,MAX_PATH);return !n||n>=MAX_PATH?std::string():GsmAtlas::Utf8(std::wstring(p,n));}

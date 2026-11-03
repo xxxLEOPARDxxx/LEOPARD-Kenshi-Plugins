@@ -5,7 +5,7 @@
     {
       "path": "GlobalSatelliteMap/GlobalSatelliteMap.cpp",
       "bytes": 67685,
-      "sha256": "1f32b7b4a29726ed6325918975b42225c9fe9ca428d4ed4f1af17f3d1ed865a6"
+      "sha256": "d39984c02218692ffa33f8d8c00fd84ae48f5d4504c6b72b0bb930539bdff448"
     },
     {
       "path": "GlobalSatelliteMap/GsmAtlasManifest.h",
@@ -34,8 +34,8 @@
     },
     {
       "path": "GlobalSatelliteMap/GsmFineViewer.h",
-      "bytes": 18995,
-      "sha256": "d559e4f1fabcb8fe36b4ad730a0325726c0311fb666fc65a39f14d9fd55f077b"
+      "bytes": 19380,
+      "sha256": "bedbff44e520777ca8a6af33349cd052b363e387481dd53130f2907bb77d210d"
     },
     {
       "path": "GlobalSatelliteMap/tests/fine_viewer_gpu.cpp",
@@ -66,7 +66,38 @@
       "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/verification.json",
       "bytes": 10225,
       "sha256": "edbffe9e7e71b5db4bf8f2f0e46e6a7142cf871a789dcd2844cbaf0ba207d594"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/native-region-material/NativeAdapter.h",
+      "bytes": 4685,
+      "sha256": "4f48e147b02cfb831f4f151a93ce6a202845a0e284b75b279ab1a48e32d0493a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/native-region-material/GeoRootChain.h",
+      "bytes": 1755,
+      "sha256": "e4366ac136870b678d176c5232e77c2d9530d2b2cb7aa3bd661218976ec00c3f"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/native-region-material/root_chain_tests.cpp",
+      "bytes": 3000,
+      "sha256": "2aa1c406191fc3335c327973a59ac8a3b26ef2833ecdf915ecc3fb9b21374bce"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/native-region-material/run_root_chain_tests.py",
+      "bytes": 1464,
+      "sha256": "37a6614a52398e701e11d3a963aef1ecc100984e6159ae5c476c81bb92687877"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/native-region-material/verification.json",
+      "bytes": 156381,
+      "sha256": "3daef14c3ca2554195e2c69651487a18d51a942d6ebc0a2a6dbefb162127113c"
     }
   ],
-  "scope": "first production native viewer integration candidate; game visual/FPS acceptance pending root installation"
+  "scope": "first production native viewer integration candidate; game visual/FPS acceptance pending root installation",
+  "candidate": "distinct-owner root fix plus16fallback preservation; root reviewed; live retry pending",
+  "dll": {
+    "bytes": 1086976,
+    "sha256": "310cf75904dd662c416d1105932b2da7e863d29cdd1a8d6990be029c7b5d325e",
+    "nativeImports": 85
+  }
 }

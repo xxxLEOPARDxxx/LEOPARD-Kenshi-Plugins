@@ -1,20 +1,23 @@
 {
   "scope": "Material-only extraction of proven native regional parameter packing; no live rendering or base publication",
-  "status": "author controls PASS; independent review pending",
+  "status": "Material packing host evidence retained; additive distinct-owner root-chain correction reviewed CLEAR; production DLL build PASS; live retry pending",
   "recordedUtc": "2026-11-03T11:15:42.452462+00:00",
   "sourceFiles": {
     ".gitignore": "5db0aced9132d0bfd3f66b534f57db5da873cde09985ec2a2a2a1cd6ee492718",
     "extraction.json": "429facc9ccdcad6138483d33c4502f3845604adb00cf5c2d2ffdb9ef70d28901",
     "freeze.py": "3f59a762f28e67da5abb67eb891022f70778c1a50b6f2f75eff5e9283527c0e6",
     "native_compile.cpp": "1ca6e8d1fcc00f339014dffb84b1deff798aa70a32ebe39cdd07e7cd9947a87d",
-    "NativeAdapter.h": "f8dae34b651853d9a9f97d846370b2bcfd4932eae0f9df16e8f19baf1aadd8e5",
+    "NativeAdapter.h": "4f48e147b02cfb831f4f151a93ce6a202845a0e284b75b279ab1a48e32d0493a",
     "NativePins.h": "598412271f5cc119e5e9aa036f72170e0afaf2b22f359b3083cec2355ac73f74",
     "prepare_tests.py": "fc8aaeadc947ad09023162e16add51ee3590a29b7df93f372d6f0f2e9c88bf2c",
     "README.md": "898446db92a4af78dfac6b9b5a714c066bce9169a2f01ab31a3c57e810578c8a",
     "RegionMaterial.h": "ccda3cbc02d6f85eb767363f1c5e16c3fbd71b35a557cc40d1f46a716447cde3",
     "run_mutants.py": "ccdd2d775f53a1295f65b30e359e65504bb9d8b373f588438b93986e86eeba81",
     "run_tests.py": "09a6e48386acd8c9bf8db3cbec0eca362f2d4a154829e841c28b7d1bd6111d7c",
-    "tests.cpp": "2fd17562d694a1f1fd05bdfa47e2bc4899854d61ef94f1e87dc8e59d99ce4fbc"
+    "tests.cpp": "2fd17562d694a1f1fd05bdfa47e2bc4899854d61ef94f1e87dc8e59d99ce4fbc",
+    "GeoRootChain.h": "e4366ac136870b678d176c5232e77c2d9530d2b2cb7aa3bd661218976ec00c3f",
+    "root_chain_tests.cpp": "2aa1c406191fc3335c327973a59ac8a3b26ef2833ecdf915ecc3fb9b21374bce",
+    "run_root_chain_tests.py": "37a6614a52398e701e11d3a963aef1ecc100984e6159ae5c476c81bb92687877"
   },
   "dependencies": {
     "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\include\\CodeAnalysis\\sourceannotations.h": "abe70c601ca3b3cadeaabeeefeff460367f15e6e873863856276da3862438f33",
@@ -1077,5 +1080,33 @@
     "Host Access substitutes native record/profile/cell boundary; native adapter compiled/linked only, never host-executed.",
     "Same-ou load generation, full base/material provenance, device/map and queued output freshness belong to caller.",
     "No FPS, long-run memory or final map-completion claim."
-  ]
+  ],
+  "historicalNativeAdapterSha256": "f8dae34b651853d9a9f97d846370b2bcfd4932eae0f9df16e8f19baf1aadd8e5",
+  "historicalDependencyScope": "The dependencies and native-contract.dll above preserve the original pre-correction native compile. They do not attest to the corrected NativeAdapter; see additiveRootChainVerification.",
+  "additiveRootChainVerification": {
+    "recordedUtc": "2026-11-03T12:31:24.453618+00:00",
+    "review": "Root independently read SDK GameWorld.zoneMgr offset0x8b0 and live different object addresses, reviewed precise guarded chain correction CLEAR.",
+    "rootCause": "Imported ou/scope.world is GameWorld; engineSlot2133960 is its ZoneManager member, not GameWorld. Original equality always refused actual live capture.",
+    "sourceSha256": {
+      "NativeAdapter.h": "4f48e147b02cfb831f4f151a93ce6a202845a0e284b75b279ab1a48e32d0493a",
+      "GeoRootChain.h": "e4366ac136870b678d176c5232e77c2d9530d2b2cb7aa3bd661218976ec00c3f",
+      "root_chain_tests.cpp": "2aa1c406191fc3335c327973a59ac8a3b26ef2833ecdf915ecc3fb9b21374bce",
+      "run_root_chain_tests.py": "37a6614a52398e701e11d3a963aef1ecc100984e6159ae5c476c81bb92687877"
+    },
+    "logsSha256": {
+      "root-chain-original-equality-red-run.log": "ca65d17922609ff62dadef4ae21225c0a4b20d9da27ab03b5fb5ec75250eb34b",
+      "root-chain-Od-run.log": "4fba11b034f4b6d707e6d8a94a5a9f6a1c918d24ff9433801c7093a3272b5ec0",
+      "root-chain-O2-run.log": "4fba11b034f4b6d707e6d8a94a5a9f6a1c918d24ff9433801c7093a3272b5ec0"
+    },
+    "focusedControlsPerOptimization": 11,
+    "originalEqualityMutantKilled": true,
+    "actualProductionBuild": {
+      "dll": "D:/DEV/Kenshi/build/GlobalSatelliteMap/GlobalSatelliteMap.dll",
+      "bytes": 1086976,
+      "sha256": "310cf75904dd662c416d1105932b2da7e863d29cdd1a8d6990be029c7b5d325e",
+      "buildLogSha256": "94e9fa03d6aee501c1b7feee40f0db1721863b6ceb1cb3e66ae9e68bc9af1c0c",
+      "nativeImports": 85,
+      "status": "native C++ compile/link/import/export checks PASS; corrected live capture pending retry"
+    }
+  }
 }

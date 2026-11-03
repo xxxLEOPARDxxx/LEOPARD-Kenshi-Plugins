@@ -1,0 +1,11 @@
+{
+  "productionTailSha256": "54a9b6e69b5f7d071b21e7bb6396dc63a273cbe6e3c2b0ec140bf5e56ab4236b",
+  "baseDetailCapacity": "unsigned BaseDetailCapacity(){return FineQualified()?0:AtlasView::DetailSlots;}",
+  "baseDetailCapacitySha256": "6597c7a44033b5af59b33528049dc502a7250caf1e7da0c3123e3e105afbb696",
+  "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\GsmFineViewer.h",
+  "results": {
+    "Od": "PASS 254 actual residency-tail checks",
+    "O2": "PASS 254 actual residency-tail checks"
+  },
+  "scope": "Actual extracted FineObserve residency maintenance plus real AtlasWindowPolicy; no engine/GPU/game/large fixtures."
+}
