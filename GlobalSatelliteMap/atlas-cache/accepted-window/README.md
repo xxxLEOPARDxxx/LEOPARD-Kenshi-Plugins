@@ -1,0 +1,37 @@
+# Accepted pixels to decoded GST2 planes
+
+`AcceptedWindow.h` is a small serialized worker-only CPU adapter. It accepts only an actual `WorldPixels::Accepted` owner and authenticated `WorldHeight::Window`. It makes no file, native metadata, engine, D3D, UI, INI or thread-creation call. It adds no scheduler or atlas publication path. Cancellation uses the existing nonblocking event check.
+
+The existing decoded GST2 format already stores material **FP16 full linear RGB plus native gloss** (8B/pixel), normalRGB plus coverage (4B), and world-height R32 (4B). No RGB quantization, YCoCg conversion, format/flag change, exposure/clamp/sharpen or radial-depth interpretation is needed.
+
+## API and lifetime
+
+`Adapter::Build(enabled, accepted, currentScope, exactFrame, authHeightWindow, cancelEvent, Ledger)` first withdraws the old result. OFF returns S_FALSE before source access. It calls `Accepted::Acquire` and refuses any unready, stale, malformed or mismatched owner/source/frame. Only then it allocates one normalRGBA8 buffer, copies every native normal RGB byte and changes its alpha from the native reserved0 to coverage255. Accepted already rejected missing/invalid terrain coverage and all nonfinite material/depth/height data; coverage is derived from that whole-window acceptance, never from material gloss or an arbitrary raw plane.
+
+`Adapter::Acquire` takes the same arguments and a `View&` output. It reacquires the original accepted owner against the fresh scope/frame/source identity, rechecks budget and cancellation and compares the current normal RGB/reserved alpha with the prepared copy. The comparison is necessary because Accepted has no mutation serial: a same-label rebuild can reuse its previous allocation address. Changed source identity or changed normals refuses and clears the adapter. A rebuild with identical normals can supply fresh material/height because every published plane then belongs to that fresh accepted snapshot. The getter never returns cached material/height addresses.
+
+The successful View copies scope/frame/height identity and borrows material and height directly from Accepted; normal borrows this adapter's copy. **The accepted owner, this adapter and acquisition context must remain alive, unchanged and serialized until all three planes have been consumed.** Keep the authenticated height snapshot through acquisition. Do not race Build/Clear/destruction with acquisition/writing or reuse an older View after any of them. No input owner/window is owned by this adapter. Stored owner address is checked only against the freshly supplied owner reference. The class cannot make use-after-destruction of caller-owned objects safe.
+
+All refused getters zero the provided View and clear owned output. Build failures/cancellation likewise leave no prepared copy. `Ready` means a copy exists, not that an old context remains authoritative; always Acquire freshly. `Error()` records the last refusal HRESULT. Clear/destruction release the single buffer; there is no retained raw pointer, pending task or growing container. Methods do not identify the game Main thread themselves: the caller must use serialized worker work, not add these scans to render/UI callbacks.
+
+## Memory and work
+
+`RequiredBytes(256/512)` includes `sizeof(Adapter)` plus exactly4B per pixel, at most **1,048,576B payload**. Unsupported sizes return0. The old copy is released before replacement, so two copies do not coexist. Build and Acquire each perform one bounded row/pixel scan, no per-pixel allocation and no source IO; consume one acquired View for its three planes rather than scanning once per plane.
+
+Ledger has two explicit caller charges: `retainedRaw` is the full retained raw/readback payload capacity (zero only after release), and `other` is all remaining producer payloads including other accepted/adapted outputs, source caches and pending worker work. Admission automatically adds Accepted::OwnedBytes, height-window payload plus its owner object, and the adapter's required bytes. Subtraction-based addition refuses overflow or a sum exceeding **64MiB**, both before allocation and at fresh acquisition. These are owned-payload charges, not CRT/stack/OS allocator or RSS guarantees; zero caller charges do not attest that unreported allocations are absent. No GPU ledger changes are made.
+
+Cancellation is checked before allocation/scan, before every row, and before publication for both Build and Acquire. Signalled or invalid events refuse conservatively. Cancellation partway through conversion never publishes partial coverage.
+
+## Writer and mip contract
+
+For512 only, `View::Plane(i)`, `Bytes(i)` and `Pitch(i)` supply exactly the existing WindowWriter512 inputs. The caller chooses/checks tile coordinates, pixel placement, source/material/capture stamps and owns the writer/file. This adapter does not map a world location to an atlas pixel or call the writer. A256 view remains256; it is not implicitly enlarged for the512 writer. Invalid plane indices return no pointer/bytes/pitch.
+
+Material and CPU worldheight bytes are unchanged, including finite negative/HDR RGB, signed/subnormal half values and native gloss. Normal RGB is unchanged; coverage alpha255 makes the existing GST2 semantic mip filter retain valid pixels, use linear coverage-weighted material/gloss and height means, and normalize the decoded average normal. Copying native alpha0 would instead erase all coverage. Existing canonicalization/mips/hash/index/ready publication remain separate; no flags2/packed input or ready atlas is produced here.
+
+## Verification and scope
+
+Run bundled Python `run_tests.py` with VC10 x64/SDK7.1 and the already prepared pinned WorldPixels fixtures. All generated artifacts stay in this folder's ignored `_generated`; borrowed generators/helpers are never invoked or rewritten. Tests authenticate the actual fullmap source, build actual Accepted windows from fourteen frozen256/512 WARP fixtures at1/3/9m (including shifts, odd phases, wet/underwater/HDR), and compare every material/height byte and every converted normal pixel. Five512 cases feed the unchanged production writer through a memory-only exact-offset sink;256 cases prove rejection without resizing or IO. Existing semantic_box is tested directly with signed HDR/gloss and coverage.
+
+Tests also cover full-width scope/material/source changes, exact frame changes, stale height IDs, OFF, wrong/unready/cleared owner, same-label rebuilt owner, one-byte CPU overflow/boundary, invalid cancel handles, negative HDR/subnormal preservation and reuse. A controlled identity fault models a new authenticated file object with the same bytes/epoch by changing a test snapshot ID; production cannot forge that API state. Actual event cuts cover preallocation/first/middle/last row/final publication in both methods and sizes; allocation and compiled runtime mutants exercise cleanup and required gates. Initial runtime RED was observed against an E_NOTIMPL stub before implementation (after correcting two test-scaffold compilation typos).
+
+This remains a bounded primitive with pinned base-snapshot provenance. It does not establish actual current native winners, arbitrary source coverage, whole-world atlas continuity, neighbor seams, valid tile placement, successful IO or runtime FPS/leak behavior. Independent review is required before integration. No frozen helper, game, installed data or INI was changed.

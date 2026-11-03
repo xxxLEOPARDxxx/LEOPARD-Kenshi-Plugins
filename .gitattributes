@@ -42,3 +42,5 @@ tools/diagnostics/satellite-capture-probe/world_frame* -text whitespace=blank-at
 tools/diagnostics/satellite-capture-probe/build_world_frame_control.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 tools/diagnostics/satellite-capture-probe/world-frame-verification.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+GlobalSatelliteMap/atlas-cache/accepted-window/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
