@@ -9,3 +9,6 @@
 *.mo
 .superpowers/
 __pycache__/
+# Local terrain-cohort test executables, raw output oracles and compiler caches.
+GlobalSatelliteMap/atlas-terrain/world-cohort/_generated/
+GlobalSatelliteMap/atlas-terrain/world-cohort/__pycache__/
