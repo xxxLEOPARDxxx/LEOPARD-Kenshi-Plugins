@@ -3,6 +3,13 @@
 Updated2026-11-03 from the user's current requests. This is a working queue,
 not a public release announcement. Latest instructions override historical notes.
 
+Latest unattended instruction2026-11-03: finish deterministic terrain and
+maximum-zoom detail first, then KEO, then optional exploration fog, diplomatic
+areas, biome boundaries and roads. The user is asleep and authorizes launching,
+loading test saves and operating Kenshi autonomously. Another Minecraft session
+may run desktop tests: prefer background file requests; before targeted UI input
+observe the actual Kenshi window and avoid blind shared-desktop actions.
+
 1. **Global satellite map — ACTIVE, unfinished.** Deliver an optional working
    GLOBAL map layer,4x4 primary tiles at8192²; preserve BestMinimap's current map.
    The16x8192 geographic terrain atlas and interactive native-map layer are
@@ -37,7 +44,7 @@ not a public release announcement. Latest instructions override historical notes
    see GlobalSatelliteMap/PLAN.md. Full atlas rerender on every lamp change is
    not an acceptable update strategy. Article finished; still check process and
    avoid taking window focus without a new instruction.
-2. **KEO — PARALLEL agents; satellite remains the main task.** User2026-11-02
+2. **KEO — after terrain/detail; satellite remains the main task.** User2026-11-02
    explicitly asks to read current Steam reports/source now: broken pathfinding,
    town inhabitants spawning outside and slowly returning, excess squads at normal
    settings, GOG refusal, and possible mouse-input latency (unconfirmed). The user

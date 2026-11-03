@@ -1,0 +1,25 @@
+{
+  "scope": "worker-only512 writes to a fresh incomplete GST2 tile; no publication/game/install",
+  "command": "python run_tests.py",
+  "checks": 1231296,
+  "compiledRuntimeMutants": 14,
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "freeze.py": "d6ad4b04e7fb4be98092049fb5ac09e0e4aa42df244e73c7c56d50bdfaafc722",
+    "README.md": "a594ce47638504d5db7b8b0cb5ac92081352fa9c85b54c081a4b09331e39fa50",
+    "run_tests.py": "7c69cf2152c981e8e67e4c35711b2e9b0017d254ef0f4e2c858e3df55568d963",
+    "test_mutants.py": "e84bb8b0bc1ca346d6030a70da5b3c6e68c60411cf96b5b53361b4f385c8baad",
+    "WindowWriter512.h": "dcf946a92da69810ffa65b118c781d74280f24b4e78a996d731cd30ae2e51d3a",
+    "writer_tests.cpp": "e773abd82c052d808a1621848da047a8294f67c90490d0fb9f25e01bc19989b2"
+  },
+  "dependencies": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\Gst2Writer.h": "cd21403b4a2115ed1ba59ef4adce91d62b602b40640dd01b84152f1c8750001b",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasReader.h": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af"
+  },
+  "logs": {
+    "build.log": "13f8c51f487d3b7392a156202ccd5d30961a6ca702958ec0ba882d84f6ce34cf",
+    "mutants.log": "4d0ef6dd6024244f7bc7ad4f15bff1148a01a764ad1341abd330409942452f28",
+    "writer.log": "db6097670a0128173b185ab0d59ad6f582597e1e9cc77291f485795c1c7ed8d0"
+  }
+}
