@@ -74,6 +74,7 @@
 #include "../../../GlobalSatelliteMap/GpuMipUpload.h"
 #include "GpuCompressedUpload.h"
 #include "GeographyCompletion.h"
+#include "FixedTerrainControl.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -128,6 +129,11 @@ Ogre::CompositorWorkspaceListener *previous = NULL;
 Ogre::CompositorWorkspaceListener *ourListener = NULL;
 std::vector<hand> handles;
 bool restorationSafe = true;
+bool fixedControlEnabled=false,fixedGsmStartupOff=false;
+std::string fixedGsmIni;
+ProbePolicy::RequestLatch fixedRequestLatch;
+FixedTerrainControl::Controller fixedControl;
+DWORD fixedPollAt=0;unsigned fixedEpoch=0;
 struct NativeRenderApi
 {
     typedef Ogre::Viewport *(__fastcall *GetLastFn)(const Ogre::Camera *);
@@ -1361,6 +1367,43 @@ void Drop()
     }
     if(privateRun)LogResourceTelemetry("after-private-terrain");
 }
+bool FixedViewerOff()
+{
+    return fixedGsmStartupOff&&!fixedGsmIni.empty()&&
+        GetPrivateProfileIntA("GlobalSatelliteMap","Enabled",1,fixedGsmIni.c_str())==0;
+}
+bool FixedNoViewerTextures()
+{
+    Ogre::TextureManager*tm=Ogre::TextureManager::getSingletonPtr();if(!tm)return false;
+    Ogre::ResourceManager::ResourceMapIterator it=tm->getResourceIterator();unsigned count=0;
+    while(it.hasMoreElements())
+    {
+        if(++count>32768)return false;
+        Ogre::ResourcePtr r=it.getNext();if(r.isNull())return false;
+        if(r->getGroup()=="LEOPARD_GlobalSatelliteMap_Development"||
+           r->getName().find("GlobalSatelliteMap_")==0)return false;
+    }
+    return true;
+}
+bool FixedContext(Ogre::CompositorWorkspace*w,bool visible)
+{
+    if(!profileOK||!OnMain()||!LoadedGuard()||!RenderAbiMatches()||!ou||ou!=requestedWorld||
+       !au||!renderer||au->render!=renderer||!restorationSafe||!chainSafe||!w||w!=gameWorkspace)return false;
+    if(renderer->workspace!=w)return false;
+    SaveFileSystem*fs=SaveFileSystem::getSingleton();
+    if(!fs||fs->busy()||!visible||!fixedGsmStartupOff||!FixedViewerOff())return false;
+    return FixedTerrainControl::Guard(true,true,FixedNoViewerTextures(),true,true,true,true,true);
+}
+void FixedDevice(Ogre::CompositorWorkspace*w,ID3D11Device**out)
+{
+    const Ogre::CompositorChannel&gb=w->getGlobalTexture("global_gbuffer");
+    if(gb.textures.size()!=3||gb.textures[0].isNull()||!IsPrivateArrayTexture(gb.textures[0].get()))
+        throw std::runtime_error("fixed control main GBuffer/device profile unavailable");
+    typedef ID3D11ShaderResourceView*(__fastcall*Getter)(Ogre::Texture*);
+    ID3D11ShaderResourceView*v=reinterpret_cast<Getter>(reinterpret_cast<BYTE*>(nativeApi.d3d11)+PrivateArraySrvGetterRva)(gb.textures[0].get());
+    if(!v)throw std::runtime_error("fixed control main GBuffer SRV unavailable");v->GetDevice(out);
+    if(!*out)throw std::runtime_error("fixed control main D3D device unavailable");
+}
 struct ProbeListener : Ogre::CompositorWorkspaceListener
 {
     virtual void passPreExecute(Ogre::CompositorPass *p)
@@ -1371,6 +1414,14 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
     virtual void workspacePreUpdate(Ogre::CompositorWorkspace *w)
     {
         Ogre::CompositorWorkspaceListener *next = previous;
+        if(fixedControl.Active()&&!fixedControl.Stopping()&&!inside)
+        {
+            inside=true;
+            try{if(!FixedContext(w,true))throw std::runtime_error("fixed control world/save/viewer/context changed");AtlasView::Com<ID3D11Device>d;FixedDevice(w,&d.p);if(!fixedControl.SameDevice(d.p))throw std::runtime_error("fixed control retained D3D device changed");fixedControl.Step(true);}
+            catch(const std::exception&e){fixedControl.Cancel();ErrorLog(std::string("SatelliteCaptureProbe: ")+e.what());}
+            catch(...){fixedControl.Cancel();ErrorLog("SatelliteCaptureProbe: fixed control exception; GPU state scopes restored");}
+            inside=false;
+        }
         if(terrainExperiment.active && !inside)
         {
             inside=true;
@@ -1533,6 +1584,43 @@ void Update(MapScreen *map)
             EnumWindows(FindWindowThread, 0);
         if (!OnMain())
             return;
+        if(fixedControlEnabled)
+        {
+            if(fixedControl.Quarantined()){if(cleanup)Drop();return;}
+            if(fixedControl.Active())
+            {
+                if(!map||!map->getVisible()||!FixedContext(gameWorkspace,true))fixedControl.Cancel();
+                DWORD error=0;std::string output;
+                if(fixedControl.Poll(error,output)){if(fixedControl.Quarantined())ErrorLog("SatelliteCaptureProbe: fixed worker wait failed; one bounded CPU job/unknown handles retained, GPU cleared, restart required; directory="+output);else if(error)ErrorLog("SatelliteCaptureProbe: fixed control refused/cancelled; incomplete private directory="+output);else Log("fixed base-fixture control complete; not active winner proof or final map; directory="+output);cleanup=true;}
+            }
+            if(fixedControl.Quarantined()){if(cleanup)Drop();return;}
+            if(cleanup&&!fixedControl.Active()){Drop();return;}
+            if(ProbePolicy::PollDue(fixedPollAt,GetTickCount()))
+            {
+                fixedPollAt=GetTickCount();const unsigned token=GetPrivateProfileIntA("Probe","FixedTerrainRequest",0,requestIni.c_str());
+                const bool changed=fixedRequestLatch.Changed(token); // Consume even while busy: never replay later.
+                const bool cancelled=GetPrivateProfileIntA("Probe","FixedTerrainCancel",0,requestIni.c_str())!=0;
+                if(cancelled)fixedControl.Cancel();
+                if(changed)
+                {
+                    if(cancelled||fixedControl.Active()||inside||pending||terrainExperiment.root||atlasRun.active||atlasRun.thread||atlasRun.pixels||!map||!map->getVisible()||!chainSafe)
+                        ErrorLog("SatelliteCaptureProbe: fixed control token consumed while unavailable; issue a new token when idle/map visible");
+                    else
+                    {
+                        if(!profileOK||!LoadedGuard()||!au||!au->render||!ou)throw std::runtime_error("fixed control native world unavailable");EnsureRenderAbi();
+                        Renderer*candidate=au->render;Ogre::CompositorWorkspace*workspace=candidate->workspace;SaveFileSystem*fs=SaveFileSystem::getSingleton();
+                        if(!workspace||!candidate->root||!candidate->scene||!restorationSafe||!fs||fs->busy()||!RenderAbiMatches())throw std::runtime_error("fixed control guarded context/save admission refused");
+                        if(!FixedViewerOff()||!FixedNoViewerTextures())throw std::runtime_error("fixed control requires restart with GlobalSatelliteMap.ini [GlobalSatelliteMap] Enabled=0 and no GSM texture resources; viewer and producer budgets cannot coexist");
+                        AtlasView::Com<ID3D11Device>d;FixedDevice(workspace,&d.p);if(++fixedEpoch==0)++fixedEpoch;
+                        fixedControl.Begin(d.p,Folder(),token,fixedEpoch,true);
+                        renderer=candidate;gameWorkspace=workspace;requestedWorld=ou;
+                        previous=gameWorkspace->getListener();ourListener=&listener;gameWorkspace->setListener(&listener);
+                        Log("fixed256 pinned base-fixture control armed; one bounded CPU slot, no native Terrain/camera, no lighting");
+                    }
+                }
+            }
+            return; // Fixed opt-in uses only its own request token, never the legacy keyboard/atlas path.
+        }
         if(atlasRun.active&&(!ou||ou!=atlasRun.world||!map||!map->getVisible()||!chainSafe||!restorationSafe))atlasRun.Cancel();
         if(atlasRun.active&&static_cast<DWORD>(GetTickCount()-lastAtlasPoll)>=250){
             lastAtlasPoll=GetTickCount();
@@ -1735,12 +1823,14 @@ void Update(MapScreen *map)
     }
     catch (const std::exception &e)
     {
+        if(fixedControl.Active())fixedControl.Cancel();
         if(atlasRun.active)atlasRun.Cancel();
         ErrorLog(std::string("SatelliteCaptureProbe: ") + e.what());
         cleanup = true;
     }
     catch (...)
     {
+        if(fixedControl.Active())fixedControl.Cancel();
         if(atlasRun.active)atlasRun.Cancel();
         ErrorLog("SatelliteCaptureProbe: request failed");
         cleanup = true;
@@ -1761,6 +1851,16 @@ __declspec(dllexport) void startPlugin()
     try
     {
         requestIni=Folder()+"SatelliteCaptureProbe.ini";
+        fixedControlEnabled=GetPrivateProfileIntA("Probe","FixedTerrainControl",0,requestIni.c_str())==1;
+        if(fixedControlEnabled)
+        {
+            std::string folder=Folder();if(!folder.empty())folder.erase(folder.size()-1);size_t slash=folder.find_last_of("/\\");
+            if(slash==std::string::npos)throw std::runtime_error("fixed control sibling viewer INI path unavailable");
+            fixedGsmIni=folder.substr(0,slash+1)+"GlobalSatelliteMap/GlobalSatelliteMap.ini";
+            fixedGsmStartupOff=GetPrivateProfileIntA("Probe","FixedTerrainGsmStartupDisabled",0,requestIni.c_str())==1&&GetPrivateProfileIntA("GlobalSatelliteMap","Enabled",1,fixedGsmIni.c_str())==0;
+            fixedRequestLatch.Changed(GetPrivateProfileIntA("Probe","FixedTerrainRequest",0,requestIni.c_str()));
+            if(!fixedGsmStartupOff)ErrorLog("SatelliteCaptureProbe: fixed control inert until restart with viewer Enabled=0 and FixedTerrainGsmStartupDisabled=1; existing request latched without replay");
+        }
         RasterPolicy::Layout raster;
         if(!RasterPolicy::Select(int(GetPrivateProfileIntA("Probe","DiagnosticSide",512,requestIni.c_str())),raster,
             GetPrivateProfileIntA("Probe","ResolutionOnlyControl",0,requestIni.c_str())==1))

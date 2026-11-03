@@ -1,0 +1,181 @@
+{
+  "scope": "opt-in private fixed256 base-fixture adapter; no installed game/INI/process changes",
+  "status": "implementer PASS; parent independent review pending",
+  "files": {
+    "CaptureProbe.cpp": "ea4fc73d48d1313f207a7e2c213e1519e92ad12a91dc5d9fdff352241a5cd975",
+    "SatelliteCaptureProbe.ini": "f411420ab497bc1f9b4de791c6769fc03a75e68a7e5f4eab42a44769ed42b759",
+    "FixedTerrainControl.h": "385d9d72473a56896a950bc9062442e0c869164fcfb4ef1f07c471d216849651",
+    "FixedTerrainControl.md": "5971798dcc38177c10080a6424499e3bc9b8ecdde61178cd4b26a3439b66c8c7",
+    "prepare_fixed_terrain.py": "df3a2de0d33f8109113064a2ba0bf81316e5dbb0d97a6b20d5df882cf653e9b8",
+    "fixed_control_tests.cpp": "b1ee8586e431cab7e7ea28565d1bfdf84d1294821b6114e01244ef1718bc965f",
+    "test_fixed_control.py": "8dd8b098d6f00ad05db9bc642090b82d6f275735449f034666a0d4337511c6a2",
+    "test_fixed_control_calls.py": "5dbfc7605da9839c3ac2e2cff11603f56d6de0d0fa756e493ab2e0691be9ba58",
+    "test_fixed_control_mutants.py": "21757aede0c9da874622ce092cf303c72ffdabbd24c053a252887061810a6486",
+    "freeze_fixed_control.py": "cec2e55f267448e2f06f3f37a44f73edb039d4d51cc1b5d1f041058a03e18808"
+  },
+  "compileClosure": {
+    "tools/diagnostics/satellite-capture-probe/CaptureProbe.cpp": "ea4fc73d48d1313f207a7e2c213e1519e92ad12a91dc5d9fdff352241a5cd975",
+    "tools/diagnostics/satellite-capture-probe/GuardProfile.h": "50f71bd03374cc392b1135185cf0b68964aae0383a584ed0e67f0635ca643103",
+    "tools/diagnostics/satellite-capture-probe/ProbePolicy.h": "4a4a9bbda0f2b5752cfc38247be535a443a6ed2e1e1dcdd216bf8f67b978ee77",
+    "tools/diagnostics/satellite-capture-probe/FixedProgramCache.h": "be53988212718e60d774508bed6702da8ab5f291fe33f6c1106c36783e568190",
+    "tools/diagnostics/satellite-capture-probe/OwnedCameraAttachment.h": "d44ef54bbc926641ed7083ee276066a15ea491391d8ddc756d14523e64629d7a",
+    "tools/diagnostics/satellite-capture-probe/OwnedCameraPose.h": "6ceff1c69c279956edf300d63972dc415dffba6272a0706e3b5efe8b7f9efd89",
+    "tools/diagnostics/satellite-capture-probe/build/PositionShader.h": "325a12fffc397dc25e7822dc7a2436feabca1554c1f5885dec2c90519d34318c",
+    "tools/diagnostics/satellite-capture-probe/build/SunShader.h": "b5e553cae76f6b81fc3d821b661b1dd61889769f0a31e4445444f2979090fb57",
+    "tools/diagnostics/satellite-capture-probe/NativeTerrainCache.h": "9c1657f3d2a7ef9eaaf8adec5578cbfa440c7480c5d854ceb15f947b893c637c",
+    "tools/diagnostics/satellite-capture-probe/build/RenderAbiProfile.h": "557b2a6e977d9048411a7f240fe1266bcbf10f3dadc6237adaeae4576bb12438",
+    "tools/diagnostics/satellite-capture-probe/TerrainExperimentPolicy.h": "b8cc94a59b269db7a8404832dbb3f7816a8b37fdb733613e25648cf7b2a3a3bb",
+    "tools/diagnostics/satellite-capture-probe/NativeWorkerHandle.h": "cc2c7bfba45c69f99183f285b339fb81b949f08fe8c0f0208ae1d31936904b73",
+    "tools/diagnostics/satellite-capture-probe/ExposurePolicy.h": "652fda6f515190eba0adda53995b7eed7c88cf9a7ec9246c90cbb7781493603a",
+    "tools/diagnostics/satellite-capture-probe/RasterPolicy.h": "4a995febedd4f349eb2a230a73d72036e4f3f8409a65abdf163fa2f8b749ce2e",
+    "tools/diagnostics/satellite-capture-probe/OwnedRtvDebt.h": "c67d71192e09b3c52efd62e101cbb4f3797430f5e906a349fba63d08764e3520",
+    "tools/diagnostics/satellite-capture-probe/AtlasCapturePolicy.h": "d3217c51e59a02be167bf424e14302fc47092c939dcdae5d3e17f7982a3ab69e",
+    "tools/diagnostics/satellite-capture-probe/AtlasPixels.h": "aecd4899a85af7fc04fe50e65854543c0afaa8ad9576c0a1dfe9093bb042202c",
+    "GlobalSatelliteMap/TextureArrayPolicy.h": "b6820920df0fe0bd205362c5699304eee2bbe332fc9338c88eb96773835d5a31",
+    "GlobalSatelliteMap/GpuMipUpload.h": "0981cca072006d999934bf1e71831a09d6d83ca68df0474fb95bd58fdf345580",
+    "tools/diagnostics/satellite-capture-probe/GpuCompressedUpload.h": "f612dda0e5303039878d65bedb662462a125d5c3044c599d6808c1aecd3bf602",
+    "tools/diagnostics/satellite-capture-probe/GeographyPolicy.h": "b5e183396b502ffb4ae72b30c915f16212303ba0e86b52b3c0fb4bf0cc042a95",
+    "tools/diagnostics/satellite-capture-probe/GeographyCompletion.h": "5ef8fff1beeadfcbc00823e15ac9da302a0c0a33e1b0dada4c8e51a0aa4d5021",
+    "tools/diagnostics/satellite-capture-probe/FixedTerrainControl.h": "385d9d72473a56896a950bc9062442e0c869164fcfb4ef1f07c471d216849651",
+    "GlobalSatelliteMap/atlas-terrain/raster/FixedTerrainRaster.h": "0ad68d252def4cb538161eedaf42116d9ff7bc458d5e8a88041309223594609f",
+    "GlobalSatelliteMap/atlas-terrain/fixed-geometry/FixedTerrainGeometry.h": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698",
+    "GlobalSatelliteMap/atlas-terrain/compact-material/CompactMaterial.h": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc",
+    "GlobalSatelliteMap/atlas-view/AtlasRelight.h": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86",
+    "GlobalSatelliteMap/atlas-view/AtlasReader.h": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed",
+    "GlobalSatelliteMap/atlas-view/AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af",
+    "GlobalSatelliteMap/atlas-terrain/compact-material/_generated/Case.h": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9",
+    "GlobalSatelliteMap/atlas-models/GraphicsState.h": "c5f3e311d81d88181882232fd85c337c1dbfb2cb6399d366853abece58ae58ac",
+    "GlobalSatelliteMap/atlas-terrain/compact-material/_generated/Shaders.h": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315",
+    "tools/diagnostics/satellite-capture-probe/PrivateBiomeReference.h": "88d5edfccc3e95845c82829746ee60db392be57777f47561f83f3ad080aaa447",
+    "tools/diagnostics/satellite-capture-probe/PrivateBiomeDds.h": "808a957cbfb6a317c72f861975c5ac4f7f865ed75d7cc270cddd3f2601ca10c3",
+    "tools/diagnostics/satellite-capture-probe/PrivatePaintedReference.h": "bdf1d59ba3c7eb5c42b2f115f02f198e663f1c2c9050bdb565b9c997e29b0e11",
+    "tools/diagnostics/satellite-capture-probe/PrivatePaintedInputs.h": "2363bb7c4d8d3058788c645643bd6ef5698fee25446a16eb760bd231283b3241",
+    "tools/diagnostics/satellite-capture-probe/build/PaintedShader.h": "6ee15d46250432044ac35d790b1da2ec1e5e8a58791de33995478ef38d665914",
+    "GlobalSatelliteMap/PaintedMapPolicy.h": "789961e6841b00b2a824b7f3e514e4b9406ed73a61455fc88b24ed7d0000f46d",
+    "tools/diagnostics/satellite-capture-probe/PaintedMipPolicy.h": "14dd3ac0b87f199640df81de4ba4245fe8e1a35b17411e653e2a36d29adfa222",
+    "tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalogData.h": "bd85da4b86a5e13bafd3ab9793c9a5f7ac3047488e57c813e430ade5d40f426f",
+    "tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalog.h": "b62a97f0ad4fe4c01966eb43a672e4df9298ce51c566ab2db8931f4b90f5aefb",
+    "tools/diagnostics/satellite-capture-probe/PrivateGeography.h": "f59edcff80aeaef1e606a430a060351519ff706026b5a31e837358bda198ca4e",
+    "tools/diagnostics/satellite-capture-probe/build/GeographyInputs.h": "e9f5be45b7d9353b50d5f5ccce72ebe5dbc08c4538984a6229671eccb3d31335",
+    "tools/diagnostics/satellite-capture-probe/build/GeographyShader.h": "13215653b003509309a098f92226acaadd3dcc122bf48e36ea8703edb9d2a46c",
+    "tools/diagnostics/satellite-capture-probe/TerrainExperiment.h": "a05ce1fa9672d1fdebb229b73e03b783f9bbb7d95606d60a00af86b3f0145244",
+    "tools/diagnostics/satellite-capture-probe/AtlasRun.h": "1d922d019d4b2694fa62289a64ba531b5ec873a0ad36163f2655166e24a05cff",
+    "GlobalSatelliteMap/atlas-cache/Gst2Writer.h": "cd21403b4a2115ed1ba59ef4adce91d62b602b40640dd01b84152f1c8750001b"
+  },
+  "candidate": {
+    "path": "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\build\\SatelliteCaptureProbe.dll",
+    "bytes": 651264,
+    "sha256": "8fe365aba79732327a107e05eb76668315d010db510d66a0b2c817ee743c187f"
+  },
+  "preparedInputs": {
+    "scope": "prepared fixed base fixture only; no active resource-winner proof",
+    "materialContractSha256": "afe79b4152ba35cc364e4f7c92a59771a428d4dec2d63217d442bfba2993f0b9",
+    "inputs": {
+      "dds00.bin": {
+        "bytes": 5592560,
+        "sha256": "c6f56a207d9868415368d109262564b2e4081f713c9aea66f0b2b3bda6b155b4",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\landtexture_rocksurface01_dif.dds"
+      },
+      "dds01.bin": {
+        "bytes": 5592560,
+        "sha256": "1f30b580a90fe3db29f2d1e5b4261555b1784722daa1cf0964e60f52a8b48639",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\mesa2rockloop_dif.dds"
+      },
+      "dds02.bin": {
+        "bytes": 5592560,
+        "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\rockbed01_dif.dds"
+      },
+      "dds03.bin": {
+        "bytes": 5592560,
+        "sha256": "70ada8b3ab3d6555dab34916a03737627bf256d7730d190bc8102649c84fdf63",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sand01bc_grey.dds"
+      },
+      "dds04.bin": {
+        "bytes": 5592560,
+        "sha256": "1b0f516c60e781820f511f999f7efd34e156fadbf70023e6e5fbae8bc012631d",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\skinnersgravel_dif.dds"
+      },
+      "dds05.bin": {
+        "bytes": 5592560,
+        "sha256": "bc712e270d0316ab91e87e3d6c4501f8f7ac8650cd1e21351bd86d42666b860d",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\wadigravel-white_dif.dds"
+      },
+      "dds06.bin": {
+        "bytes": 2796344,
+        "sha256": "673991440497732ed8dbea7471ff100452afcadc0f3c939cc1e205a87d289bad",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\landtexture_rocksurface01_nml.dds"
+      },
+      "dds07.bin": {
+        "bytes": 2796344,
+        "sha256": "910318f3dca706b2c100cefdd2d261aed045d1e5f71cc15afcbd9bbd74019c7f",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\mesa2rockloop_nml.dds"
+      },
+      "dds08.bin": {
+        "bytes": 2796344,
+        "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\rockbed01_nml.dds"
+      },
+      "dds09.bin": {
+        "bytes": 2796344,
+        "sha256": "aea8305b50dfdf370e5367273a6d30a66e710cd6c4401341a9aec5715032afc1",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sand3d_nml.dds"
+      },
+      "dds10.bin": {
+        "bytes": 2796344,
+        "sha256": "e36b85aafeaaaf10cfd756962739e514a87151f2b6cd6d1be7ec75320c9988e6",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\skinnersgravel_nml.dds"
+      },
+      "dds11.bin": {
+        "bytes": 2796344,
+        "sha256": "83270743efca5f1541ecdc4a79a10be1c3b0925f1fed2ba05cbb2e33d3cd578d",
+        "source": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\wadigravel_nml.dds"
+      },
+      "image0.rgba": {
+        "bytes": 4194304,
+        "sha256": "cb2365ba08fbf98eab4606302f2eb6b90e229697b848ea68db495abbe5f6f64f",
+        "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\image0.rgba"
+      },
+      "image1.rgba": {
+        "bytes": 16777216,
+        "sha256": "acb73150c22f66834fb68a28f42eed3276dcf58d04d8c1a96f4d60ba7a86ffc6",
+        "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\image1.rgba"
+      },
+      "image2.rgba": {
+        "bytes": 4194304,
+        "sha256": "ce37c74f5495123e61969ac19803a2aaea8c9d73da30d8903e75c40340676d7a",
+        "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\image2.rgba"
+      },
+      "height.u16": {
+        "bytes": 35378,
+        "sha256": "4c2943629387364ee0bfd9f630656affd94fdc7671ab0754b5199e8f3109d3f2",
+        "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\height.u16"
+      }
+    }
+  },
+  "results": {
+    "actualWorkerWarpChecks": 3146107,
+    "manualCases": 4,
+    "planes": 3,
+    "callerChecks": 35,
+    "callerMutants": 5,
+    "controllerMutants": 10,
+    "stagingFailureCleanupPaths": 2,
+    "waitFailedQuarantine": true
+  },
+  "gpuPayload": 86156268,
+  "cpuOwnedBlobCap": 16777216,
+  "logs": {
+    "fixed-tests.log": "4a07602f0886f18e38ed4ba29e9fab9087656c688ffa2fd70d303264080cf526",
+    "fixed-tests-build.log": "ced2ca2d889f61e0f883c291049a03a7d865e6842e310c4bcea186496ad94c14",
+    "fixed-control-calls-final.log": "51422a97479d70e221d38429d893b40600dc3936d0bbf8caece514a870f052b3",
+    "fixed-control-mutants-final.log": "c6165d9242061f88af5aa36cc93a0b068da7f3eff2d0e5a2f10fb73d10e64740",
+    "fixed-control-full-build-final.log": "b02d5993ee213bc0c0c0c6ed4d35af58985c22d5760da03a2634b523cfdfd050"
+  },
+  "limitations": [
+    "Pinned prepared base assets/frozen parameters, not active native resource-winner proof.",
+    "No lighting/water/models/native Terrain/camera or active atlas mutation.",
+    "No runtime game callback/save/load/FPS or long-run memory acceptance.",
+    "Unknown worker wait quarantines one CPU job/unknown handles until process exit; no dynamic DLL unload support."
+  ]
+}
