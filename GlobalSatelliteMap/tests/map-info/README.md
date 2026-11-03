@@ -1,0 +1,7 @@
+# Map metadata row
+
+The row uses current native zoomValueCurrent/(2*zoomLevels[2]), the audited normal maximum. zoomValueBase is an increment/minimum and is not a reference maximum. It displays only actual zoom and Loading details / Details loaded. Completion requires every shaded key of the fresh visible fine plan (never just the initial center pair), or every visible key of the ordinary base plan when refinement is infeasible. Empty plans cannot claim completion.
+
+One noninteractive Kenshi_TextboxStandardText child inherits the active theme. It is hidden with the map, destroyed during session clear or owner replacement, and recreated after a parent-widget rebuild. Text is coalesced through the existing 200ms map-update gate and rebuilt only when rounded display values change. The rightmost160px remain available for native zoom buttons. No INI polling, world/source scans, texture allocations or producer work are added by this row.
+
+run.py compiles the actual pure zoom/token/completion helper under VC10 Od/O2. Both modes pass13 controls, including partial visibility, complete center-only rejection and exact x2.25. The complete actual GlobalSatelliteMap.cpp also compiled with native SDK /GL /O2 (no execution/link/install); native-build.log retains the compiler result. Runtime layout/theme checks remain parent game validation. The three supplied locale catalogs are compiled and read back during verification.

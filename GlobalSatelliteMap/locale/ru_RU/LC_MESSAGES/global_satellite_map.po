@@ -72,3 +72,9 @@ msgstr "Максимальный зум, множитель"
 
 msgid "Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."
 msgstr "Увеличивает предел приближения при включённом спутниковом виде. 1 возвращает обычный предел. Увеличение не добавляет рельефу деталей сверх разрешения снимков."
+
+msgid "Zoom: x%.2f | Details loaded"
+msgstr "Приближение: x%.2f | Детали загружены"
+
+msgid "Zoom: x%.2f | Loading details..."
+msgstr "Приближение: x%.2f | Загрузка деталей..."

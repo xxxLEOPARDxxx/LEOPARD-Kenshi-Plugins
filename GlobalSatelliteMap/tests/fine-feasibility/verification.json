@@ -1,0 +1,8 @@
+{
+  "productionPolicySha256": "70e0eb83ed3e16f02d25a1abda37f8aff2627c8426559ea6da90b288e9996a23",
+  "results": {
+    "Od": "PASS7 actual fine-feasibility controls",
+    "O2": "PASS7 actual fine-feasibility controls"
+  },
+  "scope": "Actual planner worst bounds and feasibility, live9207primary2160x1044viewport; no engine/UI/source capture."
+}

@@ -55,6 +55,7 @@
 #include "GsmZoomStep.h"
 #include "build/GsmZoomProfile.h"
 #include "GsmFineGpu.h"
+#include "GsmMapInfo.h"
 #include "GsmFinePolicy.h"
 #include "atlas-terrain/world-native/NativeProvider.h"
 #include "atlas-terrain/fine-coordinator/FineCoordinator.h"
@@ -101,7 +102,7 @@ void ModelFailure(const char*why);
 const AtlasView::U64 ModelGpuBytes=AtlasModels::PrivateBytes+AtlasModelDecode::PrivateBytes+AtlasModelSurface::PrivateBytes;
 GsmCachedTownState::State cachedTown;std::string cachedSelectionError;
 void CachedTownCompletion(const GsmAtlas::Job&);
-void RetireGpuCharge(AtlasView::U64);void FineCancel();void FineObserve(MapScreen*);void FinePresent(MapScreen*);bool FineQualified();bool FinePending();AtlasView::U64 FineGpuBytes();AtlasView::U64 ProducerGpuBytes();
+void RetireGpuCharge(AtlasView::U64);void FineCancel();void FineObserve(MapScreen*);void FinePresent(MapScreen*);bool FineQualified();bool FinePending();bool FineDetailFeasible();bool FineReservesBaseDetail();AtlasView::U64 FineGpuBytes();AtlasView::U64 ProducerGpuBytes();
 void ResetModels(){RetireGpuCharge((modelGpuReady?ModelGpuBytes:0)+cachedTown.OwnedGpuBytes());cachedSelectionError.clear();if(!cachedTown.Clear())ErrorLog("GlobalSatelliteMap: cached town cleanup refused; private slot retained");modelCell.Clear();modelSurface.Clear();modelDecode.Clear();modelRaster.Clear();models.Clear();modelGpuReady=false;modelMapping=AtlasModelDecode::ProvenMapping();modelProofScene=NULL;modelCatalogReady=false;modelCatalogAt=0;}
 unsigned localRenders=0,localBatches=0;
 void ResetLocal(){RetireGpuCharge(localLayerReady?AtlasLocalLights::PrivateBytes:0);localLayer.Clear();localLayerReady=localFailed=false;localMapping=AtlasLocalLights::ProvenMapping();localProofScene=NULL;localRevision.Reset();if(++localVersion==0)localVersion=1;}
@@ -110,6 +111,8 @@ MyGUI::IntCoord projectedClip;bool presentationCurrent=false;
 GSM::Session session;GsmAtlas::Manifest manifest;std::string verifiedGameRoot;
 GsmAtlas::Job*job=NULL,*completed=NULL;
 WidgetRef layer,status,tiles[AtlasView::WindowSlots];
+WidgetRef mapInfo,mapInfoOwner;GsmMapInfo::Token mapInfoToken;bool mapInfoHaveToken=false;
+void ClearMapInfo(){if(mapInfo.get())MyGUI::Gui::getInstance().destroyWidget(mapInfo.get());mapInfo.reset();mapInfoOwner.reset();mapInfoHaveToken=false;}
 WidgetRef diskWarning;
 AtlasView::Relighter relighter;GsmNative::Light nativeLight;
 AtlasView::Uniforms lighting={};bool haveLighting=false;
@@ -123,7 +126,7 @@ AtlasView::U64 ViewerGpuBytes(){return BaseGpuBytes()+(ready?GsmFineGpu::Relight
 AtlasView::U64 AggregateGpuBytes(){return ViewerGpuBytes()+FineGpuBytes()+gpuRetired.Bytes()+ProducerGpuBytes();}
 AtlasView::U64 OtherGpuBytes(AtlasView::U64 excluded){AtlasView::U64 total=AggregateGpuBytes();return total>=excluded?total-excluded:AtlasView::GpuCap;}
 bool AdmitGpu(AtlasView::U64 bytes){return !gpuRetirementFailed&&!gpuRetired.Failed()&&GsmFineGpu::Fits(ViewerGpuBytes()+FineGpuBytes(),gpuRetired.Bytes(),ProducerGpuBytes(),bytes);}
-unsigned BaseDetailCapacity(){return FineQualified()?0:AtlasView::DetailSlots;}
+unsigned BaseDetailCapacity(){return FineReservesBaseDetail()?0:FineDetailFeasible()?2:AtlasView::DetailSlots;}
 void(*originalUpdate)(MapScreen*)=NULL;void(*originalLoad)(SaveFileSystem*,const std::string&)=NULL;void(*originalNew)(SaveFileSystem*)=NULL;
 std::string Folder(){wchar_t p[MAX_PATH]={0};DWORD n=GetModuleFileNameW(reinterpret_cast<HMODULE>(&__ImageBase),p,MAX_PATH);if(!n||n>=MAX_PATH)return std::string();std::wstring w(p,n);size_t at=w.find_last_of(L"/\\");return at==w.npos?std::string():GsmAtlas::Utf8(w.substr(0,at+1));}
 std::string Exe(){wchar_t p[MAX_PATH]={0};DWORD n=GetModuleFileNameW(NULL,p,MAX_PATH);return !n||n>=MAX_PATH?std::string():GsmAtlas::Utf8(std::wstring(p,n));}
@@ -193,7 +196,7 @@ void SetStage(ID3D11DeviceContext*c,unsigned stage,unsigned slot,ID3D11ShaderRes
 void RetireReads(ID3D11Texture2D*output){if(!output)return;AtlasView::Com<ID3D11Device>d;output->GetDevice(&d.p);AtlasView::Com<ID3D11DeviceContext>c;d.p->GetImmediateContext(&c.p);for(unsigned stage=0;stage<6;++stage){ID3D11ShaderResourceView*v[128]={0};switch(stage){case 0:c.p->VSGetShaderResources(0,128,v);break;case 1:c.p->HSGetShaderResources(0,128,v);break;case 2:c.p->DSGetShaderResources(0,128,v);break;case 3:c.p->GSGetShaderResources(0,128,v);break;case 4:c.p->PSGetShaderResources(0,128,v);break;default:c.p->CSGetShaderResources(0,128,v);}for(unsigned i=0;i<128;++i)if(v[i]){if(AtlasView::SameResource(v[i],output))SetStage(c.p,stage,i,NULL);v[i]->Release();}}}
 void DropEntry(int i){Entry&e=cache[i];if(!e.key.Valid())return;ID3D11Texture2D*planes[3]={e.gpu.texture[0].p,e.gpu.texture[1].p,e.gpu.texture[2].p};if(!gpuRetired.Add(planes,e.output.p,GsmFineGpu::WindowBytes)){gpuRetirementFailed=true;return;}if(tiles[i].get()){MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());w->setImageTexture("");w->setVisible(false);}MyGUI::RenderManager*rm=MyGUI::RenderManager::getInstancePtr();if(rm&&!e.name.empty()){MyGUI::ITexture*t=rm->getTexture(e.name);if(t)rm->destroyTexture(t);}RetireReads(e.output.p);e.output.Reset();e.gpu.Clear();e.texture.setNull();Ogre::TextureManager*tm=Ogre::TextureManager::getSingletonPtr();if(tm&&!e.name.empty()&&!tm->getByName(e.name).isNull())tm->remove(e.name);e.name.clear();e.key=AtlasView::WindowKey();e.shaded=e.age=0;}
 void Cancel(){if(job)InterlockedExchange(&job->read.cancel,1);if(completed){delete completed;completed=NULL;}}
-void Clear(){presentationCurrent=false;FineCancel();Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();RetireGpuCharge((ready?GsmFineGpu::RelightBytes:0)+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0));ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
+void Clear(){ClearMapInfo();presentationCurrent=false;FineCancel();Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();RetireGpuCharge((ready?GsmFineGpu::RelightBytes:0)+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0));ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
 void Notice(MapScreen*map,bool drawFailure){if(!map||status.get()||!map->mainWidget)return;MyGUI::Widget*p=map->mainWidget;MyGUI::TextBox*w=p->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(12,12,p->getWidth()>24?p->getWidth()-24:300,56),MyGUI::Align::Default,"");status.set(w);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setCaption(MyGUI::UString(drawFailure?Tr("Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."):Tr("Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible.")));statusUntil=GetTickCount()+12000;}
 void Fail(MapScreen*map,const std::string&why){bool drawFailure=ready;Clear();attempted=failed=true;ErrorLog("GlobalSatelliteMap: "+why);Notice(map,drawFailure);}
 std::string ModulePath(const char*name){wchar_t path[MAX_PATH]={0};HMODULE h=GetModuleHandleA(name);DWORD n=h?GetModuleFileNameW(h,path,MAX_PATH):0;if(!n||n>=MAX_PATH)throw std::runtime_error("native renderer module path missing");return GsmAtlas::Utf8(std::wstring(path,n));}
@@ -628,7 +631,31 @@ void Draw(MapScreen*map,DWORD now){
     }
 }
 #include "GsmFineViewer.h"
-void Tick(MapScreen*map){FineObserve(map);LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined&&!FinePending())StartValidation();if(!ready)return;Draw(map,now);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
+// Require every visible target tile. The initial center pair cannot claim completion.
+bool MapDetailsLoaded(const GSM::Rect*coords,const MyGUI::IntCoord&view,const MyGUI::IntPoint&origin){
+ if(FineDetailFeasible()){
+  if(!FineContext()||!FineJob::Internal::Fresh(finePlan,fineDemand))return false;
+  unsigned shaded=0;for(unsigned n=0;n<finePlan.count;++n){int i=FineFind(finePlan.keys[n]);if(i>=0&&fineCache[i].image.shaded)++shaded;}
+  return GsmMapInfo::Complete(finePlan.count,shaded,fineCenter);
+ }
+ if(ProducerGpuBytes()!=0)return false;
+ AtlasView::WindowRect cells[16],clip(view.left-origin.left,view.top-origin.top,view.width,view.height);for(unsigned i=0;i<16;++i)cells[i]=AtlasView::WindowRect(coords[i].x,coords[i].y,coords[i].w,coords[i].h);
+ AtlasView::WindowPlan plan=AtlasView::PlanWindows(cells,clip,BaseDetailCapacity());unsigned expected=0,shaded=0;
+ if(plan.level==5){for(unsigned n=0;n<16;++n)if(cells[n].x<clip.x+clip.w&&clip.x<cells[n].x+cells[n].w&&cells[n].y<clip.y+clip.h&&clip.y<cells[n].y+cells[n].h){++expected;int i=FindWindow(AtlasView::WindowKey(n,5,0,0));if(i>=0&&cache[i].shaded)++shaded;}}
+ else{expected=plan.visibleCount;for(unsigned n=0;n<expected;++n){int i=FindWindow(plan.keys[n]);if(i>=0&&cache[i].shaded)++shaded;}}
+ return GsmMapInfo::Complete(expected,shaded,false);
+}
+// Coalesced, read-only presentation metadata. No source scans or texture work.
+void UpdateMapInfo(MapScreen*map){
+ if(!map||!map->mainWidget||!map->mapScrollView||!map->mapImage)return;GSM::Rect cells[16];if(!Geometry(map,cells)||cells[0].w<=0||cells[0].h<=0)return;
+ MyGUI::IntCoord view=map->mapScrollView->getAbsoluteCoord(),parent=map->mainWidget->getAbsoluteCoord();MyGUI::IntPoint origin=map->mapImage->getAbsolutePosition();if(view.width<=0||view.height<=0)return;
+ GsmMapInfo::Values values;if(!GsmMapInfo::Make(map->zoomValueCurrent,map->zoomLevels[2],MapDetailsLoaded(cells,view,origin),values)){if(mapInfo.get())mapInfo.get()->setVisible(false);return;}
+ if(mapInfo.get()&&(mapInfoOwner.get()!=map->mainWidget||mapInfo.get()->getParent()!=map->mainWidget))ClearMapInfo();
+ if(!mapInfo.get()){MyGUI::TextBox*w=map->mainWidget->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(),MyGUI::Align::Default,"");mapInfo.set(w);mapInfoOwner.set(map->mainWidget);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setTextAlign(MyGUI::Align::Left|MyGUI::Align::VCenter);mapInfoHaveToken=false;}
+ MyGUI::TextBox*w=static_cast<MyGUI::TextBox*>(mapInfo.get());const int x=std::max(8,view.left-parent.left+8),y=std::max(0,std::min(parent.height-22,view.top-parent.top+view.height-22)),width=std::max(80,std::min(parent.width-x-8,view.width-160));MyGUI::IntCoord rect(x,y,width,20);if(w->getCoord()!=rect)w->setCoord(rect);
+ const GsmMapInfo::Token token(values);if(!mapInfoHaveToken||!token.Same(mapInfoToken)){char text[256]={0};_snprintf_s(text,sizeof(text),_TRUNCATE,Tr(values.loaded?"Zoom: x%.2f | Details loaded":"Zoom: x%.2f | Loading details..."),values.zoom);w->setCaption(MyGUI::UString(text));mapInfoToken=token;mapInfoHaveToken=true;}if(!w->getVisible())w->setVisible(true);
+}
+void Tick(MapScreen*map){FineObserve(map);LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(mapInfo.get()&&mapInfo.get()->getVisible())mapInfo.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined&&!FinePending())StartValidation();if(!ready)return;Draw(map,now);UpdateMapInfo(map);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
 bool RelativeZoomEnabled(MapScreen*map){return zoomStepHooksReady&&enabled&&zoomMultiplier>1&&!zoomFailed&&!zoomStepDepth&&zoomLease.Owned()&&map&&zoomOwner.get()==map->mainWidget&&GsmZoom::StepValues(map->zoomValueBase,map->zoomValueCurrent);}
 void ZoomInHook(MapScreen*map,MyGUI::Widget*sender){
     if(!RelativeZoomEnabled(map)){originalZoomIn(map,sender);return;}

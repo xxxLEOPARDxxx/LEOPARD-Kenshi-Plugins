@@ -41,7 +41,7 @@ inline bool BudgetValid(const Budget&b){
  return b.viewerGpu<=ViewerAllowance&&b.occupied<=Slots&&b.fineGpu>=U64(b.occupied)*WindowBytes&&b.fineGpu<=U64(Slots)*WindowBytes&&
  b.producerCpu>=ProducerCpuFloor()&&b.producerCpu<=AtlasView::CpuCap&&b.otherCpu<=AtlasView::CpuCap-b.producerCpu;
 }
-inline bool ProducerFits(const Budget&b){return BudgetValid(b)&&b.fineGpu<=ViewerAllowance-b.viewerGpu&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WorldCohort::GpuReservation(2);}
+inline bool ProducerFits(const Budget&b){return BudgetValid(b)&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WorldCohort::GpuReservation(2);}
 inline bool Fresh(const Plan&p,const Demand&r){return p.state==Detail&&p.count&&p.count<=Slots&&p.pairCount&&p.pairCount<=p.count&&(p.spacing==1||p.spacing==3)&&SameDemand(p.demand,r);}
 inline bool Has(const Plan&p,const FineWindows::Key&k){if(p.count>Slots||!FineWindows::Valid(k)||!FineWindows::Same(k.stamp,p.demand.view.stamp)||k.spacing!=p.spacing)return false;for(unsigned n=0;n<p.count;++n)if(FineWindows::Equal(k,p.keys[n]))return true;return false;}
 inline bool SameCell(const FineWindows::Key&a,const FineWindows::Key&b){Placement x,y;return Map(a,x)&&Map(b,y)&&x.region==y.region&&x.cell==y.cell;}
@@ -57,14 +57,19 @@ inline bool Group(Plan&p){
  }return true;
 }
 }
-inline Plan MakePlan(const Demand&r,const Budget&b,Mode mode){
+inline Plan MakePlan(const Demand&r,const Budget&b,Mode mode,const FineWindows::Key*resident=NULL,unsigned residentCount=0){
  Plan p;if(!Internal::DemandValid(r)||(mode!=CenterPair&&mode!=VisibleSet))return p;p.demand=r;
  const FineWindows::Rect&w=r.view.world;FineWindows::Internal::Clip clip={FineWindows::Internal::High(-147456,w.x),FineWindows::Internal::High(-147456,w.z),FineWindows::Internal::Low(147456,w.x+w.w),FineWindows::Internal::Low(147456,w.z+w.h)};
  if(clip.x1<=clip.x0||clip.z1<=clip.z0){p.state=Empty;return p;}
  const double density=FineWindows::Internal::Low(w.w/r.view.screenWidth,w.h/r.view.screenHeight);p.densitySpacing=density<3?1:density<9?3:9;p.state=Coarse;
- if(p.densitySpacing==9||!Internal::ProducerFits(b))return p;
- const unsigned available=Slots-b.occupied;
- for(unsigned spacing=p.densitySpacing;spacing<9;spacing*=3){unsigned worst=FineWindows::Internal::Worst(r.view,spacing);if(worst<=available&&U64(worst)*WindowBytes<=AtlasView::GpuCap-b.viewerGpu-b.fineGpu){p.spacing=spacing;p.worstVisible=worst;break;}}
+ // Planning/cache reuse does not allocate a source bank. A retained visible
+ // set may exceed the production phase allowance; CanRender checks it later.
+ if(p.densitySpacing==9||!Internal::BudgetValid(b))return p;
+ if(resident){if(residentCount!=b.occupied||residentCount>Slots)return Plan();for(unsigned n=0;n<residentCount;++n){if(!FineWindows::Valid(resident[n])||!FineWindows::Same(resident[n].stamp,r.view.stamp))return Plan();for(unsigned j=0;j<n;++j)if(FineWindows::Equal(resident[n],resident[j]))return Plan();}}
+ else if(residentCount)return Plan();
+ unsigned overlap=0,available=Slots-b.occupied;
+ for(unsigned spacing=p.densitySpacing;spacing<9;spacing*=3){unsigned worst=FineWindows::Internal::Worst(r.view,spacing),matching=0;for(unsigned n=0;resident&&n<residentCount;++n){FineWindows::Rect v;if(resident[n].spacing==spacing&&FineWindows::Bounds(resident[n],v)&&v.x<clip.x1&&clip.x0<v.x+v.w&&v.z<clip.z1&&clip.z0<v.z+v.h)++matching;}
+  if(worst<=available+matching&&U64(worst-matching)*WindowBytes<=AtlasView::GpuCap-b.viewerGpu-b.fineGpu){p.spacing=spacing;p.worstVisible=worst;overlap=matching;available+=matching;break;}}
  if(p.spacing==9)return p;
  FineWindows::Plan sorted;const unsigned x0=FineWindows::Internal::Index(clip.x0,p.spacing),z0=FineWindows::Internal::Index(clip.z0,p.spacing),x1=FineWindows::Internal::Last(clip.x1,p.spacing),z1=FineWindows::Internal::Last(clip.z1,p.spacing);
  if((x1-x0+1)*(z1-z0+1)>p.worstVisible)return Plan();
@@ -72,7 +77,7 @@ inline Plan MakePlan(const Demand&r,const Budget&b,Mode mode){
  if(!sorted.count)return Plan();
  if(mode==VisibleSet){p.count=sorted.count;for(unsigned n=0;n<p.count;++n)p.keys[n]=sorted.jobs[n].key;}
  else{p.keys[0]=sorted.jobs[0].key;p.count=1;for(unsigned n=1;n<sorted.count;++n)if(Internal::SameCell(p.keys[0],sorted.jobs[n].key)){p.keys[p.count++]=sorted.jobs[n].key;break;}}
- if(!Internal::Group(p))return Plan();p.producerPeak=b.viewerGpu+b.fineGpu+WorldCohort::GpuReservation(2);p.publicationPeak=b.viewerGpu+b.fineGpu+U64(p.worstVisible)*WindowBytes;p.cpuPeak=b.producerCpu+b.otherCpu;p.state=Detail;return p;
+ if(!Internal::Group(p))return Plan();p.producerPeak=b.viewerGpu+b.fineGpu+WorldCohort::GpuReservation(2);p.publicationPeak=b.viewerGpu+b.fineGpu+U64(p.worstVisible-overlap)*WindowBytes;p.cpuPeak=b.producerCpu+b.otherCpu;p.state=Detail;return p;
 }
 inline bool Wanted(const Plan&p,const Demand&now,const FineWindows::Key&key){return Internal::Fresh(p,now)&&Internal::Has(p,key);}
 inline bool CanRender(const Plan&p,const Demand&now,const Budget&b){return Internal::Fresh(p,now)&&Internal::ProducerFits(b);}

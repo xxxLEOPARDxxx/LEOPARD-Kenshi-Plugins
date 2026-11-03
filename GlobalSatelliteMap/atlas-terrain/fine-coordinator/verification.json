@@ -94,8 +94,8 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-viewer/FineJob.h",
-      "bytes": 9944,
-      "sha256": "80286ad2831eed94af5487636b42114e8f3575b1bf0b41c2c91121c3257789cf"
+      "bytes": 10759,
+      "sha256": "8b4cd3a8e54938a12753f3d4cc8dbfa2ed80ea284604b11c870380bab1373d7e"
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-windows/FineWindowPlanner.h",

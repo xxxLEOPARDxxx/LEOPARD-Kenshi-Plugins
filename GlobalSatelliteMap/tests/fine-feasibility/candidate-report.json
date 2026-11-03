@@ -1,0 +1,82 @@
+{
+  "cause": {
+    "livePrimary": 9207,
+    "viewport": [
+      2160,
+      1044
+    ],
+    "density": 8.007820136852395,
+    "realWorst3mSlots": 288,
+    "limit": 96,
+    "oldBaseDetailCapacity": 0
+  },
+  "change": "Infeasible fine view uses ordinary128; feasible startup2; active owned fine/source reserves0. Persistent16fallback unchanged. Simple zoom/loading row uses full visible coverage.",
+  "checks": {
+    "feasibility": {
+      "productionPolicySha256": "70e0eb83ed3e16f02d25a1abda37f8aff2627c8426559ea6da90b288e9996a23",
+      "results": {
+        "Od": "PASS7 actual fine-feasibility controls",
+        "O2": "PASS7 actual fine-feasibility controls"
+      },
+      "scope": "Actual planner worst bounds and feasibility, live9207primary2160x1044viewport; no engine/UI/source capture."
+    },
+    "capacity": {
+      "productionTailSha256": "54a9b6e69b5f7d071b21e7bb6396dc63a273cbe6e3c2b0ec140bf5e56ab4236b",
+      "baseDetailCapacity": "unsigned BaseDetailCapacity(){return FineReservesBaseDetail()?0:FineDetailFeasible()?2:AtlasView::DetailSlots;}",
+      "reserveDetailBudget": "bool FineReservesBaseDetail(){return ProducerGpuBytes()!=0||(FineDetailFeasible()&&(fineOwner||FineGpuBytes()!=0));}",
+      "baseDetailCapacitySha256": "192b10db140da39dd54d62a41b59f86d5534f0037a6e2abdc1fa1cc02e338962",
+      "source": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\GsmFineViewer.h",
+      "results": {
+        "Od": "PASS 261 actual residency-tail checks",
+        "O2": "PASS 261 actual residency-tail checks"
+      },
+      "scope": "Actual extracted FineObserve residency maintenance plus real AtlasWindowPolicy; no engine/GPU/game/large fixtures."
+    },
+    "hud": {
+      "helperSha256": "38fb5c16de4bfac275284e5c2402f4da57b616f4421d61ceb4135b89d577e4bd",
+      "results": {
+        "Od": "PASS 13 map-info controls",
+        "O2": "PASS 13 map-info controls"
+      },
+      "scope": "Pure actual metadata formatter policy; native XML/widget layout validated by parent game run."
+    },
+    "nativeLinked": "PASS startPlugin; C MCM;85 native imports",
+    "independentReview": "fine_store_finish CLEAR; reran capacity261 and HUD13 per /Od and /O2"
+  },
+  "productionSha256": {
+    "GsmFinePolicy.h": "70e0eb83ed3e16f02d25a1abda37f8aff2627c8426559ea6da90b288e9996a23",
+    "GsmFineViewer.h": "a68ac1bc785fa2a28b4a0a59124a7b2e89e5ffb79bf4f4ba8073a9709d1d8cbb",
+    "GlobalSatelliteMap.cpp": "9752e9eac2efd2a1a9f67b97acba5b3ae300d45aa3048bac84a3a68ee8113e99",
+    "GsmMapInfo.h": "38fb5c16de4bfac275284e5c2402f4da57b616f4421d61ceb4135b89d577e4bd"
+  },
+  "locales": {
+    "ru_RU": {
+      "sha256": "38a041f29c30529802523767d1556c65263fb6e7482c53575e022bcffec0f018",
+      "strings": {
+        "Zoom: x%.2f | Details loaded": "Приближение: x%.2f | Детали загружены",
+        "Zoom: x%.2f | Loading details...": "Приближение: x%.2f | Загрузка деталей..."
+      }
+    },
+    "en_GB": {
+      "sha256": "516f3d87f36c6af4d8be498c8f9544035087704ef5ab7d53b822e3e2f5514fc5",
+      "strings": {
+        "Zoom: x%.2f | Details loaded": "Zoom: x%.2f | Details loaded",
+        "Zoom: x%.2f | Loading details...": "Zoom: x%.2f | Loading details..."
+      }
+    },
+    "zh_CN": {
+      "sha256": "541f00601668bf87b1b9556083f581e58a028630cef9806065ac0300050c38f7",
+      "strings": {
+        "Zoom: x%.2f | Details loaded": "缩放：x%.2f | 细节已加载",
+        "Zoom: x%.2f | Loading details...": "缩放：x%.2f | 正在加载细节..."
+      }
+    }
+  },
+  "dll": {
+    "path": "D:/DEV/Kenshi/build/GlobalSatelliteMap/GlobalSatelliteMap.dll",
+    "bytes": 1095680,
+    "sha256": "66364c4b471b14de66e41a05a342fcf744e060f9be534f1af40dc787607dabb5"
+  },
+  "linkedBuildLogSha256": "c3fe6ce869ee687d013fbf388a938ceaad0f1a77f7232f88ffc2c55df8b9f3f6",
+  "limits": "No installation or runtime proof by child; parent owns next game validation. Host checks do not prove FPS or long-run absence of leaks."
+}

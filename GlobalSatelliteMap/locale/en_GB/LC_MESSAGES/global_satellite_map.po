@@ -72,3 +72,9 @@ msgstr "Maximum map zoom, multiplier"
 
 msgid "Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."
 msgstr "Increase the maximum zoom while satellite view is enabled. 1 restores the normal limit. Larger zoom does not add detail beyond the captured terrain resolution."
+
+msgid "Zoom: x%.2f | Details loaded"
+msgstr "Zoom: x%.2f | Details loaded"
+
+msgid "Zoom: x%.2f | Loading details..."
+msgstr "Zoom: x%.2f | Loading details..."

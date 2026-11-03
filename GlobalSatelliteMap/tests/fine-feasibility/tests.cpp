@@ -1,0 +1,7 @@
+#define NOMINMAX
+#include <windows.h>
+#include <cstdio>
+#include "../../GsmFinePolicy.h"
+unsigned checks=0;void C(bool value,const char*why){++checks;if(!value){printf("FAIL %s\n",why);throw 1;}}
+FineWindows::Request View(double w,double h){FineWindows::Request r={};r.world.x=r.world.z=-10000;r.world.w=w;r.world.h=h;r.screenWidth=2160;r.screenHeight=1044;r.stamp.source=0x100000007ULL;r.stamp.material=0x200000009ULL;return r;}
+int main(){try{FineWindows::Request live=View(2160*73728.0/9207,1044*73728.0/9207);C(FineWindows::Internal::Worst(live,3)==288,"actualx2.25 requires288 finestavailable3m windows");C(!GsmFinePolicy::CanRefine(live),"actual8.00782mpp must keep ordinary base LOD");FineWindows::Request closerView=View(2160*73728.0/20000,1044*73728.0/20000);C(GsmFinePolicy::CanRefine(closerView),"closer feasible3m view may reserve source budget");FineWindows::Request limit=View(8448,5376);C(FineWindows::Internal::Worst(limit,3)==96&&GsmFinePolicy::CanRefine(limit),"exact96-window boundary admitted");limit.world.w+=.01;C(FineWindows::Internal::Worst(limit,3)==104&&!GsmFinePolicy::CanRefine(limit),"104-window next boundary restores ordinary LOD");closerView.stamp.source=0;C(!GsmFinePolicy::CanRefine(closerView),"unqualified source cannot suppress base details");closerView=View(1000,1000);closerView.screenHeight=0;C(!GsmFinePolicy::CanRefine(closerView),"invalid viewport cannot reserve producer allowance");puts("PASS7 actual fine-feasibility controls");return 0;}catch(...){return 1;}}

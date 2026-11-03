@@ -1,0 +1,13 @@
+tests.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C2039: 'CanRefine' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C3861: 'CanRefine': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C2039: 'CanRefine' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C3861: 'CanRefine': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C2039: 'CanRefine' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C3861: 'CanRefine': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C2039: 'CanRefine' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C3861: 'CanRefine': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C2039: 'CanRefine' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C3861: 'CanRefine': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C2039: 'CanRefine' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fine-feasibility\tests.cpp(7) : error C3861: 'CanRefine': identifier not found

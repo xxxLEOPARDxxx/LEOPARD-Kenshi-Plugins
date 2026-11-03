@@ -1,15 +1,15 @@
 {
   "scope": "Pure fine terrain placement/native ABI job adapter and two-phase resource policy; no live viewer, native execution or IO",
   "status": "author controls PASS; independent review pending",
-  "recordedUtc": "2026-11-03T10:06:35.628091+00:00",
+  "recordedUtc": "2026-11-03T13:54:52.107546+00:00",
   "sourceFiles": {
     ".gitignore": "9e7f92b9d91aca493d7ab1632b3d4285c0591c88e3965d11bcda01a9bcc9d7cc",
-    "FineJob.h": "80286ad2831eed94af5487636b42114e8f3575b1bf0b41c2c91121c3257789cf",
-    "freeze.py": "3b3223c650835fa678774d71ffa439f308377c6d6ca4a565f5d509ad4e41bc81",
-    "README.md": "b307829bde47a25dd9a30a8d90a2e13a3310509c92d97e64d3d2a7c71ff8570d",
+    "FineJob.h": "8b4cd3a8e54938a12753f3d4cc8dbfa2ed80ea284604b11c870380bab1373d7e",
+    "freeze.py": "1c34fff46163cd96bcd324630fd5176041c433a8952d8c29442cd57c78668323",
+    "README.md": "f2512dc2d0fca5b30c3a16273e2ca4553682dcd2e9dd3e5fc7aa8163fe114fd6",
     "run_mutants.py": "b898a8d73db412fdb5e3a5fce6455fb1a023ca53869e46116421e9b1ed5606c3",
     "run_tests.py": "5b140412424affcf2925c1161ea501c8dc89b989406665aebcac26b84c84e269",
-    "tests.cpp": "f0cff0eabafe883d12f176fbdcdf65ef4171c7341ff7b690554c9bfb9ae5f2b2"
+    "tests.cpp": "7ce3936d61f8155d5b062ccfa53b1af458b92b11836450220c919525302004ba"
   },
   "dependencies": {
     "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\include\\CodeAnalysis\\sourceannotations.h": "abe70c601ca3b3cadeaabeeefeff460367f15e6e873863856276da3862438f33",
@@ -193,7 +193,7 @@
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\CompactMaterial.h": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\Case.h": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\Shaders.h": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fine-viewer\\FineJob.h": "80286ad2831eed94af5487636b42114e8f3575b1bf0b41c2c91121c3257789cf",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fine-viewer\\FineJob.h": "8b4cd3a8e54938a12753f3d4cc8dbfa2ed80ea284604b11c870380bab1373d7e",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fine-windows\\FineWindowPlanner.h": "29cd0a69a63c5c31fff26ff9040561f597b14011b48d1687a90dc1bad78ed091",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fixed-geometry\\FixedTerrainGeometry.h": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\PinnedPng.h": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95",
@@ -205,7 +205,7 @@
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\staged-material\\_generated\\StagedShaders.h": "dd33a9b8f84201446bdf18b28ddf0c2c3f4cc39cee439da2e6e41a6e4c606141",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\WorldSourceBank.h": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\_generated\\DecodedPins.h": "407a537bc08b96febae1f6a2b6f23d01ffd97ec420e03253a77677df6308646a",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\WorldCohort.h": "b1ee4b55e689b4ac355cd4c123324441171dc95e3f42e09dd00bcce6021f98ee",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\WorldCohort.h": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-layout\\WorldLayout.h": "20bbbceabcf45ce1609929f51b2ea0e17c9ddb37ce351c98a35f1c9bb59ebcda",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-material\\WorldMaterialPlan.h": "8bb72f85f82a827e5c79f082a9829da5644f8648b289c58aa46cf014dd0cee57",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\SourceFactory.h": "eb99bc837c802509585fbbf333eabb374cd666a11d8560d7c6ea26f495de8155",
@@ -223,28 +223,29 @@
   "evidence": {
     "_generated\\compile-O2.log": "ac557926f2b3b68fcc31513f63535ec1a7497f433c421cceff16bea0b1cfa3ff",
     "_generated\\compile-Od.log": "ac557926f2b3b68fcc31513f63535ec1a7497f433c421cceff16bea0b1cfa3ff",
-    "_generated\\imports-O2.log": "a6a7002b07649dc01bbe3642764a5189903557a337787603fbf531a7c0146180",
-    "_generated\\imports-Od.log": "f0b8bf74c44f3c79d20b71f71ea9098ba8540dd09942f4d7b5ab6f43424993f8",
+    "_generated\\imports-O2.log": "7d361aa70900943978c432dcef7dd0cd20f2204a392d94921834d3420358ba81",
+    "_generated\\imports-Od.log": "34179ebee6bf9d9d7da6e3704a795a252701e7ad9b91d1e96b60f65a203a0c00",
     "_generated\\mutants\\live-bank-upload\\compile.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\live-bank-upload\\imports.log": "8b64b5bdbaf20751d9aab23c7b24d6571c45c6706bc4dc802a2b1acd6aa56d31",
     "_generated\\mutants\\live-bank-upload\\run.log": "098c1090dc44767b36dafd885358b4daee9e2ca4ab074b4022fcde1d7a0d2ea1",
     "_generated\\mutants\\missing-cpu-floor\\compile.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\missing-cpu-floor\\imports.log": "c35e97aa3d6b8cb2ff7f02906280193da18ee87579bc379701fdc9c8ca5282d9",
     "_generated\\mutants\\missing-cpu-floor\\run.log": "ba6fae337a442b668467af8ceb57174fc59dd4a242c8befa49243939b48424a6",
+    "_generated\\progressive-suite.log": "0cadf7498db1195f064953f2656a4794b592e1b449a72ea16211c04763fe342d",
     "_generated\\red-cpu-floor.log": "ba6fae337a442b668467af8ceb57174fc59dd4a242c8befa49243939b48424a6",
     "_generated\\red.log": "141a13179daff839b9e7e278b8035bf8e225c58df1aa6f4a29f7003ec6bddb53",
     "_generated\\root-verified.log": "7c66a59811e70f19fbf30035f99eb8a701fc3dbbcb095638e7d3055453e4b4fb",
-    "_generated\\run-O2.log": "accb07252f5c6233b77e60327c81129e2aa6a44180d25eb8b4028e4af0888a7a",
-    "_generated\\run-Od.log": "accb07252f5c6233b77e60327c81129e2aa6a44180d25eb8b4028e4af0888a7a"
+    "_generated\\run-O2.log": "9025d3ffc2b149d528c687dcaad3a610ed1fde3010eb696cd606bbc4d26fe30f",
+    "_generated\\run-Od.log": "9025d3ffc2b149d528c687dcaad3a610ed1fde3010eb696cd606bbc4d26fe30f"
   },
-  "checksPerOptimization": 34586,
+  "checksPerOptimization": 34600,
   "runtimeMutantsKilled": {
     "live-bank-upload": "FAIL even1byte live bank/debt forbids upload",
     "missing-cpu-floor": "FAIL fabricated one-byte producer CPU cannot bypass frozen payload floor"
   },
   "limits": {
     "fineSlots": 96,
-    "viewerProducerAllowanceBytes": 33554432,
+    "coarseViewerProductionLimitBytes": 33554432,
     "gpuCapBytes": 201326592,
     "cpuCapBytes": 67108864,
     "producerK2GpuBytes": 137571380

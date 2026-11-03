@@ -1,0 +1,19 @@
+tests.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2660: 'GsmMapInfo::Make' : function does not take 4 arguments
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'loaded' : is not a member of 'GsmMapInfo::Values'
+        d:\dev\kenshi\ours\globalsatellitemap\tests\map-info\../../GsmMapInfo.h(6) : see declaration of 'GsmMapInfo::Values'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2660: 'GsmMapInfo::Make' : function does not take 4 arguments
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2660: 'GsmMapInfo::Make' : function does not take 4 arguments
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'Complete' : is not a member of 'GsmMapInfo'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C3861: 'Complete': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'Complete' : is not a member of 'GsmMapInfo'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C3861: 'Complete': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'Complete' : is not a member of 'GsmMapInfo'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C3861: 'Complete': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'Complete' : is not a member of 'GsmMapInfo'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C3861: 'Complete': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'Complete' : is not a member of 'GsmMapInfo'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C3861: 'Complete': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2660: 'GsmMapInfo::Make' : function does not take 4 arguments
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\map-info\tests.cpp(5) : error C2039: 'loaded' : is not a member of 'GsmMapInfo::Values'
+        d:\dev\kenshi\ours\globalsatellitemap\tests\map-info\../../GsmMapInfo.h(6) : see declaration of 'GsmMapInfo::Values'

@@ -1,0 +1,8 @@
+{
+  "helperSha256": "38fb5c16de4bfac275284e5c2402f4da57b616f4421d61ceb4135b89d577e4bd",
+  "results": {
+    "Od": "PASS 13 map-info controls",
+    "O2": "PASS 13 map-info controls"
+  },
+  "scope": "Pure actual metadata formatter policy; native XML/widget layout validated by parent game run."
+}

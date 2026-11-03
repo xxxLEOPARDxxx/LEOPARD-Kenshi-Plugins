@@ -19,8 +19,9 @@ measured aggregate of all live coarse/relighter/water/model/local-light,
 pending and retired GPU owners. `fineGpu` counts all old fine/pending/retired
 fine bytes; `occupied` counts their slots. These are owner-supplied measurements,
 not native receipts authenticated by this header. During production their
-combined value must be <=32MiB, and frozen K2's real137571380B reservation is
-added against the shared192MiB cap. K4 is not admitted. `producerCpu` MUST be
+coarse viewer aggregate must be <=32MiB. Existing fine tiles may remain
+within the measured shared192MiB cap after adding frozen K2's actual
+137571380B reservation. K4 is not admitted. `producerCpu` MUST be
 the actual owning NativeSession::CpuReservation(), including provider/controller
 and accepted payload costs. A mandatory frozen-payload lower floor rejects
 zero/tiny invented costs. `otherCpu` includes every other live CPU owner, writer,
@@ -44,10 +45,11 @@ and GPU state restoration remain the integrating coordinator's responsibility.
 This primitive alone cannot qualify an incomplete atlas for fine rendering.
 
 Run `python -B run_tests.py` with bundled Python/VC10x64/SDK7.1. /Od and /O2 each
-pass34586 production controls, including all1024 native cells' boundary keys,
+pass34600 production controls, including all1024 native cells' boundary keys,
 all local1m/3m mesh phases, independent viewport coverage, odd4cell pairing,
 QHD77-window capacity, fresh64bit scope/revision, strict zero-bank upload,
-CPU/GPU debt/caps, and real source-plan/shader jobs in all64 regions at both
+CPU/GPU debt/caps, reuse-aware pan capacity and exact retained-fine
+production headroom, and real source-plan/shader jobs in all64 regions at both
 1m and3m. PE imports are inspected before each executable and prohibit engine
 DLLs. Historical RED rejected the initial anchored key; a second observed RED
 caught a fabricated one-byte producer budget before its floor was added.
