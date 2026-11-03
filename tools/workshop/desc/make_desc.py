@@ -1258,7 +1258,7 @@ fork("Map-markers", "Map markers", """[h2]ЧТО ДЕЛАЕТ[/h2]
 [*]левый щелчок по метке - выбрать, по пустому месту - перенести выбранную; удалить - кнопкой «Удалить» в окне метки или клавишей Delete;
 [*]у меток есть типы и короткие подписи;
 [*]кнопка «Метки: Вкл/Выкл» внизу карты прячет и показывает их;
-[*]метки свои у каждого сохранения.
+[*]метки свои у каждого сохранения и сохраняются при его импорте.
 [/list]
 """, """[h2]WHAT IT DOES[/h2]
 
@@ -1269,7 +1269,7 @@ Your own markers on the world map - for notes: where the ore is, where it is dan
 [*]left-click a marker to select it, empty space to move the selected one; remove it with the Delete button in the marker window or the Delete key;
 [*]markers have types and short labels;
 [*]the "Markers: On/Off" button at the bottom of the map hides and shows them;
-[*]markers are kept per save.
+[*]markers are kept per save and preserved when importing that save.
 [/list]
 """)
 

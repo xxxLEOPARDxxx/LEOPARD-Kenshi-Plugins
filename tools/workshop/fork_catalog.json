@@ -878,17 +878,19 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "4",
+    "version": "5",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
         "Редактор переведён, расширен и показан поверх значков карты; добавлены удаление, закрытие с сохранением и выбор цвета подписи.",
-        "Подписи и кнопка не обрезаются; меньше повторных поисков и обновлений карты и меток."
+        "Подписи и кнопка не обрезаются; меньше повторных поисков и обновлений карты и меток.",
+        "Метки сохраняются при импорте сохранения и не смешиваются с другим прохождением."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
         "The translated editor is wider and above map icons, with Delete, save-and-close and label-color controls.",
-        "Labels and the button no longer clip, with fewer repeated searches and updates of the map and markers."
+        "Labels and the button no longer clip, with fewer repeated searches and updates of the map and markers.",
+        "Bookmarks survive importing a save and stay separate from other playthroughs."
       ]
     },
     "history": {
@@ -927,18 +929,30 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "5": {
+        "en": [
+          "[b]Bookmarks survive imports.[/b] Importing a save now preserves that saved world's custom map markers.",
+          "[b]Reliable saving.[/b] Manual saves, quicksaves, autosaves and Save As retain the current world's markers without mixing bookmarks from another playthrough."
+        ],
+        "ru": [
+          "[b]Метки сохраняются при импорте.[/b] Импорт сохранения больше не теряет пользовательские метки этого мира.",
+          "[b]Надёжное сохранение.[/b] Обычное сохранение, быстрое сохранение, автосохранение и «Сохранить как» сохраняют метки текущего мира, не смешивая их с другим прохождением."
+        ]
       }
     },
     "player_changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
         "Редактор переведён, расширен и показан поверх значков карты; добавлены удаление, закрытие с сохранением и выбор цвета подписи.",
-        "Подписи и кнопка не обрезаются; снижена нагрузка карты с метками."
+        "Подписи и кнопка не обрезаются; снижена нагрузка карты с метками.",
+        "Метки сохраняются при импорте сохранения и не смешиваются с другим прохождением."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
         "The translated editor is wider and above map icons, with Delete, save-and-close and label-color controls.",
-        "Labels and the button no longer clip; reduced map-marker overhead."
+        "Labels and the button no longer clip; reduced map-marker overhead.",
+        "Bookmarks survive importing a save and stay separate from other playthroughs."
       ]
     }
   },

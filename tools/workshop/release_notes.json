@@ -508,17 +508,15 @@
     ]
   },
   "Map-markers": {
-    "version": "4",
-    "published_version": "3",
+    "version": "5",
+    "published_version": "4",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "[b]Bookmarks survive imports.[/b] Importing a save now preserves that saved world's custom map markers.",
+      "[b]Reliable saving.[/b] Manual saves, quicksaves, autosaves and Save As retain the current world's markers without mixing bookmarks from another playthrough."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "[b]Метки сохраняются при импорте.[/b] Импорт сохранения больше не теряет пользовательские метки этого мира.",
+      "[b]Надёжное сохранение.[/b] Обычное сохранение, быстрое сохранение, автосохранение и «Сохранить как» сохраняют метки текущего мира, не смешивая их с другим прохождением."
     ]
   },
   "KenshiJobManagement": {

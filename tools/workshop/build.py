@@ -162,7 +162,7 @@ ITEMS = [
     dict(mod="BetterLooting", title="Better Looting (MCM fork) (QoL)", nexus=2218, version="5",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en='Rule-based looting, required-item lists, protected player storage, optional ground pickup and deposit to base storage.'),
-    dict(mod="Map-markers", title="Map markers (MCM fork) (QoL)", nexus=2211, version="4",
+    dict(mod="Map-markers", title="Map markers (MCM fork) (QoL)", nexus=2211, version="5",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Your own markers with labels on the world map, per save - a fork of Emkej8's "
             "mod with settings in Mod Config Menu."),
