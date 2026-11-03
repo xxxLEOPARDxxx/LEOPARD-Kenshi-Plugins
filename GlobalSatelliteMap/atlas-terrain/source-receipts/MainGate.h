@@ -2,7 +2,12 @@
 #include "WorkerFileLease.h"
 namespace SourceReceipts {
 // These native identity tokens stay on Main, never in WorkerRequest.
-struct MainSnapshot{U64 manager,group,archive,module,profile;WorkerRequest request;};
+enum SourceSemantics{NativeCompatible=0,OwnedRawIndexedFile=1};
+inline bool ListenerPolicyAllows(unsigned semantics,U64 listener){return semantics==OwnedRawIndexedFile||(semantics==NativeCompatible&&!listener);}
+inline bool EvidencePolicyAllows(unsigned semantics,bool ownedNamedFile){return semantics==NativeCompatible||(semantics==OwnedRawIndexedFile&&ownedNamedFile);}
+// Main-only listener identity. Raw indexed files are new plugin-owned inputs,
+// never an assertion about the stream returned by a native loading listener.
+struct MainSnapshot{U64 manager,group,archive,module,profile,listener;unsigned semantics;WorkerRequest request;};
 class MainToken{
  template<class Provider>friend class MainGate;
  MainSnapshot snapshot_;bool valid_;
@@ -21,7 +26,7 @@ public:
  void Clear(){valid_=false;std::memset(&snapshot_,0,sizeof(snapshot_));std::memset(&stamp_,0,sizeof(stamp_));}
  bool ValidFor(const Scope&now)const{return valid_&&SameScope(snapshot_.request.scope,now);}
 };
-inline bool SameSnapshot(const MainSnapshot&a,const MainSnapshot&b){return a.manager==b.manager&&a.group==b.group&&a.archive==b.archive&&a.module==b.module&&a.profile==b.profile&&SameRequest(a.request,b.request);}
+inline bool SameSnapshot(const MainSnapshot&a,const MainSnapshot&b){return a.manager==b.manager&&a.group==b.group&&a.archive==b.archive&&a.module==b.module&&a.profile==b.profile&&a.listener==b.listener&&a.semantics==b.semantics&&SameRequest(a.request,b.request);}
 template<class Provider>class MainGate{
  Provider&provider_;
  struct BankScope{Provider&p;BankScope(Provider&x):p(x){}~BankScope(){p.EndBank();}};

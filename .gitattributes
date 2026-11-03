@@ -25,3 +25,8 @@ tools/diagnostics/satellite-capture-probe/fixed_control_tests.cpp -text whitespa
 tools/diagnostics/satellite-capture-probe/freeze_fixed_control.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/diagnostics/satellite-capture-probe/prepare_fixed_terrain.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/diagnostics/satellite-capture-probe/test_fixed_control*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+tools/diagnostics/satellite-capture-probe/NativeReceiptControl.h -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/diagnostics/satellite-capture-probe/native_receipt_control* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/diagnostics/satellite-capture-probe/build_native_receipt_control.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/diagnostics/satellite-capture-probe/native-receipt-verification.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

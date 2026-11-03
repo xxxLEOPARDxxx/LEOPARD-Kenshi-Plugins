@@ -75,6 +75,7 @@
 #include "GpuCompressedUpload.h"
 #include "GeographyCompletion.h"
 #include "FixedTerrainControl.h"
+#include "NativeReceiptControl.h"
 #pragma comment(lib, "advapi32.lib")
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace
@@ -130,6 +131,9 @@ Ogre::CompositorWorkspaceListener *ourListener = NULL;
 std::vector<hand> handles;
 bool restorationSafe = true;
 bool fixedControlEnabled=false,fixedGsmStartupOff=false;
+bool nativeReceiptEnabled=false;
+DWORD nativeReceiptPollAt=0;
+ProbePolicy::RequestLatch nativeReceiptLatch;
 std::string fixedGsmIni;
 ProbePolicy::RequestLatch fixedRequestLatch;
 FixedTerrainControl::Controller fixedControl;
@@ -1584,6 +1588,22 @@ void Update(MapScreen *map)
             EnumWindows(FindWindowThread, 0);
         if (!OnMain())
             return;
+        if(nativeReceiptEnabled)
+        {
+            if(!ProbePolicy::PollDue(nativeReceiptPollAt,GetTickCount()))return;
+            nativeReceiptPollAt=GetTickCount();const unsigned token=GetPrivateProfileIntA("Probe","NativeReceiptRequest",0,requestIni.c_str());
+            if(!nativeReceiptLatch.Changed(token))return;
+            if(!token||!profileOK||!LoadedGuard()||!ou||!map||!map->getVisible()||inside||pending||fixedControl.Active()||atlasRun.active)
+            {ErrorLog("SatelliteCaptureProbe: native receipt token consumed outside checked idle world/map frame");return;}
+            SaveFileSystem*fs=SaveFileSystem::getSingleton();
+            if(!fs||fs->busy()){ErrorLog("SatelliteCaptureProbe: native receipt token consumed while save filesystem unavailable/busy");return;}
+            SourceReceipts::Scope scope={GetCurrentThreadId(),reinterpret_cast<SourceReceipts::U64>(ou),(1ULL<<32)|token,token};
+            NativeReceiptControl::Report report;HRESULT hr=NativeReceiptControl::Run(scope,report);
+            std::ostringstream summary;summary<<"native receipt metadata audit token="<<token<<" pid="<<GetCurrentProcessId()<<" thread="<<scope.thread<<" hr=0x"<<std::hex<<unsigned(hr)<<" profile=0x"<<unsigned(report.profile)<<" catalog=0x"<<unsigned(report.catalog)<<std::dec<<" groups="<<report.groups<<" attempts="<<report.attempts<<" accepted="<<report.accepted<<"; raw indexed original-file metadata only, not native listener stream; no source-file read/GPU/image change";
+            if(FAILED(hr))ErrorLog("SatelliteCaptureProbe: "+summary.str());else Log(summary.str());
+            for(unsigned i=0;i<report.attempts;++i){const NativeReceiptControl::Attempt&a=report.item[i];std::ostringstream row;row<<"native receipt group="<<a.group<<" resource="<<a.resource<<" hr=0x"<<std::hex<<unsigned(a.status)<<" path="<<a.path;Log(row.str());}
+            return;
+        }
         if(fixedControlEnabled)
         {
             if(fixedControl.Quarantined()){if(cleanup)Drop();return;}
@@ -1851,6 +1871,8 @@ __declspec(dllexport) void startPlugin()
     try
     {
         requestIni=Folder()+"SatelliteCaptureProbe.ini";
+        nativeReceiptEnabled=GetPrivateProfileIntA("Probe","NativeReceiptControl",0,requestIni.c_str())==1;
+        nativeReceiptLatch.Changed(GetPrivateProfileIntA("Probe","NativeReceiptRequest",0,requestIni.c_str()));
         fixedControlEnabled=GetPrivateProfileIntA("Probe","FixedTerrainControl",0,requestIni.c_str())==1;
         if(fixedControlEnabled)
         {

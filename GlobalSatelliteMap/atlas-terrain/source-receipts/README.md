@@ -3,7 +3,7 @@
 This C++03/Win64 component supplies a production metadata provider, a Win32-only
 file lease and a source acceptance gate. It is separate from Main, the private
 probe, texture upload, staging shaders, atlas writing and installed mods.
-**The actual native metadata API has not been executed in-game.**
+The actual native metadata API has now been exercised by an opt-in Main audit: the default strict-null policy correctly refused the normal RE_Kenshi listener; explicit raw-indexed metadata found the one expected Overlaymaps file. This is metadata capture, not yet worker acceptance or a completed rendered frame.
 `NativeMetadata::LiveFrameAdapterTested` is explicitly false. The next integration
 must provide the checked owning-frame/world/job adapter and actual runtime tests.
 Compilation and host controls are not presented as a live source-winner result.
@@ -69,8 +69,7 @@ manager recursive lock. The exact name index wins before the native-CRT-lowercas
 index. The original resource name is retained for path construction; the lowered
 key is not substituted. Native index population overwrites duplicate names with
 later registered indexed archives; this provider reads that actual mapped value,
-not all FileInfo matches or a manual mod-priority walk. Both loading-listener
-checks must be NULL. Only the **exact exported FileSystem vptr0x682dc8** is allowed;
+not all FileInfo matches or a manual mod-priority walk. Under the default `NativeCompatible` policy both loading-listener checks must be NULL. Explicit `OwnedRawIndexedFile` semantics instead describe the original file selected by the actual named group index, before any native listener transformation. This mode binds only new `OwnedNamedFile` inputs, never observed native resources. MainSnapshot stamps the full64-bit listener pointer and semantics; capture checks the pointer before/after, acceptance compares both, and bank commit checks every stamp under its locks. The listener is never called or passed to a worker. A stable pointer is only an invalidation signal, not proof of the listener's internal behavior or delivered stream contents. Only the **exact exported FileSystem vptr0x682dc8** is allowed;
 archive type text alone cannot prove it. Missing indexes, ZIP/custom archives,
 fallback location/group searches and unknown encodings refuse.
 
@@ -180,3 +179,9 @@ All files written by this workflow are inside this new component's ignored outpu
 tree. There are no game/INI/install/hook/process/UI actions. Runtime native source
 acceptance, checked-frame integration, format decoding and final GPU publication
 remain the parent's next concrete integration stage.
+
+## Live naming evidence2026-11-03
+
+The live DDS Image::load caller uses `Landscape` and the DDS basename. Painted image construction uses `Overlaymaps`; its material texture route uses AUTODETECT, so do not infer historical GPU group identity from a path. The chosen owned raw input contract uses explicit Overlaymaps+basename, with exact `blendMap.png` for the shared blend image. Canonical content pins are distinct from logical resource names. See docs/verification/2026-11-03-satellite-owned-source-inputs.md.
+
+Listener tests run41 checks under both/O2 and/Od and reject four separately compiled listener-high32, semantics, invalid-mode and borrowed-evidence mutants. Actual lease tests also withdraw bytes when either listener identity or semantics changes. The existing29 Win32 fault paths and nine mutations remain green.

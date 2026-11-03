@@ -10,7 +10,7 @@ def run(name,args):
 for name in ['prepare_profile','build_native']:
  code=run(name,[sys.executable,str(HERE/(name+'.py'))])
  if code:sys.exit(code)
-for name in ['tests','abi_tests']:
+for name in ['tests','abi_tests','listener_tests']:
  code=run(name+'-build',[str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3','/DNDEBUG','/DWIN32',str(HERE/(name+'.cpp')),'/Fo'+str(OUT/(name+'.obj')),'/Fe'+str(OUT/(name+'.exe')),'/link','advapi32.lib'])
  if code:sys.exit(code)
  pe=pefile.PE(str(OUT/(name+'.exe')))
@@ -18,4 +18,7 @@ for name in ['tests','abi_tests']:
  code=run(name,[str(OUT/(name+'.exe'))])
  if code:sys.exit(code)
 code=run('controls',[sys.executable,str(HERE/'test_controls.py')])
+if code:sys.exit(code)
+
+code=run("listener-controls",[sys.executable,str(HERE/"test_listener_controls.py")])
 if code:sys.exit(code)

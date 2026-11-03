@@ -1,0 +1,47 @@
+{
+  "scope": "opt-in raw-indexed metadata one-shot only; not complete native frame adapter",
+  "sources": {
+    "CaptureProbe.cpp": "8126effe48e974058dd572de234abad565ae0ec2c159d8e1cd2f4729f0df9e96",
+    "SatelliteCaptureProbe.ini": "1b5fb5d587790f7fd22112be0919ce86ec07a5a4dcfe6dfa1f3b5d61895afc8a",
+    "NativeReceiptControl.h": "e6661f5aea8a73c910b60003b7239695cd7ed702f0fcd684d09311cfcdca15d9",
+    "native_receipt_control_compile.cpp": "888cbf27cd70a46710e6d1dedbe899d024d4a25f0fc848f105bb329b5b8d3491",
+    "build_native_receipt_control.py": "eaa9c2d6b0a841d04a3105d2e7fbb9c5378297e7c36fdf6c52ac6e857e0421c5"
+  },
+  "provider": {
+    "MainGate.h": "9da2c4f1c09542a6c5a32d46dda9392471d30f6a6922e3ff5effbf9572ade2b7",
+    "NativeMetadata.h": "bbfe997c4293028cc1fdf1d6b5de6cd3ab571b1da067e340867a6b1f2b6e340c",
+    "ReceiptPolicy.h": "ff91b3628e5a2e4099c4b1ebbf584c39fd38834b145f6a17034f9f8532a27a52",
+    "WorkerFileLease.h": "887c19c77044eb61d50930502a1fffa8c83b016fa5235d82548b07aaa3871d30",
+    "verification.json": "0a79dc70c655ccb094a45c97e81015187fe99c42cc64469125020eb5a7e66e1f"
+  },
+  "candidate": {
+    "bytes": 687616,
+    "sha256": "74ac14c020e7bdd120235a98b26320f40e2697f7e1a9f894b9c9f7bec321c65c"
+  },
+  "runtime": [
+    {
+      "token": 1701,
+      "pid": 29860,
+      "groups": 16,
+      "attempts": 80,
+      "captured": 0,
+      "semantics": "strict-null refusal"
+    },
+    {
+      "token": 1702,
+      "pid": 30220,
+      "groups": 15,
+      "attempts": 75,
+      "captured": 1,
+      "semantics": "owned raw-indexed metadata",
+      "group": "Overlaymaps",
+      "logicalName": "new_overlay.3.3.png"
+    }
+  ],
+  "limitations": [
+    "No file-content acceptance in these audits",
+    "No GPU/image change",
+    "One named PNG source only; all-role source adapter pending",
+    "No FPS/long-run memory claim"
+  ]
+}
