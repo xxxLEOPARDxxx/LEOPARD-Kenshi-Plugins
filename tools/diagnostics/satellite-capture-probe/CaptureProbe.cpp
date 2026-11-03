@@ -77,6 +77,11 @@
 #include "FixedTerrainControl.h"
 #include "NativeReceiptControl.h"
 #include "WorldFrameControl.h"
+static void TraceWorldCohortFailure(unsigned region,unsigned cell,unsigned state,unsigned slot,unsigned input,unsigned cursor,unsigned view,HRESULT error)
+{
+    std::ostringstream s;s<<"SatelliteCaptureProbe: cohort refused region="<<region<<" cell="<<cell<<" state="<<state<<" stage="<<slot<<" input="<<input<<" cursor="<<cursor<<" view="<<view<<" hr=0x"<<std::hex<<unsigned(error);ErrorLog(s.str());
+}
+#define WORLD_COHORT_FAILURE(region,cell,state,slot,input,cursor,view,error) TraceWorldCohortFailure(region,cell,state,slot,input,cursor,view,error)
 #include "../../../GlobalSatelliteMap/atlas-terrain/world-native/NativeProvider.h"
 #include "../../../GlobalSatelliteMap/atlas-terrain/world-native-rebind/NativeSession.h"
 #include "../../../GlobalSatelliteMap/atlas-terrain/world-build/WorldBuildControl.h"

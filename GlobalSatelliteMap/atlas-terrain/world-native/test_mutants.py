@@ -4,7 +4,7 @@ HERE=Path(__file__).resolve().parent;OUT=HERE/'_generated/mutants';OUT.mkdir(par
 VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
 ENV=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
 mutants={
- 'wrong-group':{'SourceFactory.h':[("!std::strcmp(r.group,index<3?\"Overlaymaps\":\"Landscape\")",'true')]},
+ 'wrong-group':{'SourceFactory.h':[("!std::strcmp(r.group,group)",'true')]},
  'canonical-alias':{'SourceFactory.h':[("&&!std::strcmp(r.resource,name)",'&&(!std::strcmp(r.resource,name)||!std::strcmp(r.resource,canonicalPath))')]},
  'slot-zero-routing':{'StageAdapter.h':[("return stages_[r.role.slot].Capture(r,out)",'return stages_[0].Capture(r,out)')]},
  # An unsafe adapter might truncate a combined64-role bank to its first SID.

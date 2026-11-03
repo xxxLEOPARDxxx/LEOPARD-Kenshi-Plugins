@@ -1,7 +1,7 @@
 {
   "scope": "Isolated Main-only raw indexed NativeMetadata stage adapter and plain source factory; no world-stream/Main edits",
   "status": "implementer checks PASS; independent review in progress",
-  "recordedUtc": "2026-11-03T04:22:59.767442+00:00",
+  "recordedUtc": "2026-11-03T09:34:12.063559+00:00",
   "sourceFiles": {
     ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
     "freeze.py": "ac94861d08d3163c075ca2ffee5db99b6f32069158dbefbdaae5c3f63fe30ff7",
@@ -9,9 +9,9 @@
     "NativeProvider.h": "4c7268431302518edfa39292168ecf282ecf5b146cd988e84655872fc45ce144",
     "README.md": "5662b8a9cf3cbd73fa83f84bcb8f6c3c08af1b43eb1a5581f12afa6dda6bc319",
     "run_tests.py": "da4f973b7d7720e000694eda255ef4e7b6930f09b18029b1c313bce12eaf41a2",
-    "SourceFactory.h": "b2d9fd7a185f590b2ad1a705f4588e31e564e16f47084beb6cea6353a37f3e7c",
+    "SourceFactory.h": "eb99bc837c802509585fbbf333eabb374cd666a11d8560d7c6ea26f495de8155",
     "StageAdapter.h": "0554fd314cf6c4acb9c5942cfa062d66250d8a5bfcb4b8de8dbafb148a2d5937",
-    "test_mutants.py": "06029ea9b544f2f28d85f6f3d36d8e41fcace79120650232f245e92709ce5e9e",
+    "test_mutants.py": "3fd0fde383cbcb4a07914804cf5a126204f8faa60a69f94627fb6ebb5a108327",
     "tests.cpp": "8377112174d9b191a894e09fd7cde17d59d94ebf99d00fa6d47c6cea123bd4e9"
   },
   "dependencies": {
@@ -953,7 +953,7 @@
   },
   "evidence": {
     "_generated\\dependencies-after.log": "287efaeb58a05d8a7426833c87f4f5c8476efb4d747102654254ac4848fb6c26",
-    "_generated\\dependencies-before.json": "c04d025c95676caf9d3e87676f0240a9cdb3041811f5a07c41e78815b191c614",
+    "_generated\\dependencies-before.json": "2069e3f70559d4d37bfb99e0ad1096a5836a038cf15a781ddef6230a56a32af6",
     "_generated\\dependencies-before.log": "8271c63302e94dffc844a8fc18c78a26a3b10290690db91e1afc6068525682c5",
     "_generated\\dependencies-scan.log": "b23d4b422fdfff88e2f1ba833fd9947f4f46a75b32716c6d74250051aedca842",
     "_generated\\hostO2-build.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
@@ -962,32 +962,32 @@
     "_generated\\hostOd.log": "65464651ec06b02ff1fc4d7d795bb2798e1ab84471dc8f326eaa7e26249ede28",
     "_generated\\mutants\\canonical-alias\\build.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\canonical-alias\\run.log": "5926c805f86f412e76a49751d0afc4971f4fd9627eb3b20d0f0892faf9573afb",
-    "_generated\\mutants\\canonical-alias\\SourceFactory.h": "85b2f2c20aa4fb6417e851be89f8a21e83b642470f37568d019f43c477737a9f",
+    "_generated\\mutants\\canonical-alias\\SourceFactory.h": "6faee51e3cd75ec865486c9e75a20af993b5a9959ba7bd85f59f59e317309635",
     "_generated\\mutants\\canonical-alias\\StageAdapter.h": "1c319f9a738fc806ba45baa4c21680914311788d2ee2c712ef054d2b91229a9f",
     "_generated\\mutants\\canonical-alias\\tests.cpp": "1b2c4a605704e827b8af7eb3d7268ee5c1cebe4578bf0b4afe87a87a6383d2c1",
     "_generated\\mutants\\slot-zero-routing\\build.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\slot-zero-routing\\run.log": "8813eec7eb043573ce5e269c1e1772240e46259984990d0533d9aedac8363fde",
-    "_generated\\mutants\\slot-zero-routing\\SourceFactory.h": "adcf63a86467883a8402a10b88f69f31b213538d18d839752af10a6bd68b6512",
+    "_generated\\mutants\\slot-zero-routing\\SourceFactory.h": "9d536f4de66ee30fca98a4c33b133c52c1fc02d2da269fe36f32760edb6f7169",
     "_generated\\mutants\\slot-zero-routing\\StageAdapter.h": "c5d1e6f4f34c636e76ffad2bbd348f096404fabe41158527ee0976e4338ed016",
     "_generated\\mutants\\slot-zero-routing\\tests.cpp": "1b2c4a605704e827b8af7eb3d7268ee5c1cebe4578bf0b4afe87a87a6383d2c1",
     "_generated\\mutants\\truncate-full64-bank\\build.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\truncate-full64-bank\\run.log": "9c9694ccb07c00e42a15eebe8c12f3f1c10330e2222653750a7fb83e97ea1a0a",
-    "_generated\\mutants\\truncate-full64-bank\\SourceFactory.h": "adcf63a86467883a8402a10b88f69f31b213538d18d839752af10a6bd68b6512",
+    "_generated\\mutants\\truncate-full64-bank\\SourceFactory.h": "9d536f4de66ee30fca98a4c33b133c52c1fc02d2da269fe36f32760edb6f7169",
     "_generated\\mutants\\truncate-full64-bank\\StageAdapter.h": "fdaee3c673b8171ce1a763466004be3ae3e3786e7352f5ab22af745a877ec9ce",
     "_generated\\mutants\\truncate-full64-bank\\tests.cpp": "1b2c4a605704e827b8af7eb3d7268ee5c1cebe4578bf0b4afe87a87a6383d2c1",
     "_generated\\mutants\\wrong-group\\build.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\wrong-group\\run.log": "35d110c7e11465338a2c5de6ec8fad781b7a24fcda373c5d54f179b5536cd71e",
-    "_generated\\mutants\\wrong-group\\SourceFactory.h": "636927e0a8a8a022c2c5d6d6923edac914bce9538849a16e7fd4bc2c8c51df7f",
+    "_generated\\mutants\\wrong-group\\SourceFactory.h": "e03b3a4cad1eb2d21e4f27bd0b7a33c4aeda10dabdd43fbe5162c709fb040730",
     "_generated\\mutants\\wrong-group\\StageAdapter.h": "1c319f9a738fc806ba45baa4c21680914311788d2ee2c712ef054d2b91229a9f",
     "_generated\\mutants\\wrong-group\\tests.cpp": "1b2c4a605704e827b8af7eb3d7268ee5c1cebe4578bf0b4afe87a87a6383d2c1",
     "_generated\\mutants.log": "ef991e7e65a8f8369e04253c81e7daa27df1c8f23a7e93aaca8be095a91cd2a9",
     "_generated\\native-build.log": "3989dcf506407542125a3530ec6c8e3dde8b6486b2d88fd1e04ba1693b058ddf",
-    "_generated\\run-session.json": "ae6cb7734c1032beab55349a18fb1b01663c652ddef6ae304540c8ae7855d39d"
+    "_generated\\run-session.json": "68857b6439276c67b4acf8c51b74bcbe5f044df67e01a4305398bd12c364a30b"
   },
   "artifacts": {
     "hostOd.exe": {
-      "sha256": "25ca3f5cc5957411377829169ed13ddf2969f9e5fc610c2a8701d5fd9b125391",
-      "bytes": 295936,
+      "sha256": "e58875a44cc1284e70c09d0e48732896300f1a37d03c06bdf337da131dc93767",
+      "bytes": 296448,
       "imports": {
         "MSVCR100.dll": [
           "??2@YAPEAX_K@Z",
@@ -1052,8 +1052,8 @@
       "executedByHost": true
     },
     "hostO2.exe": {
-      "sha256": "7b21f90707593e28275184e9bce0b8ef5d950a75a2606e11dd864aa7ba6418b4",
-      "bytes": 244736,
+      "sha256": "7cb98865c03a21615ee9e41cbad70bab1decef8c18b92f0ec7c1c9f38ff5a31e",
+      "bytes": 245248,
       "imports": {
         "MSVCR100.dll": [
           "??2@YAPEAX_K@Z",
@@ -1116,8 +1116,8 @@
       "executedByHost": true
     },
     "native-contract.dll": {
-      "sha256": "8aa137775562c7d64a0c6f7b7ed08f304e23e1470aac0ca234733a97207cb54b",
-      "bytes": 284672,
+      "sha256": "6c4d0b2920a4b1e21fbe2a3ff83ad7f117f9c5652401b8b7453d2ab30e046d75",
+      "bytes": 285696,
       "imports": {
         "OgreMain_x64.dll": [
           "?deallocBytes@NedPoolingImpl@Ogre@@SAXPEAX@Z",
@@ -1219,7 +1219,7 @@
     {
       "name": "dependencies-before",
       "args": [
-        "C:\\Program Files\\Python314\\python.exe",
+        "C:\\Users\\User\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
         "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\freeze.py",
         "--snapshot"
       ],
@@ -1302,7 +1302,7 @@
     {
       "name": "mutants",
       "args": [
-        "C:\\Program Files\\Python314\\python.exe",
+        "C:\\Users\\User\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
         "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\test_mutants.py"
       ],
       "exitCode": 0
@@ -1310,7 +1310,7 @@
     {
       "name": "dependencies-after",
       "args": [
-        "C:\\Program Files\\Python314\\python.exe",
+        "C:\\Users\\User\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
         "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\freeze.py",
         "--check-snapshot"
       ],

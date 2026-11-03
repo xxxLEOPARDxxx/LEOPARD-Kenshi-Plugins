@@ -1,0 +1,30 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include "../SourceFactory.h"
+#include <cstdio>
+#include <fstream>
+static unsigned checks=0;
+static void C(bool v,const char*m){++checks;if(!v){printf("FAIL %s\n",m);throw 1;}}
+struct IndexedArchiveProvider{
+ bool changeArchive;IndexedArchiveProvider():changeArchive(false){}
+ HRESULT Capture(const SourceReceipts::WorkerRequest&r,SourceReceipts::MainSnapshot&out){
+  std::memset(&out,0,sizeof(out));out.manager=1;out.group=!std::strcmp(r.group,"General")?2:3;out.archive=changeArchive?77:out.group+10;out.module=4;out.profile=5;out.listener=6;out.semantics=SourceReceipts::OwnedRawIndexedFile;out.request=r;
+  const char*parent=!std::strcmp(r.group,"General")?"D:/SteamLibrary/steamapps/common/Kenshi/data/newland/Assets/Textures":"D:/SteamLibrary/steamapps/common/Kenshi/data/newland/land/textures";
+  if(!SourceReceipts::Copy(out.request.archive,SourceReceipts::TextLimit,parent)||!SourceReceipts::Copy(out.request.archiveType,sizeof(out.request.archiveType),"FileSystem"))return E_INVALIDARG;out.request.lookup=SourceReceipts::Insensitive;return SourceReceipts::ResolvePath(out.request)?S_OK:E_INVALIDARG;
+ }
+ HRESULT Refresh(const SourceReceipts::MainSnapshot&before,SourceReceipts::MainSnapshot&out){return Capture(before.request,out);}
+ HRESULT BeginBank(const SourceReceipts::MainSnapshot*,unsigned,const SourceReceipts::Scope&){return S_OK;}void EndBank(){}
+};
+static SourceReceipts::Scope Scope(){SourceReceipts::Scope s={GetCurrentThreadId(),0x200000003ULL,0x400000007ULL,0x800000009ULL};return s;}
+static void ActualRequest(unsigned input,SourceReceipts::WorkerRequest&r){SourceReceipts::Scope s=Scope();WorldRaster::Frame f={};f.source.value=s.sourceEpoch;f.source.profile=WorldBank::PinnedBaseSnapshot;f.materialGeneration=8;f.generation=s.job;f.region=2;f.cell=0;f.side=512;WorldMaterial::Planner p;WorldMaterial::Plan plan;C(p.Init(s.sourceEpoch)&&p.Build(2,0,s.sourceEpoch,0,plan),"realregion2cell0 sourceplan");WorldNative::SourceFactory factory;C(SUCCEEDED(factory.Init(f,plan,s))&&factory.Request(1,input,r),"actualstage1 request");C(factory.Matches(r),"request matchesownfactory");SourceReceipts::WorkerRequest wrong=r;SourceReceipts::Copy(wrong.group,SourceReceipts::TextLimit,"Landscape");C(!factory.Matches(wrong),"wrongLandscape group cannot masquerade ascanonicalAssets role");}
+int main(){try{
+ SourceReceipts::WorkerRequest r;ActualRequest(3,r);C(!std::strcmp(r.group,"General"),"canonicalAssets/Textures mustuseGeneral notLandscape basenamecollision");C(r.role.asset==1&&r.pin.bytes==5592560&&!std::strcmp(r.resource,"boneloop_dif_white.dds"),"actualfailedstage1input3 identity andsize unchanged");BYTE pin[32];C(WorldNative::Sha("ec0e13f7d023eec1ac9842a0553f2caaf28dc0c3ad0622175214b00e4a5d0457",pin)&&!std::memcmp(pin,r.pin.sha,32),"canonicalhash neverrewritten towrongindexedwinner");
+ // Current native group namespaces are explicit in resources.cfg. The runtime
+ // Newland archive remap keeps those group roles, never merges their basenames.
+ std::ifstream cfg("D:/SteamLibrary/steamapps/common/Kenshi/resources.cfg");C(!!cfg,"actualresources configuration");std::string line,group;bool assetsGeneral=false;while(std::getline(cfg,line)){if(line.size()&&line[0]=='[')group=line;if(line.find("FileSystem=./data/newland/Assets/Textures")!=std::string::npos)assetsGeneral=group.find("[General]")==0;}C(assetsGeneral,"physicalAssetsregisteredGeneral inactualresourcescfg");
+ unsigned general=0,landscape=0;for(unsigned asset=0;asset<SatelliteRegion::Data.assetCount;++asset){const char*path=SatelliteRegion::Data.assets[asset].path;const char*g=WorldNative::DdsGroupForCanonical(path);C(g!=NULL,"all219pinnedcatalog parents haveexplicitnativegroup");const bool isBone=asset<2;C(!std::strcmp(g,isBone?"General":"Landscape"),"independent219knowncatalog group partition");if(isBone)++general;else ++landscape;}C(general==2&&landscape==217,"exact2General217Landscape partition");
+ C(!WorldNative::DdsGroupForCanonical("data/newland/assets/textures-evil/boneloop.dds")&&!WorldNative::DdsGroupForCanonical("mods/example/boneloop.dds")&&!WorldNative::DdsGroupForCanonical("data/newland/land/textures/nested/boneloop.dds")&&!WorldNative::DdsGroupForCanonical("data/newland/assets/textures/../boneloop.dds")&&!WorldNative::DdsGroupForCanonical("data/newland/assets/textures/..")&&!WorldNative::DdsGroupForCanonical(NULL),"unknownnestedtraversalandprefixaliasesrefused");
+ IndexedArchiveProvider provider;SourceReceipts::MainGate<IndexedArchiveProvider>gate(provider);SourceReceipts::MainToken token;SourceReceipts::AcceptedReceipt accepted;SourceReceipts::WorkerFileLease lease;SourceReceipts::WorkerRequest old=r;SourceReceipts::Copy(old.group,SourceReceipts::TextLimit,"Landscape");C(SUCCEEDED(gate.Capture(old,Scope(),token)),"oldbasename namespace canmetadataresolve");SourceReceipts::WorkerRequest opened;C(token.Request(opened)&&std::strstr(opened.path,"\\land\\textures\\")!=NULL,"oldgroup actuallyresolvesotherphysicalarchive");C(lease.Open(opened,NULL,0)==E_INVALIDARG&&!lease.Ready(),"realwrongfilesame5592560bytes butdifferentSHA iscorrectlyrefused");
+ C(SUCCEEDED(gate.Capture(r,Scope(),token))&&token.Request(opened),"correctgroup metadata snapshot");C(std::strstr(opened.path,"\\Assets\\Textures\\")!=NULL,"correctactualarchive identity hascorrectcanonicalfullpath");C(SUCCEEDED(lease.Open(opened,NULL,0))&&lease.Ready()&&!lease.Data(),"realcanonicalfilehash acceptedworkerbytesremainunpublishedbeforeFresh");C(SUCCEEDED(gate.Accept(token,lease,Scope(),accepted))&&lease.Data()&&accepted.ValidFor(Scope()),"actualproductionGateFresh accepts correctregisteredarchiveandhash");provider.changeArchive=true;C(gate.Accept(token,lease,Scope(),accepted)==E_ACCESSDENIED&&!lease.Data(),"archiveidentitychange stillwithdrawsconsumer access");lease.Clear();
+ ActualRequest(9,r);C(r.role.asset==2&&!std::strcmp(r.group,"General"),"matchingboneloopnormalalsousesGeneral");
+ printf("PASS %u canonicalgroup/physicalcollision productioncontrols\n",checks);return 0;
+ }catch(...){return 1;}}

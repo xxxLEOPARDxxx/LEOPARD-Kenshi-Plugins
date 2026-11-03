@@ -9,11 +9,22 @@ inline const char*CanonicalPath(U64 asset){if(asset&&asset<=SatelliteRegion::Dat
 // DDS IDs:1..219. PNG IDs:0x10000..0x10080. Padding roles share the first
 // canonical source but remain distinct role indices in the stage transaction.
 inline const char*Basename(const char*path){if(!path)return NULL;const char*name=path;for(const char*p=path;*p;++p)if(*p=='/'||*p=='\\')name=p+1;return *name?name:NULL;}
+// Native resource groups have independent basename indexes. The two authored
+// Assets/Textures bone sources are registered in General; resolving them in
+// Landscape silently selects different vanilla files with the same basename.
+// Restrict this routing to the exact pinned catalog parent namespaces.
+inline const char*DdsGroupForCanonical(const char*path){
+ if(!path||!SourceReceipts::Ascii(path,SourceReceipts::TextLimit))return NULL;
+ const char*name=Basename(path);if(!name||!std::strcmp(name,".")||!std::strcmp(name,".."))return NULL;
+ const size_t parent=size_t(name-path);static const char assets[]="data/newland/assets/textures/",land[]="data/newland/land/textures/";
+ if(parent==sizeof(assets)-1&&!std::memcmp(path,assets,parent))return "General";
+ if(parent==sizeof(land)-1&&!std::memcmp(path,land,parent))return "Landscape";return NULL;
+}
 inline bool ValidateSourceName(const SourceReceipts::WorkerRequest&r,const char*canonicalPath,unsigned index){
  if(index>=InputsPerSid||!canonicalPath||!SourceReceipts::Ascii(canonicalPath,SourceReceipts::TextLimit)||!SourceReceipts::Ascii(r.group,SourceReceipts::TextLimit)||!SourceReceipts::Ascii(r.resource,SourceReceipts::TextLimit))return false;
  const char*name=Basename(canonicalPath);if(!name)return false;
  if(index==2){if(std::strcmp(canonicalPath,WorldBank::RgbaPins[128].path))return false;name="blendMap.png";}
- return !std::strcmp(r.group,index<3?"Overlaymaps":"Landscape")&&!std::strcmp(r.resource,name);
+ const char*group=index<3?"Overlaymaps":DdsGroupForCanonical(canonicalPath);return group&&!std::strcmp(r.group,group)&&!std::strcmp(r.resource,name);
 }
 inline bool Sha(const char*text,BYTE(&out)[32]){if(!text)return false;for(unsigned i=0;i<32;++i){unsigned a=text[i*2],b=text[i*2+1];if(!((a>='0'&&a<='9')||(a>='a'&&a<='f'))||!((b>='0'&&b<='9')||(b>='a'&&b<='f')))return false;a=a<='9'?a-'0':a-'a'+10;b=b<='9'?b-'0':b-'a'+10;out[i]=BYTE(a*16+b);}return !text[64];}
 inline unsigned InputIndex(const SourceReceipts::Role&r){switch(r.kind){case SourceReceipts::PaintedOverlay:return r.index?InputsPerSid:0;case SourceReceipts::PaintedColour:return r.index?InputsPerSid:1;case SourceReceipts::Blend:return r.index?InputsPerSid:2;case SourceReceipts::Diffuse:return r.index<6?3+r.index:InputsPerSid;case SourceReceipts::Normal:return r.index<6?9+r.index:InputsPerSid;default:return InputsPerSid;}}
@@ -36,7 +47,8 @@ public:
   if(index<3){const unsigned pin=index==2?128:index*64+frame_.region;const WorldBank::RgbaPin&p=WorldBank::RgbaPins[pin];path=p.path;hash=p.encodedSha;r.pin.bytes=p.encodedBytes;r.role.asset=0x10000ULL+pin;r.role.kind=index==0?SourceReceipts::PaintedOverlay:index==1?SourceReceipts::PaintedColour:SourceReceipts::Blend;}
   else{const unsigned kind=(index-3)/6,layer=(index-3)%6;const WorldMaterial::Bank&b=plan_.stage[slot].banks[kind];if(!b.count||b.count>6)return false;const unsigned asset=b.upload[layer<b.count?layer:0];if(asset>=SatelliteRegion::Data.assetCount)return false;const SatelliteRegion::Asset&a=SatelliteRegion::Data.assets[asset];path=a.path;hash=a.sha256;r.pin.bytes=a.bytes;r.role.asset=U64(asset)+1;r.role.kind=kind?SourceReceipts::Normal:SourceReceipts::Diffuse;r.role.index=layer;}
   r.pin.asset=r.role.asset;const char*name=index==2?"blendMap.png":Basename(path);
-  if(!name||!SourceReceipts::Copy(r.resource,sizeof(r.resource),name)||!SourceReceipts::Copy(r.group,sizeof(r.group),index<3?"Overlaymaps":"Landscape")||!Sha(hash,r.pin.sha)||!ValidateSourceName(r,path,index)||!SourceReceipts::ValidNamed(r))return false;
+  const char*group=index<3?"Overlaymaps":DdsGroupForCanonical(path);
+  if(!name||!group||!SourceReceipts::Copy(r.resource,sizeof(r.resource),name)||!SourceReceipts::Copy(r.group,sizeof(r.group),group)||!Sha(hash,r.pin.sha)||!ValidateSourceName(r,path,index)||!SourceReceipts::ValidNamed(r))return false;
   out=r;return true;
  }
  bool Matches(const SourceReceipts::WorkerRequest&r)const{

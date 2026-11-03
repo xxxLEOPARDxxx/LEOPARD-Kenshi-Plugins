@@ -14,3 +14,5 @@ GlobalSatelliteMap/atlas-terrain/world-cohort/_generated/
 GlobalSatelliteMap/atlas-terrain/world-cohort/__pycache__/
 GlobalSatelliteMap/atlas-terrain/world-native-rebind/_generated/
 GlobalSatelliteMap/atlas-cache/world-build-disk/_generated/
+
+tools/diagnostics/satellite-capture-probe/_generated/

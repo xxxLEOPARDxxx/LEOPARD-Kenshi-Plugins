@@ -45,7 +45,15 @@ template<class Provider>class Controller{
  void GpuClear(){FrameClear();gpu_->bank.Clear();gpu_->device.Reset();bankEpoch_=0;}
  HRESULT Fence(){if(gpu_->context.p&&gpu_->query.p&&!queryPending_){WorldBank::Predicate pred(gpu_->context.p);gpu_->context.p->End(gpu_->query.p);gpu_->context.p->Flush();queryPending_=true;}return S_OK;}
  HRESULT Drained(){if(!queryPending_)return S_OK;HRESULT hr=gpu_->device.p->GetDeviceRemovedReason();return FAILED(hr)?hr:gpu_->context.p->GetData(gpu_->query.p,NULL,0,D3D11_ASYNC_GETDATA_DONOTFLUSH);}
- HRESULT Refuse(HRESULT hr){error_=FAILED(hr)?hr:E_FAIL;Cancel();return error_;}
+ HRESULT Refuse(HRESULT hr){
+  error_=FAILED(hr)?hr:E_FAIL;
+#ifdef WORLD_COHORT_FAILURE
+  // Optional private-caller diagnostics, only on refusal and before Cancel
+  // replaces the failing state. No callback, allocation or logging by default.
+  try{WORLD_COHORT_FAILURE(job_.frame[0].region,job_.frame[0].cell,state_,slot_,input_,cursor_,output_,error_);}catch(...){}
+#endif
+  Cancel();return error_;
+ }
  void QuarantineOwners(){quarantined_=true;state_=Failed;QuarantineRecord&q=Quarantine();q.work=work_;q.gpu=gpu_;q.thread=thread_;q.cpuBytes=CpuReservation();q.gpuBytes=MaximumGpuReservation();InterlockedExchange(&q.marked,1);}
  void ReleaseJoinedWorker(){CloseHandle(thread_);thread_=NULL;CloseHandle(work_->wake);CloseHandle(work_->cancel);delete work_;work_=NULL;InterlockedExchange(&WorldStream::WorkerSlot(),0);}
  bool ValidRequest(unsigned slot,unsigned index,const SourceReceipts::WorkerRequest&r)const{return SourceReceipts::Valid(r)&&SourceReceipts::SameScope(r.scope,job_.scope)&&r.role.slot==slot&&WorldNative::InputIndex(r.role)==index&&factory_.Matches(r);}
