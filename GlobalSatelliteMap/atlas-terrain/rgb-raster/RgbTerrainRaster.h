@@ -84,4 +84,3 @@ public:
  ID3D11ShaderResourceView*Output(unsigned i)const{return hasFrame_&&i<3?targets_.View(i):NULL;}
 };
 }
-

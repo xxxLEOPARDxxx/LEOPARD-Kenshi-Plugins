@@ -64,3 +64,39 @@ Packed material still has an independent neighbour/phase decode edge; a private
 full-RGB terrain writer is being verified separately. The current atlas and
 personal settings remain available as fallback. No public release or journal
 entry is implied by this development checkpoint.
+
+## Production primitive follow-up
+
+The private actual-game adapter and its three completed four-view runs are
+recorded separately in `2026-11-03-fixed-terrain-game-control.md`.
+
+`rgb-raster/` now implements context-safe direct RGB16F output with exact GPU
+payload accounting and withdrawal of interrupted frame publication. Root and
+independent review passed the nine actual material controls/all three planes,
+29 actual allocation/health failure cutpoints and the runtime unwind/negative
+controls. Independent report SHA256:
+`d098805d68d52894c2e422d24f34924c2aec6c3b54463e5ff8e313bbce31e057`.
+After review, root removed only one redundant final CRLF from the header to
+pass whitespace validation. A fresh full run passed the same9,437,694 main and
+9,437,706 runtime checks,29 failure paths and six negative controls. All187
+borrowed dependencies remained byte-identical. Packaging-amended freeze:
+`82d321253aff2847acb723d0ce48f18d6feaf57e3998c390b7c3464457dac42c`.
+No C++ tokens, shader bytes, ABI, math, resource ownership or output changed.
+
+`world-source/` authenticates the real536,980,180B TIFF once per retained
+read-only handle/epoch and streams only requested rows plus the world-clipped
+two-sample normal halo. Maximum window2,117,682B. Root fresh /O2 and /Od each
+passed3,478 checks and14 compiled negative controls. All256 world blocks used
+541,863,200 exact partial-row bytes; no whole-world allocation. Independent
+review additionally checked actual write/delete/rename exclusion on its OWN
+sparse fixtures, cancellation at final boundaries, full64-bit identity and
+callback-unwind cleanup. Report SHA256:
+`1b619e4af260f017dc4ff8e24d3103040dd00bdccec3736a219a542766033ea7`.
+Unchanged source freeze:
+`bab2682335ca2343feccd0006710189bd0f03d12123a63eb5cc4f94a0e322bcf`.
+
+These two reusable primitives are not yet production Main integration. The
+material fixture is still two-SID and cannot silently represent other regions.
+The general bank plan must preserve selector order and current source identity,
+with explicit shared producer/viewer residency. Neither isolated component
+changes the installed viewer or its maximum-zoom detail on its own.
