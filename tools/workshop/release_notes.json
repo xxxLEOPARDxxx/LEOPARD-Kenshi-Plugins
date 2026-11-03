@@ -298,11 +298,13 @@
     "published_version": "6",
     "en": [
       "[b]Known location maps.[/b] An eye marks a map when all locations listed on it have already been discovered. The marker has its own setting.",
-      "[b]Up-to-date markers.[/b] Open inventory and merchant windows reflect newly discovered locations and learned blueprints."
+      "[b]Up-to-date markers.[/b] Open inventory and merchant windows reflect newly discovered locations and learned blueprints.",
+      "[b]Custom item grades.[/b] Mods can add their own grades and colours, including backpacks, without rebuilding ItemMarkers. Marker style still follows the player settings."
     ],
     "ru": [
       "[b]Карты открытых мест.[/b] Глаз отмечает карту, все перечисленные места которой уже открыты. Для метки есть отдельная настройка.",
-      "[b]Актуальные пометки.[/b] Уже открытые окна инвентаря и торговли учитывают новые открытые места и изученные чертежи."
+      "[b]Актуальные пометки.[/b] Уже открытые окна инвентаря и торговли учитывают новые открытые места и изученные чертежи.",
+      "[b]Своё качество предметов.[/b] Моды могут добавлять свои грейды и цвета, включая рюкзаки, без пересборки ItemMarkers. Стиль меток по-прежнему выбирает игрок."
     ]
   },
   "LiveXpBars": {

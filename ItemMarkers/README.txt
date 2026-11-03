@@ -169,10 +169,12 @@ Prepared release 7 / Подготовленный выпуск 7 (2026-11-03)
 
 English
 
+- Custom item grades. Mods can add their own grades and colours, including backpacks, without rebuilding ItemMarkers. Marker style still follows the player settings.
 - Known location maps. An eye marks a map when all locations listed on it have already been discovered. The marker has its own setting.
 - Up-to-date markers. Open inventory and merchant windows reflect newly discovered locations and learned blueprints.
 
 Русский
 
+- Своё качество предметов. Моды могут добавлять свои грейды и цвета, включая рюкзаки, без пересборки ItemMarkers. Стиль меток по-прежнему выбирает игрок.
 - Карты открытых мест. Глаз отмечает карту, все перечисленные места которой уже открыты. Для метки есть отдельная настройка.
 - Актуальные пометки. Уже открытые окна инвентаря и торговли учитывают новые открытые места и изученные чертежи.
