@@ -1,0 +1,14 @@
+fault.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\atlas-terrain\world-cohort\_generated\faults\fault.cpp(15) : warning C4800: 'const WorldRaster::Frame *' : forcing value to bool 'true' or 'false' (performance warning)
+PASS 1478 actual cohort fault checks: cancel
+PASS 151 actual cohort fault checks: lease
+PASS 95 actual cohort fault checks: opened
+PASS 98 actual cohort fault checks: decoded
+PASS 222 actual cohort fault checks: complete
+PASS 225 actual cohort fault checks: released
+PASS 73 actual cohort fault checks: send
+PASS 159 actual cohort fault checks: quarantine
+KILLED off-result FAIL OFF refuses complete accepted result before any Pump
+KILLED exit-error-latch FAIL explicit Cancel cannot hide abnormal worker failure
+KILLED quarantine-debt FAIL quarantine debt includes all four rasters and raw/accepted capacity
+KILLED quarantine-destructor FAIL quarantined destructor releases no GPU owner

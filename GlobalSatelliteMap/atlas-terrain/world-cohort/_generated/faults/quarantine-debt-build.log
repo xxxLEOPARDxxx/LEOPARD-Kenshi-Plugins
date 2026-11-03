@@ -1,0 +1,2 @@
+quarantine-debt.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\atlas-terrain\world-cohort\_generated\faults\quarantine-debt.cpp(15) : warning C4800: 'const WorldRaster::Frame *' : forcing value to bool 'true' or 'false' (performance warning)

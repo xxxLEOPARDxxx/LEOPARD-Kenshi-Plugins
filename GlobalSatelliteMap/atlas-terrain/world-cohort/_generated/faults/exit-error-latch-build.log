@@ -1,0 +1,2 @@
+exit-error-latch.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\atlas-terrain\world-cohort\_generated\faults\exit-error-latch.cpp(15) : warning C4800: 'const WorldRaster::Frame *' : forcing value to bool 'true' or 'false' (performance warning)
