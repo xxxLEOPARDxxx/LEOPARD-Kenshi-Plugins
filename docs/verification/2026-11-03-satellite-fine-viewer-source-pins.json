@@ -1,0 +1,72 @@
+{
+  "format": "GSM_FINE_VIEWER_CANDIDATE",
+  "version": 1,
+  "files": [
+    {
+      "path": "GlobalSatelliteMap/GlobalSatelliteMap.cpp",
+      "bytes": 67685,
+      "sha256": "1f32b7b4a29726ed6325918975b42225c9fe9ca428d4ed4f1af17f3d1ed865a6"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmAtlasManifest.h",
+      "bytes": 6858,
+      "sha256": "7e7c6b9b379f51e455aff7b9d0fe15a45475c0ea610dd50dcff074708308d048"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmAtlasJob.h",
+      "bytes": 19625,
+      "sha256": "51f42c9c18bcba77f188049ef0e86f3b7128b8f284f5f160d123a4b2df7316af"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasWindowPolicy.h",
+      "bytes": 5896,
+      "sha256": "ddefba523b4bf661990bd2af57d7cba68f3f21177701a0f9e264cfc01fe10b6c"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmFineGpu.h",
+      "bytes": 3917,
+      "sha256": "25c00c8b994d7d30256c5aeec5ba5d1846c2ae83192b36ada7fd4f3afa12406f"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmFinePolicy.h",
+      "bytes": 819,
+      "sha256": "73c1420848257ba615f0dbf063f116bfce9b2c5e1d0c27ed7236d7bafbc97a64"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmFineViewer.h",
+      "bytes": 18995,
+      "sha256": "d559e4f1fabcb8fe36b4ad730a0325726c0311fb666fc65a39f14d9fd55f077b"
+    },
+    {
+      "path": "GlobalSatelliteMap/tests/fine_viewer_gpu.cpp",
+      "bytes": 6108,
+      "sha256": "1e881e169bac8e2de8a5fc3709570d54977174a7bc996eb2a3a2528363f56e0e"
+    },
+    {
+      "path": "GlobalSatelliteMap/tests/run_fine_viewer_tests.py",
+      "bytes": 988,
+      "sha256": "043d6a0cbc78084d82903533c67e09c12c4b9693dd6bf333b7052a65e3885cd2"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/FineCoordinator.h",
+      "bytes": 16033,
+      "sha256": "fcf04c19e2b5010f064720678c7b0419ed36dea029bc1ca6d46f80d67943d102"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/tests.cpp",
+      "bytes": 10393,
+      "sha256": "a0bebb410245e1629ae32432f0c7e6c93ccac28079c0d3976408d94dfed461d5"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/README.md",
+      "bytes": 9829,
+      "sha256": "07115a0d6444e6f4d2f534c07e8e1dfe588bbda49dcfd468108dd222edc162e9"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/verification.json",
+      "bytes": 10225,
+      "sha256": "edbffe9e7e71b5db4bf8f2f0e46e6a7142cf871a789dcd2844cbaf0ba207d594"
+    }
+  ],
+  "scope": "first production native viewer integration candidate; game visual/FPS acceptance pending root installation"
+}

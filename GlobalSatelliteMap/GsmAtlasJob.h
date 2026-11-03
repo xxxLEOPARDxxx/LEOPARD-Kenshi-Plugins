@@ -80,6 +80,7 @@ inline void Validate(Job&job){
     // Require all16 real finalized headers before showing any partial map.
     for(unsigned z=0;z<4;++z)for(unsigned x=0;x<4;++x){if(Cancelled(job))throw std::runtime_error("capture validation cancelled");std::ostringstream p;p<<job.folder<<"tile_"<<x<<'_'<<z<<".gst";HANDLE f=CreateFileW(Wide(p.str()).c_str(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);if(f==INVALID_HANDLE_VALUE)throw std::runtime_error("capture tile missing");unsigned char h[1024];DWORD done=0;LARGE_INTEGER size;bool ok=GetFileSizeEx(f,&size)&&ReadFile(f,h,1024,&done,NULL)&&done==1024&&AtlasView::ValidHeader(h,size.QuadPart,x,z)&&AtlasView::Digest(h,1024,digest)&&!std::memcmp(digest,m.header[z*4+x],32);if(!CloseHandle(f))ok=false;if(!ok)throw std::runtime_error("capture tile incomplete or header identity differs");}
     if(!AtlasView::LoadWindowIndex(Canonical(job.folder+"windows.gsi"),m.captureMetadata,m.header,m.windowIndexHash,job.read,m.windows))throw std::runtime_error("terrain window index missing or checksum invalid");
+    ProducerPins(t,m); // Optional producer pins qualify fine rendering, never coarse readiness.
     m.minX=m.minZ=-147456;m.maxX=m.maxZ=147456;job.manifest=m;
 }
 inline void ValidateWaterSources(Job&job){

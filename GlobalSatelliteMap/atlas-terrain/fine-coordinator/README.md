@@ -139,3 +139,5 @@ Every generated fixture is inventoried and cleanup-manifested after its test
 process exits. Quarantine tests deliberately keep whole owners until process
 teardown. Tests establish component ownership/correctness, **not native game
 visual acceptance, instantaneous pan refinement, FPS or long-running leak proof**.
+
+Normal-frame shutdown uses `RequestShutdown` then `PollShutdown` after `Terminated`: source Idle, GPU0 and known file-consumer join are prerequisites. Poll waits zero milliseconds. Failed/unknown close retains ownership. A known empty source owner after startup failure can be deleted without a wait. Soft viewport drain acknowledges any borrowed Put before producer mutation even if retired old fine textures temporarily exceed the32MiB producer allowance. Within the shared192MiB aggregate cap and a valid64MiB CPU ledger this condition waits for the owned fence, preserving the persistent file session. The actual WARP test retires a64MiB texture and confirms a subsequent cache hit.

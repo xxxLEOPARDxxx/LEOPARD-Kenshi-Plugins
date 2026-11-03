@@ -9,13 +9,13 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-store/FineStore.h",
-      "bytes": 17781,
-      "sha256": "0083e461be3c94ad1c18a3c4818376f9ee0d0c76b45c2d75e22248798e75dc58"
+      "bytes": 18942,
+      "sha256": "3559a2ef54febd597b0419d03a31237fdabd5b5d6117bf33533bb03bee3e7cb9"
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/fine-worker/FineWorker.h",
-      "bytes": 11762,
-      "sha256": "850c67bc5a269daeba7271104f1ef55cc862e5d93899cf623b3f4abb1c17e97d"
+      "bytes": 12310,
+      "sha256": "f37408a32c3a654b5fb65b0992673dace4a41aecd5e24df1dfe10f0df2f94b21"
     },
     {
       "path": "GlobalSatelliteMap/atlas-cache/Gst2Writer.h",
@@ -69,8 +69,8 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/FineCoordinator.h",
-      "bytes": 14539,
-      "sha256": "dd8fd15aa783e209a1803764692b4d09eea6ebb6c63e66330c5922e916f5f302"
+      "bytes": 16033,
+      "sha256": "fcf04c19e2b5010f064720678c7b0419ed36dea029bc1ca6d46f80d67943d102"
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/freeze.py",
@@ -79,8 +79,8 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/README.md",
-      "bytes": 8998,
-      "sha256": "245d0f100534aaa9d267a70a97a8dce9f9c86dd8b59850704a27054ae4e61a0a"
+      "bytes": 9829,
+      "sha256": "07115a0d6444e6f4d2f534c07e8e1dfe588bbda49dcfd468108dd222edc162e9"
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/run_tests.py",
@@ -89,8 +89,8 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/tests.cpp",
-      "bytes": 8567,
-      "sha256": "f47444204cccba0711ad4351527fbaf97088f4522865696bed16ce4352bf5c60"
+      "bytes": 10393,
+      "sha256": "a0bebb410245e1629ae32432f0c7e6c93ccac28079c0d3976408d94dfed461d5"
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/fine-viewer/FineJob.h",
@@ -159,8 +159,8 @@
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/world-cohort/WorldCohort.h",
-      "bytes": 21437,
-      "sha256": "b1ee4b55e689b4ac355cd4c123324441171dc95e3f42e09dd00bcce6021f98ee"
+      "bytes": 23449,
+      "sha256": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae"
     },
     {
       "path": "GlobalSatelliteMap/atlas-terrain/world-layout/WorldLayout.h",
@@ -231,6 +231,11 @@
       "path": "GlobalSatelliteMap/atlas-view/AtlasRelight.h",
       "bytes": 15788,
       "sha256": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmFineGpu.h",
+      "bytes": 3917,
+      "sha256": "25c00c8b994d7d30256c5aeec5ba5d1846c2ae83192b36ada7fd4f3afa12406f"
     },
     {
       "path": "tools/diagnostics/satellite-capture-probe/GeographyPolicy.h",

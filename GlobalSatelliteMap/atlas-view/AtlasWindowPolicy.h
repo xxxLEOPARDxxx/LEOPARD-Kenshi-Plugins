@@ -32,11 +32,11 @@ inline unsigned EnumerateWindows(const WindowRect cells[16],const WindowRect&cli
         for(int z=z0;z<z1;++z)for(int x=x0;x<x1;++x){if(total>=cap)return cap+1;if(out)out[total]=WindowKey(t,level,unsigned(x),unsigned(z));++total;}
     }return total;
 }
-inline WindowPlan PlanWindows(const WindowRect cells[16],const WindowRect&clip){
+inline WindowPlan PlanWindows(const WindowRect cells[16],const WindowRect&clip,unsigned capacity=DetailSlots){
     // Native projection rounds primary boundaries to pixels. Both density and
     // admission use the whole projected grid, never the currently visible set.
     // Otherwise panning one pixel can change the mip without changing zoom.
-    WindowPlan p;double display=1,minW=1e100,minH=1e100;
+    WindowPlan p;capacity=std::min(capacity,DetailSlots);double display=1,minW=1e100,minH=1e100;
     for(unsigned i=0;i<16;++i){
         if(cells[i].w<=0||cells[i].h<=0)continue;
         display=std::max(display,std::max(cells[i].w,cells[i].h));
@@ -53,19 +53,19 @@ inline WindowPlan PlanWindows(const WindowRect cells[16],const WindowRect&clip){
         unsigned nx=unsigned(std::min(double(4*n),std::ceil(clip.w/spanX)+1));
         unsigned nz=unsigned(std::min(double(4*n),std::ceil(clip.h/spanZ)+1));
         worst=nx*nz;
-        if(l==5||worst<=DetailSlots)break;
+        if(l==5||worst<=capacity)break;
         ++l;
     }
     p.level=l;if(l==5)return p;
-    p.count=EnumerateWindows(cells,clip,l,p.keys,DetailSlots);p.visibleCount=p.count;
+    p.count=EnumerateWindows(cells,clip,l,p.keys,capacity);p.visibleCount=p.count;
     // A one-window apron is opportunistic. It consumes only the spare capacity
     // beyond the WORST visible phase, and cannot force a coarser mip.
-    unsigned reserve=DetailSlots-worst,n=Side(l)/WindowSide;
+    unsigned reserve=capacity-worst,n=Side(l)/WindowSide;
     double spanX=minW/n,spanZ=minH/n;
     WindowRect apron(clip.x-spanX,clip.y-spanZ,clip.w+2*spanX,clip.h+2*spanZ);
     WindowKey candidates[256];unsigned candidatesN=EnumerateWindows(cells,apron,l,candidates,256);
     if(candidatesN>256)return p;
-    while(reserve--&&p.count<DetailSlots){
+    while(reserve--&&p.count<capacity){
         int best=-1;double distance=1e100;
         for(unsigned k=0;k<candidatesN;++k){
             const WindowKey&key=candidates[k];if(p.Contains(key))continue;

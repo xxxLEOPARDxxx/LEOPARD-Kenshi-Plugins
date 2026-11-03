@@ -22,7 +22,7 @@ template<class NativeSession>class Controller {
  static U64 Extra(){return sizeof(Controller)+sizeof(Owner)-sizeof(NativeSession)-sizeof(FineWrite::Worker);}
  bool CurrentBase(const FineJob::Demand&now,const FineStore::Identity&id)const{return owner_&&FineJob::Internal::DemandValid(now)&&SourceReceipts::SameScope(owner_->scope,now.scope)&&FineStore::Same(owner_->identity,id)&&now.view.stamp.source==id.sourceEpoch&&now.view.stamp.material==id.materialGeneration;}
  bool CpuLedger(bool wholeNative,const FineStore::Ledger&external,FineStore::Ledger&out)const{out=external;return Add(out.other,Extra(),SourceReceipts::CpuCap)&&Add(out.other,wholeNative?owner_->native.CpuReservation():owner_->native.ExtraCpuPeakBytes(),SourceReceipts::CpuCap);}
- bool GpuLedger(const Residency&r,WorldBank::Ledger&out)const{std::memset(&out,0,sizeof(out));out.retained=r.viewerGpu;if(!Add(out.retained,r.fineGpu,AtlasView::GpuCap))return false;out.pending=r.pendingGpu;out.retired=r.retiredGpu;return r.occupied<=FineJob::Slots&&r.fineGpu>=U64(r.occupied)*FineJob::WindowBytes&&r.fineGpu<=U64(FineJob::Slots)*FineJob::WindowBytes;}
+ bool GpuLedger(const Residency&r,WorldBank::Ledger&out)const{std::memset(&out,0,sizeof(out));out.retained=r.viewerGpu;if(!Add(out.retained,r.fineGpu,AtlasView::GpuCap))return false;out.pending=r.pendingGpu;out.retired=r.retiredGpu;U64 total=r.viewerGpu;if(!Add(total,r.fineGpu,AtlasView::GpuCap)||!Add(total,r.pendingGpu,AtlasView::GpuCap)||!Add(total,r.retiredGpu,AtlasView::GpuCap))return false;return r.occupied<=FineJob::Slots&&r.fineGpu>=U64(r.occupied)*FineJob::WindowBytes&&r.fineGpu<=U64(FineJob::Slots)*FineJob::WindowBytes;}
  void Retain(){quarantined_=true;if(SUCCEEDED(error_))error_=E_FAIL;Debt().owner=owner_;Debt().cpu=SourceReceipts::CpuCap;Debt().gpu=owner_?owner_->native.Cohort().ReservedGpuBytes():0;}
  void Hard(HRESULT hr){if(SUCCEEDED(error_))error_=FAILED(hr)?hr:E_ABORT;if(owner_&&!owner_->stopping){owner_->stopping=true;owner_->stopAt=GetTickCount();owner_->worker.Cancel();}}
  bool PairMatches(const FineJob::Plan&p,unsigned pair,const FineJob::Demand&now,const WorldCohort::Job&job)const{
@@ -72,9 +72,13 @@ public:
    HRESULT hr=p.Pump(false,NULL,o.scope,gpu);if(WorldCohort::Quarantine().marked){Retain();return -1;}if(FAILED(hr)&&SUCCEEDED(error_))error_=hr;
    if((p.State()==WorldCohort::Idle||p.State()==WorldCohort::Stopped||p.State()==WorldCohort::Failed)&&p.ReservedGpuBytes()==0){o.terminated=true;return -1;}return 0;
   }
-  FineJob::Budget budget;if(!MakeBudget(r,external,budget)){Hard(E_OUTOFMEMORY);return 0;}
   if(!PollBoot())return quarantined_?-1:0;
   if(o.plan.state==FineJob::Detail&&!FineJob::Internal::SameDemand(o.plan.demand,now)){o.soft=true;o.draining=true;}
+  // Soft viewport drain must acknowledge borrowed pixels even while old fine
+  // textures remain charged to a pending retirement fence above32MiB.
+  if(o.soft&&o.writing){if(!PollWritten())return quarantined_?-1:0;if(o.writing)return 0;}
+  if(o.draining)return DrainStep(gpu);
+  FineJob::Budget budget;if(!MakeBudget(r,external,budget)){Residency empty;FineJob::Budget cpuOnly;if(!MakeBudget(empty,external,cpuOnly))Hard(E_OUTOFMEMORY);return 0;}
   if(o.writing){if(!PollWritten())return quarantined_?-1:0;if(o.writing)return 0;if(o.soft)return DrainStep(gpu);
    if(!FineJob::CanRender(o.plan,now,budget)){Hard(E_OUTOFMEMORY);return 0;}unsigned n=p.CurrentView();HRESULT fresh=p.Pump(true,device,o.scope,gpu);if(FAILED(fresh)||n>=2||!p.Result(n,true,o.scope,o.job.frame[n])){Hard(FAILED(fresh)?fresh:E_ABORT);return 0;}HRESULT hr=p.ReleaseView(n,true,o.scope,o.job.frame[n]);if(FAILED(hr)){Hard(hr);return 0;}if(p.State()==WorldCohort::Idle){o.queued=false;return 1;}
   }
@@ -98,6 +102,10 @@ public:
  bool ReleaseRead(){if(!Main()||!owner_||quarantined_||!owner_->reading||!owner_->readReady||!owner_->worker.ReleaseRead())return false;owner_->reading=owner_->readReady=owner_->readExposed=false;return true;}
  void Cancel(){if(Main())Hard(E_ABORT);}bool Active()const{return owner_!=NULL;}bool Terminated()const{return Main()&&owner_&&owner_->terminated;}bool ReadReady()const{return Main()&&owner_&&owner_->readReady;}bool Quarantined()const{return quarantined_;}HRESULT Error()const{return error_;}unsigned StoredWindows()const{return Main()&&owner_?owner_->stored:0;}
  U64 ProducerGpuBytes()const{return Main()&&owner_?owner_->native.Cohort().ReservedGpuBytes():0;}U64 RetainedCpuBytes()const{return quarantined_?Debt().cpu:0;}U64 RetainedGpuBytes()const{return quarantined_?Debt().gpu:0;}
+ // After consumer join and GPU bank drain, finish the idle source worker with
+ // zero-timeout polling. This is the normal-frame close/re-enable path.
+ HRESULT RequestShutdown(){if(!Main()||!owner_||quarantined_||!owner_->terminated||owner_->readExposed||owner_->native.Cohort().ReservedGpuBytes())return E_UNEXPECTED;if(owner_->native.Cohort().State()==WorldCohort::Stopped){delete owner_;owner_=NULL;return S_OK;}HRESULT hr=owner_->native.Cohort().RequestShutdown();if(FAILED(hr)){error_=hr;Retain();}return hr;}
+ HRESULT PollShutdown(){if(!Main()||quarantined_)return E_UNEXPECTED;if(!owner_)return S_OK;HRESULT hr=owner_->native.Cohort().PollShutdown();if(hr==S_FALSE)return hr;if(owner_->native.Cohort().Quarantined()){error_=hr;Retain();return FAILED(hr)?hr:E_FAIL;}if(FAILED(hr)){error_=hr;Retain();return hr;}delete owner_;owner_=NULL;return S_OK;}
  // Explicit final teardown only; NEVER call from normal live-viewer Tick.
  void Shutdown(){if(!owner_||quarantined_)return;if(!Main()){Retain();return;}Hard(E_ABORT);if(owner_->readExposed){Retain();return;}if(owner_->worker.ReadPending())owner_->worker.ReleaseRead();if(!owner_->worker.Join()){Retain();return;}owner_->native.Cohort().Shutdown();if(WorldCohort::Quarantine().marked){Retain();return;}delete owner_;owner_=NULL;}
 };

@@ -10,8 +10,9 @@ struct Manifest {
     unsigned char header[16][32];
     unsigned char captureMetadata[32];
     unsigned char windowIndexHash[32];AtlasView::WindowIndex windows;
-    double minX,minZ,maxX,maxZ;bool waterVerified,modelVerified;
-    Manifest():minX(0),minZ(0),maxX(0),maxZ(0),waterVerified(false),modelVerified(false){std::memset(header,0,sizeof(header));std::memset(captureMetadata,0,32);std::memset(windowIndexHash,0,32);}
+    unsigned char regionParameters[64][32],regionDistortion[64][32],materialSnapshots[32];
+    double minX,minZ,maxX,maxZ;bool waterVerified,modelVerified,fineVerified;
+    Manifest():minX(0),minZ(0),maxX(0),maxZ(0),waterVerified(false),modelVerified(false),fineVerified(false){std::memset(header,0,sizeof(header));std::memset(captureMetadata,0,32);std::memset(windowIndexHash,0,32);std::memset(regionParameters,0,sizeof(regionParameters));std::memset(regionDistortion,0,sizeof(regionDistortion));std::memset(materialSnapshots,0,32);}
 };
 inline bool Hex(const std::string&s,unsigned char*out){if(!GSM::Hash(s))return false;for(unsigned i=0;i<32;++i){unsigned a=s[i*2],b=s[i*2+1];out[i]=static_cast<unsigned char>(((a<='9'?a-'0':a-'a'+10)<<4)|(b<='9'?b-'0':b-'a'+10));}return true;}
 inline bool Json(const std::string&s,boost::property_tree::ptree&tree){
@@ -21,6 +22,20 @@ inline bool Json(const std::string&s,boost::property_tree::ptree&tree){
     try{std::istringstream in(s);boost::property_tree::read_json(in,tree);return true;}catch(...){return false;}
 }
 inline bool Unique(const boost::property_tree::ptree&node){std::set<std::string>keys;for(boost::property_tree::ptree::const_iterator i=node.begin();i!=node.end();++i){if((!i->first.empty()&&!keys.insert(i->first).second)||!Unique(i->second))return false;}return true;}
+// Optional fine-detail qualification. Legacy capture metadata remains usable
+// for coarse display; it never gains invented regional parameter authority.
+inline bool ProducerPins(const boost::property_tree::ptree&t,Manifest&out){
+ out.fineVerified=false;std::memset(out.regionParameters,0,sizeof(out.regionParameters));std::memset(out.regionDistortion,0,sizeof(out.regionDistortion));std::memset(out.materialSnapshots,0,32);
+ try{
+  boost::optional<const boost::property_tree::ptree&>producer=t.get_child_optional("producer");if(!producer)return false;
+  const boost::property_tree::ptree&list=producer->get_child("regionSnapshots");unsigned count=0;bool seen[64]={false};BYTE parameters[64][32]={},distortion[64][32]={},joined[64*64]={},wanted[32],actual[32];
+  if(!Hex(producer->get<std::string>("materialSnapshotsSha256"),wanted))return false;
+  for(boost::property_tree::ptree::const_iterator i=list.begin();i!=list.end();++i){if(!i->first.empty()||++count>64||i->second.size()!=3)return false;unsigned region=i->second.get<unsigned>("region");if(region>=64||seen[region]||!Hex(i->second.get<std::string>("parametersSha256"),parameters[region])||!Hex(i->second.get<std::string>("distortionSha256"),distortion[region]))return false;seen[region]=true;}
+  if(count!=64)return false;for(unsigned r=0;r<64;++r){if(!seen[r])return false;std::memcpy(joined+r*64,parameters[r],32);std::memcpy(joined+r*64+32,distortion[r],32);}
+  if(!AtlasView::Digest(joined,sizeof(joined),actual)||std::memcmp(actual,wanted,32))return false;
+  std::memcpy(out.regionParameters,parameters,sizeof(parameters));std::memcpy(out.regionDistortion,distortion,sizeof(distortion));std::memcpy(out.materialSnapshots,actual,32);out.fineVerified=true;return true;
+ }catch(...){return false;}
+}
 inline bool Ready(const std::string&text,Manifest&out){
     boost::property_tree::ptree t;if(!Json(text,t)||!Unique(t))return false;
     try{
