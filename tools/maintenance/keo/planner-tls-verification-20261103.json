@@ -1,0 +1,40 @@
+{
+  "format": "KEO_PLANNER_TLS_UNWIND_MAINTENANCE",
+  "version": 1,
+  "base": "680a2b57aad2af3a77525552ed3565556c850103",
+  "inputs": {
+    "src/planner/planner_hooks.cpp": {
+      "bytes": 10515,
+      "sha256": "8c0bc4fd113420c001ea50293aea9de7c42265c917f0fa788cdd1b004d0cb588"
+    },
+    "leopard/test_planner_tls_unwind.py": {
+      "bytes": 4417,
+      "sha256": "f12c15456a5f4484d8fa4f4217b3cda8f3b6d0d7ed41bec0f66116558cd9bbaa"
+    },
+    "leopard/planner-tls-maintenance-20261103.md": {
+      "bytes": 3124,
+      "sha256": "fb460bcf2d77dcc617077b948ff044ebc848240b3e1e97b007c7ed1574684b66"
+    }
+  },
+  "evidence": {
+    "build/planner-tls-red.log": {
+      "bytes": 447,
+      "sha256": "2a7baca4ff628693c687cebad969ff9e0970b6674ce97a9915d98fd88a27d403"
+    },
+    "build/planner-tls-final.log": {
+      "bytes": 313,
+      "sha256": "f962397abb68a268910512e9137d829e8d24d8d0411165999463133faf6944f0"
+    },
+    "build/planner-tls-tests/native-hooks.log": {
+      "bytes": 19,
+      "sha256": "b2f8f7710c50373eb39889c1704696cec8fa5e5231dac6d5cd46e68ac713a09b"
+    }
+  },
+  "results": {
+    "actualBoundary": "51 /Od +51 /O2",
+    "compiledNegativeControls": 2,
+    "nativeCompile": "planner_hooks.cpp /O2 /GL /Gy",
+    "gameCalls": false,
+    "linkedDll": false
+  }
+}

@@ -1,0 +1,342 @@
+From 71e90c1545fb5d4c396c26e52eb593695699ba41 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Tue, 3 Nov 2026 17:28:47 +0300
+Subject: [PATCH] Keep planner route deadlines frozen during pause
+
+---
+ leopard/planner-pause-maintenance-20261103.md | 30 ++++++
+ .../planner-pause-verification-20261103.json  | 96 +++++++++++++++++++
+ leopard/test_planner_pause_clock.py           | 68 +++++++++++++
+ src/planner/planner_capture.cpp               |  2 +-
+ src/planner/planner_merge.cpp                 |  3 +-
+ src/planner/planner_tick.cpp                  | 19 +++-
+ src/planner/planner_tick_internal.h           |  6 ++
+ 7 files changed, 219 insertions(+), 5 deletions(-)
+ create mode 100644 leopard/planner-pause-maintenance-20261103.md
+ create mode 100644 leopard/planner-pause-verification-20261103.json
+ create mode 100644 leopard/test_planner_pause_clock.py
+
+diff --git a/leopard/planner-pause-maintenance-20261103.md b/leopard/planner-pause-maintenance-20261103.md
+new file mode 100644
+index 0000000..5238365
+--- /dev/null
++++ b/leopard/planner-pause-maintenance-20261103.md
+@@ -0,0 +1,30 @@
++# Planner pause-clock maintenance, 2026-11-03
++
++Base: clean local `680a2b5` on `leopard`. Original jacobericson/KEO authorship and GPLv3 remain unchanged. This is temporary bug maintenance, not a new routing feature or a public release.
++
++## Confirmed problem and change
++
++The actual planner tick continued validating/searching/replanning slots while paused. Its plan, waiting and completion deadlines used raw elapsed wall time, whereas formation gather holds already used the shared pause-aware OOT clock. An unchanged plan could therefore exhaust its 120-second age, 8-second completion or 10-second section-wait budget during a long pause. Converting only Tick would mix clock domains with order capture and gather-resume rewrites.
++
++The four production-file change uses one main-thread `BehaviorNow(rawNow)` seam, delegating to the existing OOT active clock. Order capture, repeat matching, merge record lookup, gather-resume rewrites and Tick's slot/merge ages use that same domain. The existing gather hold difference no longer converts already active time twice. Tick samples the clock every enabled frame, retains its original wall-time cadence, publishes pre-arrival frame data and processes generation retirement, then skips slot/world searches while paused. Its diagnostic reporting remains on wall time.
++
++Native asynchronous request-flight QPC deadlines, locks, worker concurrency, graph/search algorithms, path costs, limits, water behavior, cancellation, priorities, settings and defaults are unchanged. They are a separate bounded result/ownership handshake, not these simulation-age deadlines. No per-frame heap allocation, cache, thread, retained pointer, timer, INI read or native write was added. The old per-slot OOT conversion is removed; the active-clock conversion is once per tick and per relevant order boundary.
++
++Исправлена подтверждённая ошибка: пауза больше не расходует время ожидания и срок действительности плана маршрута. Планировщик не запускает повторные поиски маршрута на паузе. После снятия паузы отсчёт продолжается; обычные сроки ожидания сохранены. Это не подтверждение исправления всех крюков, кругов и остановок в реальной игре.
++
++## Test evidence
++
++- Actual old extracted `PlannerTick` produced RED: `FAIL paused actual tick does not scan or replan slots`, retained in `build/planner-pause-red.log`.
++- `python leopard/test_planner_pause_clock.py`: 18 actual boundary controls each `/Od` and `/O2`; six separately compiled negative controls fail their intended runtime assertion. The fixture uses the actual extracted Tick, actual caller timestamp expressions, actual hold expression, actual OOT implementation and actual `PlanReplanDue`. Native seams only observe work/arguments; no game functions/process are invoked.
++- Cases: order on pause, 600-second pause/resume, capture/merge/resume domain agreement, no double-conversion of gather hold, unchanged 8/10/120 active-second deadlines, wall diagnostic cadence, generation retirement during pause, routing OFF.
++- Existing `plan_policy_units`, `plan_store_units`, `plan_merge_units` and `order_outcome_table_units`: four suites pass. Log `build/planner-pause-tests/existing-suites.log`.
++- Changed native translation units `planner_capture.cpp`, `planner_merge.cpp`, `planner_tick.cpp` compile using the real KEO SDK with VC10 `/O2 /GL /Gy`; logs under `build/planner-pause-tests/native/`.
++- `git diff --check`: clean. No full compile matrix was repeated; no final DLL link or installation performed by this task.
++
++Host/static evidence establishes these deadline/caller properties, not in-game route quality, FPS or absence of all long-running leaks. The preserved personal installed `keoRouting=false` was read only. Installed DLL still E1558949...; prior newer priority-publication candidate D396C05A... remains separate and uninstalled. No game/INI/UI/publication/commit actions.
++
++## Scope
++
++Production: `src/planner/planner_tick_internal.h`, `planner_tick.cpp`, `planner_capture.cpp`, `planner_merge.cpp`.
++
++Proof: this report, `leopard/test_planner_pause_clock.py`, `leopard/planner-pause-verification-20261103.json`. The manifest pins direct test inputs and compact logs; source/read-only installed identities are recorded without distributing personal settings.
+diff --git a/leopard/planner-pause-verification-20261103.json b/leopard/planner-pause-verification-20261103.json
+new file mode 100644
+index 0000000..38ae589
+--- /dev/null
++++ b/leopard/planner-pause-verification-20261103.json
+@@ -0,0 +1,96 @@
++{
++  "format": "KEO_PLANNER_PAUSE_MAINTENANCE",
++  "version": 1,
++  "base": "680a2b57aad2af3a77525552ed3565556c850103",
++  "scope": "main-thread planner behavioral clock only; no native pipeline clock/geometry/settings/install changes",
++  "inputs": {
++    "src/planner/planner_tick_internal.h": {
++      "bytes": 4301,
++      "sha256": "613274a9869895c5d07b1af8abb8e58c588d4228c5750cb8b033745b2f4d3f7c"
++    },
++    "src/planner/planner_tick.cpp": {
++      "bytes": 28779,
++      "sha256": "4a9b656d5f4e309c1a62cc62c2c806eca3328645682b65998f2cdbf67b337ede"
++    },
++    "src/planner/planner_capture.cpp": {
++      "bytes": 8596,
++      "sha256": "bf100bc8a8f01719cebc24214a0c2991d57a4c45caddf7c88c0131799cddde91"
++    },
++    "src/planner/planner_merge.cpp": {
++      "bytes": 16037,
++      "sha256": "79486a5c2d4833aac461a8ced9758c1812fbec95499369812864dca14a39127b"
++    },
++    "src/planner/plan_policy.h": {
++      "bytes": 22111,
++      "sha256": "6bbeb8e7f4bdb3e97bd6de9189ec3d858a5d0ba38a0fd2cebf56ff505fdd614c"
++    },
++    "src/planner/plan_policy.cpp": {
++      "bytes": 20237,
++      "sha256": "adf1fdb0d26a76d525afbcf01d82eee58245a3c74addb7dd80cc1c090c5ca133"
++    },
++    "src/movement/order_outcome_table.h": {
++      "bytes": 7085,
++      "sha256": "bfcfe5eb07b9f75fee06f788192d009b10f9f92bbd79e657e0731c8c1f0d000e"
++    },
++    "src/movement/order_outcome_table.cpp": {
++      "bytes": 20981,
++      "sha256": "56f0883f41628e72494edfca4d4698d51d430d4cc54719125011587f58bee9ad"
++    },
++    "src/movement/order_outcome_policy.h": {
++      "bytes": 4539,
++      "sha256": "5130d9a0043eb94dc3ebbdf22a24f9c50728e27c10b173ca384d1c60002bf574"
++    },
++    "src/movement/order_outcome_policy.cpp": {
++      "bytes": 3251,
++      "sha256": "711831bca1077567aa4c9087a04021e6e5f21944ba16d1830b7577eccb4b4ab9"
++    },
++    "leopard/test_planner_pause_clock.py": {
++      "bytes": 7043,
++      "sha256": "2b5c23ee4275d5be6eb5792685c9625a6ceacc8710d9e7ac8ac7fcc749a431d3"
++    },
++    "leopard/planner-pause-maintenance-20261103.md": {
++      "bytes": 4537,
++      "sha256": "9ba8850b8768a66eddbab2af253b6d8f42df857a10ca2cc4de518217870479f3"
++    }
++  },
++  "evidence": {
++    "build/planner-pause-red.log": {
++      "bytes": 539,
++      "sha256": "268819e781c50ed9b26cbbd39edb89681c00e3f04b933542625dbb5699a93af7"
++    },
++    "build/planner-pause-final.log": {
++      "bytes": 1356,
++      "sha256": "be5c70a59c3393e6b29cd2934c4838909686cfc7fe3a9bb5c8a455abd66df971"
++    },
++    "build/planner-pause-tests/existing-suites.log": {
++      "bytes": 223,
++      "sha256": "53acbca16c669c649cb47ed60c6fb0207b08cbafc416f34641913a35946b00fe"
++    },
++    "build/planner-pause-tests/native/planner_capture.log": {
++      "bytes": 21,
++      "sha256": "240cde8ac3187bfb5811c4e11e4f5e9ff3c11f68eba7e0ef97dcc51c174dfeab"
++    },
++    "build/planner-pause-tests/native/planner_merge.log": {
++      "bytes": 19,
++      "sha256": "decf1fb42ef242a3d6ad9a80a3e0ff01d16d1f541eee879d91da4df8758217e2"
++    },
++    "build/planner-pause-tests/native/planner_tick.log": {
++      "bytes": 18,
++      "sha256": "22909cc24df0201693a87817066faa588311d1a7f8491a73f07b759a0f3d3d35"
++    }
++  },
++  "results": {
++    "boundary": "18 /Od +18 /O2",
++    "functionalMutants": 6,
++    "existingSuites": 4,
++    "nativeCompile": "3 changed TUs /O2 /GL /Gy; no linked DLL"
++  },
++  "installedDll": {
++    "bytes": 1437184,
++    "sha256": "e155894936c0fceaac3813bd88448b64f5dd896a047a66bd369bad3fa51c4324"
++  },
++  "priorCandidate": {
++    "bytes": 1439744,
++    "sha256": "d396c05a64dfa45eb8ea515782cb7c0327d00e7ceb86108881a4e2e21f767ca2"
++  }
++}
+diff --git a/leopard/test_planner_pause_clock.py b/leopard/test_planner_pause_clock.py
+new file mode 100644
+index 0000000..996964c
+--- /dev/null
++++ b/leopard/test_planner_pause_clock.py
+@@ -0,0 +1,68 @@
++"""Production planner boundary clocks + actual shared active clock and replan policy.
++No game/native calls. Extracts the current tick, capture/merge timestamp expressions
++and resume conversion; fake native seams only observe their arguments/work count.
++"""
++from pathlib import Path
++import os,re,subprocess,sys
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/planner-pause-tests';OUT.mkdir(exist_ok=True)
++tick=(ROOT/'src/planner/planner_tick.cpp').read_text();capture=(ROOT/'src/planner/planner_capture.cpp').read_text();merge=(ROOT/'src/planner/planner_merge.cpp').read_text()
++def body(source,marker):
++ a=source.index(marker);b=source.index('{',a);end=b+1;depth=1
++ while depth:depth+=(source[end]=='{')-(source[end]=='}');end+=1
++ return source[a:end]
++clock=body(tick,'double planner_tick_detail::BehaviorNow(') if 'double planner_tick_detail::BehaviorNow(' in tick else 'double BehaviorNow(double rawNow){return rawNow;}'
++clock=clock.replace('double planner_tick_detail::BehaviorNow(', 'double BehaviorNow(')
++capture_expr=re.search(r'double now = ([^;]+);',body(capture,'int PlannerNoteOrder(')).group(1)
++merge_expr=re.search(r'double now = ([^;]+);',body(merge,'bool PlannerMergeGather(')).group(1)
++resume_prefix=body(merge,'void PlannerResumeFromGather(').split('TakeSnapshot();')[0]
++resume_convert=re.search(r'now = BehaviorNow\(now\);',resume_prefix)
++hold_expr=re.search(r'^\s+(.+ - m->holdTime)\),$',body(tick,'static PlanDropWhy SlotDropDue('),re.M).group(1)
++code=r'''
++#include <windows.h>
++#include <cmath>
++#include <cstdio>
++#include <cstdlib>
++#include "planner/plan_policy.h"
++#include "movement/order_outcome_table.h"
++using namespace planner;
++unsigned checks=0;bool paused=false;double raw=0,seenTick=-1,seenMerge=-1,seenReport=-1;
++int mode=PLANNER_ON,calls=0,resets=0,preFrames=0;unsigned gen=1,s_storeGen=0;
++double s_lastTick=0;const double TICK_SECONDS=.25;const int PLAN_SLOTS=1,PLAYER_SCAN_MAX=1,REPLANS_PER_TICK=4;
++struct PlayerChar{int unused;};
++void C(bool b,const char*s){++checks;if(!b){std::printf("FAIL %s\n",s);std::exit(1);}}
++bool ZonePauseIsPaused(){return paused;}double ElapsedSec(){return raw;}
++int PlanStoreMode(){return mode;}void PlannerPreArrivalFrame(){++preFrames;}unsigned CgStoreGen(){return gen;}
++void PlanStoreReset(){++resets;}void TakeSnapshot(){}int ReadPlayers(PlayerChar*){return 1;}bool PlanStoreKey(int){return true;}
++bool TickSlot(int,const PlayerChar*,int,double now,bool){seenTick=now;++calls;return false;}
++void PlannerWaterRefresh(){}void MergeTick(double now){seenMerge=now;}void PlannerReportTick(double now){seenReport=now;}
++@CLOCK@
++double CaptureNow(){return @CAPTURE@;}double MergeNow(){return @MERGE@;}
++double ResumeNow(double now){@RESUME@ return now;}
++double HoldAge(double now,double held){struct Hold{double holdTime;}value={held};const Hold*m=&value;return @HOLD@;}
++@TICK@
++PlanReplanIn Due(double now,double planned){PlanReplanIn in={};in.now=now;in.planTime=planned;in.distToPortal=100;in.waitSeconds=10;return in;}
++int main(){OOT_ResetForTest();raw=100;double planned=CaptureNow();C(planned==100,"capture begins in active seconds");
++ PlannerTick(NULL,101);C(calls==1&&resets==1&&seenTick==101,"initial actual tick stamps current active domain");
++ paused=true;PlannerTick(NULL,102);int atPause=calls;PlannerTick(NULL,701);
++ C(calls==atPause,"paused actual tick does not scan or replan slots");
++ raw=701;C(CaptureNow()==101,"order issued while paused uses frozen active clock");C(MergeNow()==101,"merge lookup shares capture active domain");C(ResumeNow(701)==101,"gather resume rewrites share active domain");
++ paused=false;PlannerTick(NULL,702);C(seenTick==102&&seenMerge==102,"resume does not age planner or merge through paused600s");C(HoldAge(seenTick,101)==1,"gather hold is not converted from active time twice");C(seenReport==702,"diagnostic heartbeat retains wall-time cadence");C(PlanReplanDue(Due(seenTick,planned))==PRW_NONE,"long pause cannot expire120s plan");
++ PlanReplanIn in=Due(seenTick,planned);in.completeSince=101;C(PlanReplanDue(in)==PRW_NONE,"completion timeout excludes paused interval");in.completeSince=0;in.waitSince=101;in.loadedChangedSincePlan=1;C(PlanReplanDue(in)==PRW_NONE,"section wait timeout excludes paused interval");
++ PlannerTick(NULL,708);in.now=seenTick;in.waitSince=0;in.completeSince=101;C(PlanReplanDue(in)==PRW_NONE,"completion remains below8 active seconds");PlannerTick(NULL,709);in.now=seenTick;C(PlanReplanDue(in)==PRW_ARRIVAL_TIMEOUT,"completion still expires at8 active seconds");
++ in.completeSince=0;in.waitSince=101;PlannerTick(NULL,711);in.now=seenTick;C(PlanReplanDue(in)==PRW_WAIT,"wait still expires at10 active seconds");
++ PlannerTick(NULL,820);C(PlanReplanDue(Due(seenTick,planned))==PRW_AGE,"plan still expires at120 active seconds");
++ paused=true;++gen;PlannerTick(NULL,821);C(resets==2,"generation reset still runs during pause");int before=calls;mode=PLANNER_OFF;PlannerTick(NULL,1400);C(calls==before,"routing OFF performs no planner work");
++ std::printf("PASS %u actual planner clock boundary controls\n",checks);return 0;}
++'''
++code=code.replace('@CLOCK@',clock).replace('@CAPTURE@',capture_expr).replace('@MERGE@',merge_expr).replace('@RESUME@',resume_convert.group(0) if resume_convert else '').replace('@HOLD@',hold_expr).replace('@TICK@',body(tick,'void PlannerTick('))
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=os.environ.copy();env['INCLUDE']=f'{VC}/include;{SDK}/Include;{ROOT}/src';env['LIB']=f'{VC}/lib/amd64;{SDK}/Lib/x64'
++def run(name,source,opt,negative=False):
++ file=OUT/(name+'.cpp');file.write_text(source);exe=OUT/(name+'.exe')
++ p=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(file),str(ROOT/'src/planner/plan_policy.cpp'),str(ROOT/'src/movement/order_outcome_table.cpp'),str(ROOT/'src/movement/order_outcome_policy.cpp'),'/Fo'+str(OUT)+'\\','/Fe'+str(exe)],env=env,cwd=OUT,capture_output=True,text=True);print(p.stdout+p.stderr,end='');assert p.returncode==0
++ p=subprocess.run([str(exe)],capture_output=True,text=True);print(p.stdout+p.stderr,end='');assert (p.returncode!=0 and 'FAIL ' in p.stdout) if negative else p.returncode==0
++for opt in ['Od','O2']:run('clock-'+opt,code,opt)
++mutants=[('raw-capture','double CaptureNow(){return '+capture_expr+';}','double CaptureNow(){return ElapsedSec();}'),('raw-merge','double MergeNow(){return '+merge_expr+';}','double MergeNow(){return ElapsedSec();}'),('raw-resume','double ResumeNow(double now){now = BehaviorNow(now); return now;}','double ResumeNow(double now){return now;}'),('raw-tick','TickSlot(slot, players, nPlayers, activeNow,','TickSlot(slot, players, nPlayers, now,'),('raw-merge-tick','MergeTick(activeNow);','MergeTick(now);'),('double-hold','return '+hold_expr+';}','return OOT_ActiveNow(now, ZonePauseIsPaused()) - m->holdTime;}')]
++for name,before,after in mutants:
++ assert before in code,name
++ run('mutant-'+name,code.replace(before,after,1),'O2',True)
++print('PASS six compiled planner clock negative controls')
+diff --git a/src/planner/planner_capture.cpp b/src/planner/planner_capture.cpp
+index 8810b83..a3c7470 100644
+--- a/src/planner/planner_capture.cpp
++++ b/src/planner/planner_capture.cpp
+@@ -169,7 +169,7 @@ int PlannerNoteOrder(const uintptr_t* chars, int n, const float* location, void*
+ 	}
+ 	int order = ++s_orderSeq;
+ 	float dest[3] = { location[0], location[1], location[2] };
+-	double now = ElapsedSec();
++	double now = BehaviorNow(ElapsedSec());
+ 	if (MarkRepeats(chars, n, dest, now) == 0)
+ 		return 0;
+ 	TakeSnapshot();
+diff --git a/src/planner/planner_merge.cpp b/src/planner/planner_merge.cpp
+index 18e6d31..87a7b60 100644
+--- a/src/planner/planner_merge.cpp
++++ b/src/planner/planner_merge.cpp
+@@ -332,7 +332,7 @@ bool PlannerMergeGather(const uintptr_t* chars, int n, float gather[3], unsigned
+ {
+ 	if (PlanStoreMode() != PLANNER_ON || !chars || n <= 0 || !gather || !alone || !gatherDist)
+ 		return false;
+-	double now = ElapsedSec();
++	double now = BehaviorNow(ElapsedSec());
+ 	const MergeRecord* best = NULL;
+ 	for (int i = 0; i < MERGE_RECORDS; ++i)
+ 	{
+@@ -392,6 +392,7 @@ void PlannerResumeFromGather(const uintptr_t* chars, int n, double now)
+ {
+ 	if (PlanStoreMode() != PLANNER_ON || !chars || n <= 0)
+ 		return;
++	now = BehaviorNow(now);
+ 	TakeSnapshot();
+ 	ClearMemo();
+ 	for (int k = 0; k < n; ++k)
+diff --git a/src/planner/planner_tick.cpp b/src/planner/planner_tick.cpp
+index 3f97735..1238040 100644
+--- a/src/planner/planner_tick.cpp
++++ b/src/planner/planner_tick.cpp
+@@ -63,6 +63,11 @@ struct DropFacts { float moveDest[3]; double planAge; bool halted; };
+ } // namespace planner_tick_detail
+ using namespace planner_tick_detail;
+ 
++double planner_tick_detail::BehaviorNow(double rawNow)
++{
++	return OOT_ActiveNow(rawNow, ZonePauseIsPaused());
++}
++
+ // Written by the arm, then read by the main thread alone.
+ static CoarseScratch* s_scratch     = NULL;
+ static int            s_legSpan     = 2;
+@@ -582,7 +587,7 @@ static PlanDropWhy SlotDropDue(const PlanView& v, uintptr_t character, const flo
+ 	return PlanDropDue(true, IslandK7IsUnconcious(character), DistXz(pos, v.finalDest), moveDest, v.finalDest,
+ 	                   v.destAtPlan,
+ 	                   PlanIsModSend(moveDest, v.resend, v.resendCount, m->holdDest, m->haveHold,
+-	                                 OOT_ActiveNow(now, ZonePauseIsPaused()) - m->holdTime),
++	                                 now - m->holdTime),
+ 	                   halted);
+ }
+ 
+@@ -733,6 +738,7 @@ static bool TickSlot(int slot, const PlayerChar* players, int nPlayers, double n
+ void PlannerTick(void* zoneMgr, double now)
+ {
+ 	if (PlanStoreMode() == PLANNER_OFF) return;
++	const double activeNow = BehaviorNow(now);
+ 	(void)zoneMgr;
+ 	PlannerPreArrivalFrame();
+ 	if (now - s_lastTick < TICK_SECONDS)
+@@ -744,6 +750,13 @@ void PlannerTick(void* zoneMgr, double now)
+ 		PlanStoreReset();
+ 		s_storeGen = gen;
+ 	}
++	// Keep load/generation retirement and wall-time reporting alive, but do not
++	// expire, replace or search character routes while simulation is paused.
++	if (ZonePauseIsPaused())
++	{
++		PlannerReportTick(now);
++		return;
++	}
+ 	TakeSnapshot();
+ 	PlayerChar players[PLAYER_SCAN_MAX];
+ 	int nPlayers = ReadPlayers(players);
+@@ -754,11 +767,11 @@ void PlannerTick(void* zoneMgr, double now)
+ 	{
+ 		if (!PlanStoreKey(slot))
+ 			continue;
+-		if (TickSlot(slot, players, nPlayers, now, replans < REPLANS_PER_TICK))
++		if (TickSlot(slot, players, nPlayers, activeNow, replans < REPLANS_PER_TICK))
+ 			++replans;
+ 	}
+ 	PlannerWaterRefresh();
+-	MergeTick(now);
++	MergeTick(activeNow);
+ 	PlannerReportTick(now);
+ }
+ 
+diff --git a/src/planner/planner_tick_internal.h b/src/planner/planner_tick_internal.h
+index 663a7a5..e87c6c4 100644
+--- a/src/planner/planner_tick_internal.h
++++ b/src/planner/planner_tick_internal.h
+@@ -14,6 +14,12 @@
+ namespace planner {
+ namespace planner_tick_detail {
+ 
++// Main thread only. All planner behavioral ages share the existing order-outcome
++// active clock. Pass raw ElapsedSec/frame time once, never an already active value.
++// Wall-time cadence, diagnostic intervals and native async completion clocks stay
++// separate. The shared clock survives load; generation reset retires old plans.
++double BehaviorNow(double rawNow);
++
+ // A located point: its store node and section, and whether the engine's own face lookup found it.
+ struct Located { unsigned key; int dir; int uid; int node; int exact; };
+ 

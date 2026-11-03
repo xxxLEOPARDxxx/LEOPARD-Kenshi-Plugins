@@ -1,0 +1,89 @@
+{
+  "format": "KEO_PLANNER_MAINTENANCE_CANDIDATE",
+  "version": 1,
+  "base": "680a2b57aad2af3a77525552ed3565556c850103",
+  "productionDiffSha256": "27cc866714ed4d0489c8554a7a8d0a76dd8476c9fcbabe23b85d1ecd3f82fa6d",
+  "sources": {
+    "src/planner/planner_capture.cpp": {
+      "bytes": 8596,
+      "sha256": "bf100bc8a8f01719cebc24214a0c2991d57a4c45caddf7c88c0131799cddde91"
+    },
+    "src/planner/planner_merge.cpp": {
+      "bytes": 16037,
+      "sha256": "79486a5c2d4833aac461a8ced9758c1812fbec95499369812864dca14a39127b"
+    },
+    "src/planner/planner_tick.cpp": {
+      "bytes": 28779,
+      "sha256": "4a9b656d5f4e309c1a62cc62c2c806eca3328645682b65998f2cdbf67b337ede"
+    },
+    "src/planner/planner_tick_internal.h": {
+      "bytes": 4301,
+      "sha256": "613274a9869895c5d07b1af8abb8e58c588d4228c5750cb8b033745b2f4d3f7c"
+    },
+    "src/planner/planner_hooks.cpp": {
+      "bytes": 10515,
+      "sha256": "8c0bc4fd113420c001ea50293aea9de7c42265c917f0fa788cdd1b004d0cb588"
+    }
+  },
+  "proofs": {
+    "leopard/planner-pause-verification-20261103.json": {
+      "bytes": 3621,
+      "sha256": "6c06da63d97014fe881e94c65ec0ffc0fa8f29d54167fb73d1a7421df280415e"
+    },
+    "leopard/planner-tls-verification-20261103.json": {
+      "bytes": 1318,
+      "sha256": "02805e199a2b2a5b0c8fd03df18af48a0c383081e867a4ba1d1bf4117ba39b9f"
+    }
+  },
+  "candidate": {
+    "bytes": 1440256,
+    "sha256": "52f7c723a497b22b2e5b19b3632a2699adb6d813dc07169770a44563b4402fde"
+  },
+  "candidatePath": "D:\\DEV\\Kenshi\\forks\\KEO\\build\\KEO_step4_plannercare_prod\\KEO.dll",
+  "buildLog": {
+    "bytes": 421,
+    "sha256": "16868ab6c2037d6e9a18580afae225007f65d15a45007cb7191762c3522ca921"
+  },
+  "fullBuildLog": {
+    "bytes": 8991,
+    "sha256": "af01c3efbb9ad4cc603f1c38495a7316b555e6789436518cf6a21483bdd6900b"
+  },
+  "build": "one PROD;341 compiled,0 restored;BUILD_CACHE=off;4 compiler processes;/O2 /GL /LTCG",
+  "exports": [
+    "?startPlugin@@YAXXZ",
+    "MCM_Describe"
+  ],
+  "kenshiLibImports": 144,
+  "importsEqualPriorPriorityCandidate": true,
+  "locales": {
+    "en_GB": {
+      "bytes": 10692,
+      "sha256": "42ab3e53215639d16dabad9e6f504b01ef9632003c904bb78c5520abcd62fe91"
+    },
+    "ru_RU": {
+      "bytes": 14428,
+      "sha256": "e4b5548d42dabddec8ff0648808f015c108eae2c401291d6c8af4f10364e3c4b"
+    },
+    "zh_CN": {
+      "bytes": 10467,
+      "sha256": "c64ac378cda3f2cf2fc655e5591089b6a4ef0c221aee234514b72c420196e2de"
+    }
+  },
+  "installedDllUnchanged": {
+    "bytes": 1437184,
+    "sha256": "e155894936c0fceaac3813bd88448b64f5dd896a047a66bd369bad3fa51c4324"
+  },
+  "personalIniReadOnlyHash": {
+    "bytes": 36412,
+    "sha256": "70e4d9fab5f3a4584be17d05c931d25c07abe3d12d0e534ba454b7056a545afc"
+  },
+  "routingMasterRemainsFalse": true,
+  "independentReview": "fine_job_finish CLEAR clock and TLS; actual fresh18x2+6 mutants and51x2+2 mutants",
+  "installation": false,
+  "commit": false,
+  "publication": false,
+  "limits": [
+    "No game routing-ON/short-path/FPS or long-run leak acceptance",
+    "No spawn or GOG fix claim"
+  ]
+}

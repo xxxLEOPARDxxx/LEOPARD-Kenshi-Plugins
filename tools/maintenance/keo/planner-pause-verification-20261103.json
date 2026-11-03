@@ -1,0 +1,96 @@
+{
+  "format": "KEO_PLANNER_PAUSE_MAINTENANCE",
+  "version": 1,
+  "base": "680a2b57aad2af3a77525552ed3565556c850103",
+  "scope": "main-thread planner behavioral clock only; no native pipeline clock/geometry/settings/install changes",
+  "inputs": {
+    "src/planner/planner_tick_internal.h": {
+      "bytes": 4301,
+      "sha256": "613274a9869895c5d07b1af8abb8e58c588d4228c5750cb8b033745b2f4d3f7c"
+    },
+    "src/planner/planner_tick.cpp": {
+      "bytes": 28779,
+      "sha256": "4a9b656d5f4e309c1a62cc62c2c806eca3328645682b65998f2cdbf67b337ede"
+    },
+    "src/planner/planner_capture.cpp": {
+      "bytes": 8596,
+      "sha256": "bf100bc8a8f01719cebc24214a0c2991d57a4c45caddf7c88c0131799cddde91"
+    },
+    "src/planner/planner_merge.cpp": {
+      "bytes": 16037,
+      "sha256": "79486a5c2d4833aac461a8ced9758c1812fbec95499369812864dca14a39127b"
+    },
+    "src/planner/plan_policy.h": {
+      "bytes": 22111,
+      "sha256": "6bbeb8e7f4bdb3e97bd6de9189ec3d858a5d0ba38a0fd2cebf56ff505fdd614c"
+    },
+    "src/planner/plan_policy.cpp": {
+      "bytes": 20237,
+      "sha256": "adf1fdb0d26a76d525afbcf01d82eee58245a3c74addb7dd80cc1c090c5ca133"
+    },
+    "src/movement/order_outcome_table.h": {
+      "bytes": 7085,
+      "sha256": "bfcfe5eb07b9f75fee06f788192d009b10f9f92bbd79e657e0731c8c1f0d000e"
+    },
+    "src/movement/order_outcome_table.cpp": {
+      "bytes": 20981,
+      "sha256": "56f0883f41628e72494edfca4d4698d51d430d4cc54719125011587f58bee9ad"
+    },
+    "src/movement/order_outcome_policy.h": {
+      "bytes": 4539,
+      "sha256": "5130d9a0043eb94dc3ebbdf22a24f9c50728e27c10b173ca384d1c60002bf574"
+    },
+    "src/movement/order_outcome_policy.cpp": {
+      "bytes": 3251,
+      "sha256": "711831bca1077567aa4c9087a04021e6e5f21944ba16d1830b7577eccb4b4ab9"
+    },
+    "leopard/test_planner_pause_clock.py": {
+      "bytes": 7043,
+      "sha256": "2b5c23ee4275d5be6eb5792685c9625a6ceacc8710d9e7ac8ac7fcc749a431d3"
+    },
+    "leopard/planner-pause-maintenance-20261103.md": {
+      "bytes": 4537,
+      "sha256": "9ba8850b8768a66eddbab2af253b6d8f42df857a10ca2cc4de518217870479f3"
+    }
+  },
+  "evidence": {
+    "build/planner-pause-red.log": {
+      "bytes": 539,
+      "sha256": "268819e781c50ed9b26cbbd39edb89681c00e3f04b933542625dbb5699a93af7"
+    },
+    "build/planner-pause-final.log": {
+      "bytes": 1356,
+      "sha256": "be5c70a59c3393e6b29cd2934c4838909686cfc7fe3a9bb5c8a455abd66df971"
+    },
+    "build/planner-pause-tests/existing-suites.log": {
+      "bytes": 223,
+      "sha256": "53acbca16c669c649cb47ed60c6fb0207b08cbafc416f34641913a35946b00fe"
+    },
+    "build/planner-pause-tests/native/planner_capture.log": {
+      "bytes": 21,
+      "sha256": "240cde8ac3187bfb5811c4e11e4f5e9ff3c11f68eba7e0ef97dcc51c174dfeab"
+    },
+    "build/planner-pause-tests/native/planner_merge.log": {
+      "bytes": 19,
+      "sha256": "decf1fb42ef242a3d6ad9a80a3e0ff01d16d1f541eee879d91da4df8758217e2"
+    },
+    "build/planner-pause-tests/native/planner_tick.log": {
+      "bytes": 18,
+      "sha256": "22909cc24df0201693a87817066faa588311d1a7f8491a73f07b759a0f3d3d35"
+    }
+  },
+  "results": {
+    "boundary": "18 /Od +18 /O2",
+    "functionalMutants": 6,
+    "existingSuites": 4,
+    "nativeCompile": "3 changed TUs /O2 /GL /Gy; no linked DLL"
+  },
+  "installedDll": {
+    "bytes": 1437184,
+    "sha256": "e155894936c0fceaac3813bd88448b64f5dd896a047a66bd369bad3fa51c4324"
+  },
+  "priorCandidate": {
+    "bytes": 1439744,
+    "sha256": "d396c05a64dfa45eb8ea515782cb7c0327d00e7ceb86108881a4e2e21f767ca2"
+  }
+}

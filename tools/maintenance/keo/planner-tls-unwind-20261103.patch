@@ -1,0 +1,283 @@
+From 03a2581d27047fc90665c74d7b7a838891e2611e Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Tue, 3 Nov 2026 17:29:56 +0300
+Subject: [PATCH] Restore planner request context across native unwinds
+
+---
+ ...lanner-maintenance-candidate-20261103.json | 89 +++++++++++++++++++
+ leopard/planner-tls-maintenance-20261103.md   | 22 +++++
+ .../planner-tls-verification-20261103.json    | 40 +++++++++
+ leopard/test_planner_tls_unwind.py            | 42 +++++++++
+ src/planner/planner_hooks.cpp                 | 36 +++++---
+ 5 files changed, 215 insertions(+), 14 deletions(-)
+ create mode 100644 leopard/planner-maintenance-candidate-20261103.json
+ create mode 100644 leopard/planner-tls-maintenance-20261103.md
+ create mode 100644 leopard/planner-tls-verification-20261103.json
+ create mode 100644 leopard/test_planner_tls_unwind.py
+
+diff --git a/leopard/planner-maintenance-candidate-20261103.json b/leopard/planner-maintenance-candidate-20261103.json
+new file mode 100644
+index 0000000..48a135b
+--- /dev/null
++++ b/leopard/planner-maintenance-candidate-20261103.json
+@@ -0,0 +1,89 @@
++{
++  "format": "KEO_PLANNER_MAINTENANCE_CANDIDATE",
++  "version": 1,
++  "base": "680a2b57aad2af3a77525552ed3565556c850103",
++  "productionDiffSha256": "27cc866714ed4d0489c8554a7a8d0a76dd8476c9fcbabe23b85d1ecd3f82fa6d",
++  "sources": {
++    "src/planner/planner_capture.cpp": {
++      "bytes": 8596,
++      "sha256": "bf100bc8a8f01719cebc24214a0c2991d57a4c45caddf7c88c0131799cddde91"
++    },
++    "src/planner/planner_merge.cpp": {
++      "bytes": 16037,
++      "sha256": "79486a5c2d4833aac461a8ced9758c1812fbec95499369812864dca14a39127b"
++    },
++    "src/planner/planner_tick.cpp": {
++      "bytes": 28779,
++      "sha256": "4a9b656d5f4e309c1a62cc62c2c806eca3328645682b65998f2cdbf67b337ede"
++    },
++    "src/planner/planner_tick_internal.h": {
++      "bytes": 4301,
++      "sha256": "613274a9869895c5d07b1af8abb8e58c588d4228c5750cb8b033745b2f4d3f7c"
++    },
++    "src/planner/planner_hooks.cpp": {
++      "bytes": 10515,
++      "sha256": "8c0bc4fd113420c001ea50293aea9de7c42265c917f0fa788cdd1b004d0cb588"
++    }
++  },
++  "proofs": {
++    "leopard/planner-pause-verification-20261103.json": {
++      "bytes": 3621,
++      "sha256": "6c06da63d97014fe881e94c65ec0ffc0fa8f29d54167fb73d1a7421df280415e"
++    },
++    "leopard/planner-tls-verification-20261103.json": {
++      "bytes": 1318,
++      "sha256": "02805e199a2b2a5b0c8fd03df18af48a0c383081e867a4ba1d1bf4117ba39b9f"
++    }
++  },
++  "candidate": {
++    "bytes": 1440256,
++    "sha256": "52f7c723a497b22b2e5b19b3632a2699adb6d813dc07169770a44563b4402fde"
++  },
++  "candidatePath": "D:\\DEV\\Kenshi\\forks\\KEO\\build\\KEO_step4_plannercare_prod\\KEO.dll",
++  "buildLog": {
++    "bytes": 421,
++    "sha256": "16868ab6c2037d6e9a18580afae225007f65d15a45007cb7191762c3522ca921"
++  },
++  "fullBuildLog": {
++    "bytes": 8991,
++    "sha256": "af01c3efbb9ad4cc603f1c38495a7316b555e6789436518cf6a21483bdd6900b"
++  },
++  "build": "one PROD;341 compiled,0 restored;BUILD_CACHE=off;4 compiler processes;/O2 /GL /LTCG",
++  "exports": [
++    "?startPlugin@@YAXXZ",
++    "MCM_Describe"
++  ],
++  "kenshiLibImports": 144,
++  "importsEqualPriorPriorityCandidate": true,
++  "locales": {
++    "en_GB": {
++      "bytes": 10692,
++      "sha256": "42ab3e53215639d16dabad9e6f504b01ef9632003c904bb78c5520abcd62fe91"
++    },
++    "ru_RU": {
++      "bytes": 14428,
++      "sha256": "e4b5548d42dabddec8ff0648808f015c108eae2c401291d6c8af4f10364e3c4b"
++    },
++    "zh_CN": {
++      "bytes": 10467,
++      "sha256": "c64ac378cda3f2cf2fc655e5591089b6a4ef0c221aee234514b72c420196e2de"
++    }
++  },
++  "installedDllUnchanged": {
++    "bytes": 1437184,
++    "sha256": "e155894936c0fceaac3813bd88448b64f5dd896a047a66bd369bad3fa51c4324"
++  },
++  "personalIniReadOnlyHash": {
++    "bytes": 36412,
++    "sha256": "70e4d9fab5f3a4584be17d05c931d25c07abe3d12d0e534ba454b7056a545afc"
++  },
++  "routingMasterRemainsFalse": true,
++  "independentReview": "fine_job_finish CLEAR clock and TLS; actual fresh18x2+6 mutants and51x2+2 mutants",
++  "installation": false,
++  "commit": false,
++  "publication": false,
++  "limits": [
++    "No game routing-ON/short-path/FPS or long-run leak acceptance",
++    "No spawn or GOG fix claim"
++  ]
++}
+diff --git a/leopard/planner-tls-maintenance-20261103.md b/leopard/planner-tls-maintenance-20261103.md
+new file mode 100644
+index 0000000..ce334c5
+--- /dev/null
++++ b/leopard/planner-tls-maintenance-20261103.md
+@@ -0,0 +1,22 @@
++# Planner destination TLS unwind maintenance, 2026-11-03
++
++Separate bounded patch on local base `680a2b5`, alongside the independently frozen planner pause-clock patch. Original jacobericson/KEO authorship and GPLv3 unchanged; no publication, version bump, game/INI/UI/installation/commit action.
++
++## Confirmed failure and repair
++
++Actual `hook_setDestinationVec3` saved `t_plan` at entry and restored it only at normal return. An exception escaping the original destination routine left the interrupted character/slot in thread-local routing context. Owned host originals reproduce this with C++ exceptions; the full regression additionally covers SEH. This proves the stale-context defect, not that it caused a particular player's reported circles.
++
++Only this wrapper changes. A POD `__try/__finally` restores the exact saved context after both ordinary and exceptional exits, including nested calls. The original function still receives identical arguments exactly once. Existing post-success diagnostics execute in their original position; exceptions are not caught/swallowed or retried. No routing algorithm, native address/profile, queue, budget, worker concurrency, gameplay setting or default changes.
++
++No allocation, lock, retained pointer, logging, world walk, polling or own worker is added. Normal entry does the same bounded TLS copy as before; finally extends that restoration to unwind. Runtime CPU/FPS and long-session leak freedom are not established by this host test.
++
++Исправлен подтверждённый случай, когда после ошибки при назначении пути в контексте потока оставался предыдущий персонаж. Контекст теперь восстанавливается и при исключениях; новая логика маршрутов или принудительные повторные запросы не добавлены.
++
++## Verification
++
++- Before edit: `leopard/test_planner_tls_unwind.py` produced actual RED `FAIL normal/C++/SEH path restores exact previous TLS` (log `build/planner-tls-red.log`). Earlier isolated actual-body reproduction is under `build/planner-pause-tests/tls-audit/result.log`.
++- Final `/Od` and `/O2`: 51 actual production-wrapper controls each, two compiled negative controls fail runtime assertions. Normal, nested, NULL destination, unarmed routing, C++ unwind, SEH unwind, original exactly once and an independent thread's TLS isolation are exercised. Test uses owned stack movement buffers and originals, never a game process or native engine function.
++- Actual `src/planner/planner_hooks.cpp` compiles against current KEO SDK with VC10 `/O2 /GL /Gy`: `build/planner-tls-tests/native-hooks.log`.
++- `git diff --check`: clean. No final DLL link performed at this stage.
++
++Scope: `src/planner/planner_hooks.cpp`, `leopard/test_planner_tls_unwind.py`, this report and its small `planner-tls-verification-20261103.json` input/log manifest. The separate pause-clock files were not modified by this second change. Installed DLL and personal routing state remain unchanged.
+diff --git a/leopard/planner-tls-verification-20261103.json b/leopard/planner-tls-verification-20261103.json
+new file mode 100644
+index 0000000..25ff354
+--- /dev/null
++++ b/leopard/planner-tls-verification-20261103.json
+@@ -0,0 +1,40 @@
++{
++  "format": "KEO_PLANNER_TLS_UNWIND_MAINTENANCE",
++  "version": 1,
++  "base": "680a2b57aad2af3a77525552ed3565556c850103",
++  "inputs": {
++    "src/planner/planner_hooks.cpp": {
++      "bytes": 10515,
++      "sha256": "8c0bc4fd113420c001ea50293aea9de7c42265c917f0fa788cdd1b004d0cb588"
++    },
++    "leopard/test_planner_tls_unwind.py": {
++      "bytes": 4417,
++      "sha256": "f12c15456a5f4484d8fa4f4217b3cda8f3b6d0d7ed41bec0f66116558cd9bbaa"
++    },
++    "leopard/planner-tls-maintenance-20261103.md": {
++      "bytes": 3124,
++      "sha256": "fb460bcf2d77dcc617077b948ff044ebc848240b3e1e97b007c7ed1574684b66"
++    }
++  },
++  "evidence": {
++    "build/planner-tls-red.log": {
++      "bytes": 447,
++      "sha256": "2a7baca4ff628693c687cebad969ff9e0970b6674ce97a9915d98fd88a27d403"
++    },
++    "build/planner-tls-final.log": {
++      "bytes": 313,
++      "sha256": "f962397abb68a268910512e9137d829e8d24d8d0411165999463133faf6944f0"
++    },
++    "build/planner-tls-tests/native-hooks.log": {
++      "bytes": 19,
++      "sha256": "b2f8f7710c50373eb39889c1704696cec8fa5e5231dac6d5cd46e68ac713a09b"
++    }
++  },
++  "results": {
++    "actualBoundary": "51 /Od +51 /O2",
++    "compiledNegativeControls": 2,
++    "nativeCompile": "planner_hooks.cpp /O2 /GL /Gy",
++    "gameCalls": false,
++    "linkedDll": false
++  }
++}
+diff --git a/leopard/test_planner_tls_unwind.py b/leopard/test_planner_tls_unwind.py
+new file mode 100644
+index 0000000..92a177b
+--- /dev/null
++++ b/leopard/test_planner_tls_unwind.py
+@@ -0,0 +1,42 @@
++"""Actual planner destination wrapper with owned normal/nested/unwind seams.
++No game process, native calls or real CharMovement lifetime assumptions.
++"""
++from pathlib import Path
++import os,subprocess
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/planner-tls-tests';OUT.mkdir(exist_ok=True)
++s=(ROOT/'src/planner/planner_hooks.cpp').read_text();a=s.index('static void hook_setDestinationVec3(');b=s.index('{',a);end=b+1;depth=1
++while depth:depth+=(s[end]=='{')-(s[end]=='}');end+=1
++actual=s[a:end]
++fixture=r'''
++#include <windows.h>
++#include <stdint.h>
++#include <cstdio>
++#include <cstring>
++#include <stdexcept>
++struct PlannerTls{uintptr_t cm;float dest[3];int haveDest,slot,islandSeen,flipped,edgeSeen;};
++__declspec(thread) PlannerTls t_plan;
++__declspec(thread) int mode,depth,calls;unsigned checks=0;
++volatile LONG s_armed=1;struct Counters{volatile LONG rung17,roadPreempt,staleRerequest;}counter;
++Counters*PlannerCountersGet(){return &counter;}int PlanStoreFind(uintptr_t p){return int(p&15);}
++#define OFF_CMOV_EDGE_COUNTER 0
++void C(bool b,const char*s){++checks;if(!b){std::printf("FAIL %s\n",s);std::exit(1);}}
++static void hook_setDestinationVec3(void*,const float*,int,bool);
++void Original(void*cm,const float*dest,int priority,bool notVertical){++calls;C(t_plan.cm==(uintptr_t)cm&&t_plan.haveDest==(dest!=NULL)&&t_plan.slot==(s_armed?PlanStoreFind((uintptr_t)cm):-1),"original sees only its own synchronous planner context");C(priority==3&&notVertical,"arguments forwarded unchanged");if(mode==1)throw std::runtime_error("owned C++ original failure");if(mode==2)RaiseException(0xe1122334,0,0,NULL);if(mode==3&&!depth){PlannerTls saved=t_plan;++depth;int child=0;float p[3]={4,5,6};hook_setDestinationVec3(&child,p,3,true);--depth;C(std::memcmp(&saved,&t_plan,sizeof(saved))==0,"nested return restores exact outer context");}t_plan.islandSeen=1;t_plan.flipped=1;t_plan.edgeSeen=1;}
++void(*orig_setDestinationVec3)(void*,const float*,int,bool)=Original;
++@BODY@
++void SehCall(void*cm,const float*dest){__try{hook_setDestinationVec3(cm,dest,3,true);}__except(GetExceptionCode()==0xe1122334?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){}}
++void Case(int m){PlannerTls saved;std::memset(&saved,0x37,sizeof(saved));saved.cm=123;saved.slot=2;t_plan=saved;mode=m;depth=calls=0;int cm=0;float dest[3]={1,2,3};if(m==2)SehCall(&cm,dest);else{try{hook_setDestinationVec3(&cm,m==4?NULL:dest,3,true);}catch(const std::exception&){C(m==1,"original C++ exception reaches caller unchanged");}}C(std::memcmp(&saved,&t_plan,sizeof(saved))==0,"normal/C++/SEH path restores exact previous TLS");C(calls==(m==3?2:1),"native original runs exactly once per invocation");}
++DWORD WINAPI OtherThread(void*){Case(0);Case(1);Case(2);Case(3);return 0;}
++int main(){for(int m=0;m<5;++m)Case(m);s_armed=0;Case(0);s_armed=1;PlannerTls main=t_plan;HANDLE thread=CreateThread(NULL,0,OtherThread,NULL,0,NULL);C(thread!=NULL,"owned independent TLS thread");C(WaitForSingleObject(thread,5000)==WAIT_OBJECT_0,"owned TLS test thread joined");CloseHandle(thread);C(std::memcmp(&main,&t_plan,sizeof(main))==0,"other thread cannot replace Main planner TLS");std::printf("PASS %u actual planner TLS unwind controls\n",checks);return 0;}
++'''.replace('@BODY@',actual)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=os.environ.copy();env['INCLUDE']=f'{VC}/include;{SDK}/Include';env['LIB']=f'{VC}/lib/amd64;{SDK}/Lib/x64'
++def run(name,code,opt,negative=False):
++ p=OUT/(name+'.cpp');p.write_text(code);exe=OUT/(name+'.exe');r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(p),'/Fo'+str(OUT/'tls.obj'),'/Fe'+str(exe)],env=env,capture_output=True,text=True);print(r.stdout+r.stderr,end='');assert r.returncode==0
++ r=subprocess.run([str(exe)],capture_output=True,text=True);print(r.stdout+r.stderr,end='');assert (r.returncode!=0 and 'FAIL ' in r.stdout) if negative else r.returncode==0
++for opt in ['Od','O2']:run('tls-'+opt,fixture,opt)
++run('mutant-cleared',fixture.replace('t_plan = saved;','std::memset(&t_plan,0,sizeof(t_plan));'),'O2',True)
++# Make restoration normal-return-only again; the exact current body otherwise stays.
++normal=fixture.replace('__try\n\t{','\n\t{',1).replace('__finally\n\t{','\n\t{',1)
++assert normal!=fixture
++run('mutant-normal-only',normal,'O2',True)
++print('PASS two compiled planner TLS negative controls')
+diff --git a/src/planner/planner_hooks.cpp b/src/planner/planner_hooks.cpp
+index 074d9b1..6aec044 100644
+--- a/src/planner/planner_hooks.cpp
++++ b/src/planner/planner_hooks.cpp
+@@ -69,22 +69,30 @@ static const char*          s_refusedWhy = NULL;                 // a literal: t
+ static void hook_setDestinationVec3(void* cm, const float* dest, int priority, bool notVertical)
+ {
+ 	PlannerTls saved = t_plan;
+-	t_plan.cm = (uintptr_t)cm;
+-	t_plan.haveDest = dest != NULL;
+-	if (dest) { t_plan.dest[0] = dest[0]; t_plan.dest[1] = dest[1]; t_plan.dest[2] = dest[2]; }
+-	t_plan.slot = InterlockedCompareExchange(&s_armed, 0, 0) ? PlanStoreFind((uintptr_t)cm) : -1;
+-	t_plan.islandSeen = t_plan.flipped = t_plan.edgeSeen = 0;
+-	if (t_plan.slot >= 0 && cm && *(const int*)((const char*)cm + OFF_CMOV_EDGE_COUNTER) >= 17)
+-		InterlockedIncrement(&PlannerCountersGet()->rung17);
+-	orig_setDestinationVec3(cm, dest, priority, notVertical);
+-	if (t_plan.slot >= 0)
++	__try
+ 	{
+-		if (!t_plan.islandSeen)
+-			InterlockedIncrement(&PlannerCountersGet()->roadPreempt);
+-		else if (t_plan.flipped && !t_plan.edgeSeen)
+-			InterlockedIncrement(&PlannerCountersGet()->staleRerequest);
++		t_plan.cm = (uintptr_t)cm;
++		t_plan.haveDest = dest != NULL;
++		if (dest) { t_plan.dest[0] = dest[0]; t_plan.dest[1] = dest[1]; t_plan.dest[2] = dest[2]; }
++		t_plan.slot = InterlockedCompareExchange(&s_armed, 0, 0) ? PlanStoreFind((uintptr_t)cm) : -1;
++		t_plan.islandSeen = t_plan.flipped = t_plan.edgeSeen = 0;
++		if (t_plan.slot >= 0 && cm && *(const int*)((const char*)cm + OFF_CMOV_EDGE_COUNTER) >= 17)
++			InterlockedIncrement(&PlannerCountersGet()->rung17);
++		orig_setDestinationVec3(cm, dest, priority, notVertical);
++		if (t_plan.slot >= 0)
++		{
++			if (!t_plan.islandSeen)
++				InterlockedIncrement(&PlannerCountersGet()->roadPreempt);
++			else if (t_plan.flipped && !t_plan.edgeSeen)
++				InterlockedIncrement(&PlannerCountersGet()->staleRerequest);
++		}
++	}
++	__finally
++	{
++		// Restore the outer synchronous request on native/C++ unwind too.
++		// No caught exception, retained native pointer or repeated engine call.
++		t_plan = saved;
+ 	}
+-	t_plan = saved;
+ }
+ 
+ // AI back thread, after the original computed its point. The planner's point for a planned
