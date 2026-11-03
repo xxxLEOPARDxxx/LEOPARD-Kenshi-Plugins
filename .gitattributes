@@ -7,6 +7,9 @@ GlobalSatelliteMap/atlas-terrain/raster/** -text whitespace=blank-at-eol,blank-a
 GlobalSatelliteMap/atlas-terrain/raw-rgb/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/atlas-terrain/rgb-raster/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/atlas-terrain/world-source/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/world-material/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/staged-material/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/fine-windows/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the exact working-file hashes recorded for the private game adapter.
 tools/diagnostics/satellite-capture-probe/CaptureProbe.cpp text eol=crlf
 tools/diagnostics/satellite-capture-probe/SatelliteCaptureProbe.ini text eol=lf

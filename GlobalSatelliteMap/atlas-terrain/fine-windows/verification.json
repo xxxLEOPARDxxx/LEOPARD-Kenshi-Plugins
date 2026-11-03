@@ -1,0 +1,79 @@
+{
+  "scope": "pure bounded1/3/9m visible-window math and exact completion admission; no Main/game/cache/thread/install",
+  "status": "implementer PASS; independent review pending",
+  "command": "C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe run_tests.py",
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "dependencies.json": "392fd8c9402baccf61b1ef9988cfd219c5bba4b6739e0c98af70b87857b02629",
+    "FineWindowPlanner.h": "29cd0a69a63c5c31fff26ff9040561f597b14011b48d1687a90dc1bad78ed091",
+    "freeze.py": "142e38dd7d5e863e65e23d8f053fc03cd4ffcc2949ac3d4f3fd513430150f21c",
+    "PLAN.md": "af64e46cb9f615414fccc2079f2d78eecbfa5e8ddc268898c594ad3f078fc15f",
+    "planner_tests.cpp": "7d00a3388b9fc936ea975f7f8791439d0381514e0278bb3eb50e7f17c401f94d",
+    "README.md": "a09451fbc335dac209f66da65b177c52cc2fbf132112bde57d8e6dda1cf87f77",
+    "run_tests.py": "1c5e2dc8647bd9a65659f7f653d606948493ef034a32ab6de55a29add03ff7b3",
+    "test_mutants.py": "9d4daee6a184e242d1d26d7fd37618b9b1e15220a1406782596ecbde2aa2a801"
+  },
+  "dependencies": {
+    "GlobalSatelliteMap/atlas-view/AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af",
+    "GlobalSatelliteMap/atlas-view/AtlasWindowPolicy.h": "5c07dbc43fff567ef6504d90ffe944011c67d4e200c4c46c37b18bd51561b224"
+  },
+  "outputs": {
+    "absolute-center-build.log": "b5e3b3e3b74207e2cb5e7edabaa757b268a7bb7e83d8f47077645bd8b67bd3d2",
+    "absolute-center-run.log": "559bb5cf72cef4dcb82d9e061b45f2f429fa546ef0bdaabd76fd6443d2607328",
+    "apron-reserve-build.log": "24ae872881bb771e663194c0a81d6562fec75732f149d2d6744cfb484e7fff78",
+    "apron-reserve-run.log": "82d0b41f518b69b0c36d0fab93bdd2057b5ce324c717d704f2946162a214c38a",
+    "build-O2.log": "24ca21dfb04693ce73f2bf29dbe325f3117ae2f9e9d826310240d17e852b8448",
+    "build-Od.log": "24ca21dfb04693ce73f2bf29dbe325f3117ae2f9e9d826310240d17e852b8448",
+    "capacity-build.log": "2cf12e8a138c9c98fadb3a5893e6efd9c407347969ba3b561211035e352f272c",
+    "capacity-run.log": "f9b8f8d5585aa7e3ec939011b79dc2c2c63ad9c976e043f5d7e4f7d96c006b41",
+    "completion-build.log": "8c973494c496aeebc3b1326455fb58a7bbf33a88c980d3ad59cbe9975581a42d",
+    "completion-run.log": "22faef70cc34fcbc69262b28f9a0be33d70416fedb4fc52c6c7793cfc366acc4",
+    "material-epoch-build.log": "0bb7bbc8ec0ba3fa8e3b103509ef08b604cf6ef291d6e41749b90292cc0ef9f1",
+    "material-epoch-run.log": "b922ce182d6c2c048fd223fc74f5e5192e78a57d50b38cf5a28d6978e876279f",
+    "mutants.log": "02fbd73a8ba0856db1f12ceeebe9078f44fce293e4c68d2212f3e5191fda9eb4",
+    "negative-priority-build.log": "cd786d1a0729aa31fc0ef1b85349167d46990c6608bf1c3cf8e961aadcd26cd9",
+    "negative-priority-run.log": "9d5df709c5d208c19c74fa93a952da2cfaa0ae7376e684f68cf9e14142a9b835",
+    "phase-reserve-build.log": "7abab2f325e80c58081d8284bb31eeb2a3dbeb093d958445a5b169915ab3b904",
+    "phase-reserve-run.log": "5f3dd5bd082025c8e6d421dd42e9b4df5ce6eed7b5f01ff60126f3a8f513be0f",
+    "planner_O2.exe": "b1dde085037273045edff6201e1bbbd1b4bd08cc62e2f392b4383fc31a9e7660",
+    "planner_Od.exe": "354df8b20624efddcf1ca3376f4c22f2ef44667431c92a305f595f22fd807bfb",
+    "red-malformed-plan.log": "7aacdba74e4277546679f52c87919a795bad1f790827ec7588ff9505e227b632",
+    "red-missing-header.log": "6df9b3c579380207110160ab88460864afb531f59160fdd930b1d9630483a7ea",
+    "red-negative-priority.log": "9d5df709c5d208c19c74fa93a952da2cfaa0ae7376e684f68cf9e14142a9b835",
+    "run-O2.log": "651af0fdb270608c8708fe835495a42a876732cba108ba214c19beb0b1d6a841",
+    "run-Od.log": "651af0fdb270608c8708fe835495a42a876732cba108ba214c19beb0b1d6a841",
+    "source-ledger-build.log": "cc61f785fdd667e122ca8f822af165d4cf02d29e5aec1207af97cf54d8e2a9b1",
+    "source-ledger-run.log": "c7b37ce00a21067ff538c56ebcabf25978e90553ab6fdd7923d25d1f0fcf14b4",
+    "source-proof-build.log": "31d43359c6c9639582d24ba367725e7732694eb657153b5dae4f9e14c67f8860",
+    "source-proof-run.log": "efce81f4c8dc1b8f3817f6ec6aaa806373855e48e2a682aabcc2627f029a47a6"
+  },
+  "results": {
+    "optimizedChecks": 458358,
+    "unoptimizedChecks": 458358,
+    "compiledMutants": 9,
+    "cppHeapAllocations": 0,
+    "maxJobs": 128,
+    "worldExtent": 294912,
+    "worldOrigin": -147456,
+    "globalGrid9": 128,
+    "globalGrid3": 384,
+    "globalGrid1": 1152,
+    "tileExtent": 73728
+  },
+  "limits": {
+    "maxGpuCap": 201326592,
+    "minimumRawWindowBytes": 1048576,
+    "maxScreenAxis": 16384,
+    "maxJobs": 128
+  },
+  "limitations": [
+    "Not Main/viewer/renderer or cache integration.",
+    "Budget.limit must honor the smallest applicable pipeline cap; existing90MiB raster is unchanged.",
+    "Explicit source/raster/per-window residency proof remains external and must cover all proposed keys including apron/worstphase.",
+    "Same-view pan stability assumes unchanged extents/screen/reservation; genuinely changed source residency can alter admission.",
+    "1m output uses actual18m height grid and does not invent height detail; screen density may warrant only9m even at zoom8.",
+    "Key equality does not authenticate completed pixels; source/resource/worker/retirement safety remains caller responsibility.",
+    "Coarse fallback ownership is never released by this planner; no whole-view completion claim.",
+    "No FPS, whole-process peak or in-game visual acceptance claim."
+  ]
+}

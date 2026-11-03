@@ -1,0 +1,486 @@
+{
+  "scope": "CPU base-snapshot cell/bank planner +qualified ordered-algebra/source/paint/residency design; no renderer/game/frozen-folder edits",
+  "status": "implementer PASS; parent independent review pending",
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "authenticate.py": "3ee28ecfe44278d855335aef4d8e2350de3c1b504ce4857bbefcf4e3cfa1f2c6",
+    "DESIGN.md": "9303809755f0e5e97f6c9c2deb26798a96f8b1fc04df66c661bb11c5227eded3",
+    "freeze.py": "812e3179444e96b507f2bc5d461035af7efb9b315f2b8f5b709927c7b5a7756b",
+    "plan_tests.cpp": "b790f25c924b130e86848dfbfafbcfe031ac03cd02b6e9b45c38938b320dd835",
+    "README.md": "7462718fb6cc0c6809b10b13a3a7acfa7ad8967cf7eed2a90ea9566ef9ea5e8e",
+    "run_tests.py": "ddb86d541d14a4222f10fa5a4b04b6942100481dc638ccf84e812c32603201b3",
+    "test_mutants.py": "f83a513b4de65ef3f243c44836e492ee9a3dd182e0e7593ea55d40af6151e1fe",
+    "WorldMaterialPlan.h": "8bb72f85f82a827e5c79f082a9829da5644f8648b289c58aa46cf014dd0cee57"
+  },
+  "dependencies": {
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\catalog.json": "6e274871f3a0d894db352306a5fb6b1f004e685a75897cf8e897fc47e53bb454",
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\RegionCatalogData.h": "bd85da4b86a5e13bafd3ab9793c9a5f7ac3047488e57c813e430ade5d40f426f",
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\source-manifest.json": "69b7a25921afa65cecbeef898bd2ca80eca0eeaaf16237790c8b3477337a4023",
+    "D:\\DEV\\Kenshi\\research\\global-satellite-20261031\\biome-current-36248\\active-biomes.json": "511a8813928114dbf6b2697d5fa46a46e858c46690907cf8493e092c84633d0f",
+    "D:\\DEV\\Kenshi\\research\\global-satellite-20261031\\biome-current-36248\\biome-selection-snapshot.json": "5cb085baa67a7100181daf4edf25bdf3e47f5c162f7ef551fa8eb5910e565d60",
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\RegionCatalog.h": "b62a97f0ad4fe4c01966eb43a672e4df9298ce51c566ab2db8931f4b90f5aefb",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_source\\GeographyTerrain.hlsl": "f9326a91f29e1f1644fc0acbb33bc126bce04590faef2cc7b89dabd1292fd9a1",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_source\\GeographyVertex.hlsl": "6ef9efa2c8027da354f812b3f59bfa055c48edcfa4a2057782bd7416f58d54e9",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\contract.json": "afe79b4152ba35cc364e4f7c92a59771a428d4dec2d63217d442bfba2993f0b9",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af"
+  },
+  "realCases": [
+    {
+      "region": [
+        3,
+        3
+      ],
+      "regionIndex": 27,
+      "cell": 10,
+      "nativeSelector": [
+        18,
+        4,
+        0,
+        0
+      ],
+      "nativeChannels": [
+        1,
+        0
+      ],
+      "nativeSidOrder": [
+        "2743-Newwworld.mod",
+        "48690-Newwworld.mod"
+      ],
+      "sources": [
+        11,
+        37
+      ],
+      "sourceAssets": [
+        100,
+        101,
+        109,
+        110,
+        148,
+        149,
+        163,
+        167,
+        194,
+        195,
+        210,
+        212
+      ],
+      "diffuseLayers": 6,
+      "normalLayers": 6,
+      "ddsBytes": 50331456,
+      "monoSourceBytes": 83885956,
+      "stageSourceBytes": 88080260
+    },
+    {
+      "region": [
+        6,
+        6
+      ],
+      "regionIndex": 54,
+      "cell": 3,
+      "nativeSelector": [
+        68,
+        49,
+        37,
+        3
+      ],
+      "nativeChannels": [
+        4,
+        3,
+        2,
+        0
+      ],
+      "nativeSidOrder": [
+        "55399-Newwworld.mod",
+        "2730-Newwworld.mod",
+        "5663-Newwworld.mod",
+        "51632-Newwworld.mod"
+      ],
+      "sources": [
+        42,
+        8,
+        48,
+        39
+      ],
+      "sourceAssets": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        26,
+        27,
+        34,
+        35,
+        46,
+        47,
+        66,
+        67,
+        70,
+        71,
+        72,
+        73,
+        92,
+        93,
+        94,
+        95,
+        117,
+        118,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        144,
+        145,
+        163,
+        164,
+        184,
+        185,
+        186,
+        188,
+        194,
+        195,
+        206,
+        207
+      ],
+      "diffuseLayers": 23,
+      "normalLayers": 23,
+      "ddsBytes": 192937248,
+      "monoSourceBytes": 226491748,
+      "stageSourceBytes": 88080260
+    }
+  ],
+  "authenticatedRealFiles": {
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\landtexture_rocksurface01_dif.dds": {
+      "sha256": "c6f56a207d9868415368d109262564b2e4081f713c9aea66f0b2b3bda6b155b4",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\landtexture_rocksurface01_nml.dds": {
+      "sha256": "673991440497732ed8dbea7471ff100452afcadc0f3c939cc1e205a87d289bad",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\mesa2rockloop_dif.dds": {
+      "sha256": "1f30b580a90fe3db29f2d1e5b4261555b1784722daa1cf0964e60f52a8b48639",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\mesa2rockloop_nml.dds": {
+      "sha256": "910318f3dca706b2c100cefdd2d261aed045d1e5f71cc15afcbd9bbd74019c7f",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\rockbed01_dif.dds": {
+      "sha256": "1d9b2ba1350a1eb4773220c0314d9c23c4c3aafc8fa9c1dc8397796656e95134",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\rockbed01_nml.dds": {
+      "sha256": "8b2855d7b7c9a1d2c4eeb8973d3e77e2e2f5e773d0d3e8b133d9fcdbf8c09ee6",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sand01bc_grey.dds": {
+      "sha256": "70ada8b3ab3d6555dab34916a03737627bf256d7730d190bc8102649c84fdf63",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sand3d_nml.dds": {
+      "sha256": "aea8305b50dfdf370e5367273a6d30a66e710cd6c4401341a9aec5715032afc1",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\skinnersgravel_dif.dds": {
+      "sha256": "1b0f516c60e781820f511f999f7efd34e156fadbf70023e6e5fbae8bc012631d",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\skinnersgravel_nml.dds": {
+      "sha256": "e36b85aafeaaaf10cfd756962739e514a87151f2b6cd6d1be7ec75320c9988e6",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\wadigravel-white_dif.dds": {
+      "sha256": "bc712e270d0316ab91e87e3d6c4501f8f7ac8650cd1e21351bd86d42666b860d",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\wadigravel_nml.dds": {
+      "sha256": "83270743efca5f1541ecdc4a79a10be1c3b0925f1fed2ba05cbb2e33d3cd578d",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\overlaymaps\\new_overlay.3.3.png": {
+      "sha256": "079e3557b69ba792df738bddefd098ad728482de4a48725bd3585e8ba04186c2",
+      "bytes": 1707240
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\overlaymaps\\colour.3.3.png": {
+      "sha256": "49154c4aca9bfde375314568f330f665347c8bc2fd8068db6cc7a8c0d5a9a9bd",
+      "bytes": 9960925
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\agglomerate_cliff_dif.dds": {
+      "sha256": "de8ae09c7343d4d6c4a4a3d10a1e1294ad1a7f368b4d730b969c4d7b939f27a8",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\agglomerate_cliff_nml.dds": {
+      "sha256": "20dbd8ab83b685286e59296177f04e999975d5895bea79139e21bf410f31ff98",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashland-snow_dif.dds": {
+      "sha256": "303cca82e3725445bb580101b509f7b96a17948d29a8de8ba025e83e40930383",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashland-snow_nml.dds": {
+      "sha256": "83526728187c5d5e4bc8587a699e64667e7493bbdfa04909a5db8e0382088d3b",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashland_ash_dif.dds": {
+      "sha256": "a03282eb81b0593740efecabca2f91901cf72aaa90040448bed7c437f204fc71",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashland_ash_nml.dds": {
+      "sha256": "cd633a505a67fc50ee4f53ebea0b8a6b574347c055ca77676c8ab63de137d8d7",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashland_ashnoise_dif.dds": {
+      "sha256": "9404baa920e7963e8f37765b23426bb5f7ecf54f6464e3b4f7310e755abd5d0b",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashland_ashnoise_nml.dds": {
+      "sha256": "2a972dbe57405a5cd9477106249cc037db0263e7b54d41011fd8a9103095fcd2",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashloop_dif.dds": {
+      "sha256": "7c459fadc30db17da7cc9fe33e733dd515db0883a4fdc4dd8a6a0b2846b1c828",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\ashloop_nml.dds": {
+      "sha256": "434f77bdbbbc9b4487c11aff8aad7a8aaae125159155219e827a7edaa87bc708",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\canyongrass_dif.dds": {
+      "sha256": "ae59bcf0c9762b6c8adc9d21d42416363f34ea4a433e4c0832d102d74f5791df",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\canyongrass_nml.dds": {
+      "sha256": "6d9eeadf87886708fe4291c77c61499d15a7f69fd55aeb33d1bf4c9be5b6d2ed",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\circuitrypanel_nml.dds": {
+      "sha256": "277b41d19695aac74100e46994ff97d2cee2c754fb44fc16cac90e251e00006f",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\circuitrypanelcliffs_dif.dds": {
+      "sha256": "af3ab154e73b4a495fd55fb8c414863a568dcef52e315b309d0eae8b24f499b3",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\darkstone_landbaseloop_dif_hi.dds": {
+      "sha256": "815059b142335dd0fb8f68e473ad41f559a768a977db556a447358c99074d047",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\darkstone_landbaseloop_nml_hi.dds": {
+      "sha256": "95f4c0d93a5f49b07a36252db1518cf07888eb88c4065047fd787f9750dc3845",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\earthstone_dif.dds": {
+      "sha256": "1075bf4e6e12d9bea711666006f570448597629330d6f3ff63cbd285c50d2589",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\earthstone_nml.dds": {
+      "sha256": "04a5db60d66d8333da0c61c49656da1b6b29ee87ad86bfd535d3fafcafa5a7f7",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\flat_land_dif.dds": {
+      "sha256": "b218a6d111fcace9509d00a4bfb7e93a05e8d2852807fe994fabb7cd459561bb",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\flat_land_nml.dds": {
+      "sha256": "5011e3768448a3c78ef1efc749fe6159ef32ad2d786d6e115988d3a12fd7597f",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\flintcliffs_dif.dds": {
+      "sha256": "f6c2ea64858edd5cc6bf6ed3fee3118fa76530905190ad3e28dd1c8c7de3114f",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\flintcliffs_nml.dds": {
+      "sha256": "abb84ea96977144ec8fa71dbd70187938fe8437bc50c5d93202bf6fd334d7bb4",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\gravel_chips_dif.dds": {
+      "sha256": "edb2ce481ceee216d33cb39da5ba9ee38076baeefb05b80f6b119b5a1d1ac27b",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\gravel_chips_nml.dds": {
+      "sha256": "66603eff6ab4fd33d13d26719bbc16907053c26861e8090166ef058fb0c74c55",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\gritmudrock_dif.dds": {
+      "sha256": "c421c1a5a92b448055c46256672e82b3c0472a21bf059eed5897321b6b8e822d",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\gritmudrock_nml.dds": {
+      "sha256": "b71e81504ba7b4107bc976e1e30884856203e40072144d1c7522555cca60ec8b",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\mudcrack-complex_dif.dds": {
+      "sha256": "4a1207c7d9c8af707a557cbcc8e0c2236bea6e2d65fee5d1d468ae2888e20952",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\mudcrack-complex_nml.dds": {
+      "sha256": "70952578761d6051420bb09985d7eb2e3c068126d23a2ef6fef65e0ca84acdec",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\patagonian_dif.dds": {
+      "sha256": "87d2ae70761674432e2169276c8d8ff891b378c3dbcaaa6382efe2b1e770cff9",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\patagonian_nml.dds": {
+      "sha256": "0df93c57dec10b43437e37fcac35be73ac00fe068dc7780bdcf062e4db5e0364",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\river_pebbles_dif.dds": {
+      "sha256": "47ff95b83ff73211d1506afcdf89e0751f11c156491c24f2fb629d0694902cd7",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\river_pebbles_nml.dds": {
+      "sha256": "7936d13d397c9dd856cde5a59ada4eecc206b2d7073cbf15de20d2d1fe229166",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\road_newtex_sand01_dif.dds": {
+      "sha256": "4ac63a22f32a8ebae78795987ef6c5f56714cba4d213d31c2334c73f1324ff41",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\road_newtex_sand01_nml.dds": {
+      "sha256": "96fc16fb14f3523ec5d5faee6f9151c34928c5ae26373dcaeb401df15fec9c30",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\roadloop01_dif.dds": {
+      "sha256": "3d9401809663e537657a2605835cacdc7549a87640de147898eb8bff037fbbd5",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\roadloop01_nml.dds": {
+      "sha256": "e1e1912e621184f4406287f7f2cc8b84f5a45d4783b2f72177d5db9e8f4921ab",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sand01bc_grey_nml.dds": {
+      "sha256": "8b9e747a498e1359e58a5264c606bc3b8edcba0718e4e09b3a2045244405a4ad",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\seaweed-tarsand_dif.dds": {
+      "sha256": "8a75ece7201638ce9a46dd81cf0737f5b23b38ec5a5eaa17c823fb8f995aca07",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\seaweedplane_nml.dds": {
+      "sha256": "7e4ba72691988c05fb93fb7f339ca7f8149757f534815554ee1250bdb2076104",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sharpblockloop_darker_dif.dds": {
+      "sha256": "9996e0acdd197da92c3ed0f5b2d58ff4f774634d8d0aafcf45c65102be59bd31",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\sharpblockloop_nml.dds": {
+      "sha256": "6cda77b6d8b88f94afad61cfb0b5169adc752a558c2ad261718e47f6c60f0101",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\tarsandcliff_dif.dds": {
+      "sha256": "c79440631b40b228d6f4a2117bd39b8fff4630b7a346f5899dbb33d42f578f09",
+      "bytes": 5592560
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\textures\\tarsandcliff_nml.dds": {
+      "sha256": "f35dcaae6851085577a9813b30a3ffbac66b7fb067a7c3c4571c03f5d8030b98",
+      "bytes": 2796344
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\overlaymaps\\new_overlay.6.6.png": {
+      "sha256": "70701bc6a66e14d296353a50b1fee102c52ee9655ff35b783b6258176a37201f",
+      "bytes": 424245
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\overlaymaps\\colour.6.6.png": {
+      "sha256": "757264203682cf5a99e4397230d312e0fd6c21f97c23a0b1398a747ba090bbc7",
+      "bytes": 5222881
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\overlaymaps\\new_overlay.7.6.png": {
+      "sha256": "b5d6039d50209e30e84b2dab634e3a3ace5a00d4a7c7aa28346b3a603a94c5f6",
+      "bytes": 768079
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\overlaymaps\\colour.7.6.png": {
+      "sha256": "3910a106b7c91c38c09e7442ff5d4b5c1e6a21120a0c0f0583878191a55505bc",
+      "bytes": 3842479
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\blendmap.png": {
+      "sha256": "db1b67238c5639f1791079b092c4d1a4cd66897c5a33093f07c781fa7d7ce907",
+      "bytes": 51948
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\deferred\\terrain.hlsl": {
+      "sha256": "7bde0c5f6aa81d542b5c25925b28508a937d5086effeb959a9b0c5b96f11eb07",
+      "bytes": 4116
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\deferred\\terrainfp4.hlsl": {
+      "sha256": "050de26aa6082155fe95bf027b5783b86d87ae6cc03381d9c761b731a88327d7",
+      "bytes": 12605
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\deferred\\gbuffer.hlsl": {
+      "sha256": "d6a525658f224379269369c9adaa928fc82a72285aed5cffb21d077df4c9c943",
+      "bytes": 2460
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\materials\\common\\wet.hlsl": {
+      "sha256": "e9042fbf57df1463d014761576701dd3c7e8680f70c89adcb9196ffdb5580d11",
+      "bytes": 967
+    }
+  },
+  "results": {
+    "optimizedChecks": 61105,
+    "unoptimizedChecks": 61105,
+    "compiledMutants": 11,
+    "cells": 1024,
+    "fourSidCells": 49
+  },
+  "budget": {
+    "cap": 201326592,
+    "worstFourSidDds": 192937248,
+    "worstMonoSources": 226491748,
+    "fixedSidSourcesWithFullPaintAndBlend": 83885956,
+    "staged256SourcesPlusPingPong": 88080260,
+    "fourPatchRgbBeforeReadback": 90088444,
+    "rgbMaterialReadback": 524288,
+    "rgbNormalReadback": 262144,
+    "rgbHeightReadback": 262144,
+    "fourPatchRgbWithThreeReadbacks": 91137020,
+    "separateFp32ProofBeforeObserver": 90612732,
+    "fp32ProofOneObserver": 1048576
+  },
+  "outputs": {
+    "aliases-build.log": "12b474832c8adc6a879bbd3c9e0ccd536b228329cfa7321b4e9f3eaa77a32753",
+    "aliases-run.log": "1b8ce811630dbb11abb1d3d6e6e396c77984eca05da04a2616489f703839f577",
+    "authenticate.log": "d1a95974f22c474b60767c7154c8c8543bff9e26f597a92cb51ce0c2151c7f62",
+    "authenticated-plans.json": "868c98251daf6da650b5afc2b91d8cfc477c8895448f5f568aa0368ff65ac836",
+    "build.log": "51de499045c61b6574a0656cf18d7f3397fce1d3d3e22a182e43fd819ac27cb2",
+    "channel-build.log": "d5cc8e03074315d2da8f0a3cd88cba109313606429c824f23e65bca75147059f",
+    "channel-run.log": "bf751b22eb78b4c284a9e946c3ddbe3f10f3ca234e6cd92fd393a882ed319a91",
+    "debug-build.log": "51de499045c61b6574a0656cf18d7f3397fce1d3d3e22a182e43fd819ac27cb2",
+    "debug.log": "ebed2e1792e74da4ba16f94d2c6463920cc39f524bb6aac5ed63bba103c34407",
+    "epoch-build.log": "0746b7b90cb0b94f545bbbe29c2cd67d8527d763bd68c0427a1adf38ca665cb8",
+    "epoch-run.log": "d7bcbb29af5f12f251e85f4ffbe29c5a2bccf3e34fe7528cb6a8ff0724b87b83",
+    "Expected.h": "76ec1cab22659cf3cc935eb061fbf0fef0058f77430bde9a0beb4231d5026b59",
+    "five-slots-build.log": "1c0b71f79f96cae960077826a77cc8a7ad291106628d2e80196b2390b5e847ce",
+    "five-slots-run.log": "a8e8b75c02348307be4b230f96a7305c83d6d2e6d19b079b0f2cb76b8fea46a1",
+    "mip-shape-build.log": "6d9db14aaa7297b0a53251b1d08af2f4cc5982f94aba516d4cb060ebfc7ef185",
+    "mip-shape-run.log": "c7f8e5d2635042b68cf003440a7c3fb77a650625b68fd7ecdefc1cdf257d5a03",
+    "mutants.log": "524665acc1993347618e0a1ada8093514302a712c8e1997cc957ac746ea4a79b",
+    "paint-build.log": "57903589b1444c22efadbd664e8b187a32ef5de172f69f80dd81ef39c14fb67d",
+    "paint-run.log": "7aa762f571b107e2e887be1f4826de3f7eed650c55dd0220ee059c8dabcfd636",
+    "pingpong-build.log": "04e2b10a04b318cc964aa1009eda828709dd06e012cdbd59c4231ed9c3e9bfd1",
+    "pingpong-run.log": "c7f8e5d2635042b68cf003440a7c3fb77a650625b68fd7ecdefc1cdf257d5a03",
+    "plan.log": "ebed2e1792e74da4ba16f94d2c6463920cc39f524bb6aac5ed63bba103c34407",
+    "red.log": "545b0196781bd4e40691ec207c4421cefc95037fd05279e1334885161c8e8acc",
+    "roles-build.log": "2b00a072fcf36baff93d604bf2d45c1c0a5f629ef2279e43de3ce5d88c46ea92",
+    "roles-run.log": "7dd1b18a391dd6e087093aaef4c0d7b646319c8b2e2596cbb5a4cec74ccd6d9f",
+    "selector-row-build.log": "655fef823ce2af84f003633f7ccf8ea577af482e11fd5909e8da4a2930604355",
+    "selector-row-run.log": "cfb0bbce3f150192cd49ca793a01430c315d08fd3e02389c6859e80c1993cbb8",
+    "two-sid-cap-build.log": "3fe89c712187a4beb5a148eb63d9179533dc28bc966e6dfdd7251b65b8e8d85c",
+    "two-sid-cap-run.log": "1cb85eaf9eb7c48adc500dc9b9abd9aea3ec58708d5d06659fce74b4e2859984",
+    "viewer-cap-build.log": "c64e8e0954f827894f7ead3b54955aee4fcc070977dc0cd67f8fbf179491dac2",
+    "viewer-cap-run.log": "29d2dbab5f2696126f8ecc6d6035fd87307bf820f5405a423159131f68e621dc"
+  },
+  "limitations": [
+    "Current authoritative native resource-winner mapping remains a required production receipt.",
+    "Budget candidates are arithmetic only; stage-side256. No GPU loader or material values fabricated.",
+    "Exact original selectors/slots15CBrows retained; bank-role indices only are remapped.",
+    "Multi-cell/paint-scissor derivative parity and production whole-owner residency require separate proof.",
+    "Staged parity is against pinned private monolithic reference, not stock native DXBC byte equality."
+  ]
+}

@@ -16,6 +16,17 @@ replacement passes validation; no incomplete diagnostic replaces ready.json.
 - `raster/`: context-safe fixed terrain render with real1m/3m/9m controls.
 - `raw-rgb/`: direct terrain RGB16F writer; removes checker-parity neighbour
   reconstruction from material storage without changing native material math.
+- `rgb-raster/`: state-safe direct-RGB render, typed frame validation and guarded
+  publication; still a fixed two-SID component.
+- `world-source/`: authenticated retained-file height supplier; streams at most
+  one2,117,682B window, with no complete-world allocation.
+- `world-material/`: all1024 base-snapshot cell plans, original selector order,
+  per-SID role remaps and explicit staged-source arithmetic/provenance limits.
+- `staged-material/`: four ordered float32 accumulation passes and one common
+  material tail, verified against the pinned private monolithic reference.
+  This does not claim stock game DXBC identity or implement a streaming loader.
+- `fine-windows/`: bounded globally anchored1m/3m/9m planning and complete-key
+  admission, including source/material epochs and explicit capacity/reservations.
 
 The private game adapter is documented in
 `tools/diagnostics/satellite-capture-probe/FixedTerrainControl.md`. It tests the
@@ -56,3 +67,12 @@ Source texture detail, loaded mesh/LOD detail and screen zoom are separate
 limits. Increased zoom alone must not be presented as improved rendered detail.
 No public release, full-world seam guarantee or absence of all leaks follows
 from the isolated components or a single successful capture.
+
+For visible detail integration, reserve the complete maximum source/raster and
+fixed non-detail owners before sizing the reusable fine-window pool. Charge
+that pool once: do not count cached reusable fine entries as retained AND as
+new windows. Protect in-flight leases explicitly. Keep reservations stable over
+ordinary pan/zoom so filling a cache cannot itself force repeated1m/3m switches.
+The planner alone neither owns that pool nor authorizes a renderer: the old
+90MiB diagnostic helpers retain their checks, and production must account all
+current, pending and retired owners against the unchanged192MiB shared cap.
