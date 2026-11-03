@@ -729,3 +729,37 @@ material and normals outside the edge strip matched. This does not identify the
 exact native stitch branch, prove a universal halo width or register the original
 user screenshot. Case1 still requires actual equal-world comparison against the
 case0 interior reference; full-world recapture is not authorized by this control.
+
+## Owned native-source single-window control (2026-11-03)
+
+`[Probe] WorldFrameControl=1` is a separate private startup mode. It is mutually
+exclusive with NativeReceiptControl and FixedTerrainControl. Restart with the
+viewer `[GlobalSatelliteMap] Enabled=0` and `FixedTerrainGsmStartupDisabled=1`;
+no viewer texture resources may remain. The existing WorldFrameRequest value
+is latched without replay. With a loaded, paused test world and visible global
+map, change WorldFrameRequest to a fresh nonzero token. WorldFrameCancel=1
+withdraws an active request. This is an internal control, not an MCM feature.
+
+The fixed window is material region27/cell10, center(-13824,-13824),512 square,
+1 metre per pixel. Native GameData material parameters are copied after bounded
+region/path/SID/mask checks. Main captures the exact-group original-file source
+metadata; the worker authenticates TIFF and image content, decodes images and
+validates pixels. Main alone performs bounded D3D uploads/draw/readback in the
+checked compositor context. The export worker receives only copied metadata,
+a path and borrowed accepted CPU planes; ownership lasts until its known join.
+Map visibility uses unlink-aware widgets. Load/new-game generation changes,
+including reloads with the same GameWorld address, invalidate the request.
+
+A fresh `world-frame-PID-token-tick/frame.gwf` is a small forensic artifact:
+176-byte GWSF0001 header, FP16 RGB/gloss, normalRGBA8 and world-heightR32. At512
+it is4,194,480 bytes. Material alpha remains gloss; plane2 is authenticated
+triangle height, not normalized radial. A file can finish before Main learns
+of a later context change; only a successful fresh Main acknowledgment marks
+this diagnostic request complete. It is never a GST/GSI/ready atlas and cannot
+replace or advertise the working map. Header materialSha hashes the900 material
+parameters only; distortion/provenance remain separate copied/gated state.
+
+Host controls, malformed/cancel/wait/fault cases and independent reviews do not
+prove actual game pixels, production scheduler latency or universal leak freedom.
+The private callback still performs conservative INI/resource census checks;
+these must not become a permanent per-frame production path.

@@ -49,7 +49,7 @@ $env:LIB="$vc/lib/amd64;$sdk/Lib/x64;D:/DEV/Kenshi/deps/KenshiLib/Libraries;$boo
 $env:PATH="$vc/bin/amd64;$env:PATH"
 & "$vc/bin/amd64/cl.exe" /nologo /c /EHsc /MD /O2 /GS- /GL /W3 /D NDEBUG /D WIN32 /D _WINDOWS /D _USRDLL /D UNICODE /D _UNICODE "/Fo$out/CaptureProbe.obj" "$PSScriptRoot/CaptureProbe.cpp"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
-& "$vc/bin/amd64/link.exe" /nologo /DLL /MACHINE:X64 /LTCG "/OUT:$out/SatelliteCaptureProbe.dll" KenshiLib.lib OgreMain_x64.lib MyGUIEngine_x64.lib user32.lib kernel32.lib advapi32.lib "$out/CaptureProbe.obj"
+& "$vc/bin/amd64/link.exe" /nologo /DLL /MACHINE:X64 /LTCG "/OUT:$out/SatelliteCaptureProbe.dll" KenshiLib.lib OgreMain_x64.lib MyGUIEngine_x64.lib user32.lib kernel32.lib advapi32.lib d3d11.lib dxgi.lib ole32.lib windowscodecs.lib "$out/CaptureProbe.obj"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
 & $python (Join-Path $repo 'GlobalSatelliteMap/tests/test_pe_contract.py') "$out/SatelliteCaptureProbe.dll" --imports-root 'D:/SteamLibrary/steamapps/common/Kenshi' --report "$PSScriptRoot/loader-contract.json"
 if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}

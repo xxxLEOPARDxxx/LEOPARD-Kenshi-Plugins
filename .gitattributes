@@ -34,3 +34,11 @@ tools/diagnostics/satellite-capture-probe/native-receipt-verification.json -text
 GlobalSatelliteMap/atlas-terrain/world-native/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 GlobalSatelliteMap/atlas-terrain/world-pixels/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+tools/diagnostics/satellite-capture-probe/WorldFrameControl.h -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+tools/diagnostics/satellite-capture-probe/world_frame* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+tools/diagnostics/satellite-capture-probe/build_world_frame_control.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+tools/diagnostics/satellite-capture-probe/world-frame-verification.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
