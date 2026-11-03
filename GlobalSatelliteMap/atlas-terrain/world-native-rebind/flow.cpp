@@ -1,0 +1,14 @@
+#define REBIND_FIXTURE_ONLY
+#include "tests.cpp"
+int main(){try{
+ AtlasView::Com<ID3D11Device>d;AtlasView::Com<ID3D11DeviceContext>context;C(SUCCEEDED(D3D11CreateDevice(NULL,D3D_DRIVER_TYPE_WARP,NULL,0,NULL,0,D3D11_SDK_VERSION,&d.p,NULL,&context.p)),"actual WARP device for terminal-provider reuse");
+ SourceReceipts::Scope scope={GetCurrentThreadId(),7,0x100000007ULL,0x300000001ULL};Session*s=new Session;Ready(*s,scope);WorldCohort::Job*j=new WorldCohort::Job;InitJob(*j,scope);j->count=2;CapturedSources*tokens=new CapturedSources;WorldBank::Ledger ledger={};U64 lastBinding=0;
+ for(unsigned repeat=0;repeat<2;++repeat){++scope.job;j->scope=scope;for(unsigned n=0;n<2;++n)j->frame[n].generation=scope.job;C(SUCCEEDED(s->RebindCapture(*j,*tokens))&&s->Binding()!=lastBinding&&s->ReadyFor(*j),"fresh terminal native-style provider per persistent cohort");lastBinding=s->Binding();C(SUCCEEDED(s->Cohort().Submit(true,*j,*tokens,scope)),"submit captured terminal-provider tokens to persistent cohort");
+  for(unsigned n=0;n<2;++n){DWORD start=GetTickCount();while(s->Cohort().State()!=WorldCohort::Complete&&GetTickCount()-start<60000){C(SUCCEEDED(s->Cohort().Pump(true,d.p,scope,ledger)),"actual WIC/source/bank/raster through rebind proxy");Sleep(1);}C(s->Cohort().Result(n,true,scope,j->frame[n])!=NULL,"fresh accepted cohort output through terminal adapter");
+   for(unsigned p=0;p<3;++p){char file[160];std::sprintf(file,"../world-cohort/_generated/sequential-%u-accepted-%u.bin",n,p);std::vector<BYTE>expected=Read(file);C(!std::memcmp(s->Cohort().Plane(n,p,true,scope,j->frame[n]),&expected[0],expected.size()),"rebound native-style provider output exact to sequential reference");}
+   WorldCohort::Borrowed borrow={};C(s->Cohort().Borrow(n,true,scope,j->frame[n],borrow)&&borrow.controllerCpuBytes+s->ExtraCpuPeakBytes()==s->CpuReservation(),"borrow owner ledger composes wrapper peak without double counting controller");C(s->RebindCapture(*j,*tokens)==E_UNEXPECTED&&s->Binding()==lastBinding&&s->Cohort().Result(n,true,scope,j->frame[n]),"unreleased CPU/plane view forbids provider rebinding without Pump");C(s->Cohort().ReleaseView(n,true,scope,j->frame[n])==S_OK,"all consumer work completed before release");
+  }
+  C(s->Cohort().State()==WorldCohort::Idle&&s->Cohort().OwnedGpuBytes()==WorldBank::SourceBytes&&s->Cohort().HeightAuthentications()==1,"persistent bank/worker/TIFF survive terminal provider replacement");
+ }
+ C(NativeFakeStage::commits==4&&NativeFakeStage::live==4&&NativeFakeStage::peak==8,"one shared source commit per SID and bounded old/new provider peak");const U64 cpu=s->CpuReservation();delete tokens;delete j;delete s;C(!NativeFakeStage::live,"all native-style stage owners destroyed after joined persistent worker");printf("PASS %u actual rebind WIC/WARP checks; two cohorts/four views, TIFF authenticated once; CPU%I64uB\n",checks,cpu);return 0;
+ }catch(...){return 1;}}

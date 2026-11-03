@@ -12,3 +12,5 @@ __pycache__/
 # Local terrain-cohort test executables, raw output oracles and compiler caches.
 GlobalSatelliteMap/atlas-terrain/world-cohort/_generated/
 GlobalSatelliteMap/atlas-terrain/world-cohort/__pycache__/
+GlobalSatelliteMap/atlas-terrain/world-native-rebind/_generated/
+GlobalSatelliteMap/atlas-cache/world-build-disk/_generated/
