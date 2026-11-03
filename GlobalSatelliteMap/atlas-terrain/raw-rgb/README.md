@@ -1,0 +1,35 @@
+# Native terrain full-RGB material output
+
+Separate isolated helper above the reviewed compact two-SID sources. It adds native linear RGB/gloss RGBA16F and preserves native normal RGBA8, radial R32F and D32. No Main, probe, installed-game, INI, cache or MCM changes. Native Sun/HDR lighting/display composition belongs to a later caller; these files are material outputs.
+
+Run bundled Python `C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe run_tests.py`. Pillow is required for independent fixture decoding. VC10 x64/SDK7.1/fxc are configured by the runner. `--skip-mutants` omits compiled negative controls only.
+
+## Exact shader cutpoint
+
+The generator reads the authenticated native-derived GeographyTerrain source (f9326a91...), reconstructing its ignored snapshots through the compact component's owned source recipe when necessary. In active main_fs it replaces only `writeAlbedo(buffer,biome.albedo.rgb,fragCoord.xy)` with direct RGB and omits the final zero-metalness writer that would overwrite blue. Original writeGloss remains. Reversing those two substitutions restores the exact original bytes. Inactive mapfeature_fs, native sampling/weights/order/brightness/wetness, VS-evaluated cliff phase, normal conversion/alpha and radial depth remain unchanged. Native VS bytecode stays dbd13838450fa683426bf3df92728fc0c3dbdf2b798c31c6c1004d0a3e3ed238.
+
+Production RgbShader retains all original source/sampler slots and the exact3856B pixel-constant ABI. The independent test-only PrewriteShader observes **original** biome.albedo immediately before any active GBuffer writer on RGBA32F; it does not use the RGB substitutions or a packed decoder. Its unused normal-map RGB sampler is optimized away, while all constant offsets stay the same. RgbShader is the production variant; PrewriteShader is an oracle only.
+
+No game shader copies are tracked here. Generated snapshots/DXBC/test data stay under ignored output directories. Source preparation may regenerate the compact component's own ignored _source and _generated/source-build via its authenticated recipe; no game/probe/build source is changed. Remaining compact fixture outputs are relocated into this component's _generated/fixture, preserving the compact owner code except include paths. Existing compact source/artifact hashes are checked.
+
+## Resource API, ownership and budget
+
+`TerrainRaw::Targets::Init(device,otherOwnedBytes)` owns four fixed256² one-mip 2D surfaces: RGBA16F material, RGBA8 native normal/alpha, R32F radial, D32. View/Target(0..2), Texture(0..3) and Depth return borrowed references only while initialized. Clear releases every owned COM object and resets public outputs/OwnedGpuBytes. Reinitialization refuses until Clear. Any allocation/view/post-create device-health failure rolls back before publication.
+
+Packed four-surface payload is1048576B; raw is1310720B, exactly262144B extra. Init checks the complete caller sum against the controlled90MiB limit and unchanged global192MiB bound before allocating. This owner does not include source arrays, shader/CB/geometry/helper/readback/pending/retired allocations; the caller must charge them. The actual WARP fixture conservatively passes compact83885956B source payload plus4MiB other reservation, keeping the combined declared payload below90MiB. State/driver allocation overhead is outside payload accounting.
+
+This is a resource owner, not a production renderer. It performs no pipeline binding, draw, file read, native/Ogre call, thread/timer or world scan. Init-only allocations are reused; no per-frame work is introduced by the owner. The caller serializes the live immediate-context/render-thread path, checks aliases and saves/restores every touched pipeline slot/predication around rendering. The WARP harness's explicit draws/readbacks are test work, not an in-game scheduling/latency promise. Externally retained/bound resources remain the external owner's live payload after Clear. No FPS, universal leak-free, shutdown or hot-unload guarantee is claimed.
+
+Source/current-world/material/weather/lighting proof stays outside this helper. Fixture parameters are the frozen historical two-SID records, with explicit test wetness/water/brightness changes. They are not current native values or proof of active source resolution. Arbitrary finite inputs can still hit native wetness=-0.7 singularity or overflow/saturate FP16; no clamps or alternate formula were added. Future accepted coverage must reject/mask invalid output and prove the supported native material/weather domain; a finite mask alone cannot establish that domain.
+
+## Actual tests and outputs
+
+Nine real DDS/PNG/TIFF cases use the same four audited65² source patches/18m height grid, native VS and compact two-SID sources:1m,3m,9m; even64-pixel3m shift; wet3m; underwater3m; controlled native HDR brightness at3m and1m with wet gloss; odd1-pixel3m shift. Finer raster does not invent finer terrain height.
+
+Each case saves material.rgba16f, normal.rgba8, radial.r32f, original prewrite.rgba32f and exact vertex/pixel CB bytes. controls.json records world bounds, camera, scalar changes, formats, source/shader references and hashes. Normal alpha remains native zero, not an accepted-coverage mask; radial is distance/farClip, not absolute height.
+
+The production RGB shader on RGBA32F matches original native prewrite exactly in the exercised cases (maximum absolute difference0). RGBA16F is checked per channel within one half-storage quantum+2e-6. Observed max storage error0.00777053833 occurs in HDR; native RGB reaches8.1171875 and gloss spans0..0.532714844. No pre-lighting HDR clamp is introduced. Native normal/radial bytes match the original packed shader per case; first four normal/radial files also hash-identically to the frozen compact outputs.
+
+Odd/even overlap uses independent native prewrite as the reference. Original prewrite already differs slightly with the capture camera/raster interpolation: even64 shift max0.000869780779, odd1 shift max0.00122564659. Actual half-output differences are0.000732421875 and0.0012512207 respectively; normal max1LSB. Tests require raw overlap to follow native prewrite drift plus the two storage errors, and report drift separately (within1UNORM level in these cases). This proves the new output introduces no packed-neighbor/checker dependency. It does **not** prove exact global pixel equality or solve native floating-point camera/interpolation residue; no shader/VS precision rewrite is hidden here. Different3m/9m derivative footprints are not required to have equal material samples.
+
+Compiled functional mutants cover budget/charge/format, retained views, restored packed writer, zero-metal blue overwrite, lost gloss, invented normal alpha, wrong radial, omitted wetness, HDR clamp and partial cleanup. Eight texture/SRV/RTV/DSV/device-health failure controls check unpublication, complete COM rollback and context preservation. Failed compilation is never counted as a killed mutant. verification.json records exact source/artifact hashes and results; independent review is separate.

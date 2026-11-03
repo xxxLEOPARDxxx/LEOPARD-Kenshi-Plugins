@@ -1,0 +1,523 @@
+{
+  "scope": "isolated raw RGB terrain target owner and native-derived PS variant; no Main/probe/game/install/INI/commit",
+  "status": "implementer PASS; independent review pending",
+  "command": "C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe run_tests.py",
+  "production": {
+    "RawMaterial.h": "7b1c6a7f1cee698a9a9e4dc2e54a142d48bb34dde1cdab5659370d290a26569d",
+    "generate.py": "5e47d395febcd94e49cf84361937f574576e1915ff1293b84a34dcaf19435be5",
+    "prepare_fixture.py": "ff827bf557a6d5b36e305d88146a9d8de91dd06733b8ddc750c25c5477b0d3f4",
+    "run_tests.py": "418e9231f6e2903b68e76e93fc8d867bf87cd79d7cb80dfca30d27b34db863da",
+    "test_mutants.py": "a1e8c78aebe90ea88ac95a75c212f3278e9a927c9d23b07bf6ca200472bc8844",
+    "warp_tests.cpp": "de3478af18edbd865df814409b2ac1372cc5945e6412af35840c0e9a533d240a",
+    "policy_tests.cpp": "a3695d7b5548bd39cebf0d28c506383faab1c70b1e617d4bff7710faaa9a4399",
+    "README.md": "aa9b19bea0c9c27891f970343d46dd61e138c41093adc49c5c7c9f7e0e0e527b",
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7"
+  },
+  "artifacts": {
+    "RawShaders.h": "8a16b0da86c3aa7e37f77a256944bfcb5afd0e16ad0b9a02f26c8b5543b77aba",
+    "Rgb.hlsl": "f45589c9c59684169cfa5c92313a2b5ef6c3d6f3b5c57891a1061a4867723819",
+    "Prewrite.hlsl": "5079cd27ceb67201c0d3f72b8ee3a3167c55fa41aa0f0b8095b0cde28fd7ee85",
+    "Rgb.cso": "1dd118fe042b8f7297fe7ce5ab9d20c5392cce85acdffc8b33bd8ac006b7af2b",
+    "Prewrite.cso": "b0832e07c76bb8314c330b96a66ffbdb23cfc27e9ce5b5b312488c5cb7e0768b",
+    "Rgb.reflection.txt": "03f24a7de34a7ec57d215ac4c0bcbf2d9a62d35436bad25e464dd0f3665db2dc",
+    "Prewrite.reflection.txt": "6aec2196eb4ee0ad4563d3156f3e982b34e8af4dad39e342f87aee53643ee241",
+    "shader-contract.json": "2327484e4632f7d568e63635c562492c1048e8d20910c8de0b07f7fe1ee43160",
+    "fixture-provenance.json": "01929202727109d8ac5d63cac0f2575c6b984136ad96a68d9c28f5e07e58d087",
+    "controls.json": "9d813f18d3150f5d536797791e26f9056ecb593051fdc4e7141d3023b9582b05",
+    "height.u16": "4c2943629387364ee0bfd9f630656affd94fdc7671ab0754b5199e8f3109d3f2",
+    "policy-red.log": "e6bb13694504eee11b64ee050a7389dad0f52867b423cfa7d3b9ca616f37939f",
+    "fixture.log": "3f4e3f713953736aa6c5384f044db4e31832d513f6a1ca457e90b69f49d31336",
+    "generate.log": "1aa6b9c46fb2576692a19536d92be38f369e4629d36147e4fd9ef02c415a4c6f",
+    "policy-build.log": "4d3630623c6a2ae941c3161596f2c04f9df6d146f9f07af207e3bda7835b5a99",
+    "policy-run.log": "b635d1821c5deabb5954a4f52cada2b45d8a7a8945fd27550bf0109a08e75022",
+    "warp-build.log": "2e6fedf4f4c8a2d99b2a2ff58a6035813e3f4202497bd357a4ba683ab61bfa68",
+    "warp-run.log": "718c993158957501cb71118811560265519423478bd4998553b00e0f3a8e1ff2",
+    "mutants.log": "b98921564857b57fc5e4a8feeef08d0cfd0781d177e13b83d8192886c49fa738",
+    "fixture/Case.h": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9",
+    "fixture/Shaders.h": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315",
+    "fixture/CompactMaterial.h": "e7f708162447241de6544e5dc69ef5c0fd5bc3e1939a1dc868ceedb997188ce0",
+    "fixture/contract.json": "afe79b4152ba35cc364e4f7c92a59771a428d4dec2d63217d442bfba2993f0b9",
+    "fixture/Pixel.cso": "4b3b71ccb9c75b79791b9cf3bef5f858ba9c53151a9cfc0d65cd2e7d113fdebe",
+    "fixture/Vertex.cso": "dbd13838450fa683426bf3df92728fc0c3dbdf2b798c31c6c1004d0a3e3ed238",
+    "fixture/ProbeExpected.h": "5f0b36351b8b47dbb5f61a4917fdbbde736873ff31a8a2bf27d7f5d584bf1823",
+    "fixture/image0.rgba": "cb2365ba08fbf98eab4606302f2eb6b90e229697b848ea68db495abbe5f6f64f",
+    "fixture/image1.rgba": "acb73150c22f66834fb68a28f42eed3276dcf58d04d8c1a96f4d60ba7a86ffc6",
+    "fixture/image2.rgba": "ce37c74f5495123e61969ac19803a2aaea8c9d73da30d8903e75c40340676d7a",
+    "control3-vertex-cb.bin": "c15e061152fdb7f8006c6eb259653008bc0c72d35148008f4bf6986610b468a7",
+    "control3-pixel-cb.bin": "6db46c5f659d574500167fa43543461b5dec629fd1b9787e837574eaa1aee5ab",
+    "control3-material.rgba16f": "9386fbf42145aacb4e6a084b4eac603c97560b2e43750b1c6ec8eede8c91dbb1",
+    "control3-normal.rgba8": "025899c807ea53b9e8a2ce831b921a56b2c8fa2987cc57e407d7d9938b01ee1d",
+    "control3-radial.r32f": "262c8c343630a30e6086c1321dc229528dea56ee79dd341a61dc922914ae1bd7",
+    "control3-prewrite.rgba32f": "1de9f828b11a63c4eb553c6c4b6a6b0ae93f710f083f1ac9ec459a3e914134d8",
+    "control9-vertex-cb.bin": "a6080d49054309c5afa5d485b68a7b6145bee48c3360cabdd8b838bdd465c13f",
+    "control9-pixel-cb.bin": "6db46c5f659d574500167fa43543461b5dec629fd1b9787e837574eaa1aee5ab",
+    "control9-material.rgba16f": "3ef8d58db1b6612fafb9c51ec369092284c28c7c0dd144451e92f0a46b5d2464",
+    "control9-normal.rgba8": "46e391925cab26550df372cd6c6256a8e4f1ced3f635372cb5a74a071b1f6b7a",
+    "control9-radial.r32f": "1cd67e8b94b19d44ce3d7270b51d211da60da9b465c6536d33f76cf2a524deeb",
+    "control9-prewrite.rgba32f": "763b5daed421963e2115eeca2507cfebe130dc028246c6fcb5c8b203d67a44eb",
+    "shift3-vertex-cb.bin": "f4507aaf678ff9e3fed67fc96bfe3bac8f553f6907a8a6d4f15e7eff9d841adc",
+    "shift3-pixel-cb.bin": "3dcfe2a62028731c94fd6dbf4a59ca13bf87f0650b4dcc0ee5f895c143089be7",
+    "shift3-material.rgba16f": "3250e728ab830525dccfe5d68983e72e1bf3c621a28fd2e3aea201f3d76b52a3",
+    "shift3-normal.rgba8": "390042fe00bbc7284bee4074c7efc20199caab81ee3127d6a7c806060c882c99",
+    "shift3-radial.r32f": "862437d14853fe16a5ba8bf091bc65b892e56491bdceb80de220ca056426c3eb",
+    "shift3-prewrite.rgba32f": "606addd0691f1ff77a7ec030d0b2385500897cf41f99194e19107114b0bf9c88",
+    "control1-vertex-cb.bin": "412f421ba2c7e8cb15635d4452d3282dd0062a274dc083e45a9d354bf2cd57e5",
+    "control1-pixel-cb.bin": "6db46c5f659d574500167fa43543461b5dec629fd1b9787e837574eaa1aee5ab",
+    "control1-material.rgba16f": "c5a4be13bf3d0ec4e12616cf89384b2f2668b806e8b68640219d4c90ce133460",
+    "control1-normal.rgba8": "24de1bdb26c6b5d040427773b3b6001353c4141e56a14a351d011c0f882279e1",
+    "control1-radial.r32f": "affb526e48da7b5d6d4495c68c9e9bc9aee3e2e4c385fc5029c7a4f6c8a32df3",
+    "control1-prewrite.rgba32f": "b126b40a50a4afea526d76d1869fcab27cd1e4af3e51f0cb48a8c5db2f3aaec9",
+    "wet3-vertex-cb.bin": "c15e061152fdb7f8006c6eb259653008bc0c72d35148008f4bf6986610b468a7",
+    "wet3-pixel-cb.bin": "19a37068a6af332964d15035189250282f247eb5d650c17e56ea9af2c0193caa",
+    "wet3-material.rgba16f": "ef552d7a9eb93df89c2b403877b0aa1ec2c00315660afb7cd3adfbe3548c61ab",
+    "wet3-normal.rgba8": "025899c807ea53b9e8a2ce831b921a56b2c8fa2987cc57e407d7d9938b01ee1d",
+    "wet3-radial.r32f": "262c8c343630a30e6086c1321dc229528dea56ee79dd341a61dc922914ae1bd7",
+    "wet3-prewrite.rgba32f": "fbe7519579f13fd55ba16f7fea281d3236e0de98aa6f00fd9cdf0db81168312b",
+    "underwater3-vertex-cb.bin": "c15e061152fdb7f8006c6eb259653008bc0c72d35148008f4bf6986610b468a7",
+    "underwater3-pixel-cb.bin": "78311691c00dd3d73cad1f46a0f6d7e4787cd60c1c79c755e206e06b38483ca9",
+    "underwater3-material.rgba16f": "6178b52049398996dd852144966029656989a7f7bc1e94de15bd975cdf378487",
+    "underwater3-normal.rgba8": "025899c807ea53b9e8a2ce831b921a56b2c8fa2987cc57e407d7d9938b01ee1d",
+    "underwater3-radial.r32f": "262c8c343630a30e6086c1321dc229528dea56ee79dd341a61dc922914ae1bd7",
+    "underwater3-prewrite.rgba32f": "3d734996f30c5c9a1329ae810edc727ff5430668d1b476780944e55ffed93543",
+    "hdr3-vertex-cb.bin": "c15e061152fdb7f8006c6eb259653008bc0c72d35148008f4bf6986610b468a7",
+    "hdr3-pixel-cb.bin": "413244f283fd1dadc1f8f914ee0a022d0bd28ef9dd55109e37d3dfe699d4548d",
+    "hdr3-material.rgba16f": "c05b89f04803730a4eff005423e58a9cf874da0cc39a373d4e29cc65b37cfedc",
+    "hdr3-normal.rgba8": "025899c807ea53b9e8a2ce831b921a56b2c8fa2987cc57e407d7d9938b01ee1d",
+    "hdr3-radial.r32f": "262c8c343630a30e6086c1321dc229528dea56ee79dd341a61dc922914ae1bd7",
+    "hdr3-prewrite.rgba32f": "e73f9ca9730fe3032851b294bb261950d6ad8246711a34daf70ca4a5f03e3c62",
+    "hdr1-vertex-cb.bin": "412f421ba2c7e8cb15635d4452d3282dd0062a274dc083e45a9d354bf2cd57e5",
+    "hdr1-pixel-cb.bin": "c087877358f605066df98cef44ea14ba0641ee9cc725fa4dcb3ba7cb48bd0df1",
+    "hdr1-material.rgba16f": "b3030b3e7bbeb0ad4ec344371a08174290ab6b737b533788f98a6a8127d074b4",
+    "hdr1-normal.rgba8": "24de1bdb26c6b5d040427773b3b6001353c4141e56a14a351d011c0f882279e1",
+    "hdr1-radial.r32f": "affb526e48da7b5d6d4495c68c9e9bc9aee3e2e4c385fc5029c7a4f6c8a32df3",
+    "hdr1-prewrite.rgba32f": "1ffb623816235f21319917071db86f3c93c52a4dbbb8d0e03eeeeceef8e18b99",
+    "odd3-vertex-cb.bin": "3cd80c655b46bdcff137153fc3a5e92b5ca28d0dd03c722bc2ddaad49fa6a5cf",
+    "odd3-pixel-cb.bin": "ba9b46559ebc09b7dcbd44c0eced0e1958d628da45dcf59e79b4d10c6838090d",
+    "odd3-material.rgba16f": "183d85a799573c81265110821715a07be11515e51dcc3d4c6a86e06abcc6ad09",
+    "odd3-normal.rgba8": "cd0859ddc8a2a873a1c7d3c50dac076a3a9b90983b137c8bffe913f60aadbb22",
+    "odd3-radial.r32f": "b9fe9b032de8fced0ca85d6ff4ae81890bbd235dbcc378c29d5f15162e9aafc7",
+    "odd3-prewrite.rgba32f": "eecedcd8ef96295bdc63db73e63d00cf0871414da16cbd372a59a868787885dd"
+  },
+  "dependencies": {
+    "compactFreeze": "d27666a36c147e32562a58690d4984ab2b9b4b88d4a8d92b1b28115f07230bf8",
+    "geometryHeader": {
+      "path": "../fixed-geometry/FixedTerrainGeometry.h",
+      "sha256": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698"
+    }
+  },
+  "results": {
+    "warpChecks": 11475562,
+    "cases": 9,
+    "covered": 589824,
+    "maxFloat": 0.0,
+    "maxHalf": 0.00777053833,
+    "maxRGB": 8.1171875,
+    "minGloss": 0.0,
+    "maxGloss": 0.532714844,
+    "hdrComponents": 390361,
+    "overlaps": [
+      {
+        "shiftPixels": 64,
+        "samples": 36864,
+        "maxHalf": 0.000732421875,
+        "maxOriginalPrewrite": 0.000869780779,
+        "maxNormalByte": 1
+      },
+      {
+        "shiftPixels": 1,
+        "samples": 65025,
+        "maxHalf": 0.0012512207,
+        "maxOriginalPrewrite": 0.00122564659,
+        "maxNormalByte": 1
+      }
+    ],
+    "functionalMutants": 12,
+    "initFailureControls": 8,
+    "nativeNormalRadial": "byte-exact per9cases and first4 hash-identical to frozencompact",
+    "rgbShaderNativeFieldsBindings": "same3856B CB/8SRV/3samplers",
+    "prewriteObserver": "original biome.albedo before GBuffer, F32; only unusednormalMaps removed byoptimizer"
+  },
+  "shader": {
+    "nativeSha256": "f9326a91f29e1f1644fc0acbb33bc126bce04590faef2cc7b89dabd1292fd9a1",
+    "activeChanges": [
+      {
+        "before": "writeAlbedo   ( buffer, biome.albedo.rgb, fragCoord.xy );",
+        "after": "buffer.buf0.rgb = biome.albedo.rgb;"
+      },
+      {
+        "before": "writeMetalness( buffer, 0.0f );",
+        "after": "/* Native zero metalness is not written over full RGB. */"
+      }
+    ],
+    "inactiveMapfeatureUntouched": true,
+    "observer": "original biome.albedo before first active GBuffer writer; RGBA32F",
+    "shaders": [
+      {
+        "name": "Rgb",
+        "sourceSha256": "f45589c9c59684169cfa5c92313a2b5ef6c3d6f3b5c57891a1061a4867723819",
+        "sha256": "1dd118fe042b8f7297fe7ce5ab9d20c5392cce85acdffc8b33bd8ac006b7af2b",
+        "bytes": 36968,
+        "fields": [
+          {
+            "name": "paintedTileBase",
+            "offset": 0,
+            "bytes": 16
+          },
+          {
+            "name": "viewport",
+            "offset": 16,
+            "bytes": 16
+          },
+          {
+            "name": "farClip",
+            "offset": 32,
+            "bytes": 4
+          },
+          {
+            "name": "cameraPos",
+            "offset": 36,
+            "bytes": 12
+          },
+          {
+            "name": "waterHeightRel",
+            "offset": 48,
+            "bytes": 4
+          },
+          {
+            "name": "wetness",
+            "offset": 52,
+            "bytes": 4
+          },
+          {
+            "name": "scalesA",
+            "offset": 64,
+            "bytes": 16
+          },
+          {
+            "name": "scalesB",
+            "offset": 80,
+            "bytes": 16
+          },
+          {
+            "name": "scalesC",
+            "offset": 96,
+            "bytes": 16
+          },
+          {
+            "name": "slopeMin",
+            "offset": 112,
+            "bytes": 16
+          },
+          {
+            "name": "slopeMax",
+            "offset": 128,
+            "bytes": 16
+          },
+          {
+            "name": "slopeBlend",
+            "offset": 144,
+            "bytes": 16
+          },
+          {
+            "name": "overlayMult",
+            "offset": 160,
+            "bytes": 16
+          },
+          {
+            "name": "textureFade",
+            "offset": 176,
+            "bytes": 16
+          },
+          {
+            "name": "absorbance",
+            "offset": 192,
+            "bytes": 32
+          },
+          {
+            "name": "brightnessFix",
+            "offset": 224,
+            "bytes": 16
+          },
+          {
+            "name": "satBiome",
+            "offset": 240,
+            "bytes": 3600
+          },
+          {
+            "name": "geoSelectorRegion",
+            "offset": 3840,
+            "bytes": 16
+          }
+        ],
+        "bindings": [
+          [
+            "Anisotropic",
+            "sampler",
+            "NA",
+            "s0",
+            "1"
+          ],
+          [
+            "Linear",
+            "sampler",
+            "NA",
+            "s2",
+            "1"
+          ],
+          [
+            "Nearest",
+            "sampler",
+            "NA",
+            "s4",
+            "1"
+          ],
+          [
+            "diffuseMaps",
+            "texture",
+            "2darray",
+            "t0",
+            "1"
+          ],
+          [
+            "normalMaps",
+            "texture",
+            "2darray",
+            "t1",
+            "1"
+          ],
+          [
+            "overlayMap",
+            "texture",
+            "2darray",
+            "t2",
+            "1"
+          ],
+          [
+            "colourMap",
+            "texture",
+            "2darray",
+            "t3",
+            "1"
+          ],
+          [
+            "interiorClip",
+            "texture",
+            "2d",
+            "t4",
+            "1"
+          ],
+          [
+            "geoBlend",
+            "texture",
+            "2d",
+            "t5",
+            "1"
+          ],
+          [
+            "geoSelector",
+            "texture",
+            "2d",
+            "t6",
+            "1"
+          ],
+          [
+            "geoDiffuse1",
+            "texture",
+            "2darray",
+            "t7",
+            "1"
+          ]
+        ]
+      },
+      {
+        "name": "Prewrite",
+        "sourceSha256": "5079cd27ceb67201c0d3f72b8ee3a3167c55fa41aa0f0b8095b0cde28fd7ee85",
+        "sha256": "b0832e07c76bb8314c330b96a66ffbdb23cfc27e9ce5b5b312488c5cb7e0768b",
+        "bytes": 30128,
+        "fields": [
+          {
+            "name": "paintedTileBase",
+            "offset": 0,
+            "bytes": 16
+          },
+          {
+            "name": "viewport",
+            "offset": 16,
+            "bytes": 16
+          },
+          {
+            "name": "farClip",
+            "offset": 32,
+            "bytes": 4
+          },
+          {
+            "name": "cameraPos",
+            "offset": 36,
+            "bytes": 12
+          },
+          {
+            "name": "waterHeightRel",
+            "offset": 48,
+            "bytes": 4
+          },
+          {
+            "name": "wetness",
+            "offset": 52,
+            "bytes": 4
+          },
+          {
+            "name": "scalesA",
+            "offset": 64,
+            "bytes": 16
+          },
+          {
+            "name": "scalesB",
+            "offset": 80,
+            "bytes": 16
+          },
+          {
+            "name": "scalesC",
+            "offset": 96,
+            "bytes": 16
+          },
+          {
+            "name": "slopeMin",
+            "offset": 112,
+            "bytes": 16
+          },
+          {
+            "name": "slopeMax",
+            "offset": 128,
+            "bytes": 16
+          },
+          {
+            "name": "slopeBlend",
+            "offset": 144,
+            "bytes": 16
+          },
+          {
+            "name": "overlayMult",
+            "offset": 160,
+            "bytes": 16
+          },
+          {
+            "name": "textureFade",
+            "offset": 176,
+            "bytes": 16
+          },
+          {
+            "name": "absorbance",
+            "offset": 192,
+            "bytes": 32
+          },
+          {
+            "name": "brightnessFix",
+            "offset": 224,
+            "bytes": 16
+          },
+          {
+            "name": "satBiome",
+            "offset": 240,
+            "bytes": 3600
+          },
+          {
+            "name": "geoSelectorRegion",
+            "offset": 3840,
+            "bytes": 16
+          }
+        ],
+        "bindings": [
+          [
+            "Anisotropic",
+            "sampler",
+            "NA",
+            "s0",
+            "1"
+          ],
+          [
+            "Linear",
+            "sampler",
+            "NA",
+            "s2",
+            "1"
+          ],
+          [
+            "Nearest",
+            "sampler",
+            "NA",
+            "s4",
+            "1"
+          ],
+          [
+            "diffuseMaps",
+            "texture",
+            "2darray",
+            "t0",
+            "1"
+          ],
+          [
+            "overlayMap",
+            "texture",
+            "2darray",
+            "t2",
+            "1"
+          ],
+          [
+            "colourMap",
+            "texture",
+            "2darray",
+            "t3",
+            "1"
+          ],
+          [
+            "interiorClip",
+            "texture",
+            "2d",
+            "t4",
+            "1"
+          ],
+          [
+            "geoBlend",
+            "texture",
+            "2d",
+            "t5",
+            "1"
+          ],
+          [
+            "geoSelector",
+            "texture",
+            "2d",
+            "t6",
+            "1"
+          ],
+          [
+            "geoDiffuse1",
+            "texture",
+            "2darray",
+            "t7",
+            "1"
+          ]
+        ]
+      }
+    ],
+    "vertexUnchangedSha256": "dbd13838450fa683426bf3df92728fc0c3dbdf2b798c31c6c1004d0a3e3ed238"
+  },
+  "budget": {
+    "packedFourSurfacePayload": 1048576,
+    "rawFourSurfacePayload": 1310720,
+    "extra": 262144,
+    "controlledCap": 94371840,
+    "globalCap": 201326592,
+    "compactSourceBytes": 83885956,
+    "testOtherReservation": 4194304,
+    "allocationsPerDrawByOwner": 0,
+    "liveNativePointers": 0
+  },
+  "limits": [
+    "Resource-owner only; renderer must serialize immediatecontext, preserve state/checkaliases, maintain complete lifetime/ownedledger.",
+    "Source/material/weather values are pinned fixture data, not active current native source proof.",
+    "Arbitrary finite native inputs may be singular or exceed/saturate FP16; canonical domain proof/acceptedcoverage remains required.",
+    "Original native prewrite alreadydrifts across odd/even shiftedcameras; rawstorage adds no packedneighbor dependency, not exactworldpixel equality.",
+    "No native Sun/display/game/wholeworld/FPS/all-leaks/shutdown/hotunload claim."
+  ]
+}
