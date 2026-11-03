@@ -428,3 +428,15 @@ simplified geometry, not a completed loaded-town layer. Keep the accepted terrai
 fallback and zoom behavior while integrating it. Fog and the requested overlays
 follow core city coverage. KEO maintenance and Map-markers import work continue
 independently.
+
+### 2026-11-04: release hardware budgets
+
+The current 512MiB owned-GPU profile is a development ceiling, not a minimum
+hardware specification or proof of support for a low-memory GPU. It excludes
+Kenshi's own allocations. Before public release provide coherent quality/cache
+budgets, account for the transient producer and city layers within each profile,
+and retain usable coarse coverage when detail cannot be admitted. Test smaller
+budgets and constrained hardware; do not imply that high-end-host tests prove
+compatibility. A profile must not leave a permanently blurred map or repeatedly
+retry allocations at a hard minimum. This requirement is separate from repairing
+the city-integration regression in the current profile.

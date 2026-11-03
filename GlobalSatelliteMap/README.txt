@@ -36,6 +36,9 @@ reserve. The detailed raster/compositor adds 2,884,080 owned GPU bytes when
 initialized. Borrowed native mesh buffers/textures retain their existing separate
 32MiB/64MiB limits. These are resource payload bounds, not total game/driver RAM
 or VRAM guarantees. GPU retirement debt and failed-fence admission remain counted.
+The viewer/layer allowance is 40MiB within that same aggregate, independently
+of retained fine tiles. This development profile is not a low-end hardware claim;
+selectable lower budgets and constrained-hardware acceptance are still pending.
 Actual end-to-end town appearance, frame time and long-session growth require
 game measurements; offline tests do not prove freedom from every possible leak.
 
@@ -87,6 +90,9 @@ RU
 Удерживаемые штатные буферы и текстуры имеют отдельные лимиты 32/64МиБ.
 Это границы данных ресурсов, а не всей памяти игры или видеодрайвера. Реальное
 изображение городов, FPS и рост памяти проверяются отдельно в игре.
+Внутри общего лимита для просмотра и слоёв отведено 40МиБ отдельно от подробных
+плиток. Это профиль стенда, а не подтверждение работы на слабых видеокартах:
+выбор меньших бюджетов и проверка на ограниченном железе ещё предстоят.
 
 Перед полным рендером нужно не менее 24ГБ свободного места; сетка занимает около
 23ГБ. Просмотр использует готовую сетку. Для этого обновления полный рендер не

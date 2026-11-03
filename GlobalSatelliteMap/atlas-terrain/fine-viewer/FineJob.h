@@ -4,7 +4,7 @@
 namespace FineJob {
 typedef FineWindows::U64 U64;
 enum{MaxVisible=GsmCacheProfile::MaxVisible,Slots=MaxVisible,CacheSlots=GsmCacheProfile::FineCacheSlots};
-const U64 ViewerAllowance=32ULL*1024*1024,WindowBytes=256ULL*256*20;
+const U64 ViewerAllowance=GsmCacheProfile::ViewerBytes,WindowBytes=256ULL*256*20;
 struct Demand{FineWindows::Request view;SourceReceipts::Scope scope;U64 revision;};
 struct Budget{U64 viewerGpu,fineGpu,producerCpu,otherCpu;unsigned occupied;};
 struct UploadGate{U64 producerReservedGpu;bool consumersJoined;};

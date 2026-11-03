@@ -5,6 +5,19 @@
 namespace FineCoordinator {
 typedef FineStore::U64 U64;
 struct Residency {U64 viewerGpu,fineGpu,pendingGpu,retiredGpu;unsigned occupied;Residency():viewerGpu(0),fineGpu(0),pendingGpu(0),retiredGpu(0),occupied(0){}};
+// Match MakeBudget's viewer/debt attribution without treating retained fine
+// images as viewer allocations. All measured owners and the actual K2 bank
+// still have to fit the shared GPU cap before starting another producer.
+inline bool StartupFits(const Residency&r){
+ if(r.viewerGpu>FineJob::ViewerAllowance||r.occupied>FineJob::CacheSlots||
+    r.fineGpu<U64(r.occupied)*FineJob::WindowBytes||r.fineGpu>U64(FineJob::CacheSlots)*FineJob::WindowBytes)return false;
+ U64 viewer=r.viewerGpu;
+ if(r.pendingGpu>FineJob::ViewerAllowance-viewer)return false;viewer+=r.pendingGpu;
+ if(r.retiredGpu>FineJob::ViewerAllowance-viewer)return false;viewer+=r.retiredGpu;
+ return viewer<=AtlasView::GpuCap&&r.fineGpu<=AtlasView::GpuCap-viewer&&
+    WorldCohort::GpuReservation(2)<=AtlasView::GpuCap-viewer-r.fineGpu;
+}
+
 template<class NativeSession>class Controller {
  typedef WorldCohort::Controller<NativeSession> Producer;
  struct Owner {
