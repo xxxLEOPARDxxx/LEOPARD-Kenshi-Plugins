@@ -1,0 +1,252 @@
+{
+  "format": "GSM_FINE_COORDINATOR_VERIFICATION",
+  "version": 1,
+  "files": [
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/accepted-window/AcceptedWindow.h",
+      "bytes": 4692,
+      "sha256": "71dd16bba54fd1e69a5fbf7872bac14edfbf5dec2932b4f28ae2d109a4bd4899"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-store/FineStore.h",
+      "bytes": 17781,
+      "sha256": "0083e461be3c94ad1c18a3c4818376f9ee0d0c76b45c2d75e22248798e75dc58"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-worker/FineWorker.h",
+      "bytes": 11762,
+      "sha256": "850c67bc5a269daeba7271104f1ef55cc862e5d93899cf623b3f4abb1c17e97d"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/Gst2Writer.h",
+      "bytes": 5330,
+      "sha256": "cd21403b4a2115ed1ba59ef4adce91d62b602b40640dd01b84152f1c8750001b"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/window-writer512/WindowWriter512.h",
+      "bytes": 4765,
+      "sha256": "dcf946a92da69810ffa65b118c781d74280f24b4e78a996d731cd30ae2e51d3a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/world-build-disk/WorldBuildDisk.h",
+      "bytes": 8911,
+      "sha256": "78a93d3bc2f82b181c1e3897f4316379aebd1d1ac175bd3e4d0fd1280605e858"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/world-window-session/WorldWindowSession.h",
+      "bytes": 6356,
+      "sha256": "58897825667c60f408c990651085ac02737bdaf136d8a1f6e0b72a993e0cb71e"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-models/GraphicsState.h",
+      "bytes": 4027,
+      "sha256": "c5f3e311d81d88181882232fd85c337c1dbfb2cb6399d366853abece58ae58ac"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/compact-material/_generated/Case.h",
+      "bytes": 8068,
+      "sha256": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/compact-material/_generated/Shaders.h",
+      "bytes": 101535,
+      "sha256": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/compact-material/CompactMaterial.h",
+      "bytes": 5756,
+      "sha256": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/.gitignore",
+      "bytes": 25,
+      "sha256": "5db0aced9132d0bfd3f66b534f57db5da873cde09985ec2a2a2a1cd6ee492718"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/faults.cpp",
+      "bytes": 6760,
+      "sha256": "8c6c262ed9b5d6728d3a21ed0c7d7d999e327d9a2e0feee924cfbc3ef76a2e48"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/FineCoordinator.h",
+      "bytes": 14539,
+      "sha256": "dd8fd15aa783e209a1803764692b4d09eea6ebb6c63e66330c5922e916f5f302"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/freeze.py",
+      "bytes": 1069,
+      "sha256": "60b225e19a424c6c4dafb0d441777c251236b809f29f1299659d517fd33950a6"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/README.md",
+      "bytes": 8998,
+      "sha256": "245d0f100534aaa9d267a70a97a8dce9f9c86dd8b59850704a27054ae4e61a0a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/run_tests.py",
+      "bytes": 2621,
+      "sha256": "54438aeab9400300260a49395e743ea36a4eabada6105c1995c75297c782f202"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-coordinator/tests.cpp",
+      "bytes": 8567,
+      "sha256": "f47444204cccba0711ad4351527fbaf97088f4522865696bed16ce4352bf5c60"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-viewer/FineJob.h",
+      "bytes": 9944,
+      "sha256": "80286ad2831eed94af5487636b42114e8f3575b1bf0b41c2c91121c3257789cf"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-windows/FineWindowPlanner.h",
+      "bytes": 7320,
+      "sha256": "29cd0a69a63c5c31fff26ff9040561f597b14011b48d1687a90dc1bad78ed091"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fixed-geometry/FixedTerrainGeometry.h",
+      "bytes": 3646,
+      "sha256": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/png-source/PinnedPng.h",
+      "bytes": 4211,
+      "sha256": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/raster/FixedTerrainRaster.h",
+      "bytes": 12234,
+      "sha256": "0ad68d252def4cb538161eedaf42116d9ff7bc458d5e8a88041309223594609f"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/source-receipts/MainGate.h",
+      "bytes": 4820,
+      "sha256": "9da2c4f1c09542a6c5a32d46dda9392471d30f6a6922e3ff5effbf9572ade2b7"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/source-receipts/ReceiptPolicy.h",
+      "bytes": 6662,
+      "sha256": "ff91b3628e5a2e4099c4b1ebbf584c39fd38834b145f6a17034f9f8532a27a52"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/source-receipts/WorkerFileLease.h",
+      "bytes": 4986,
+      "sha256": "887c19c77044eb61d50930502a1fffa8c83b016fa5235d82548b07aaa3871d30"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/staged-material/_generated/StagedShaders.h",
+      "bytes": 42093,
+      "sha256": "dd33a9b8f84201446bdf18b28ddf0c2c3f4cc39cee439da2e6e41a6e4c606141"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/staged-material/StagedMaterial.h",
+      "bytes": 2970,
+      "sha256": "4d0bcdd32180541b59085e18d0f444f061a3f8b8bebc367196b63765711677bb"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-bank/_generated/DecodedPins.h",
+      "bytes": 33086,
+      "sha256": "407a537bc08b96febae1f6a2b6f23d01ffd97ec420e03253a77677df6308646a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-bank/WorldSourceBank.h",
+      "bytes": 12242,
+      "sha256": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-cohort/flow_tests.cpp",
+      "bytes": 14704,
+      "sha256": "98e8fba5c504d2033424c1dd273193f75a87e2f677e6f3711859cfbc437628a4"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-cohort/WorldCohort.h",
+      "bytes": 21437,
+      "sha256": "b1ee4b55e689b4ac355cd4c123324441171dc95e3f42e09dd00bcce6021f98ee"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-layout/WorldLayout.h",
+      "bytes": 1991,
+      "sha256": "20bbbceabcf45ce1609929f51b2ea0e17c9ddb37ce351c98a35f1c9bb59ebcda"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-material/WorldMaterialPlan.h",
+      "bytes": 6246,
+      "sha256": "8bb72f85f82a827e5c79f082a9829da5644f8648b289c58aa46cf014dd0cee57"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-native/SourceFactory.h",
+      "bytes": 6377,
+      "sha256": "eb99bc837c802509585fbbf333eabb374cd666a11d8560d7c6ea26f495de8155"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-native/StageAdapter.h",
+      "bytes": 4180,
+      "sha256": "0554fd314cf6c4acb9c5942cfa062d66250d8a5bfcb4b8de8dbafb148a2d5937"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-native-rebind/NativeRebind.h",
+      "bytes": 7542,
+      "sha256": "0435317234a3e3ba55b3ba53a6884b9a0f90279708cc62fb8aa8c06d52d3d85c"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-native-rebind/tests.cpp",
+      "bytes": 9066,
+      "sha256": "afe1b253a389497f71e3dc15cb6b03a254b81c93d27f008464d1f6c13bc99292"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-pixels/WorldPixels.h",
+      "bytes": 8389,
+      "sha256": "8a0413d58f28728dd0d83e6a3d8a48cbbc9affc23c74d11e9d73453c32d9cc22"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-raster/WorldTerrainRaster.h",
+      "bytes": 18321,
+      "sha256": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-source/WorldHeightSource.h",
+      "bytes": 7640,
+      "sha256": "50fde36344ca4d97099d8a0749e79ab71f20f260ff5249c80d4dccd86ddb3700"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-stream/flow_tests.cpp",
+      "bytes": 12613,
+      "sha256": "efba3c273382e40ec2f23f24a19b79afc9152b85fc489e79168434ba9064b09a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-stream/WorldStream.h",
+      "bytes": 21000,
+      "sha256": "85ed283b33e0fcc602f04b1a0d420ca428058e0a9272d7d27beaba5da7f362f5"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasPolicy.h",
+      "bytes": 3014,
+      "sha256": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasReader.h",
+      "bytes": 4576,
+      "sha256": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasRelight.h",
+      "bytes": 15788,
+      "sha256": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86"
+    },
+    {
+      "path": "tools/diagnostics/satellite-capture-probe/GeographyPolicy.h",
+      "bytes": 3190,
+      "sha256": "b5e183396b502ffb4ae72b30c915f16212303ba0e86b52b3c0fb4bf0cc042a95"
+    },
+    {
+      "path": "tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalog.h",
+      "bytes": 8174,
+      "sha256": "b62a97f0ad4fe4c01966eb43a672e4df9298ce51c566ab2db8931f4b90f5aefb"
+    },
+    {
+      "path": "tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalogData.h",
+      "bytes": 259179,
+      "sha256": "bd85da4b86a5e13bafd3ab9793c9a5f7ac3047488e57c813e430ade5d40f426f"
+    }
+  ],
+  "scope": "actual two-phase WIC/WARP/fine-file owner; no native engine viewer/FPS claim"
+}

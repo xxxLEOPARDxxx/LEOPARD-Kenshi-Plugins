@@ -1,0 +1,19 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include "FineWorker.h"
+#define FINE_STORE_FIXTURE_ONLY
+#include "../fine-store/tests.cpp"
+static Fixture*fixture=NULL;
+static DWORD WINAPI MakeFixture(void*){try{fixture=new Fixture;fixture->Build(Key(0));return 0;}catch(...){return 1;}}
+static FineStore::Config Config(const wchar_t*parent,const wchar_t*leaf){FineStore::Config c={};C(FineStore::Configure(c,parent,(std::wstring(parent)+L"\\"+leaf).c_str()),"pure before-worker path/config copy");return c;}
+static void Boot(FineWrite::Worker&w){for(unsigned n=0;n<10000;++n){int r=w.PollBoot();if(r==1)return;C(r==0,"boot pending is not an error");Sleep(1);}C(false,"boot deadline");}
+static FineStore::Receipt Written(FineWrite::Worker&w){FineStore::Receipt out={};for(unsigned n=0;n<10000;++n){int r=w.PollPut(out);if(r==1)return out;C(r==0,"put pending is not an error");Sleep(1);}C(false,"put deadline");return out;}
+static int Read(FineWrite::Worker&w){for(unsigned n=0;n<10000;++n){int r=w.PollGet();if(r>0)return r;C(r==0,"get pending is not an error");Sleep(1);}C(false,"get deadline");return -1;}
+static void Joined(FineWrite::Worker&w){for(unsigned n=0;n<10000;++n){int r=w.TryJoin();if(r==1)return;C(r==0,"known consumer join pending");Sleep(1);}C(false,"join deadline");}
+static WorldCohort::Borrowed Borrow(){WorldCohort::Borrowed b={};b.accepted=&fixture->accepted;b.window=&fixture->window;b.retainedRawBytes=fixture->Budget().retainedRaw;b.otherCpuBytes=sizeof(Fixture);b.scope=fixture->scope;b.frame=Frame(Key(0),fixture->scope);return b;}
+#ifndef FINE_WORKER_FIXTURE_ONLY
+int wmain(int argc,wchar_t**argv){try{C(argc==2,"runner owned fixture root");mainThread=GetCurrentThreadId();HANDLE maker=CreateThread(NULL,0,MakeFixture,NULL,0,NULL);C(maker&&WaitForSingleObject(maker,10000)==WAIT_OBJECT_0,"producer fixture worker known joined");DWORD exit=~0u;C(GetExitCodeThread(maker,&exit)&&!exit&&fixture,"actual accepted producer retained on Main");CloseHandle(maker);
+ FineStore::Identity id=Identity();FineStore::Ledger external=fixture->Budget();external.other+=fixture->accepted.OwnedBytes();FineWrite::Worker worker;C(worker.Start(fixture->scope,id,Config(argv[1],L"normal"),external),"Main Start performs no fine-file IO");Boot(worker);WorldCohort::Borrowed borrow=Borrow(),bad=borrow;bad.scope.world^=1ULL<<32;FineStore::Ledger extra;
+ C(!worker.SubmitPut(bad,Key(0),id,extra),"stale high64bit world refuses before async borrow");C(worker.SubmitPut(borrow,Key(0),id,extra)&&worker.BorrowPending(),"actual accepted borrow submitted once");C(!worker.SubmitPut(borrow,Key(0),id,extra),"one pending operation only");FineStore::Receipt receipt=Written(worker);C(receipt.serial&&!worker.BorrowPending(),"put ack releases producer borrow before Main consumes result");fixture->accepted.Clear();
+ C(worker.SubmitGet(Key(0),id,external),"disk read independent of released Accepted producer");C(Read(worker)==1,"ready fine blob read once");FineStore::View view={};C(worker.PeekRead(true,fixture->scope,Key(0),id,view)&&view.material&&view.height,"Main fresh scope consumes completed read");const BYTE saved=view.material[0];SourceReceipts::Scope stale=fixture->scope;stale.job^=1ULL<<32;FineStore::View hidden={};C(!worker.PeekRead(true,stale,Key(0),id,hidden)&&!hidden.material,"fresh full64bit capture gates read publication");C(!worker.SubmitGet(Key(1),id,external),"held read prevents queue replacement");C(worker.PollGet()==0,"read event is not duplicated");
+ worker.Cancel();C(worker.TryJoin()==0&&view.material[0]==saved,"cancel never asynchronously reclaims Main-held read");C(worker.ReleaseRead(),"Main explicitly releases completed read before stop");Joined(worker);C(!worker.Quarantined()&&worker.Error()==S_OK,"graceful cancelled idle read known closed and joined");delete fixture;fixture=NULL;std::printf("PASS %u actual persistent fine-worker controls\n",checks);return 0;}catch(...){return 1;}}
+#endif
