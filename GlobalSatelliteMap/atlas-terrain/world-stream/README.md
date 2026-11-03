@@ -1,7 +1,7 @@
 # One-window staged source/render controller — development
 
 `WorldStream.h` joins a Main-only metadata gate and D3D owner to one persistent
-worker. This is a bounded **one-window diagnostic integration core**, not the
+worker. This is a bounded **one-window integration core**, not the
 complete atlas/fine-cache scheduler or an installed game feature.
 
 Main supplies a typed `Job`, a checked current world/source/job scope and captured
@@ -30,10 +30,20 @@ and consumption separately requires enabled/current Scope/exact Frame even if no
 subsequent Pump occurred. Result buffers are borrowed only until ReleaseResult,
 Cancel, Shutdown or another job: consume/copy while the exact result is retained.
 
-The three outputs are raw RGBA16F material, normalRGBA8 and **radialR32**, not world
-height. `Complete` means this diagnostic readback finished; it does not certify
-finite/covered imagery. A separate validated height/pixel conversion is required
-before writing GST2 completion bits. No final atlas publication occurs here.
+After the query and readback, Main copies the immutable scope/frame metadata and
+sends `ValidatePixels` to the same worker. `WorldPixels::Accepted::Build` checks
+all raw pixels against the authenticated height window, preserves material and
+normal bytes, and constructs the world-height plane from actual fixed terrain
+triangles. `ValidatingPixels` exposes no result. Only successful `WValidated`
+plus Main's exact current acquisition can become `Complete`.
+
+Default `Plane(0..2)` now returns accepted RGBA16F material, normalRGBA8 and
+**world-height R32 in metres**. `RawPlane(0..2)` is an explicitly diagnostic view
+of the retained raw slab, including radialR32 at index2. It is guarded by the
+same accepted Result check and must never substitute for the default height
+plane in a GST2 writer. Every Result/Plane/RawPlane consumption rechecks current
+enabled/scope/exact frame/authenticated Window identity, independently of Pump.
+No GST2 write, cache-completion bit or final atlas publication occurs here.
 
 `CountedLedger` includes a worst-case512/16-patch source/raster/readback reservation
 of112,825,820B plus all external retained/pending/retired owners under192MiB.
@@ -54,6 +64,19 @@ owner. The host must retain/report this debt and require restart before resuming
 an incompatible viewer reservation. No claim is made for invalid caller thread
 or pointer use, native-module unload while active, or absence of every OS fault.
 
+ReleaseResult clears the accepted slab on Main only after `WValidated`, while the
+worker has no command and cannot access it. Cancel/Close and explicit Stop free
+accepted/raw/window owners on the serialized worker. An unsolicited wake-wait
+failure preserves all Main-borrowable owners, including the source lease and
+decoded RGBA, until Main observes the stopped thread and joins/deletes Work.
+Prior `WOpened`, `WDecoded` and `WValidated` observations cannot race exit freeing
+the encoded source, decoded upload buffer, accepted pixels or raw/height window.
+Decoder COM cleanup still runs on the worker; Main never borrows that decoder.
+If Cancel happened before that dead-worker observation, Pump still latches the
+worker's failed HRESULT before joined cleanup; Failed never returns stale success.
+Quarantine's full Work debt includes the accepted allocation even if a failed
+wait prevents proving when its construction/cleanup finished.
+
 Explicit copied CPU payload is bounded below64MiB. As documented by PinnedPng,
 opaque WIC/COM/driver allocations and decode latency are not hard-bounded by that
 payload calculation. File/hash/decode work stays on the worker. Main contains
@@ -62,10 +85,26 @@ The one-transition-per-Pump API is deliberately unsuitable as an unbatched
 4096-window full-world scheduler: measured/budgeted batching and grouping views
 by SID are required before production throughput acceptance.
 
+The CPU reservation includes both the retained maximum4MiB raw readback slab and
+the maximum4MiB accepted slab, plus its owner and copied metadata inside Work.
+Before ValidatePixels, Main copies `CpuReservation()-Accepted::RequiredBytes(512)`
+as the other-owner charge; Build adds its exact requested-size output charge.
+Successful result release frees the accepted slab while retaining the bounded
+raw capacity, authenticated height window and source bank for reuse.
+
 `run_tests.py` runs production lifecycle tests under VC10/Od and/O2, then real
-Win32/WIC/WARP flow: two256 frames byte-exact against allthree frozen planes,
-one512/1m material observation, shader-source mutation after Submit, persistent
-TIFF authentication, OFF drain and world-change cancellation. The metadata
+Win32/WIC/WARP flow: two256 frames byte-exact against allthree frozen raw planes,
+one512/1m material observation, all393216 accepted height pixels against an
+independent emitted-geometry/strip/barycentric oracle, and unchanged material/
+normal bytes. Controls include shader-source mutation after Submit, persistent
+TIFF authentication, repeated accepted release, OFF drain, world-change and
+pending pixel-acceptance cancellation. Real Work tests additionally exercise
+invalid raw pixels, shared CPU admission, recovery and serialized cleanup.
+`adversarial_tests.py` repeats the original wake/send/query/fence/destructor/debt
+controls and adds abnormal post-validation exit retention plus Complete/worker-
+exit/explicit-Cancel failure reporting and both source-handoff exit phases,
+with five cleanup/reservation/error-latch
+mutants required to fail. The metadata
 provider is explicitly test-owned; no native API, game/INI, installed atlas or
 live save is changed. Generated observations remain ignored.
 

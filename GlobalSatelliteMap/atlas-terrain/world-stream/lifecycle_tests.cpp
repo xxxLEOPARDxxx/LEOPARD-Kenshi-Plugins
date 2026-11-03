@@ -26,6 +26,6 @@ int main(){try{
  Check(!c->Result(true,scope,j.frame)&&!c->Plane(0,true,scope,j.frame)&&!c->Plane(3,true,scope,j.frame),"no premature diagnostic publication");
  c->Cancel();for(unsigned n=0;n<10000&&c->State()!=Idle;++n){c->Pump(false,NULL,scope,l);Sleep(1);}
  Check(c->State()==Idle,"idle cancellation drains worker");
- c->Shutdown();Check(c->State()==Stopped,"explicit join shutdown");delete c;
- printf("PASS %u production controller lifecycle checks\n",checks);return 0;
+ const WorldBank::U64 reservation=c->CpuReservation();c->Shutdown();Check(c->State()==Stopped,"explicit join shutdown");delete c;
+ printf("PASS %u production controller lifecycle checks; copiedCPU%I64uB; accepted512%I64uB\n",checks,reservation,WorldPixels::Accepted::RequiredBytes(512));return 0;
  }catch(...){return 1;}}
