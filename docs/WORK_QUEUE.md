@@ -1,49 +1,37 @@
 # Active work and next requested tasks
 
-Updated2026-11-03 from the user's current requests. This is a working queue,
-not a public release announcement. Latest instructions override historical notes.
+Updated 2026-11-04. This is a private working queue, not a release announcement.
+The user is at the PC. Ask for scene preparation; use background telemetry and
+file requests. Do not take desktop focus or collide with Minecraft autotests.
+Always check the actual process immediately before replacing a loaded DLL.
 
-Latest unattended instruction2026-11-03: finish deterministic terrain and
-maximum-zoom detail first, then KEO, then optional exploration fog, diplomatic
-areas, biome boundaries and roads. The user is asleep and authorizes launching,
-loading test saves and operating Kenshi autonomously. Another Minecraft session
-may run desktop tests: prefer background file requests; before targeted UI input
-observe the actual Kenshi window and avoid blind shared-desktop actions.
+1. **Global satellite map — terrain/zoom accepted; detailed cities next.**
+   User confirms sharp detail at every fixed zoom step and warm return pans on
+   2026-11-04. Do not restart terrain redesign or full atlas capture without a
+   newly reported concrete defect. Keep the accepted atlas and cache behaviour.
 
-1. **Global satellite map — ACTIVE, unfinished.** Deliver an optional working
-   GLOBAL map layer,4x4 primary tiles at8192²; preserve BestMinimap's current map.
-   The16x8192 geographic terrain atlas and interactive native-map layer are
-   installed. Sun/ambient/water/local-light controls, extended proportional zoom
-   and immediate ready-tile presentation are implemented; the user accepted the
-   zoom and disappearance of vanilla edge strips. Existing distant-town proxies
-   and a bounded cached Hub fallback render, but detailed walls/stalls/lampposts
-   remain incomplete. A native-source instance helper is tested and reviewed,
-   not wired into Main. Its alpha materials need a separate full-RGB HDR stage
-   and dense model-only output; a9m final reduction loses thin walls.
-   Two actual same-world controls identified geometry-context differences at
-   capture boundaries;16px inset does not cure them. Shared global native LOD
-   is not approved: quality/cap and viewport/worker ownership remain unresolved.
-   Latest user instruction2026-11-03 REVOKES the earlier restriction on a
-   fundamental terrain-render rewrite and explicitly requests better detail at
-   maximum zoom. Build deterministic geometry in shared world coordinates and
-   prove a failing boundary before replacing the full atlas. Add bounded visible
-   fine-detail rendering rather than enlarging every primary tile or stretching
-   the9m source. Preserve current usable atlas until a replacement passes.
-   No blind halo/blur/full-world recapture. See
-   verification/2026-11-03-satellite-overlap-controls.md and
-   GlobalSatelliteMap/PLAN.md for the current replacement plan.
-   It is not a finished game feature. Complete actual building/model coverage
-   and measured stability/performance. User authorized
-   autonomous launch/load/input when away. Latest clarification2026-11-01:
-   while the user writes at the PC, do not launch/focus/switch windows; ask the
-   user to prepare game scenes, then use file requests/read-only telemetry in
-   the background. Preserve personal settings and use test saves.
-   User clarification2026-11-01: dynamic lighting includes actual torches,
-   lanterns and similar local sources, not only sun/day-night. MCM must offer
-   separate switches for lighting components, city models and other render layers;
-   see GlobalSatelliteMap/PLAN.md. Full atlas rerender on every lamp change is
-   not an acceptable update strategy. Article finished; still check process and
-   avoid taking window focus without a new instruction.
+   A new detailed-city candidate is now locally installed: DLL SHA256
+   5cae6c2287c69f023e77950784210f0103d64af11c92b496532862521f2ce0c1,
+   1,226,752 bytes. It adds supported real plaster/Wall4/Gate4/market instance
+   geometry, native raw-RGB/translucency HDR composition and accepted height for
+   water/lamps. Other materials, ordinary non-instanced objects, all player
+   buildings and shadows are unfinished. This is a supported subset, not all
+   city objects. Native source resolution/hash/admission failures retain LOD.
+   Independent code/GPU reviews and focused lifecycle/packet/water controls pass;
+   actual loaded-town appearance and performance still await a game run. Three
+   catalogs and README are installed; personal INI and 16-tile atlas unchanged.
+
+   Current local GPU cap512MiB, fine residency256/visible96, disk512 files;
+   CPU fine cap64MiB includes conservative3MiB city-capture reserve. No native
+   world scan per tile; catalog/capture limited to existing1Hz model update.
+   Loaded snapshot content comparison avoids invalidating unchanged city windows.
+   Stale worker results after option toggles are discarded by epoch.
+
+   Next: actual Hub buildings/walls/stalls picture, then remaining object/material
+   families and unloaded-city detail. Fog, biome/diplomatic zones and roads follow
+   core city coverage. DF remains paused. No satellite publication is authorized
+   or claimed. One prior DLL backup is kept at backup/gsm-loaded-town-20261104.
+
 2. **KEO — after terrain/detail; satellite remains the main task.** User2026-11-02
    explicitly asks to read current Steam reports/source now: broken pathfinding,
    town inhabitants spawning outside and slowly returning, excess squads at normal

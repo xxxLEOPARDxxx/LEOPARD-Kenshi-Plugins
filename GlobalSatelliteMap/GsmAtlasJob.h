@@ -3,6 +3,7 @@
 #include "CaptureValidation.h" // Existing atomic world/load generation, no game calls.
 #include "build/GsmNativeProfile.h"
 #include "GsmCachedTownJob.h"
+#include "atlas-models/loaded-instances/_generated/InstanceAssetPins.h"
 #include "../tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalogData.h"
 namespace GsmAtlas {
 inline std::wstring Wide(const std::string&s){for(size_t i=0;i<s.size();++i)if(static_cast<unsigned char>(s[i])<32||s[i]==127||(s[i]==':'&&i!=1))throw std::runtime_error("source path control/alias refused");int n=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s.data(),static_cast<int>(s.size()),NULL,0);if(n<=0||n>=MAX_PATH)throw std::runtime_error("source path UTF8/length refused");std::wstring w(n,0);if(MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s.data(),static_cast<int>(s.size()),&w[0],n)!=n)throw std::runtime_error("source path conversion failed");for(size_t i=0;i<w.size();++i)if(w[i]=='/')w[i]='\\';return w;}
@@ -14,8 +15,8 @@ inline std::wstring Canonical(const std::string&s){
     return w;
 }
 struct Job {
-    HANDLE thread;LONG generation;bool validation,waterValidation,modelValidation,cachedTown,ok;std::string folder,game,engine,module[2];char error[512];Manifest manifest;AtlasView::ReadRequest read;AtlasView::WindowKey window;unsigned char windowHashes[3][32];float windowMinHeight;bool windowHasFiniteHeight;GsmCachedTown::Request cachedTownRequest;GsmCachedTown::Result cachedTownResult;
-    Job():thread(NULL),generation(0),validation(false),waterValidation(false),modelValidation(false),cachedTown(false),ok(false),windowMinHeight(0),windowHasFiniteHeight(false){error[0]=0;}
+    HANDLE thread;LONG generation;unsigned modelEpoch;bool validation,waterValidation,modelValidation,instanceValidation,cachedTown,ok;std::string folder,game,engine,module[2];char error[512];Manifest manifest;AtlasView::ReadRequest read;AtlasView::WindowKey window;unsigned char windowHashes[3][32];float windowMinHeight;bool windowHasFiniteHeight;GsmCachedTown::Request cachedTownRequest;GsmCachedTown::Result cachedTownResult;
+    Job():thread(NULL),generation(0),modelEpoch(0),validation(false),waterValidation(false),modelValidation(false),instanceValidation(false),cachedTown(false),ok(false),windowMinHeight(0),windowHasFiniteHeight(false){error[0]=0;}
 };
 inline void ObserveGeneration(void*input){Job&job=*static_cast<Job*>(input);if(job.generation!=InterlockedCompareExchange(&GSM::generation,0,0))InterlockedExchange(&job.read.cancel,1);}
 inline bool Cancelled(Job&job){ObserveGeneration(&job);return AtlasView::Cancelled(job.read);}
@@ -91,6 +92,12 @@ inline void ValidateWaterSources(Job&job){
     if(Cancelled(job))throw std::runtime_error("water source validation cancelled");
     job.manifest.waterVerified=true;
 }
+inline void ValidateInstanceSources(Job&job){
+    job.manifest.instancesVerified=false;AtlasView::U64 remaining=256ULL*1024*1024;
+    for(unsigned i=0;i<sizeof(InstanceAssetPins)/sizeof(InstanceAssetPins[0]);++i)
+        if(!HashFile(job.game+InstanceAssetPins[i].path,InstanceAssetPins[i].sha256,job,remaining))throw std::runtime_error("loaded town geometry material source differs: "+std::string(InstanceAssetPins[i].path));
+    if(Cancelled(job))throw std::runtime_error("loaded town material validation cancelled");job.manifest.instancesVerified=true;
+}
 inline void ValidateModelSources(Job&job){
     job.manifest.modelVerified=false;AtlasView::U64 remaining=16ULL*1024*1024;
     for(unsigned i=0;i<sizeof(GsmModelShaderInputs)/sizeof(GsmModelShaderInputs[0]);++i)
@@ -123,8 +130,9 @@ inline DWORD WINAPI Run(void*input){
     job.read.afterChunk=ObserveGeneration;job.read.observer=&job;
     try{
         if(Cancelled(job))throw std::runtime_error("GST2 job cancelled");
-        if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)+unsigned(job.cachedTown)>1)throw std::runtime_error("GST2 worker validation mode is ambiguous");
+        if(unsigned(job.validation)+unsigned(job.waterValidation)+unsigned(job.modelValidation)+unsigned(job.instanceValidation)+unsigned(job.cachedTown)>1)throw std::runtime_error("GST2 worker validation mode is ambiguous");
         if(job.cachedTown){ReadCachedTown(job);}
+        else if(job.instanceValidation){ValidateInstanceSources(job);job.ok=!Cancelled(job);}
         else if(job.modelValidation){ValidateModelSources(job);job.ok=!Cancelled(job);}
         else if(job.waterValidation){ValidateWaterSources(job);job.ok=!Cancelled(job);}
         else if(job.validation){Validate(job);job.ok=!Cancelled(job);}

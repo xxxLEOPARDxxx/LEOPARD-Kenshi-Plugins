@@ -1,113 +1,94 @@
 Global Satellite Map (development)
 
 EN
-Private development plugin, not a public release. Best Minimap keeps its existing
-map source. The global-map overlay uses one verified4x4 grid of8192x8192 tiles.
-Terrain capture is reused: zooming, sunlight and lamps do not recapture the world.
+Private development plugin. The minimap keeps its own existing map source.
+The global map uses one 4x4 grid of 8192x8192 terrain tiles. Zooming and changing
+lighting reuse that grid; supported close views receive streamed finer materials.
+Fixed zoom steps preserve native centre/cursor anchors and marker alignment.
+The user accepted terrain detail and zoom behaviour on 2026-11-04.
 
-MCM: Satellite view, Sunlight, Sky and ambient light, Water, Torches and lamps,
-Existing city models, Detailed log. Main view and optional layers default OFF;
-sun/ambient default ON. Detailed log is last and defaults OFF. Errors always log.
-No restart is required for these settings. Maximum map zoom is an optional1..8
-multiplier, default1, active with satellite view;2shows native terrain pixels at
-1:1 in the tested interface. Higher values enlarge the captured pixels. Native input anchors and marker thresholds are retained; reducing the limit recentres/clamps
-through the native zoom method. The original maximum is restored on disable.
+MCM: Satellite view; Sunlight; Sky and ambient light; Water; Torches and lamps;
+Existing city models; Maximum map zoom (1..8); Detailed log. Layers default OFF,
+sun and ambient default ON. Detailed log is last and OFF by default. Errors are
+always reported. These controls do not need a restart.
 
-Current renderer: geographic terrain materials, current native sun/ambient/HDR
-exposure, optional distant water, native point/spot lights in loaded areas.
-A paused unchanged light snapshot does not repeatedly dirty all windows. View
-streaming keeps16coarse fallbacks plus up to128detail windows. At most4windows
-are shaded per200ms map tick. The original map remains available on refusal.
+The existing city option combines distant town geometry, one available cached
+loaded-town model, and a new supported loaded-instance layer. The current detailed
+subset uses native plaster building materials, Wall4, Gate4 and market materials.
+It preserves their native dust/wetness, alpha clipping and translucency. Other
+materials, ordinary non-instanced objects, full player construction and shadows
+are still unfinished. Do not describe the current subset as all city geometry.
+Unloaded towns keep the available distant/cached model; zones are not activated.
 
-City-model development subset: already registered static DistantTown proxies,
-up to64towns;2source admissions per200ms and coherent1Hz town catalog. No zone
-activation, original Entity clone, native model unload or per-window GPU-state
-creation. Packet COM references are retired on OFF/load/world/scene transitions.
-Each refresh starts from pristine terrain planes, so removed models leave no
-accumulated silhouettes. One owned cached-town LOD now covers the nearest
-eligible loaded town without a proxy, using its actual existing cache file.
-Full loaded-building materials, player construction and shadows remain unfinished;
-the separate loaded-windmill helper is not an active feature.
+Loaded source capture is limited to one nearby town and four candidate checks
+on the existing 1Hz catalog update. Per-window draws use copied matrices and
+retained COM resources, with no native world scan. Identical captures do not dirty
+map windows. Source/world/origin changes invalidate snapshots; disabled or refused
+detail falls back to existing LOD/terrain. Model-job epochs reject old completion
+after toggling the setting. Accepted model height/coverage feeds lamps and water,
+so opaque water cannot paint over a higher accepted building surface.
 
-Owned texture/constant payload is capped at192MiB (driver/native overhead is
-separate). With terrain/water/local lights/model working surfaces it is196086608
-bytes. Borrowed native model buffers have a separate32MiB steady-state cap;
-diffuse resources64MiB. A single incoming packet can temporarily retain up to
-another32MiB of existing native buffers before global admission/refusal. These
-are resource payload bounds, not an absolute VRAM or process-memory guarantee.
-Native model imports and long-run FPS/memory still require game measurements.
+The current local development profile caps owned GPU payload at 512MiB, fine
+residency at 256 windows, visible fine work at 96 windows, and fine disk LRU at
+512 files. Offscreen sharp tiles remain warm until actual pressure. CPU fine-work
+payload remains capped at 64MiB, including a conservative 3MiB loaded-capture
+reserve. The detailed raster/compositor adds 2,884,080 owned GPU bytes when
+initialized. Borrowed native mesh buffers/textures retain their existing separate
+32MiB/64MiB limits. These are resource payload bounds, not total game/driver RAM
+or VRAM guarantees. GPU retirement debt and failed-fence admission remain counted.
+Actual end-to-end town appearance, frame time and long-session growth require
+game measurements; offline tests do not prove freedom from every possible leak.
 
-Before full terrain generation allow at least24GB free: the current raw grid is
-about23GB. Only one current grid is needed. Existing diagnostic captures are not
-release content. The display requires matching captures/ready.json/capture.json,
-windows.gsi and16GSTtiles; changed game/mod sources refuse the old data.
+Before full terrain generation allow at least 24GB free; the raw grid is about
+23GB. Normal viewing reuses it. Keep matching captures/ready.json/capture.json,
+windows.gsi and all 16 GST files. No new full capture is needed for this update.
+Exploration fog, biome zones, diplomatic zones and roads remain future options.
 
-Build: GlobalSatelliteMap/build.ps1 (VC10 x64 /GL and /LTCG).
-Checks: tests/run_viewer_tests.ps1 and tests/run_local_composition_tests.ps1;
-atlas-models/run_tests.ps1, decode/run_tests.ps1 and surface/run_tests.ps1.
-UI catalogs are en_GB/ru_RU/zh_CN; runtime packages use MO only.
-
-Extended zoom uses a proportional button/wheel step on close views, preserving
-native centre/cursor anchors;1 restores normal input. One private cached-town
-LOD is read in the existing bounded worker and imported on the render thread,
-without activating zones. It may miss recent town changes. Native whole-building
-materials remain separate work. Normal explicit cleanup is required while the
-renderer is alive; a passive exit owner retains at most one bounded graph until
-OS teardown if cleanup is omitted. Runtime DLL unloading is unsupported.
+Build: GlobalSatelliteMap/build.ps1, native VC10 x64 /GL /LTCG.
+Focused proofs: tests/loaded-town; atlas-models/loaded-instances/run_town.py;
+atlas-water/run_pipeline_tests.ps1; tests/local_composition_tests.py.
+UI: en_GB, ru_RU and zh_CN. Runtime catalogs are MO only. No personal INI or
+capture files belong in a public package. This module has no public release yet.
 
 RU
-Закрытая разработка спутникового слоя глобальной карты, не публичный выпуск.
-Миникарта сохраняет прежний источник карты. Используется одна проверенная сетка
-4x4 из16плиток8192x8192. При масштабе и смене освещения мир повторно не снимается.
+Закрытая разработка спутниковой глобальной карты. Миникарта использует прежний
+источник. Основа - одна сетка 4x4 из плиток 8192x8192. При зуме и смене света
+она используется повторно; вблизи подгружаются более подробные материалы.
+Фиксированные ступени сохраняют привязку центра/курсора и совпадение меток.
+04.11.2026 пользователь подтвердил качество рельефа и работу зума.
 
-В MCM: спутниковый вид, солнце, фоновое освещение, вода, факелы и фонари,
-существующие модели городов, подробный журнал. Основной слой и дополнительные
-слои по умолчанию выключены, солнце и фоновый свет включены. Подробный журнал
-последний и выключен; ошибки видны всегда. Перезапуск для этих настроек не нужен.
-Добавлен множитель максимального зума1..8, по умолчанию1, для спутникового вида.
-В проверяемом интерфейсе2позволяет показывать пиксели рельефа1:1. Большие значения
-увеличивают сами пиксели снимка. Штатные привязки ввода и метки сохраняются; при уменьшении
-предела масштаб и центр обновляются штатным способом. Отключение возвращает
-прежний предел.
+В MCM: спутниковый вид, солнце, свет неба, вода, факелы и фонари, модели городов,
+максимальный зум 1..8 и подробный журнал. Слои по умолчанию выключены, солнце
+и фоновый свет включены. Журнал последний, по умолчанию выключен; ошибки видны
+всегда. Для этих настроек перезапуск не требуется.
 
-Реализованы географические материалы рельефа, текущее солнце и фоновый свет,
-экспозиция, необязательная вода и реальные источники света загруженных областей.
-При неизменном освещении на паузе участки не перерисовываются без причины.
-Сохраняются16грубых подложек и до128детальных участков; не более4перерисовок за
-200мс при открытой карте. При отказе слоя остаётся обычная карта.
+Модели городов объединяют дальние модели, доступную кэшированную модель города
+и новый слой поддерживаемых объектов загруженной сцены. Сейчас подробный слой
+охватывает штукатурные материалы зданий, Wall4, Gate4 и материалы рынка.
+Сохраняются штатные пыль, намокание, отсечение прозрачных участков и просвечивание.
+Другие материалы, обычные неинстансные объекты, все постройки игрока и тени ещё
+не закончены. Это пока часть городской геометрии. Непрогруженные города сохраняют
+доступные дальние модели; ради карты новые зоны не активируются.
 
-Экспериментальные модели городов используют уже зарегистрированные статичные
-дальние модели: до64городов, две проверки источников за200мс, список раз в секунду.
-Зоны не активируются, оригинальные модели не клонируются и не выгружаются.
-Ресурсы повторно используются, очищаются при отключении и смене мира/сцены.
-Перед каждой отрисовкой моделей копируется чистый рельеф, чтобы удалённые здания
-не оставляли силуэтов. Полные материалы загруженных зданий, стройка игрока и тени ещё не подключены.
-Одна собственная готовая LOD-модель поддерживает ближайший загруженный город без
-дальнего proxy, если его файл уже существует. Отдельный модуль мельницы не активен.
+Снимок исходной геометрии ограничен одним ближайшим городом и четырьмя кандидатами
+при существующем обновлении каталога раз в секунду. Отрисовка участков использует
+скопированные матрицы и удерживаемые графические ресурсы, без обхода мира для
+каждой плитки. Неизменившийся снимок не запускает лишнюю перерисовку. При смене
+мира/сцены/начала координат снимок сбрасывается. Отказ подробного слоя сохраняет
+прежние модели и рельеф. Устаревший ответ фоновой проверки после переключения
+настройки отбрасывается. Высота принятой геометрии используется светом и водой,
+чтобы вода не перекрывала более высокое здание.
 
-Собственные текстуры и константы ограничены192МиБ; все текущие слои требуют
-196086608байт. Удерживаемые родные буферы моделей ограничены32МиБ, текстуры64МиБ;
-временно принимаемый пакет может удерживать ещё до32МиБ существующих буферов.
-Это границы полезных ресурсов, а не оценка полной памяти драйвера и процесса.
-Игровые замеры FPS и длительного роста памяти проверяются отдельно.
+Текущий локальный профиль: до 512МиБ собственных GPU-данных, 256 сохранённых
+подробных участков, до 96 видимых участков в плане и 512 файлов дискового кэша.
+Уже загруженные участки сохраняются вне экрана до реальной нехватки ресурсов.
+Лимит CPU-данных подробного рендера - 64МиБ, включая резерв 3МиБ для снимка города.
+Новый растеризатор и смешивание занимают 2 884 080 GPU-байт после инициализации.
+Удерживаемые штатные буферы и текстуры имеют отдельные лимиты 32/64МиБ.
+Это границы данных ресурсов, а не всей памяти игры или видеодрайвера. Реальное
+изображение городов, FPS и рост памяти проверяются отдельно в игре.
 
-Перед полной съёмкой нужно хотя бы24ГБ свободного места: сырая сетка занимает
-около23ГБ. Достаточно одной текущей сетки. Диагностические захваты не входят в
-релиз. При несовпадении источников игры/сборки старая сетка не используется.
-Три языка интерфейса: русский, английский, китайский; в игре нужны только MO.
-
-Управление увеличенным зумом: при множителе больше1 шаг кнопок растёт с
-масштабом, колесо ускоряется на близком виде. Сохраняются штатные привязки:
-кнопки относительно центра окна, колесо относительно курсора. Значение1
-возвращает штатный шаг. Это меняет управление, а не разрешение рельефа.
-
-Для ближайшего загруженного города без действующей дальней модели можно
-использовать один существующий cached LOD. Файл читается в прежнем фоновом
-потоке, импортируется в отдельный незарегистрированный Mesh и рисуется тем же
-слоем. Например, это позволяет показать Хаб без активации дополнительных зон.
-Это готовая упрощённая модель: недавние изменения города могут в ней отсутствовать.
-Полные материалы и геометрия загруженных зданий пока не переносятся.
-При отключении/смене мира собственная модель явно очищается в игровом потоке.
-Если явная очистка при завершении процесса не произошла, один ограниченный граф
-владения сохраняется до завершения ОС без поздних вызовов Ogre/COM. Выгрузка DLL
-на лету не поддерживается; отсутствие любых утечек этой мерой не утверждается.
+Перед полным рендером нужно не менее 24ГБ свободного места; сетка занимает около
+23ГБ. Просмотр использует готовую сетку. Для этого обновления полный рендер не
+требуется. Туман исследования, биомы, дипломатические зоны и дороги - следующие
+необязательные слои. Публичного выпуска этого плагина пока нет.

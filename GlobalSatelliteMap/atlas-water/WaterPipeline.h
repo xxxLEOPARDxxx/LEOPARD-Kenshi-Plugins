@@ -8,6 +8,7 @@ inline bool PipelineFits(U64 callerOwnedBytes){return callerOwnedBytes<=AtlasVie
 struct HdrStage {
  void*context;
  HRESULT(*apply)(void*,const AtlasView::Cell&,const AtlasView::Uniforms&,ID3D11ShaderResourceView*,ID3D11Texture2D*);
+ const AtlasView::Cell*(*surface)(void*);
 };
 class Pipeline {
  AtlasView::Relighter terrain_;
@@ -74,7 +75,9 @@ public:
   if(waterEnabled)for(unsigned p=0;p<5;++p)if(!InputSafe(c.p,waterInputs[p],output)||!AtlasView::SameDevice(waterSamplers[p],device_.p)||!AtlasView::LightView(waterInputs[p],device_.p,p>=3,1))return DXGI_ERROR_INVALID_CALL;
   HRESULT hr=terrain_.Render(cell,terrain,terrainLight,terrainSampler,work_.p);
   if(SUCCEEDED(hr)&&stage){SavedPredicate stagePredicate(c.p);SavedCompute stageSaved(c.p);hr=stage->apply(stage->context,cell,terrain,workView_.p,work_.p);}
-  if(waterEnabled){ID3D11ShaderResourceView*source[8]={workView_.p,cell.view[1].p,cell.view[2].p,waterInputs[0],waterInputs[1],waterInputs[2],waterInputs[3],waterInputs[4]};
+  const AtlasView::Cell*accepted=&cell;
+  if(SUCCEEDED(hr)&&stage&&stage->surface){accepted=stage->surface(stage->context);if(!accepted||accepted->side!=256)hr=E_INVALIDARG;else for(unsigned p=0;p<3;++p)if(!InputSafe(c.p,accepted->view[p].p,output))hr=DXGI_ERROR_INVALID_CALL;}
+  if(waterEnabled&&SUCCEEDED(hr)){ID3D11ShaderResourceView*source[8]={workView_.p,accepted->view[1].p,accepted->view[2].p,waterInputs[0],waterInputs[1],waterInputs[2],waterInputs[3],waterInputs[4]};
   if(SUCCEEDED(hr))hr=water_.Render(water,source,waterSamplers,work_.p,callerOwnedBytes+PipelinePrivateBytes-PrivateBytes);}
   if(SUCCEEDED(hr))hr=Tone(c.p,terrain,output);return hr;
  }

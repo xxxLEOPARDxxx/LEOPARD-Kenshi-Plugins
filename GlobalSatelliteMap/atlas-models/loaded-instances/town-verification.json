@@ -1,0 +1,21 @@
+{
+  "scope": "TownCompose isolated HDR/native lighting/acceptedY, actual frozen raw raster triangles; no live native admission or map integration proof",
+  "results": [
+    {
+      "opt": "Od",
+      "result": "PASS 46 actual town HDR/acceptedY controls\n"
+    },
+    {
+      "opt": "O2",
+      "result": "PASS 46 actual town HDR/acceptedY controls\n"
+    }
+  ],
+  "functionalMutants": 7,
+  "sourceSha256": {
+    "TownCompose.h": "77a706788614effb11a00c7b9a19a5d18308d2342fb48c26b1c7a04468ba385b",
+    "TownCompose.hlsl": "7f9e09992d2d1fb18212cf416c978546204b067483f37a9aefb16bbb09b553f8",
+    "town_tests.cpp": "7e5023ed90a55aa213bba69d99b1622b6741de5e0a2ffbbb6d6cccf9bc404b8d",
+    "generate_town.py": "4a2cf053ff0741c6906e528de25685b67b71a35171a507a87cf9cf37ae8eaa90",
+    "run_town.py": "7232ab55a7f9cd1a8da71a9bd1ab2ca67c54dc840d261a72878f56936b00d295"
+  }
+}

@@ -61,8 +61,8 @@ msgstr "Light terrain with existing point and spot lights in loaded areas. Unloa
 msgid "Existing city models"
 msgstr "Existing city models"
 
-msgid "Show existing city LOD models and an available cached model for a loaded town. Full building geometry and recent changes missing from that cache are not included."
-msgstr "Show existing city LOD models and an available cached model for a loaded town. Full building geometry and recent changes missing from that cache are not included."
+msgid "Show distant town models and supported building geometry from loaded areas, including walls and market stalls. Other objects retain the available town model."
+msgstr "Show distant town models and supported building geometry from loaded areas, including walls and market stalls. Other objects retain the available town model."
 
 msgid "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."
 msgstr "Development terrain view with current sunlight, sky lighting, optional water and lights in loaded areas. City models are experimental."

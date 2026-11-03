@@ -414,4 +414,17 @@ not disclose intentionally hidden information. Bounded geometry/cache updates,
 no per-frame world scans or file writes, clipping/zoom/skin checks, three locales
 and lifecycle/performance review are required. These are future tasks only:
 no implementation or public release is claimed. Current priority remains city
-coverage and the reported fast-zoom edge display defect.
+coverage.
+
+### 2026-11-04: terrain/zoom accepted; move to loaded city geometry
+
+The user confirms fixed zoom steps, sharp detail at all zoom levels and the
+warm-neighborhood improvement. Treat this terrain/viewer stage as accepted;
+do not restart terrain work or rerender the atlas without a new concrete defect.
+The next deliverable is visible detailed city geometry, including walls and
+market objects, using the existing native instance prototype and a transient
+HDR/translucency compositor. Current distant/cached city meshes are still
+simplified geometry, not a completed loaded-town layer. Keep the accepted terrain
+fallback and zoom behavior while integrating it. Fog and the requested overlays
+follow core city coverage. KEO maintenance and Map-markers import work continue
+independently.

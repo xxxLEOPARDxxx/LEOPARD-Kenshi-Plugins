@@ -45,7 +45,7 @@ const unsigned MaxBlock=256;const AtlasView::U64 PrivateBytes=526416;
 LOCAL_HELPERS
 struct Layer{unsigned LastBatches()const{return 1;}void Clear(){}HRESULT Init(ID3D11Device*,const void*,SIZE_T,AtlasView::U64 caller){++localInit;lastLocalCaller=caller;return nextLocalInit;}HRESULT Render(bool,const NativeLocalLights::Snapshot&,LONG,const ProvenMapping&,const Region&,ID3D11ShaderResourceView*const source[4],ID3D11Texture2D*,AtlasView::U64 caller){++localCalls;lastApplyCaller=caller;Check(source[0]==reinterpret_cast<ID3D11ShaderResourceView*>(99)&&source[1]==reinterpret_cast<ID3D11ShaderResourceView*>(1)&&source[2]==reinterpret_cast<ID3D11ShaderResourceView*>(2)&&source[3]==reinterpret_cast<ID3D11ShaderResourceView*>(3),"actual ApplyLocal passes HDR/material/normal/height slots in order");return nextLocal;}};
 }
-namespace AtlasWater{const AtlasView::U64 PipelinePrivateBytes=3408256;struct Uniforms{float tileBounds[4],sourceWindow[4],waterPlane[4];};struct HdrStage{void*context;HRESULT(*apply)(void*,const AtlasView::Cell&,const AtlasView::Uniforms&,ID3D11ShaderResourceView*,ID3D11Texture2D*);};}
+namespace AtlasWater{const AtlasView::U64 PipelinePrivateBytes=3408256;struct Uniforms{float tileBounds[4],sourceWindow[4],waterPlane[4];};struct HdrStage{void*context;HRESULT(*apply)(void*,const AtlasView::Cell&,const AtlasView::Uniforms&,ID3D11ShaderResourceView*,ID3D11Texture2D*);const AtlasView::Cell*(*surface)(void*);};}
 static bool debug=false,localOption=true,localFailed=false,localLayerReady=false,ready=true,localDiagnosticLogged=false,originDiagnosticLogged=false,waterFailed=false,waterPipelineReady=false;
 static DWORD localDiagnosticAt=0;static LONG observedGeneration=7;static unsigned localVersion=1,lightVersion=2,waterVersion=1,shadeCursor=0,localRenders=0,localBatches=0;
 static const void*localProofScene=NULL;static const void*fakeScene=reinterpret_cast<void*>(11);
@@ -56,11 +56,23 @@ struct Output{ID3D11Texture2D*p;Output():p(NULL){}};struct Entry{AtlasView::Cell
 static Entry cache[AtlasView::WindowSlots];static AtlasView::Uniforms lighting={};
 static bool modelGpuReady=false,modelsOn=false,modelError=false;
 static const AtlasView::U64 ModelGpuBytes=3145936;
+void RetireGpuCharge(AtlasView::U64){} // no queued GPU work in this CPU caller fixture
+static bool gpuAdmit=true;bool AdmitGpu(AtlasView::U64){return gpuAdmit;}
+AtlasView::U64 OtherGpuBytes(AtlasView::U64 excluded){return AtlasView::WindowGpuBytes()+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0)+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0)-excluded;}
 static AtlasView::Cell modelCell;
 struct ModelFixture{unsigned revision;ModelFixture():revision(1){}unsigned Revision()const{return revision;}}models;
 bool ModelsAvailable(){return modelsOn;}
 HRESULT PrepareModelCell(const Entry&e,const AtlasView::Uniforms&,bool&applied){modelCell=e.gpu;applied=modelsOn&&!modelError;return modelError?E_FAIL:S_OK;}
 void ModelFailure(const char*){modelsOn=false;modelError=false;}
+// This suite keeps the new optional town layer OFF and verifies the existing
+// terrain/local/water callers; the actual town material/HDR path has WARP tests.
+static bool loadedGpuReady=false;const AtlasView::U64 LoadedGpuBytes=2884080;
+bool LoadedTouches(const AtlasView::Uniforms&){return false;}
+void LoadedFailure(const char*){}
+struct LoadedStage{bool local,detailed;const AtlasView::Cell*accepted;};
+const AtlasView::Cell*LoadedSurface(void*context){return static_cast<LoadedStage*>(context)->accepted;}
+HRESULT ApplyLocal(void*,const AtlasView::Cell&,const AtlasView::Uniforms&,ID3D11ShaderResourceView*,ID3D11Texture2D*);
+HRESULT ApplyLoadedAndLocal(void*context,const AtlasView::Cell&cell,const AtlasView::Uniforms&u,ID3D11ShaderResourceView*v,ID3D11Texture2D*t){return static_cast<LoadedStage*>(context)->local?ApplyLocal(NULL,cell,u,v,t):S_OK;}
 
 static void ErrorLog(const std::string&){++errors;}static void Diagnostic(const std::string&){}
 bool DiagnosticScene(const void*&scene,const void*&camera){scene=fakeScene;camera=reinterpret_cast<void*>(12);return scene!=NULL;}
@@ -86,9 +98,10 @@ int main(){try{
  Reset();Admit();localMapping.verified=false;Check(!WantsLocal(cache[0]),"unproven mapping refuses");localMapping.verified=true;++observedGeneration;Check(!WantsLocal(cache[0]),"stale generation refuses mapping");observedGeneration=7;localMapping.sourceSceneOrigin[0]=1;Check(!WantsLocal(cache[0]),"source origin mismatch refuses");
  Reset();Admit();fakeScene=reinterpret_cast<void*>(13);LocalDiagnostic(2000);Check(!localMapping.verified&&!localProofScene,"scene replacement invalidates coordinate proof before reuse");
  Reset();Admit();NativeLocalLights::lights[0].worldPosition[0]=100000;NativeLocalLights::lights[0].worldPosition[2]=100000;LocalDiagnostic(2000);Check(!WantsLocal(cache[0]),"outside radius skips local stage");
- Reset();Admit();AtlasView::Uniforms u={};u.tileBounds[2]=u.tileBounds[3]=2304;Check(RenderLayers(cache[0],cache[0].gpu,u,false,true)==S_OK&&localInit==1&&pipelineInit==1&&localCalls==1&&terrainStage==1&&!waterStage,"waterOFF locals use terrain HDR stage");Check(lastLocalCaller==AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes&&lastPipelineCaller==AtlasView::WindowGpuBytes()+AtlasLocalLights::PrivateBytes&&lastApplyCaller==lastLocalCaller,"actual Init/Render ledgers include external private resources once");
+ Reset();Admit();AtlasView::Uniforms u={};u.tileBounds[2]=u.tileBounds[3]=2304;Check(RenderLayers(cache[0],cache[0].gpu,u,false,true)==S_OK&&localInit==1&&pipelineInit==1&&localCalls==1&&terrainStage==1&&!waterStage,"waterOFF locals use terrain HDR stage");Check(lastLocalCaller==AtlasView::WindowGpuBytes()&&lastPipelineCaller==AtlasView::WindowGpuBytes()+AtlasLocalLights::PrivateBytes&&lastApplyCaller==AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes,"actual Init/Render ledgers include external private resources once");
  Reset();Admit();Check(RenderLayers(cache[0],cache[0].gpu,u,true,false)==S_OK&&!localInit&&!localCalls&&waterStage==1,"localOFF water uses null HDR callback");
  Reset();Admit();Check(RenderLayers(cache[0],cache[0].gpu,u,true,true)==S_OK&&localCalls==1&&waterStage==1,"waterON locals pass callback once");
+ Reset();Admit();gpuAdmit=false;Check(RenderLayers(cache[0],cache[0].gpu,u,false,true)==E_OUTOFMEMORY&&!localInit&&!pipelineInit&&!writes,"retirement refusal blocks all lazy stage allocation");gpuAdmit=true;
  Reset();Admit();nextLocalInit=E_FAIL;Check(FAILED(RenderLayers(cache[0],cache[0].gpu,u,false,true))&&!pipelineInit&&!writes,"local init failure stops before display/pipeline");
  Reset();Admit();nextPipelineInit=E_FAIL;Check(FAILED(RenderLayers(cache[0],cache[0].gpu,u,false,true))&&!localCalls&&!writes,"pipeline init failure stops before stage/display");
  Reset();Admit();Check(Shade()<=4&&writes==4&&cache[0].localApplied,"actual Draw four-window local budget");localOption=false;unsigned total=0;for(unsigned i=0;i<(AtlasView::WindowSlots+3)/4;++i)total+=Shade();Check(total==4&&terrainFallback==4&&!cache[0].localApplied,"OFF dirties old applied locals then restores only affected outputs");
@@ -114,9 +127,8 @@ int main(){try{
  ('ignore exact revision','localRevision.Observe(values,observedGeneration)','false'),
  ('reuse stale cell eligibility','if(e.localChecked==localVersion)','if(true)'),
  ('omit local init','if(useLocal&&!localLayerReady)','if(false)'),
- ('omit HDR callback','useLocal?&stage:NULL','NULL'),
- ('omit external caller ledger','(localLayerReady?AtlasLocalLights::PrivateBytes:0)','0'),
- ('omit pipeline in stage ledger','AtlasView::WindowGpuBytes()+AtlasWater::PipelinePrivateBytes','AtlasView::WindowGpuBytes()'),
+ ('omit HDR callback','(useLocal||context.detailed)?&stage:NULL','NULL'),
+ ('omit external caller ledger','OtherGpuBytes(localLayerReady?AtlasLocalLights::PrivateBytes:0)','AtlasView::WindowGpuBytes()'),
  ('omit local failure fallback','if(FAILED(hr)&&useLocal)','if(false)'),
  ('omit water retry','if(useWater)hr=RenderLayers(e,cell,u,true,false);',''),
  ('ignore paused version','(useLocal&&e.localStamp!=localVersion)','false'),

@@ -12,6 +12,10 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & $python (Join-Path $PSScriptRoot 'atlas-models/private-lod/generate_profile.py')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $python (Join-Path $PSScriptRoot 'atlas-models/loaded-instances/generate.py')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $python (Join-Path $PSScriptRoot 'atlas-models/loaded-instances/generate_town.py')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & $python (Join-Path $PSScriptRoot 'generate_viewer_assets.py')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & (Join-Path (Split-Path $PSScriptRoot -Parent) 'build.ps1') -SrcDir $PSScriptRoot -Name GlobalSatelliteMap

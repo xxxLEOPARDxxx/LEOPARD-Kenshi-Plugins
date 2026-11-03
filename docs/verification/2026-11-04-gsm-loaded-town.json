@@ -1,0 +1,26 @@
+{
+  "dateMoscow": "2026-11-04",
+  "state": "installed-private-candidate; gameplay acceptance pending",
+  "dllSha256": "5cae6c2287c69f023e77950784210f0103d64af11c92b496532862521f2ce0c1",
+  "sourceSha256": {
+    "GlobalSatelliteMap/GlobalSatelliteMap.cpp": "04ff7e2f9ee7ce245df0aa0931d4acebef0707232c734498fd84112f0936c5ec",
+    "GlobalSatelliteMap/GsmInstanceSources.h": "d6f98cb70e94caec5fa8f18819e6e32ff245e6b0a8dfeab51eb84c90aa2e4e8e",
+    "GlobalSatelliteMap/GsmLoadedTownState.h": "a6c72b617332b37ad3bba9660e5b80bef2976266652da44c7c8b7898cb57f378",
+    "GlobalSatelliteMap/GsmAtlasJob.h": "cef5e258daa5141ac081a0cba09d7528d03568267e060518c6af7d744511c43d",
+    "GlobalSatelliteMap/GsmAtlasManifest.h": "82b6cf328de4b6228657bfee22830dd29748d36d4d85d372a5cf929c4a932904",
+    "GlobalSatelliteMap/GsmFineViewer.h": "88a7adc6a995012d501bd857d6f01f0843cbb781c47e57253d47512a43724663",
+    "GlobalSatelliteMap/atlas-water/WaterPipeline.h": "03e43225d838cd055c18b41fdcb74549bedb40d3b3a289232e04aa48a10f7676",
+    "GlobalSatelliteMap/atlas-models/loaded-instances/InstanceRaster.h": "046a8efab8f7e99f3847e4dc2ee51ec523ab1677b44603673c55202c7f172b39",
+    "GlobalSatelliteMap/atlas-models/loaded-instances/TownCompose.h": "77a706788614effb11a00c7b9a19a5d18308d2342fb48c26b1c7a04468ba385b",
+    "GlobalSatelliteMap/atlas-models/loaded-instances/TownCompose.hlsl": "7f9e09992d2d1fb18212cf416c978546204b067483f37a9aefb16bbb09b553f8"
+  },
+  "verification": {
+    "nativeBuild": "PASS 86 imports/startPlugin/MCM",
+    "packetRefresh": "9 /Od and /O2",
+    "modelEpoch": "35 /Od and /O2; actual Poll prefix, real event handles",
+    "localCaller": "64 +11 mutants",
+    "townCompose": "46 /Od and /O2 +7 mutants",
+    "waterPipeline": "262329 pixel/state controls; new accepted-surface check"
+  },
+  "cleanup": "Deletion of old atlas and stale session caches rejected by automatic policy; no deletion executed."
+}

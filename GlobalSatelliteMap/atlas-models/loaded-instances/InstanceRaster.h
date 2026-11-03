@@ -23,6 +23,15 @@ public:Packet():draw_(NULL),count_(0),generation_(0),buffers_(0),textures_(0){st
  void Clear(){delete[]draw_;draw_=NULL;count_=generation_=0;buffers_=textures_=0;std::memset(origin_,0,12);}
  unsigned Count()const{return count_;}unsigned Generation()const{return generation_;}const float*SourceSceneOrigin()const{return origin_;}U64 BorrowedBuffers()const{return buffers_;}U64 BorrowedTextures()const{return textures_;}
  const float*RawSceneWorld(unsigned i)const{return i<count_?draw_[i].rawWorld:NULL;}const float*LocalBounds(unsigned i)const{return i<count_?draw_[i].localBounds:NULL;}
+ bool SameContents(const Packet&other)const{
+  if(count_!=other.count_||generation_!=other.generation_||std::memcmp(origin_,other.origin_,12))return false;
+  for(unsigned i=0;i<count_;++i){const Draw&a=draw_[i],&b=other.draw_[i];const Shape&x=a.shape,&y=b.shape;
+   if(a.kind!=b.kind||a.cullMode!=b.cullMode||a.vertex.p!=b.vertex.p||a.index.p!=b.index.p||x.layout!=y.layout||x.vertexStart!=y.vertexStart||x.vertexCount!=y.vertexCount||x.vertexBytes!=y.vertexBytes||x.vertexOffset!=y.vertexOffset||x.indexStart!=y.indexStart||x.indexCount!=y.indexCount||x.indexBytes!=y.indexBytes||x.indexFormat!=y.indexFormat)return false;
+   if(std::memcmp(&a.surface,&b.surface,sizeof(Surface))||std::memcmp(a.rawWorld,b.rawWorld,64)||std::memcmp(a.localBounds,b.localBounds,24))return false;
+   for(unsigned k=0;k<TextureCount(a.kind);++k)if(a.texture[k].p!=b.texture[k].p)return false;
+   D3D11_SAMPLER_DESC sa={},sb={};a.sampler.p->GetDesc(&sa);b.sampler.p->GetDesc(&sb);if(std::memcmp(&sa,&sb,sizeof(sa)))return false;
+  }return true;
+ }
  bool RequiresNativeLighting(unsigned i)const{return i<count_&&LoadedInstances::RequiresNativeLighting(draw_[i].kind);}bool CanDecode()const{if(!count_)return false;for(unsigned i=0;i<count_;++i)if(RequiresNativeLighting(i))return false;return true;}
  HRESULT Adopt(ID3D11Device*d,const RawDraw*raw,unsigned count,const float*origin,unsigned generation,U64 otherBuffers=0,U64 otherTextures=0){
   if(!d||!raw||!count||count>MaxRecords||draw_||!origin||!generation||!AtlasModels::Finite(origin,3)||otherBuffers>BufferCap||otherTextures>TextureCap)return E_INVALIDARG;
