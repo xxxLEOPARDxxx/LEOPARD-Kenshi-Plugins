@@ -78,6 +78,10 @@
 #include "NativeReceiptControl.h"
 #include "WorldFrameControl.h"
 #include "../../../GlobalSatelliteMap/atlas-terrain/world-native/NativeProvider.h"
+#include "../../../GlobalSatelliteMap/atlas-terrain/world-native-rebind/NativeSession.h"
+#include "../../../GlobalSatelliteMap/atlas-terrain/world-build/WorldBuildControl.h"
+#include "../../../GlobalSatelliteMap/atlas-terrain/world-layout/WorldLayout.h"
+#include "../../../GlobalSatelliteMap/atlas-cache/world-build-disk/WorldBuildDisk.h"
 #include <WidgetRef.h>
 #include "../../../GlobalSatelliteMap/atlas-terrain/staged-material/_generated/StagedShaders.h"
 #pragma comment(lib, "advapi32.lib")
@@ -145,6 +149,14 @@ DWORD worldFramePollAt=0,worldFrameToken=0;
 unsigned worldFrameEpoch=0;
 volatile LONG worldFrameLoadGeneration=0;
 LONG worldFrameCapturedLoad=0;
+typedef WorldBuild::Controller<WorldNativeRebind::NativeSession,WorldBuildDisk::Factory,WorldBuildDisk::Config> NativeWorldBuild;
+NativeWorldBuild*worldBuild=NULL;
+bool worldBuildEnabled=false,worldBuildStop=false;
+SourceReceipts::Scope worldBuildScope={};WorldCohort::Job worldBuildJob;
+WorldRaster::Material worldBuildMaterial;unsigned worldBuildMaterialRegion=64;
+unsigned worldBuildCount=0,worldBuildDone=0,worldBuildCase=0;DWORD worldBuildToken=0,worldBuildPollAt=0;
+LONG worldBuildCapturedLoad=0;ProbePolicy::RequestLatch worldBuildLatch;
+std::string worldBuildRoot,worldBuildDirectory;
 void (*worldFrameOriginalLoad)(SaveFileSystem*,const std::string&)=NULL;
 void (*worldFrameOriginalNew)(SaveFileSystem*)=NULL;
 
@@ -1469,6 +1481,7 @@ void PrepareWorldFrame(unsigned token)
     HRESULT hr=worldFrame->Begin(j,Folder()+suffix);if(FAILED(hr)){std::ostringstream e;e<<"world frame native input admission hr=0x"<<std::hex<<unsigned(hr);throw std::runtime_error(e.str());}
     worldFrameToken=token;worldFrameStop=false;
 }
+#include "WorldBuildMain.inl"
 struct ProbeListener : Ogre::CompositorWorkspaceListener
 {
     virtual void passPreExecute(Ogre::CompositorPass *p)
@@ -1479,6 +1492,14 @@ struct ProbeListener : Ogre::CompositorWorkspaceListener
     virtual void workspacePreUpdate(Ogre::CompositorWorkspace *w)
     {
         Ogre::CompositorWorkspaceListener *next = previous;
+        if(worldBuildEnabled&&OnMain()&&worldBuild&&worldBuild->Active()&&!worldBuild->Quarantined()&&!inside)
+        {
+            inside=true;
+            try{bool admitted=!worldBuildStop&&FixedContext(w,true)&&worldFrameMapRoot.get()&&worldFrameMapImage.get()&&worldFrameMapRoot.get()->getInheritedVisible()&&worldFrameMapImage.get()->getInheritedVisible();AtlasView::Com<ID3D11Device>d;if(admitted)FixedDevice(w,&d.p);WorldBuildFinished(worldBuild->Tick(admitted,d.p,WorldBuildNow()));}
+            catch(const std::exception&e){worldBuildStop=true;worldBuild->Cancel();ErrorLog(std::string("SatelliteCaptureProbe: world build callback: ")+e.what());}
+            catch(...){worldBuildStop=true;worldBuild->Cancel();ErrorLog("SatelliteCaptureProbe: world build callback exception; consumer cancellation first");}
+            inside=false;
+        }
         if(worldFrameEnabled&&OnMain()&&worldFrame&&worldFrame->Active()&&!worldFrame->Quarantined()&&!inside)
         {
             inside=true;
@@ -1657,6 +1678,34 @@ void Update(MapScreen *map)
             EnumWindows(FindWindowThread, 0);
         if (!OnMain())
             return;
+        if(worldBuildEnabled)
+        {
+            if(worldBuild&&worldBuild->Quarantined()){if(cleanup)Drop();return;}
+            if(worldBuild&&worldBuild->Active()&&(worldBuildStop||!map||!map->getVisible()||!FixedContext(gameWorkspace,true)||!SourceReceipts::SameScope(WorldBuildNow(),worldBuildScope)))
+            {worldBuildStop=true;worldBuild->Cancel();WorldBuildFinished(worldBuild->Tick(false,NULL,WorldBuildNow()));}
+            if(cleanup&&(!worldBuild||!worldBuild->Active())){Drop();return;}
+            if(ProbePolicy::PollDue(worldBuildPollAt,GetTickCount()))
+            {
+                worldBuildPollAt=GetTickCount();unsigned token=GetPrivateProfileIntA("Probe","WorldBuildRequest",0,requestIni.c_str());
+                const bool changed=worldBuildLatch.Changed(token),cancel=GetPrivateProfileIntA("Probe","WorldBuildCancel",0,requestIni.c_str())!=0;
+                if(cancel&&worldBuild){worldBuildStop=true;worldBuild->Cancel();}
+                if(changed)
+                {
+                    if(!token||cancel||(worldBuild&&worldBuild->Active())||inside||pending||terrainExperiment.root||atlasRun.active||atlasRun.thread||atlasRun.pixels||!map||!map->getVisible()||!chainSafe)throw std::runtime_error("world build request consumed outside idle map context");
+                    if(!profileOK||!LoadedGuard()||!au||!au->render||!ou)throw std::runtime_error("world build native world unavailable");EnsureRenderAbi();
+                    Renderer*candidate=au->render;Ogre::CompositorWorkspace*workspace=candidate->workspace;SaveFileSystem*fs=SaveFileSystem::getSingleton();
+                    if(!workspace||!candidate->root||!candidate->scene||!restorationSafe||!fs||fs->busy()||!RenderAbiMatches()||!FixedViewerOff()||!FixedNoViewerTextures())throw std::runtime_error("world build requires guarded context and viewer OFF at startup/current with no viewer textures");
+                    if(!map->mainWidget||!map->mapImage)throw std::runtime_error("world build map widgets unavailable");worldFrameMapRoot.set(map->mainWidget);worldFrameMapImage.set(map->mapImage);
+                    if(!worldFrameMapRoot.get()||!worldFrameMapImage.get())throw std::runtime_error("world build map unlink registration unavailable");
+                    AtlasView::Com<ID3D11Device>d;FixedDevice(workspace,&d.p);PrepareWorldBuild(token);
+                    renderer=candidate;gameWorkspace=workspace;requestedWorld=ou;previous=gameWorkspace->getListener();ourListener=&listener;gameWorkspace->setListener(&listener);
+                    Log("world build armed:512@9m four-view cell cohorts; new incomplete GST2 directory only; working atlas unchanged");
+                }
+            }
+            if(worldBuild&&worldBuild->Ready()&&!worldBuildStop&&worldBuildDone<worldBuildCount&&!inside)
+            {PrepareWorldBuildJob();if(!worldBuild->Queue(worldBuildJob))throw std::runtime_error("world build native cohort/source admission refused");}
+            return;
+        }
         if(worldFrameEnabled)
         {
             if(worldFrame&&worldFrame->Quarantined()){if(cleanup)Drop();return;}
@@ -1938,6 +1987,7 @@ void Update(MapScreen *map)
     }
     catch (const std::exception &e)
     {
+        if(worldBuild&&worldBuild->Active()){worldBuildStop=true;worldBuild->Cancel();}
         if(worldFrame&&worldFrame->Active()){worldFrameStop=true;worldFrame->Cancel();}
         if(fixedControl.Active())fixedControl.Cancel();
         if(atlasRun.active)atlasRun.Cancel();
@@ -1946,6 +1996,7 @@ void Update(MapScreen *map)
     }
     catch (...)
     {
+        if(worldBuild&&worldBuild->Active()){worldBuildStop=true;worldBuild->Cancel();}
         if(worldFrame&&worldFrame->Active()){worldFrameStop=true;worldFrame->Cancel();}
         if(fixedControl.Active())fixedControl.Cancel();
         if(atlasRun.active)atlasRun.Cancel();
@@ -1974,9 +2025,12 @@ __declspec(dllexport) void startPlugin()
         nativeReceiptLatch.Changed(GetPrivateProfileIntA("Probe","NativeReceiptRequest",0,requestIni.c_str()));
         fixedControlEnabled=GetPrivateProfileIntA("Probe","FixedTerrainControl",0,requestIni.c_str())==1;
         worldFrameEnabled=GetPrivateProfileIntA("Probe","WorldFrameControl",0,requestIni.c_str())==1;
+        worldBuildEnabled=GetPrivateProfileIntA("Probe","WorldBuildControl",0,requestIni.c_str())==1;
+        worldBuildLatch.Changed(GetPrivateProfileIntA("Probe","WorldBuildRequest",0,requestIni.c_str()));
         worldFrameLatch.Changed(GetPrivateProfileIntA("Probe","WorldFrameRequest",0,requestIni.c_str()));
         if(worldFrameEnabled&&(fixedControlEnabled||nativeReceiptEnabled))throw std::runtime_error("world frame diagnostic modes are mutually exclusive");
-        if(fixedControlEnabled||worldFrameEnabled)
+        if(worldBuildEnabled&&(worldFrameEnabled||fixedControlEnabled||nativeReceiptEnabled))throw std::runtime_error("world build diagnostic modes are mutually exclusive");
+        if(fixedControlEnabled||worldFrameEnabled||worldBuildEnabled)
         {
             std::string folder=Folder();if(!folder.empty())folder.erase(folder.size()-1);size_t slash=folder.find_last_of("/\\");
             if(slash==std::string::npos)throw std::runtime_error("fixed control sibling viewer INI path unavailable");
@@ -2008,7 +2062,7 @@ __declspec(dllexport) void startPlugin()
         }
     }
     catch(...){ErrorLog("SatelliteCaptureProbe: request path unavailable; inert");return;}
-    if(worldFrameEnabled&&(KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),WorldFrameLoadHook,&worldFrameOriginalLoad)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),WorldFrameNewHook,&worldFrameOriginalNew)))
+    if((worldFrameEnabled||worldBuildEnabled)&&(KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::loadGame),WorldFrameLoadHook,&worldFrameOriginalLoad)||KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),WorldFrameNewHook,&worldFrameOriginalNew)))
     {ErrorLog("SatelliteCaptureProbe: world frame lifecycle hooks unavailable; inert");return;}
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(KenshiLib::GetRealAddress(&MapScreen::update), Update, &originalUpdate))
