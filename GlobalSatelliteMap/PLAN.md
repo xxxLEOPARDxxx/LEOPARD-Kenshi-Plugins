@@ -39,6 +39,15 @@ Parallel ownership: deterministic geometry helper and material/cache audit have
 separate agents; root owns integration and deployment. KEO remains a separate
 parallel maintenance task; Dynamic Factions remains paused.
 
+Latest unattended order2026-11-03: terrain/detail first, then KEO, then optional
+fog/diplomacy/biomes/roads. User authorizes launching/loading/testing while asleep;
+another Minecraft session may use desktop input, so prefer file requests and
+observe the exact target window before input. Components and one-window streaming
+core have now passed real-file/WIC/WARP controls and independent review. Actual
+native source/frame integration and installed fine-window presentation remain
+unfinished. See verification/2026-11-03-streamed-window-controller.md. Do not treat
+the one-window control's transition schedule as full-world production throughput.
+
 ## Historical checkpoint, 2026-11-02, user-accepted terrain viewer
 
 The complete4x4 atlas of16 real8192 GST2 cells is captured, validated and installed.

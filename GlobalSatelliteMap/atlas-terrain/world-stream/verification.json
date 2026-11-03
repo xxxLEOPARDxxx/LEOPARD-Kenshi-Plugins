@@ -1,0 +1,43 @@
+{
+  "scope": "one-window worker/sourcegate/WIC/staged GPU/readback development core; raw radial output; fake metadata host control; no game/Main installation",
+  "command": "python run_tests.py",
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "flow_tests.cpp": "abeda41d86a0859ef78864a652acd685ef622bd637aa1503fd37e586824a0035",
+    "freeze.py": "df5378c613215beee04856d3db462b0ae01ac10e2da68401165ad0718f0fa40e",
+    "lifecycle_tests.cpp": "27b4f1283057aa430445054381cc6d696f3a4833d818c9f402e7ca93e991f9d3",
+    "README.md": "45ab5a206b016dd7a28c40a6e64d77497ed91159d9d5134f9b7314b16b696ea4",
+    "run_tests.py": "deb4e58f1d3432b49b7693b1e7343b52e4f625c3e6ab34e9337684b6428ce9e5",
+    "WorldStream.h": "6cfcfe1680810c28ea5cb692c510c2d6790f8d734ed63e742e95fa53aa14de0f"
+  },
+  "dependencies": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-raster\\WorldTerrainRaster.h": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-raster\\verification.json": "9d140c2b98189028d32abbec434bd48875fef2e12787b5108a585f992f82a7ae",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\WorldSourceBank.h": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\verification.json": "bfbf93a0038f81c6b84f5473efc7d84306e3f14c940d238e97115cc8fa273079",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-source\\WorldHeightSource.h": "50fde36344ca4d97099d8a0749e79ab71f20f260ff5249c80d4dccd86ddb3700",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-source\\verification.json": "bab2682335ca2343feccd0006710189bd0f03d12123a63eb5cc4f94a0e322bcf",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\MainGate.h": "4c415996abdd6b9db2e0c95cde750812c77b7cac55027160403b5a368f645544",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\WorkerFileLease.h": "887c19c77044eb61d50930502a1fffa8c83b016fa5235d82548b07aaa3871d30",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\ReceiptPolicy.h": "ff91b3628e5a2e4099c4b1ebbf584c39fd38834b145f6a17034f9f8532a27a52",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\verification.json": "f7e7aa94d38dd7af18d6da29cd8694a42a63d075e6ad4eac91746380070ff2d7",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\PinnedPng.h": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\verification.json": "931297e052082cc0c604a4829f6190cb18b6cd1b54bc7ab395e4ec9e43c1edd4"
+  },
+  "logs": {
+    "flow-build.log": "83658047ab814ffc605e3ca01e8f98020f1342b740691d1291ed30601c9169f1",
+    "flow-run.log": "ed6857140eaa1cd8397e9aec3085d40bb4f26d277c6be721a4f9099596b94329",
+    "lifecycleO2-build.log": "e8c21369461fe734812607567a9a086826bd356ce1e20f2a7df56a00abcb45f8",
+    "lifecycleO2-run.log": "9682f200da1144e07f76328dec64173c607a06b7046eb55279226d29da01ad19",
+    "lifecycleOd-build.log": "e8c21369461fe734812607567a9a086826bd356ce1e20f2a7df56a00abcb45f8",
+    "lifecycleOd-run.log": "9682f200da1144e07f76328dec64173c607a06b7046eb55279226d29da01ad19"
+  },
+  "gpuReservationBytes": 112825820,
+  "limits": [
+    "one process-local worker slot",
+    "same-thread Main/destruction; joined worker",
+    "unknown failure retains conservative debt until restart",
+    "raw outputs require separate finite/world-height acceptance",
+    "not a full-world throughput scheduler"
+  ]
+}
