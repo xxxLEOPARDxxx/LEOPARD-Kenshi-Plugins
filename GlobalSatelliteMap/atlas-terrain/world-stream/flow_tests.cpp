@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "WorldStream.h"
+#include "../world-native/SourceFactory.h"
 #include "../compact-material/_generated/Shaders.h"
 #include "../staged-material/_generated/StagedShaders.h"
 #include <cstdio>
@@ -9,14 +10,12 @@ static unsigned checks=0;
 static void C(bool b,const char*s){++checks;if(!b){fprintf(stderr,"FAIL %s\n",s);throw 1;}}
 struct Provider{
  unsigned captures,refreshes,commits;Provider():captures(0),refreshes(0),commits(0){}
- HRESULT Capture(const SourceReceipts::WorkerRequest&r,SourceReceipts::MainSnapshot&out){++captures;out.manager=1;out.group=2;out.archive=3;out.module=4;out.profile=5;out.request=r;std::strcpy(out.request.archive,"D:/SteamLibrary/steamapps/common/Kenshi");std::strcpy(out.request.archiveType,"FileSystem");out.request.lookup=SourceReceipts::Exact;return SourceReceipts::ResolvePath(out.request)?S_OK:E_INVALIDARG;}
+ HRESULT Capture(const SourceReceipts::WorkerRequest&r,SourceReceipts::MainSnapshot&out){++captures;out.manager=1;out.group=2;out.archive=3;out.module=4;out.profile=5;out.request=r;const char*canonical=WorldNative::CanonicalPath(r.role.asset);if(!canonical)return E_INVALIDARG;const char*base=WorldNative::Basename(canonical);std::string parent(canonical,size_t(base-canonical));std::string archive="D:/SteamLibrary/steamapps/common/Kenshi/"+parent;std::strcpy(out.request.archive,archive.c_str());std::strcpy(out.request.archiveType,"FileSystem");out.request.lookup=SourceReceipts::Exact;return SourceReceipts::ResolvePath(out.request)?S_OK:E_INVALIDARG;}
  HRESULT Refresh(const SourceReceipts::MainSnapshot&before,SourceReceipts::MainSnapshot&out){++refreshes;out=before;return S_OK;}
  HRESULT BeginBank(const SourceReceipts::MainSnapshot*,unsigned count,const SourceReceipts::Scope&){++commits;return count==15?S_OK:E_INVALIDARG;}void EndBank(){}
 };
-static void Tokens(Provider&p,const Job&j,CapturedSources&out){SourceReceipts::MainGate<Provider>gate(p);for(unsigned s=0;s<j.plan.sidCount;++s)for(unsigned i=0;i<15;++i){SourceReceipts::WorkerRequest r={};r.scope=j.scope;r.role.slot=s;r.role.asset=1+s*15+i;r.pin.asset=r.role.asset;r.pin.epoch=j.scope.sourceEpoch;std::strcpy(r.group,"TestOwnedBaseProfile");const char*path,*sha;
- if(i<3){const WorldBank::RgbaPin&pin=WorldBank::RgbaPins[i==2?128:i*64+j.frame.region];path=pin.path;sha=pin.encodedSha;r.pin.bytes=pin.encodedBytes;r.role.kind=i==0?SourceReceipts::PaintedOverlay:i==1?SourceReceipts::PaintedColour:SourceReceipts::Blend;}
- else{unsigned k=(i-3)/6,n=(i-3)%6;const WorldMaterial::Bank&b=j.plan.stage[s].banks[k];const SatelliteRegion::Asset&a=SatelliteRegion::Data.assets[b.upload[n<b.count?n:0]];path=a.path;sha=a.sha256;r.pin.bytes=a.bytes;r.role.kind=k?SourceReceipts::Normal:SourceReceipts::Diffuse;r.role.index=n;}
- Hex(sha,r.pin.sha);std::strcpy(r.resource,path);C(SUCCEEDED(gate.Capture(r,j.scope,out.token[s][i])),"test-owned metadata token");}}
+// Explicit test-owned provider, now consuming the real logical-name factory.
+static void Tokens(Provider&p,const Job&j,CapturedSources&out){WorldNative::SourceFactory factory;C(SUCCEEDED(factory.Init(j.frame,j.plan,j.scope)),"logical source factory");SourceReceipts::MainGate<Provider>gate(p);for(unsigned s=0;s<j.plan.sidCount;++s)for(unsigned i=0;i<15;++i){SourceReceipts::WorkerRequest r;C(factory.Request(s,i,r),"owned raw request from canonical asset");C(SUCCEEDED(gate.Capture(r,j.scope,out.token[s][i])),"test-owned metadata token with native-style logical name");}}
 static std::vector<BYTE>Read(const std::string&path){std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);C(!!f,"oracle input");size_t n=size_t(f.tellg());std::vector<BYTE>b(n);f.seekg(0);f.read(reinterpret_cast<char*>(&b[0]),n);C(!!f,"oracle read");return b;}
 int main(){try{
  AtlasView::Com<ID3D11Device>d;AtlasView::Com<ID3D11DeviceContext>ctx;C(SUCCEEDED(D3D11CreateDevice(NULL,D3D_DRIVER_TYPE_WARP,NULL,0,NULL,0,D3D11_SDK_VERSION,&d.p,NULL,&ctx.p)),"owned WARP device");Provider provider;Controller<Provider>*c=new Controller<Provider>(provider);C(c->Start()==S_OK,"start joined persistent worker");SourceReceipts::Scope scope={GetCurrentThreadId(),7,0x100000007ULL,0x300000001ULL};WorldBank::Ledger external={};

@@ -3,12 +3,12 @@
   "command": "python run_tests.py",
   "sourceFiles": {
     ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
-    "flow_tests.cpp": "abeda41d86a0859ef78864a652acd685ef622bd637aa1503fd37e586824a0035",
-    "freeze.py": "df5378c613215beee04856d3db462b0ae01ac10e2da68401165ad0718f0fa40e",
+    "flow_tests.cpp": "2c71443aa601a2228c4e59b77b386f8d23a42c2896b816c695639e1a81fe5341",
+    "freeze.py": "99ab4d9030de7223f51c10c8b89a01989ca938937cdf60a231cceaf408bef7f7",
     "lifecycle_tests.cpp": "27b4f1283057aa430445054381cc6d696f3a4833d818c9f402e7ca93e991f9d3",
-    "README.md": "45ab5a206b016dd7a28c40a6e64d77497ed91159d9d5134f9b7314b16b696ea4",
+    "README.md": "5b1949001ac4cd5b108d3d8ee002876d049f7c0e8024b1cca8449c219a8800d2",
     "run_tests.py": "deb4e58f1d3432b49b7693b1e7343b52e4f625c3e6ab34e9337684b6428ce9e5",
-    "WorldStream.h": "6cfcfe1680810c28ea5cb692c510c2d6790f8d734ed63e742e95fa53aa14de0f"
+    "WorldStream.h": "7593fea4e012446173b0cd7ee20499905795b26b8f12c059c573d59e9abe6ff0"
   },
   "dependencies": {
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-raster\\WorldTerrainRaster.h": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b",
@@ -22,16 +22,22 @@
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\ReceiptPolicy.h": "ff91b3628e5a2e4099c4b1ebbf584c39fd38834b145f6a17034f9f8532a27a52",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\verification.json": "0a79dc70c655ccb094a45c97e81015187fe99c42cc64469125020eb5a7e66e1f",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\PinnedPng.h": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\verification.json": "931297e052082cc0c604a4829f6190cb18b6cd1b54bc7ab395e4ec9e43c1edd4"
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\verification.json": "931297e052082cc0c604a4829f6190cb18b6cd1b54bc7ab395e4ec9e43c1edd4",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\SourceFactory.h": "b2d9fd7a185f590b2ad1a705f4588e31e564e16f47084beb6cea6353a37f3e7c",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\StageAdapter.h": "0554fd314cf6c4acb9c5942cfa062d66250d8a5bfcb4b8de8dbafb148a2d5937",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\NativeProvider.h": "4c7268431302518edfa39292168ecf282ecf5b146cd988e84655872fc45ce144",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\verification.json": "41c3f923a000b3ead9d17e2ddd61010caaa9c67a45e5ddc9064c1adb517a1840"
   },
   "logs": {
     "flow-build.log": "83658047ab814ffc605e3ca01e8f98020f1342b740691d1291ed30601c9169f1",
-    "flow-run.log": "32b3a791833fae306a88a8362e884504686c0b077406d1ac0da91859794b37d8",
-    "lifecycleO2-build.log": "6497b60f9f9d5997bbc2f8d0925914e49a0c6156ef90d11f5d85ddd6513d42ee",
+    "flow-run.log": "2b47439721d9a7108dd3bb7850d42acd1acbfeaa9ba0cf5bc102f3d17f69e3ce",
+    "lifecycleO2-build.log": "b36234fe32fcc0d8ee90cf93c034f518c6b3340875b772cc2e8d852a22a92b34",
     "lifecycleO2-run.log": "9682f200da1144e07f76328dec64173c607a06b7046eb55279226d29da01ad19",
-    "lifecycleOd-build.log": "6497b60f9f9d5997bbc2f8d0925914e49a0c6156ef90d11f5d85ddd6513d42ee",
+    "lifecycleOd-build.log": "b36234fe32fcc0d8ee90cf93c034f518c6b3340875b772cc2e8d852a22a92b34",
     "lifecycleOd-run.log": "9682f200da1144e07f76328dec64173c607a06b7046eb55279226d29da01ad19",
-    "listener-stamp-regression.log": "dc2474a2b25519016de4be9cf90a0bac7734efd98929658ed59d8bf033961abe"
+    "listener-stamp-regression.log": "dc2474a2b25519016de4be9cf90a0bac7734efd98929658ed59d8bf033961abe",
+    "logical-name-green.log": "0f299e65182c0dc7bb7d9e71bd736af882a82e023d943be7484059e9b219db60",
+    "logical-name-red.log": "39cc81e3fc67b2a6ae5b2e84cb6375c68b181006f1fa50141b5e842840ee8a86"
   },
   "gpuReservationBytes": 112825820,
   "limits": [

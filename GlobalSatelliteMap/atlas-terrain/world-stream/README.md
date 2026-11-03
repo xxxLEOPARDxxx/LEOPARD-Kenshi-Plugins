@@ -6,7 +6,7 @@ complete atlas/fine-cache scheduler or an installed game feature.
 
 Main supplies a typed `Job`, a checked current world/source/job scope and captured
 tokens for all15 source roles of each real SID. Order is overlay PNG, painted
-colour PNG, blend PNG, six diffuse DDS, six normal DDS. Canonical logical names,
+colour PNG, blend PNG, six diffuse DDS, six normal DDS. Canonical asset IDs and exact native-style logical group/name pairs,
 full encoded pins, family/layer/slot,64-bit source/world/job and shader pins are
 checked. Shader bytes are copied before Submit returns. Material/frame/grid are
 copied. A live-game adapter must establish their actual provenance and current
@@ -68,3 +68,5 @@ one512/1m material observation, shader-source mutation after Submit, persistent
 TIFF authentication, OFF drain and world-change cancellation. The metadata
 provider is explicitly test-owned; no native API, game/INI, installed atlas or
 live save is changed. Generated observations remain ignored.
+
+Logical resource names are now created and checked by world-native/SourceFactory: DDS basenames in Landscape, painted basenames and exact blendMap.png in Overlaymaps. Canonical content pins remain separate. The controller initializes one bounded copied factory per Submit; every later source checks its complete expected role/pin/slot/name, without rebuilding plans per input. The test-owned flow provider uses explicit parent archives for these same logical names; it does not call native APIs. The former full-canonical-path-only controller was observed RED on this real request shape before integration.

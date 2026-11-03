@@ -3,6 +3,7 @@
 #include "../world-source/WorldHeightSource.h"
 #include "../png-source/PinnedPng.h"
 #include "../source-receipts/MainGate.h"
+#include "../world-native/SourceFactory.h"
 namespace WorldStream {
 typedef WorldBank::U64 U64;
 enum Status{Stopped, Booting, Idle, LoadingHeight, LoadingSource, AcceptingSource, DecodingSource, UploadingSource, ReleasingSource, DrawingStage, AwaitingGpu, Complete, Cancelling, Failed};
@@ -44,7 +45,7 @@ struct QuarantineRecord{void*work;void*gpu;U64 cpuBytes,gpuBytes;volatile LONG m
 inline volatile LONG&WorkerSlot(){static volatile LONG slot=0;return slot;}
 inline QuarantineRecord&Quarantine(){static QuarantineRecord q;return q;}
 template<class Provider>class Controller{
- GpuOwners*gpu_;Provider&provider_;SourceReceipts::MainGate<Provider>gate_;DWORD owner_;Status state_;HRESULT error_;Work*work_;HANDLE thread_;bool quarantined_,submitted_,queryPending_,closeSent_;U64 bankEpoch_;Job job_;CapturedSources captured_;SourceReceipts::AcceptedReceipt accepted_[15];unsigned slot_,input_;BYTE shaderCopy_[21920];WorldBank::Sources&bank_;WorldRaster::Raster&raster_;AtlasView::Com<ID3D11Device>&device_;AtlasView::Com<ID3D11DeviceContext>&context_;AtlasView::Com<ID3D11Texture2D>*staging_;AtlasView::Com<ID3D11Query>&query_;
+ GpuOwners*gpu_;Provider&provider_;SourceReceipts::MainGate<Provider>gate_;DWORD owner_;Status state_;HRESULT error_;Work*work_;HANDLE thread_;bool quarantined_,submitted_,queryPending_,closeSent_;U64 bankEpoch_;Job job_;WorldNative::SourceFactory sourceFactory_;CapturedSources captured_;SourceReceipts::AcceptedReceipt accepted_[15];unsigned slot_,input_;BYTE shaderCopy_[21920];WorldBank::Sources&bank_;WorldRaster::Raster&raster_;AtlasView::Com<ID3D11Device>&device_;AtlasView::Com<ID3D11DeviceContext>&context_;AtlasView::Com<ID3D11Texture2D>*staging_;AtlasView::Com<ID3D11Query>&query_;
  Controller(const Controller&);Controller&operator=(const Controller&);
  LONG WorkerStatus()const{return work_?InterlockedCompareExchange(&work_->state,0,0):WStopped;}
  bool Send(Command command){InterlockedExchange(&work_->state,WBusy);InterlockedExchange(&work_->command,command);if(SetEvent(work_->wake))return true;work_->error=E_FAIL;InterlockedExchange(&work_->state,WError);return false;}
@@ -68,11 +69,7 @@ template<class Provider>class Controller{
   return hr;
  }
  bool ValidRequest(unsigned slot,unsigned index,const SourceReceipts::WorkerRequest&r)const{
-  if(!SourceReceipts::Valid(r)||!SourceReceipts::SameScope(r.scope,job_.scope)||r.role.slot!=slot)return false;
-  const char*path=NULL;const char*sha=NULL;unsigned bytes=0,kind=0,layer=0;
-  if(index<3){const WorldBank::RgbaPin&p=WorldBank::RgbaPins[index==2?128:index*64+job_.frame.region];path=p.path;sha=p.encodedSha;bytes=p.encodedBytes;kind=index==0?SourceReceipts::PaintedOverlay:index==1?SourceReceipts::PaintedColour:SourceReceipts::Blend;}
-  else{unsigned k=(index-3)/6;layer=(index-3)%6;const WorldMaterial::Bank&b=job_.plan.stage[slot].banks[k];if(!b.count||b.count>6)return false;const SatelliteRegion::Asset&a=SatelliteRegion::Data.assets[b.upload[layer<b.count?layer:0]];path=a.path;sha=a.sha256;bytes=a.bytes;kind=k?SourceReceipts::Normal:SourceReceipts::Diffuse;}
-  BYTE pin[32];Hex(sha,pin);return r.role.kind==kind&&r.role.index==layer&&r.pin.bytes==bytes&&!std::strcmp(r.resource,path)&&!std::memcmp(r.pin.sha,pin,32);
+  return SourceReceipts::Valid(r)&&SourceReceipts::SameScope(r.scope,job_.scope)&&r.role.slot==slot&&WorldNative::InputIndex(r.role)==index&&sourceFactory_.Matches(r);
  }
  HRESULT RequestInput(){if(!captured_.token[slot_][input_].Request(work_->request)||!ValidRequest(slot_,input_,work_->request))return E_INVALIDARG;if(!Send(Open))return E_FAIL;state_=LoadingSource;return S_OK;}
  HRESULT NextInput(const SourceReceipts::Scope&now,const WorldBank::Ledger&l){
@@ -92,7 +89,7 @@ public:
  HRESULT Submit(bool enabled,const Job&j,const CapturedSources&tokens,const SourceReceipts::Scope&now){
   if(!enabled)return S_FALSE;if(!OnMain()||state_!=Idle||!work_||WorkerStatus()!=WIdle||quarantined_||!SourceReceipts::ScopeValid(now)||now.thread!=owner_||!SourceReceipts::SameScope(j.scope,now)||j.frame.generation!=now.job||!j.frame.materialGeneration||j.material.generation!=j.frame.materialGeneration||!WorldBank::SameEpoch(j.frame.source,j.material.source)||j.frame.region!=j.material.region||j.frame.source.value!=now.sourceEpoch||!WorldBank::ValidEpoch(j.frame.source)||!WorldRaster::ValidGrid(j.grid)||j.grid.sourceEpoch!=now.sourceEpoch||!WorldRaster::ValidShaders(j.shaders)||!j.heightPath[0]||j.heightPath[259]||!WorldRaster::CarryBytes(j.frame.side))return E_INVALIDARG;
   WorldMaterial::Planner planner;WorldMaterial::Plan expected;if(!planner.Init(now.sourceEpoch)||!planner.Build(j.frame.region,j.frame.cell,now.sourceEpoch,0,expected)||!WorldBank::EqualPlan(j.plan,expected))return E_INVALIDARG;
-  job_=j;for(unsigned s=0;s<expected.sidCount;++s)for(unsigned i=0;i<15;++i){SourceReceipts::WorkerRequest r;if(!tokens.token[s][i].Request(r)||!ValidRequest(s,i,r)){std::memset(&job_,0,sizeof(job_));return E_INVALIDARG;}}
+  sourceFactory_.Clear();if(FAILED(sourceFactory_.Init(j.frame,j.plan,j.scope)))return E_INVALIDARG;job_=j;for(unsigned s=0;s<expected.sidCount;++s)for(unsigned i=0;i<15;++i){SourceReceipts::WorkerRequest r;if(!tokens.token[s][i].Request(r)||!ValidRequest(s,i,r)){std::memset(&job_,0,sizeof(job_));sourceFactory_.Clear();return E_INVALIDARG;}}
   std::memcpy(shaderCopy_,j.shaders.vertex.data,4440);std::memcpy(shaderCopy_+4440,j.shaders.partial.data,13208);std::memcpy(shaderCopy_+17648,j.shaders.tail.data,4272);job_.shaders.vertex.data=shaderCopy_;job_.shaders.partial.data=shaderCopy_+4440;job_.shaders.tail.data=shaderCopy_+17648;
   captured_=tokens;error_=S_OK;submitted_=true;closeSent_=false;slot_=input_=0;ResetEvent(work_->cancel);std::wcscpy(work_->path,j.heightPath);work_->epoch=now.sourceEpoch;work_->side=j.frame.side;work_->region.x0=j.grid.x;work_->region.z0=j.grid.z;work_->region.x1=j.grid.x+j.grid.columns*64;work_->region.z1=j.grid.z+j.grid.rows*64;if(!Send(Height))return Refuse(E_FAIL);state_=LoadingHeight;return S_OK;
  }

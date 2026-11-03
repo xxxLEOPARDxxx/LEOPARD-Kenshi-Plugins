@@ -8,7 +8,7 @@ def sha(p):
  return h.hexdigest()
 own={p.name:sha(p) for p in sorted(here.iterdir()) if p.is_file() and p.name!='verification.json'}
 deps={}
-for folder,files in [('world-raster',['WorldTerrainRaster.h','verification.json']),('world-bank',['WorldSourceBank.h','verification.json']),('world-source',['WorldHeightSource.h','verification.json']),('source-receipts',['MainGate.h','WorkerFileLease.h','ReceiptPolicy.h','verification.json']),('png-source',['PinnedPng.h','verification.json'])]:
+for folder,files in [('world-raster',['WorldTerrainRaster.h','verification.json']),('world-bank',['WorldSourceBank.h','verification.json']),('world-source',['WorldHeightSource.h','verification.json']),('source-receipts',['MainGate.h','WorkerFileLease.h','ReceiptPolicy.h','verification.json']),('png-source',['PinnedPng.h','verification.json']),('world-native',['SourceFactory.h','StageAdapter.h','NativeProvider.h','verification.json'])]:
  for file in files:
   p=here.parent/folder/file;deps[str(p.resolve())]=sha(p)
 logs={p.name:sha(p) for p in sorted((here/'_generated').glob('*.log'))}
