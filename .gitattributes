@@ -46,3 +46,8 @@ tools/diagnostics/satellite-capture-probe/world-frame-verification.json -text wh
 GlobalSatelliteMap/atlas-cache/accepted-window/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 GlobalSatelliteMap/atlas-terrain/world-cohort/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+GlobalSatelliteMap/atlas-cache/world-write-worker/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/world-layout/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+GlobalSatelliteMap/atlas-cache/world-window-session/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
