@@ -8,7 +8,7 @@
 // HeightWindow, Session or Config. No disk record is trusted across processes.
 namespace FineStore {
 typedef SourceReceipts::U64 U64;
-enum { Slots=128, HeaderBytes=1024, PayloadBytes=256*256*16, FileBytes=HeaderBytes+PayloadBytes };
+enum { Slots=GsmCacheProfile::DiskSlots, HeaderBytes=1024, PayloadBytes=256*256*16, FileBytes=HeaderBytes+PayloadBytes };
 const U64 DiskCap=U64(Slots)*FileBytes;
 typedef WorldBuildDisk::Config Config;
 inline bool Configure(Config&c,const wchar_t*p,const wchar_t*d){return WorldBuildDisk::Configure(c,p,d);}

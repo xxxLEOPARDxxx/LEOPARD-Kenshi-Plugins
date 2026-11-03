@@ -11,7 +11,9 @@ and @3m detail keys are accepted. Render priority is center-first; all wanted
 keys are grouped into distinct same-cell K2 views. An odd group gets a distinct
 same-cell companion explicitly marked unwanted. `CenterPair` returns only the
 first two wanted same-cell keys, or one wanted plus an unwanted companion.
-It still reserves all viewport pan phases; it does not pretend the entire view
+Worst-case pan phases still choose a stable1m/3m spacing with at most96 visible
+keys; physical residency is independently bounded256. Actual current clipped
+keys minus retained overlap determine new allocation/slot requirements. it does not pretend the entire view
 is refined after two outputs. No 9m key enters the fine namespace.
 
 Producer and publication phases are separate. `Budget.viewerGpu` MUST be a
@@ -20,7 +22,7 @@ pending and retired GPU owners. `fineGpu` counts all old fine/pending/retired
 fine bytes; `occupied` counts their slots. These are owner-supplied measurements,
 not native receipts authenticated by this header. During production their
 coarse viewer aggregate must be <=32MiB. Existing fine tiles may remain
-within the measured shared192MiB cap after adding frozen K2's actual
+within the measured shared512MiB cap after adding frozen K2's actual
 137571380B reservation. K4 is not admitted. `producerCpu` MUST be
 the actual owning NativeSession::CpuReservation(), including provider/controller
 and accepted payload costs. A mandatory frozen-payload lower floor rejects
@@ -30,7 +32,7 @@ headers, index, metadata and retained blob; the shared cap is64MiB.
 At publication, `CanUpload` requires the current exact demand and wanted key,
 a KNOWN joined/acknowledged consumer, and the ACTUAL producer reservation zero
 after asynchronous bank/fence drain. It counts the next20B-per-pixel resource
-against96 slots and the same192MiB GPU cap. Do not pass true/zero merely because
+against256 physical slots and the same512MiB GPU cap. Do not pass true/zero merely because
 cancellation was requested. The policy does not drain or join on its own.
 Budget values must be read again by the real owner before each allocation.
 

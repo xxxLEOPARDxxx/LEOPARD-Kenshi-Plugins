@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\run.py", line 6, in <module>
+    exe=OUT/(mode+'.exe');p=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT','/'+mode,str(HERE/'tests.cpp'),'/Fo'+str(exe.with_suffix('.obj')),'/Fe'+str(exe),'/link','d3d11.lib','dxgi.lib','advapi32.lib'],env=env,capture_output=True,text=True);(OUT/(mode+'-build.log')).write_text(p.stdout+p.stderr);assert not p.returncode,p.stdout+p.stderr
+                                                                                                                                                                                                                                                                                                                                     ^^^^^^^^^^^^^^^^
+AssertionError: tests.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(9) : error C2039: 'MaxVisible' : is not a member of 'FineJob'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(9) : error C2065: 'MaxVisible' : undeclared identifier
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(9) : error C2039: 'CacheSlots' : is not a member of 'FineJob'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(9) : error C2065: 'CacheSlots' : undeclared identifier
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(17) : error C2039: 'Lru' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(17) : error C3861: 'Lru': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(17) : error C2039: 'Lru' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(17) : error C3861: 'Lru': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(17) : error C2039: 'Lru' : is not a member of 'GsmFinePolicy'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\warm-cache\tests.cpp(17) : error C3861: 'Lru': identifier not found

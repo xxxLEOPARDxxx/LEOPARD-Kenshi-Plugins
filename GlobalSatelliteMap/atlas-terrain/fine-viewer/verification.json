@@ -1,15 +1,15 @@
 {
   "scope": "Pure fine terrain placement/native ABI job adapter and two-phase resource policy; no live viewer, native execution or IO",
   "status": "author controls PASS; independent review pending",
-  "recordedUtc": "2026-11-03T13:54:52.107546+00:00",
+  "recordedUtc": "2026-11-03T20:29:52.127759+00:00",
   "sourceFiles": {
     ".gitignore": "9e7f92b9d91aca493d7ab1632b3d4285c0591c88e3965d11bcda01a9bcc9d7cc",
-    "FineJob.h": "8b4cd3a8e54938a12753f3d4cc8dbfa2ed80ea284604b11c870380bab1373d7e",
-    "freeze.py": "1c34fff46163cd96bcd324630fd5176041c433a8952d8c29442cd57c78668323",
-    "README.md": "f2512dc2d0fca5b30c3a16273e2ca4553682dcd2e9dd3e5fc7aa8163fe114fd6",
+    "FineJob.h": "bda688554011b7057262f222745f0bbe0fdd1cf47af7e1c140ce4a1a3972612f",
+    "freeze.py": "9ff6ee20726801b0c2a58de4f41ab772e136b303bc0e776a38cd938dd930964f",
+    "README.md": "ba9098ed760f5a548261c217994795bfc312ea95b4959c32e2a58406081ef145",
     "run_mutants.py": "b898a8d73db412fdb5e3a5fce6455fb1a023ca53869e46116421e9b1ed5606c3",
     "run_tests.py": "5b140412424affcf2925c1161ea501c8dc89b989406665aebcac26b84c84e269",
-    "tests.cpp": "7ce3936d61f8155d5b062ccfa53b1af458b92b11836450220c919525302004ba"
+    "tests.cpp": "1811f9f9b06f502cee1c1868a28ab77c36e327d9c4d753b2433b1738adfbba17"
   },
   "dependencies": {
     "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\include\\CodeAnalysis\\sourceannotations.h": "abe70c601ca3b3cadeaabeeefeff460367f15e6e873863856276da3862438f33",
@@ -189,11 +189,12 @@
     "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include\\specstrings_undef.h": "d6aa8686e37a65f311b04f58cabc272b6d3a2502383e38a8f05a04cb8a2a81fd",
     "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include\\wincodec.h": "e5f0f342c655d9402446df3fef302beac8a0caea583063f173cf7e1411e518e0",
     "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include\\wnnc.h": "076a2ad4b12b9da3309859567d256841a51272c29840887f95f15c29c29793fd",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\GsmCacheProfile.h": "9778e1cc59131465e4a62f0e3b30d0122600d110e900f5a1653c2621a52d9ffa",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-models\\GraphicsState.h": "c5f3e311d81d88181882232fd85c337c1dbfb2cb6399d366853abece58ae58ac",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\CompactMaterial.h": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\Case.h": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\Shaders.h": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fine-viewer\\FineJob.h": "8b4cd3a8e54938a12753f3d4cc8dbfa2ed80ea284604b11c870380bab1373d7e",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fine-viewer\\FineJob.h": "bda688554011b7057262f222745f0bbe0fdd1cf47af7e1c140ce4a1a3972612f",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fine-windows\\FineWindowPlanner.h": "29cd0a69a63c5c31fff26ff9040561f597b14011b48d1687a90dc1bad78ed091",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fixed-geometry\\FixedTerrainGeometry.h": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\PinnedPng.h": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95",
@@ -213,7 +214,7 @@
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-raster\\WorldTerrainRaster.h": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-source\\WorldHeightSource.h": "50fde36344ca4d97099d8a0749e79ab71f20f260ff5249c80d4dccd86ddb3700",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-stream\\WorldStream.h": "85ed283b33e0fcc602f04b1a0d420ca428058e0a9272d7d27beaba5da7f362f5",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasPolicy.h": "f5d0e56fa909f7e27a55926d19fb77aa3479015c44ce874cdf1258be08d05e5d",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasReader.h": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasRelight.h": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86",
     "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\GeographyPolicy.h": "b5e183396b502ffb4ae72b30c915f16212303ba0e86b52b3c0fb4bf0cc042a95",
@@ -221,10 +222,10 @@
     "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\RegionCatalogData.h": "bd85da4b86a5e13bafd3ab9793c9a5f7ac3047488e57c813e430ade5d40f426f"
   },
   "evidence": {
-    "_generated\\compile-O2.log": "ac557926f2b3b68fcc31513f63535ec1a7497f433c421cceff16bea0b1cfa3ff",
-    "_generated\\compile-Od.log": "ac557926f2b3b68fcc31513f63535ec1a7497f433c421cceff16bea0b1cfa3ff",
-    "_generated\\imports-O2.log": "7d361aa70900943978c432dcef7dd0cd20f2204a392d94921834d3420358ba81",
-    "_generated\\imports-Od.log": "34179ebee6bf9d9d7da6e3704a795a252701e7ad9b91d1e96b60f65a203a0c00",
+    "_generated\\compile-O2.log": "3269d4d718bec625745ff669e320cb0e044408eaa2b4efca3c0ff9fb63187649",
+    "_generated\\compile-Od.log": "3269d4d718bec625745ff669e320cb0e044408eaa2b4efca3c0ff9fb63187649",
+    "_generated\\imports-O2.log": "799be59d8fe02a637e7c7472a3fbe097a3028e77d1c2759c0d54947bb45ea5ab",
+    "_generated\\imports-Od.log": "15dc78d7106310619b70d1f18df5fd58999c031ca78321ccd2252d80f4421028",
     "_generated\\mutants\\live-bank-upload\\compile.log": "8d54f69c2dfd045cc200eb3ca599a287c71d99b0007e87ccb2ce442ecd3556ef",
     "_generated\\mutants\\live-bank-upload\\imports.log": "8b64b5bdbaf20751d9aab23c7b24d6571c45c6706bc4dc802a2b1acd6aa56d31",
     "_generated\\mutants\\live-bank-upload\\run.log": "098c1090dc44767b36dafd885358b4daee9e2ca4ab074b4022fcde1d7a0d2ea1",
@@ -236,7 +237,8 @@
     "_generated\\red.log": "141a13179daff839b9e7e278b8035bf8e225c58df1aa6f4a29f7003ec6bddb53",
     "_generated\\root-verified.log": "7c66a59811e70f19fbf30035f99eb8a701fc3dbbcb095638e7d3055453e4b4fb",
     "_generated\\run-O2.log": "9025d3ffc2b149d528c687dcaad3a610ed1fde3010eb696cd606bbc4d26fe30f",
-    "_generated\\run-Od.log": "9025d3ffc2b149d528c687dcaad3a610ed1fde3010eb696cd606bbc4d26fe30f"
+    "_generated\\run-Od.log": "9025d3ffc2b149d528c687dcaad3a610ed1fde3010eb696cd606bbc4d26fe30f",
+    "_generated\\warm-profile.log": "0cadf7498db1195f064953f2656a4794b592e1b449a72ea16211c04763fe342d"
   },
   "checksPerOptimization": 34600,
   "runtimeMutantsKilled": {
@@ -244,9 +246,10 @@
     "missing-cpu-floor": "FAIL fabricated one-byte producer CPU cannot bypass frozen payload floor"
   },
   "limits": {
-    "fineSlots": 96,
+    "maxVisible": 96,
+    "physicalFineSlots": 256,
     "coarseViewerProductionLimitBytes": 33554432,
-    "gpuCapBytes": 201326592,
+    "gpuCapBytes": 536870912,
     "cpuCapBytes": 67108864,
     "producerK2GpuBytes": 137571380
   }

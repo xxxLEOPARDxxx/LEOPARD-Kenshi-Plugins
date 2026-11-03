@@ -18,7 +18,7 @@ current viewport demand and every retained external CPU/GPU allocation.
   `Residency` explicitly contains viewerGpu, fineGpu, pendingGpu, retiredGpu and
   occupied fine slots. Pending/retired owners join the aggregate viewer
   allowance, never disappear into zero. Fine textures and the producer share
-  one192MiB cap; all CPU owners share one64MiB cap.
+  one512MiB cap; all CPU owners share one64MiB cap.
 - `Queue(plan,pair,currentDemand,currentIdentity,copiedNativeJob,residency,cpu)`
   accepts one exact K2 pair. It regenerates the pair's expected canonical native
   placement/plan and checks exact frames/grids. All shader bytes and job data
@@ -33,7 +33,7 @@ current viewport demand and every retained external CPU/GPU allocation.
   source producer and pumps cancellation asynchronously until its real
   `ReservedGpuBytes()==0`. Normal Tick never calls the up-to5s Shutdown loop.
 - `RequestRead(plan,key,currentDemand,currentIdentity,residency,cpu)` is admitted
-  only after actual source GPU drain. It reuses the persistent128-record disk
+  only after actual source GPU drain. It reuses the persistent512-record disk
   index. `PeekRead(enabled,currentDemand,currentIdentity,residency,cpu,View&)`
   rechecks exact full64bit scope/revision/Identity, wanted key, CPU budget, GPU
   phase/slot capacity and absence of producer borrows before exposing CPU data.
@@ -140,4 +140,4 @@ process exits. Quarantine tests deliberately keep whole owners until process
 teardown. Tests establish component ownership/correctness, **not native game
 visual acceptance, instantaneous pan refinement, FPS or long-running leak proof**.
 
-Normal-frame shutdown uses `RequestShutdown` then `PollShutdown` after `Terminated`: source Idle, GPU0 and known file-consumer join are prerequisites. Poll waits zero milliseconds. Failed/unknown close retains ownership. A known empty source owner after startup failure can be deleted without a wait. Soft viewport drain acknowledges any borrowed Put before producer mutation even if retired old fine textures temporarily exceed the32MiB producer allowance. Within the shared192MiB aggregate cap and a valid64MiB CPU ledger this condition waits for the owned fence, preserving the persistent file session. The actual WARP test retires a64MiB texture and confirms a subsequent cache hit.
+Normal-frame shutdown uses `RequestShutdown` then `PollShutdown` after `Terminated`: source Idle, GPU0 and known file-consumer join are prerequisites. Poll waits zero milliseconds. Failed/unknown close retains ownership. A known empty source owner after startup failure can be deleted without a wait. Soft viewport drain acknowledges any borrowed Put before producer mutation even if retired old fine textures temporarily exceed the32MiB producer allowance. Within the shared512MiB aggregate cap and a valid64MiB CPU ledger this condition waits for the owned fence, preserving the persistent file session. The actual WARP test retires a64MiB texture and confirms a subsequent cache hit.

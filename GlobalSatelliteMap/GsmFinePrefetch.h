@@ -4,7 +4,7 @@ namespace GsmFinePrefetch {
 // At most two same-cell pairs beyond the leading edge, under the current
 // exact demand/base identity. This authorises cache production, never display.
 inline FineJob::Plan Make(const FineJob::Plan&visible,const FineJob::Demand&now,const FineJob::Budget&budget,double dx,double dz,unsigned ordinal){
- FineJob::Plan out;if(ordinal>=2||!FineJob::Internal::Fresh(visible,now)||!FineJob::Internal::ProducerFits(budget)||!_finite(dx)||!_finite(dz)||(std::abs(dx)+std::abs(dz)<.01))return out;
+ FineJob::Plan out;if(budget.occupied>=FineJob::CacheSlots||ordinal>=2||!FineJob::Internal::Fresh(visible,now)||!FineJob::Internal::ProducerFits(budget)||!_finite(dx)||!_finite(dz)||(std::abs(dx)+std::abs(dz)<.01))return out;
  const unsigned spacing=visible.spacing;const double width=256.0*spacing;const FineWindows::Rect&w=now.view.world;
  const bool horizontal=std::abs(dx)>=std::abs(dz);const double movement=horizontal?dx:dz;const bool positive=movement>0;
  const double edge=horizontal?(positive?w.x+w.w:w.x):(positive?w.z+w.h:w.z);

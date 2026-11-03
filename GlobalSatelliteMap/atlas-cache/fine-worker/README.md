@@ -84,10 +84,10 @@ its output Blob object conservatively; there is no unbounded queue or second Blo
 
 ## Healthy terminal cache cleanup
 
-The128-record file index cannot be reused after its Session ends. Before Close,
+The512-record file index cannot be reused after its Session ends. Before Close,
 the worker therefore discards known closed indexed payloads for a normal stop or
 graceful cancellation while the Session is still healthy. This prevents every
-map reopening from leaving another128MiB of unusable session payloads.
+map reopening from leaving another512MiB of unusable session payloads.
 FineStore performs the bounded physical-identity inventory and HANDLE-relative
 deletions **on this worker**, never Main. Empty session directories remain.
 

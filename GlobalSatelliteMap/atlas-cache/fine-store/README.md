@@ -56,7 +56,7 @@ worker `Close` must have run and `NeedsRetention()` must be false.
 ## Closed-session payload cleanup
 
 `DiscardKnownClosed()` is a terminal **owning-worker-only** operation. The fixed
-private index is its bounded ownership inventory: it checks at most128 recorded
+private index is its bounded ownership inventory: it checks at most512 recorded
 physical file IDs, exact sizes and nonreparse directory/file guards before
 deleting anything. It then rechecks each indexed file through the existing
 HANDLE-relative Remove path. It never enumerates a directory, follows a filename
@@ -74,10 +74,10 @@ are not swept. No file I/O is added to Main or a normal rendering frame.
 
 ## Disk and CPU limits
 
-There are128 fixed slot names, each exactly1,049,600B (1024B header plus
-1,048,576B payload), hence **134,348,800B maximum**. The worker removes a
+There are512 fixed slot names, each exactly1,049,600B (1024B header plus
+1,048,576B payload), hence **537,395,200B maximum**. The worker removes a
 known-closed LRU record **before** creating its replacement; it never creates
-a129th file. An evicted receipt's serial no longer passes `Check`. If an
+a513th file. An evicted receipt's serial no longer passes `Check`. If an
 unexpected file replaces a slot, its physical identity prevents deleting it.
 
 All operations are serialized; there is no internal request queue. A production
@@ -85,7 +85,7 @@ coordinator must retain **exactly one pending read Blob**, clear/join that work
 before replacing it, and include every unrelated retained Blob in `ledger.other`.
 This component cannot discover allocations owned by unrelated caller objects.
 
-The single64MiB CPU budget charges `sizeof(Session)` (including128 index records,
+The single64MiB CPU budget charges `sizeof(Session)` (including512 index records,
 all hashes, header copies and path guards), one normal-coverage adapter, borrowed
 Accepted/window owners, one1KiB scratch header, one Blob/payload, and explicit
 `Ledger.retainedRaw`/`Ledger.other`. Automatic Accepted/window charges must not be
