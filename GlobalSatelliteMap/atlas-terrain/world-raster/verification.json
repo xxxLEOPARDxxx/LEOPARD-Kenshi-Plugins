@@ -1,0 +1,58 @@
+{
+  "scope": "Reusable ordered staged world raster; pinned base snapshot; no Main/probe/live native integration",
+  "status": "implementer PASS; independent review pending",
+  "command": "C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe run_tests.py",
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "api_tests.cpp": "0b5d6ed3b7ee33b10986e6004149999a8cd6b64c42621acabf66f1c4465c0466",
+    "dependencies.json": "150fe2fbe0d2ad8f66bb5eb193f94bcdc5856b2bb7f0b2eccc4bf4dce2c39f16",
+    "freeze.py": "8c10b41efb6e67788e6778f35068899421fff4ee58170dfa1761ffdc66560fee",
+    "oracle_tests.h": "60618d1569cfcd245165d7d94e34b8517054d34ee9a4dc884df1864753595478",
+    "PLAN.md": "406078d907c791469ce631d1bec000689975ac45ece17c5f3bf1746e87b4ef8c",
+    "prepare_fixtures.py": "22b6ab889704ad78b9d386a51e23f131a966b2e8d13568b06732aa31df1bc3cd",
+    "README.md": "eddb6b74c02c5b41e13d5557e49faf93f069815e7303c3e48509abe83a5e4a89",
+    "run_tests.py": "1b61708fbf6731c291178f34b311ea98f79804407038fc51cec14566fd98b60d",
+    "test_failures.py": "5a083108482a3d3c99f108a7d3f564d074b7b16a882df5847e5d030d76547b3b",
+    "warp_tests.cpp": "750048d7e325db33f8beac791e3628099986879dbfcefa1e0a9f15228cc3bc68",
+    "WorldTerrainRaster.h": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b"
+  },
+  "generated": {
+    "_generated\\fixtures.json": "74c7b19c37938452cc4c329df841e5d3c4545fc71c1211114e6ee0d785d9904a",
+    "_generated\\height-four.u16": "ab0babcecf361645e514b963052acf14c4490fb0984e2711b54282a60a92eeb7",
+    "_generated\\height-two.u16": "4ba23fd21ed66e93db04c9828b40dcc99e8de4fa5cf302187502da407acc6dad",
+    "_generated\\Materials.h": "909396ce5eef1de8410dd78b0764fdd302b3af44c5eabe23f6c06caa23c370f9"
+  },
+  "evidence": {
+    "_generated\\api_tests.log": "b4daa8359afb1b535f619e84a4d5d80c1a15025aee0101b106fc050448c07478",
+    "_generated\\dependencies-after.log": "03e3e7bd3f039066b65a5e654403546f3dbb3819f931db3cdb1de28ad2e29b80",
+    "_generated\\dependencies-before.log": "03e3e7bd3f039066b65a5e654403546f3dbb3819f931db3cdb1de28ad2e29b80",
+    "_generated\\failures.log": "68623b89af27922a56c05b83d3c6e1afd755151332a509b099482255f55a421b",
+    "_generated\\prepare_fixtures.log": "70ac5d5f38548cd72feb1bd747c47a03460b3aa55279a92820858e60c14db0f9",
+    "_generated\\warp_tests.log": "1b68cfcaeee6095390dbbe7d88fe20269e550b768f4ea48d68b6d705953f7c66"
+  },
+  "results": {
+    "apiChecks": 14,
+    "warpChecks": 31985585,
+    "actual256Controls": 9,
+    "actual512MonolithicControls": 5,
+    "actualFourSidSmoke": 1,
+    "initHresultFaults": 42,
+    "initExceptionFaults": 42,
+    "phaseChecks": 1489,
+    "functionalMutants": 10,
+    "cleanupMutants": 1
+  },
+  "budget": {
+    "sharedCap": 201326592,
+    "sourceBank": 83885956,
+    "raster256SixteenPatches": 8230488,
+    "raster512SixteenPatches": 24745560
+  },
+  "limitations": [
+    "Pinned base source/material parameters do not prove current native winners or live weather.",
+    "Four-SID case is real staged-source coverage/finite/state smoke, not a full-bank monolithic parity proof.",
+    "Native inherited camera-float drift remains; finer output adds no height samples beyond the 18m source.",
+    "Ready proves healthy command submission, not GPU completion; caller owns fences, serialized context, complete GPU ledger and source/material/frame authority.",
+    "No game FPS, universal finite-output, whole-world seam or leak-free claim."
+  ]
+}

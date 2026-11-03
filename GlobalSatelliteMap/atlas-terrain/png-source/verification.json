@@ -1,0 +1,32 @@
+{
+  "scope": "worker-only canonical PNG input; no current winner/Main/game/install claim",
+  "command": "python run_tests.py",
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "cross_pin.cpp": "99030e766dfe18ac7c139c453e8b0456448aa4c1990edb8e18d76b075a5a1dc7",
+    "decode_tests.cpp": "d1daa68bd23a87d36b0b019a0f90d2097a3a929b0d1786330eafdc9ac1c91af2",
+    "freeze.py": "9e27a3966c6aa9e0440277936efb3015461774b2aff917ce3f8a9f1c85268780",
+    "PinnedPng.h": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95",
+    "README.md": "e79849e81f23e0fc01baf7189955e59c142f24e5346d127097d05b4cfe90ce16",
+    "run_tests.py": "2648d4035d428c81a18affe13c4e271b7a75c9efd4184bf3dbb6002bc323bfd2",
+    "test_mutants.py": "ffb7e949b61c5a9b3d024821aec2a9be72ae7ba3adbe31240a2d03333049b89a"
+  },
+  "dependencies": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\WorldSourceBank.h": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\verification.json": "bfbf93a0038f81c6b84f5473efc7d84306e3f14c940d238e97115cc8fa273079",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\_generated\\DecodedPins.h": "407a537bc08b96febae1f6a2b6f23d01ffd97ec420e03253a77677df6308646a"
+  },
+  "checks": 660,
+  "realImages": 129,
+  "compiledRuntimeMutants": 5,
+  "logs": {
+    "alias-run.log": "37fd0ccbd0be673ff55b75e33ecfd33bbdcc727e5605aa2e7b5b36cc7ccac5d4",
+    "BGRA-run.log": "580ec632e69ec4dd05ec888fd44e530212b548cb0319989b5ef358f0c8967f63",
+    "build.log": "1fe9835390f31f7260cca4653af65da853746f08d70e31ea177f511fd7cc151d",
+    "cancel-run.log": "6252f25a16820b372fedbda66facd0350b4d02abb6c382aea482b4989d313c30",
+    "decode.log": "89fbdee6b81ccc9747cd15855e93e0e468c0c83321d1ff2fda485eaf37b50ff7",
+    "encoded-hash-run.log": "dba9aaf7b7a7435c5376b0e0c5bfacf71ae71370bf378704e2e881801f388f6a",
+    "mutants.log": "c8444bd7cbc5983b2fee147e9303e4eee8c98359a8b4b91f4a07c2e39ffdfb02",
+    "tu-identity-run.log": "eee6c99d559b59281606dc1e90da6aacdba2e5548ea7998d7f41e8d38f749580"
+  }
+}
