@@ -103,28 +103,28 @@
   "locales": [
     {
       "language": "en_GB",
-      "messages": 49,
-      "po_sha256": "aac4bed4e21dc2d5f6f98cc63b71f18c8ffd6d4a6569deb91caf5c0bd6c72618",
-      "mo_sha256": "8cedc016c19881df33fcbd65f2247379024f6353aec59db32582374c08b25cdf"
+      "messages": 51,
+      "po_sha256": "8cc4dfc83c8f8f2b468205648c3c5dfbb7e6fe668a0bf4ad529a5fafe54b2887",
+      "mo_sha256": "1ebc965dbb2f33d1a7f8a4e3732d9e9b9cfef62302cc851a2c97b6a3cc246730"
     },
     {
       "language": "ru_RU",
-      "messages": 49,
-      "po_sha256": "c3d33142036c11e25db2bf01fa9507df803bfe9e816d996559ee16ee567bffab",
-      "mo_sha256": "f2cce9766c8bb5acffd0662e0fda6f37596b850fecbc73a31e58acdeb56b4a5e"
+      "messages": 51,
+      "po_sha256": "1f05fba42144b3e6b2a05e2cc6a43fecd2a0eb874820d8880c4a52b728d97580",
+      "mo_sha256": "bda563090b0059ffffe62aded15a4b26bfdc9165e50eb833e6c875bd91dc55f1"
     },
     {
       "language": "zh_CN",
-      "messages": 49,
-      "po_sha256": "5500fd1d226f2a86876c23d9a06af96b130d3504d0556bd7ea1f5b88f4023035",
-      "mo_sha256": "67d0415a6d2768467f89acce238eb30026452f7e9351ad04a6b0a05527b566e3"
+      "messages": 51,
+      "po_sha256": "48ad39e7a64ffcebe8e53214a31debeb9758b0ed8b91bbb2de2b1731c80d8da0",
+      "mo_sha256": "efb29f60aa37857b6fe251981a821643725e2a45ef9ce03fcfc1c39d29acaf16"
     }
   ],
   "candidate": {
     "path": "D:\\DEV\\Kenshi\\build\\ItemMarkers\\ItemMarkers.dll",
-    "bytes": 148480,
-    "sha256": "1ae3cea68a4260f671ee2fe655a71762867791abb67a6fce388f45b274cd8b9c",
-    "game_imports": 55
+    "bytes": 190464,
+    "sha256": "f25c231a06e5263b432d55f88ef01b6d9cd45e0e82c049b1ce86f2a81bf15523",
+    "game_imports": 56
   },
   "no_install": true,
   "no_live_process_access": true

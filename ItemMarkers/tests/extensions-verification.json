@@ -1,0 +1,29 @@
+{
+  "dllSha256": "f25c231a06e5263b432d55f88ef01b6d9cd45e0e82c049b1ce86f2a81bf15523",
+  "bytes": 190464,
+  "nativeImports": 56,
+  "exports": [
+    "?startPlugin@@YAXXZ",
+    "ItemMarkers_GetApi",
+    "MCM_Describe"
+  ],
+  "inputs": {
+    "ItemMarkers.cpp": "f0fbca59f8c30296aa4bdf4bfa40a87a46d9ab81ffaa6d3f59179c0baefee8fc",
+    "GradeExtensions.h": "062048d83baaadc24e1659780e17bb232a6aad04faa5d466d5deadbe0c2f29e0",
+    "GradeProfiles.h": "86bf01213eb2a72fa5b5e455bcc986b365b8db13679f81b90fdeda8fa77da0e9",
+    "GradeRuntime.h": "a386b7322685571ae9b5bed3af1f280256a0d1d37d7efd131ed1005ce341229c",
+    "sdk/GradeProviderExample.cpp": "d7e3a6bb4623339648620da2c3207c7c6027d26d3031fe7b6e86facfd8dd3eaf",
+    "sdk/README.txt": "ffa38545ebac95015d7f1f5f61428b905743fab5be7b803cabb94d339a11129b",
+    "tests/extensions_tests.cpp": "9bfb13ad0196ad31cf48a4ba7797db95399e5996e104d8e9a6b7d60edfe938c8",
+    "tests/extensions_runtime.cpp": "515358d9fbee497a84d91062b233c1e4b87d0d22e49fc674843014c9ccea9572",
+    "tests/extensions_refresh_tests.py": "62957aa76a8a28a0bf33da299cb6c5eb2a9a58d575df18ec1dca1331577d0de0"
+  },
+  "publicHeaderSha256": "be95354f936b883343f9051d0d4b7e1b85baf4bbb9ff9e1a9f88acb9b60b57c6",
+  "tests": {
+    "pure": "20622 each /Od and /O2, including10000 zero-allocation registry+rule lookups",
+    "actualDllAndConfig": "52 each /Od and /O2, including reload exception rollback",
+    "extractedRefresh": "34 each /Od and /O2; 6 functional mutants rejected",
+    "knownMaps": "10543 production checks;15 compiled mutants rejected"
+  },
+  "scope": "Linked and host-tested candidate, not gameplay/FPS QA or publication."
+}

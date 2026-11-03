@@ -157,3 +157,9 @@ msgstr "Bought bag"
 
 msgid "Colour of the bag on items you bought, #RRGGBB."
 msgstr "Colour of the bag on items you bought, #RRGGBB."
+
+msgid "Reload custom grade rules"
+msgstr "Reload custom grade rules"
+
+msgid "Reload profiles from the grades folder. Invalid files leave the previous rules active."
+msgstr "Reload profiles from the grades folder. Invalid files leave the previous rules active."

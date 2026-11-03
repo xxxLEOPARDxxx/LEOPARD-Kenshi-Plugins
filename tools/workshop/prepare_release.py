@@ -21,6 +21,14 @@ def main():
             for name in ['README.txt','README.md','ORIGIN.md','LICENSE']:
                 p=Path(src)/name
                 if p.is_file():shutil.copy2(p,Path(dst)/name)
+            if mod=='ItemMarkers':
+                sdk=Path(dst)/'sdk';sdk.mkdir(exist_ok=True)
+                shutil.copy2(Path(src).parent/'shared'/'ItemMarkersApi.h',sdk/'ItemMarkersApi.h')
+                for name in ['README.txt','GradeProviderExample.cpp']:
+                    shutil.copy2(Path(src)/'sdk'/name,sdk/name)
+                grades=Path(dst)/'grades';grades.mkdir(exist_ok=True)
+                # Only our disabled sample; never overwrite/delete player profiles.
+                shutil.copy2(Path(src)/'grades'/'backpack-example.ini.disabled',grades/'backpack-example.ini.disabled')
         # build.py deletes only these generated directories. Validate first.
         for child in ['content','screens']:
             target=(HERE/mod/child).resolve()

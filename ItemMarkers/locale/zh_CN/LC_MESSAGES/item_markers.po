@@ -157,3 +157,9 @@ msgstr "买入钱袋"
 
 msgid "Colour of the bag on items you bought, #RRGGBB."
 msgstr "你买入物品上钱袋的颜色,#RRGGBB。"
+
+msgid "Reload custom grade rules"
+msgstr "重新加载自定义品质规则"
+
+msgid "Reload profiles from the grades folder. Invalid files leave the previous rules active."
+msgstr "重新加载 grades 文件夹中的配置。文件无效时保留之前的规则。"

@@ -14,6 +14,25 @@ ITEM MARKERS (QoL)
   - такой же глаз на картах мест, если ВСЕ перечисленные места уже
     открыты. Карты без списка мест и карты с неизвестным местом не помечаются.
 
+СВОЁ КАЧЕСТВО ПРЕДМЕТОВ
+
+Другие моды могут добавлять свои грейды и цвета, в том числе рюкзакам,
+без пересборки ItemMarkers. Для постоянных правил достаточно профилей
+в папке grades. Для качества каждого отдельного экземпляра есть SDK.
+Готовый пример правил выключен: замените ID на настоящие из своего мода
+перед включением. Подробности и пример подключения - sdk/README.txt.
+В MCM есть кнопка перезагрузки правил. Стили меток и их прозрачность
+по-прежнему выбирает игрок. Характеристики вещей плагин не изменяет.
+
+CUSTOM ITEM GRADES
+
+Other mods can add grades and colours, including backpacks, without
+recompiling ItemMarkers. Static rules use profiles in grades; per-instance
+quality uses the public SDK. The example profile is disabled: replace its
+IDs with real data from your mod before enabling it. See sdk/README.txt
+and the integration example. Reload rules through MCM. Player marker
+style and opacity still apply; ItemMarkers never changes item stats.
+
 Один плагин вместо LtEast's Rarity Backgrounds, LtEast's Item Status
 Indicators и LtEast's Mod Settings Core. Их нужно ОТКЛЮЧИТЬ, иначе
 пометки будут двойными.

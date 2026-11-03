@@ -264,6 +264,8 @@ def runtime_file_allowed(mod, folder, name):
             return False
     if mod == "ModConfigMenu" and rel.startswith("sdk/") and name.lower().endswith(".h"):
         return True  # public integration header, not plugin implementation
+    if mod == "ItemMarkers" and rel in ("sdk/ItemMarkersApi.h", "sdk/GradeProviderExample.cpp"):
+        return True  # explicit public SDK, not internal implementation
     return not SKIP.search(name)
 
 def source_dir(mod):

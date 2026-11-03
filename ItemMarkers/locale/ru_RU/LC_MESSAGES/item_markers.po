@@ -157,3 +157,9 @@ msgstr "Мешочек купленного"
 
 msgid "Colour of the bag on items you bought, #RRGGBB."
 msgstr "Цвет мешочка на купленных вещах, #RRGGBB."
+
+msgid "Reload custom grade rules"
+msgstr "Перезагрузить правила качества"
+
+msgid "Reload profiles from the grades folder. Invalid files leave the previous rules active."
+msgstr "Перезагрузить профили из папки grades. Если в файлах ошибка, прежние правила продолжат работать."

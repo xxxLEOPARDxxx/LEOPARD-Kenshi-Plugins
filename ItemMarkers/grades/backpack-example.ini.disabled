@@ -1,0 +1,13 @@
+; Example only: NOT loaded until renamed to .ini and supplied with real FCS IDs.
+; Names/keys/IDs are ASCII; UTF-8 comments are allowed. No item stats are changed.
+[Grade.high-backpack]
+Rank=4
+Colour=#31ef87
+; Optional role from the active interface's kenshi_colours.xml:
+; Palette=ItemGrade4
+
+[Rule.high-backpack]
+ItemID=REPLACE_WITH_BACKPACK_STRING_ID
+MaterialID=REPLACE_WITH_QUALITY_CLASS_STRING_ID
+Grade=high-backpack
+Priority=10

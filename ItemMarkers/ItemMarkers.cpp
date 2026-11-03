@@ -67,6 +67,7 @@
 
 #include <GameTheme.h>
 #include <HoldKey.h>
+#include "GradeRuntime.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -175,6 +176,16 @@ namespace
         g_holdKey = HoldKey::Parse(key);
         g_debug = ReadInt(ini, "Debug", 0, 0, 1) != 0;
         KLocLog::SetEnabled(g_debug);
+        static bool rulesPrepared = false;
+        if (!rulesPrepared)
+        {
+            const std::string module = ModulePath(".dll");
+            const std::string::size_type slash = module.find_last_of("/\\");
+            if (slash != std::string::npos)
+                IMRuntime::Get().SetDirectory(module.substr(0, slash) + "\\grades");
+            IMRuntime::Get().ReloadSafely();
+            rulesPrepared = true;
+        }
         RefreshAll();                   // из MCM - перерисовать открытые иконки
     }
 
@@ -327,6 +338,35 @@ namespace
         return IsMeitou(item) ? g_meitouColour : g_gradeColour[grade];
     }
 
+    struct ResolvedGrade
+    {
+        int rank;
+        MyGUI::Colour colour;
+        uint64_t revision;
+        ResolvedGrade() : rank(-1), colour(MyGUI::Colour::White), revision(0) {}
+    };
+    ResolvedGrade ResolveGrade(Item* item)
+    {
+        ResolvedGrade result;
+        result.revision = IMRuntime::Get().Revision();
+        if (!g_rarity || item == NULL || item->data == NULL)
+            return result;
+        const IM_ItemView view = { sizeof(IM_ItemView), static_cast<int>(item->data->type), item,
+            item->data->stringID.c_str(), item->materialData ? item->materialData->stringID.c_str() : "",
+            Graded(item) ? LevelOf(item) : -1, 0 };
+        IM_Appearance appearance = {};
+        if (IMRuntime::Get().Query(view, appearance, result.revision))
+        {
+            result.rank = appearance.rank;
+            result.colour = MyGUI::Colour(((appearance.rgb >> 16) & 255) / 255.0f,
+                ((appearance.rgb >> 8) & 255) / 255.0f, (appearance.rgb & 255) / 255.0f);
+            return result;
+        }
+        result.rank = GradeOf(item);
+        if (result.rank >= 0) { ReadColours(); result.colour = GradeColourOf(item, result.rank); }
+        return result;
+    }
+
 
     // ---------------------------------------------------------------
     // Иконки и их пометки
@@ -340,6 +380,7 @@ namespace
         bool bag;                              // нарисован мешочек сделки
         bool known, knowledgeItem;
         MyGUI::Widget* eye;
+        ResolvedGrade grade;
         IconEntry() : item(NULL), bag(false), known(false), knowledgeItem(false), eye(NULL) {}
     };
     std::map<MyGUI::Widget*, IconEntry> g_icons;   // корень иконки -> вещь
@@ -596,7 +637,7 @@ namespace
     }
     // END known location maps
 
-    void Decorate(MyGUI::Widget* root, IconEntry& entry, MapKnowledgeBatch& maps)
+    void Decorate(MyGUI::Widget* root, IconEntry& entry, MapKnowledgeBatch& maps, const ResolvedGrade* supplied = NULL)
     {
         Item* const item = entry.item;
         if (root == NULL || item == NULL || item->data == NULL)
@@ -605,13 +646,14 @@ namespace
         if (size.width <= 0 || size.height <= 0)
             return;
 
+        entry.grade = supplied != NULL ? *supplied : ResolveGrade(item);
+        const int grade = entry.grade.rank;
+        const MyGUI::Colour& colour = entry.grade.colour;
+
         if (g_rarity)
         {
-            const int grade = GradeOf(item);
             if (grade >= g_minGrade)
             {
-                ReadColours();
-                const MyGUI::Colour& colour = GradeColourOf(item, grade);
                 if (g_style == 1)
                 {
                     // Рамка - четыре полосы по краям, толщина в пикселях:
@@ -667,7 +709,7 @@ namespace
         }
 
         // Звезда - поверх картинки, в выбранном углу.
-        if (g_rarity && g_style == 3 && Graded(item) && GradeOf(item) >= g_minGrade)
+        if (g_rarity && g_style == 3 && grade >= g_minGrade)
         {
             const std::string& texture = Texture("itemmarkers_star.png");
             if (!texture.empty())
@@ -683,7 +725,7 @@ namespace
                 if (star != NULL)
                 {
                     star->setImageTexture(texture);
-                    star->setColour(GradeColourOf(item, GradeOf(item)));
+                    star->setColour(colour);
                     SetDepthLast(star, FRONT_DEPTH);
                     entry.marks.push_back(star);
                     g_markRoot[star] = root;
@@ -692,7 +734,7 @@ namespace
         }
 
         // значки - слева сверху, по очереди; звезда там же - значки за ней
-        int corner = (g_rarity && g_style == 3 && g_starCorner == 0 && GradeOf(item) >= g_minGrade)
+        int corner = (g_rarity && g_style == 3 && g_starCorner == 0 && grade >= g_minGrade)
                          ? (size.width < 80 ? 16 : 20) + 4 : 2;
         if (g_stolen && item->isStolen(true))
         {
@@ -732,7 +774,7 @@ namespace
         {
             const int side = g_stolenSize;
             int right = 2;
-            if (g_rarity && g_style == 3 && g_starCorner == 1 && GradeOf(item) >= g_minGrade)
+            if (g_rarity && g_style == 3 && g_starCorner == 1 && grade >= g_minGrade)
                 right += (size.width < 80 ? 16 : 20) + 2;
             MyGUI::ImageBox* const bag = MakeImage(root, MyGUI::IntCoord(size.width - side - right, 2, side, side),
                                                    MyGUI::Align::Right | MyGUI::Align::Top);
@@ -788,11 +830,11 @@ namespace
     // Перерисовка из MCM идёт по уже открытым иконкам: вещь могла уйти
     // раньше иконки - сбой одной иконки не должен ронять игру (ревью
     // 09.10.2026; при создании иконки та же защита - SafeOnIcon).
-    bool SafeDecorate(MyGUI::Widget* root, IconEntry* entry, MapKnowledgeBatch* maps)
+    bool SafeDecorate(MyGUI::Widget* root, IconEntry* entry, MapKnowledgeBatch* maps, const ResolvedGrade* supplied = NULL)
     {
         __try
         {
-            Decorate(root, *entry, *maps);
+            Decorate(root, *entry, *maps, supplied);
             return true;
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
@@ -1056,9 +1098,39 @@ namespace
     // Клавиша показа: каждый кадр - только опрос клавиши.
     void (*g_origGuiUpdate)(ForgottenGUI*) = NULL;
 
+    void RefreshExtensionMarks()
+    {
+        static DWORD last = 0;
+        const DWORD now = GetTickCount();
+        if (now - last < 400) return;
+        last = now;
+        IMRuntime::Get().ProcessReload();
+        if (!g_enabled || !g_rarity || !g_shown || g_icons.empty()) return;
+        const uint64_t revision = IMRuntime::Get().Revision();
+        MapKnowledgeBatch maps(false);
+        for (std::map<MyGUI::Widget*, IconEntry>::iterator it = g_icons.begin(); it != g_icons.end(); ++it)
+        {
+            IconEntry& entry = it->second;
+            if (entry.grade.revision == revision || !it->first->getInheritedVisible()) continue;
+            Item* const live = ResolveIconItem(entry);
+            if (live == NULL) continue;
+            const ResolvedGrade grade = ResolveGrade(live);
+            if (entry.grade.rank == grade.rank && entry.grade.colour == grade.colour)
+            {
+                entry.grade.revision = grade.revision;
+                continue;                       // notification without a visual change: no widget churn
+            }
+            Undecorate(entry);
+            SafeDecorate(it->first, &entry, &maps, &grade);
+        }
+    }
+
+    int __cdecl ReloadGradeRules(void*, char*, unsigned) { IMRuntime::Get().RequestReload(); return 1; }
+
     void GuiUpdate_hook(ForgottenGUI* self)
     {
         g_origGuiUpdate(self);
+        RefreshExtensionMarks();
         RecheckDynamicMarks(self);
         if (g_debug && g_statIcons > 0)
         {
@@ -1129,8 +1201,27 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->integer(api, "ItemMarkers", "FactionStrength", Tr("Uniform badge strength"), Tr("How visible the badge is, 1-10 (10% steps)."), 9, 1, 10, 0);
     api->toggle(api, "ItemMarkers", "Blueprint", Tr("Eye on learned blueprints"), Tr("An eye in the lower left corner of a blueprint icon if that blueprint is already learned - no need to buy it again."), 1, 0);
     api->toggle(api, "ItemMarkers", "MapsKnown", Tr("Eye on known location maps"), Tr("An eye in the lower left corner of a map icon when all listed locations are already discovered. Maps without locations are not marked."), 1, 0);
+    if (api->version >= 3)
+        api->action(api, Tr("Reload custom grade rules"), Tr("Reload profiles from the grades folder. Invalid files leave the previous rules active."), &ReloadGradeRules, NULL, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "ItemMarkers", "Debug", Tr("Detailed log"), Tr("In RE_Kenshi_log.txt: the first 200 marked items (kind, level, grade) and how long marking takes."), 0, 0);
+}
+
+namespace
+{
+    int __cdecl RegisterGradeProvider(const IM_Provider* p, IM_Handle* h)
+    { try { return IMRuntime::Get().Add(p, h); } catch (...) { return IM_INVALID; } }
+    int __cdecl UnregisterGradeProvider(IM_Handle h)
+    { try { return IMRuntime::Get().Remove(h); } catch (...) { return IM_INVALID; } }
+    int __cdecl NotifyGradeProvider(IM_Handle h)
+    { return IMRuntime::Get().Notify(h); }
+    int __cdecl RequestGradeReload() { return IMRuntime::Get().RequestReload(); }
+}
+extern "C" __declspec(dllexport) const IM_Api* __cdecl ItemMarkers_GetApi(uint32_t version, uint32_t apiSize)
+{
+    static const IM_Api api = { sizeof(IM_Api), ITEMMARKERS_API_VERSION, &RegisterGradeProvider,
+        &UnregisterGradeProvider, &NotifyGradeProvider, &RequestGradeReload };
+    return version == ITEMMARKERS_API_VERSION && apiSize == sizeof(IM_Api) ? &api : NULL;
 }
 
 
