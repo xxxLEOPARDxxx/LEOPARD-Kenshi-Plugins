@@ -1,0 +1,83 @@
+{
+  "format": "KEO_PLANNER_JOB_CANCELLATION_VERIFICATION",
+  "version": 1,
+  "utc": "2026-11-03T17:24:42.499342+00:00",
+  "base": "03a2581",
+  "productionScope": [
+    "src/movement/island_cancel_hooks.cpp"
+  ],
+  "checksPerOptimization": 142,
+  "optimizations": [
+    "Od",
+    "O2"
+  ],
+  "compiledNegativeControls": 2,
+  "nativeChangedTuCompile": "passed",
+  "routingChanged": false,
+  "installed": false,
+  "review": "CLEAR: root and independent fine_job_finish; fresh 142 controls each Od/O2 and two compiled mutants",
+  "files": [
+    {
+      "path": "src/movement/island_cancel_hooks.cpp",
+      "bytes": 11905,
+      "sha256": "b7cb0f26772636727a8cd83ae02ac883e3f033dad40aa4ae4cfe515461669f1c"
+    },
+    {
+      "path": "src/game/bindings.h",
+      "bytes": 16192,
+      "sha256": "48f17f39687d38fe9b3069fdfeb71ee9df3373732980c736ecfcc7a6629802a4"
+    },
+    {
+      "path": "src/movement/island_orders.cpp",
+      "bytes": 30412,
+      "sha256": "8dd84df7784dfbd299835d8f3e4960785c2ca90c8580c30a6a7a0ba2584f1bc1"
+    },
+    {
+      "path": "src/movement/k7_observe.cpp",
+      "bytes": 22270,
+      "sha256": "54bad8cfbb89bf272b510cd02268a47355c2596e9486dd333527aa5831b5ebf2"
+    },
+    {
+      "path": "src/planner/plan_store.cpp",
+      "bytes": 20605,
+      "sha256": "35a43a630711af162a8e2dc9d3e923c0cbc517385a54d3c69ee7aa621b6beb55"
+    },
+    {
+      "path": "src/planner/plan_policy.cpp",
+      "bytes": 20237,
+      "sha256": "adf1fdb0d26a76d525afbcf01d82eee58245a3c74addb7dd80cc1c090c5ca133"
+    },
+    {
+      "path": "src/planner/plan_build.cpp",
+      "bytes": 5638,
+      "sha256": "566c2bd2db5bfb518a011da6367d4d21e881b0cb9c134f4fed18d9f85139f0b0"
+    },
+    {
+      "path": "leopard/test_planner_job_cancel.py",
+      "bytes": 7885,
+      "sha256": "137707cb5498b6b432f7653fb608c660bcd1aac6a1a40a72acb7b241f3247c87"
+    },
+    {
+      "path": "leopard/planner-job-maintenance-20261103.md",
+      "bytes": 4512,
+      "sha256": "a3d3b1d00c3af8eb75aa1b78de2208cb914be5ee7d9670bc65eb0eaf08846bbd"
+    },
+    {
+      "path": "build/planner-job-red.log",
+      "bytes": 629,
+      "sha256": "39397788f8dfd2b1c3dad43ba0c4eb720fd9490a3f311637774f9d49ed477ba7"
+    },
+    {
+      "path": "build/planner-job-final.log",
+      "bytes": 588,
+      "sha256": "d9f2e84e9f2e736dcaf572931c4de9fae7cafeefa56c2929ffd095d00c796513"
+    },
+    {
+      "path": "build/planner-job-tests/native-cancel.log",
+      "bytes": 25,
+      "sha256": "e87bae8dd42d6cbbe2c9099d7304e53ae149e1301154eb89dad92fbe353bfb9c"
+    }
+  ],
+  "linkedCandidateSha256": "44096772665f9d3d6bd6bc106157f258634ac91b9b1d77217934c0f5fb99d940",
+  "kenshiLibImports": 144
+}
