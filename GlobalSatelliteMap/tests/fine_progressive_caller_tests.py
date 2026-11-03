@@ -12,7 +12,7 @@ text=(HERE.parent/'GsmFineViewer.h').read_text();a=text.index('else if(result==3
 prefix=r'''#include <cstdio>
 namespace FineStore{struct View{unsigned proof;};}
 struct Owner{bool ready,allowed;unsigned releases;Owner():ready(true),allowed(true),releases(0){}bool ReadReady(){return ready;}bool PeekRead(bool,int,int,int,int,FineStore::View&v){v.proof=allowed?7:0;return allowed;}void ReleaseRead(){++releases;ready=false;}}owner,*fineOwner=&owner;
-int fineDemand=1,fineIdentity=2;unsigned fineRead=0,uploads=0;bool fineCenter=false;unsigned finePair=1;struct Plan{unsigned pairCount;Plan():pairCount(14){}}finePlan;bool succeed=true,fail=false;
+int fineDemand=1,fineIdentity=2;unsigned fineRead=0,uploads=0;bool fineCenter=false,fineSpeculative=false;unsigned fineAheadRead=0;unsigned finePair=1;struct Plan{unsigned pairCount;Plan():pairCount(14){}}finePlan;bool succeed=true,fail=false;
 int FineResidency(){return 3;}int FineCpuLedger(){return 4;}bool FineUpload(const FineStore::View&v){if(v.proof!=7)throw 2;if(fail)throw 3;if(succeed)++uploads;return succeed;}
 void C(bool b,const char*s){if(!b){fprintf(stderr,"FAIL %s\n",s);throw 1;}}
 void Complete(int result){'''
@@ -28,6 +28,6 @@ def run(label,body,opt,red=False):
  source=OUT/(label+'.cpp');source.write_text(prefix+body+suffix);exe=source.with_suffix('.exe')
  p=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT',opt,str(source),'/Fo'+str(source.with_suffix('.obj')),'/Fe'+str(exe)],env=env,capture_output=True,text=True);(OUT/(label+'-build.log')).write_text(p.stdout+p.stderr);assert not p.returncode,p.stdout+p.stderr
  p=subprocess.run([str(exe)],env=env,capture_output=True,text=True);(OUT/(label+'-run.log')).write_text(p.stdout+p.stderr);print(p.stdout+p.stderr,end='');assert (p.returncode!=0)==red
-legacy=branch.replace('if(!FineUpload(view))','if((fineCenter||finePair>=finePlan.pairCount)&&!FineUpload(view))');assert legacy!=branch
+legacy=branch.replace('if(!fineSpeculative&&!FineUpload(view))','if(!fineSpeculative&&(fineCenter||finePair>=finePlan.pairCount)&&!FineUpload(view))');assert legacy!=branch
 run('fine-progressive-legacy-batch-red',legacy,'/Od',True)
 run('fine-progressive-Od',branch,'/Od');run('fine-progressive-O2',branch,'/O2')

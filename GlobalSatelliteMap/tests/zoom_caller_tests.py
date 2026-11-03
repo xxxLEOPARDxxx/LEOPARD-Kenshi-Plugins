@@ -32,7 +32,7 @@ namespace MyGUI {struct Widget {int width,height;bool alive;Widget(int w=16384,i
 namespace Ogre {struct Vector4{float v[4];Vector4(){v[0]=.3f;v[1]=.4f;v[2]=443;v[3]=464;}};}
 struct MapScreen {MyGUI::Widget*mainWidget,*mapImage,*mapScrollView;float zoomValueBase,zoomValueMax,zoomValueCurrent,zoomLevels[3];Ogre::Vector4 zoomCenterOffset;bool zoomUpdated,visible;MapScreen(MyGUI::Widget*m,MyGUI::Widget*i,MyGUI::Widget*s):mainWidget(m),mapImage(i),mapScrollView(s),zoomValueBase(.1209716796875f),zoomValueMax(2),zoomValueCurrent(2),zoomUpdated(false),visible(true){zoomLevels[0]=.2f;zoomLevels[1]=.53333336f;zoomLevels[2]=1;}bool getVisible(){++visibilityQueries;return visible;}};
 struct WidgetRef {MyGUI::Widget*p;WidgetRef():p(NULL){}MyGUI::Widget*get(){return p;}void set(MyGUI::Widget*w){++ownerWrites;if(!managerReady)return;p=w;}void unlink(MyGUI::Widget*w){if(p==w)p=NULL;}void reset(){p=NULL;}};
-bool enabled=false,zoomFailed=false;int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;
+bool enabled=false,zoomFailed=false;unsigned zoomStepDepth=0;float zoomInputMinimum=0,zoomInputPeak=0;int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;
 void(*originalZoomIn)(MapScreen*,MyGUI::Widget*)=NULL;
 bool ZoomNativeProfile(){++profileQueries;return profileOK;}void ErrorLog(const std::string&){++errors;}void Diagnostic(const std::string&){++diagnostics;}
 void FakeClamp(MapScreen*m,MyGUI::Widget*){++clamps;m->zoomValueCurrent=(std::min)(m->zoomValueCurrent+m->zoomValueBase,m->zoomValueMax);m->zoomCenterOffset.v[0]=.5f;m->zoomCenterOffset.v[1]=.5f;m->zoomCenterOffset.v[2]=1080;m->zoomCenterOffset.v[3]=522;m->zoomUpdated=true;if(throwClamp)throw std::runtime_error("native clamp edge failure");}
@@ -40,10 +40,10 @@ void Original(MapScreen*m){++originals;if(m&&m->zoomUpdated){m->mapImage->width=
 __APPLY__
 __HOOK__
 void C(bool b,const char*s){++checks;if(!b){std::printf("FAIL %s check%u\n",s,checks);throw 1;}}
-void Reset(){zoomLease.Reset();zoomOwner.reset();zoomFailed=false;enabled=false;zoomMultiplier=1;profileOK=managerReady=true;throwClamp=false;visibilityQueries=widthQueries=heightQueries=profileQueries=ownerWrites=clamps=errors=diagnostics=originals=ticks=0;}
+void Reset(){zoomLease.Reset();zoomOwner.reset();zoomFailed=false;zoomStepDepth=0;zoomInputMinimum=zoomInputPeak=0;enabled=false;zoomMultiplier=1;profileOK=managerReady=true;throwClamp=false;visibilityQueries=widthQueries=heightQueries=profileQueries=ownerWrites=clamps=errors=diagnostics=originals=ticks=0;}
 void SetupActive(MapScreen&m){enabled=true;zoomMultiplier=2;ApplyZoomLimit(&m);C(m.zoomValueMax==4&&m.zoomValueCurrent==2&&zoomLease.Owned(),"actualcaller raises cap withoutmovingcurrent");}
 int main(){try{
- {Reset();MyGUI::Widget main,image,scroll;MapScreen m(&main,&image,&scroll);ApplyZoomLimit(&m);C(visibilityQueries==0&&profileQueries==0&&widthQueries==0&&heightQueries==0&&ownerWrites==0,"defaultOFF performszeroqueries andnoWidgetManagerregistration");C(m.zoomValueMax==2&&m.zoomValueCurrent==2&&!m.zoomUpdated,"OFF fields unchanged");enabled=true;zoomMultiplier=1;ApplyZoomLimit(&m);C(!visibilityQueries&&!profileQueries&&!ownerWrites,"native1 unowned alsozeroqueries");}
+ {Reset();MyGUI::Widget main,image,scroll;MapScreen m(&main,&image,&scroll);ApplyZoomLimit(&m);C(visibilityQueries==0&&profileQueries==0&&widthQueries==0&&heightQueries==0&&ownerWrites==0,"defaultOFF performszeroqueries andnoWidgetManagerregistration");C(m.zoomValueMax==2&&m.zoomValueCurrent==2&&!m.zoomUpdated,"OFF fields unchanged");enabled=true;zoomMultiplier=1;ApplyZoomLimit(&m);C(visibilityQueries==1&&profileQueries==1&&ownerWrites==1&&zoomInputMinimum==m.zoomValueBase&&zoomInputPeak==m.zoomLevels[2]&&!zoomLease.Owned(),"native1 validates input bounds without inventing maximum lease");}
  {Reset();MyGUI::Widget main,image,scroll;MapScreen m(&main,&image,&scroll);SetupActive(m);float levels[3];std::memcpy(levels,m.zoomLevels,12);for(unsigned i=0;i<20;++i)ApplyZoomLimit(&m);C(m.zoomValueMax==4&&clamps==0&&diagnostics==1,"idempotent norepeat nativeclamp/writeevent");C(!std::memcmp(levels,m.zoomLevels,12)&&m.zoomValueBase==.1209716796875f,"markerthreshold/min fields preserved");m.zoomValueCurrent=4;image.width=image.height=32768;enabled=false;ApplyZoomLimit(&m);C(m.zoomValueMax==2&&m.zoomValueCurrent==2&&clamps==1&&!zoomLease.Owned(),"OFF restores originalcap viaexactlyone nativeanchorclamp");C(m.zoomUpdated&&m.zoomCenterOffset.v[0]==.5f,"nativecentreanchor used");Original(&m);ApplyZoomLimit(&m);C(clamps==1,"OFF restored norepeat");}
  {Reset();MyGUI::Widget main,image,scroll;MapScreen m(&main,&image,&scroll);SetupActive(m);m.zoomValueCurrent=4;image.width=image.height=32768;m.zoomValueCurrent=m.zoomValueBase;m.zoomUpdated=true;ApplyZoomLimit(&m);C(!zoomFailed&&m.zoomValueMax==4&&clamps==0,"worldclear pending nativeresize doesnotrefuse/compound");Original(&m);ApplyZoomLimit(&m);C(!zoomFailed&&m.zoomValueMax==4&&m.zoomValueCurrent==m.zoomValueBase,"worldclear resize completes andpreserves stablecap");}
  {Reset();MyGUI::Widget main,image,scroll;MapScreen m(&main,&image,&scroll);SetupActive(m);m.zoomValueCurrent=m.zoomValueBase;image.width=image.height=32768;m.zoomUpdated=true;zoomMultiplier=8;ApplyZoomLimit(&m);C(!zoomFailed,"pending nativeresize plusnewfactor mustnotrefuse stale dimensions");Original(&m);ApplyZoomLimit(&m);C(!zoomFailed&&m.zoomValueMax==16&&m.zoomValueCurrent==m.zoomValueBase,"deferrednewfactor applied aftercorrect nativeresize");}
@@ -62,14 +62,14 @@ r=subprocess.run([str(H/'caller.exe')],capture_output=True,text=True);(H/'run.lo
 
 if not args.skip_mutants:
     cases=[
-        ('offqueries','if((!enabled||zoomMultiplier==1)&&!zoomLease.Owned())return;',''),
+        ('offqueries','if(!enabled&&!zoomLease.Owned())return;',''),
         ('pendingresize','if(map->zoomUpdated)return;',''),
         ('rollbackdirty','map->zoomUpdated=oldDirty;','map->zoomUpdated=true;'),
         ('untrackedowner','if(zoomOwner.get()!=map->mainWidget)return;',''),
         ('missingclamp','if(action.clamp){if(originalZoomIn)','if(false){if(originalZoomIn)'),
         ('profilebypass','if(!ZoomNativeProfile()){zoomFailed=true;','if(false){zoomFailed=true;'),
         ('profilehotretry','if(zoomFailed)return;',''),
-        ('wrongthreshold','map->zoomLevels[2],map->zoomValueMax','map->zoomLevels[1],map->zoomValueMax'),
+        ('wrongthreshold','zoomMultiplier,map->zoomValueBase,map->zoomLevels[2],map->zoomValueMax','zoomMultiplier,map->zoomValueBase,map->zoomLevels[1],map->zoomValueMax'),
     ]
     results=[]
     for name,old,new in cases:

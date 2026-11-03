@@ -1,0 +1,39 @@
+tests.cpp
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(10) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(10) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(11) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(11) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(12) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(12) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(13) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(13) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(14) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(14) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(15) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(15) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(16) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(16) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(17) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(18) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(18) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(18) : error C2039: 'WheelNotches' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(18) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(18) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(18) : error C3861: 'WheelNotches': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(19) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(19) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(19) : error C2039: 'DiscreteTarget' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(19) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(19) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(19) : error C3861: 'DiscreteTarget': identifier not found
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(20) : error C2039: 'TargetScope' : is not a member of 'GsmZoom'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(20) : error C2065: 'TargetScope' : undeclared identifier
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(20) : error C2146: syntax error : missing ';' before identifier 'scope'
+D:\DEV\Kenshi\ours\GlobalSatelliteMap\tests\fixed-zoom\tests.cpp(20) : error C3861: 'scope': identifier not found

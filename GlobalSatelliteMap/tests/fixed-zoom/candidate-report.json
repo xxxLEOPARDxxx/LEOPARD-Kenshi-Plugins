@@ -1,0 +1,42 @@
+{
+  "productionSha256": {
+    "GsmZoomStep.h": "8b2282689fff9b0d22316b27184194c23d8bab7d9cf642d0676c3244b9ad0dc1",
+    "GlobalSatelliteMap.cpp": "a372e28507cbb256149c77cee9623eea61349371ac787acd934116ce63dc3589",
+    "GsmFineViewer.h": "ebbcd7ddd86a8a245945ce47ce81ae7edaaa7b1713104bfefb6f23f13def39ba",
+    "GsmFinePrefetch.h": "2fa113c96ad970bd75527ee8f0bcac1928d43a411ac15ec3ad291646cfbf316f"
+  },
+  "tests": {
+    "verification.json": {
+      "productionStepSha256": "8b2282689fff9b0d22316b27184194c23d8bab7d9cf642d0676c3244b9ad0dc1",
+      "results": {
+        "Od": "PASS 27 fixed zoom controls",
+        "O2": "PASS 27 fixed zoom controls"
+      },
+      "scope": "Production deterministic zoom ladder and scoped exact native clamp; no game/UI."
+    },
+    "caller-verification.json": {
+      "wrapperSha256": "1d899eaa9c07e35548c955364892cf03be6ca70fd16abc914ac4a11fa4e4295e",
+      "results": {
+        "Od": "PASS 32 actual fixed zoom caller controls",
+        "O2": "PASS 32 actual fixed zoom caller controls"
+      },
+      "scope": "Actual production wrapper bodies; bounded fake native methods matching audited arithmetic/anchors. No game/UI."
+    },
+    "cadence-verification.json": {
+      "actualTickGate": "if(!tickClock.Due(now,ready&&(job||completed)&&BaseDetailCapacity()==AtlasView::DetailSlots&&ProducerGpuBytes()==0?50:200))return;",
+      "gateSha256": "9cef9d0f7444321d0913938e9a2d57512b94d4fb85991b89792ded8ff2b48110",
+      "results": {
+        "Od": "PASS 8 actual Tick cadence controls",
+        "O2": "PASS 8 actual Tick cadence controls"
+      },
+      "scope": "Actual extracted Tick interval choice; no game/FPS claim."
+    }
+  },
+  "capLifecycle": "28actual production controls and8compiled mutants freshly passed",
+  "nativeCompile": {
+    "mode": "VC10/O2/GL complete GlobalSatelliteMap.cpp compile only",
+    "logSha256": "c221f9f6ef3f8b0fb53753f13bf057c75905afba2b62681548ce9c0cd21c7fe6"
+  },
+  "review": "fine_store_finish independent CLEAR; reran27+32+8 per /Od and/O2",
+  "runtime": "No game/UI/INI/installation by child; sibling owns final combined linked candidate and parent game acceptance."
+}

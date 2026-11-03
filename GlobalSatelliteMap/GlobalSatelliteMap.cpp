@@ -71,7 +71,7 @@ extern "C" IMAGE_DOS_HEADER __ImageBase;
 namespace {
 const char*const ID="GlobalSatelliteMap";
 const char*const Group="LEOPARD_GlobalSatelliteMap_Development";
-int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;bool zoomFailed=false;
+int zoomMultiplier=1;GsmZoom::Lease zoomLease;WidgetRef zoomOwner;bool zoomFailed=false;float zoomInputMinimum=0,zoomInputPeak=0;
 void(*originalZoomIn)(MapScreen*,MyGUI::Widget*)=NULL;
 void(*originalZoomOut)(MapScreen*,MyGUI::Widget*)=NULL;
 void(*originalZoomWheel)(MapScreen*,MyGUI::Widget*,int)=NULL;
@@ -655,19 +655,23 @@ void UpdateMapInfo(MapScreen*map){
  MyGUI::TextBox*w=static_cast<MyGUI::TextBox*>(mapInfo.get());const int x=std::max(8,view.left-parent.left+8),y=std::max(0,std::min(parent.height-22,view.top-parent.top+view.height-22)),width=std::max(80,std::min(parent.width-x-8,view.width-160));MyGUI::IntCoord rect(x,y,width,20);if(w->getCoord()!=rect)w->setCoord(rect);
  const GsmMapInfo::Token token(values);if(!mapInfoHaveToken||!token.Same(mapInfoToken)){char text[256]={0};_snprintf_s(text,sizeof(text),_TRUNCATE,Tr(values.loaded?"Zoom: x%.2f | Details loaded":"Zoom: x%.2f | Loading details..."),values.zoom);w->setCaption(MyGUI::UString(text));mapInfoToken=token;mapInfoHaveToken=true;}if(!w->getVisible())w->setVisible(true);
 }
-void Tick(MapScreen*map){FineObserve(map);LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(mapInfo.get()&&mapInfo.get()->getVisible())mapInfo.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined&&!FinePending())StartValidation();if(!ready)return;Draw(map,now);UpdateMapInfo(map);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
-bool RelativeZoomEnabled(MapScreen*map){return zoomStepHooksReady&&enabled&&zoomMultiplier>1&&!zoomFailed&&!zoomStepDepth&&zoomLease.Owned()&&map&&zoomOwner.get()==map->mainWidget&&GsmZoom::StepValues(map->zoomValueBase,map->zoomValueCurrent);}
+void Tick(MapScreen*map){if(zoomStepDepth)return;FineObserve(map);LONG gen=InterlockedCompareExchange(&GSM::generation,0,0);if(gen!=observedGeneration){Clear();session.Reset();observedGeneration=gen;}Poll(map);if(!map||!map->getVisible()||!enabled){localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();lightClock.Reset();if(layer.get())layer.get()->setVisible(false);if(mapInfo.get()&&mapInfo.get()->getVisible())mapInfo.get()->setVisible(false);if(status.get())status.get()->setVisible(false);if(completed){delete completed;completed=NULL;}return;}DWORD now=GetTickCount();if(status.get()&&statusUntil&&static_cast<LONG>(now-statusUntil)>=0){MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;}if(ready)RepositionZoom(map);if(!tickClock.Due(now,ready&&(job||completed)&&BaseDetailCapacity()==AtlasView::DetailSlots&&ProducerGpuBytes()==0?50:200))return;SaveFileSystem*fs=SaveFileSystem::getSingleton();if(!fs||fs->busy()||!ou)return;if(session.Change("",reinterpret_cast<unsigned long long>(ou))){Clear();InterlockedIncrement(&GSM::generation);observedGeneration=InterlockedCompareExchange(&GSM::generation,0,0);}if(!attempted&&!job&&!jobQuarantined&&!FinePending())StartValidation();if(!ready)return;Draw(map,now);UpdateMapInfo(map);if(layer.get()&&!layer.get()->getVisible())layer.get()->setVisible(true);}
+bool RelativeZoomEnabled(MapScreen*map){return zoomStepHooksReady&&enabled&&!zoomFailed&&!zoomStepDepth&&map&&zoomOwner.get()==map->mainWidget&&zoomInputMinimum>0&&map->zoomValueBase==zoomInputMinimum&&map->zoomLevels[2]==zoomInputPeak&&GsmZoom::StepValues(map->zoomValueBase,map->zoomValueCurrent)&&((zoomMultiplier==1&&!zoomLease.Owned()&&map->zoomValueMax==float(double(zoomInputPeak)*2))||(zoomMultiplier>1&&zoomLease.Owned()&&map->zoomValueMax==float(double(zoomInputPeak)*2*zoomMultiplier)));}
 void ZoomInHook(MapScreen*map,MyGUI::Widget*sender){
     if(!RelativeZoomEnabled(map)){originalZoomIn(map,sender);return;}
-    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::StepScope step(map->zoomValueBase,GsmZoom::ButtonStep(map->zoomValueBase,map->zoomValueCurrent));originalZoomIn(map,sender);
+    float target;if(!GsmZoom::DiscreteTarget(map->zoomValueBase,map->zoomLevels[2],map->zoomValueMax,map->zoomValueCurrent,1,target)){originalZoomIn(map,sender);return;}
+    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::TargetScope bounds(map->zoomValueBase,map->zoomValueMax,target);originalZoomIn(map,sender);
 }
 void ZoomOutHook(MapScreen*map,MyGUI::Widget*sender){
     if(!RelativeZoomEnabled(map)){originalZoomOut(map,sender);return;}
-    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::StepScope step(map->zoomValueBase,GsmZoom::ButtonStep(map->zoomValueBase,map->zoomValueCurrent));originalZoomOut(map,sender);
+    float target;if(!GsmZoom::DiscreteTarget(map->zoomValueBase,map->zoomLevels[2],map->zoomValueMax,map->zoomValueCurrent,-1,target)){originalZoomOut(map,sender);return;}
+    // The same audited center-anchor clamp already handles cap reductions.
+    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::TargetScope bounds(map->zoomValueBase,map->zoomValueMax,target);originalZoomIn(map,sender);
 }
 void ZoomWheelHook(MapScreen*map,MyGUI::Widget*sender,int relative){
-    if(!RelativeZoomEnabled(map)){originalZoomWheel(map,sender,relative);return;}
-    GsmZoom::DepthScope depth(zoomStepDepth);originalZoomWheel(map,sender,GsmZoom::WheelStep(relative,map->zoomValueBase,map->zoomValueCurrent));
+    if(!relative||!RelativeZoomEnabled(map)){originalZoomWheel(map,sender,relative);return;}
+    float target;if(!GsmZoom::DiscreteTarget(map->zoomValueBase,map->zoomLevels[2],map->zoomValueMax,map->zoomValueCurrent,GsmZoom::WheelNotches(relative),target)){originalZoomWheel(map,sender,relative);return;}
+    GsmZoom::DepthScope depth(zoomStepDepth);GsmZoom::TargetScope bounds(map->zoomValueBase,map->zoomValueMax,target);originalZoomWheel(map,sender,relative);
 }
 bool ZoomNativeProfile(){
     static int checked=0;if(checked)return checked>0;checked=-1;
@@ -688,18 +692,20 @@ void InstallZoomSteps(){
     if(!zoomStepHooksReady)ErrorLog("GlobalSatelliteMap: relative zoom hooks incomplete; original input retained");
 }
 void ApplyZoomLimit(MapScreen*map){
-    if((!enabled||zoomMultiplier==1)&&!zoomLease.Owned())return;
+    if(zoomStepDepth)return;
+    if(!enabled&&!zoomLease.Owned())return;
     if(!map||!map->mainWidget||!map->mapImage||!map->mapScrollView||!map->getVisible())return;
     // Native clear/zoom input updates scalar zoom before resizing the widget.
     // Let originalUpdate consume that dirty state before inferring canvas size.
     if(map->zoomUpdated)return;
-    if(zoomOwner.get()!=map->mainWidget){zoomOwner.set(map->mainWidget);zoomLease.Reset();zoomFailed=false;if(zoomOwner.get()!=map->mainWidget)return;}
+    if(zoomOwner.get()!=map->mainWidget){zoomOwner.set(map->mainWidget);zoomLease.Reset();zoomFailed=false;zoomInputMinimum=zoomInputPeak=0;if(zoomOwner.get()!=map->mainWidget)return;}
     if(zoomFailed)return;
     if(!ZoomNativeProfile()){zoomFailed=true;ErrorLog("GlobalSatelliteMap: map zoom native profile differs; extension inactive");return;}
     const GsmZoom::Lease before=zoomLease;
     GsmZoom::Action action;GsmZoom::Result result=zoomLease.Plan(enabled,zoomMultiplier,map->zoomValueBase,map->zoomLevels[2],map->zoomValueMax,map->zoomValueCurrent,map->mapImage->getWidth(),map->mapImage->getHeight(),action);
     if(result==GsmZoom::Refused){zoomFailed=true;ErrorLog("GlobalSatelliteMap: map zoom geometry refused; native values retained");return;}
     if(result==GsmZoom::ForeignChange){Diagnostic("map zoom maximum changed by another owner; further override suspended until settings change");return;}
+    if(!zoomInputMinimum){zoomInputMinimum=map->zoomValueBase;zoomInputPeak=map->zoomLevels[2];}
     if(result!=GsmZoom::Apply)return;
     const float oldMaximum=map->zoomValueMax,oldCurrent=map->zoomValueCurrent;const Ogre::Vector4 oldCenter=map->zoomCenterOffset;const bool oldDirty=map->zoomUpdated;
     map->zoomValueMax=action.maximum;

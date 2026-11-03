@@ -1,0 +1,9 @@
+# Deterministic native zoom
+
+Fixed extended levels are x1, x1.25, x1.5, x2, x2.5, x3, x4, x6 and x8, clipped to the chosen maximum (including exact integer caps x5/x7). Lower levels retain native minimum plus a bounded zoom-out ladder. Selection uses the current native maximum reference `2*zoomLevels[2]`; render density still comes from the actual resized viewport, not from this table.
+
+The existing audited native wheel first clamps the candidate to `[base,max]`, then calculates its cursor anchor and dirty state; outside-viewport input returns first. A scoped singleton interval `[target,target]` therefore yields the exact grid value with one original wheel call, without changing current on entry or snapping afterwards. Both buttons use the already audited original In clamp, including clamp-down, with its native viewport-center anchor. Both bounds and reentry depth restore on C++ unwind. ApplyZoomLimit and Tick refuse reentry while the temporary bounds exist.
+
+Satellite OFF preserves raw native input. Enabled x1 may use fixed lower steps only with the captured live widget/minimum/peak and exact native maximum, without creating a maximum lease; modified bounds pass through. Existing extension ownership remains required above x1.
+
+`run.py`: 27 actual policy/RAII controls per VC10 /Od and /O2. `caller.py`: 32 actual extracted wrapper/cap-caller/entry controls per mode, including x1, outside and zero wheel, extreme batches, exceptions and nested lifecycle. `cadence.py`: 8 actual Tick gate controls per mode. Ordinary pending reads/uploads poll at50ms only with full ordinary capacity and zero source bank; idle/unvalidated/fine/source-draining paths retain200ms. Existing `zoom_caller_tests.py` retains28 actual cap lifecycle checks and8 compiled mutation controls. RED logs preserve the former continuous result and cold200ms cadence. Native runtime zoom/markers/anchors, loading latency and FPS remain parent game acceptance checks.

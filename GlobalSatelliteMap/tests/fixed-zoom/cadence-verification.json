@@ -1,0 +1,9 @@
+{
+  "actualTickGate": "if(!tickClock.Due(now,ready&&(job||completed)&&BaseDetailCapacity()==AtlasView::DetailSlots&&ProducerGpuBytes()==0?50:200))return;",
+  "gateSha256": "9cef9d0f7444321d0913938e9a2d57512b94d4fb85991b89792ded8ff2b48110",
+  "results": {
+    "Od": "PASS 8 actual Tick cadence controls",
+    "O2": "PASS 8 actual Tick cadence controls"
+  },
+  "scope": "Actual extracted Tick interval choice; no game/FPS claim."
+}

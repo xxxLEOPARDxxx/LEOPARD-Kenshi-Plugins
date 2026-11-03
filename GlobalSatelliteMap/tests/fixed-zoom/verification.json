@@ -1,0 +1,8 @@
+{
+  "productionStepSha256": "8b2282689fff9b0d22316b27184194c23d8bab7d9cf642d0676c3244b9ad0dc1",
+  "results": {
+    "Od": "PASS 27 fixed zoom controls",
+    "O2": "PASS 27 fixed zoom controls"
+  },
+  "scope": "Production deterministic zoom ladder and scoped exact native clamp; no game/UI."
+}

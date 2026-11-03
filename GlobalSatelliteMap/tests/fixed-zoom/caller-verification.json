@@ -1,0 +1,8 @@
+{
+  "wrapperSha256": "1d899eaa9c07e35548c955364892cf03be6ca70fd16abc914ac4a11fa4e4295e",
+  "results": {
+    "Od": "PASS 32 actual fixed zoom caller controls",
+    "O2": "PASS 32 actual fixed zoom caller controls"
+  },
+  "scope": "Actual production wrapper bodies; bounded fake native methods matching audited arithmetic/anchors. No game/UI."
+}
