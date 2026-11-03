@@ -763,3 +763,8 @@ Host controls, malformed/cancel/wait/fault cases and independent reviews do not
 prove actual game pixels, production scheduler latency or universal leak freedom.
 The private callback still performs conservative INI/resource census checks;
 these must not become a permanent per-frame production path.
+
+`WorldFrameCase=0` keeps the original center. Case1, latched during preparation,
+uses center(-13568,-13568), the same512/1m grid/material and a256x256 equal-world
+overlap. Values above1 refuse before native material, job or output work. This
+compares actual neighboring viewport phases without altering the active atlas.

@@ -1445,6 +1445,8 @@ void WorldFrameFinished(int result)
 }
 void PrepareWorldFrame(unsigned token)
 {
+    const unsigned windowCase=GetPrivateProfileIntA("Probe","WorldFrameCase",0,requestIni.c_str());
+    if(windowCase>1)throw std::runtime_error("world frame case outside explicit0/1 control");
     worldFrameCapturedLoad=InterlockedCompareExchange(&worldFrameLoadGeneration,0,0);
     char executable[MAX_PATH]={0};DWORD n=GetModuleFileNameA(NULL,executable,MAX_PATH);
     if(!n||n>=MAX_PATH)throw std::runtime_error("world frame executable path unavailable");
@@ -1454,7 +1456,7 @@ void PrepareWorldFrame(unsigned token)
     WorldStream::Job&j=worldFrameJob;std::memset(&j,0,sizeof(j));if(++worldFrameEpoch==0)++worldFrameEpoch;
     j.scope.thread=GetCurrentThreadId();j.scope.world=reinterpret_cast<SourceReceipts::U64>(ou);j.scope.sourceEpoch=(SourceReceipts::U64(GetCurrentProcessId())<<32)|worldFrameEpoch;j.scope.job=(3ULL<<32)|token;
     j.frame.source.value=j.scope.sourceEpoch;j.frame.source.profile=WorldBank::PinnedBaseSnapshot;j.frame.generation=j.scope.job;j.frame.materialGeneration=(2ULL<<32)|token;
-    j.frame.region=27;j.frame.cell=10;j.frame.side=512;j.frame.x=j.frame.z=-13824;j.frame.spacing=1;j.frame.cameraY=10000;j.frame.farClip=20000;j.frame.waterHeight=-10000;
+    j.frame.region=27;j.frame.cell=10;j.frame.side=512;j.frame.x=j.frame.z=windowCase?-13568.0f:-13824.0f;j.frame.spacing=1;j.frame.cameraY=10000;j.frame.farClip=20000;j.frame.waterHeight=-10000;
     j.grid.x=j.grid.z=7360;j.grid.columns=j.grid.rows=2;j.grid.sourceEpoch=j.scope.sourceEpoch;
     j.material.source=j.frame.source;j.material.generation=j.frame.materialGeneration;j.material.region=27;
     std::memcpy(j.material.parameters,geography.parameters,sizeof(j.material.parameters));std::memcpy(j.material.distortion,geography.distortion,sizeof(j.material.distortion));
