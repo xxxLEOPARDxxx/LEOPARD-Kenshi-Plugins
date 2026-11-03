@@ -1,0 +1,11 @@
+from pathlib import Path
+import hashlib,json
+HERE=Path(__file__).resolve().parent;OUT=HERE/'_generated';ROOT=HERE.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for name in ['source.log','debug.log']:assert 'PASS 3478 world source checks' in (OUT/name).read_text()
+assert 'PASS 14 compiled production world-source mutants rejected' in (OUT/'mutants.log').read_text()
+deps=[ROOT/'atlas-view/AtlasReader.h',ROOT/'atlas-view/AtlasPolicy.h',HERE.parent/'fixed-geometry/FixedTerrainGeometry.h',HERE.parent/'fixed-geometry/expected-patch.f32']
+source={p.name:sha(p) for p in HERE.iterdir() if p.is_file() and p.name!='verification.json'}
+j=dict(scope='worker-only pinned streamed fullmap height/window cache; no renderer/native/game/install changes',status='implementer PASS; independent review pending',command='python run_tests.py',sourceFiles=source,dependencies={p.as_posix():sha(p) for p in deps},results=dict(optimizedChecks=3478,unoptimizedChecks=3478,compiledRuntimeMutants=14,worldBlocks=256,partialRowReads=263360,windowReadBytes=541863200,maxCppAllocation=2117682,peakCppTestAllocation=2624682),profile=dict(path='data/newland/land/fullmap.tif',bytes=536980180,sha256='6f7d4bc7baaf80dbf8db91e6f367db71f87fe38f053a34108f192584c9637b18',width=16385,height=16385,stripOffset=43686,stripBytes=536936450,sampleBytes=2,sourceStepMeters=18,worldExtentMeters=294912),logs={p.name:sha(p) for p in OUT.iterdir() if p.is_file() and (p.suffix=='.log' or p.name in ['source_tests.exe','source_debug.exe'])},limits=dict(maxWindowBytes=2117682,authScratchBytes=65536,maxVertexSide=1025,maxSourceSide=1029),limitations=['Exact filesystem base-source profile, not arbitrary live native/mod resource-winner proof.','One Source owner thread, one explicit window cache; caller controls worker/cancel/join/borrowed lifetimes and total CPU ledger.','No engine/D3D/render/write/INI/native/process calls or final map integration.','Instrumented C++ ownership bounds and tested handles do not prove whole-process peak, all leaks or FPS.'])
+(HERE/'verification.json').write_text(json.dumps(j,indent=2)+'\n')
+print('PASS frozen',len(source),'own files;',len(deps),'dependencies; manifest',sha(HERE/'verification.json'))

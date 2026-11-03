@@ -1,0 +1,93 @@
+{
+  "scope": "worker-only pinned streamed fullmap height/window cache; no renderer/native/game/install changes",
+  "status": "implementer PASS; independent review pending",
+  "command": "python run_tests.py",
+  "sourceFiles": {
+    ".gitignore": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7",
+    "freeze.py": "0b58145f7a526d2bb3f2a17b4a718953cdafa562d4b84a94a0228456e98eb1f0",
+    "PLAN.md": "a085f8dd0956dc3d2a24a71bede45cd60ea80e22d76758e43068fc5a0db3d62a",
+    "README.md": "ea91d9c4ac14e725d91b49e7e68537ecf2c01c9228a96e14f41d35942113bcf5",
+    "run_tests.py": "ca24426267b24ab518110db01ebf56eac9d4d851564a9c24377f8cc820dc5b38",
+    "source_tests.cpp": "af734c1fd5a8b1e675a382e1b7b8d43b604abb3e5a17cb4a752c7733e8788e6b",
+    "test_mutants.py": "e55e03e2b8414c28e51461429e7e1b5ade3ea1dbbfdfe9bb49e0e1c5462e360e",
+    "WorldHeightSource.h": "50fde36344ca4d97099d8a0749e79ab71f20f260ff5249c80d4dccd86ddb3700"
+  },
+  "dependencies": {
+    "D:/DEV/Kenshi/ours/GlobalSatelliteMap/atlas-view/AtlasReader.h": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed",
+    "D:/DEV/Kenshi/ours/GlobalSatelliteMap/atlas-view/AtlasPolicy.h": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af",
+    "D:/DEV/Kenshi/ours/GlobalSatelliteMap/atlas-terrain/fixed-geometry/FixedTerrainGeometry.h": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698",
+    "D:/DEV/Kenshi/ours/GlobalSatelliteMap/atlas-terrain/fixed-geometry/expected-patch.f32": "100568ef85e501c9362790248b66daf0fdeb29fc0b08ae9944f0f65d9b5d8be2"
+  },
+  "results": {
+    "optimizedChecks": 3478,
+    "unoptimizedChecks": 3478,
+    "compiledRuntimeMutants": 14,
+    "worldBlocks": 256,
+    "partialRowReads": 263360,
+    "windowReadBytes": 541863200,
+    "maxCppAllocation": 2117682,
+    "peakCppTestAllocation": 2624682
+  },
+  "profile": {
+    "path": "data/newland/land/fullmap.tif",
+    "bytes": 536980180,
+    "sha256": "6f7d4bc7baaf80dbf8db91e6f367db71f87fe38f053a34108f192584c9637b18",
+    "width": 16385,
+    "height": 16385,
+    "stripOffset": 43686,
+    "stripBytes": 536936450,
+    "sampleBytes": 2,
+    "sourceStepMeters": 18,
+    "worldExtentMeters": 294912
+  },
+  "logs": {
+    "build.log": "5164091afc340a0c8e6de2b17205510100c781b8a7e7969989b65d70027d21e9",
+    "cache-identity-build.log": "ef22ab483996834f869fd2208f2fd2dcce113e9709cb6d59e428a6cc50d1a4a2",
+    "cache-identity-run.log": "99a174755ced71a107453f7720cefc9b732cbcfce54e774e20f1b7e9ae515f28",
+    "cancel-cache-build.log": "14c4800016fb3c56aff8fb7d62b0230332e0822d91bdaca4f73eb8da02c2322c",
+    "cancel-cache-run.log": "8957e152c3f085fd58f854e5f671f200095549c3922444d0acddf3d3dd680ea5",
+    "debug-build.log": "5164091afc340a0c8e6de2b17205510100c781b8a7e7969989b65d70027d21e9",
+    "debug.log": "0fac77013e537e32ea107567781e62db724901a5b9a4d5ea949078cac4836332",
+    "epoch-build.log": "0746b7b90cb0b94f545bbbe29c2cd67d8527d763bd68c0427a1adf38ca665cb8",
+    "epoch-run.log": "f8c4615e8769d2183393ceb40aa0ba86a570fba65d244c55261b2d1fe890643c",
+    "format-build.log": "efc3f554ba706e70a82858a4662a18b1360f4f57a7857d65baae1244f0e9eed1",
+    "format-run.log": "216cb4f2dad0cafe5d71d8d4f2edfb73131c361d931ee5a76f44600a1dc12e48",
+    "growth-build.log": "fa08b6f571a7c1dd0d63b5ba9aa72bb357d890cd5961c1f4779fd65fe41283da",
+    "growth-run.log": "b401ace30d08c412e5a49c00b0328ef1bc6f1489ab63aa0199133a22ecf46ca5",
+    "halo-build.log": "79dd2bf5989f065001988c50c10b0567dc20e8b88539d6c0aff16d69eeed441a",
+    "halo-run.log": "92585f50a91ab7f3853bd2fc444f855907fff7d0e30fcac862e10b35a7f59d27",
+    "hash-build.log": "10d2e51e7a31fc1f1c724f394351d7f4bd2871c04745efe4aa97dcc81a139005",
+    "hash-run.log": "4c7e4b275ed243713763ffc6f29dfaee4960e4a4862828dad5203b151f7a060a",
+    "hidden-whole-image-build.log": "db8d5567e950c61794c3fe4a00b9e7546db1596082642e93a7aa92d97298e38a",
+    "hidden-whole-image-run.log": "235b35e8447239d17c222d4cf3427e8ca250352d3a71f967ea1e4199ed9f0ef8",
+    "inclusive-cap-build.log": "f1d44fb8efafe8f64e18b68584e3468a8bb2a40ff1d5b20d07c404ff5d477b35",
+    "inclusive-cap-run.log": "5b5f3410d5923b70bf80341bf32a1c0ca24d3e784f3a37ffa347609a3c02bf26",
+    "mutants.log": "f0e79e5690b1c865f3d4e2ce5c24ac135448c0308c4656b4ebf0839b09890537",
+    "partial-clear-build.log": "8452b22b73bd251a0e8a4e4fed85a4861982874b00c45faf424e4383be260857",
+    "partial-clear-run.log": "df117d26441e4773e1d548d1adeb150a8ee03076f254ce17eadb6291cee67fc1",
+    "red.log": "235b35e8447239d17c222d4cf3427e8ca250352d3a71f967ea1e4199ed9f0ef8",
+    "row-offset-build.log": "cf9926b9abfd38b76a1f060358832de88697b569e90218b22cd0eda4ea1af9c9",
+    "row-offset-run.log": "e4c57e96274507c831d8a6ed1205712e14ab756d5fad65b8b71f0f3c4bdc9a0f",
+    "row-stride-build.log": "ea48d9423a7229d6a8169b9668a67521a776d1086227d8e8461e3ce6e417d3fd",
+    "row-stride-run.log": "e4c57e96274507c831d8a6ed1205712e14ab756d5fad65b8b71f0f3c4bdc9a0f",
+    "source.log": "0fac77013e537e32ea107567781e62db724901a5b9a4d5ea949078cac4836332",
+    "source_debug.exe": "177908966b4ad0852ef618c81d362ca56cb9cd87af8a516e5bdab5e019e2e0e6",
+    "source_tests.exe": "70ce8455a86b623f2d2efade38644b13d1122218a659639a2ffbb7b430d78345",
+    "worker-owner-build.log": "5680550327a186593f0d3f2f661462a746ca683ebf184b7ca57d2775540e19d8",
+    "worker-owner-run.log": "8cd6c2e7f517a2ddf9bbc50e15da754ba6f27936e5af2fdac5378e0111730bf3",
+    "world-edge-build.log": "361c5eee4f45e11126e3ea42d5900591c1d3889c0c7e5fcceb174554189b12b6",
+    "world-edge-run.log": "11472303c9832d8064a1d0d58fb0c47ac0924b4401d6383a3c2694a0fb7cae1e"
+  },
+  "limits": {
+    "maxWindowBytes": 2117682,
+    "authScratchBytes": 65536,
+    "maxVertexSide": 1025,
+    "maxSourceSide": 1029
+  },
+  "limitations": [
+    "Exact filesystem base-source profile, not arbitrary live native/mod resource-winner proof.",
+    "One Source owner thread, one explicit window cache; caller controls worker/cancel/join/borrowed lifetimes and total CPU ledger.",
+    "No engine/D3D/render/write/INI/native/process calls or final map integration.",
+    "Instrumented C++ ownership bounds and tested handles do not prove whole-process peak, all leaks or FPS."
+  ]
+}
