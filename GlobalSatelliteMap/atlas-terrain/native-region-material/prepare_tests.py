@@ -1,0 +1,9 @@
+from pathlib import Path
+import hashlib,json,re
+HERE=Path(__file__).resolve().parent;OUT=HERE/'_generated';OUT.mkdir(exist_ok=True);PROBE=HERE.parents[2]/'tools/diagnostics/satellite-capture-probe'
+legacy=PROBE/'region-catalog/build/actual-parameters.cpp';text=legacy.read_text();prefix=text[:text.index('int main(')];prefix=prefix.replace('#include "RegionCatalogData.h"','#include "'+(PROBE/'region-catalog/RegionCatalogData.h').as_posix()+'"').replace('#include "../GeographyPolicy.h"','#include "'+(PROBE/'GeographyPolicy.h').as_posix()+'"')
+loader=text[text.index('std::ifstream input(argv[2]'):text.index('for(unsigned phase=0;phase<3;++phase)')].replace('argv[2]','"record-inputs.bin"').replace('argv[1]','"source.fixture"')
+(OUT/'Fixture.h').write_bytes((prefix+'\nvoid LoadFixtures(){\n'+loader+'\n}\n').encode())
+for name in ['source.fixture','record-inputs.bin']:(OUT/name).write_bytes((PROBE/'region-catalog/build'/name).read_bytes())
+native=Path('D:/DEV/Kenshi/research/gsm-region2-diagnosis-20261103/native-material.bin');proof=Path('D:/DEV/Kenshi/research/gsm-region2-diagnosis-20261103/native-material-proof.json');j=json.loads(proof.read_text());data=native.read_bytes();assert len(data)==3840 and hashlib.sha256(data[:3600]).hexdigest()==j['parameterSha256'] and hashlib.sha256(data[3600:]).hexdigest()==j['distortionSha256'];(OUT/'native-case2.bin').write_bytes(data)
+(OUT/'fixture-pins.json').write_bytes((json.dumps({'legacySourceSha256':hashlib.sha256(legacy.read_bytes()).hexdigest(),'sourceFixtureSha256':hashlib.sha256((OUT/'source.fixture').read_bytes()).hexdigest(),'recordInputsSha256':hashlib.sha256((OUT/'record-inputs.bin').read_bytes()).hexdigest(),'fixtureHeaderSha256':hashlib.sha256((OUT/'Fixture.h').read_bytes()).hexdigest(),'nativeCase2Sha256':hashlib.sha256(data).hexdigest(),'nativeCase2Proof':j},indent=2)+'\n').encode());print('Prepared exact legacy/independent field fixtures and actual native case2 snapshot')

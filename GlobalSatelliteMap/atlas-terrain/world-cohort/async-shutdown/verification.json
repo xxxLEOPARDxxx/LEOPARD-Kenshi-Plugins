@@ -1,0 +1,23 @@
+{
+  "contract": "Main-only Idle/WIdle/no-GPU async Stop; known join and marker before delete; bounded quarantine on unknown state",
+  "files": {
+    "WorldCohort.h": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae",
+    "async-shutdown/tests.cpp": "95341063874970922bba364b29471df907fe11a89d74e64bed9ed6170be34e25",
+    "async-shutdown/run_tests.py": "2cd155ba989d79d75c76408cdf73197d8df267833ab57da2d685ed9467496a0d",
+    "async-shutdown/README.md": "e67327695adcf568e08346cc4faf91d8419d4ecb6fc3f79b6cde7d76f5ccc4cb",
+    "async-shutdown/red-missing-api.log": "04eee7855f3e0fcb80534f42936092796b27ccb4f93691fe10e9355dad5ecdb4"
+  },
+  "results": {
+    "missing-marker-O2.log": "PASS 10 actual idle-worker asynchronous shutdown controls",
+    "missing-marker-Od.log": "PASS 10 actual idle-worker asynchronous shutdown controls",
+    "normal-O2.log": "PASS 95 actual idle-worker asynchronous shutdown controls",
+    "normal-Od.log": "PASS 96 actual idle-worker asynchronous shutdown controls",
+    "timeout-wrap-O2.log": "PASS 10 actual idle-worker asynchronous shutdown controls",
+    "timeout-wrap-Od.log": "PASS 10 actual idle-worker asynchronous shutdown controls",
+    "wait-failed-O2.log": "PASS 9 actual idle-worker asynchronous shutdown controls",
+    "wait-failed-Od.log": "PASS 9 actual idle-worker asynchronous shutdown controls",
+    "wait-failed-request-O2.log": "PASS 8 actual idle-worker asynchronous shutdown controls",
+    "wait-failed-request-Od.log": "PASS 8 actual idle-worker asynchronous shutdown controls"
+  },
+  "limits": "Real WIC idle worker only. No live game, source/raster job, long-duration leak or FPS proof."
+}

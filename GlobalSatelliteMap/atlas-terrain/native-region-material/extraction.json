@@ -1,0 +1,18 @@
+{
+  "PrivateGeographySha256": "f59edcff80aeaef1e606a430a060351519ff706026b5a31e837358bda198ca4e",
+  "PrivateBiomeReferenceSha256": "88d5edfccc3e95845c82829746ee60db392be57777f47561f83f3ad080aaa447",
+  "functions": {
+    "void FillRecord(": "da17620682db0ab99c2115e9e65bf1b0c71f4b2e39a826542954c4c1de61a086",
+    "void ParametersRegion(": "bf618a4413a97ec779ecfe70d6d0faab9ae0f54082e98ab19e4d88a9f263c07b",
+    "static float Float(": "50b6bfcc99e5d2258b1424f5e6fada6b1c5d25d4d3bee219759286e6eab83346",
+    "static std::string File(": "e03a1eff91702da87b2b231a4e089f75e8fbb07b199215bedea5425f3e6fc9e8",
+    "static std::string Canonical(": "aed689d869e0a4a17fe64d33951471c1107f1df5c7627e03d950932d8e196c94",
+    "static std::string Hash(": "c1a8f4915e0a6a5e4c51d5606a044d3a833abd5f1c70174717e94edd615bdb62"
+  },
+  "adaptations": [
+    "GameData type generalized to Access::Record; only GetData/IsBiome/Cell boundary substituted",
+    "PrivateBiomeReference helper names changed only",
+    "Guard file-path copies at MAX_PATH and returned cell bytes at1..2048",
+    "Fresh copied scope, exact material generation, hashes and zero-on-refusal output added"
+  ]
+}

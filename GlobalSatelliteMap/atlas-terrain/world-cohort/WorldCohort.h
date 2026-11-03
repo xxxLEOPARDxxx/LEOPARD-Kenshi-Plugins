@@ -4,7 +4,7 @@ namespace WorldCohort {
 typedef WorldBank::U64 U64;
 using WorldStream::Work;
 using WorldStream::CapturedSources;
-enum Status{Stopped,Booting,Idle,LoadingHeight,InitializingViews,LoadingSource,DecodingSource,UploadingSource,ReleasingSource,BeginningViews,DrawingStage,FinishingViews,QueueReadback,AwaitingGpu,ValidatingPixels,Complete,Cancelling,Failed};
+enum Status{Stopped,Booting,Idle,LoadingHeight,InitializingViews,LoadingSource,DecodingSource,UploadingSource,ReleasingSource,BeginningViews,DrawingStage,FinishingViews,QueueReadback,AwaitingGpu,ValidatingPixels,Complete,Cancelling,Failed,Stopping};
 struct Job{
  SourceReceipts::Scope scope;WorldRaster::Material material;WorldRaster::Shaders shaders;WorldMaterial::Plan plan;
  wchar_t heightPath[260];unsigned count;WorldRaster::Frame frame[4];WorldRaster::Grid grid[4];
@@ -34,7 +34,7 @@ inline QuarantineRecord&Quarantine(){static QuarantineRecord q;return q;}
 template<class Provider>class Controller{
  GpuOwners*gpu_;Provider&provider_;SourceReceipts::MainGate<Provider>gate_;DWORD owner_;Status state_;HRESULT error_;Work*work_;HANDLE thread_;
  bool quarantined_,queryPending_,closeSent_;U64 bankEpoch_;Job job_;WorldNative::SourceFactory factory_;CapturedSources captured_;SourceReceipts::AcceptedReceipt accepted_[15];
- unsigned slot_,input_,cursor_,output_;BYTE shaderCopy_[21920];
+ unsigned slot_,input_,cursor_,output_;DWORD shutdownAt_;BYTE shaderCopy_[21920];
  Controller(const Controller&);Controller&operator=(const Controller&);
  bool OnMain()const{return GetCurrentThreadId()==owner_;}
  LONG WorkerStatus()const{return work_?InterlockedCompareExchange(&work_->state,0,0):WorldStream::WStopped;}
@@ -70,19 +70,19 @@ template<class Provider>class Controller{
   for(unsigned p=0;p<3&&SUCCEEDED(hr);++p){D3D11_TEXTURE2D_DESC t={};t.Width=t.Height=job_.frame[0].side;t.MipLevels=t.ArraySize=t.SampleDesc.Count=1;t.Usage=D3D11_USAGE_STAGING;t.CPUAccessFlags=D3D11_CPU_ACCESS_READ;t.Format=p==0?DXGI_FORMAT_R16G16B16A16_FLOAT:p==1?DXGI_FORMAT_R8G8B8A8_UNORM:DXGI_FORMAT_R32_FLOAT;hr=d->CreateTexture2D(&t,NULL,&gpu_->staging[p].p);}return hr;
  }
 public:
- explicit Controller(Provider&p):gpu_(new GpuOwners),provider_(p),gate_(p),owner_(GetCurrentThreadId()),state_(Stopped),error_(S_OK),work_(NULL),thread_(NULL),quarantined_(false),queryPending_(false),closeSent_(false),bankEpoch_(0),slot_(0),input_(0),cursor_(0),output_(0){std::memset(&job_,0,sizeof(job_));}
+ explicit Controller(Provider&p):gpu_(new GpuOwners),provider_(p),gate_(p),owner_(GetCurrentThreadId()),state_(Stopped),error_(S_OK),work_(NULL),thread_(NULL),quarantined_(false),queryPending_(false),closeSent_(false),bankEpoch_(0),slot_(0),input_(0),cursor_(0),output_(0),shutdownAt_(0){std::memset(&job_,0,sizeof(job_));}
  ~Controller(){Shutdown();if(!quarantined_)delete gpu_;}
- Status State()const{return state_;}HRESULT Error()const{return error_;}unsigned CurrentView()const{return output_;}unsigned CurrentStage()const{return slot_;}unsigned StageCursor()const{return cursor_;}
+ Status State()const{return state_;}HRESULT Error()const{return error_;}bool Quarantined()const{return quarantined_;}unsigned CurrentView()const{return output_;}unsigned CurrentStage()const{return slot_;}unsigned StageCursor()const{return cursor_;}
  U64 CpuReservation()const{return sizeof(Controller)+sizeof(GpuOwners)+sizeof(Work)+WorldHeight::MaxSamples*2+32ULL*1024*1024+512ULL*512*16+WorldHeight::AuthScratch+WorldPixels::Accepted::RequiredBytes(512)-sizeof(WorldPixels::Accepted);}
  U64 MaximumGpuReservation()const{return GpuReservation(CountValid(job_.count)?job_.count:4);}
  U64 OwnedGpuBytes()const{U64 n=gpu_->bank.OwnedGpuBytes();for(unsigned k=0;k<4;++k)n+=gpu_->raster[k].OwnedGpuBytes();for(unsigned p=0;p<3;++p)if(gpu_->staging[p].p)n+=U64(job_.frame[0].side)*job_.frame[0].side*(p?4:8);return n;}
- U64 ReservedGpuBytes()const{return quarantined_||queryPending_||OwnedGpuBytes()||(state_!=Idle&&state_!=Booting&&state_!=Stopped&&state_!=Failed)?MaximumGpuReservation():0;}
+ U64 ReservedGpuBytes()const{return quarantined_||queryPending_||OwnedGpuBytes()||(state_!=Idle&&state_!=Booting&&state_!=Stopped&&state_!=Failed&&state_!=Stopping)?MaximumGpuReservation():0;}
  bool CountedLedger(const WorldBank::Ledger&external,WorldBank::Ledger&out)const{out=external;const unsigned n=CountValid(job_.count)?job_.count:4;return WorldStream::Add(out.carry,U64(n)*WorldRaster::CarryBytes(512))&&WorldStream::Add(out.raster,U64(n)*WorldRaster::MeshBytes(16))&&WorldStream::Add(out.outputs,U64(n)*WorldRaster::TargetBytes(512))&&WorldStream::Add(out.readback,512ULL*512*16)&&WorldBank::Fits(out);}
  HRESULT Start(){
   if(!OnMain()||work_||thread_||quarantined_||CpuReservation()>SourceReceipts::CpuCap||InterlockedCompareExchange(&WorldStream::WorkerSlot(),1,0)!=0)return E_UNEXPECTED;
   Work*w=new(std::nothrow)Work;if(!w){InterlockedExchange(&WorldStream::WorkerSlot(),0);return E_OUTOFMEMORY;}w->wake=CreateEventA(NULL,FALSE,FALSE,NULL);w->cancel=CreateEventA(NULL,TRUE,FALSE,NULL);
   if(!w->wake||!w->cancel){if(w->wake)CloseHandle(w->wake);if(w->cancel)CloseHandle(w->cancel);delete w;InterlockedExchange(&WorldStream::WorkerSlot(),0);return E_FAIL;}
-  HANDLE thread=CreateThread(NULL,0,Work::Run,w,0,NULL);if(!thread){CloseHandle(w->wake);CloseHandle(w->cancel);delete w;InterlockedExchange(&WorldStream::WorkerSlot(),0);return E_FAIL;}work_=w;thread_=thread;state_=Booting;return S_OK;
+  HANDLE thread=CreateThread(NULL,0,Work::Run,w,0,NULL);if(!thread){CloseHandle(w->wake);CloseHandle(w->cancel);delete w;InterlockedExchange(&WorldStream::WorkerSlot(),0);return E_FAIL;}work_=w;thread_=thread;error_=S_OK;shutdownAt_=0;state_=Booting;return S_OK;
  }
  HRESULT Submit(bool enabled,const Job&j,const CapturedSources&tokens,const SourceReceipts::Scope&now){
   if(!enabled)return S_FALSE;if(!OnMain()||state_!=Idle||!work_||WorkerStatus()!=WorldStream::WIdle||quarantined_||now.thread!=owner_||!SourceReceipts::SameScope(j.scope,now)||!ValidJob(j))return E_INVALIDARG;
@@ -95,9 +95,9 @@ public:
   const SatelliteRegion::Region&r=SatelliteRegion::Data.regions[j.frame[0].region];work_->region.x0=(r.worldX+147456)/18+(j.frame[0].cell%4)*512;work_->region.z0=(r.worldZ+147456)/18+(j.frame[0].cell/4)*512;work_->region.x1=work_->region.x0+512;work_->region.z1=work_->region.z0+512;
   if(!Send(WorldStream::Height))return Refuse(E_FAIL);state_=LoadingHeight;return S_OK;
  }
- void Cancel(){if(!OnMain()||!work_||quarantined_||state_==Booting||state_==Stopped)return;if(state_==Idle&&!gpu_->bank.OwnedGpuBytes()&&WorkerStatus()==WorldStream::WIdle&&!work_->height.Ready()&&!work_->pixels.capacity())return;SetEvent(work_->cancel);work_->operation.Cancel();CancelRasters();Fence();state_=Cancelling;}
+ void Cancel(){if(!OnMain()||!work_||quarantined_||state_==Booting||state_==Stopped||state_==Stopping)return;if(state_==Idle&&!gpu_->bank.OwnedGpuBytes()&&WorkerStatus()==WorldStream::WIdle&&!work_->height.Ready()&&!work_->pixels.capacity())return;SetEvent(work_->cancel);work_->operation.Cancel();CancelRasters();Fence();state_=Cancelling;}
  HRESULT Pump(bool enabled,ID3D11Device*d,const SourceReceipts::Scope&now,const WorldBank::Ledger&external){
-  if(!OnMain())return RPC_E_WRONG_THREAD;if(quarantined_)return E_FAIL;if(!work_)return E_UNEXPECTED;LONG w=WorkerStatus();DWORD alive=WaitForSingleObject(thread_,0);if(alive==WAIT_FAILED){Fence();QuarantineOwners();return E_FAIL;}const bool exited=alive==WAIT_OBJECT_0;
+  if(!OnMain())return RPC_E_WRONG_THREAD;if(state_==Stopping)return PollShutdown();if(quarantined_)return E_FAIL;if(!work_)return E_UNEXPECTED;LONG w=WorkerStatus();DWORD alive=WaitForSingleObject(thread_,0);if(alive==WAIT_FAILED){Fence();QuarantineOwners();return E_FAIL;}const bool exited=alive==WAIT_OBJECT_0;
   if(state_==Booting&&!exited){if(w==WorldStream::WBoot)return S_FALSE;if(w==WorldStream::WError){error_=work_->error;state_=Failed;return error_;}state_=Idle;return S_OK;}
   // Latch abnormal exit even when explicit Cancel preceded its observation.
   if(exited){error_=FAILED(work_->error)?work_->error:E_FAIL;if(state_!=Cancelling){CancelRasters();Fence();state_=Cancelling;}}
@@ -142,6 +142,36 @@ public:
   if(++output_<job_.count)state_=QueueReadback;else{FrameClear();captured_=CapturedSources();for(unsigned i=0;i<15;++i)accepted_[i].Clear();state_=Idle;}return S_OK;
  }
  unsigned HeightAuthentications()const{return OnMain()&&work_&&(state_==Idle||state_==Complete)?work_->heightOpens:0;}
+ // Asynchronous retirement is deliberately narrower than final teardown:
+ // Main has already joined all consumers, drained GPU work and closed the bank.
+ // No blocking waits, source reads or GPU operations occur in these two methods.
+ HRESULT RequestShutdown(){
+  if(!OnMain())return RPC_E_WRONG_THREAD;
+  if(quarantined_||state_!=Idle||!work_||!thread_||queryPending_||gpu_->query.p||ReservedGpuBytes()||WorkerStatus()!=WorldStream::WIdle||work_->accepted.Ready())return E_UNEXPECTED;
+  const DWORD wait=WaitForSingleObject(thread_,0);
+  if(wait!=WAIT_TIMEOUT){error_=wait==WAIT_OBJECT_0&&FAILED(work_->error)?work_->error:E_FAIL;QuarantineOwners();return error_;}
+  shutdownAt_=GetTickCount();state_=Stopping;
+  InterlockedExchange(&work_->command,WorldStream::Stop);
+  // Once stop is published, even a wake failure must go through PollShutdown:
+  // the owner and global worker slot remain live until a proven join or quarantine.
+  if(!SetEvent(work_->wake))error_=E_FAIL;
+  return S_OK;
+ }
+ HRESULT PollShutdown(){
+  if(!OnMain())return RPC_E_WRONG_THREAD;
+  if(quarantined_)return FAILED(error_)?error_:E_FAIL;
+  if(!work_&&!thread_&&(state_==Stopped||state_==Failed))return error_;
+  if(state_!=Stopping||!work_||!thread_)return E_UNEXPECTED;
+  const DWORD wait=WaitForSingleObject(thread_,0);
+  if(wait==WAIT_OBJECT_0){
+   if(WorkerStatus()!=WorldStream::WStopped){error_=E_FAIL;QuarantineOwners();return error_;}
+   // Work owns the terminal HRESULT. Latch it BEFORE deleting joined owners.
+   if(FAILED(work_->error))error_=work_->error;
+   ReleaseJoinedWorker();state_=FAILED(error_)?Failed:Stopped;return error_;
+  }
+  if(wait!=WAIT_TIMEOUT||DWORD(GetTickCount()-shutdownAt_)>=5000){error_=wait==WAIT_TIMEOUT?HRESULT_FROM_WIN32(ERROR_TIMEOUT):E_FAIL;QuarantineOwners();return error_;}
+  return S_FALSE;
+ }
  void Shutdown(){
   if(!OnMain()||!work_||quarantined_)return;SetEvent(work_->cancel);work_->operation.Cancel();InterlockedExchange(&work_->command,WorldStream::Stop);SetEvent(work_->wake);Fence();DWORD start=GetTickCount(),wait=WAIT_TIMEOUT;HRESULT drained=S_FALSE;
   do{wait=WaitForSingleObject(thread_,0);drained=Drained();if(wait==WAIT_OBJECT_0&&drained!=S_FALSE)break;if(wait==WAIT_FAILED)break;Sleep(1);}while(GetTickCount()-start<5000);

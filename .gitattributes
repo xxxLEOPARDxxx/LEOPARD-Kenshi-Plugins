@@ -66,6 +66,7 @@ GlobalSatelliteMap/atlas-terrain/fine-viewer/** -text whitespace=blank-at-eol,bl
 GlobalSatelliteMap/atlas-cache/fine-store/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/atlas-cache/fine-worker/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 GlobalSatelliteMap/atlas-terrain/fine-coordinator/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+GlobalSatelliteMap/atlas-terrain/native-region-material/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 tools/diagnostics/satellite-capture-probe/finalize_world_build.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/diagnostics/satellite-capture-probe/test_finalize_world_build.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

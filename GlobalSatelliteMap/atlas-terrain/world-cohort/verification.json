@@ -1,6 +1,6 @@
 {
   "scope": "Isolated two/four-view same-cell terrain cohort; shared frozen plain worker/sourcebank, serial accepted output and CPU borrow; no Main/native integration or writer",
-  "status": "author controls PASS; independent review pending",
+  "status": "Historical raster/borrow evidence retained; current additive async shutdown independently reviewed and tested",
   "recordedUtc": "2026-11-03T06:09:58.446408+00:00",
   "sourceFiles": {
     "contract_tests.cpp": "c030c07f80c7e83dd4a68447f2a17573adf442f1dbb58b7a2b5a52b64303c3a7",
@@ -11,7 +11,7 @@
     "PLAN.md": "4582b11031276c4c9203b5236dc6df577fea676a78b8b054dfb72141c3402a0e",
     "README.md": "8386c7bd860093e2bfdf7b2dc5a058842539876c0d1b3dcb9db30916c0929f36",
     "run_tests.py": "84634f7042bdf7963b48ef8072ef19aef6b04905c2a677a186fd5bcc6dec95ad",
-    "WorldCohort.h": "af238ea65257246f0c68743bb7e92bf4663da292e11cb9c324b7340a637e9a3e"
+    "WorldCohort.h": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae"
   },
   "dependencies": {
     "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include\\BaseTsd.h": "3c3a6c4c0752e0f5bd3cbca58e3dbada10d82f8d51be5fc2c40d3be3068172df",
@@ -228,8 +228,8 @@
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\verification.json": "bfbf93a0038f81c6b84f5473efc7d84306e3f14c940d238e97115cc8fa273079",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\WorldSourceBank.h": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-material\\WorldMaterialPlan.h": "8bb72f85f82a827e5c79f082a9829da5644f8648b289c58aa46cf014dd0cee57",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\SourceFactory.h": "b2d9fd7a185f590b2ad1a705f4588e31e564e16f47084beb6cea6353a37f3e7c",
-    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\verification.json": "41c3f923a000b3ead9d17e2ddd61010caaa9c67a45e5ddc9064c1adb517a1840",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\SourceFactory.h": "eb99bc837c802509585fbbf333eabb374cd666a11d8560d7c6ea26f495de8155",
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\verification.json": "02647c30ac4dca5ee0079cdd825478c8e53e1a1eabb8f1648d7fd69123a79283",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-pixels\\verification.json": "8bdad5e8c4d7ef997f04da8fb45a044a3e51930943541baa9acf6665e242ee60",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-pixels\\WorldPixels.h": "8a0413d58f28728dd0d83e6a3d8a48cbbc9affc23c74d11e9d73453c32d9cc22",
     "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-raster\\verification.json": "9d140c2b98189028d32abbec434bd48875fef2e12787b5108a585f992f82a7ae",
@@ -376,5 +376,30 @@
     "Caller must join every borrowing consumer before Pump/ReleaseView/Cancel/Shutdown/destruction.",
     "Explicit payload caps do not bound opaque WIC/driver/RSS or per-operation latency.",
     "No native API execution, full-world throughput, FPS, long-run leak or publication claim."
-  ]
+  ],
+  "additiveAsyncShutdown": {
+    "recordedUtc": "2026-11-03T11:01:47.073729+00:00",
+    "previousRasterEvidence": {
+      "source": "af238ea65257246f0c68743bb7e92bf4663da292e11cb9c324b7340a637e9a3e",
+      "recordedUtc": "2026-11-03T06:09:58.446408+00:00",
+      "copiedCpuBytes": 44514346
+    },
+    "currentHeaderSha256": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae",
+    "focusedEvidence": "async-shutdown/verification.json",
+    "focusedEvidenceSha256": "40a7e72f31e5bc22ac38da42d98578e1410e68968dbbbdb5fe2659a73b9fc700",
+    "independentReview": "D:/DEV/Kenshi/ours/docs/verification/2026-11-03-satellite-native-material-and-idle-stop-review.md",
+    "dependencyRepins": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\SourceFactory.h",
+        "before": "b2d9fd7a185f590b2ad1a705f4588e31e564e16f47084beb6cea6353a37f3e7c",
+        "after": "eb99bc837c802509585fbbf333eabb374cd666a11d8560d7c6ea26f495de8155"
+      },
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\verification.json",
+        "before": "41c3f923a000b3ead9d17e2ddd61010caaa9c67a45e5ddc9064c1adb517a1840",
+        "after": "02647c30ac4dca5ee0079cdd825478c8e53e1a1eabb8f1648d7fd69123a79283"
+      }
+    ],
+    "note": "The old raster executable/log/source CPU44514346B metrics remain historical. They were not rerun or represented as current after the new shutdown timestamp/sizeof change. Current async host tests compile the real changed header under VC10 Od/O2; full renderer/native/live validation belongs to parent."
+  }
 }

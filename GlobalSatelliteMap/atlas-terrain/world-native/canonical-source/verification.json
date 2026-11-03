@@ -1,7 +1,7 @@
 {
   "scope": "Canonical resource group routing and real same-size physical DDS collision; fake metadata namespaces, actual production receipt/worker code, no native game API execution",
   "status": "author controls PASS; independent review pending",
-  "recordedUtc": "2026-11-03T09:37:04.003643+00:00",
+  "recordedUtc": "2026-11-03T09:39:00.738975+00:00",
   "sourceFiles": {
     ".gitignore": "9e7f92b9d91aca493d7ab1632b3d4285c0591c88e3965d11bcda01a9bcc9d7cc",
     "freeze.py": "5be455d6317d095302d8798cc791964ad00c0a9a1fec1d8e622ff56534959006",
