@@ -41,6 +41,7 @@ template<class Factory,class Config>class Worker {
   if(!Main()||quarantined_)return -1;if(!work_)return 1;if(!stopping_)return -1;
   DWORD wait=WaitForSingleObject(thread_,timeout);if(wait==WAIT_TIMEOUT){if(retainTimeout)Retain();return retainTimeout?-1:0;}
   if(wait!=WAIT_OBJECT_0||InterlockedCompareExchange(&work_->finished,0,0)!=1){Retain();return -1;}
+  if(FAILED(work_->error)&&SUCCEEDED(error_))error_=work_->error;
   CloseHandle(thread_);thread_=NULL;CloseHandle(work_->wake);CloseHandle(work_->cancel);delete work_;work_=NULL;pending_=false;return 1;
  }
 public:

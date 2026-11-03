@@ -53,3 +53,5 @@ GlobalSatelliteMap/atlas-terrain/world-layout/** -text whitespace=blank-at-eol,b
 GlobalSatelliteMap/atlas-cache/world-window-session/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 GlobalSatelliteMap/atlas-terrain/world-native-rebind/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+GlobalSatelliteMap/atlas-terrain/world-build/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

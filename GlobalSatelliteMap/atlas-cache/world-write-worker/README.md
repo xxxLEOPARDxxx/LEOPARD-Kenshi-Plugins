@@ -24,6 +24,8 @@ Shutdown or destroy it while the writer is unacknowledged.** Cancel signals the
 writer event first. TryJoin polls with zero wait (0 pending,1 joined,-1 refusal)
 for ordinary asynchronous cancellation. Join is an explicit teardown operation with a5s bound and
 returns true only after the thread exits with the final cleanup marker. Main
+also reads Error after a known join: cleanup completion does not imply successful
+file work. Reap preserves a terminal worker HRESULT before destroying Work.
 must finish this join before cancelling or releasing the parent. Unknown waits,
 timeouts or an absent finish marker retain the complete worker and report
 Quarantined; the containing parent must likewise be retained with its CPU/GPU

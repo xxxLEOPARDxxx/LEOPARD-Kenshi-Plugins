@@ -1,0 +1,298 @@
+{
+  "scope": "Isolated actual WIC/WARP cohort to accepted Session worker; no native caller/installation/atlas publication",
+  "status": "author PASS; independent review pending",
+  "sources": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\.gitignore": {
+      "bytes": 25,
+      "sha256": "5db0aced9132d0bfd3f66b534f57db5da873cde09985ec2a2a2a1cd6ee492718"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\build_tests.cpp": {
+      "bytes": 6136,
+      "sha256": "005f9621f598433457080384bebf5a38b6fdeb0d0d56ec8e5b6e02798e965ad1"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\freeze.py": {
+      "bytes": 1867,
+      "sha256": "14399580212228e6ee74c0f7712e15d37b372c2c798e1327811b8dc9a98907f1"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\README.md": {
+      "bytes": 5151,
+      "sha256": "f25812e715dd71604c04b69404b0ea3501088e5ce4d9493fe4103991c09176a7"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\run_tests.py": {
+      "bytes": 1288,
+      "sha256": "46ae86ab5e9316002df204a1c0483d25d58267461c02be4194e5bb59b4007eab"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\test_graceful_error.py": {
+      "bytes": 4622,
+      "sha256": "dd30eae9313e60695f7c34bd84df279a21aa156a35b5ba8c9f3b8495ba46673e"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\WorldBuildControl.h": {
+      "bytes": 6927,
+      "sha256": "1ec7a61071ded9363af95e153df28c468e8b32cf8c9d0ac98a377605dfe7c471"
+    }
+  },
+  "dependencies": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native-rebind\\tests.cpp": {
+      "bytes": 9066,
+      "sha256": "afe1b253a389497f71e3dc15cb6b03a254b81c93d27f008464d1f6c13bc99292"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\flow_tests.cpp": {
+      "bytes": 14704,
+      "sha256": "98e8fba5c504d2033424c1dd273193f75a87e2f677e6f3711859cfbc437628a4"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-stream\\flow_tests.cpp": {
+      "bytes": 12613,
+      "sha256": "efba3c273382e40ec2f23f24a19b79afc9152b85fc489e79168434ba9064b09a"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-stream\\WorldStream.h": {
+      "bytes": 21000,
+      "sha256": "85ed283b33e0fcc602f04b1a0d420ca428058e0a9272d7d27beaba5da7f362f5"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-raster\\WorldTerrainRaster.h": {
+      "bytes": 18321,
+      "sha256": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\WorldSourceBank.h": {
+      "bytes": 12242,
+      "sha256": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-material\\WorldMaterialPlan.h": {
+      "bytes": 6246,
+      "sha256": "8bb72f85f82a827e5c79f082a9829da5644f8648b289c58aa46cf014dd0cee57"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasPolicy.h": {
+      "bytes": 3014,
+      "sha256": "b934b9c95fcfce27fdd1032dfea874210de388268aebd2e652291ccca0b373af"
+    },
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\RegionCatalogData.h": {
+      "bytes": 259179,
+      "sha256": "bd85da4b86a5e13bafd3ab9793c9a5f7ac3047488e57c813e430ade5d40f426f"
+    },
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\region-catalog\\RegionCatalog.h": {
+      "bytes": 8174,
+      "sha256": "b62a97f0ad4fe4c01966eb43a672e4df9298ce51c566ab2db8931f4b90f5aefb"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasRelight.h": {
+      "bytes": 15788,
+      "sha256": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-view\\AtlasReader.h": {
+      "bytes": 4576,
+      "sha256": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed"
+    },
+    "D:\\DEV\\Kenshi\\ours\\tools\\diagnostics\\satellite-capture-probe\\GeographyPolicy.h": {
+      "bytes": 3190,
+      "sha256": "b5e183396b502ffb4ae72b30c915f16212303ba0e86b52b3c0fb4bf0cc042a95"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-bank\\_generated\\DecodedPins.h": {
+      "bytes": 33086,
+      "sha256": "407a537bc08b96febae1f6a2b6f23d01ffd97ec420e03253a77677df6308646a"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\fixed-geometry\\FixedTerrainGeometry.h": {
+      "bytes": 3646,
+      "sha256": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\staged-material\\StagedMaterial.h": {
+      "bytes": 2970,
+      "sha256": "4d0bcdd32180541b59085e18d0f444f061a3f8b8bebc367196b63765711677bb"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\raster\\FixedTerrainRaster.h": {
+      "bytes": 12234,
+      "sha256": "0ad68d252def4cb538161eedaf42116d9ff7bc458d5e8a88041309223594609f"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\CompactMaterial.h": {
+      "bytes": 5756,
+      "sha256": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\Case.h": {
+      "bytes": 8068,
+      "sha256": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-models\\GraphicsState.h": {
+      "bytes": 4027,
+      "sha256": "c5f3e311d81d88181882232fd85c337c1dbfb2cb6399d366853abece58ae58ac"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-source\\WorldHeightSource.h": {
+      "bytes": 7640,
+      "sha256": "50fde36344ca4d97099d8a0749e79ab71f20f260ff5249c80d4dccd86ddb3700"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\png-source\\PinnedPng.h": {
+      "bytes": 4211,
+      "sha256": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\MainGate.h": {
+      "bytes": 4820,
+      "sha256": "9da2c4f1c09542a6c5a32d46dda9392471d30f6a6922e3ff5effbf9572ade2b7"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\WorkerFileLease.h": {
+      "bytes": 4986,
+      "sha256": "887c19c77044eb61d50930502a1fffa8c83b016fa5235d82548b07aaa3871d30"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\source-receipts\\ReceiptPolicy.h": {
+      "bytes": 6662,
+      "sha256": "ff91b3628e5a2e4099c4b1ebbf584c39fd38834b145f6a17034f9f8532a27a52"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\SourceFactory.h": {
+      "bytes": 5420,
+      "sha256": "b2d9fd7a185f590b2ad1a705f4588e31e564e16f47084beb6cea6353a37f3e7c"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-pixels\\WorldPixels.h": {
+      "bytes": 8389,
+      "sha256": "8a0413d58f28728dd0d83e6a3d8a48cbbc9affc23c74d11e9d73453c32d9cc22"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\compact-material\\_generated\\Shaders.h": {
+      "bytes": 101535,
+      "sha256": "461631a275ee0240566c8eee6fb5a75291e287c95aa85bf9ca31ab663c23f315"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\staged-material\\_generated\\StagedShaders.h": {
+      "bytes": 42093,
+      "sha256": "dd33a9b8f84201446bdf18b28ddf0c2c3f4cc39cee439da2e6e41a6e4c606141"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\WorldCohort.h": {
+      "bytes": 21113,
+      "sha256": "af238ea65257246f0c68743bb7e92bf4663da292e11cb9c324b7340a637e9a3e"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\accepted-window\\AcceptedWindow.h": {
+      "bytes": 4692,
+      "sha256": "71dd16bba54fd1e69a5fbf7872bac14edfbf5dec2932b4f28ae2d109a4bd4899"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native-rebind\\NativeRebind.h": {
+      "bytes": 7542,
+      "sha256": "0435317234a3e3ba55b3ba53a6884b9a0f90279708cc62fb8aa8c06d52d3d85c"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native\\StageAdapter.h": {
+      "bytes": 4180,
+      "sha256": "0554fd314cf6c4acb9c5942cfa062d66250d8a5bfcb4b8de8dbafb148a2d5937"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\world-write-worker\\WorldWriteWorker.h": {
+      "bytes": 6468,
+      "sha256": "daf61ef19fe20f1a0b37f9bbcdc6880c7862e5c0d00bb5ec00d3ac2f764cca3a"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\world-window-session\\WorldWindowSession.h": {
+      "bytes": 6356,
+      "sha256": "58897825667c60f408c990651085ac02737bdaf136d8a1f6e0b72a993e0cb71e"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\window-writer512\\WindowWriter512.h": {
+      "bytes": 4765,
+      "sha256": "dcf946a92da69810ffa65b118c781d74280f24b4e78a996d731cd30ae2e51d3a"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\Gst2Writer.h": {
+      "bytes": 5330,
+      "sha256": "cd21403b4a2115ed1ba59ef4adce91d62b602b40640dd01b84152f1c8750001b"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-native-rebind\\verification.json": {
+      "bytes": 156315,
+      "sha256": "2a110152a9c3b3b62541f2aa775d0bb066faf04c7929455393aae5c9ca131957"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\verification.json": {
+      "bytes": 48395,
+      "sha256": "bb238e5523ecc45b1f669d778527ff0c93365d80ca0a013a2ad912351f9580ed"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\world-window-session\\verification.json": {
+      "bytes": 22223,
+      "sha256": "866f6792a3a452cdeb1760ff6792b13254ed5319202afc1dc4afa4cd2be7d78f"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-cache\\world-write-worker\\verification.json": {
+      "bytes": 12958,
+      "sha256": "35b1612f85f2f48ff48d7f3f296b4ae4009e1a047297be4cc71c18be1d76dad7"
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\newland\\land\\fullmap.tif": {
+      "bytes": 536980180,
+      "sha256": "6f7d4bc7baaf80dbf8db91e6f367db71f87fe38f053a34108f192584c9637b18"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-0-accepted-0.bin": {
+      "bytes": 2097152,
+      "sha256": "030f034a03b9faf8dd6da601796cc203a1a5e1a68daf8391d9dc2c1e04816aa6"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-0-accepted-1.bin": {
+      "bytes": 1048576,
+      "sha256": "cb6b9b584d24298446a4ae63d36dd082ed3fa470b423392f52cf6d761db6c327"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-0-accepted-2.bin": {
+      "bytes": 1048576,
+      "sha256": "4f6a506c7e7c603e7e300d9284b2ed42d9e5f192f8a64ab554165bf7ad6c77f8"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-1-accepted-0.bin": {
+      "bytes": 2097152,
+      "sha256": "bea8dcd044bad6541f184fedbf03d13ba01c133148776e0d39364fe1a579005f"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-1-accepted-1.bin": {
+      "bytes": 1048576,
+      "sha256": "4723fc9156a892af3e072cf54513040a7744f5cc8f0640171d2fac93c5d6673e"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-1-accepted-2.bin": {
+      "bytes": 1048576,
+      "sha256": "c5888d610e41280a4756921452d1c5e6a6436e680653cf4313eedce97e5e1787"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-2-accepted-0.bin": {
+      "bytes": 2097152,
+      "sha256": "6036dc54be2f12bb1d199cd002dd1feca2f7f9906bdaba5d17f68bcea9209b23"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-2-accepted-1.bin": {
+      "bytes": 1048576,
+      "sha256": "af544ce97e259f97133ccd9bbd13dcbfeb433b4571bfecfdd38b3ae054448b16"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-2-accepted-2.bin": {
+      "bytes": 1048576,
+      "sha256": "6bb1bb37ddccf38b1e1b7256020bffd8f14e671007a589d57f8f173a4a806190"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-3-accepted-0.bin": {
+      "bytes": 2097152,
+      "sha256": "4f540c00ad24a812116e44b430e62ea1c6790cf2c71a64ff7bbb3f7ba492b218"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-3-accepted-1.bin": {
+      "bytes": 1048576,
+      "sha256": "8a2cfca712143f4076cf3720406bc023f224d6ed94c57d6003717dccb4880781"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-cohort\\_generated\\sequential-3-accepted-2.bin": {
+      "bytes": 1048576,
+      "sha256": "c0f7586fbad033d83d0a57289e3f1e0da31a75211b0f1360c6d9ad0cbf7517c6"
+    }
+  },
+  "evidence": {
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildO2-compile.log": {
+      "bytes": 709,
+      "sha256": "60b6f0134a66bbc1f6281de4891c7fe3a6a87253e08c81ec5d4a622ae06c8e91"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildO2-imports.log": {
+      "bytes": 5702,
+      "sha256": "c7e02d8711dac21cc855e5411b16e158f56a03f7b3498b527a238f39f6875721"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildO2-run.log": {
+      "bytes": 53,
+      "sha256": "1fbd94f1abecea0c12d48bfe82bb76ee93d0e31eb0cbdb9c592982a15fc35ad4"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildO2.exe": {
+      "bytes": 515584,
+      "sha256": "da6607fae25d515e7f4ff90eac2bf5f610e912ede13f0532ca2823c237b687af"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildOd-compile.log": {
+      "bytes": 709,
+      "sha256": "60b6f0134a66bbc1f6281de4891c7fe3a6a87253e08c81ec5d4a622ae06c8e91"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildOd-imports.log": {
+      "bytes": 5702,
+      "sha256": "d2185bcc79ff055f8940c03addac7f5b88ca5c08bf7fd95f007539da76c99864"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildOd-run.log": {
+      "bytes": 53,
+      "sha256": "20d8443d8b6ad833af92535e6457f38594366fe6427dbf4c22671e3043f52818"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\buildOd.exe": {
+      "bytes": 683520,
+      "sha256": "76fcb8806c2a3c5494767d09891ec2935a3ed49b90e9d04d06dc804cdb436906"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\graceful-regression\\graceful-exit-build.log": {
+      "bytes": 696,
+      "sha256": "9efa09539a63aa444fa0e74d5c8b1343eed2a9257083ea423d8cdc0e19b05594"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\graceful-regression\\graceful-exit.exe": {
+      "bytes": 510464,
+      "sha256": "a723400be6e6668a5125fed24276870accc9b8419457325ba7d9e246885ee14a"
+    },
+    "D:\\DEV\\Kenshi\\ours\\GlobalSatelliteMap\\atlas-terrain\\world-build\\_generated\\graceful-regression\\graceful-exit.log": {
+      "bytes": 58,
+      "sha256": "c73174e62eeed782a29f4eaefba5b765ad46d85658b44a0e80d80afeb0b15e5b"
+    }
+  }
+}

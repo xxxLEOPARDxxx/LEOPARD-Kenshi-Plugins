@@ -1,5 +1,7 @@
 # Independent write-worker and layout review
 
+**Superseded worker pin:** A later concrete parent-integration review found P2 EOF error loss. Independently reproduced at both optimizations; see `eof-addendum.md`. The original worker CLEAR below is historical and does not authorize the unfixed worker. The amended `daf61ef1` header/`35b1612f` manifest now pass the same14-control EOF regression at O2/Od and close the worker finding. Parent post-join error handling remains separately reviewed. Layout remains CLEAR.
+
 Verdict: CLEAR for these two primitives at the pins below. No remaining confirmed P1/P2 finding and no source correction requested. This is conditional on the documented immutable CPU borrow, factory/config and parent quarantine contracts; it is not approval of an unreviewed Main/native integration or atlas publication.
 
 | Scope | Header SHA256 | Frozen manifest SHA256 |

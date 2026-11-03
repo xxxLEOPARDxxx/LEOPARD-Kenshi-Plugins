@@ -1,0 +1,23 @@
+from pathlib import Path
+import os,re,subprocess,sys,json
+HERE=Path(__file__).resolve().parent;ROOT=HERE.parent.parent;OWNER=HERE;OUT=OWNER/'_generated/graceful-regression';OUT.mkdir(exist_ok=True)
+def absolute(t,b):return re.sub(r'^\s*#include\s+"([^"]+)"',lambda m:'#include "'+(b/m[1]).resolve().as_posix()+'"',t,flags=re.M)
+worker=absolute((ROOT/'atlas-cache/world-write-worker/WorldWriteWorker.h').read_text(),ROOT/'atlas-cache/world-write-worker')
+worker=worker.replace('namespace WorldWrite {','namespace Failure {static volatile LONG failWake=0;static DWORD Wake(HANDLE h){DWORD r=::WaitForSingleObject(h,INFINITE);return InterlockedExchange(&failWake,0)?WAIT_FAILED:r;}}\nnamespace WorldWrite {',1).replace('WaitForSingleObject(w.wake,INFINITE)','Failure::Wake(w.wake)')
+old=' Worker():work_(NULL)';assert worker.count(old)==1;worker=worker.replace(old,' HANDLE ReviewThread()const{return thread_;}void ReviewFailWake(){InterlockedExchange(&Failure::failWake,1);SetEvent(work_->wake);}\n'+old)
+(OUT/'Writer.h').write_text(worker)
+header=absolute((OWNER/'WorldBuildControl.h').read_text(),OWNER);old='"'+(ROOT/'atlas-cache/world-write-worker/WorldWriteWorker.h').as_posix()+'"';assert header.count(old)==1;header=header.replace(old,'"'+(OUT/'Writer.h').as_posix()+'"')
+old=' Controller():owner_(NULL)';assert header.count(old)==1;header=header.replace(old,' HANDLE ReviewWriterThread()const{return owner_->writer.ReviewThread();}void ReviewFailWake(){owner_->writer.ReviewFailWake();}\n'+old);(OUT/'Build.h').write_text(header)
+prefix=absolute((OWNER/'build_tests.cpp').read_text().split('int main()')[0],OWNER).replace('"'+(OWNER/'WorldBuildControl.h').as_posix()+'"','"'+(OUT/'Build.h').as_posix()+'"')
+body=r'''
+int main(){try{AtlasView::Com<ID3D11Device>d;AtlasView::Com<ID3D11DeviceContext>ctx;C(SUCCEEDED(D3D11CreateDevice(NULL,D3D_DRIVER_TYPE_WARP,NULL,0,NULL,0,D3D11_SDK_VERSION,&d.p,NULL,&ctx.p)),"own WARP");SourceReceipts::Scope scope={GetCurrentThreadId(),7,0x100000007ULL,0x300000005ULL};Stats stats={};stats.main=scope.thread;std::vector<BYTE>expected[4][3];WorldWindow::Ledger external;external.other=sizeof(stats);for(unsigned n=0;n<4;++n)for(unsigned p=0;p<3;++p){char path[160];sprintf(path,"../world-cohort/_generated/sequential-%u-accepted-%u.bin",n,p);expected[n][p]=Read(path);stats.expected[n][p]=&expected[n][p][0];external.other+=expected[n][p].capacity();}Config config={&stats};Build b;C(b.Begin(scope,0x900000001ULL,config,external),"actual build begins");Run(b,d.p,scope,true);WorldCohort::Job*j=new WorldCohort::Job;InitJob(*j,scope);j->count=2;C(b.Queue(*j)&&Run(b,d.p,scope,false)==1&&b.Ready()&&b.Windows()==2,"real writes acknowledged before isolated writer exit");
+ b.ReviewFailWake();C(WaitForSingleObject(b.ReviewWriterThread(),5000)==WAIT_OBJECT_0,"actual idle writer exits after wake wait failure");C(b.Complete(),"Complete checks current cached readiness");DWORD start=GetTickCount();int result=0;while(b.Active()&&GetTickCount()-start<10000){result=b.Tick(true,d.p,scope);Sleep(1);}printf("observed result=%d error=%08x active=%u filesClosed=%ld\n",result,unsigned(b.Error()),unsigned(b.Active()),stats.closes);C(result==-1&&FAILED(b.Error())&&!b.Active(),"graceful EOF propagates already-failed writer instead of positive completion");delete j;return 0;}catch(...){return 1;}}
+'''
+(OUT/'graceful-exit.cpp').write_text(prefix+body)
+VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');ENV=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64');exe=OUT/'graceful-exit.exe'
+p=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/O2','/MT','/W3',str(OUT/'graceful-exit.cpp'),'/Fo'+str(exe.with_suffix('.obj')),'/Fe'+str(exe),'/link','d3d11.lib','dxgi.lib','advapi32.lib','ole32.lib','windowscodecs.lib'],cwd=OWNER,env=ENV,capture_output=True,text=True);(OUT/'graceful-exit-build.log').write_text(p.stdout+p.stderr);assert not p.returncode,p.stdout+p.stderr
+sys.path.insert(0,'D:/DEV/Kenshi/ours/SkillLevelUpInfo/tests/_tools');import pefile
+imports=[d.dll.decode()for d in pefile.PE(str(exe)).DIRECTORY_ENTRY_IMPORT];assert not any('ogre'in x.lower()or'kenshi'in x.lower()for x in imports);(OUT/'graceful-exit-imports.json').write_text(json.dumps(imports,indent=2)+'\n')
+p=subprocess.run([str(exe)],cwd=OWNER,capture_output=True,text=True);(OUT/'graceful-exit.log').write_text(p.stdout+p.stderr);print(p.stdout+p.stderr,end='');print('exit',p.returncode)
+
+assert p.returncode == 0, 'terminal writer error must reach graceful EOF result'
