@@ -19,8 +19,10 @@ within an owner retain their accepted warm-cache behaviour.
 Verification:
 
 - Native VC10 /GL /LTCG build passes86-import/startPlugin/MCM checks.
-- Candidate SHA2567f765299e067b1833acbe6aa6f48ef60cd8047ca46cadb364e984860b8729f2a,
-  1,226,752B. Log: build/GlobalSatelliteMap/layered-budget-build.log.
+- Final candidate SHA2566fdcf9b880e7cc8aadadc381339b172b374b3a3741dde81217153df75d0821f1,
+  1,227,264B. Log: build/GlobalSatelliteMap/layered-budget-build.log.
+  It also preserves the first nearer town's bounded capture-refusal diagnostic
+  when a later fallback succeeds; no city-selection or geometry guess is made.
 - Actual startup header plus extracted actual MakeBudget/native reservation:
   24 controls per/Od,/O2, including actual observed7,880,725B external CPU,
   full256 fine slots, pending/retired/overflow and physical boundaries.
@@ -41,3 +43,12 @@ long-session FPS/memory or support for lower-end GPUs. The512MiB development
 profile excludes Kenshi/driver allocations; coherent selectable smaller budgets
 and constrained-hardware acceptance are explicitly recorded before public release.
 No atlas rerender, personal setting change or public release is part of this repair.
+
+Separate bounded read-only investigation establishes Hub id2 is first1026m,
+Rebel Base134 second4998m and Factory85 third5878m. The Hub has131 active
+potentially supported instances below the checked caps. Its exact native refusal
+is not present in the old log because success134 erased it. The final diagnostic
+retains that reason with town id/HRESULT, at most one fixed-size source message
+per capture attempt, deduplicated by the existing caller. Independent review CLEAR.
+Evidence: research/gsm-loaded-town-selection-20261104/report.txt and JSON;682128B
+read only, no engine calls or process writes.

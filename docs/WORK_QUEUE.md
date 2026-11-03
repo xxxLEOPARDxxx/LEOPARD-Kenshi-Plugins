@@ -28,11 +28,14 @@ Always check the actual process immediately before replacing a loaded DLL.
    Stale worker results after option toggles are discarded by epoch.
 
    The first city candidate regressed x6/x8: measured viewer34,143,518B exceeded
-   its old32MiB sublimit. A checked repair is built7f765299e067b1833acbe6aa6f48ef60cd8047ca46cadb364e984860b8729f2a:
+   its old32MiB sublimit. A checked repair is built6fdcf9b880e7cc8aadadc381339b172b374b3a3741dde81217153df75d0821f1:
    viewer40MiB inside unchanged512MiB, separate fine-cache startup attribution,
    and old-stamp retirement before fresh identity. Tests/review pass; installation
    and live image acceptance are pending. Smaller selectable GPU budgets and
    constrained-machine checks remain required before release, not implemented.
+   Final candidate retains the first nearer town refusal even when a later town
+   succeeds. RPM proves Hub2 first and131 active supported candidates; the old
+   log erased its exact refusal. Do not change ordering or bounds on a guess.
 
    Next: actual Hub buildings/walls/stalls picture, then remaining object/material
    families and unloaded-city detail. Fog, biome/diplomatic zones and roads follow

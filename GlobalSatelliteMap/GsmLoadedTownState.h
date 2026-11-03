@@ -2,6 +2,7 @@
 #include "atlas-models/loaded-instances/NativeInstances.h"
 #include "atlas-models/ModelRegion.h"
 #include <memory>
+#include <sstream>
 namespace GsmLoadedTown {
 // One already loaded town. A successful capture owns only copied values and
 // COM references. Never load zones or keep a native Town/Building pointer.
@@ -34,6 +35,7 @@ public:
             Ogre::SceneManager*scene,const void*king,LONG generation,volatile LONG*live,
             bool verified,ID3D11Device*device,AtlasView::U64 otherBuffers,
             AtlasView::U64 otherTextures,std::string&error){
+        error.clear();
         if(!verified||!scene||!king||!device||!live||generation<=0||values.generation!=generation||
             !rawCamera||!origin||!AtlasModels::Finite(rawCamera,3)||!AtlasModels::Finite(origin,3)||
             values.count>GsmTownDiagnostic::Limit||!GsmTownValues::Generation(live,generation)){
@@ -56,12 +58,18 @@ public:
                 HRESULT hr=fresh->Read(true,town,scene,generation,live,true,device,
                     otherBuffers+BorrowedBuffers(),otherTextures+BorrowedTextures());
                 if(!GsmTownValues::Generation(live,generation)){Clear();return E_ABORT;}
-                if(hr==E_ABORT)continue;
-                if(FAILED(hr)){error=fresh->LastError();continue;}
+                // A successful fallback must not erase the first nearer town's
+                // refusal. Keep one bounded reason for the caller's deduplicated
+                // error log; expected empty E_ABORT remains a quiet retry.
+                if(FAILED(hr)){
+                    const char*why=fresh->LastError();
+                    if(error.empty()&&(hr!=E_ABORT||(why&&*why))){std::ostringstream row;row<<"town="<<id<<" hr="<<std::hex<<unsigned(hr)<<" "<<(why?why:"");error=row.str();}
+                    continue;
+                }
                 if(hr!=S_OK||!fresh->Geometry().Count())continue;
                 AtlasModelRegion::Bounds b;if(!Bounds(fresh->Geometry(),b)||std::memcmp(fresh->Geometry().SourceSceneOrigin(),origin,12))continue;
-                if(town_==id&&snapshot_.get()&&snapshot_->Geometry().SameContents(fresh->Geometry())){error.clear();return S_FALSE;}
-                snapshot_=fresh;bounds_=b;town_=id;generation_=generation;scene_=scene;Dirty();error.clear();return S_OK;
+                if(town_==id&&snapshot_.get()&&snapshot_->Geometry().SameContents(fresh->Geometry()))return S_FALSE;
+                snapshot_=fresh;bounds_=b;town_=id;generation_=generation;scene_=scene;Dirty();return S_OK;
             }
             Clear();return S_FALSE;
         }catch(const std::exception&e){error=e.what();Clear();return E_FAIL;}
