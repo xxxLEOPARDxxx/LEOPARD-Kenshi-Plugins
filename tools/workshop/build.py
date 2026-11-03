@@ -91,7 +91,7 @@ ITEMS = [
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en='Let a conscious patient help with their own treatment, including repair of robotic limbs on biological characters.'),
     # --- новые, 05.10.2026 (Nexus 2201-2205) ---
-    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="11",
+    dict(mod="ModConfigMenu", title="Mod Config Menu (QoL)", nexus=2202, version="12",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en='In-game settings for RE_Kenshi plugins, with tooltips, page scrolling and keyboard or mouse binding support.'),
     dict(mod="QuickStartSelect", title="Quick Start Select (QoL)", nexus=2201, version="7",

@@ -62,17 +62,13 @@
     ]
   },
   "ModConfigMenu": {
-    "version": "11",
-    "published_version": "10",
+    "version": "12",
+    "published_version": "11",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "[b]Mod-list scrolling.[/b] The scrollbar sits between the mod buttons and the divider without cutting their borders, in vanilla and modified interfaces."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "[b]Прокрутка списка модов.[/b] Ползунок располагается между кнопками модов и разделителем, не подрезая рамки, в ванильном и изменённых интерфейсах."
     ]
   },
   "BetterLooting": {
