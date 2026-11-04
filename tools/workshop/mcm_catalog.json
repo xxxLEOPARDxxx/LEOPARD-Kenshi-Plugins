@@ -93,7 +93,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "public": false
   },
   {
     "package": "GearCompare",
@@ -569,7 +570,8 @@
         "method": "bridge"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "public": false
   },
   {
     "package": "Organize-the-Trader",
@@ -654,7 +656,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "public": false
   },
   {
     "package": "StackSort",
@@ -728,7 +731,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "public": false
   },
   {
     "package": "KEO",
@@ -745,6 +749,7 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "public": false
   }
 ]

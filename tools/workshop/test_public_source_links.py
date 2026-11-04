@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import unittest
 
-from publication_sections import public_source_links, OUR_REPOSITORY_URL
+from publication_sections import public_source_links, OUR_REPOSITORY_URL, supported_section
 from validate_descriptions import player_feature_claims
 
 PLUGINS='https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins'
@@ -34,7 +34,7 @@ class SourceLinkPolicy(unittest.TestCase):
     def test_mcm_is_byte_preserved_and_requires_both_repositories(self):
         source='Our repositories: [url='+PLUGINS+']Plugins[/url], [url='+FORKS+']Forks[/url].'
         self.assertEqual(public_source_links('ModConfigMenu',source),source)
-        player_feature_claims('ModConfigMenu',source,'fixture')
+        player_feature_claims('ModConfigMenu',supported_section('en')+source,'fixture')
         with self.assertRaises(ValueError):player_feature_claims('ModConfigMenu',PLUGINS,'fixture')
 
     def test_other_mod_rejects_our_namespace(self):
@@ -52,7 +52,7 @@ class SourceLinkPolicy(unittest.TestCase):
             for lang,text in pair.items():
                 with self.subTest(mod=mod,lang=lang):
                     self.assertEqual(public_source_links(mod,text),text)
-                    player_feature_claims(mod,text,'canonical fixture')
+                    player_feature_claims(mod,(supported_section(lang)+text) if mod=='ModConfigMenu' else text,'canonical fixture')
 
 
 if __name__=='__main__':unittest.main()

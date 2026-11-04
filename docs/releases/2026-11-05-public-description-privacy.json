@@ -1,0 +1,21 @@
+{
+  "time_msk": "2026-11-05T02:47:02.808343+03:00",
+  "status": "description_privacy_correction_only_no_new_public_version",
+  "live_steam_evidence": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\mcm-privacy-20261105\\correction_verified.json",
+  "public_catalog_count": 38,
+  "internal_catalog_count": 43,
+  "mcm13_repack": {
+    "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\ModConfigMenu-13.zip",
+    "bytes": 148402,
+    "sha256": "8e7fa92a3b8707efb34f3759552500b5f3a963e8d3908b7255911f03b7da9df2",
+    "files": 15,
+    "crc": "passed",
+    "dll_unchanged": true,
+    "note_ru": "Повторная упаковка ранее проверенной правки: удалены упоминания частных проектов из README; новых изменений кода нет. MCM13 не опубликована."
+  },
+  "tests": [
+    "7 public catalog/privacy cases",
+    "7 source-link cases"
+  ],
+  "personal_changelog_changed": false
+}

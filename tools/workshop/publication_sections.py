@@ -33,6 +33,27 @@ def forks():
 def mcm_catalog():
     return json.loads((HERE/'mcm_catalog.json').read_text(encoding='utf-8'))
 
+def public_mcm_catalog(catalog=None, published=None):
+    """Only confirmed public releases may appear in player-facing descriptions.
+
+    Keep mcm_catalog() complete for internal source/export verification. Prepared
+    archives, local DLLs and catalog support are not publication evidence.
+    """
+    if catalog is None:catalog=mcm_catalog()
+    if published is None:
+        published=json.loads((HERE/'published_releases.json').read_text(encoding='utf-8'))['mods']
+    def positive(value):
+        return not isinstance(value,bool) and re.fullmatch(r'[1-9]\d*',str(value)) is not None
+    result=[]
+    for entry in catalog:
+        if entry.get('public') is False or entry.get('experimental') is True:continue
+        if entry.get('group') not in ('own','emkej_fork','other_fork'):continue
+        record=published.get(entry['package'])
+        if not isinstance(record,dict):continue
+        if not all(positive(record.get(field)) for field in ('workshop_id','nexus','version')):continue
+        result.append(entry)
+    return result
+
 def section(title,text):return '[h2]'+title+'[/h2]\n\n'+text.strip()+'\n\n'
 def bullets(lines):return '[list]\n'+'\n'.join('[*]'+line for line in lines)+'\n[/list]'
 
@@ -59,15 +80,15 @@ def fork_sections(mod,body,lang):
     return credit+source+'\n\n'+own+guide
 
 def supported_section(lang):
-    entries=mcm_catalog()
+    entries=public_mcm_catalog()
     def names(group,skip_self=False):return ', '.join(e['name'] for e in entries if e['group']==group and (not skip_self or e['id']!='ModConfigMenu'))
     other=', '.join(e['name']+' ('+e['author']+')' for e in entries if e['group']=='other_fork')
     if lang=='ru':
         rows=['[b]Наши плагины:[/b] '+names('own',True)+'.','[b]Наши форки Emkej8:[/b] '+names('emkej_fork')+'.','[b]Наши форки других авторов:[/b] '+other+'.']
-        tail='У самого Mod Config Menu есть страница настроек. В список входят подготовленные и отключённые сборки; Organize the Inventory пока собран локально. Dynamic Factions поддерживает MCM, но ещё разрабатывается. Global Satellite Map - локальный прототип спутникового слоя глобальной карты. KEO: Kenshi Engine Optimizations - локальная сборка с MCM, ещё проходит проверку. XP Overhaul (Asur) - отдельная локальная сборка. Эти моды устанавливаются отдельно.'
+        tail='У самого Mod Config Menu есть страница настроек. Эти моды устанавливаются отдельно.'
         return section('ПОДДЕРЖИВАЕМЫЕ ПЛАГИНЫ И ФОРКИ',bullets(rows)+'\n\n'+tail)
     rows=['[b]Our plugins:[/b] '+names('own',True)+'.','[b]Our Emkej8 forks:[/b] '+names('emkej_fork')+'.','[b]Our forks of other authors:[/b] '+other+'.']
-    tail='Mod Config Menu also has its own settings page. The list includes prepared and disabled builds; Organize the Inventory is currently a local build. Dynamic Factions supports MCM but remains in development. Global Satellite Map is a local prototype for a satellite world-map layer. KEO: Kenshi Engine Optimizations is a local MCM maintenance build still being tested. XP Overhaul (Asur) is a separate local build. These mods are installed separately.'
+    tail='Mod Config Menu also has its own settings page. These mods are installed separately.'
     return section('SUPPORTED PLUGINS AND FORKS',bullets(rows)+'\n\n'+tail)
 
 def apply_sections(table,items):

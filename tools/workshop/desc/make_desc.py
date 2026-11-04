@@ -332,7 +332,7 @@ T["StatColours"] = ("""[h2]ЧТО ДЕЛАЕТ[/h2]
 """ + settings_ru("Stat Colours", "StatColours", "«Включено» действует после перезапуска игры, остальное - сразу.") + """
 [h2]СОВМЕСТИМОСТЬ[/h2]
 
-Строки KillCounter («Убийств», «Нокаутов», «Отрублено») тоже окрашиваются. С XP_Overhaul скорость прокачки считается по его кривой, если его версия это поддерживает; иначе - по кривой игры.
+Строки KillCounter («Убийств», «Нокаутов», «Отрублено») тоже окрашиваются.
 """, """[h2]WHAT IT DOES[/h2]
 
 [list]
@@ -349,7 +349,7 @@ Helper colours follow the interface theme if you use an interface mod. Every ste
 """ + settings_en("Stat Colours", "StatColours", "\"Enabled\" takes effect after a game restart, the rest at once.") + """
 [h2]COMPATIBILITY[/h2]
 
-KillCounter lines ("Kills", "Knockouts", "Limbs severed") are coloured too. With XP_Overhaul the levelling speed follows its curve if its version supports that; otherwise the game's curve.
+KillCounter lines ("Kills", "Knockouts", "Limbs severed") are coloured too.
 """)
 
 # --------------------------------------------------------------- GearCompare
@@ -781,7 +781,7 @@ T["RangedDamageXp"] = ("""[h2]ЧТО ДЕЛАЕТ[/h2]
 [*][b]Турели[/b] - вместо Арбалетов, если стрелок сидит за турелью.
 [/list]
 
-Обычный опыт за стрельбу остаётся как был, прибавка идёт сверху. Действует всё, что обычно влияет на опыт: расовый множитель, XP_Overhaul, полосы LiveXpBars.
+Обычный опыт за стрельбу остаётся как был, прибавка идёт сверху. Действует всё, что обычно влияет на опыт: расовый множитель, полосы LiveXpBars.
 
 Не считаются попадания по своим, по лежачим без сознания и совсем слабые царапины (всё это настраивается). Сколько опыта даёт урон и потолок за одно попадание - тоже.
 
@@ -795,7 +795,7 @@ In the game a crossbowman gets experience for shooting itself, no matter what th
 [*][b]Turrets[/b] - instead of Crossbows when the shooter mans a turret.
 [/list]
 
-The usual shooting experience stays as it was, the bonus goes on top. Everything that normally affects experience applies: racial multiplier, XP_Overhaul, LiveXpBars.
+The usual shooting experience stays as it was, the bonus goes on top. Everything that normally affects experience applies: racial multiplier, LiveXpBars.
 
 Hits on your own people, on unconscious targets and tiny scratches do not count (all adjustable). The XP per damage and the cap per hit are adjustable too.
 

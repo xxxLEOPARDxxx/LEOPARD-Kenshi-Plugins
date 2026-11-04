@@ -6,7 +6,7 @@ import re
 import sys
 import build
 from release_metadata import render_note
-from publication_sections import forks, mcm_catalog, OUR_REPOSITORY_URL
+from publication_sections import forks, mcm_catalog, public_mcm_catalog, OUR_REPOSITORY_URL
 from mcm_inventory import verify_catalog
 
 HERE=Path(__file__).resolve().parent
@@ -21,7 +21,32 @@ def balanced(text,path):
         else:stack.append(tag)
     if stack:raise ValueError('Unclosed BBCode: '+str(path))
 
+def validate_public_mcm_text(text,path,require_all=False,allow_original_keo=False):
+    """Reject private catalog references anywhere in public Steam/Nexus text."""
+    public=public_mcm_catalog()
+    packages={entry['package'] for entry in public}
+    for entry in mcm_catalog():
+        if entry['package'] in packages:continue
+        aliases={entry['name'],entry['package'],entry['id']}
+        if entry['package']=='XP_Overhaul':aliases.add('XPO')
+        if entry['package']=='KEO':aliases.add('Kenshi Engine Optimizations')
+        # KEO also names the already-public upstream plugin. Keep honest
+        # compatibility references outside MCM; never announce our local fork.
+        if entry['package']=='KEO' and allow_original_keo:
+            aliases.discard('KEO')
+            local=r'(?:our\s+(?:local\s+)?(?:fork|build)|local\s+(?:fork|build)|наш\w*[^.\n]{0,32}(?:форк|сборк)|локальн\w*)'
+            if re.search(r'\bKEO\b[^.\n]{0,160}'+local+'|'+local+r'[^.\n]{0,160}\bKEO\b',text,re.I):
+                raise ValueError('Private KEO fork announcement in '+str(path))
+        for alias in aliases:
+            if re.search(r'(?<!\w)'+re.escape(alias)+r'(?!\w)',text,re.I):
+                raise ValueError('Private MCM catalog reference: '+alias+' in '+str(path))
+    if require_all:
+        for entry in public:
+            if entry['name'] not in text:
+                raise ValueError('Missing supported MCM page: '+entry['name']+' in '+str(path))
+
 def player_feature_claims(mod,text,path):
+    validate_public_mcm_text(text,path,require_all=(mod=='ModConfigMenu'),allow_original_keo=(mod!='ModConfigMenu'))
     if mod=='ModConfigMenu':
         required=('https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins',
                   'https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks')
@@ -86,9 +111,6 @@ def validate(names):
                 if not all(value in text for value in headings) or fork['author'] not in text:raise ValueError('Missing explicit fork credit/change/history section: '+mod+' '+lang)
                 for url in (fork['original_url'],fork['source_url']):
                     if url and (url not in text or url not in nexus):raise ValueError('Missing original-source link: '+mod)
-            if mod=='ModConfigMenu':
-                for consumer in mcm_catalog():
-                    if consumer['name'] not in text or consumer['name'] not in nexus:raise ValueError('Missing supported MCM page: '+consumer['name']+' '+lang)
             if mod=='AIFixed' and int(item['version'])>=2:
                 credits=('Basusu','3787399736','3787375792','https://github.com/Basusu0/Basusu-kenshi-plugins','GPLv3')
                 if not all(value in text and value in nexus for value in credits):raise ValueError('Missing AI collection author/original/source credit: '+lang)
