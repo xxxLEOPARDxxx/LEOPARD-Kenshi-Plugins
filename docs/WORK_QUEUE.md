@@ -6,7 +6,8 @@ file requests. Do not take desktop focus or collide with Minecraft autotests.
 Always check the actual process immediately before replacing a loaded DLL.
 
 1. **Global satellite map — new reported zoom/seam defects, 2026-11-04.**
-   Current private installed build75f41fe, local VRAM8GiB/RAM32GiB. MCM offers
+   Current private installed buildD4598BA5 (05a70ff),03:59MSK04Nov,
+   local VRAM8GiB/RAM32GiB. MCM offers
    VRAM1..8 and RAM1..32 in1GiB restart-required steps; RAMLRU fills on demand,
    not an eager32GiB allocation. Live232 entries/243478872B and418hits confirmed.
    The accepted16-tile atlas is unchanged; no new full render is needed here.

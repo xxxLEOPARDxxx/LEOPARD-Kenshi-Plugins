@@ -11,11 +11,11 @@ Private development build; no public release/version bump or personal release-jo
 
 ## Evidence and limits
 
-LOD904 controls perGPU1/8 andVC10Od/O2; Mainbatch29peroptimization; purepump26/progress12 andnativegetters compile; index6480controls plus4 functional mutants; prefetch8332 andhiddenmap14profiles. Independently reviewed. Actual native metadata/specified CPUallowances67010198B below64MiB; this ledger does not claim to measure every engine/MyGUI allocation.
+LOD904 controls perGPU1/8 andVC10Od/O2; Mainbatch29peroptimization; purepump26/progress12 andnativegetters compile; index6480controls plus4 functional mutants; prefetch8332 andhiddenmap14profiles. Independently reviewed. Actual native metadata/specified CPUallowances67010282B below64MiB; this ledger does not claim to measure every engine/MyGUI allocation.
 
 The screenshot seam followsworldZ3072. All28 current fine source planes are present and numerically continuous. Current shade epochs agree and inspected MyGUI bounds meet atY698, fullUV. This is not evidence that the visible seam has been fixed. A bounded final-output readback will distinguish the lighting/layer output from final UI filtering without recapturing the atlas.
 
-Installation and runtime acceptance pending. Current game holds75f41fe; combined candidate is not installed.
+Installed privately at03:59MSK on2026-11-04 after fresh CIM+GetProcess both confirmed Kenshi closed. DLLD4598BA59D2377324C613FB2692A936F16FB04101BD454A5B82426D67D9D0BE5 (1356800B),86native imports/startPlugin/MCM verified. Source05a70ff and94cb5ca pushed. Backup/receiptD:/DEV/Kenshi/backup/gsm-zoom-followup-20261104. PersonalINI A0E2B20E...FED4BC and capture/ready/windows.gsi hashes unchanged. Native seam diagnostic integration independently reviewed CLEAR after source-pin/provenance fixes. Runtime visual and loading-speed acceptance remains pending; no readback request submitted yet.
 
 ## Private seam readback
 
