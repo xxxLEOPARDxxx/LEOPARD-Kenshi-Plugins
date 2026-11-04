@@ -1,4 +1,4 @@
-From adb308fbe23e047d044343304c11d17cccd83f98 Mon Sep 17 00:00:00 2001
+From 57724259214d72c240ea37a6a030a4ffea50d522 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Wed, 4 Nov 2026 20:29:48 +0300
 Subject: [PATCH] Restrict readiness bypass to the verified native loading poll
