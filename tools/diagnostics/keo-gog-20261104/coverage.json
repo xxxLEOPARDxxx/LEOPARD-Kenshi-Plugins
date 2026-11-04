@@ -1,0 +1,1711 @@
+{
+  "schema": 1,
+  "checked_date": "2026-11-04",
+  "source_head": "57724259214d72c240ea37a6a030a4ffea50d522",
+  "scope": "Offline source and official SDK table coverage. No GOG executable bytes or runtime verification available.",
+  "summary": {
+    "registry_function_rows": 98,
+    "registry_differing_gog": 98,
+    "registry_distinct_steam_minus_gog_deltas": 9,
+    "registry_missing_installed_table": 0,
+    "manifest_all_branches": 94,
+    "manifest_registry_resolved": 34,
+    "manifest_manual": 60,
+    "manifest_kinds": {
+      "HOOK_FATAL": 24,
+      "HOOK_DIAGNOSTIC": 70
+    },
+    "rva_declarations": 287,
+    "manual_rva_declarations": 219,
+    "direct_base_expressions": 30,
+    "manifest_table_named": 61
+  },
+  "tables": {
+    "installed": {
+      "Steam": {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\RVAs\\Steam_1.0.65.br",
+        "bytes": 30520,
+        "sha256": "573c395997ed8d93dd837e27f89a440323089edd1ba93f68291631b448f9cbd0",
+        "entries": 7630
+      },
+      "GOG": {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\RVAs\\GOG_1.0.65.br",
+        "bytes": 30520,
+        "sha256": "a2a6394e95312a89e3d3f6842fbfda9c16e7d79749f1ee796fbd6168600bf347",
+        "entries": 7630
+      }
+    },
+    "official_0_5_1": {
+      "Steam": {
+        "path": "D:\\DEV\\Kenshi\\deps\\KenshiLib_0.5.1\\RE_Kenshi\\RVAs\\Steam_1.0.65.br",
+        "bytes": 30712,
+        "sha256": "a2d6027fdb009146f1391d59c3bbe9e20aa9643d95e5c60faf8bc894e67e2289",
+        "entries": 7678
+      },
+      "GOG": {
+        "path": "D:\\DEV\\Kenshi\\deps\\KenshiLib_0.5.1\\RE_Kenshi\\RVAs\\GOG_1.0.65.br",
+        "bytes": 30712,
+        "sha256": "8910248abd88d78b777c8f77d5e8ef5287b87757001000cade44e7082e58cbc0",
+        "entries": 7678
+      }
+    }
+  },
+  "libraries": {
+    "installed": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\KenshiLib.dll",
+      "bytes": 951808,
+      "sha256": "5b6240622d06801dc39896e385efb834b8e1fe2fcdf86067d071ae7a04f6c83b",
+      "function_stub_names": 10093,
+      "table_base": "0xd7000"
+    },
+    "official_0_5_1": {
+      "path": "D:\\DEV\\Kenshi\\deps\\KenshiLib_0.5.1\\KenshiLib.dll",
+      "bytes": 956416,
+      "sha256": "9c7f3c6f63f8faff3573095199494f8e985fda91f54b9c3cad7079d0a56b1886",
+      "function_stub_names": 10153,
+      "table_base": "0xd8000"
+    }
+  },
+  "gog_executable_available": false,
+  "expected_gog_md5": "213349bf76a0a758067f9ed0aef2ab01",
+  "native_profile_verified": false,
+  "runtime_tested": false,
+  "manifest": [
+    {
+      "name": "showLoadingMessage",
+      "steam_rva": "0x6e9800",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x6e9110"
+      ]
+    },
+    {
+      "name": "isContentPending",
+      "steam_rva": "0x3ab4f0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3ab110"
+      ]
+    },
+    {
+      "name": "isLoadedZoneScope",
+      "steam_rva": "0x3ac810",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3ac430"
+      ]
+    },
+    {
+      "name": "updateCameraZone",
+      "steam_rva": "0xa11da0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0xa114c0"
+      ]
+    },
+    {
+      "name": "addOrderSelected",
+      "steam_rva": "0x7f9280",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x7f8bc0"
+      ]
+    },
+    {
+      "name": "destroyListInsert",
+      "steam_rva": "0x799be0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x799520"
+      ]
+    },
+    {
+      "name": "resetUnloadZones",
+      "steam_rva": "0x36c1e0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x36be00"
+      ]
+    },
+    {
+      "name": "processLoading",
+      "steam_rva": "0xa0e950",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0xa0e070"
+      ]
+    },
+    {
+      "name": "calculateCurrentPos",
+      "steam_rva": "0x4fe2c0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x4fe5d0"
+      ]
+    },
+    {
+      "name": "getSpeed",
+      "steam_rva": "0x7f4ba0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x7f44e0"
+      ]
+    },
+    {
+      "name": "factionRelationsUpdate",
+      "steam_rva": "0x6b2480",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x6b1d90"
+      ]
+    },
+    {
+      "name": "Character::giveItem",
+      "steam_rva": "0x5ca970",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x5cac80"
+      ]
+    },
+    {
+      "name": "builderPlace",
+      "steam_rva": "0x4d6810",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "createBuilding",
+      "steam_rva": "0x57c1e0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x57c4f0"
+      ]
+    },
+    {
+      "name": "getDropped",
+      "steam_rva": "0x5cc110",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x5cc420"
+      ]
+    },
+    {
+      "name": "takeOutsideTick",
+      "steam_rva": "0x3356a0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "takeOutsidePathImpossible",
+      "steam_rva": "0x33da20",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "findKOIntruderTown",
+      "steam_rva": "0x99b380",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x99aaa0"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::saveGame",
+      "steam_rva": "0x473380",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x472fa0"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::loadGame",
+      "steam_rva": "0x474340",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x473f60"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::newGame",
+      "steam_rva": "0x470d00",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x470920"
+      ]
+    },
+    {
+      "name": "BackpackInventoryLayout::setupSections",
+      "steam_rva": "0x1502e0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x150200"
+      ]
+    },
+    {
+      "name": "activateZoneMap",
+      "steam_rva": "0xa0e1b0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0xa0d8d0"
+      ]
+    },
+    {
+      "name": "finalizeZoneResources",
+      "steam_rva": "0x8f5100",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "townListDestroy",
+      "steam_rva": "0x92a4f0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x929c10"
+      ]
+    },
+    {
+      "name": "zoneMapUpdate",
+      "steam_rva": "0xa0a960",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0xa0a080"
+      ]
+    },
+    {
+      "name": "unstitchCrossSection",
+      "steam_rva": "0xd9ab20",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "nmgStitch",
+      "steam_rva": "0x3c56f0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3c5310"
+      ]
+    },
+    {
+      "name": "searchSetNodeCost",
+      "steam_rva": "0xda6370",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphExpandNode",
+      "steam_rva": "0xda5860",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphPositionLookup",
+      "steam_rva": "0xda4470",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphHeuristicGoalAdjacent",
+      "steam_rva": "0xda6a30",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphHeuristicClusterCentre",
+      "steam_rva": "0xda6690",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphHeuristicCoarseSeed",
+      "steam_rva": "0xda5fe0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphInstanceConnect",
+      "steam_rva": "0xd9ad30",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "navMeshFaceAabb",
+      "steam_rva": "0xcfd610",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "removeInstance",
+      "steam_rva": "0xd0dc30",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "createInstance",
+      "steam_rva": "0x3acd20",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3ac940"
+      ]
+    },
+    {
+      "name": "physicsUpdateUT",
+      "steam_rva": "0x4cd040",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x4cd350"
+      ]
+    },
+    {
+      "name": "hullPushHull",
+      "steam_rva": "0x4cc210",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushEntity",
+      "steam_rva": "0x7dc170",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushScythe",
+      "steam_rva": "0x7dbf20",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushRoot",
+      "steam_rva": "0x7dc0b0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushBase",
+      "steam_rva": "0x7dc110",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "nmgUpdate",
+      "steam_rva": "0x3c8b70",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3c8790"
+      ]
+    },
+    {
+      "name": "wallAddProgress",
+      "steam_rva": "0x5594a0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x5597b0"
+      ]
+    },
+    {
+      "name": "navMeshGenerateAabb",
+      "steam_rva": "0x3a6580",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3a61a0"
+      ]
+    },
+    {
+      "name": "scoreFindFoodOnGround",
+      "steam_rva": "0x5972a0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x5975b0"
+      ]
+    },
+    {
+      "name": "operatorWantGone",
+      "steam_rva": "0x5a2200",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x5a2510"
+      ]
+    },
+    {
+      "name": "deleteInstance",
+      "steam_rva": "0x3ab8a0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3ab4c0"
+      ]
+    },
+    {
+      "name": "clearanceResetKeys",
+      "steam_rva": "0xd617d0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "sectionCutLookup",
+      "steam_rva": "0xdcaee0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "loadPhysXResource",
+      "steam_rva": "0x7e4850",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x7e4190"
+      ]
+    },
+    {
+      "name": "haulAmount",
+      "steam_rva": "0x356d50",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "isInIsland",
+      "steam_rva": "0xa07eb0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0xa075d0"
+      ]
+    },
+    {
+      "name": "getIsland",
+      "steam_rva": "0xa09ae0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0xa09200"
+      ]
+    },
+    {
+      "name": "setDestinationVec3",
+      "steam_rva": "0x6607e0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x660af0"
+      ]
+    },
+    {
+      "name": "getZoneEdge",
+      "steam_rva": "0x3a39c0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3a35e0"
+      ]
+    },
+    {
+      "name": "charMovementUpdate",
+      "steam_rva": "0x65f510",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x65f820"
+      ]
+    },
+    {
+      "name": "updateOnScreenCheck",
+      "steam_rva": "0x5c94d0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x5c97e0"
+      ]
+    },
+    {
+      "name": "pausedUpdate",
+      "steam_rva": "0x5c7090",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x5c73a0"
+      ]
+    },
+    {
+      "name": "stopCharactersMovement",
+      "steam_rva": "0x7f58d0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x7f5210"
+      ]
+    },
+    {
+      "name": "addJobSelected",
+      "steam_rva": "0x7f4ef0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x7f4830"
+      ]
+    },
+    {
+      "name": "addTaskNearest",
+      "steam_rva": "0x7fa2d0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x7f9c10"
+      ]
+    },
+    {
+      "name": "dispatchJob",
+      "steam_rva": "0x3ce030",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3cdc50"
+      ]
+    },
+    {
+      "name": "navMeshGenerate",
+      "steam_rva": "0x3ab700",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3ab320"
+      ]
+    },
+    {
+      "name": "edgeProcess",
+      "steam_rva": "0xdd92f0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "nmResultPopulate",
+      "steam_rva": "0xe0aff0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "processJobAlt",
+      "steam_rva": "0x3cbe60",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3cba80"
+      ]
+    },
+    {
+      "name": "buildCollision",
+      "steam_rva": "0x3cb700",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3cb320"
+      ]
+    },
+    {
+      "name": "buildCollisionInterior",
+      "steam_rva": "0x3cbab0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3cb6d0"
+      ]
+    },
+    {
+      "name": "stitchUnloadedZone",
+      "steam_rva": "0x3cb140",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3cad60"
+      ]
+    },
+    {
+      "name": "stitchWithInteriors",
+      "steam_rva": "0x3c5c10",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3c5830"
+      ]
+    },
+    {
+      "name": "lockZone",
+      "steam_rva": "0x3c73b0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3c6fd0"
+      ]
+    },
+    {
+      "name": "navMeshStop",
+      "steam_rva": "0x3aae90",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3aaab0"
+      ]
+    },
+    {
+      "name": "getSeedPointsAdjacent",
+      "steam_rva": "0x3c96e0",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3c9300"
+      ]
+    },
+    {
+      "name": "csFindPath",
+      "steam_rva": "0x3aa950",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3aa570"
+      ]
+    },
+    {
+      "name": "csCheckFaceConn",
+      "steam_rva": "0x3a5b00",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3a5720"
+      ]
+    },
+    {
+      "name": "findPathFull",
+      "steam_rva": "0xce56d0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "requestPath",
+      "steam_rva": "0x145cb0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x145bd0"
+      ]
+    },
+    {
+      "name": "pathReqSubmit",
+      "steam_rva": "0x3aaef0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3aab10"
+      ]
+    },
+    {
+      "name": "csFindPathFallback",
+      "steam_rva": "0x3aabf0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3aa810"
+      ]
+    },
+    {
+      "name": "contentStreamCallee_0x8869",
+      "steam_rva": "0x3a9f20",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3a9b40"
+      ]
+    },
+    {
+      "name": "addInstance",
+      "steam_rva": "0xd0d8f0",
+      "kind": "HOOK_FATAL",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "contentStream",
+      "steam_rva": "0x3ae350",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": true,
+      "official_gog_rvas": [
+        "0x3adf70"
+      ]
+    },
+    {
+      "name": "dequeueWork",
+      "steam_rva": "0x3bee40",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "enqueueThreadSafe",
+      "steam_rva": "0x3b6110",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "gatesUpdateCodes",
+      "steam_rva": "0x2ef460",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "gatesFindPath",
+      "steam_rva": "0x2ec540",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "WaterOcclusionListener::frameRenderingQueued",
+      "steam_rva": "0x9d9060",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "CsmShadowMap::setupCascade",
+      "steam_rva": "0x862f60",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "PagedGeometry::update",
+      "steam_rva": "0xa29e40",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": []
+    },
+    {
+      "name": "OptionsWindow::create",
+      "steam_rva": "0x3f0120",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3efd40"
+      ]
+    },
+    {
+      "name": "OptionsWindow::saveOptions",
+      "steam_rva": "0x3ec950",
+      "kind": "HOOK_DIAGNOSTIC",
+      "registry_resolved": false,
+      "official_gog_rvas": [
+        "0x3ec570"
+      ]
+    }
+  ],
+  "registry": [
+    {
+      "name": "ForgottenGUI::showLoadingMessage",
+      "legacy": "0x6e9800",
+      "steam_implementation": "0x6e9800",
+      "official_gog_rvas": [
+        "0x6e9110"
+      ]
+    },
+    {
+      "name": "NavMesh::isLoaded(coords)",
+      "legacy": "0x3ab4f0",
+      "steam_implementation": "0x3ab4f0",
+      "official_gog_rvas": [
+        "0x3ab110"
+      ]
+    },
+    {
+      "name": "ZoneManager::updateGPUSafeThread",
+      "legacy": "0x46fc9",
+      "steam_implementation": "0xa11da0",
+      "official_gog_rvas": [
+        "0xa114c0"
+      ]
+    },
+    {
+      "name": "ZoneManager::processLoading",
+      "legacy": "0xa0e950",
+      "steam_implementation": "0xa0e950",
+      "official_gog_rvas": [
+        "0xa0e070"
+      ]
+    },
+    {
+      "name": "PlayerInterface::addOrderSelectedCharacters",
+      "legacy": "0x7f9280",
+      "steam_implementation": "0x7f9280",
+      "official_gog_rvas": [
+        "0x7f8bc0"
+      ]
+    },
+    {
+      "name": "ZoneMap::_activate",
+      "legacy": "0x16243",
+      "steam_implementation": "0xa0d6a0",
+      "official_gog_rvas": [
+        "0xa0cdc0"
+      ]
+    },
+    {
+      "name": "NavMesh::create",
+      "legacy": "0x2d7b8",
+      "steam_implementation": "0x3abf00",
+      "official_gog_rvas": [
+        "0x3abb20"
+      ]
+    },
+    {
+      "name": "ZoneMap::getAreaSector",
+      "legacy": "0x26bc0",
+      "steam_implementation": "0x8f3e00",
+      "official_gog_rvas": [
+        "0x8f3520"
+      ]
+    },
+    {
+      "name": "ZoneMapContent::createLoadedItems",
+      "legacy": "0xd5bc",
+      "steam_implementation": "0x9fc720",
+      "official_gog_rvas": [
+        "0x9fbe40"
+      ]
+    },
+    {
+      "name": "TownBase::delayedSpawningChecks",
+      "legacy": "0x2e073",
+      "steam_implementation": "0x927540",
+      "official_gog_rvas": [
+        "0x926c60"
+      ]
+    },
+    {
+      "name": "PhysicsInterface::setQueuesAreClear",
+      "legacy": "0x579460",
+      "steam_implementation": "0x579460",
+      "official_gog_rvas": [
+        "0x579770"
+      ]
+    },
+    {
+      "name": "PlatoonHandleContainerList::getCharacterOrPlatoon",
+      "legacy": "0x3e419",
+      "steam_implementation": "0x4fdf90",
+      "official_gog_rvas": [
+        "0x4fe2a0"
+      ]
+    },
+    {
+      "name": "hand::getCharacter",
+      "legacy": "0x7974f0",
+      "steam_implementation": "0x7974f0",
+      "official_gog_rvas": [
+        "0x796e30"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::generateTaskBT",
+      "legacy": "0x3cbe60",
+      "steam_implementation": "0x3cbe60",
+      "official_gog_rvas": [
+        "0x3cba80"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::updateBT",
+      "legacy": "0x3ce030",
+      "steam_implementation": "0x3ce030",
+      "official_gog_rvas": [
+        "0x3cdc50"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::stitchExterior",
+      "legacy": "0x39810",
+      "steam_implementation": "0x3cb700",
+      "official_gog_rvas": [
+        "0x3cb320"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::stitchInterior",
+      "legacy": "0x3cbab0",
+      "steam_implementation": "0x3cbab0",
+      "official_gog_rvas": [
+        "0x3cb6d0"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::splice",
+      "legacy": "0x1c418",
+      "steam_implementation": "0x3ca290",
+      "official_gog_rvas": [
+        "0x3c9eb0"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::TaskQueue::push",
+      "legacy": "0x2eeba",
+      "steam_implementation": "0x3c6620",
+      "official_gog_rvas": [
+        "0x3c6240"
+      ]
+    },
+    {
+      "name": "hkMemoryAllocator::_DESTRUCTOR",
+      "legacy": "0xba9580",
+      "steam_implementation": "0xba9580",
+      "official_gog_rvas": [
+        "0xba8ca0"
+      ]
+    },
+    {
+      "name": "NavMesh::shutdown",
+      "legacy": "0x3aae90",
+      "steam_implementation": "0x3aae90",
+      "official_gog_rvas": [
+        "0x3aaab0"
+      ]
+    },
+    {
+      "name": "NavMesh::directPath",
+      "legacy": "0x3aa950",
+      "steam_implementation": "0x3aa950",
+      "official_gog_rvas": [
+        "0x3aa570"
+      ]
+    },
+    {
+      "name": "NavMesh::pathExists(keys)",
+      "legacy": "0x3a5b00",
+      "steam_implementation": "0x3a5b00",
+      "official_gog_rvas": [
+        "0x3a5720"
+      ]
+    },
+    {
+      "name": "NavMesh::findPath",
+      "legacy": "0x3aabf0",
+      "steam_implementation": "0x3aabf0",
+      "official_gog_rvas": [
+        "0x3aa810"
+      ]
+    },
+    {
+      "name": "HavokCharacter::requestPath",
+      "legacy": "0x145cb0",
+      "steam_implementation": "0x145cb0",
+      "official_gog_rvas": [
+        "0x145bd0"
+      ]
+    },
+    {
+      "name": "NavMesh::postMessage",
+      "legacy": "0x3aaef0",
+      "steam_implementation": "0x3aaef0",
+      "official_gog_rvas": [
+        "0x3aab10"
+      ]
+    },
+    {
+      "name": "ZoneMap::isInIsland",
+      "legacy": "0x2fce8",
+      "steam_implementation": "0xa07eb0",
+      "official_gog_rvas": [
+        "0xa075d0"
+      ]
+    },
+    {
+      "name": "ZoneManager::getIsland",
+      "legacy": "0xa09ae0",
+      "steam_implementation": "0xa09ae0",
+      "official_gog_rvas": [
+        "0xa09200"
+      ]
+    },
+    {
+      "name": "ZoneManager::_calculateIslands",
+      "legacy": "0xa09520",
+      "steam_implementation": "0xa09520",
+      "official_gog_rvas": [
+        "0xa08c40"
+      ]
+    },
+    {
+      "name": "NavMesh::getZoneEdge",
+      "legacy": "0x3a39c0",
+      "steam_implementation": "0x3a39c0",
+      "official_gog_rvas": [
+        "0x3a35e0"
+      ]
+    },
+    {
+      "name": "NavMesh::isLoaded(zone)",
+      "legacy": "0x3ac810",
+      "steam_implementation": "0x3ac810",
+      "official_gog_rvas": [
+        "0x3ac430"
+      ]
+    },
+    {
+      "name": "GameWorld::destroy(MovableObject)",
+      "legacy": "0x799be0",
+      "steam_implementation": "0x799be0",
+      "official_gog_rvas": [
+        "0x799520"
+      ]
+    },
+    {
+      "name": "NavMesh::createEdgePath",
+      "legacy": "0x3a9f20",
+      "steam_implementation": "0x3a9f20",
+      "official_gog_rvas": [
+        "0x3a9b40"
+      ]
+    },
+    {
+      "name": "NavMesh::update",
+      "legacy": "0x3ae350",
+      "steam_implementation": "0x3ae350",
+      "official_gog_rvas": [
+        "0x3adf70"
+      ]
+    },
+    {
+      "name": "Character::isPlayerCharacter",
+      "legacy": "0x790b30",
+      "steam_implementation": "0x790b30",
+      "official_gog_rvas": [
+        "0x790470"
+      ]
+    },
+    {
+      "name": "ZoneMap::isTerrainCollisionLoaded",
+      "legacy": "0xa08e10",
+      "steam_implementation": "0xa08e10",
+      "official_gog_rvas": [
+        "0xa08530"
+      ]
+    },
+    {
+      "name": "ZoneManager::deactivateAllActiveZones",
+      "legacy": "0x36c1e0",
+      "steam_implementation": "0x36c1e0",
+      "official_gog_rvas": [
+        "0x36be00"
+      ]
+    },
+    {
+      "name": "ZoneManager::deactivateZoneMap",
+      "legacy": "0x365ed",
+      "steam_implementation": "0xa09bb0",
+      "official_gog_rvas": [
+        "0xa092d0"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::getSingleton",
+      "legacy": "0x37dd80",
+      "steam_implementation": "0x37dd80",
+      "official_gog_rvas": [
+        "0x37d9a0"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::fileExists",
+      "legacy": "0x470a70",
+      "steam_implementation": "0x470a70",
+      "official_gog_rvas": [
+        "0x470690"
+      ]
+    },
+    {
+      "name": "PlayerInterface::stopCharactersMovement",
+      "legacy": "0x7f58d0",
+      "steam_implementation": "0x7f58d0",
+      "official_gog_rvas": [
+        "0x7f5210"
+      ]
+    },
+    {
+      "name": "PlayerInterface::addJobSelectedCharacters",
+      "legacy": "0x7f4ef0",
+      "steam_implementation": "0x7f4ef0",
+      "official_gog_rvas": [
+        "0x7f4830"
+      ]
+    },
+    {
+      "name": "PlayerInterface::addTaskNearestSelectedCharacter",
+      "legacy": "0x7fa2d0",
+      "steam_implementation": "0x7fa2d0",
+      "official_gog_rvas": [
+        "0x7f9c10"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::getSeedPointsFromAdjacentZone",
+      "legacy": "0x3c96e0",
+      "steam_implementation": "0x3c96e0",
+      "official_gog_rvas": [
+        "0x3c9300"
+      ]
+    },
+    {
+      "name": "NavMesh::getSector(coords)",
+      "legacy": "0x3ab1f0",
+      "steam_implementation": "0x3ab1f0",
+      "official_gog_rvas": [
+        "0x3aae10"
+      ]
+    },
+    {
+      "name": "NavMesh::getFilename",
+      "legacy": "0x3a6230",
+      "steam_implementation": "0x3a6230",
+      "official_gog_rvas": [
+        "0x3a5e50"
+      ]
+    },
+    {
+      "name": "NavMesh::loadZone",
+      "legacy": "0x3a7f10",
+      "steam_implementation": "0x3a7f10",
+      "official_gog_rvas": [
+        "0x3a7b30"
+      ]
+    },
+    {
+      "name": "NavMesh::deleteMesh(sector)",
+      "legacy": "0x3ac8b0",
+      "steam_implementation": "0x3ac8b0",
+      "official_gog_rvas": [
+        "0x3ac4d0"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::lockZone",
+      "legacy": "0x3c73b0",
+      "steam_implementation": "0x3c73b0",
+      "official_gog_rvas": [
+        "0x3c6fd0"
+      ]
+    },
+    {
+      "name": "NavMeshGenerator::unlockZone",
+      "legacy": "0x3bf560",
+      "steam_implementation": "0x3bf560",
+      "official_gog_rvas": [
+        "0x3bf180"
+      ]
+    },
+    {
+      "name": "ZoneManager::getZoneMap(int,int)",
+      "legacy": "0xa07c10",
+      "steam_implementation": "0xa07c10",
+      "official_gog_rvas": [
+        "0xa07330"
+      ]
+    },
+    {
+      "name": "ZoneMapContent::_NV_update",
+      "legacy": "0x9ff730",
+      "steam_implementation": "0x9ff730",
+      "official_gog_rvas": [
+        "0x9fee50"
+      ]
+    },
+    {
+      "name": "Character::_NV_playerMoveOrderDefault",
+      "legacy": "0x5d1820",
+      "steam_implementation": "0x5d1820",
+      "official_gog_rvas": [
+        "0x5d1b30"
+      ]
+    },
+    {
+      "name": "AbstractMovementBase::_NV_getPosition",
+      "legacy": "0x664640",
+      "steam_implementation": "0x664640",
+      "official_gog_rvas": [
+        "0x664950"
+      ]
+    },
+    {
+      "name": "CharMovement::_NV_pathOk",
+      "legacy": "0x65dd70",
+      "steam_implementation": "0x65dd70",
+      "official_gog_rvas": [
+        "0x65e080"
+      ]
+    },
+    {
+      "name": "CharMovement::_NV_pathFailed",
+      "legacy": "0x65dda0",
+      "steam_implementation": "0x65dda0",
+      "official_gog_rvas": [
+        "0x65e0b0"
+      ]
+    },
+    {
+      "name": "CharMovement::_NV_isDestinationReached",
+      "legacy": "0x65e320",
+      "steam_implementation": "0x65e320",
+      "official_gog_rvas": [
+        "0x65e630"
+      ]
+    },
+    {
+      "name": "AbstractMovementBase::getDestination",
+      "legacy": "0x65dd40",
+      "steam_implementation": "0x65dd40",
+      "official_gog_rvas": [
+        "0x65e050"
+      ]
+    },
+    {
+      "name": "ResourceLoader::updateMT",
+      "legacy": "0x44bba0",
+      "steam_implementation": "0x44bba0",
+      "official_gog_rvas": [
+        "0x44b7c0"
+      ]
+    },
+    {
+      "name": "Platoon::activate",
+      "legacy": "0x7eb250",
+      "steam_implementation": "0x7eb250",
+      "official_gog_rvas": [
+        "0x7eab90"
+      ]
+    },
+    {
+      "name": "GameWorld::_NV_mainLoop_GPUSensitiveStuff",
+      "legacy": "0x787e70",
+      "steam_implementation": "0x787e70",
+      "official_gog_rvas": [
+        "0x7877a0"
+      ]
+    },
+    {
+      "name": "GameDataContainer::load",
+      "legacy": "0x6c0800",
+      "steam_implementation": "0x6c0800",
+      "official_gog_rvas": [
+        "0x6c0110"
+      ]
+    },
+    {
+      "name": "ZoneManager::activateZoneMap",
+      "legacy": "0xa0e1b0",
+      "steam_implementation": "0xa0e1b0",
+      "official_gog_rvas": [
+        "0xa0d8d0"
+      ]
+    },
+    {
+      "name": "ZoneManager::setup",
+      "legacy": "0xa12880",
+      "steam_implementation": "0xa12880",
+      "official_gog_rvas": [
+        "0xa11fa0"
+      ]
+    },
+    {
+      "name": "NavMesh::generate",
+      "legacy": "0x3ab700",
+      "steam_implementation": "0x3ab700",
+      "official_gog_rvas": [
+        "0x3ab320"
+      ]
+    },
+    {
+      "name": "PhysicsActual::_NV_backThreadUpdate",
+      "legacy": "0x7dc4c0",
+      "steam_implementation": "0x7dc4c0",
+      "official_gog_rvas": [
+        "0x7dbe00"
+      ]
+    },
+    {
+      "name": "PhysicsActual::_NV_updateUT",
+      "legacy": "0x4cd040",
+      "steam_implementation": "0x4cd040",
+      "official_gog_rvas": [
+        "0x4cd350"
+      ]
+    },
+    {
+      "name": "ZoneMap::update",
+      "legacy": "0xa0a960",
+      "steam_implementation": "0xa0a960",
+      "official_gog_rvas": [
+        "0xa0a080"
+      ]
+    },
+    {
+      "name": "CharBody::_NV_update",
+      "legacy": "0x5c6290",
+      "steam_implementation": "0x5c6290",
+      "official_gog_rvas": [
+        "0x5c65a0"
+      ]
+    },
+    {
+      "name": "CharMovement::_NV_update",
+      "legacy": "0x65f510",
+      "steam_implementation": "0x65f510",
+      "official_gog_rvas": [
+        "0x65f820"
+      ]
+    },
+    {
+      "name": "GameWorld::processThreadMessages",
+      "legacy": "0x31372",
+      "steam_implementation": "0x785260",
+      "official_gog_rvas": [
+        "0x784b90"
+      ]
+    },
+    {
+      "name": "GameWorld::processKillList",
+      "legacy": "0x489f5",
+      "steam_implementation": "0x79cd00",
+      "official_gog_rvas": [
+        "0x79c640"
+      ]
+    },
+    {
+      "name": "GameWorld::charsUpdateUT",
+      "legacy": "0x28d5d",
+      "steam_implementation": "0x785ea0",
+      "official_gog_rvas": [
+        "0x7857d0"
+      ]
+    },
+    {
+      "name": "SaveManager::execute",
+      "legacy": "0x17607",
+      "steam_implementation": "0x47baa0",
+      "official_gog_rvas": [
+        "0x47bb90"
+      ]
+    },
+    {
+      "name": "GameWorld::threadSafeRagdollUpdates",
+      "legacy": "0x54089",
+      "steam_implementation": "0x7d17e0",
+      "official_gog_rvas": [
+        "0x7d1120"
+      ]
+    },
+    {
+      "name": "PlayerInterface::update",
+      "legacy": "0x384fb",
+      "steam_implementation": "0x800a80",
+      "official_gog_rvas": [
+        "0x8003c0"
+      ]
+    },
+    {
+      "name": "WeatherSystem::updateMT",
+      "legacy": "0x2a810",
+      "steam_implementation": "0x9e9540",
+      "official_gog_rvas": [
+        "0x9e8c60"
+      ]
+    },
+    {
+      "name": "ZoneManager::updateMainThread",
+      "legacy": "0xfa1a",
+      "steam_implementation": "0xa11b70",
+      "official_gog_rvas": [
+        "0xa11290"
+      ]
+    },
+    {
+      "name": "RootObjectFactory::mainThreadUpdate",
+      "legacy": "0x18cd7",
+      "steam_implementation": "0x582880",
+      "official_gog_rvas": [
+        "0x582b90"
+      ]
+    },
+    {
+      "name": "GameWorld::charsUpdate",
+      "legacy": "0x4b628",
+      "steam_implementation": "0x7862f0",
+      "official_gog_rvas": [
+        "0x785c20"
+      ]
+    },
+    {
+      "name": "GameWorld::charsUpdatePaused",
+      "legacy": "0xb4c4",
+      "steam_implementation": "0x7866f0",
+      "official_gog_rvas": [
+        "0x786020"
+      ]
+    },
+    {
+      "name": "FactionManager::updateMT",
+      "legacy": "0x234a7",
+      "steam_implementation": "0x2e74b0",
+      "official_gog_rvas": [
+        "0x2e7040"
+      ]
+    },
+    {
+      "name": "ForgottenGUI::update",
+      "legacy": "0x2670b",
+      "steam_implementation": "0x6e98d0",
+      "official_gog_rvas": [
+        "0x6e91e0"
+      ]
+    },
+    {
+      "name": "ThreadClass::startRunning",
+      "legacy": "0x49071",
+      "steam_implementation": "0x3bed70",
+      "official_gog_rvas": [
+        "0x3be990"
+      ]
+    },
+    {
+      "name": "FoliageSystem::update",
+      "legacy": "0x5fb0",
+      "steam_implementation": "0x6cc120",
+      "official_gog_rvas": [
+        "0x6cba30"
+      ]
+    },
+    {
+      "name": "PlayerInterface::mouseScan",
+      "legacy": "0x3bdae",
+      "steam_implementation": "0x7ff6b0",
+      "official_gog_rvas": [
+        "0x7feff0"
+      ]
+    },
+    {
+      "name": "UtilityT::traceAll",
+      "legacy": "0x1c79c",
+      "steam_implementation": "0x9b28d0",
+      "official_gog_rvas": [
+        "0x9b1ff0"
+      ]
+    },
+    {
+      "name": "UtilityT::trace",
+      "legacy": "0x2e2c1",
+      "steam_implementation": "0x9b5bc0",
+      "official_gog_rvas": [
+        "0x9b52e0"
+      ]
+    },
+    {
+      "name": "ParticlePool::update",
+      "legacy": "0x8f2b",
+      "steam_implementation": "0x40ba60",
+      "official_gog_rvas": [
+        "0x40b680"
+      ]
+    },
+    {
+      "name": "ZoneManager::updateRendertimeThread",
+      "legacy": "0x202cf",
+      "steam_implementation": "0xa0e400",
+      "official_gog_rvas": [
+        "0xa0db20"
+      ]
+    },
+    {
+      "name": "TownList::updateTownsDiscovery",
+      "legacy": "0x455a2",
+      "steam_implementation": "0x92e7e0",
+      "official_gog_rvas": [
+        "0x92df00"
+      ]
+    },
+    {
+      "name": "FactionManager::updateThreaded",
+      "legacy": "0x2464",
+      "steam_implementation": "0x2e7550",
+      "official_gog_rvas": [
+        "0x2e70e0"
+      ]
+    },
+    {
+      "name": "Character::updateOnScreenCheck",
+      "legacy": "0x3560c",
+      "steam_implementation": "0x5c94d0",
+      "official_gog_rvas": [
+        "0x5c97e0"
+      ]
+    },
+    {
+      "name": "WeatherSystem::updateBT",
+      "legacy": "0x33a73",
+      "steam_implementation": "0x9e80a0",
+      "official_gog_rvas": [
+        "0x9e77c0"
+      ]
+    },
+    {
+      "name": "AITaskSytem::update",
+      "legacy": "0xf65f",
+      "steam_implementation": "0x50ce90",
+      "official_gog_rvas": [
+        "0x50d1a0"
+      ]
+    },
+    {
+      "name": "AnimationClass::updateThreaded",
+      "legacy": "0x207b1",
+      "steam_implementation": "0x5b3ce0",
+      "official_gog_rvas": [
+        "0x5b3ff0"
+      ]
+    },
+    {
+      "name": "PhysicsActual::threadJunkPreBT",
+      "legacy": "0xa78b",
+      "steam_implementation": "0x4cbb90",
+      "official_gog_rvas": [
+        "0x4cbea0"
+      ]
+    },
+    {
+      "name": "PhysicsActual::threadJunkPostBT",
+      "legacy": "0x17a58",
+      "steam_implementation": "0x4cceb0",
+      "official_gog_rvas": [
+        "0x4cd1c0"
+      ]
+    }
+  ],
+  "required_without_official_symbol": [
+    {
+      "name": "edgeProcess",
+      "steam_rva": "0xdd92f0"
+    },
+    {
+      "name": "nmResultPopulate",
+      "steam_rva": "0xe0aff0"
+    },
+    {
+      "name": "findPathFull",
+      "steam_rva": "0xce56d0"
+    },
+    {
+      "name": "addInstance",
+      "steam_rva": "0xd0d8f0"
+    }
+  ],
+  "additional_nonentry_contracts": [
+    {
+      "owner": "readiness loading poll",
+      "steam_only_returns": [
+        "0xA0EA90",
+        "0x3AC822"
+      ],
+      "required": "Read real GOG call instructions/register contracts, not entry RVA delta."
+    },
+    {
+      "owner": "path priority publication",
+      "steam_only_returns": [
+        "0x3AAF60"
+      ],
+      "required": "Audit 28 GOG code windows before enabling capability."
+    },
+    {
+      "owner": "other native helpers/data/Havok/PhysX/module hooks",
+      "required": "Audit manual RVAs, inline sites, vtables, allocator/TLS and layout contracts before GOG gate removal."
+    }
+  ],
+  "source_pins": {
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\plugin\\plugin_entry.cpp": "b7356a4b1413f6e8e3f09a292128bd16d2c234e057ab35a9197d21285b77a548",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\plugin\\hook_manifest.cpp": "57e8f79d450d362e33dff1b2cda46ee3bdce8eb6c9a2b219bab10c0990e3afe2",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\plugin\\hook_manifest_rows.inc": "62aa4b20fcc1fc4ee31c3b4085e680f689755402a604ca0553ed55df7b6336e3",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\klib_bindings.cpp": "c2eaf5f595ae8e85b10ada23991b9ca473670cf0a9e2cd18216c8f3cefc45235",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\klib_platform_policy.h": "df2f9934c4bbf1dcd716a5aa2b39fd61cbaca0e2c8e39610c7a33425960d8178",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\klib_address_policy.h": "490d5b752fd598c1d7d5294c943428dfe55f27293ba192a61242ba2f1d8f5a51",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\klib_globals.cpp": "5c76ec22cc7165b71d1c3c07ed2b03819dd294bdc6f3608e85b3870ff7ea3953",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\klib_members.h": "54889a9a7f733ce4de63f892290ba612260e8f35da24db4c1ef39dc39b81e51a",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\klib_layout.cpp": "494a5847281a27fb6a6d1618a82f63eabf69c311f9984789059cc388066a0414",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\rva.h": "78d909c4f5efa405abcab5112a0f5bcf40613d9e5bc172e32d018d7b5e01c104",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\offsets.h": "f7849717b4e4791f7d23a17a7c7829a36827320352be697673e7f5b81b5f3e57",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\game\\game.cpp": "2bca1ce4bf8ad35664a0c8f3f123999d1df17bb49b5e43d8cbbef80c876ea5eb",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\base\\havok_alloc.cpp": "9af21518c572ef8175f4863560dd13739485c094cee3fa571d64a21667cf5c30",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\base\\prologue.cpp": "4e8c3f84ff72c9f00729a199528b703844b128959374a52f5b15d25b62ba3899",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\render\\scene_lever_policy.h": "95c769317d9c67ac2767c2f6699b123e7d6fd910251f5c7a0f17758d76c36658",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\render\\d3d_state_policy.h": "8c9dfbea525655143bc4a46b398d35420ef42b000efbb933ee4715f90bd60096",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\fixes\\physx\\physx_query_guard_policy.cpp": "3e10527158eb8aa844c0faa0ec46f61580dd499a11839438390bf809c629f073",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\fixes\\stitch\\stitch_byte_guard_policy.cpp": "b91e13c37ab6bab8cc1d2b44d2a8e8f0a99fd01784b6f5f0a34ba5a6afbcdcf6",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\build_leopard.bat": "04de4d22ee6a797cbd0c97d84c3c7fabf371fe59bd2ab21624364267d21217eb",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\tools\\kenshilib\\build_env.bat": "bde254757e5c2a2d03c901fdb9307f92d5ff9698438df9c6f4ac9239c49ede4e",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\README.md": "59d6a1f30acb08ff5afccfb697f3ab9588b2a2c45e296e898232981e69bfcc8c",
+    "D:\\DEV\\Kenshi\\KenshiLib-src\\Source\\kenshi\\Kenshi.cpp": "5239d2c5edb2877ee1dd397dad39d3ed1a75ad1482569bee9791c4bb9b79c0a1",
+    "D:\\DEV\\Kenshi\\KenshiLib-src\\Source\\core\\Functions.cpp": "47740eea3a5bded4bce8019c897aaf51396c28fc44b35a8b8086dea3903436c6",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\zone\\readiness\\zone_readiness_poll_scope.h": "67a104dca2dd244157f5c5c8e06a9cab12276480e9aa2e95ace89c9d996180b7",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\zone\\readiness\\zone_readiness_poll_scope.cpp": "cbdf5fae7c42974ec4432d600185796198d339d72c77001a962a635108a330d1",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\pathfind\\path_priority_publication.h": "5af07f3d75a288a94389f7893ddcf2efee8bb5c72e30500b67a4235a3b2404e9",
+    "D:\\DEV\\Kenshi\\forks\\KEO\\src\\pathfind\\path_priority_publication.cpp": "dbeed9e3bb2ab9a74c3a98964c1900e60ab01c769959799dbf7254207ab19c80"
+  },
+  "upstream_reference": "https://github.com/jacobericson/KEO",
+  "upstream_observation": "README explicitly lists GOG unsupported; checked public source page on2026-11-04."
+}
