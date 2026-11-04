@@ -124,3 +124,15 @@ their radial values are calculated against the actual authenticated canonical
 height source and then accepted through the unmodified production validator.
 These are disk/acceptance tests, **not native game rendering, GPU relighting,
 coordinator cancellation/join proof, FPS or long-running memory measurements**.
+
+## Prepared RAM Blob copies
+
+`Blob::CloneTo` creates an independent owned payload and never lends the source
+pointer. The caller reserves either its retained RAM entry or existing read
+scratch before calling. `CaptureAccepted` is used by the file worker immediately
+after a successful real Put, while its immutable Borrow remains held. It uses
+the existing AcceptedWindow adapter and fresh scope/frame/window validation;
+the passed Receipt must belong to that completed Put. This trusted internal API
+does not admit arbitrary untrusted receipts or reconstruct private header SHA.
+Allocation/cancellation returns false with an empty output and does not mutate
+Session status. See the actual integration and tests in `../fine-ramcache`.

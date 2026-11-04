@@ -1,0 +1,239 @@
+{
+  "format": "GSM_FINE_RAMCACHE_VERIFICATION",
+  "version": 1,
+  "controlsPerOptimization": 114,
+  "optimizations": [
+    "Od",
+    "O2"
+  ],
+  "workerRegressionControlsPerOptimization": 179,
+  "red": "actual old worker Get performs disk IO after successful Put",
+  "files": [
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/accepted-window/AcceptedWindow.h",
+      "bytes": 4692,
+      "sha256": "71dd16bba54fd1e69a5fbf7872bac14edfbf5dec2932b4f28ae2d109a4bd4899"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/.gitignore",
+      "bytes": 12,
+      "sha256": "c024e9d06523f36410828d879b2377cb98eea74c73a67ac8a2fb1065e35aa8d7"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/allocation.cpp",
+      "bytes": 2447,
+      "sha256": "63e217ec6d44aeb7e0d7fe2a80659fa1502bb84fcd90f1cea89747c8dd97bfba"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/FineRamCache.h",
+      "bytes": 5288,
+      "sha256": "00a504aff328975a5adbe28773026f98a5790ef822ceaea2ffa04e6bd3b1bffe"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/freeze.py",
+      "bytes": 1319,
+      "sha256": "cdfaa92f7fb99ff9fcf108d3efc9340dad07622399b1cbb5a3afd13f50b31ac8"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/lru.cpp",
+      "bytes": 4878,
+      "sha256": "57472f68f54cdf851cc17f5c5bd5e8d6875a4b48fe54bc4d454a0a13aa6252a1"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/quarantine.cpp",
+      "bytes": 1574,
+      "sha256": "1172255654871ca42fc2f2d892d0744a151003001ad4672720b6cc31d2afe24e"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/README.md",
+      "bytes": 4654,
+      "sha256": "877e73a71ab72627d99c722a2eaef0976ea5cadd61f73057b842e2af5429e1d9"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/run_tests.py",
+      "bytes": 1642,
+      "sha256": "e61972811c34bf4e0e783c35a2f230cc6108daddd966cfde2c797650eb40a87a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-ramcache/tests.cpp",
+      "bytes": 3041,
+      "sha256": "3494d309e6b056fa96ce17c88076f91bf76602060a58c47ee668e7cb55339bab"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-store/FineStore.h",
+      "bytes": 20981,
+      "sha256": "78086d1b0388f1576432492ffc9c8137cd98ea358a2231083fa16508eb9bd096"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-store/tests.cpp",
+      "bytes": 8850,
+      "sha256": "e8133e2ebe95a33485fccd5a1637fb38318ba4d41683aa5f451ed6a8c55a259c"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-worker/FineWorker.h",
+      "bytes": 14483,
+      "sha256": "c62e2d5a5cf45a28a27cc5d3af3b64b8e1b68580e187bcacd4039e7cc4e33861"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/fine-worker/tests.cpp",
+      "bytes": 4305,
+      "sha256": "27175d628456c0750963756392bb7854f618d8b935634e91d00c40fda90373f4"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/Gst2Writer.h",
+      "bytes": 5330,
+      "sha256": "cd21403b4a2115ed1ba59ef4adce91d62b602b40640dd01b84152f1c8750001b"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/window-writer512/WindowWriter512.h",
+      "bytes": 4765,
+      "sha256": "dcf946a92da69810ffa65b118c781d74280f24b4e78a996d731cd30ae2e51d3a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/world-build-disk/WorldBuildDisk.h",
+      "bytes": 8911,
+      "sha256": "78a93d3bc2f82b181c1e3897f4316379aebd1d1ac175bd3e4d0fd1280605e858"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-cache/world-window-session/WorldWindowSession.h",
+      "bytes": 6356,
+      "sha256": "58897825667c60f408c990651085ac02737bdaf136d8a1f6e0b72a993e0cb71e"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-models/GraphicsState.h",
+      "bytes": 4027,
+      "sha256": "c5f3e311d81d88181882232fd85c337c1dbfb2cb6399d366853abece58ae58ac"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/compact-material/_generated/Case.h",
+      "bytes": 8068,
+      "sha256": "4183e38910f3f9a4c2de6ac65238b8ba53b5814d982c2abfd0d63ddb8646e2f9"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/compact-material/CompactMaterial.h",
+      "bytes": 5756,
+      "sha256": "415fbb566e2e51a5a9e486b2cefff21cd7b5b593911e1370cf5bedd2be9152cc"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fine-windows/FineWindowPlanner.h",
+      "bytes": 7339,
+      "sha256": "5c53b9e6245d5e1d2d13d2aaf4754b1791781c9d1a6e116f448ae0326097c10b"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/fixed-geometry/FixedTerrainGeometry.h",
+      "bytes": 3646,
+      "sha256": "8c77945b97bc5925ff78d7845677d4c18d21a920176c1f7279ec6d08349d7698"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/png-source/PinnedPng.h",
+      "bytes": 4211,
+      "sha256": "d30b5413dbc653fbc72fa588673a902999338cf920f4d2a3aee14c9276a9fe95"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/raster/FixedTerrainRaster.h",
+      "bytes": 12234,
+      "sha256": "0ad68d252def4cb538161eedaf42116d9ff7bc458d5e8a88041309223594609f"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/source-receipts/MainGate.h",
+      "bytes": 4820,
+      "sha256": "9da2c4f1c09542a6c5a32d46dda9392471d30f6a6922e3ff5effbf9572ade2b7"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/source-receipts/ReceiptPolicy.h",
+      "bytes": 6662,
+      "sha256": "ff91b3628e5a2e4099c4b1ebbf584c39fd38834b145f6a17034f9f8532a27a52"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/source-receipts/WorkerFileLease.h",
+      "bytes": 4986,
+      "sha256": "887c19c77044eb61d50930502a1fffa8c83b016fa5235d82548b07aaa3871d30"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/staged-material/StagedMaterial.h",
+      "bytes": 2970,
+      "sha256": "4d0bcdd32180541b59085e18d0f444f061a3f8b8bebc367196b63765711677bb"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-bank/_generated/DecodedPins.h",
+      "bytes": 33086,
+      "sha256": "407a537bc08b96febae1f6a2b6f23d01ffd97ec420e03253a77677df6308646a"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-bank/WorldSourceBank.h",
+      "bytes": 12242,
+      "sha256": "3cfe3c6e9c40bc6fdb966a496a932af04d5d014ab43eb87a336065c9fc589837"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-cohort/WorldCohort.h",
+      "bytes": 23449,
+      "sha256": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-material/WorldMaterialPlan.h",
+      "bytes": 6246,
+      "sha256": "8bb72f85f82a827e5c79f082a9829da5644f8648b289c58aa46cf014dd0cee57"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-native/SourceFactory.h",
+      "bytes": 6377,
+      "sha256": "eb99bc837c802509585fbbf333eabb374cd666a11d8560d7c6ea26f495de8155"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-pixels/WorldPixels.h",
+      "bytes": 8389,
+      "sha256": "8a0413d58f28728dd0d83e6a3d8a48cbbc9affc23c74d11e9d73453c32d9cc22"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-raster/WorldTerrainRaster.h",
+      "bytes": 18321,
+      "sha256": "75c969b4db4f93d6a146cd39bb746dbc8c2dbd94cfb1f015025d0162da6b9e4b"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-source/WorldHeightSource.h",
+      "bytes": 7640,
+      "sha256": "50fde36344ca4d97099d8a0749e79ab71f20f260ff5249c80d4dccd86ddb3700"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-terrain/world-stream/WorldStream.h",
+      "bytes": 21000,
+      "sha256": "85ed283b33e0fcc602f04b1a0d420ca428058e0a9272d7d27beaba5da7f362f5"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasPolicy.h",
+      "bytes": 3080,
+      "sha256": "7bd8ad19580198dcbd24611cc5e121139e97fc07997441c7340dd15e93f4511c"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasReader.h",
+      "bytes": 4576,
+      "sha256": "8123d74f9916234ce944794759b38ff955251650e7bf2e8141a9b1d868c1b9ed"
+    },
+    {
+      "path": "GlobalSatelliteMap/atlas-view/AtlasRelight.h",
+      "bytes": 15788,
+      "sha256": "e98382b3693ae3177751eafea990cb3981000ab1decc7b963bf93f4f94fe3e86"
+    },
+    {
+      "path": "GlobalSatelliteMap/GsmCacheProfile.h",
+      "bytes": 1766,
+      "sha256": "731927fd403b74883a177f049a4741bc494afc292c611a19136c5d5e8b6fbafd"
+    },
+    {
+      "path": "tools/diagnostics/satellite-capture-probe/GeographyPolicy.h",
+      "bytes": 3190,
+      "sha256": "b5e183396b502ffb4ae72b30c915f16212303ba0e86b52b3c0fb4bf0cc042a95"
+    },
+    {
+      "path": "tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalog.h",
+      "bytes": 8174,
+      "sha256": "b62a97f0ad4fe4c01966eb43a672e4df9298ce51c566ab2db8931f4b90f5aefb"
+    },
+    {
+      "path": "tools/diagnostics/satellite-capture-probe/region-catalog/RegionCatalogData.h",
+      "bytes": 259179,
+      "sha256": "bd85da4b86a5e13bafd3ab9793c9a5f7ac3047488e57c813e430ade5d40f426f"
+    }
+  ],
+  "scope": "actual worker RAM retention with authenticated Accepted data and real private disk fallback; no game/GPU/FPS claim"
+}

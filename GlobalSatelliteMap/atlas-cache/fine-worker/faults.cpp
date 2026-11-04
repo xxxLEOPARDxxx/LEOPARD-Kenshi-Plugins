@@ -1,6 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define NOMINMAX
 #include <windows.h>
+#include <new>
+#include <cstdlib>
+// These pre-existing cases intentionally exercise actual file IO, including
+// Get's final HANDLE close. Refuse only the optional RAM hash-table allocation
+// so warm hits cannot bypass the disk fault being tested.
+void*operator new[](size_t n,const std::nothrow_t&)throw(){if(n==16384*sizeof(void*))return NULL;return std::malloc(n);}
 static DWORD observedMain=0;static int faultMode=0;static HANDLE workerThread=NULL,entered=NULL,releaseBarrier=NULL;static bool captureThread=false,mainWaitFail=false;static volatile LONG trapped=0;
 static bool FineFile(HANDLE h){LARGE_INTEGER n={};return GetFileSizeEx(h,&n)&&n.QuadPart==1049600;}
 static HANDLE WINAPI TestThread(LPSECURITY_ATTRIBUTES a,SIZE_T stack,LPTHREAD_START_ROUTINE fn,LPVOID arg,DWORD flags,LPDWORD id){HANDLE h=CreateThread(a,stack,fn,arg,flags,id);if(captureThread)workerThread=h;return h;}

@@ -28,17 +28,29 @@ detail falls back to existing LOD/terrain. Model-job epochs reject old completio
 after toggling the setting. Accepted model height/coverage feeds lamps and water,
 so opaque water cannot paint over a higher accepted building surface.
 
-The current local development profile caps owned GPU payload at 512MiB, fine
-residency at 256 windows, visible fine work at 96 windows, and fine disk LRU at
-512 files. Offscreen sharp tiles remain warm until actual pressure. CPU fine-work
-payload remains capped at 64MiB, including a conservative 3MiB loaded-capture
-reserve. The detailed raster/compositor adds 2,884,080 owned GPU bytes when
-initialized. Borrowed native mesh buffers/textures retain their existing separate
-32MiB/64MiB limits. These are resource payload bounds, not total game/driver RAM
-or VRAM guarantees. GPU retirement debt and failed-fence admission remain counted.
-The viewer/layer allowance is 40MiB within that same aggregate, independently
-of retained fine tiles. This development profile is not a low-end hardware claim;
-selectable lower budgets and constrained-hardware acceptance are still pending.
+MCM provides independent cache budgets in1GiB steps: video memory1..8GiB and
+RAM1..32GiB. Defaults are1GiB VRAM and2GiB RAM. Both settings have a restart
+asterisk: one immutable budget is used for the whole process session. These are
+lazy ceilings, not startup reservations; leave memory for Kenshi and other apps.
+GPU admission includes the viewer/layers, visible/retained fine windows, source
+producer and pending/retired GPU resources. Physical residency scales from665
+to6144 windows; visible fine work stays bounded at96 per spacing. Offscreen sharp
+tiles remain warm until pressure. Only visible widgets are processed per frame.
+
+A file worker retains validated prepared fine tiles in a separate RAM LRU after
+production or disk reads. Cache hits publish independent read copies without IO;
+eviction never invalidates Main's current read. Failed optional RAM allocation
+keeps the valid disk result. After visible work and600ms stability,8..64 pairs
+around the viewport can be prewarmed in RAM without speculative GPU uploads.
+Ordinary map close/reopen keeps the worker/cache; world change or disabling the
+plugin drains it. The existing disk LRU remains512 files, independent of RAM.
+
+Producer/IO scratch remains separately capped at64MiB, including a conservative
+3MiB loaded-capture reserve and cache metadata. The detailed raster/compositor
+adds2,884,080 owned GPU bytes when initialized. Native mesh buffers/textures have
+separate32MiB/64MiB retained-reference limits. These are resource payload bounds,
+not total game/driver RAM or VRAM guarantees. Viewer/layers have40MiB inside the
+selected aggregate. GPU retirement debt and failed-fence admission remain counted.
 Actual end-to-end town appearance, frame time and long-session growth require
 game measurements; offline tests do not prove freedom from every possible leak.
 
@@ -82,17 +94,29 @@ RU
 настройки отбрасывается. Высота принятой геометрии используется светом и водой,
 чтобы вода не перекрывала более высокое здание.
 
-Текущий локальный профиль: до 512МиБ собственных GPU-данных, 256 сохранённых
-подробных участков, до 96 видимых участков в плане и 512 файлов дискового кэша.
-Уже загруженные участки сохраняются вне экрана до реальной нехватки ресурсов.
-Лимит CPU-данных подробного рендера - 64МиБ, включая резерв 3МиБ для снимка города.
-Новый растеризатор и смешивание занимают 2 884 080 GPU-байт после инициализации.
-Удерживаемые штатные буферы и текстуры имеют отдельные лимиты 32/64МиБ.
-Это границы данных ресурсов, а не всей памяти игры или видеодрайвера. Реальное
-изображение городов, FPS и рост памяти проверяются отдельно в игре.
-Внутри общего лимита для просмотра и слоёв отведено 40МиБ отдельно от подробных
-плиток. Это профиль стенда, а не подтверждение работы на слабых видеокартах:
-выбор меньших бюджетов и проверка на ограниченном железе ещё предстоят.
+В MCM есть два независимых бюджета с шагом1ГиБ: видеопамять1..8ГиБ и оперативная
+память1..32ГиБ. По умолчанию1ГиБ VRAM и2ГиБ RAM. Обе настройки помечены звёздочкой:
+бюджет фиксируется до конца запуска. Память выделяется постепенно; оставляйте
+запас для самой Kenshi и других программ. Вместимость GPU-кэша растёт от665
+до6144 плиток. В общий бюджет входят слои карты, подробные плитки, производитель
+и ресурсы, ожидающие завершения работы GPU. За кадр обрабатываются только видимые
+виджеты, а не все тысячи сохранённых плиток. Видимый план ограничен96 участками
+на каждый шаг разрешения.
+
+Рабочий поток сохраняет проверенные готовые подробные плитки в RAM после
+производства или чтения с диска. Попадание в кэш обходится без диска; выданная
+копия не зависит от вытеснения записи. Неудачная необязательная аллокация RAM
+не портит рабочий результат на диске. После видимых плиток и600мс стабильности
+прогреваются8..64 пары вокруг текущего вида без загрузки лишних текстур в VRAM.
+Обычное закрытие карты сохраняет кэш. Смена мира и отключение плагина завершают
+его работу. Дисковый LRU по-прежнему ограничен512 файлами отдельно от RAM.
+
+Рабочие буферы производителя и IO имеют отдельный предел64МиБ, включая метаданные
+и резерв3МиБ для снимка города. Новый растеризатор занимает2 884 080 GPU-байт.
+Для просмотра и слоёв отведено40МиБ внутри выбранного GPU-бюджета. Удерживаемые
+штатные буферы и текстуры имеют отдельные лимиты32/64МиБ. Это границы данных
+ресурсов, а не всей памяти игры или видеодрайвера. Реальное изображение, FPS
+и рост памяти проверяются отдельно в игре.
 
 Перед полным рендером нужно не менее 24ГБ свободного места; сетка занимает около
 23ГБ. Просмотр использует готовую сетку. Для этого обновления полный рендер не

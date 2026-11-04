@@ -1,0 +1,15 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <windows.h>
+static volatile LONG fineReads=0,mainReads=0;static DWORD testMain=0;
+static BOOL WINAPI CacheReadFile(HANDLE h,LPVOID p,DWORD n,LPDWORD done,LPOVERLAPPED o){InterlockedIncrement(&fineReads);if(GetCurrentThreadId()==testMain)InterlockedIncrement(&mainReads);return ::ReadFile(h,p,n,done,o);}
+#define ReadFile CacheReadFile
+#define FINE_WORKER_FIXTURE_ONLY
+#include "../fine-worker/tests.cpp"
+#undef ReadFile
+int wmain(int argc,wchar_t**argv){try{
+ C(argc==2,"runner owned root");testMain=mainThread=GetCurrentThreadId();HANDLE maker=CreateThread(NULL,0,MakeFixture,NULL,0,NULL);C(maker&&WaitForSingleObject(maker,10000)==WAIT_OBJECT_0,"actual accepted source ready");DWORD exit=~0u;C(GetExitCodeThread(maker,&exit)&&!exit&&fixture,"fixture known joined");CloseHandle(maker);
+ FineStore::Identity id=Identity();FineStore::Ledger external=fixture->Budget();external.other+=fixture->accepted.OwnedBytes();FineWrite::Worker worker;C(worker.Start(fixture->scope,id,Config(argv[1],L"normal"),external),"worker starts");Boot(worker);FineStore::Ledger empty;C(worker.SubmitPut(Borrow(),Key(0),id,empty),"accepted tile submitted");FineStore::Receipt receipt=Written(worker);C(receipt.serial!=0,"native disk Put acknowledged");WorldPixels::View accepted={};BYTE heightSha[32],actualSha[32];C(fixture->accepted.Acquire(true,fixture->scope,Frame(Key(0),fixture->scope),fixture->window,accepted)&&AtlasView::Digest(accepted.height,256*256*4,heightSha),"expected authenticated height digest retained before producer release");fixture->accepted.Clear();
+ InterlockedExchange(&fineReads,0);C(worker.SubmitGet(Key(0),id,external)&&Read(worker)==1,"prepared tile read completes");FineStore::View view={};C(worker.PeekRead(true,fixture->scope,Key(0),id,view)&&view.material,"fresh RAM view published");C(InterlockedCompareExchange(&fineReads,0,0)==0,"successful Put warms prepared RAM tile before any disk Get");
+ C(!std::memcmp(view.material,&fixture->material[0],256*256*8)&&AtlasView::Digest(view.height,256*256*4,actualSha)&&!std::memcmp(heightSha,actualSha,32),"RAM warm/read keeps exact HDR material and authenticated heights");bool normals=true;for(unsigned i=0;i<256*256;++i)normals=normals&&!std::memcmp(view.normal+i*4,&fixture->normal[i*4],3)&&view.normal[i*4+3]==255;C(normals,"RAM warm/read preserves normal RGB and canonical coverage255");FineWrite::RamStats stats=worker.MemoryStats();C(stats.hits==1&&stats.entries==1&&stats.bytes==FineRam::Cache::BaseBytes()+FineRam::Cache::EntryBytes(),"Main atomically observes actual bounded cache ownership counters");
+ const BYTE saved=view.material[0];worker.Cancel();C(worker.TryJoin()==0&&view.material[0]==saved,"cancel preserves published clone");C(worker.ReleaseRead(),"clone explicitly released");Joined(worker);C(!worker.Quarantined(),"healthy RAM owner known joined");C(!mainReads,"no file IO on native Main");delete fixture;fixture=NULL;std::printf("PASS %u RAM worker warm/read/borrow controls\n",checks);return 0;
+ }catch(...){return 1;}}

@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-04",
+  "kind": "actual native metadata/admission; no engine/runtime allocation/FPS claim",
+  "compiler": "Visual C++10 x64 /O2 COFF sizeof constants from included actual GlobalSatelliteMap.cpp; actual MakeBudget and reservation bodies /Od and /O2 host",
+  "profile": {
+    "gpuGiB": 8,
+    "ramGiB": 32,
+    "retainedGpuSlots": 6144,
+    "indexMetadataCharged": 1579304
+  },
+  "sizeof": {
+    "baseCache": 25344,
+    "fineCache": 1376256,
+    "retired": 602272,
+    "models": 1170968,
+    "plan": 10912,
+    "aheadPlan": 10912,
+    "manifest": 4784,
+    "maxIndex": 1579304,
+    "scratch": 251904,
+    "visible": 768,
+    "localDiagnostic": 608,
+    "localRevision": 458776,
+    "nativeLight": 152,
+    "relighter": 56,
+    "fineTiles": 4608,
+    "job": 6184,
+    "cachedTown": 9352,
+    "nativeTownState": 8648,
+    "nativeTownSnapshot": 7648,
+    "widgetSlots": 12676
+  },
+  "bounds": {
+    "ordinaryIndexBytes": 2096640,
+    "existingCachedTownPayloadAllowance": 2097152,
+    "loadedOldNewPacketsAllowance": 3145728,
+    "additionalFixedAllowance": 524288,
+    "ordinaryJobs": 2,
+    "eachOrdinaryJobPixels": 1048576
+  },
+  "result": {
+    "externalCpu": 19676908,
+    "producerCpu": 45077658,
+    "otherCpu": 21767804,
+    "totalCpu": 66845462,
+    "cap": 67108864,
+    "margin": 263402,
+    "admittedOd": true,
+    "admittedO2": true
+  },
+  "sha256": {
+    "GlobalSatelliteMap.cpp": "e29e6e2204a80c169c81ae5ca00c23b9966f836c2abaa06b5958b14ab9c67687",
+    "GsmFineViewer.h": "d5ce3ffedf91ca41303d0243caddc77082e46c75f4f61ec0200b3870cad8bcd6",
+    "GsmFineIndex.h": "aeab6f52c44ac10d9298e4f4d5dd3efee0c5869deed2e55bd26eb3be62f43bf2",
+    "GsmFineWidgetSlots.h": "4203de4c19cdf091d438a6527a19042fa242bf81c46fe4bcc31fb4c02cc9527c",
+    "GsmCacheProfile.h": "731927fd403b74883a177f049a4741bc494afc292c611a19136c5d5e8b6fbafd",
+    "atlas-terrain/fine-coordinator/FineCoordinator.h": "635b4111e2d4fdaa7f54796c51ecef68d49b1e25686e5aa8af5c9a114fcd96ad",
+    "atlas-terrain/world-cohort/WorldCohort.h": "672f855dc845c5af25fa92dca861ba28bcd2b73aa4ae285c8ac389d792ab63ae",
+    "atlas-terrain/world-native-rebind/NativeRebind.h": "0435317234a3e3ba55b3ba53a6884b9a0f90279708cc62fb8aa8c06d52d3d85c"
+  }
+}

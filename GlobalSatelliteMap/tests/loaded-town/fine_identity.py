@@ -12,7 +12,7 @@ stop = source.index('std::memset(&fineIdentity', start)
 prefix = source[start:stop]
 code = r'''
 #include <cstdio>
-namespace FineJob {enum {CacheSlots=256};}
+namespace FineJob {enum {CacheSlots=256};inline unsigned ActiveSlots(){return CacheSlots;}}
 struct Owner {unsigned cancelled;Owner():cancelled(0){}void Cancel(){++cancelled;}};
 Owner* fineOwner=0;
 struct Entry {bool valid;}fineCache[256];

@@ -31,6 +31,24 @@ public:
  Blob():data_(NULL),session_(0),serial_(0){std::memset(&key_,0,sizeof(key_));std::memset(&identity_,0,sizeof(identity_));std::memset(&frame_,0,sizeof(frame_));std::memset(&height_,0,sizeof(height_));}
  ~Blob(){Clear();}void Clear(){delete[]data_;data_=NULL;session_=serial_=0;}
  U64 OwnedBytes()const{return data_?sizeof(Blob)+PayloadBytes:0;}
+ // These copies are worker-only operations. The caller separately reserves
+ // retained cache bytes or the existing64MiB IO/read scratch before calling.
+ // A failed allocation/cancel leaves the destination empty, never aliases it.
+ bool CloneTo(Blob&out,U64 availablePayload,HANDLE cancel)const{
+  if(&out==this)return false;out.Clear();if(!data_||availablePayload<PayloadBytes||WorldPixels::Cancelled(cancel))return false;
+  BYTE*copy=new(std::nothrow)BYTE[PayloadBytes];if(!copy)return false;
+  for(unsigned at=0;at<PayloadBytes;at+=65536){if(WorldPixels::Cancelled(cancel)){delete[]copy;return false;}std::memcpy(copy+at,data_+at,65536);}
+  if(WorldPixels::Cancelled(cancel)){delete[]copy;return false;}
+  out.data_=copy;out.key_=key_;out.identity_=identity_;out.frame_=frame_;out.height_=height_;out.session_=session_;out.serial_=serial_;return true;
+ }
+ bool CaptureAccepted(const Receipt&r,const WorldPixels::Accepted&p,const SourceReceipts::Scope&scope,const WorldRaster::Frame&frame,const WorldHeight::Window&w,HANDLE cancel,const AcceptedWindow::Ledger&scratch,U64 availablePayload){
+  Clear();if(!r.session||!r.serial||availablePayload<PayloadBytes||!Anchored(r.key,r.identity,scope,frame)||WorldPixels::Cancelled(cancel))return false;
+  AcceptedWindow::Adapter adapter;if(adapter.Build(true,p,scope,frame,w,cancel,scratch)!=S_OK)return false;AcceptedWindow::View view={};if(!adapter.Acquire(true,p,scope,frame,w,cancel,scratch,view)||view.side!=256)return false;
+  BYTE*copy=new(std::nothrow)BYTE[PayloadBytes];if(!copy)return false;unsigned at=0;
+  for(unsigned plane=0;plane<3;++plane){const BYTE*src=static_cast<const BYTE*>(view.Plane(plane));for(unsigned n=0;n<view.Bytes(plane);n+=65536){if(WorldPixels::Cancelled(cancel)){delete[]copy;return false;}std::memcpy(copy+at,src+n,65536);at+=65536;}}
+  if(WorldPixels::Cancelled(cancel)){delete[]copy;return false;}
+  data_=copy;key_=r.key;identity_=r.identity;frame_=frame;height_=view.heightSource;session_=r.session;serial_=r.serial;return true;
+ }
  bool Acquire(bool enabled,const FineWindows::Key&key,const Identity&identity,View&out)const{
   std::memset(&out,0,sizeof(out));if(!enabled||!data_||!FineWindows::Equal(key_,key)||!Same(identity_,identity))return false;
   out.material=data_;out.normal=data_+256*256*8;out.height=reinterpret_cast<const float*>(data_+256*256*12);out.key=key_;out.identity=identity_;out.frame=frame_;out.heightSource=height_;return true;

@@ -1,7 +1,9 @@
 #pragma once
 #include "../fine-store/FineStore.h"
+#include "../fine-ramcache/FineRamCache.h"
 #include "../../atlas-terrain/world-cohort/WorldCohort.h"
 namespace FineWrite {
+struct RamStats {FineStore::U64 bytes,hits,misses;unsigned entries;RamStats():bytes(0),hits(0),misses(0),entries(0){}};
 // Single persistent worker, no IO/native call on Main. Caller retains borrowed
 // producer owners until Put ack OR known finished/joined consumer. On quarantine
 // caller MUST retain the whole producer and charge its own CPU/GPU debt too.
@@ -12,11 +14,16 @@ class Worker {
   FineStore::Config config;SourceReceipts::Scope scope;FineStore::Identity identity;
   FineWindows::Key key;FineStore::Ledger initial,ledger;WorldCohort::Borrowed borrow;
   FineStore::Receipt receipt;FineStore::Blob blob;FineStore::Session*session;
+  FineRam::Cache ram;FineStore::U64 ramBudget;
+  __declspec(align(8)) volatile LONGLONG ramBytes,ramHits,ramMisses,ramEntries;
   HANDLE wake,cancel;volatile LONG state,command,finished,retained;HRESULT error;
-  Work(const FineStore::Config&c):config(c),session(NULL),wake(NULL),cancel(NULL),state(Boot),command(None),finished(0),retained(0),error(S_OK){std::memset(&scope,0,sizeof(scope));std::memset(&identity,0,sizeof(identity));std::memset(&key,0,sizeof(key));std::memset(&borrow,0,sizeof(borrow));std::memset(&receipt,0,sizeof(receipt));}
+  Work(const FineStore::Config&c):config(c),session(NULL),ramBudget(0),ramBytes(0),ramHits(0),ramMisses(0),ramEntries(0),wake(NULL),cancel(NULL),state(Boot),command(None),finished(0),retained(0),error(S_OK){std::memset(&scope,0,sizeof(scope));std::memset(&identity,0,sizeof(identity));std::memset(&key,0,sizeof(key));std::memset(&borrow,0,sizeof(borrow));std::memset(&receipt,0,sizeof(receipt));}
+  void PublishRam(){InterlockedExchange64(&ramBytes,LONGLONG(ram.Bytes()));InterlockedExchange64(&ramHits,LONGLONG(ram.Hits()));InterlockedExchange64(&ramMisses,LONGLONG(ram.Misses()));InterlockedExchange64(&ramEntries,LONGLONG(ram.Entries()));}
   static DWORD WINAPI Run(void*p){Work&w=*static_cast<Work*>(p);
    try{
-    w.session=new FineStore::Session;w.error=w.session->Begin(true,w.scope,w.identity,w.config,w.initial);if(FAILED(w.error))throw 1;InterlockedExchange(&w.state,Idle);
+    w.session=new FineStore::Session;w.error=w.session->Begin(true,w.scope,w.identity,w.config,w.initial);if(FAILED(w.error))throw 1;
+    // Optional retention failure must not poison the already valid disk owner.
+    w.ram.Begin(w.scope,w.identity,w.ramBudget);w.PublishRam();InterlockedExchange(&w.state,Idle);
     for(;;){
      if(WaitForSingleObject(w.wake,INFINITE)!=WAIT_OBJECT_0){w.error=E_FAIL;InterlockedExchange(&w.retained,1);break;}
      LONG command=InterlockedExchange(&w.command,None);if(command==Stop){
@@ -26,12 +33,21 @@ class Worker {
      }
      if(command==Put){
       w.error=w.session->Put(true,w.key,w.identity,*w.borrow.accepted,w.borrow.scope,w.borrow.frame,*w.borrow.window,w.cancel,w.ledger,w.receipt);
+      if(w.error==S_OK&&!w.session->NeedsRetention()){
+       AcceptedWindow::Ledger scratch;scratch.retainedRaw=w.ledger.retainedRaw;scratch.other=w.ledger.other+FineStore::Session::FixedCpuBytes();
+       w.ram.RememberAccepted(w.receipt,*w.borrow.accepted,w.borrow.scope,w.borrow.frame,*w.borrow.window,w.cancel,scratch);w.PublishRam();
+      }
       // This publication is the consumer acknowledgement, including failures.
       std::memset(&w.borrow,0,sizeof(w.borrow));
       if(w.session->NeedsRetention()){InterlockedExchange(&w.retained,1);break;}
       InterlockedExchange(&w.state,SUCCEEDED(w.error)?PutDone:Failed);
      }else if(command==Get){
-      w.error=w.session->Get(true,w.key,w.identity,w.cancel,w.ledger,w.blob);
+      w.error=WorldPixels::Cancelled(w.cancel)?HRESULT_FROM_WIN32(ERROR_CANCELLED):w.ram.Get(w.key,w.identity,w.cancel,w.ledger,w.blob);
+      if(w.error!=S_OK&&!WorldPixels::Cancelled(w.cancel)){
+       w.error=w.session->Get(true,w.key,w.identity,w.cancel,w.ledger,w.blob);
+       if(w.error==S_OK&&!w.session->NeedsRetention())w.ram.Remember(w.blob,w.key,w.identity,w.cancel);
+      }
+      w.PublishRam();
       if(w.session->NeedsRetention()){InterlockedExchange(&w.retained,1);break;}
       InterlockedExchange(&w.state,FAILED(w.error)?Failed:w.error==S_FALSE?Miss:ReadDone);
      }else {w.error=E_UNEXPECTED;break;}
@@ -40,6 +56,7 @@ class Worker {
    std::memset(&w.borrow,0,sizeof(w.borrow));
    // A worker EOF/exception while Main could be reading cannot reclaim Blob.
    if(w.blob.OwnedBytes())InterlockedExchange(&w.retained,1);
+   if(!InterlockedCompareExchange(&w.retained,0,0)){w.ram.Clear();w.PublishRam();}
    // A normal/graceful-cancel terminal session cannot reuse its private cache.
    // Remove only known closed indexed payloads here on the worker. Poisoned or
    // uncertain owners retain forensic data; active Main reads never reach here.
@@ -84,12 +101,15 @@ public:
  ~Worker(){if(!work_||quarantined_)return;if(!Main()){Retain();return;}Cancel();if(pendingGet_&&announcedRead_){Retain();return;}Join();}
  static FineStore::U64 FixedCpuBytes(){return sizeof(Worker)+sizeof(Work);} // Session charges itself inside FineStore
  FineStore::U64 RetainedCpuBytes()const{return quarantined_?Debt().cpu:0;}bool Quarantined()const{return quarantined_;}HRESULT Error()const{return error_;}
+ // Independent retained RAM is never hidden inside the64MiB scratch ceiling.
+ RamStats MemoryStats()const{RamStats s;if(!Main()||!work_||quarantined_)return s;s.bytes=FineStore::U64(InterlockedCompareExchange64(&work_->ramBytes,0,0));s.hits=FineStore::U64(InterlockedCompareExchange64(&work_->ramHits,0,0));s.misses=FineStore::U64(InterlockedCompareExchange64(&work_->ramMisses,0,0));s.entries=unsigned(InterlockedCompareExchange64(&work_->ramEntries,0,0));return s;}
+ FineStore::U64 RamBytes()const{return MemoryStats().bytes;}FineStore::U64 RetainedRamBytes()const{return quarantined_&&work_?work_->ramBudget:0;}
  bool BorrowPending()const{return pendingPut_;}bool ReadPending()const{return pendingGet_;}
  bool Start(const SourceReceipts::Scope&scope,const FineStore::Identity&identity,const FineStore::Config&config,const FineStore::Ledger&external){
   if(!Main()||work_||thread_||stopping_||failed_||quarantined_||Debt().work||scope.thread!=owner_||!SourceReceipts::ScopeValid(scope)||!FineStore::Valid(identity)||scope.sourceEpoch!=identity.sourceEpoch)return false;
   FineStore::Ledger ledger=external;if(!Add(ledger.other,FixedCpuBytes())||ledger.retainedRaw>SourceReceipts::CpuCap-ledger.other||FineStore::Session::FixedCpuBytes()>SourceReceipts::CpuCap-ledger.other-ledger.retainedRaw)return false;
   if(InterlockedCompareExchange(&Slot(),1,0)!=0)return false;try{work_=new Work(config);}catch(...){InterlockedExchange(&Slot(),0);error_=E_OUTOFMEMORY;return false;}
-  work_->scope=scope;work_->identity=identity;work_->initial=ledger;work_->wake=CreateEventA(NULL,FALSE,FALSE,NULL);work_->cancel=CreateEventA(NULL,TRUE,FALSE,NULL);if(work_->wake&&work_->cancel)thread_=CreateThread(NULL,0,Work::Run,work_,0,NULL);
+  work_->scope=scope;work_->identity=identity;work_->initial=ledger;work_->ramBudget=GsmCacheProfile::RamBudgetBytes();work_->wake=CreateEventA(NULL,FALSE,FALSE,NULL);work_->cancel=CreateEventA(NULL,TRUE,FALSE,NULL);if(work_->wake&&work_->cancel)thread_=CreateThread(NULL,0,Work::Run,work_,0,NULL);
   if(!thread_){error_=E_FAIL;if(work_->wake){if(!CloseHandle(work_->wake)){Retain();return false;}work_->wake=NULL;}if(work_->cancel){if(!CloseHandle(work_->cancel)){Retain();return false;}work_->cancel=NULL;}delete work_;work_=NULL;InterlockedExchange(&Slot(),0);return false;}return true;
  }
  int PollBoot(){if(!Check())return -1;if(stopping_)return 0;if(InterlockedCompareExchange(&work_->state,0,0)==Idle&&!ready_){ready_=true;return 1;}return 0;}

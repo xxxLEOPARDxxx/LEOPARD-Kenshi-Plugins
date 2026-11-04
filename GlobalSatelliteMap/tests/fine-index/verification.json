@@ -1,0 +1,24 @@
+{
+  "scope": "pure actual GsmFineIndex header; no viewer/game integration",
+  "results": [
+    {
+      "opt": "Od",
+      "result": "PASS 6479 fine-index controls; maximum6144 metadata=1579304 bytes\n"
+    },
+    {
+      "opt": "O2",
+      "result": "PASS 6479 fine-index controls; maximum6144 metadata=1579304 bytes\n"
+    }
+  ],
+  "functionalMutants": [
+    "stamp32",
+    "duplicate-slot",
+    "wrong-erase",
+    "worst-spacing"
+  ],
+  "sha256": {
+    "GsmFineIndex.h": "aeab6f52c44ac10d9298e4f4d5dd3efee0c5869deed2e55bd26eb3be62f43bf2",
+    "tests\\fine-index\\index_tests.cpp": "8e7fc67fe60d0b5dc1210cfeb756aff0a73346b6f6db29888cb85e85925aa5a1",
+    "tests\\fine-index\\run.py": "cbdf6b6f1a3d16500ecc667a10233a5daa6955623ce3c2ca949324e3784abe5b"
+  }
+}

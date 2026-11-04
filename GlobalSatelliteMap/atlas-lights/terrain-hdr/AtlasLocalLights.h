@@ -3,7 +3,7 @@
 #include "../../atlas-water/AtlasWater.h"
 namespace AtlasLocalLights {
 typedef unsigned __int64 U64;
-const U64 Cap=AtlasView::GpuCap;
+static const U64&Cap=AtlasView::GpuCap;
 const unsigned Batch=32,MaxBlock=256;
 struct GpuLight {float positionRange[4],directionType[4],diffusePower[4],spot[4];};
 struct Uniforms {float tileBounds[4],sourceWindow[4],dispatchWindow[4],sceneToCache[4],parallelView[4];GpuLight lights[Batch];};

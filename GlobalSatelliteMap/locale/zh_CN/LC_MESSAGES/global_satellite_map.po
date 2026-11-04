@@ -78,3 +78,18 @@ msgstr "缩放：x%.2f | 细节已加载"
 
 msgid "Zoom: x%.2f | Loading details..."
 msgstr "缩放：x%.2f | 正在加载细节..."
+
+msgid "Map cache"
+msgstr "地图缓存"
+
+msgid "Video memory budget, GiB"
+msgstr "地图显存上限，GiB"
+
+msgid "Maximum video memory used by the map, including detailed tiles and rendering. 1 GiB steps, up to 8 GiB. Memory is allocated as needed; leave room for Kenshi and other applications."
+msgstr "地图使用的显存上限，包括精细地块与渲染资源。每档1 GiB，最高8 GiB。按需分配内存；请为Kenshi和其他程序保留余量。"
+
+msgid "RAM cache budget, GiB"
+msgstr "地图内存缓存上限，GiB"
+
+msgid "Keep prepared terrain tiles in RAM for faster return visits and nearby-area loading. 1 GiB steps, up to 32 GiB. The cache grows as you view the map; leave room for the game and other applications."
+msgstr "在内存中保留已生成的地形地块，以加快返回浏览和邻近区域加载。每档1 GiB，最高32 GiB。缓存会随地图浏览逐渐增长；请为游戏和其他程序保留余量。"

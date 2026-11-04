@@ -9,8 +9,8 @@ struct Residency {U64 viewerGpu,fineGpu,pendingGpu,retiredGpu;unsigned occupied;
 // images as viewer allocations. All measured owners and the actual K2 bank
 // still have to fit the shared GPU cap before starting another producer.
 inline bool StartupFits(const Residency&r){
- if(r.viewerGpu>FineJob::ViewerAllowance||r.occupied>FineJob::CacheSlots||
-    r.fineGpu<U64(r.occupied)*FineJob::WindowBytes||r.fineGpu>U64(FineJob::CacheSlots)*FineJob::WindowBytes)return false;
+ if(r.viewerGpu>FineJob::ViewerAllowance||r.occupied>FineJob::ActiveSlots()||
+    r.fineGpu<U64(r.occupied)*FineJob::WindowBytes||r.fineGpu>U64(FineJob::ActiveSlots())*FineJob::WindowBytes)return false;
  U64 viewer=r.viewerGpu;
  if(r.pendingGpu>FineJob::ViewerAllowance-viewer)return false;viewer+=r.pendingGpu;
  if(r.retiredGpu>FineJob::ViewerAllowance-viewer)return false;viewer+=r.retiredGpu;
@@ -35,7 +35,7 @@ template<class NativeSession>class Controller {
  static U64 Extra(){return sizeof(Controller)+sizeof(Owner)-sizeof(NativeSession)-sizeof(FineWrite::Worker);}
  bool CurrentBase(const FineJob::Demand&now,const FineStore::Identity&id)const{return owner_&&FineJob::Internal::DemandValid(now)&&SourceReceipts::SameScope(owner_->scope,now.scope)&&FineStore::Same(owner_->identity,id)&&now.view.stamp.source==id.sourceEpoch&&now.view.stamp.material==id.materialGeneration;}
  bool CpuLedger(bool wholeNative,const FineStore::Ledger&external,FineStore::Ledger&out)const{out=external;return Add(out.other,Extra(),SourceReceipts::CpuCap)&&Add(out.other,wholeNative?owner_->native.CpuReservation():owner_->native.ExtraCpuPeakBytes(),SourceReceipts::CpuCap);}
- bool GpuLedger(const Residency&r,WorldBank::Ledger&out)const{std::memset(&out,0,sizeof(out));out.retained=r.viewerGpu;if(!Add(out.retained,r.fineGpu,AtlasView::GpuCap))return false;out.pending=r.pendingGpu;out.retired=r.retiredGpu;U64 total=r.viewerGpu;if(!Add(total,r.fineGpu,AtlasView::GpuCap)||!Add(total,r.pendingGpu,AtlasView::GpuCap)||!Add(total,r.retiredGpu,AtlasView::GpuCap))return false;return r.occupied<=FineJob::CacheSlots&&r.fineGpu>=U64(r.occupied)*FineJob::WindowBytes&&r.fineGpu<=U64(FineJob::CacheSlots)*FineJob::WindowBytes;}
+ bool GpuLedger(const Residency&r,WorldBank::Ledger&out)const{std::memset(&out,0,sizeof(out));out.retained=r.viewerGpu;if(!Add(out.retained,r.fineGpu,AtlasView::GpuCap))return false;out.pending=r.pendingGpu;out.retired=r.retiredGpu;U64 total=r.viewerGpu;if(!Add(total,r.fineGpu,AtlasView::GpuCap)||!Add(total,r.pendingGpu,AtlasView::GpuCap)||!Add(total,r.retiredGpu,AtlasView::GpuCap))return false;return r.occupied<=FineJob::ActiveSlots()&&r.fineGpu>=U64(r.occupied)*FineJob::WindowBytes&&r.fineGpu<=U64(FineJob::ActiveSlots())*FineJob::WindowBytes;}
  void Retain(){quarantined_=true;if(SUCCEEDED(error_))error_=E_FAIL;Debt().owner=owner_;Debt().cpu=SourceReceipts::CpuCap;Debt().gpu=owner_?owner_->native.Cohort().ReservedGpuBytes():0;}
  void Hard(HRESULT hr){if(SUCCEEDED(error_))error_=FAILED(hr)?hr:E_ABORT;if(owner_&&!owner_->stopping){owner_->stopping=true;owner_->stopAt=GetTickCount();owner_->worker.Cancel();}}
  bool PairMatches(const FineJob::Plan&p,unsigned pair,const FineJob::Demand&now,const WorldCohort::Job&job)const{
@@ -106,7 +106,7 @@ public:
  }
  bool Drain(){if(!Ready())return false;owner_->draining=true;return true;}
  bool RequestRead(const FineJob::Plan&p,const FineWindows::Key&key,const FineJob::Demand&now,const FineStore::Identity&id,const Residency&r,const FineStore::Ledger&external){
-  if(!Ready()||!CurrentBase(now,id)||!FineJob::Wanted(p,now,key)||owner_->native.Cohort().ReservedGpuBytes()!=0)return false;FineJob::Budget b;if(!MakeBudget(r,external,b))return false;FineJob::UploadGate gate={0,true};if(!FineJob::CanUpload(p,now,key,b,gate))return false;FineStore::Ledger ledger;if(!CpuLedger(true,external,ledger))return false;
+  if(!Ready()||!CurrentBase(now,id)||!FineJob::Wanted(p,now,key)||owner_->native.Cohort().ReservedGpuBytes()!=0)return false;FineJob::Budget b;if(!MakeBudget(r,external,b))return false;FineJob::UploadGate gate={0,true};if(!FineJob::CanRead(p,now,key,b,gate))return false;FineStore::Ledger ledger;if(!CpuLedger(true,external,ledger))return false;
   if(!owner_->worker.SubmitGet(key,id,ledger))return false;owner_->plan=p;owner_->readingKey=key;owner_->reading=true;owner_->readReady=owner_->readExposed=false;return true;
  }
  bool PeekRead(bool enabled,const FineJob::Demand&now,const FineStore::Identity&id,const Residency&r,const FineStore::Ledger&external,FineStore::View&out){
@@ -115,6 +115,10 @@ public:
  bool ReleaseRead(){if(!Main()||!owner_||quarantined_||!owner_->reading||!owner_->readReady||!owner_->worker.ReleaseRead())return false;owner_->reading=owner_->readReady=owner_->readExposed=false;return true;}
  void Cancel(){if(Main())Hard(E_ABORT);}bool Active()const{return owner_!=NULL;}bool Terminated()const{return Main()&&owner_&&owner_->terminated;}bool ReadReady()const{return Main()&&owner_&&owner_->readReady;}bool Quarantined()const{return quarantined_;}HRESULT Error()const{return error_;}unsigned StoredWindows()const{return Main()&&owner_?owner_->stored:0;}
  U64 ProducerGpuBytes()const{return Main()&&owner_?owner_->native.Cohort().ReservedGpuBytes():0;}U64 RetainedCpuBytes()const{return quarantined_?Debt().cpu:0;}U64 RetainedGpuBytes()const{return quarantined_?Debt().gpu:0;}
+ FineWrite::RamStats MemoryStats()const{return Main()&&owner_&&!quarantined_?owner_->worker.MemoryStats():FineWrite::RamStats();}
+ U64 RamBytes()const{return MemoryStats().bytes;}
+ // Prepared RAM payload is separate from strict producer/scratch CPU debt.
+ U64 RetainedRamBytes()const{return Main()&&owner_?(quarantined_?GsmCacheProfile::RamBudgetBytes():owner_->worker.RetainedRamBytes()):0;}
  // After consumer join and GPU bank drain, finish the idle source worker with
  // zero-timeout polling. This is the normal-frame close/re-enable path.
  HRESULT RequestShutdown(){if(!Main()||!owner_||quarantined_||!owner_->terminated||owner_->readExposed||owner_->native.Cohort().ReservedGpuBytes())return E_UNEXPECTED;if(owner_->native.Cohort().State()==WorldCohort::Stopped){delete owner_;owner_=NULL;return S_OK;}HRESULT hr=owner_->native.Cohort().RequestShutdown();if(FAILED(hr)){error_=hr;Retain();}return hr;}

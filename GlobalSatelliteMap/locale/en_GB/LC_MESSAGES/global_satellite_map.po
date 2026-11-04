@@ -78,3 +78,18 @@ msgstr "Zoom: x%.2f | Details loaded"
 
 msgid "Zoom: x%.2f | Loading details..."
 msgstr "Zoom: x%.2f | Loading details..."
+
+msgid "Map cache"
+msgstr "Map cache"
+
+msgid "Video memory budget, GiB"
+msgstr "Video memory budget, GiB"
+
+msgid "Maximum video memory used by the map, including detailed tiles and rendering. 1 GiB steps, up to 8 GiB. Memory is allocated as needed; leave room for Kenshi and other applications."
+msgstr "Maximum video memory used by the map, including detailed tiles and rendering. 1 GiB steps, up to 8 GiB. Memory is allocated as needed; leave room for Kenshi and other applications."
+
+msgid "RAM cache budget, GiB"
+msgstr "RAM cache budget, GiB"
+
+msgid "Keep prepared terrain tiles in RAM for faster return visits and nearby-area loading. 1 GiB steps, up to 32 GiB. The cache grows as you view the map; leave room for the game and other applications."
+msgstr "Keep prepared terrain tiles in RAM for faster return visits and nearby-area loading. 1 GiB steps, up to 32 GiB. The cache grows as you view the map; leave room for the game and other applications."

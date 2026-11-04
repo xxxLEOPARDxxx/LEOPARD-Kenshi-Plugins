@@ -5,6 +5,7 @@ namespace FineJob {
 typedef FineWindows::U64 U64;
 enum{MaxVisible=GsmCacheProfile::MaxVisible,Slots=MaxVisible,CacheSlots=GsmCacheProfile::FineCacheSlots};
 const U64 ViewerAllowance=GsmCacheProfile::ViewerBytes,WindowBytes=256ULL*256*20;
+inline unsigned ActiveSlots(){return GsmCacheProfile::FineSlots();}
 struct Demand{FineWindows::Request view;SourceReceipts::Scope scope;U64 revision;};
 struct Budget{U64 viewerGpu,fineGpu,producerCpu,otherCpu;unsigned occupied;};
 struct UploadGate{U64 producerReservedGpu;bool consumersJoined;};
@@ -38,8 +39,20 @@ inline bool SameDemand(const Demand&a,const Demand&b){
 // NativeSession::CpuReservation(), plus all other live owners in otherCpu.
 inline U64 ProducerCpuFloor(){return sizeof(WorldCohort::Work)+WorldHeight::MaxSamples*2+32ULL*1024*1024+512ULL*512*16+WorldHeight::AuthScratch+WorldPixels::Accepted::RequiredBytes(512)-sizeof(WorldPixels::Accepted);}
 inline bool BudgetValid(const Budget&b){
- return b.viewerGpu<=ViewerAllowance&&b.occupied<=CacheSlots&&b.fineGpu>=U64(b.occupied)*WindowBytes&&b.fineGpu<=U64(CacheSlots)*WindowBytes&&
+ return b.viewerGpu<=ViewerAllowance&&b.occupied<=ActiveSlots()&&b.fineGpu>=U64(b.occupied)*WindowBytes&&b.fineGpu<=U64(ActiveSlots())*WindowBytes&&
  b.producerCpu>=ProducerCpuFloor()&&b.producerCpu<=AtlasView::CpuCap&&b.otherCpu<=AtlasView::CpuCap-b.producerCpu;
+}
+// Fixed metadata scratch: validate a large retained neighborhood without an
+// O(N*N) comparison loop or per-pan heap allocations. Load is at most3/8.
+inline bool ResidentsValid(const FineWindows::Key*resident,unsigned count,const FineWindows::Stamp&stamp){
+ if(!resident||count>ActiveSlots())return false;
+ unsigned short index[16384]={};
+ for(unsigned n=0;n<count;++n){const FineWindows::Key&k=resident[n];
+  if(!FineWindows::Valid(k)||!FineWindows::Same(k.stamp,stamp))return false;
+  unsigned at=(k.x*73856093u^k.z*19349663u^k.spacing*83492791u)&16383u,probes=0;
+  while(index[at]){if(FineWindows::Equal(k,resident[index[at]-1]))return false;if(++probes==16384)return false;at=(at+1)&16383u;}
+  index[at]=static_cast<unsigned short>(n+1);
+ }return true;
 }
 inline bool ProducerFits(const Budget&b){return BudgetValid(b)&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WorldCohort::GpuReservation(2);}
 inline bool Fresh(const Plan&p,const Demand&r){return p.state==Detail&&p.count&&p.count<=Slots&&p.pairCount&&p.pairCount<=p.count&&(p.spacing==1||p.spacing==3)&&SameDemand(p.demand,r);}
@@ -65,13 +78,13 @@ inline Plan MakePlan(const Demand&r,const Budget&b,Mode mode,const FineWindows::
  // Planning/cache reuse does not allocate a source bank. A retained visible
  // set may exceed the production phase allowance; CanRender checks it later.
  if(p.densitySpacing==9||!Internal::BudgetValid(b))return p;
- if(resident){if(residentCount!=b.occupied||residentCount>CacheSlots)return Plan();for(unsigned n=0;n<residentCount;++n){if(!FineWindows::Valid(resident[n])||!FineWindows::Same(resident[n].stamp,r.view.stamp))return Plan();for(unsigned j=0;j<n;++j)if(FineWindows::Equal(resident[n],resident[j]))return Plan();}}
+ if(resident){if(residentCount!=b.occupied||!Internal::ResidentsValid(resident,residentCount,r.view.stamp))return Plan();}
  else if(residentCount)return Plan();
  unsigned overlap=0,required=0,available=MaxVisible;
  for(unsigned spacing=p.densitySpacing;spacing<9;spacing*=3){unsigned worst=FineWindows::Internal::Worst(r.view,spacing),matching=0;for(unsigned n=0;resident&&n<residentCount;++n){FineWindows::Rect v;if(resident[n].spacing==spacing&&FineWindows::Bounds(resident[n],v)&&v.x<clip.x1&&clip.x0<v.x+v.w&&v.z<clip.z1&&clip.z0<v.z+v.h)++matching;}
   const unsigned actual=(FineWindows::Internal::Last(clip.x1,spacing)-FineWindows::Internal::Index(clip.x0,spacing)+1)*(FineWindows::Internal::Last(clip.z1,spacing)-FineWindows::Internal::Index(clip.z0,spacing)+1);
   if(worst>MaxVisible)continue;
-  if(matching<=actual&&actual-matching<=CacheSlots-b.occupied&&U64(actual-matching)*WindowBytes<=AtlasView::GpuCap-b.viewerGpu-b.fineGpu){p.spacing=spacing;p.worstVisible=worst;overlap=matching;required=actual;break;}
+  if(matching<=actual&&actual-matching<=ActiveSlots()-b.occupied&&U64(actual-matching)*WindowBytes<=AtlasView::GpuCap-b.viewerGpu-b.fineGpu){p.spacing=spacing;p.worstVisible=worst;overlap=matching;required=actual;break;}
   // Physical neighborhood pressure must retire old owners, not permanently
   // downgrade a feasible1m demand merely because cached3m tiles already fit.
   return p;}
@@ -88,9 +101,12 @@ inline bool Wanted(const Plan&p,const Demand&now,const FineWindows::Key&key){ret
 inline bool CanRender(const Plan&p,const Demand&now,const Budget&b){return Internal::Fresh(p,now)&&Internal::ProducerFits(b);}
 // Gate values must come from the real owner AFTER known consumer join and GPU
 // drain. These copied values are policy inputs, not fabricated native receipts.
+inline bool CanRead(const Plan&p,const Demand&now,const FineWindows::Key&key,const Budget&b,const UploadGate&gate){
+ return Wanted(p,now,key)&&Internal::BudgetValid(b)&&gate.consumersJoined&&gate.producerReservedGpu==0;
+}
 inline bool CanUpload(const Plan&p,const Demand&now,const FineWindows::Key&key,const Budget&b,const UploadGate&gate){
- return Wanted(p,now,key)&&Internal::BudgetValid(b)&&gate.consumersJoined&&gate.producerReservedGpu==0&&b.occupied<CacheSlots&&
- b.fineGpu<=U64(CacheSlots-1)*WindowBytes&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WindowBytes;
+ return Wanted(p,now,key)&&Internal::BudgetValid(b)&&gate.consumersJoined&&gate.producerReservedGpu==0&&b.occupied<ActiveSlots()&&
+ b.fineGpu<=U64(ActiveSlots()-1)*WindowBytes&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WindowBytes;
 }
 inline bool MakeJob(const Plan&p,unsigned pair,const Demand&now,const Snapshot&snapshot,const Settings&settings,const WorldRaster::Shaders&shaders,const wchar_t*path,WorldCohort::Job&out){
  if(!Internal::Fresh(p,now)||pair>=p.pairCount||!FineWindows::Same(snapshot.stamp,p.demand.view.stamp)||!path)return false;

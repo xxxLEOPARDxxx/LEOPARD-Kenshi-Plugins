@@ -37,6 +37,15 @@ Always check the actual process immediately before replacing a loaded DLL.
    succeeds. RPM proves Hub2 first and131 active supported candidates; the old
    log erased its exact refusal. Do not change ordering or bounds on a guess.
 
+   Latest user memory request supersedes the fixed512MiB development profile:
+   VRAM1..8GiB, RAM1..32GiB in1GiB MCM steps, immutable per session with restart
+   flags. Actual RAM LRU,665..6144 GPU slots,8..64 surrounding warmup pairs,
+   O(logN) resident index and192 reusable widgets are implemented and reviewed.
+   Installed02:47MSK, DLL75f41fe57b205592b6362e4d39bd3b56e2f2d7851273e30e87cbd25afb4d6cdd,
+   local8GiBVRAM/32GiBRAM. Atlas/other INI bytes preserved. Await user's scene
+   for RAM-hit/pan/reopen measurements; do not claim live performance yet.
+   See docs/verification/2026-11-04-gsm-memory-caches.md for current evidence.
+
    Next: actual Hub buildings/walls/stalls picture, then remaining object/material
    families and unloaded-city detail. Fog, biome/diplomatic zones and roads follow
    core city coverage. DF remains paused. No satellite publication is authorized

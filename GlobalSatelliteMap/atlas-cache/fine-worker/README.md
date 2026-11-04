@@ -27,7 +27,8 @@ are Main-only.
    completion state. Only a successful acknowledgement, or a known completed
    join of the stopped consumer, permits the producer to change. A failed poll
    alone is not such a join.
-5. `SubmitGet(key, identity, externalLedger)` requests a disk window.
+5. `SubmitGet(key, identity, externalLedger)` requests prepared bytes from
+   worker-owned RAM first, then the validated disk cache on a miss.
    `PollGet()` returns1 once for a completed read,2 once for a cache miss,0 pending,
    -1 failure. Work owns exactly one Blob. No second operation is admitted until
    the read is explicitly released.
@@ -65,7 +66,7 @@ another worker from hiding that debt. `Quarantined()` remains true even if the
 physical thread later exits. Caller must retain the whole producer and its
 CPU/GPU owners too; its own reservation is additional to the reported worker debt.
 
-`RetainedCpuBytes()` conservatively reports the64MiB CPU cap on quarantine. This
+`RetainedCpuBytes()` conservatively reports the64MiB scratch cap on quarantine. This
 is intentional fail-closed ownership, not a claim that an ordinary cache leaks
 64MiB. The destructor does not free quarantined owners. It also refuses to
 delete a Main-held read without acknowledgement. A normal stopped, finished and
@@ -81,6 +82,13 @@ FineStore automatically accounts the Accepted and authenticated height-window
 owners it consumes. SubmitGet's external ledger must include the still-retained
 producer and all unrelated base/model/read allocations. FineStore also counts
 its output Blob object conservatively; there is no unbounded queue or second Blob.
+
+Prepared RAM entries live separately in this actual worker. Successful Put packs
+the still-held accepted view before clearing/acknowledging Borrow. RAM hits create
+independent scratch Blobs; eviction cannot reclaim Main's read. Optional retention
+OOM preserves a successful disk result. `MemoryStats()`/`RamBytes()` are Main-only
+atomic telemetry; `RetainedRamBytes()` conservatively reports the boot RAM cap on
+quarantine separately from64MiB scratch. See `../fine-ramcache/README.md`.
 
 ## Healthy terminal cache cleanup
 

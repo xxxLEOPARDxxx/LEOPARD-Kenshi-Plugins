@@ -78,3 +78,18 @@ msgstr "Приближение: x%.2f | Детали загружены"
 
 msgid "Zoom: x%.2f | Loading details..."
 msgstr "Приближение: x%.2f | Загрузка деталей..."
+
+msgid "Map cache"
+msgstr "Кэш карты"
+
+msgid "Video memory budget, GiB"
+msgstr "Видеопамять для карты, ГиБ"
+
+msgid "Maximum video memory used by the map, including detailed tiles and rendering. 1 GiB steps, up to 8 GiB. Memory is allocated as needed; leave room for Kenshi and other applications."
+msgstr "Верхний предел видеопамяти для карты, включая подробные плитки и отрисовку. Шаг 1 ГиБ, до 8 ГиБ. Память выделяется по мере необходимости; оставляйте запас для Kenshi и других программ."
+
+msgid "RAM cache budget, GiB"
+msgstr "Кэш карты в оперативной памяти, ГиБ"
+
+msgid "Keep prepared terrain tiles in RAM for faster return visits and nearby-area loading. 1 GiB steps, up to 32 GiB. The cache grows as you view the map; leave room for the game and other applications."
+msgstr "Хранить готовые плитки рельефа в оперативной памяти для быстрого возврата и загрузки соседних участков. Шаг 1 ГиБ, до 32 ГиБ. Кэш растёт при просмотре карты; оставляйте запас для игры и других программ."
