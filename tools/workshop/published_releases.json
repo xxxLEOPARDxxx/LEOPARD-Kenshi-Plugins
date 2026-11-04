@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-02",
+  "date": "2026-11-04",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -29,7 +29,7 @@
     "ModConfigMenu": {
       "nexus": 2202,
       "workshop_id": 3813761584,
-      "version": "11"
+      "version": "12"
     },
     "AIFixed": {
       "nexus": 2256,
@@ -104,7 +104,7 @@
     "Map-markers": {
       "nexus": 2211,
       "workshop_id": 3813852161,
-      "version": "4"
+      "version": "5"
     },
     "Organize-the-Crafting-Stations": {
       "nexus": 2219,
@@ -182,7 +182,7 @@
     "ItemMarkers": {
       "nexus": 2224,
       "workshop_id": 3816608451,
-      "version": "6"
+      "version": "7"
     },
     "LiveXpBars": {
       "nexus": 2188,
