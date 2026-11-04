@@ -1,7 +1,7 @@
 {
   "time_msk": "2026-11-05T01:30:28.056196+03:00",
   "version": "13",
-  "status": "installed_locally_pending_game_acceptance",
+  "status": "installed_locally_user_confirmed_ready_for_release",
   "imports": {
     "KenshiLib.dll": 33,
     "MyGUIEngine_x64.dll": 92
@@ -69,5 +69,10 @@
     "layout_negative_mutants": 4
   },
   "independent_review": "CLEAR; in-game input and visual acceptance still pending",
-  "release_package": "D:/DEV/Kenshi/workshop/nexus/ModConfigMenu-13.zip"
+  "release_package": "D:/DEV/Kenshi/workshop/nexus/ModConfigMenu-13.zip",
+  "user_acceptance": {
+    "time_msk": "2026-11-05T01:40:33.216845+03:00",
+    "result": "User confirmed: works",
+    "question_scope": "Red confirmation modal; Cancel/Escape preserve settings; destructive reset was not requested"
+  }
 }

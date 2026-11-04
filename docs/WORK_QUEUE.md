@@ -133,7 +133,7 @@ plugin or retain a dangling UI/plugin reference. RU/EN/ZH, inherited vanilla/Dar
 skins, bounded lifecycle and meaningful actual reset-flow tests. IMPLEMENTED and
 installed locally 05Nov01:30MSK; MCM13 ZIP/ENRU descriptions prepared. Independent
 review CLEAR; native VC10 GL/LTCG and actual reset45/modal51 checks Od/O2 pass.
-User in-game cancellation/appearance check pending. Private local installation
+User confirmed the in-game cancellation/appearance check: works. Private local installation
 receipt: docs/releases/2026-11-05-mcm-reset-confirmation.json.
 Published baseline is MCM12 (confirmed ledger); one next public package is13,
 not one increment per intermediate fix. No Nexus/Steam publication authorized
