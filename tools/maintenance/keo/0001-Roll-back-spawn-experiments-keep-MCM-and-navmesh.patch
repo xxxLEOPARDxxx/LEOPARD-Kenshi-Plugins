@@ -1,0 +1,974 @@
+From 022bb70114d2063eaf5808b5fb3f70a3505c116e Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 00:58:44 +0300
+Subject: [PATCH] Roll back spawn experiments while retaining MCM and navmesh
+ fixes
+
+---
+ README.md                                     |  71 ++-------
+ .../activation-ready-candidate-20261104.json  |  35 -----
+ .../readiness-scope-candidate-20261104.json   |  24 ----
+ .../readiness-scope-maintenance-20261104.md   |  45 ------
+ leopard/readiness_poll_scope_tests.cpp        |  36 -----
+ leopard/readiness_scope_integration_tests.cpp |  97 -------------
+ .../spawn-experiments-rollback-20261105.json  |  23 +++
+ leopard/test_activation_readiness.py          |  66 ---------
+ leopard/test_readiness_poll_scope.py          |  41 ------
+ leopard/test_readiness_scope_integration.py   |  44 ------
+ src/game/rva.h                                |   3 -
+ src/plugin/hook_manifest.cpp                  |  14 --
+ src/plugin/hook_manifest_rows.inc             |   7 -
+ src/zone/readiness/readiness_hook.cpp         | 136 +-----------------
+ src/zone/readiness/readiness_hook.h           |  14 --
+ .../readiness/zone_readiness_poll_scope.cpp   |  52 -------
+ .../readiness/zone_readiness_poll_scope.h     |  21 ---
+ tools/build/coresrc.txt                       |   1 -
+ 18 files changed, 42 insertions(+), 688 deletions(-)
+ delete mode 100644 leopard/activation-ready-candidate-20261104.json
+ delete mode 100644 leopard/readiness-scope-candidate-20261104.json
+ delete mode 100644 leopard/readiness-scope-maintenance-20261104.md
+ delete mode 100644 leopard/readiness_poll_scope_tests.cpp
+ delete mode 100644 leopard/readiness_scope_integration_tests.cpp
+ create mode 100644 leopard/spawn-experiments-rollback-20261105.json
+ delete mode 100644 leopard/test_activation_readiness.py
+ delete mode 100644 leopard/test_readiness_poll_scope.py
+ delete mode 100644 leopard/test_readiness_scope_integration.py
+ delete mode 100644 src/zone/readiness/zone_readiness_poll_scope.cpp
+ delete mode 100644 src/zone/readiness/zone_readiness_poll_scope.h
+
+diff --git a/README.md b/README.md
+index 375ce76..dab0141 100644
+--- a/README.md
++++ b/README.md
+@@ -163,59 +163,18 @@ The mod is built into `build\KEO_step4_prod\`. To install it, copy that folder i
+ GPL-3.0; see [LICENSE](LICENSE).
+ 
+ 
+-## Private maintenance: native readiness scope (2026-11-04)
+-
+-KEO's asynchronous navmesh wait bypass now belongs only to the verified native
+-loading poll. AI movement, grounding, ambient spawning, delayed town spawning,
+-building work and unknown callers keep the engine's own readiness result.
+-The native world is not declared ready just because its section queue is empty.
+-Existing loading/preload workers remain; no new thread or global world scan.
+-The scope is one synchronous call, one-shot, thread-local and restored after
+-C++ or native exceptions. A mismatched byte profile or unavailable hook pair
+-retains native readiness instead of broadening the override.
+-
+-This is a private test candidate, not a public release or a claim that every
+-reported spawn/route problem is solved. GOG remains unsupported pending its
+-actual executable/module profile. Player settings are not changed.
+-
+-## Частная доработка: готовность зоны (04.11.2026)
+-
+-Ускоряющий обход ожидания навмеша оставлен только штатному загрузчику.
+-Перемещение ИИ, поиск земли под персонажем, появление отрядов и жителей города,
+-работа со зданиями и неизвестные вызовы получают штатный ответ готовности.
+-Пустая очередь секций сама по себе больше не объявляет зону готовой для них.
+-Существующие рабочие потоки загрузки сохранены. Новых потоков и обходов мира нет.
+-При несовпадении профиля или невозможности установить пару хуков остаётся
+-штатное ожидание. Личные настройки не меняются.
+-
+-Это тестовая сборка, не публичный выпуск и не подтверждение исправления всех
+-жалоб на спавн и маршруты. Нужна проверка в игре; поддержка GOG пока не заявляется.
+-
+-
+-### Private activation-readiness test, 04 November 2026
+-
+-The earlier caller-scope build did not eliminate the user's Squin population
+-displacement. This candidate also prevents the native unloaded-platoon eligibility
+-check from treating an early ZoneMap loaded flag as sufficient while the same
+-zone's native navmesh is still unready. Other loaded-flag consumers keep their
+-native result. If the exact native profile or the additional hook is unavailable,
+-the loading-poll bypass remains disabled. No NPC teleport or population multiplier
+-is added. Detailed logging includes cumulative activation checks/waits.
+-
+-This does not repair positions already written to a save, nor prove every direct
+-activation path is covered. Verify with a clean pre-arrival Hub-to-Squin test.
+-Game FPS/long-term memory and actual prevention remain unverified.
+-
+-### Частная проверка активации отрядов, 04 ноября 2026
+-
+-Предыдущая сборка не устранила появление жителей Скуина вне города. Эта сборка
+-дополнительно задерживает штатную проверку активации выгруженного отряда, если
+-зона помечена загруженной раньше готовности её навмеша. Остальные обращения к
+-флагу загрузки сохраняют штатное поведение. При неподтверждённом профиле или
+-неустановленном дополнительном хуке ранний ответ загрузчику отключён.
+-Телепортации и изменения численности нет. В подробном журнале — число проверок
+-активации и отложенных активаций.
+-
+-Уже записанные в сохранение смещённые позиции не исправляются. Нужен новый заход
+-Хаб → Скуин из сохранения до появления проблемы. Предотвращение конкретного случая,
+-FPS и длительная стабильность памяти ещё не подтверждены в игре.
++### Maintenance rollback / Откат экспериментов, 05.11.2026
++
++The Squin crowd was reproduced with KEO and KEOCompat absent from the running
++process. The two experimental spawn-related readiness/activation changes have
++therefore been removed. Native feature code is restored exactly to 5f68039;
++MCM integration, shorter RU/EN/ZH labels, and the earlier navmesh/pathfinding
++corrections are retained. This does not identify the cause of the observed crowd
++or claim any spawn fix. Already displaced saved actors are not changed.
++
++Толпа у Скуина воспроизвелась при фактическом отсутствии KEO и KEOCompat в
++процессе игры. Два экспериментальных изменения готовности/активации против
++этого спавна удалены. Native-код возвращён точно к состоянию 5f68039; MCM,
++короткие подписи RU/EN/ZH и прежние исправления навмеша/маршрутизации сохранены.
++Причина толпы этим не установлена; исправление спавна не заявляется. Ранее
++сохранённые позиции персонажей не меняются.
+diff --git a/leopard/activation-ready-candidate-20261104.json b/leopard/activation-ready-candidate-20261104.json
+deleted file mode 100644
+index 5fd398f..0000000
+--- a/leopard/activation-ready-candidate-20261104.json
++++ /dev/null
+@@ -1,35 +0,0 @@
+-{
+-  "status": "installed_private_candidate_not_game_verified",
+-  "time_msk": "2026-11-05T00:02:45.718846+03:00",
+-  "dll_sha256": "67a135200b03fa25757b119887bf1fb40e60ef49a8411ef0b2de92f6e74f3f73",
+-  "dll_bytes": 1445888,
+-  "native_imports_verified": 144,
+-  "startPlugin": true,
+-  "regression": {
+-    "guard_checks_each_Od_O2": 334,
+-    "startup_checks_each_Od_O2": 22594,
+-    "caller_option_cases_each": 4608,
+-    "legacy_failure_observed": true
+-  },
+-  "independent_review": "macro_1024: ABI, native windows, lock release, fail-closed startup; no blocker",
+-  "case_snapshot": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\20261104-keo-readiness\\squin-23000.json",
+-  "source_hashes": {
+-    "src/zone/readiness/readiness_hook.cpp": "28db75ae23c78ab8aba60b1528b922932f3330cf29a29c973101262a41a9510f",
+-    "src/zone/readiness/readiness_hook.h": "d9805ce40ec1c6956dc70493a38517117fbce76d5c566fd50593f48546a86d73",
+-    "src/plugin/hook_manifest.cpp": "8d869fab9a0f411b05f315f62e87d160188e8e0af9618dac953e2d6e406937e4",
+-    "src/plugin/hook_manifest_rows.inc": "a54e4eaf2285cb79f22c1f17c0545802f06147dfac4fb846a002fbba4469e041",
+-    "src/game/rva.h": "6379928d25f23eea6969b10f1a642e8445a979ac81ef780eacdea01f39e5ec76"
+-  },
+-  "limitations": [
+-    "Squin prevention not proven",
+-    "saved displaced actors not repaired",
+-    "GOG unsupported pending real native image",
+-    "not all direct activation paths covered"
+-  ],
+-  "preserved": {
+-    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "70e4d9fab5f3a4584be17d05c931d25c07abe3d12d0e534ba454b7056a545afc",
+-    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",
+-    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.dll": "2aba97961f99ca33207f7a99e178f8d828528eb9fae9d80e87ea1ddef5272537"
+-  },
+-  "backup": "D:\\DEV\\Kenshi\\backup\\keo-activation-ready-20261104"
+-}
+\ No newline at end of file
+diff --git a/leopard/readiness-scope-candidate-20261104.json b/leopard/readiness-scope-candidate-20261104.json
+deleted file mode 100644
+index 629ea1f..0000000
+--- a/leopard/readiness-scope-candidate-20261104.json
++++ /dev/null
+@@ -1,24 +0,0 @@
+-{
+-  "date_msk": "2026-11-04T20:29:47.914047+03:00",
+-  "sources": {
+-    "src/zone/readiness/readiness_hook.cpp": "4ae1f1a6df135cb8d29aaeacb04ad9af9b92dd6d5205e11f4a39cf76396d69a9",
+-    "src/zone/readiness/readiness_hook.h": "5260a076935845ac78144dc06c614d57c18b2c67ea942d9d133c62fb4ae735b3",
+-    "src/zone/readiness/zone_readiness_poll_scope.cpp": "cbdf5fae7c42974ec4432d600185796198d339d72c77001a962a635108a330d1",
+-    "src/zone/readiness/zone_readiness_poll_scope.h": "67a104dca2dd244157f5c5c8e06a9cab12276480e9aa2e95ace89c9d996180b7",
+-    "src/game/rva.h": "78d909c4f5efa405abcab5112a0f5bcf40613d9e5bc172e32d018d7b5e01c104",
+-    "src/plugin/hook_manifest.cpp": "57e8f79d450d362e33dff1b2cda46ee3bdce8eb6c9a2b219bab10c0990e3afe2",
+-    "src/plugin/hook_manifest_rows.inc": "62aa4b20fcc1fc4ee31c3b4085e680f689755402a604ca0553ed55df7b6336e3",
+-    "tools/build/coresrc.txt": "ef43932d01635e44dbe8003526c11708bfbd98fd45400fb7f6e42823434b4b02"
+-  },
+-  "artifacts": {
+-    "dev": {
+-      "bytes": 1552896,
+-      "sha256": "04c1638a15d806e0a736394a6f314f04646bac4bada4a3b86285fec83c16372c"
+-    },
+-    "prod": {
+-      "bytes": 1444352,
+-      "sha256": "0aa1750f697af7d965308eaf169b9ddaa608bc71beba0b169f3a48671e0f911a"
+-    }
+-  },
+-  "status": "private_native_build_verified_runtime_pending"
+-}
+\ No newline at end of file
+diff --git a/leopard/readiness-scope-maintenance-20261104.md b/leopard/readiness-scope-maintenance-20261104.md
+deleted file mode 100644
+index f0c3233..0000000
+--- a/leopard/readiness-scope-maintenance-20261104.md
++++ /dev/null
+@@ -1,45 +0,0 @@
+-# KEO native readiness scope - private candidate, 04.11.2026
+-
+-Baseline local5f68039. Actual EXE SHA256504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e.
+-The coordinates getter3AB4F0 was shared by loading, AI/grounding, building
+-and spawning callers. Old step3 promoted native false totrue for unknown cells
+-when global section count waszero. This is a reproduced native-boundary policy
+-defect; it is not a reproduced specific shopkeeper displacement or duplicate squad.
+-
+-The only confirmed direct loading caller is processLoading'sA0EA8B (returnA0EA90)
+-through zone wrapper3AC810 and its inner coordinates call3AC81D (return3AC822).
+-The same processLoading body invokes delayedSpawningChecks, so a whole-driver
+-TLS bracket or global state4 test would also authorize spawning incorrectly.
+-
+-Prepare validates seven actual byte windows before any readiness hook is patched.
+-Optional wrapper row is in the hook manifest. Paired startup capability requires
+-both originals and intact inner call bytes. Unknown/changed hook chains fall
+-back to native readiness. A relocated call can disable acceleration safely;
+-actual MinHook routing remains a game acceptance check.
+-
+-The wrapper captures _ReturnAddress in the detour, enters a POD TLS frame,
+-masks outer permission even for unrelated nested wrappers, and restores in
+-__finally. The getter consumes the positive token BEFORE calling native original;
+-first mismatch also consumes. Manager,zone+24,return address all match exactly.
+-Native true remains true. Native false outside the exact loading poll returns
+-before expensive readiness classification and never receives the queue bypass.
+-Absolute return addresses are cached at startup; no GameAddr linear scan in
+-the hot wrapper. OFF startup does not query the private profile. No heap,
+-logging, lock, new thread, retained world pointer or per-frame INI read added.
+-
+-Verification:
+--253 actual pure-policy controls each VC10/Od and/O2; five compiled mutations
+- rejected; actual124 EXE bytes, overflow, thread separation,C++/SEH tested.
+--22586 extracted-production checks/4608 cases each/Od and/O2; native originals
+- called once, native true/false, all caller classes, options, cell classes,
+- nesting, exact args, capability/profile failures, OFF/noquery/noheap checked.
+- Legacy5f68039 fails the ambient-spawn negative control for the intended reason.
+--Independent review found hot GameAddr and OFF profile reads; both corrected.
+--Full DEV and PROD:342 actual sources each, BUILD_CACHE=off,VC10/GL/LTCG.
+- Both x64/startPlugin and144 KenshiLib0.5.0 imports pass.
+-
+-Only tests/native build are accepted. Runtime loading, exact hook-chain behavior,
+-NPC positions/population, route quality,FPS and long-session lifetime await game
+-comparison. This does not repair ambient population weighting, prove GOG support
+-or replace the author's routing algorithm. No public version bump/publication.
+-Map and DF remain paused. Existing personal INI must be preserved.
+diff --git a/leopard/readiness_poll_scope_tests.cpp b/leopard/readiness_poll_scope_tests.cpp
+deleted file mode 100644
+index 7f539e6..0000000
+--- a/leopard/readiness_poll_scope_tests.cpp
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#define NOMINMAX
+-#include "zone/readiness/zone_readiness_poll_scope.h"
+-#include <Windows.h>
+-#include <cstdio>
+-#include <cstring>
+-#include <cstdlib>
+-#include "readiness_poll_windows.h"
+-using namespace ZoneReadinessPoll;
+-union ContextMustBePod{Context context;Frame frame;};
+-static unsigned checks=0;
+-static void C(bool result,const char*why){++checks;if(!result){std::printf("FAIL %s\n",why);std::exit(1);}}
+-static void*M(){return reinterpret_cast<void*>(uintptr_t(0x1000));}
+-static void*P(){return reinterpret_cast<void*>(uintptr_t(0x2018));}
+-static __declspec(thread) Context tls={};
+-static bool Equal(const Context&a,const Context&b){return a.manager==b.manager&&a.coords==b.coords&&a.expectedReturn==b.expectedReturn&&a.admitted==b.admitted&&a.consumed==b.consumed;}
+-static void ThrowCpp(){throw 7;}
+-static void Unwind(unsigned mode){Frame frame;Enter(tls,frame,M(),P(),CoordsReturn,true);__try{C(Take(tls,M(),P(),CoordsReturn),"inner request consumed before native boundary");if(mode==1)ThrowCpp();if(mode==2)RaiseException(0xE0000123,0,0,NULL);}__finally{Leave(tls,frame);}}
+-static void CatchSeh(){__try{Unwind(2);}__except(GetExceptionCode()==0xE0000123?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){}}
+-struct ThreadProbe{Context observed;bool took;};
+-static DWORD WINAPI Foreign(void*data){ThreadProbe&p=*static_cast<ThreadProbe*>(data);p.observed=tls;Frame frame;Enter(tls,frame,M(),P(),CoordsReturn,true);p.took=Take(tls,M(),P(),CoordsReturn);Leave(tls,frame);return 0;}
+-struct ReaderProbe{unsigned calls,seen[7];int badWindow,badByte,unreadable;ReaderProbe():calls(0),badWindow(-1),badByte(-1),unreadable(-1){std::memset(seen,0,sizeof(seen));}};
+-static bool ReadWindow(void*user,uintptr_t rva,unsigned char*out,size_t bytes){ReaderProbe&p=*static_cast<ReaderProbe*>(user);++p.calls;for(unsigned i=0;i<7;++i)if(FrozenWindows[i].rva==rva){++p.seen[i];if(int(i)==p.unreadable||FrozenWindows[i].bytes!=bytes||!out)return false;std::memcpy(out,FrozenWindows[i].data,bytes);if(int(i)==p.badWindow)out[p.badByte]^=1;return true;}return false;}
+-int main(){
+- C(WrapperRva==0x3AC810&&LoadingPollReturn==0xA0EA90&&CoordsReturn==0x3AC822,"exact positive native callsite constants");
+- Frame outer;Enter(tls,outer,M(),P(),CoordsReturn,true);C(tls.admitted&&!tls.consumed&&tls.manager==M()&&tls.coords==P(),"Enter installs exact positive context");C(Take(tls,M(),P(),CoordsReturn),"positive request consumes its permit");C(tls.consumed&&!Take(tls,M(),P(),CoordsReturn),"same outer request cannot consume twice");Leave(tls,outer);Context empty={};C(Equal(tls,empty),"Leave restores empty original TLS");
+- for(unsigned admitted=0;admitted<2;++admitted){Frame first;Enter(tls,first,M(),P(),CoordsReturn,true);Context before=tls;Frame nested;Enter(tls,nested,M(),P(),CoordsReturn,admitted!=0);C(Take(tls,M(),P(),CoordsReturn)==(admitted!=0),"nested unadmitted entry masks outer even for same arguments");Leave(tls,nested);C(Equal(tls,before)&&Take(tls,M(),P(),CoordsReturn),"nested scope restores exact still-unconsumed outer");Leave(tls,first);}
+- for(unsigned mismatch=0;mismatch<7;++mismatch){Frame frame;Enter(tls,frame,M(),P(),CoordsReturn,true);void*manager=M();void*coords=P();uintptr_t ret=CoordsReturn;if(mismatch==0)manager=NULL;if(mismatch==1)manager=reinterpret_cast<void*>(uintptr_t(0x3000));if(mismatch==2)coords=NULL;if(mismatch==3)coords=reinterpret_cast<void*>(uintptr_t(0x3018));if(mismatch==4)ret=0;if(mismatch==5)ret=CoordsReturn+1;if(mismatch==6)ret=LoadingPollReturn;C(!Take(tls,manager,coords,ret),"wrong manager coords return or null never admitted");C(tls.consumed&&!Take(tls,M(),P(),CoordsReturn),"mismatching first getter cannot donate permit to nested original");Leave(tls,frame);}
+- for(unsigned invalid=0;invalid<4;++invalid){Frame frame;Enter(tls,frame,invalid==0?NULL:M(),invalid==1?NULL:P(),invalid==2?0:CoordsReturn,invalid!=3);C(!Take(tls,M(),P(),CoordsReturn),"incomplete or unadmitted context fails closed");Leave(tls,frame);}
+- for(unsigned consumed=0;consumed<2;++consumed){Frame frame;Enter(tls,frame,M(),P(),CoordsReturn,true);if(consumed)C(Take(tls,M(),P(),CoordsReturn),"outer consumed setup");Context saved=tls;Unwind(0);C(Equal(tls,saved),"ordinary unwind restores exact consumed state");try{Unwind(1);C(false,"C++ exception must escape");}catch(int value){C(value==7,"C++ exception preserved");}C(Equal(tls,saved),"C++ unwind restores exact previous context");CatchSeh();C(Equal(tls,saved),"SEH unwind restores exact previous context");Leave(tls,frame);}
+- {Frame frame;Enter(tls,frame,M(),P(),CoordsReturn,true);Context saved=tls;ThreadProbe p={};HANDLE thread=CreateThread(NULL,0,Foreign,&p,0,NULL);C(thread!=NULL&&WaitForSingleObject(thread,10000)==WAIT_OBJECT_0,"actual independent caller TLS thread joined");C(CloseHandle(thread)!=FALSE,"thread handle closed");C(Equal(p.observed,empty)&&p.took&&Equal(tls,saved),"foreign thread has independent empty context and does not consume parent");Leave(tls,frame);}
+- C(!ZoneCoords(NULL)&&ZoneCoords(reinterpret_cast<void*>(uintptr_t(0x2000)))==P(),"zone coordinates use checked24-byte offset without dereference");const uintptr_t high=~uintptr_t(0);C(ZoneCoords(reinterpret_cast<void*>(high-24))==reinterpret_cast<void*>(high),"inclusive uintptr offset boundary");C(!ZoneCoords(reinterpret_cast<void*>(high-23))&&!ZoneCoords(reinterpret_cast<void*>(high)),"offset overflow fails closed");
+- ReaderProbe reader;C(Profile(ReadWindow,&reader)&&reader.calls==7,"actual EXE-derived seven-window profile accepted");for(unsigned i=0;i<7;++i)C(reader.seen[i]==1,"every required semantic native window read exactly once");C(!Profile(NULL,&reader)&&reader.calls==7,"missing reader refuses without native queries");
+- unsigned bytes=0;for(unsigned i=0;i<7;++i){for(unsigned byte=0;byte<FrozenWindows[i].bytes;++byte){ReaderProbe changed;changed.badWindow=int(i);changed.badByte=int(byte);C(!Profile(ReadWindow,&changed),"each native window byte mutation refuses");++bytes;}ReaderProbe unreadable;unreadable.unreadable=int(i);C(!Profile(ReadWindow,&unreadable),"each unreadable semantic window refuses");}
+- for(unsigned mask=0;mask<64;++mask)C(Capability((mask&1)!=0,(mask&2)!=0,(mask&4)!=0,(mask&8)!=0,(mask&16)!=0,(mask&32)!=0)==(mask==63),"every capability prerequisite is required");unsigned queries=reader.calls;C(!Capability(false,true,true,true,true,true)&&reader.calls==queries,"OFF capability performs zero reader/native queries");
+- std::printf("PASS %u pure readiness poll scope controls; %u actual EXE bytes; nested/C++/SEH/TLS/profile\n",checks,bytes);return 0;
+-}
+diff --git a/leopard/readiness_scope_integration_tests.cpp b/leopard/readiness_scope_integration_tests.cpp
+deleted file mode 100644
+index 321852c..0000000
+--- a/leopard/readiness_scope_integration_tests.cpp
++++ /dev/null
+@@ -1,97 +0,0 @@
+-#define WIN32_LEAN_AND_MEAN
+-#define NOMINMAX
+-#include <Windows.h>
+-#include <cstdio>
+-#include <cstring>
+-#include <cstdlib>
+-#include <new>
+-#include <stdint.h>
+-#include "zone/readiness/readiness_hook.h"
+-#include "zone/readiness/zone_readiness_poll_scope.h"
+-#include "zone/readiness/zone_readiness_contract.h"
+-#include "native_windows.h"
+-#define ZONEHAND_STEP 3
+-#define KLIB_MEMBER(category,base,name,offset) ((uintptr_t)(base)+(offset))
+-#define OFF_RDY_SM_PENDING_SECTIONS 0
+-#define OFF_ZM_LOADING 8
+-enum{RC_POLL4,RC_MAIN,RC_OFF,RC_COUNT};
+-enum{RZ_UNKNOWN,RZ_NO_SECTION,RZ_OUTDOOR_MISSING,RZ_NOT_IN_WORLD,RZ_BUILDINGS_PENDING,RZ_COUNT};
+-enum{RDY_OFF_SAMPLE_MASK=15};
+-namespace zone{struct Cfg{bool deferralEnabled,readinessOverridesEnabled,islandReadinessRuleEnabled;}g_zoneCfg={true,true,false};}
+-static volatile LONG s_activationWaits=0,s_activationChecks=0;
+-static uintptr_t gameBase=0x140000000ULL;
+-static __declspec(thread) uintptr_t fakeReturn=0;
+-static __declspec(thread) bool mainThread=true;
+-static __declspec(thread) unsigned mode=0;
+-static volatile LONG getterCalls=0,wrapperCalls=0,addressQueries=0,classScans=0,errorCalls=0,newCalls=0;
+-void*operator new(size_t bytes){void*p=std::malloc(bytes);if(!p)throw std::bad_alloc();InterlockedIncrement(&newCalls);return p;}
+-void*operator new[](size_t bytes){return ::operator new(bytes);}
+-void operator delete(void*p){std::free(p);}
+-void operator delete[](void*p){std::free(p);}
+-static uintptr_t Ret(uintptr_t rva){return gameBase+rva;}
+-static void*TestReturnAddress(){return reinterpret_cast<void*>(fakeReturn);}
+-static void* fakeNavManager=NULL;
+-static bool OriginalBT(void*){return true;}
+-static void*GameAddr(size_t rva){InterlockedIncrement(&addressQueries);if(rva==0x2133560)return &fakeNavManager;if(rva==0x7EB40E)return reinterpret_cast<void*>(Ret(rva));if(rva==ZoneReadinessPoll::LoadingPollReturn||rva==ZoneReadinessPoll::CoordsReturn)return reinterpret_cast<void*>(Ret(rva));for(unsigned i=0;i<sizeof(nativeWindows)/sizeof(nativeWindows[0]);++i)if(rva>=nativeWindows[i].rva&&rva-nativeWindows[i].rva<nativeWindows[i].bytes)return nativeWindows[i].data+(rva-nativeWindows[i].rva);return NULL;}
+-static bool nativeResult=false,isTransitionActive=false,prioritizedThisTransition=false,worldState4=true;
+-static int prioritized=0,deferredFrameCount=0,cellClass=0;
+-static unsigned char world[16]={};static void*g_cachedZoneMgr=world;
+-static struct{volatile LONG g_rdyContractGlobal,g_rdyContractAdopted,g_rdyContractPrivate;}g_rdyContract;
+-static struct{volatile LONG g_rdyOffSample,g_rdyCls[RC_COUNT][RZ_COUNT],g_rdyRuleReady,g_rdyRuleWait,g_rdyBypass;}g_rdy;
+-static bool IsMainThread(){return mainThread;}
+-static void CallPrioritizeNavMeshQueue(){++prioritized;}
+-static void IslandCountReadiness(bool,bool){}
+-static int ZoneReadinessBridgeClassOf(int,int){return cellClass;}
+-static bool IsStatePoll4(){return worldState4;}
+-static int ClassifyZoneReadiness(uintptr_t,const int*,bool){InterlockedIncrement(&classScans);return RZ_OUTDOOR_MISSING;}
+-static double ElapsedSec(){return 0.;}
+-static void LogError(const char*){InterlockedIncrement(&errorCalls);}
+-#define KEO_DETAIL(message) ((void)0)
+-static bool OriginalGetter(void*,void*);
+-namespace game{struct Orig{bool(*orig_isContentPending)(void*,void*);}g_hookOrig={OriginalGetter};}
+-#include "scope.extract.h"
+-#ifdef LEGACY_UNSAFE
+-#include "legacy.extract.h"
+-#else
+-#include "getter.extract.h"
+-#endif
+-struct Zone{int prefix[6];int pos[2];Zone(){std::memset(this,0,sizeof(*this));pos[0]=5;pos[1]=8;}};
+-static Zone zoneValue,otherZone;
+-static bool nestedResult=false;
+-static bool OriginalGetter(void*manager,void*coords){InterlockedIncrement(&getterCalls);if(mode==1){mode=0;uintptr_t saved=fakeReturn;fakeReturn=Ret(ZoneReadinessPoll::CoordsReturn);nestedResult=hook_isContentPending(manager,coords);fakeReturn=saved;}if(mode==2)throw 23;if(mode==3)RaiseException(0xE0000711,0,0,NULL);return nativeResult;}
+-static bool OriginalWrapper(void*manager,void*zone){InterlockedIncrement(&wrapperCalls);if(!zone)return false;uintptr_t saved=fakeReturn;bool result=false;__try{if(mode==4){mode=0;fakeReturn=Ret(0x8F864C);nestedResult=hook_isLoadedZone(manager,zone);}fakeReturn=Ret(mode==5?0x3AC823:ZoneReadinessPoll::CoordsReturn);void*coords=ZoneReadinessPoll::ZoneCoords(zone);if(mode==6)coords=otherZone.pos;if(mode==7){static int otherManager=0;manager=&otherManager;}result=hook_isContentPending(manager,coords);}__finally{fakeReturn=saved;}return result;}
+-static unsigned checks=0;
+-static void C(bool ok,const char*why){++checks;if(!ok){std::printf("FAIL %s\n",why);std::exit(1);}}
+-static bool Same(const ZoneReadinessPoll::Context&a,const ZoneReadinessPoll::Context&b){return a.manager==b.manager&&a.coords==b.coords&&a.expectedReturn==b.expectedReturn&&a.admitted==b.admitted&&a.consumed==b.consumed;}
+-static void Boot(){zone::g_zoneCfg.deferralEnabled=zone::g_zoneCfg.readinessOverridesEnabled=true;zone::g_zoneCfg.islandReadinessRuleEnabled=false;game::g_hookOrig.orig_isContentPending=OriginalGetter;g_readinessZoneOriginal=OriginalWrapper;g_readinessLoadedBTOriginal=OriginalBT;ReadinessPollPrepare();C(ReadinessPollPrepared(),"startup actual native profile prepared before hooks");ReadinessActivationFinalize(true);ReadinessPollFinalize(true,true);mainThread=true;nativeResult=false;mode=0;cellClass=0;world[8]=0;isTransitionActive=false;}
+-static bool Call(uintptr_t caller,bool wrapper,int&manager){fakeReturn=Ret(caller);return wrapper?hook_isLoadedZone(&manager,&zoneValue):hook_isContentPending(&manager,zoneValue.pos);}
+-static void TestSeh(int&manager){__try{Call(ZoneReadinessPoll::LoadingPollReturn,true,manager);C(false,"SEH must propagate");}__except(GetExceptionCode()==0xE0000711?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){}}
+-struct ThreadProbe{bool empty,result,restored;};
+-static DWORD WINAPI Foreign(void*data){ThreadProbe&p=*static_cast<ThreadProbe*>(data);ZoneReadinessPoll::Context empty={};p.empty=Same(t_readinessPoll,empty);mainThread=false;int manager=0;p.result=Call(ZoneReadinessPoll::LoadingPollReturn,true,manager);p.restored=Same(t_readinessPoll,empty);return 0;}
+-int main(){
+- Boot();int manager=0;C(!Call(0x8F864C,true,manager),"non-poll native false cannot be promoted");
+- struct Caller{uintptr_t ret;bool wrapper;};const Caller callers[]={{0xA0EA90,true},{0x8F864C,true},{0x9275EB,false},{0x660985,true},{0x65ED30,true},{0x556DDC,true},{0x556E6B,true},{0x123456,true},{0x123456,false}};
+- unsigned cases=0;for(unsigned c=0;c<sizeof(callers)/sizeof(callers[0]);++c)for(unsigned thread=0;thread<2;++thread)for(unsigned ready=0;ready<2;++ready)for(unsigned sections=0;sections<2;++sections)for(unsigned cls=0;cls<4;++cls)for(unsigned loaded=0;loaded<2;++loaded)for(unsigned def=0;def<2;++def)for(unsigned overrides=0;overrides<2;++overrides)for(unsigned rule=0;rule<2;++rule){mainThread=thread!=0;nativeResult=ready!=0;manager=int(sections);cellClass=int(cls);world[8]=(unsigned char)loaded;zone::g_zoneCfg.deferralEnabled=def!=0;zone::g_zoneCfg.readinessOverridesEnabled=overrides!=0;zone::g_zoneCfg.islandReadinessRuleEnabled=rule!=0;LONG calls=getterCalls,scans=classScans,queries=addressQueries,allocs=newCalls;bool result=Call(callers[c].ret,callers[c].wrapper,manager);bool expected=ready||(c==0&&thread&&def&&overrides&&!loaded&&cls!=1&&cls!=2&&!sections);C(result==expected,"exact caller/native/options/section/cell/loading truth table");C(getterCalls==calls+1,"each actual getter calls original exactly once");if(c!=0)C(classScans==scans,"unrelated caller makes zero classification scans");C(addressQueries==queries,"hook path uses cached absolute addresses without KlibAddress scans");C(newCalls==allocs,"normal extracted wrapper/getter path allocates zero C++ objects");++cases;}
+- Boot();manager=0;mode=1;nestedResult=true;C(Call(0xA0EA90,true,manager)&&!nestedResult,"getter permit consumed before same-argument nested original query");mode=4;nestedResult=true;C(Call(0xA0EA90,true,manager)&&!nestedResult,"unadmitted nested ambient wrapper masks positive outer context");for(unsigned m=5;m<8;++m){mode=m;C(!Call(0xA0EA90,true,manager),"relocated return or different manager/coords fails closed");}mode=0;
+- // Compare against the exact caller-owned context, including consumed=true
+- // left by earlier direct getters; zero TLS is not a universal outer state.
+- for(unsigned prior=0;prior<3;++prior)for(unsigned m=2;m<4;++m){
+-  ZoneReadinessPoll::Frame outer;
+-  if(prior){ZoneReadinessPoll::Enter(t_readinessPoll,outer,&manager,otherZone.pos,Ret(ZoneReadinessPoll::CoordsReturn),true);if(prior==2)C(ZoneReadinessPoll::Take(t_readinessPoll,&manager,otherZone.pos,Ret(ZoneReadinessPoll::CoordsReturn)),"consumed positive outer exception baseline");}
+-  ZoneReadinessPoll::Context expectedBefore=t_readinessPoll;mode=m;
+-  if(m==2){try{Call(0xA0EA90,true,manager);C(false,"C++ exception must propagate");}catch(int value){C(value==23,"original C++ exception preserved");}}
+-  else TestSeh(manager);
+-  C(Same(t_readinessPoll,expectedBefore),m==2?"C++ wrapper finally restores exact previous TLS fields":"SEH wrapper finally restores exact previous TLS fields");
+-  if(prior)ZoneReadinessPoll::Leave(t_readinessPoll,outer);
+- }
+- mode=0;
+- {ZoneReadinessPoll::Frame outer;ZoneReadinessPoll::Enter(t_readinessPoll,outer,&manager,zoneValue.pos,Ret(ZoneReadinessPoll::CoordsReturn),true);ZoneReadinessPoll::Context before=t_readinessPoll;ThreadProbe p={};HANDLE h=CreateThread(NULL,0,Foreign,&p,0,NULL);C(h&&WaitForSingleObject(h,10000)==WAIT_OBJECT_0,"actual worker TLS fixture joined");C(CloseHandle(h)!=FALSE,"worker handle closed");C(p.empty&&!p.result&&p.restored&&Same(t_readinessPoll,before),"worker cannot borrow main-thread poll capability");ZoneReadinessPoll::Leave(t_readinessPoll,outer);}
+- Boot();nativeResult=true;C(Call(0x8F864C,true,manager)&&Call(0x9275EB,false,manager),"native true always survives outside loading poll");nativeResult=false;fakeReturn=Ret(0xA0EA90);LONG calls=getterCalls;C(!hook_isLoadedZone(&manager,NULL)&&getterCalls==calls,"native wrapper null zone remains false without getter call");
+- for(unsigned missing=0;missing<4;++missing){Boot();if(missing==2)game::g_hookOrig.orig_isContentPending=NULL;if(missing==3)g_readinessZoneOriginal=NULL;ReadinessPollFinalize(missing!=0,missing!=1);game::g_hookOrig.orig_isContentPending=OriginalGetter;g_readinessZoneOriginal=OriginalWrapper;C(!Call(0xA0EA90,true,manager),"missing paired hook or original function retains native false");}
+- for(unsigned window=0;window<sizeof(nativeWindows)/sizeof(nativeWindows[0]);++window){nativeWindows[window].data[0]^=1;ReadinessPollPrepare();C(!ReadinessPollPrepared(),"startup mutation of every semantic profile window refuses");ReadinessPollFinalize(true,true);C(!Call(0xA0EA90,true,manager),"failed profile cannot promote loading poll");nativeWindows[window].data[0]^=1;}
+- Boot();ReadinessActivationFinalize(false);ReadinessPollFinalize(true,true);C(!Call(0xA0EA90,true,manager),"missing population guard disables early loading poll");
+- Boot();nativeWindows[0].data[13]^=1;ReadinessPollFinalize(true,true);C(!Call(0xA0EA90,true,manager),"post-install changed inner call fails closed");nativeWindows[0].data[13]^=1;
+- for(unsigned option=0;option<2;++option){zone::g_zoneCfg.deferralEnabled=option!=0;zone::g_zoneCfg.readinessOverridesEnabled=option==0;LONG queries=addressQueries;ReadinessPollPrepare();C(!ReadinessPollPrepared(),"OFF setting does not prepare override capability");ReadinessPollFinalize(true,false);C(addressQueries==queries,"OFF startup makes zero profile or post-install byte queries");C(!Call(0xA0EA90,true,manager),"OFF setting retains native readiness");}
+- Boot();zone::g_zoneCfg.readinessOverridesEnabled=false;isTransitionActive=true;prioritizedThisTransition=false;prioritized=0;C(!Call(0x8F864C,true,manager)&&prioritized==1,"existing once-per-transition queue priority preserved with override OFF");Call(0x8F864C,true,manager);C(prioritized==1,"queue priority remains once per transition");
+- std::printf("PASS %u extracted readiness integration checks across %u cases; original once; nested/C++/SEH/TLS/profile/OFF/no allocations\n",checks,cases);return 0;
+-}
+\ No newline at end of file
+diff --git a/leopard/spawn-experiments-rollback-20261105.json b/leopard/spawn-experiments-rollback-20261105.json
+new file mode 100644
+index 0000000..0d1361c
+--- /dev/null
++++ b/leopard/spawn-experiments-rollback-20261105.json
+@@ -0,0 +1,23 @@
++{
++  "status": "rollback_installed_locally_not_published",
++  "time_msk": "2026-11-05T00:57:43.702096+03:00",
++  "dll_sha256": "32c40117e0271494ef6f84d827d7b18b3da40b9bf3cf325aaab589c76e653423",
++  "dll_bytes": 1441280,
++  "native_exact_baseline": "5f68039",
++  "retained": "MCM + compact RU/EN/ZH labels + navmesh/path priority/pause/TLS/jobcancel fixes",
++  "removed_experiments": [
++    "5772425",
++    "fb8c46a native spawn changes"
++  ],
++  "running_game_unloaded_module_proof": [],
++  "preserved_files": {
++    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "f15de53129ecc2d9537ebf18d465ed2493aa1caa3af1c2573ffed91feec8bd9d",
++    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",
++    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.dll": "2aba97961f99ca33207f7a99e178f8d828528eb9fae9d80e87ea1ddef5272537",
++    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\RE_Kenshi.json": "46dba618bbfac3e915141a0277a1106a3c30ed2d5fa8e6920782ea89ad6c2e68",
++    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\mods.cfg": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f"
++  },
++  "backup": "D:\\DEV\\Kenshi\\backup\\keo-spawn-rollback-20261105",
++  "runtime_current_game_KEO": null,
++  "next_launch_restores_KEO": true
++}
+\ No newline at end of file
+diff --git a/leopard/test_activation_readiness.py b/leopard/test_activation_readiness.py
+deleted file mode 100644
+index d86c366..0000000
+--- a/leopard/test_activation_readiness.py
++++ /dev/null
+@@ -1,66 +0,0 @@
+-"""Compile the actual loaded-BT guard; missing hook reproduces native early activation."""
+-from pathlib import Path
+-import os,sys,subprocess,hashlib
+-sys.dont_write_bytecode=True
+-root=Path(__file__).resolve().parents[1];out=root/'build/leopard-activation-readiness';out.mkdir(parents=True,exist_ok=True)
+-source=(root/'src/zone/readiness/readiness_hook.cpp').read_text(encoding='utf-8')
+-def body(marker):
+- start=source.index(marker);end=source.index('{',start)+1;depth=1
+- while depth:depth+=(source[end]=='{')-(source[end]=='}');end+=1
+- return source[start:end]
+-missing='bool hook_isLoadedBT(' not in source
+-code='bool hook_isLoadedBT(void*zone){return g_readinessLoadedBTOriginal(zone);}' if missing else body('bool hook_isLoadedBT(').replace('_ReturnAddress()','TestReturnAddress()')
+-prefix=r"""
+-#define WIN32_LEAN_AND_MEAN
+-#include <Windows.h>
+-#include <stdint.h>
+-#include <cstdio>
+-#include <cstdlib>
+-#include <cstring>
+-#include <new>
+-static unsigned checks=0;static LONG allocs=0;
+-void*operator new(size_t n){InterlockedIncrement(&allocs);void*p=malloc(n);if(!p)throw std::bad_alloc();return p;}
+-void*operator new[](size_t n){return ::operator new(n);}void operator delete(void*p){free(p);}void operator delete[](void*p){free(p);}
+-static void C(bool b,const char*s){++checks;if(!b){printf("FAIL %s\n",s);exit(1);}}
+-namespace zone{struct Cfg{bool deferralEnabled,readinessOverridesEnabled;}g_zoneCfg={true,true};}
+-namespace ZoneReadinessPoll{void*ZoneCoords(void*z){return z?(void*)((uintptr_t)z+24):NULL;}}
+-static volatile LONG s_readinessPollReady=1;
+-static uintptr_t s_activationReturn=0x1407EB40EULL,s_nativeNavSlot=0;
+-static uintptr_t actualReturn=s_activationReturn;
+-static void*TestReturnAddress(){return(void*)actualReturn;}
+-static bool btReady=true,navReady=false;static unsigned btCalls=0,navCalls=0;static void*expectedZone=NULL,*expectedNav=NULL;
+-static bool OriginalBT(void*z){++btCalls;C(z==expectedZone,"exact original zone");return btReady;}
+-static bool OriginalNav(void*m,void*c){++navCalls;C(m==expectedNav&&c==ZoneReadinessPoll::ZoneCoords(expectedZone),"native getter receives same zone coords and manager");return navReady;}
+-typedef bool(*ReadinessLoadedBTOriginal)(void*);
+-static ReadinessLoadedBTOriginal g_readinessLoadedBTOriginal=OriginalBT;
+-namespace game{struct Orig{bool(*orig_isContentPending)(void*,void*);}g_hookOrig={OriginalNav};}
+-static volatile LONG s_activationWaits=0,s_activationChecks=0;
+-"""
+-suffix=r"""
+-int main(){
+- unsigned char zoneData[64]={};int manager=0;void*nav=&manager;s_nativeNavSlot=(uintptr_t)&nav;expectedNav=nav;expectedZone=zoneData;
+- C(!hook_isLoadedBT(zoneData),"loaded flag must NOT activate platoon before native navmesh readiness");
+- C(btCalls==1&&navCalls==1,"one original plus one native readiness check");
+- for(unsigned enabled=0;enabled<2;++enabled)for(unsigned def=0;def<2;++def)for(unsigned over=0;over<2;++over)for(unsigned caller=0;caller<2;++caller)for(unsigned bt=0;bt<2;++bt)for(unsigned ready=0;ready<2;++ready){
+-  s_readinessPollReady=enabled;zone::g_zoneCfg.deferralEnabled=def!=0;zone::g_zoneCfg.readinessOverridesEnabled=over!=0;actualReturn=caller?s_activationReturn:0x140123456ULL;btReady=bt!=0;navReady=ready!=0;
+-  unsigned bc=btCalls,nc=navCalls;LONG ac=allocs;bool guarded=enabled&&def&&over&&caller&&bt;
+-  C(hook_isLoadedBT(zoneData)==(bt&&(!guarded||ready)),"caller/options/native-ready truth table");C(btCalls==bc+1,"original exactly once");C(navCalls==nc+(guarded?1:0),"no navmesh query for unrelated callers or native false");C(allocs==ac,"zero per-call allocations");
+- }
+- s_readinessPollReady=1;zone::g_zoneCfg.deferralEnabled=zone::g_zoneCfg.readinessOverridesEnabled=true;actualReturn=s_activationReturn;btReady=true;navReady=false;
+- nav=NULL;C(!hook_isLoadedBT(zoneData),"missing live manager keeps platoon unloaded");nav=&manager;
+- s_nativeNavSlot=0;C(!hook_isLoadedBT(zoneData),"missing manager slot keeps platoon unloaded");s_nativeNavSlot=(uintptr_t)&nav;
+- game::g_hookOrig.orig_isContentPending=NULL;C(!hook_isLoadedBT(zoneData),"missing native readiness function keeps platoon unloaded");game::g_hookOrig.orig_isContentPending=OriginalNav;
+- expectedZone=NULL;C(!hook_isLoadedBT(NULL),"null target retains no admission");expectedZone=zoneData;
+- printf("PASS %u activation checks; native wait, original once, options, no allocation\n",checks);return 0;
+-}
+-"""
+-(out/'guard.cpp').write_text(prefix+code+suffix)
+-vc=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');sdk=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
+-env=dict(os.environ,INCLUDE=f'{vc}/include;{sdk}/Include',LIB=f'{vc}/lib/amd64;{sdk}/Lib/x64')
+-for opt in ['/Od','/O2']:
+- exe=out/('guard-'+opt[1:]+'.exe');p=subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT',opt,str(out/'guard.cpp'),'/Fo'+str(out)+'/', '/Fe'+str(exe)],cwd=out,env=env,capture_output=True,text=True)
+- if p.returncode:print(p.stdout+p.stderr);raise SystemExit(p.returncode)
+- p=subprocess.run([str(exe)],capture_output=True,text=True);(out/('guard-'+opt[1:]+'-run.log')).write_text(p.stdout+p.stderr);print(p.stdout,end='',flush=True)
+- if '--expect-red' in sys.argv:assert p.returncode==1 and 'loaded flag must NOT activate platoon' in p.stdout
+- else:assert not missing and p.returncode==0,(missing,p.returncode,p.stderr)
+-print('source',hashlib.sha256(source.encode()).hexdigest(),'legacy/no-hook',missing)
+diff --git a/leopard/test_readiness_poll_scope.py b/leopard/test_readiness_poll_scope.py
+deleted file mode 100644
+index 8fff5d0..0000000
+--- a/leopard/test_readiness_poll_scope.py
++++ /dev/null
+@@ -1,41 +0,0 @@
+-"""Bounded offline native windows and actual pure scope under VC10 Od/O2."""
+-from pathlib import Path
+-import hashlib,os,subprocess,sys
+-sys.dont_write_bytecode=True
+-HERE=Path(__file__).resolve().parent;ROOT=HERE.parent
+-OUT=HERE/'_generated'/'readiness-poll-scope';OUT.mkdir(parents=True,exist_ok=True)
+-sys.path.insert(0,'D:/DEV/Kenshi/ours/SkillLevelUpInfo/tests/_tools')
+-import pefile
+-data=Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/Kenshi_x64.exe').read_bytes()
+-assert hashlib.sha256(data).hexdigest()=='504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e'
+-pe=pefile.PE(data=data,fast_load=True)
+-windows=[(0x3AC810,36),(0x3AB4F0,16),(0x53986,5),(0x117ED,5),(0xA0EA35,13),(0xA0EA80,32),(0xA0EAA0,17)]
+-parts=['struct FrozenWindow{uintptr_t rva;size_t bytes;unsigned char data[36];};','static const FrozenWindow FrozenWindows[]={']
+-for rva,count in windows:
+- at=pe.get_offset_from_rva(rva);blob=data[at:at+count];assert len(blob)==count
+- parts.append('{0x%X,%d,{%s}},'%(rva,count,','.join('0x%02x'%b for b in blob)))
+-parts.append('};');(OUT/'readiness_poll_windows.h').write_text('\n'.join(parts)+'\n')
+-VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
+-ENV=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src;{OUT}',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
+-def check(name,source,opt,green=True):
+- exe=OUT/(name+'.exe')
+- p=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT',opt,'/W4',str(HERE/'readiness_poll_scope_tests.cpp'),str(source),'/Fo'+str(OUT)+'/', '/Fe'+str(exe)],cwd=OUT,env=ENV,capture_output=True,text=True);(OUT/(name+'-build.log')).write_text(p.stdout+p.stderr)
+- if p.returncode:print(p.stdout+p.stderr);raise SystemExit(p.returncode)
+- p=subprocess.run([str(exe)],capture_output=True,text=True);(OUT/(name+'-run.log')).write_text(p.stdout+p.stderr);print(name,p.stdout+p.stderr,end='',flush=True)
+- assert (p.returncode==0 if green else p.returncode==1 and 'FAIL 'in p.stdout),(name,p.returncode)
+-source=ROOT/'src/zone/readiness/zone_readiness_poll_scope.cpp'
+-for opt in ['/Od','/O2']:check('scope-'+opt[1:],source,opt)
+-if '--mutants' in sys.argv:
+- text=source.read_text()
+- controls=[
+-  ('mask','tls=frame.current;','if(admitted)tls=frame.current;'),
+-  ('consume-mismatch','tls.consumed=true;','if(match)tls.consumed=true;'),
+-  ('restore','tls=frame.previous;','tls=frame.current;'),
+-  ('wrapper-capability','&&origWrapper;',';'),
+-  ('profile-window','sizeof(Windows)/sizeof(Windows[0]);','sizeof(Windows)/sizeof(Windows[0])-1;'),
+- ]
+- for name,before,after in controls:
+-  assert text.count(before)==1,name
+-  variant=OUT/'scope-mutant.cpp';variant.write_text(text.replace(before,after))
+-  check('mutant-'+name,variant,'/O2',False)
+- print('PASS',len(controls),'compiled pure readiness poll negative controls')
+diff --git a/leopard/test_readiness_scope_integration.py b/leopard/test_readiness_scope_integration.py
+deleted file mode 100644
+index 6f4e5f0..0000000
+--- a/leopard/test_readiness_scope_integration.py
++++ /dev/null
+@@ -1,44 +0,0 @@
+-"""Extract actual readiness wrapper/getter/startup bodies; no game code calls."""
+-from pathlib import Path
+-import hashlib,os,subprocess,sys
+-sys.dont_write_bytecode=True
+-ROOT=Path(__file__).resolve().parents[1]
+-HERE=Path(__file__).resolve().parent
+-OUT=ROOT/'build/leopard-readiness-integration-tests';OUT.mkdir(parents=True,exist_ok=True)
+-sys.path.insert(0,'D:/DEV/Kenshi/ours/SkillLevelUpInfo/tests/_tools')
+-import pefile
+-exe=Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/Kenshi_x64.exe').read_bytes()
+-assert hashlib.sha256(exe).hexdigest()=='504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e'
+-pe=pefile.PE(data=exe,fast_load=True)
+-windows=[(0x3AC810,36),(0x3AB4F0,16),(0x53986,5),(0x117ED,5),(0xA0EA35,13),(0xA0EA80,32),(0xA0EAA0,17),(0xA0C360,16),(0x7EB406,16),(0x8814,5)]
+-lines=['struct NativeWindow{uintptr_t rva;size_t bytes;unsigned char data[36];};','static NativeWindow nativeWindows[]={']
+-for rva,count in windows:
+- at=pe.get_offset_from_rva(rva);data=exe[at:at+count];lines.append('{0x%X,%d,{%s}},'%(rva,count,','.join('0x%02x'%b for b in data)))
+-lines.append('};');(OUT/'native_windows.h').write_text('\n'.join(lines)+'\n')
+-source=(ROOT/'src/zone/readiness/readiness_hook.cpp').read_text(encoding='utf-8')
+-def body(text,marker):
+- start=text.index(marker);end=text.index('{',start)+1;depth=1
+- while depth:depth+=(text[end]=='{')-(text[end]=='}');end+=1
+- return text[start:end]
+-start=source.index('ReadinessZoneOriginal g_readinessZoneOriginal')
+-getter=body(source,'bool hook_isContentPending(')
+-block=source[start:source.index('bool hook_isContentPending(',start)]
+-block=block.replace('_ReturnAddress()','TestReturnAddress()')
+-getter=getter.replace('_ReturnAddress()','TestReturnAddress()')
+-(OUT/'scope.extract.h').write_text(block)
+-(OUT/'getter.extract.h').write_text(getter)
+-legacy=subprocess.run(['git','-C',str(ROOT),'show','5f68039:src/zone/readiness/readiness_hook.cpp'],capture_output=True,text=True,check=True).stdout
+-(OUT/'legacy.extract.h').write_text(body(legacy,'bool hook_isContentPending('))
+-VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
+-ENV=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src;{OUT}',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
+-def run(name,opt,old=False):
+- target=OUT/(name+'.exe');flags=['/DLEGACY_UNSAFE']if old else []
+- cmd=[str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT',opt,'/W3']+flags+[str(HERE/'readiness_scope_integration_tests.cpp'),str(ROOT/'src/zone/readiness/zone_readiness_poll_scope.cpp'),str(ROOT/'src/zone/readiness/zone_readiness_contract.cpp'),'/Fo'+str(OUT)+'/', '/Fe'+str(target)]
+- p=subprocess.run(cmd,cwd=OUT,env=ENV,capture_output=True,text=True);(OUT/(name+'-build.log')).write_text(p.stdout+p.stderr)
+- if p.returncode:print(p.stdout+p.stderr);raise SystemExit(p.returncode)
+- p=subprocess.run([str(target)],capture_output=True,text=True);(OUT/(name+'-run.log')).write_text(p.stdout+p.stderr);print(name,p.stdout+p.stderr,end='',flush=True)
+- if old:assert p.returncode==1 and 'FAIL non-poll native false cannot be promoted'in p.stdout,(p.returncode,p.stdout,p.stderr)
+- else:assert p.returncode==0,(p.returncode,p.stdout,p.stderr)
+-run('legacy-red','/O2',True)
+-for opt in ['/Od','/O2']:run('integration-'+opt[1:],opt)
+-print('PASS extracted integration and actual 5f68039 negative control; source SHA256',hashlib.sha256(source.encode()).hexdigest())
+\ No newline at end of file
+diff --git a/src/game/rva.h b/src/game/rva.h
+index 3e8a1a0..6314475 100644
+--- a/src/game/rva.h
++++ b/src/game/rva.h
+@@ -15,7 +15,6 @@
+ const size_t RVA_SHOW_LOADING_MESSAGE = 0x6E9800;  // ForgottenGUI::showLoadingMessage(bool)
+ 
+ // From IDA Pro (same binary, not in KenshiLib exports)
+-const size_t RVA_IS_LOADED_ZONE       = 0x3AC810;  // NavMesh::isLoaded(ZoneMap*), exact loading-poll scope
+ const size_t RVA_IS_CONTENT_PENDING   = 0x3AB4F0;  // SectionManager::isContentPending (514 bytes)
+ 
+ // Hook targets
+@@ -544,6 +543,4 @@ const size_t RVA_LAYOUT_MAIN_WIDGET_CHECK       = 0x14E90C;  // GenericFixedInve
+ const size_t RVA_BACKPACK_OWNER_READ_CHECK      = 0x70D5B5;  // openBackpackButton's `mov r11,[rbx+50h]`: InventoryGUI::callbackObject
+ const size_t RVA_BACKPACK_OWNER_WRITE_CHECK     = 0x70D5CA;  // openBackpackButton's `mov [rdi+230h],r11`: ContainerItem::callbackOwner
+ 
+-const size_t RVA_IS_LOADED_BT = 0xA0C360; // ZoneMap::isLoadedBT; pinned native profile
+-
+ #endif // KEO_RVA_H
+diff --git a/src/plugin/hook_manifest.cpp b/src/plugin/hook_manifest.cpp
+index 5b95cc8..7a815da 100644
+--- a/src/plugin/hook_manifest.cpp
++++ b/src/plugin/hook_manifest.cpp
+@@ -157,9 +157,6 @@ bool HookRowWanted(HookRowId id)
+ 
+ static void InstallLoadingHooks(int* installed, int*)
+ {
+-	// Freeze the exact scope profile BEFORE patching either readiness entry.
+-	ReadinessPollPrepare();
+-	bool coordsInstalled=false,wrapperInstalled=false;
+ 	// Loading-message and readiness-bypass hooks
+ 	if (HookInstall(HOOK_SHOW_LOADING_MESSAGE, hook_showLoadingMessage,
+ 			&game::g_hookOrig.orig_showLoadingMessage, installed, false) != NULL)
+@@ -171,17 +168,6 @@ static void InstallLoadingHooks(int* installed, int*)
+ 		LogError("FAILED to hook isContentPending");
+ 		zone::g_zoneCfg.preloadEnabled = false;  // registration readiness requires isContentPending
+ 	}
+-	else coordsInstalled=true;
+-	if(coordsInstalled&&ReadinessPollPrepared())
+-	{
+-		if(HookInstall(HOOK_IS_LOADED_ZONE,hook_isLoadedZone,&g_readinessZoneOriginal,installed,false)==NULL)
+-			wrapperInstalled=true;
+-	}
+-	bool activationInstalled=false;
+-	if(coordsInstalled&&wrapperInstalled&&ReadinessPollPrepared())
+-		activationInstalled=HookInstall(HOOK_IS_LOADED_BT,hook_isLoadedBT,&g_readinessLoadedBTOriginal,installed,false)==NULL;
+-	ReadinessActivationFinalize(activationInstalled);
+-	ReadinessPollFinalize(coordsInstalled,wrapperInstalled);
+ 
+ 	// Camera-zone orchestrator hook
+ 	if (HookInstall(HOOK_UPDATE_CAMERA_ZONE, hook_updateCameraZone,
+diff --git a/src/plugin/hook_manifest_rows.inc b/src/plugin/hook_manifest_rows.inc
+index e5793a8..aea9876 100644
+--- a/src/plugin/hook_manifest_rows.inc
++++ b/src/plugin/hook_manifest_rows.inc
+@@ -47,13 +47,6 @@
+ 	         0x40,0x53,0x56,0x57,0x48,0x83,0xEC,0x30,0x48,0xC7,0x44,0x24,0x20,0xFE,0xFF,0xFF)
+ 	HOOK_ROW(HOOK_IS_CONTENT_PENDING, "isContentPending", RVA_IS_CONTENT_PENDING, HOOK_FATAL, HOOK_BY_STARTUP, HOOK_WANT_ALWAYS, HOOK_CAP_NONE,
+ 	         0x40,0x55,0x56,0x57,0x41,0x54,0x41,0x55,0x48,0x81,0xEC,0xB0,0x00,0x00,0x00,0x48)
+-	HOOK_ROW(HOOK_IS_LOADED_BT, "isLoadedBT.population", RVA_IS_LOADED_BT, HOOK_DIAGNOSTIC, HOOK_BY_STARTUP, HOOK_WANT_ALWAYS, HOOK_CAP_NONE,
+-	         0x40,0x53,0x48,0x83,0xEC,0x20,0x48,0x8B,0xD9,0x48,0x85,0xC9,0x75,0x08,0x32,0xC0)
+-	// Optional scope gate; failure retains native readiness instead of a broad
+-	// bypass. The exact whole-wrapper/callsite profile is additionally checked
+-	// before either readiness entry is patched.
+-	HOOK_ROW(HOOK_IS_LOADED_ZONE, "isLoadedZoneScope", RVA_IS_LOADED_ZONE, HOOK_DIAGNOSTIC, HOOK_BY_STARTUP, HOOK_WANT_ALWAYS, HOOK_CAP_NONE,
+-	         0x48,0x83,0xEC,0x28,0x48,0x85,0xD2,0x74,0x14,0x48,0x83,0xC2,0x18,0xE8,0xCB,0x4F)
+ 	HOOK_ROW(HOOK_UPDATE_CAMERA_ZONE, "updateCameraZone", RVA_UPDATE_CAMERA_ZONE, HOOK_FATAL, HOOK_BY_STARTUP, HOOK_WANT_ALWAYS, HOOK_CAP_NONE,
+ 	         0x48,0x8B,0xC4,0x48,0x89,0x50,0x10,0x48,0x89,0x48,0x08,0x55,0x56,0x57,0x41,0x54)
+ 	// Hook target and, in FULL builds, the scatter patch's scan base.
+diff --git a/src/zone/readiness/readiness_hook.cpp b/src/zone/readiness/readiness_hook.cpp
+index d687e6c..62b3022 100644
+--- a/src/zone/readiness/readiness_hook.cpp
++++ b/src/zone/readiness/readiness_hook.cpp
+@@ -2,7 +2,7 @@
+ // readiness_hook.cpp - Readiness classification and per-caller answers.
+ // Main, AI and spawn threads; try-lock +0x200 shared, release it, then try +0x1E0
+ // exclusive. Never hold both locks. Side effects stay on main; the answer is
+-// is native outside the exact loading poll; the per-zone ready byte is never written.
++// computed on every thread and the per-zone ready byte is never written.
+ 
+ #include "zone/preload/preload.h"
+ #include "zone/transition.h"
+@@ -13,11 +13,6 @@
+ #include "zone/readiness/zone_readiness_contract.h"
+ #include "zone/readiness/zone_readiness_ledger_bridge.h"
+ #include "zone/readiness/zone_readiness_classify.h"
+-#include "zone/readiness/zone_readiness_poll_scope.h"
+-#include <intrin.h>
+-#include <cstring>
+-
+-namespace { static volatile LONG s_activationWaits=0,s_activationChecks=0; }
+ 
+ 
+ 
+@@ -281,8 +276,8 @@ namespace readiness_hook_detail {
+ // game (the pause near inaccessible zones while the state is not 0). The
+ // accepted cost: a main-thread setDestination during state 4 keeps today's
+ // lenient sections == 0 answer. A flag set by a hook around
+-// Diagnostic state label only. Positive bypass authority comes from the
+-// separately profiled exact loading-poll token, never this shared state.
++// ZoneManager__stateMachineDriver 0xA0E950 would tell the poll apart exactly
++// (not done now).
+ static bool IsStatePoll4()
+ {
+ 	void* zm = g_cachedZoneMgr;
+@@ -352,8 +347,6 @@ void ReadinessReportTick(double now)
+ 	LONG cAdopt = ReadCounter(&g_rdyContract.g_rdyContractAdopted);
+ 	LONG cGlobal = ReadCounter(&g_rdyContract.g_rdyContractGlobal);
+ #endif
+-	LONG activationChecks=ReadCounter(&s_activationChecks),activationWaits=ReadCounter(&s_activationWaits);
+-	sig += (unsigned long)activationChecks+(unsigned long)activationWaits;
+ 	sig += (unsigned long)bypass + (unsigned long)rReady + (unsigned long)rWait
+ 	     + (unsigned long)scans
+ #if ZONEHAND_STEP >= 2
+@@ -382,7 +375,6 @@ void ReadinessReportTick(double now)
+ 		   << v[c][RZ_NO_SECTION] << "/" << v[c][RZ_OUTDOOR_MISSING] << "/"
+ 		   << v[c][RZ_BUILDINGS_PENDING];
+ 	ss << " bypass=" << bypass
+-       << " activation=" << activationChecks << "/" << activationWaits
+ #if ZONEHAND_STEP >= 2
+ 	   << " rule=superseded"   // the readiness contract answers every cell before this rule is reached
+ #else
+@@ -432,130 +424,15 @@ using namespace ::hooks_detail;
+ //     continues in the background.
+ // The ready byte is never written.
+ 
+-// Only the exact, profiled native loading-poll wrapper may use the bypass.
+-// Every other native-false result stays false, regardless of global ZM state.
+ // Threading: isContentPending is also reached through isZoneStillLoading
+ // (0x3AC810) from CharMovement::setDestination (AI evaluation), the
+ // spawn-check thread and character creation. The return value is computed
+-// only for the exact profiled loading poll; other callers retain native answers.
+-// The side effects (queue reprioritization,
++// identically on every thread; the side effects (queue reprioritization,
+ // deferred-frame accounting, LogDebug's ostringstream) run only on the main
+ // thread. Per-thread call/not-ready counters feed the Islands diagnostic line.
+ 
+-ReadinessZoneOriginal g_readinessZoneOriginal = NULL;
+-namespace {
+-static __declspec(thread) ZoneReadinessPoll::Context t_readinessPoll = {0};
+-static volatile LONG s_readinessPollReady = 0;
+-static bool s_readinessPollProfile = false;
+-static bool s_readinessPollWanted = false;
+-static uintptr_t s_loadingPollReturn=0,s_coordsReturn=0;
+-static bool ReadinessPollBytes(void*,uintptr_t rva,unsigned char*out,size_t count)
+-{
+-    if(!out||!count||count>36)return false;
+-    __try {const void*p=GameAddr(rva);if(!p)return false;std::memcpy(out,p,count);return true;}
+-    __except(EXCEPTION_EXECUTE_HANDLER){return false;}
+-}
+-}
+-
+-ReadinessLoadedBTOriginal g_readinessLoadedBTOriginal = NULL;
+-namespace {
+-static bool s_activationHookInstalled=false,s_activationProfile=false;
+-static uintptr_t s_activationReturn=0,s_nativeNavSlot=0;
+-
+-static bool ReadinessActivationProfile()
+-{
+-    // Exact native getter, eligible-platoon call/test and public thunk. These
+-    // are startup-only checks on the pinned executable, before either hook.
+-    struct W {uintptr_t rva;size_t bytes;unsigned char data[16];};
+-    const W windows[]={
+-    {0xA0C360,16,{0x40,0x53,0x48,0x83,0xEC,0x20,0x48,0x8B,0xD9,0x48,0x85,0xC9,0x75,0x08,0x32,0xC0}},
+-    {0x7EB406,16,{0x48,0x8B,0xCB,0xE8,0x06,0xD4,0x81,0xFF,0x84,0xC0,0x74,0x6C,0xF3,0x0F,0x10,0x15}},
+-    {0x8814,5,{0xE9,0x47,0x3B,0xA0,0x00}},
+-    };
+-    unsigned char actual[16];
+-    for(size_t i=0;i<sizeof(windows)/sizeof(windows[0]);++i)
+-        if(!ReadinessPollBytes(NULL,windows[i].rva,actual,windows[i].bytes)
+-            ||std::memcmp(actual,windows[i].data,windows[i].bytes)!=0)return false;
+-    return true;
+-}
+-}
+-void ReadinessActivationFinalize(bool installed){s_activationHookInstalled=installed&&g_readinessLoadedBTOriginal!=NULL;}
+-bool hook_isLoadedBT(void*zone)
+-{
+-    const uintptr_t caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
+-    const bool result=g_readinessLoadedBTOriginal(zone);
+-    // Only the native unloaded-platoon eligibility check is narrowed. Other
+-    // isLoadedBT consumers retain their answer; the original lock has already
+-    // been released before taking the navmesh getter's own locks.
+-    if(!result||caller!=s_activationReturn
+-        ||InterlockedCompareExchange(&s_readinessPollReady,0,0)==0
+-        ||!zone::g_zoneCfg.deferralEnabled||!zone::g_zoneCfg.readinessOverridesEnabled)return result;
+-    if(!zone||!s_nativeNavSlot||!game::g_hookOrig.orig_isContentPending)return false;
+-    void*manager=*reinterpret_cast<void**>(s_nativeNavSlot);
+-    if(!manager)return false;
+-    InterlockedIncrement(&s_activationChecks);
+-    // Bypass our public readiness detour: population must see the unmodified
+-    // native readiness, even inside any nested loading-poll TLS scope.
+-    const bool ready=game::g_hookOrig.orig_isContentPending(manager,ZoneReadinessPoll::ZoneCoords(zone));
+-    if(!ready)InterlockedIncrement(&s_activationWaits);
+-    return ready;
+-}
+-
+-void ReadinessPollPrepare()
+-{
+-    InterlockedExchange(&s_readinessPollReady,0);
+-    s_loadingPollReturn=s_coordsReturn=0;
+-    s_activationReturn=s_nativeNavSlot=0;s_activationHookInstalled=false;s_activationProfile=false;
+-    s_readinessPollWanted=zone::g_zoneCfg.deferralEnabled&&zone::g_zoneCfg.readinessOverridesEnabled;
+-    s_readinessPollProfile=s_readinessPollWanted&&ZoneReadinessPoll::Profile(ReadinessPollBytes,NULL);
+-    s_activationProfile=s_readinessPollProfile&&ReadinessActivationProfile();
+-    s_readinessPollProfile=s_readinessPollProfile&&s_activationProfile;
+-    if(s_readinessPollProfile){
+-        s_loadingPollReturn=reinterpret_cast<uintptr_t>(GameAddr(ZoneReadinessPoll::LoadingPollReturn));
+-        s_coordsReturn=reinterpret_cast<uintptr_t>(GameAddr(ZoneReadinessPoll::CoordsReturn));
+-        s_activationReturn=reinterpret_cast<uintptr_t>(GameAddr(0x7EB40E));
+-        s_nativeNavSlot=reinterpret_cast<uintptr_t>(GameAddr(0x2133560));
+-        if(!s_loadingPollReturn||!s_coordsReturn||!s_activationReturn||!s_nativeNavSlot)s_readinessPollProfile=false;
+-    }
+-}
+-bool ReadinessPollPrepared(){return s_readinessPollWanted&&s_readinessPollProfile;}
+-void ReadinessPollFinalize(bool coordsHook,bool wrapperHook)
+-{
+-    // Some detour implementations relocate the wrapper's inner call. In that
+-    // case an original return address cannot be proven: keep native readiness.
+-    const unsigned char expected[7]={0xE8,0xCB,0x4F,0xC6,0xFF,0x84,0xC0};
+-    unsigned char actual[7]={0};
+-    const bool paired=ZoneReadinessPoll::Capability(s_readinessPollWanted,s_readinessPollProfile,
+-        coordsHook,wrapperHook,game::g_hookOrig.orig_isContentPending!=NULL,g_readinessZoneOriginal!=NULL);
+-    const bool innerIntact=paired&&ReadinessPollBytes(NULL,0x3AC81D,actual,sizeof(actual))
+-        &&std::memcmp(actual,expected,sizeof(actual))==0;
+-    const bool admitted=ZoneReadinessPoll::Capability(s_readinessPollWanted,
+-        s_readinessPollProfile&&innerIntact&&s_activationHookInstalled,coordsHook,wrapperHook,
+-        game::g_hookOrig.orig_isContentPending!=NULL,g_readinessZoneOriginal!=NULL);
+-    InterlockedExchange(&s_readinessPollReady,admitted?1:0);
+-    if(s_readinessPollWanted&&!admitted)
+-        LogError("KEO: loading-poll readiness scope unavailable; native readiness retained");
+-}
+-bool hook_isLoadedZone(void* manager,void* zone)
+-{
+-    // Capture the caller in this detour, never in a noinline helper. Each
+-    // wrapper masks outer eligibility, including unknown/nested callers.
+-    const uintptr_t caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
+-    const bool admitted=InterlockedCompareExchange(&s_readinessPollReady,0,0)!=0
+-        &&IsMainThread()&&caller==s_loadingPollReturn;
+-    ZoneReadinessPoll::Frame frame;
+-    ZoneReadinessPoll::Enter(t_readinessPoll,frame,manager,ZoneReadinessPoll::ZoneCoords(zone),
+-        s_coordsReturn,admitted);
+-    __try {return g_readinessZoneOriginal(manager,zone);}
+-    __finally {ZoneReadinessPoll::Leave(t_readinessPoll,frame);}
+-}
+-
+ bool hook_isContentPending(void* manager, void* zonePos)
+ {
+-    // Consume before invoking the original: an unrelated/nested original may
+-    // not inherit the loading poll's one positive token.
+-    const bool loadingPoll=ZoneReadinessPoll::Take(t_readinessPoll,manager,zonePos,
+-        reinterpret_cast<uintptr_t>(_ReturnAddress()));
+ 	bool onMainThread = IsMainThread();
+ 
+ 	// Prioritize navmesh queue once per transition, at start of state 4.
+@@ -607,11 +484,6 @@ bool hook_isContentPending(void* manager, void* zonePos)
+ 	if (result)
+ 		return true;
+ 
+-	// Content, AI, grounding and spawn queries must never see a false native
+-	// result promoted merely because the global section queue is empty.
+-	if (!loadingPoll)
+-		return false;
+-
+ 	if (!zone::g_zoneCfg.deferralEnabled)
+ 		return false;
+ 
+diff --git a/src/zone/readiness/readiness_hook.h b/src/zone/readiness/readiness_hook.h
+index 91adb15..ba6a655 100644
+--- a/src/zone/readiness/readiness_hook.h
++++ b/src/zone/readiness/readiness_hook.h
+@@ -4,19 +4,5 @@
+ #define KEO_READINESS_HOOK_H
+ 
+ bool hook_isContentPending(void* manager, void* zonePos);
+-// Paired startup capability. If the private byte profile or either hook is
+-// unavailable, readiness falls back to the original for every caller.
+-typedef bool (*ReadinessZoneOriginal)(void* manager, void* zone);
+-extern ReadinessZoneOriginal g_readinessZoneOriginal;
+-void ReadinessPollPrepare();
+-bool ReadinessPollPrepared();
+-void ReadinessPollFinalize(bool coordsHook, bool wrapperHook);
+-bool hook_isLoadedZone(void* manager, void* zone);
+-
+-// Native population activation must not consume early ZoneMap loaded flags.
+-typedef bool (*ReadinessLoadedBTOriginal)(void* zone);
+-extern ReadinessLoadedBTOriginal g_readinessLoadedBTOriginal;
+-void ReadinessActivationFinalize(bool installed);
+-bool hook_isLoadedBT(void* zone);
+ 
+ #endif // KEO_READINESS_HOOK_H
+diff --git a/src/zone/readiness/zone_readiness_poll_scope.cpp b/src/zone/readiness/zone_readiness_poll_scope.cpp
+deleted file mode 100644
+index b0ab3fb..0000000
+--- a/src/zone/readiness/zone_readiness_poll_scope.cpp
++++ /dev/null
+@@ -1,52 +0,0 @@
+-#include "zone/readiness/zone_readiness_poll_scope.h"
+-#include <string.h>
+-namespace ZoneReadinessPoll {
+-void Enter(Context&tls,Frame&frame,void*manager,void*coords,uintptr_t expectedReturn,bool admitted)
+-{
+- frame.previous=tls;
+- frame.current.manager=manager;frame.current.coords=coords;frame.current.expectedReturn=expectedReturn;
+- frame.current.admitted=admitted;frame.current.consumed=false;
+- // Every entry replaces the outer context, including unadmitted entries.
+- tls=frame.current;
+-}
+-void Leave(Context&tls,const Frame&frame){tls=frame.previous;}
+-bool Take(Context&tls,void*manager,void*coords,uintptr_t actualReturn)
+-{
+- const bool match=tls.admitted&&!tls.consumed&&tls.manager&&tls.coords&&tls.expectedReturn&&manager&&coords&&actualReturn
+-  &&tls.manager==manager&&tls.coords==coords&&tls.expectedReturn==actualReturn;
+- // Burn the first attempt before the caller invokes the original getter.
+- // A mismatch must not donate an outer permit to a nested native query.
+- tls.consumed=true;
+- return match;
+-}
+-void* ZoneCoords(void*zone)
+-{
+- const uintptr_t address=reinterpret_cast<uintptr_t>(zone);
+- return address&&address<=~uintptr_t(0)-24?reinterpret_cast<void*>(address+24):NULL;
+-}
+-namespace {
+-struct Window {uintptr_t rva;size_t bytes;unsigned char data[36];};
+-const Window Windows[]={
+- {0x3AC810,36,{0x48,0x83,0xec,0x28,0x48,0x85,0xd2,0x74,0x14,0x48,0x83,0xc2,0x18,0xe8,0xcb,0x4f,0xc6,0xff,0x84,0xc0,0x74,0x07,0xb0,0x01,0x48,0x83,0xc4,0x28,0xc3,0x32,0xc0,0x48,0x83,0xc4,0x28,0xc3}},
+- {0x3AB4F0,16,{0x40,0x55,0x56,0x57,0x41,0x54,0x41,0x55,0x48,0x81,0xec,0xb0,0x00,0x00,0x00,0x48}},
+- {0x53986,5,{0xe9,0x85,0x8e,0x35,0x00}},
+- {0x117ED,5,{0xe9,0xfe,0x9c,0x39,0x00}},
+- {0xA0EA35,13,{0x83,0xbe,0xd8,0x81,0x16,0x00,0x04,0x0f,0x85,0xe7,0x00,0x00,0x00}},
+- {0xA0EA80,32,{0x48,0x8b,0x53,0x10,0x48,0x8b,0x0d,0xd5,0x4a,0x72,0x01,0xe8,0xf6,0x4e,0x64,0xff,0x84,0xc0,0x0f,0x84,0x91,0x00,0x00,0x00,0x48,0x8b,0x1b,0x48,0x85,0xdb,0x75,0xe0}},
+- {0xA0EAA0,17,{0xc6,0x86,0xb8,0x00,0x00,0x00,0x01,0xc7,0x86,0xd8,0x81,0x16,0x00,0x05,0x00,0x00,0x00}}
+-};
+-}
+-bool Profile(Reader reader,void*user)
+-{
+- if(!reader)return false;
+- unsigned char actual[36];
+- for(size_t i=0;i<sizeof(Windows)/sizeof(Windows[0]);++i){const Window&w=Windows[i];
+-  if(!reader(user,w.rva,actual,w.bytes)||memcmp(actual,w.data,w.bytes)!=0)return false;
+- }
+- return true;
+-}
+-bool Capability(bool wanted,bool profile,bool coordsHook,bool wrapperHook,bool origCoords,bool origWrapper)
+-{
+- return wanted&&profile&&coordsHook&&wrapperHook&&origCoords&&origWrapper;
+-}
+-}
+diff --git a/src/zone/readiness/zone_readiness_poll_scope.h b/src/zone/readiness/zone_readiness_poll_scope.h
+deleted file mode 100644
+index 868ca5c..0000000
+--- a/src/zone/readiness/zone_readiness_poll_scope.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#pragma once
+-#include <stddef.h>
+-#include <stdint.h>
+-
+-// Pure policy only. Caller owns the TLS Context and restores a POD Frame in
+-// __finally. No native object is dereferenced by this component. Native return
+-// addresses supplied to Enter/Take are absolute addresses; constants below are
+-// Steam RVAs. Capability/Profile are startup gates, never per-getter work.
+-namespace ZoneReadinessPoll {
+-enum { WrapperRva=0x3AC810,LoadingPollReturn=0xA0EA90,CoordsReturn=0x3AC822 };
+-struct Context {void*manager;void*coords;uintptr_t expectedReturn;bool admitted,consumed;};
+-struct Frame {Context current,previous;};
+-void Enter(Context&tls,Frame&frame,void*manager,void*coords,uintptr_t expectedReturn,bool admitted);
+-void Leave(Context&tls,const Frame&frame);
+-// First attempt is consumed even on mismatch, before invoking the original.
+-bool Take(Context&tls,void*manager,void*coords,uintptr_t actualReturn);
+-void* ZoneCoords(void*zone);
+-typedef bool (*Reader)(void*user,uintptr_t rva,unsigned char*out,size_t bytes);
+-bool Profile(Reader reader,void*user);
+-bool Capability(bool wanted,bool profile,bool coordsHook,bool wrapperHook,bool origCoords,bool origWrapper);
+-}
+diff --git a/tools/build/coresrc.txt b/tools/build/coresrc.txt
+index 3f7d23e..37a35b3 100644
+--- a/tools/build/coresrc.txt
++++ b/tools/build/coresrc.txt
+@@ -340,4 +340,3 @@ src\inventory\backpack_window.cpp
+ src\pathfind\path_budget_policy.cpp
+ 
+ src\pathfind\path_priority_publication.cpp
+-src/zone/readiness/zone_readiness_poll_scope.cpp
+-- 
+2.46.0.windows.1
+
