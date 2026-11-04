@@ -39,7 +39,7 @@ int main(int argc,char**argv){try{
  C(AtlasView::GpuCap==gpu*GiB&&AtlasWater::Cap==gpu*GiB&&AtlasLocalLights::Cap==gpu*GiB&&FineWindows::GpuCap==gpu*GiB,"all GPU aliases observe configured budget, not static initialization value");
  C(AtlasView::CpuCap==64ULL*1024*1024&&SourceReceipts::CpuCap==AtlasView::CpuCap,"producer scratch remains separate64MiB");
  C(GsmCacheProfile::Configure(gpu,ram)&&!GsmCacheProfile::Configure(gpu==8?7:gpu+1,ram)&&!GsmCacheProfile::Configure(gpu,ram==32?31:ram+1),"both session budgets immutable after successful configuration");
- C(FineJob::MaxVisible==96&&FineJob::Slots==96,"visible rendering demand is independent of memory budget");
+ C(FineJob::MaxVisible==512&&FineJob::Slots==512&&GsmCacheProfile::OneMetreVisible==96,"wider visible3m demand keeps original bounded1m threshold");
  const unsigned active=GsmCacheProfile::FineSlots();
  C(active>=96&&active<=6144&&active>256,"real active cache grows beyond old256 slots");
 #ifndef MEMORY_LEGACY

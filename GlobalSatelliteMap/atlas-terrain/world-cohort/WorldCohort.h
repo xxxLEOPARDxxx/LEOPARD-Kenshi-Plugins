@@ -73,6 +73,7 @@ public:
  explicit Controller(Provider&p):gpu_(new GpuOwners),provider_(p),gate_(p),owner_(GetCurrentThreadId()),state_(Stopped),error_(S_OK),work_(NULL),thread_(NULL),quarantined_(false),queryPending_(false),closeSent_(false),bankEpoch_(0),slot_(0),input_(0),cursor_(0),output_(0),shutdownAt_(0){std::memset(&job_,0,sizeof(job_));}
  ~Controller(){Shutdown();if(!quarantined_)delete gpu_;}
  Status State()const{return state_;}HRESULT Error()const{return error_;}bool Quarantined()const{return quarantined_;}unsigned CurrentView()const{return output_;}unsigned CurrentStage()const{return slot_;}unsigned StageCursor()const{return cursor_;}
+ unsigned CurrentInput()const{return input_;}LONG ProgressWorkerState()const{return OnMain()?WorkerStatus():WorldStream::WStopped;}
  U64 CpuReservation()const{return sizeof(Controller)+sizeof(GpuOwners)+sizeof(Work)+WorldHeight::MaxSamples*2+32ULL*1024*1024+512ULL*512*16+WorldHeight::AuthScratch+WorldPixels::Accepted::RequiredBytes(512)-sizeof(WorldPixels::Accepted);}
  U64 MaximumGpuReservation()const{return GpuReservation(CountValid(job_.count)?job_.count:4);}
  U64 OwnedGpuBytes()const{U64 n=gpu_->bank.OwnedGpuBytes();for(unsigned k=0;k<4;++k)n+=gpu_->raster[k].OwnedGpuBytes();for(unsigned p=0;p<3;++p)if(gpu_->staging[p].p)n+=U64(job_.frame[0].side)*job_.frame[0].side*(p?4:8);return n;}

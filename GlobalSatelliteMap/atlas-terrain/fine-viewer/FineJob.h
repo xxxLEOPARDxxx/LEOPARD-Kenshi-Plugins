@@ -74,7 +74,7 @@ inline Plan MakePlan(const Demand&r,const Budget&b,Mode mode,const FineWindows::
  Plan p;if(!Internal::DemandValid(r)||(mode!=CenterPair&&mode!=VisibleSet))return p;p.demand=r;
  const FineWindows::Rect&w=r.view.world;FineWindows::Internal::Clip clip={FineWindows::Internal::High(-147456,w.x),FineWindows::Internal::High(-147456,w.z),FineWindows::Internal::Low(147456,w.x+w.w),FineWindows::Internal::Low(147456,w.z+w.h)};
  if(clip.x1<=clip.x0||clip.z1<=clip.z0){p.state=Empty;return p;}
- const double density=FineWindows::Internal::Low(w.w/r.view.screenWidth,w.h/r.view.screenHeight);p.densitySpacing=density<3?1:density<9?3:9;p.state=Coarse;
+ const double density=FineWindows::Internal::Low(w.w/r.view.screenWidth,w.h/r.view.screenHeight);p.densitySpacing=density<3&&FineWindows::Internal::Worst(r.view,1)<=GsmCacheProfile::OneMetreVisible?1:density<=9?3:9;p.state=Coarse;
  // Planning/cache reuse does not allocate a source bank. A retained visible
  // set may exceed the production phase allowance; CanRender checks it later.
  if(p.densitySpacing==9||!Internal::BudgetValid(b))return p;

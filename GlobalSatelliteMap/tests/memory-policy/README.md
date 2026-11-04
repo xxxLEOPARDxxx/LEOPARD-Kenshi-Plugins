@@ -8,7 +8,7 @@ to stable boot storage so aliases created during static initialization do not
 freeze the old512MiB limit.
 
 Maximum physical metadata is6144fine slots, independent of active capacity and
-the unchanged96visible demand. Active slots reserve192MiB for actual K2,
+the independently bounded512visible3m demand (the1m threshold stays96). Active slots reserve192MiB for actual K2,
 40MiB viewer and margin, then floor remaining bytes by actual1.25MiB/window:
 GPU1..8GiB gives665/1484/2304/3123/3942/4761/5580/6144slots. Storage is lazy;
 these counts do not allocate corresponding GPU payload. GPU debt and fences
@@ -19,7 +19,7 @@ the separately selected RAM budget belongs to the prepared-tile cache.
 starts one short process per setting (no reconfiguration races), and passes31
 controls each. It covers defaults, allVRAM1..8 independent settings, extended
 RAM9/16/31/32GiB, invalidGPU0/9/~0 andRAM0/33/~0,
-immutability, GPU aliases acrosswater/local/fineplanner, visible96, active/max
+immutability, GPU aliases acrosswater/local/fineplanner, visible512/1m96, active/max
 bounds, actual K2+full cache admission, pending/retired debt, overflow, complete
 scaled resident-list validation/duplicate refusal, and actual WARP event-fence
 drain/reuse. Opaque debt counters exercise multiGiB arithmetic without allocating
@@ -49,8 +49,12 @@ final native Main layout. An included actual GlobalSatelliteMap.cpp was compiled
 to COFF solely to read initialized sizeof constants; it was never linked/run.
 The unchanged production reservation and MakeBudget bodies then ran on the host
 under both optimizations. With the full6144 index, planning metadata and scratch,
-192widget bindings,2MiB existing-town allowance,3MiB loaded-packet reserve, global
+1024widget bindings,2MiB existing-town allowance,3MiB loaded-packet reserve, global
 window index and TWO ordinary jobs (each index plus1MiB pixels), total charged
-CPU is66,845,462B against67,108,864B:263,402B remains. Source hashes and exact
+CPU is67,010,282B against67,108,864B:98,582B remains. This includes the
+idle72B readback Request and12B shade cursor. The empty Blob owns no payload.
+A separate diagnostic-active/no-ordinary-jobs scenario includes512KiB staging
+host allowance plus512KiB Blob payload and8B owner:61,756,066B total,
+5,352,798B margin. No readback request or allocation was performed by this proof. Source hashes and exact
 allowances are in the compact JSON. This is a conservative defined scenario,
 not a measurement of every allocation inside Ogre/MyGUI or the whole game.

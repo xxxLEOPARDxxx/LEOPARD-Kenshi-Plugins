@@ -6,7 +6,7 @@ namespace FineWindows {
 typedef AtlasView::U64 U64;
 static const U64&GpuCap=AtlasView::GpuCap;
 const U64 RawWindowBytes=256ULL*256*16;
-enum{MaxJobs=128,MaxScreen=16384,WorldExtent=294912,WorldOrigin=-147456};
+enum{MaxJobs=GsmCacheProfile::MaxVisible,MaxScreen=16384,WorldExtent=294912,WorldOrigin=-147456};
 struct Stamp{U64 source,material;};
 struct Rect{double x,z,w,h;};
 struct Key{unsigned spacing,x,z;Stamp stamp;};

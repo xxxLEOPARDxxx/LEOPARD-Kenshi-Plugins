@@ -6,7 +6,7 @@ namespace GsmFinePolicy {
 // must fit the real fine-residency cap, or ordinary base LOD stays enabled.
 inline bool CanRefine(const FineWindows::Request&view){
  const FineWindows::Rect&w=view.world;if(!view.screenWidth||!view.screenHeight||view.screenWidth>FineWindows::MaxScreen||view.screenHeight>FineWindows::MaxScreen||!FineWindows::Same(view.stamp,view.stamp)||!_finite(w.x)||!_finite(w.z)||!_finite(w.w)||!_finite(w.h)||w.w<=0||w.h<=0||!_finite(w.x+w.w)||!_finite(w.z+w.h))return false;
- return std::min(w.w/view.screenWidth,w.h/view.screenHeight)<9&&FineWindows::Internal::Worst(view,3)<=96;
+ return std::min(w.w/view.screenWidth,w.h/view.screenHeight)<=9&&FineWindows::Internal::Worst(view,3)<=GsmCacheProfile::MaxVisible;
 }
 inline bool Intersects(const FineWindows::Key&key,const FineWindows::Request&view){FineWindows::Rect b;return FineWindows::Same(key.stamp,view.stamp)&&FineWindows::Bounds(key,b)&&b.x<view.world.x+view.world.w&&view.world.x<b.x+b.w&&b.z<view.world.z+view.world.h&&view.world.z<b.z+b.h;}
 inline int Farthest(const FineWindows::Key*keys,const bool*valid,unsigned count,const FineWindows::Request&view,const FineWindows::Key*protect=NULL,unsigned protectedCount=0){
@@ -22,8 +22,8 @@ inline int Lru(const FineWindows::Key*keys,const bool*valid,const FineWindows::U
  }return -1;
 }
 inline int PlanningVictim(const FineWindows::Key*keys,const bool*valid,unsigned count,const FineWindows::Request&view,const FineWindows::U64*touch=NULL){
- if(!keys||!valid||count>GsmCacheProfile::FineSlots()||!view.screenWidth||!view.screenHeight)return -1;double density=std::min(view.world.w/view.screenWidth,view.world.h/view.screenHeight);if(density>=9||FineWindows::Internal::Worst(view,3)>96)return -1;
- unsigned spacing=density<3&&FineWindows::Internal::Worst(view,1)<=96?1:3;bool obsolete[GsmCacheProfile::FineCacheSlots]={false};for(unsigned n=0;n<count;++n)obsolete[n]=valid[n]&&(!Intersects(keys[n],view)||keys[n].spacing!=spacing);
+ if(!keys||!valid||count>GsmCacheProfile::FineSlots()||!view.screenWidth||!view.screenHeight)return -1;double density=std::min(view.world.w/view.screenWidth,view.world.h/view.screenHeight);if(density>9||FineWindows::Internal::Worst(view,3)>GsmCacheProfile::MaxVisible)return -1;
+ unsigned spacing=density<3&&FineWindows::Internal::Worst(view,1)<=GsmCacheProfile::OneMetreVisible?1:3;bool obsolete[GsmCacheProfile::FineCacheSlots]={false};for(unsigned n=0;n<count;++n)obsolete[n]=valid[n]&&(!Intersects(keys[n],view)||keys[n].spacing!=spacing);
  return touch?Lru(keys,obsolete,touch,count,view):Farthest(keys,obsolete,count,view);
 }
 inline std::string NativeRoot(std::string root){while(root.size()>3&&(root[root.size()-1]=='/'||root[root.size()-1]=='\\'))root.erase(root.size()-1);return root;}

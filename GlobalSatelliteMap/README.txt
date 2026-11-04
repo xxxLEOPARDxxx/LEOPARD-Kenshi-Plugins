@@ -34,7 +34,7 @@ asterisk: one immutable budget is used for the whole process session. These are
 lazy ceilings, not startup reservations; leave memory for Kenshi and other apps.
 GPU admission includes the viewer/layers, visible/retained fine windows, source
 producer and pending/retired GPU resources. Physical residency scales from665
-to6144 windows; visible fine work stays bounded at96 per spacing. Offscreen sharp
+to6144 windows; visible3m work is bounded at512 windows, while1m uses96. Offscreen sharp
 tiles remain warm until pressure. Only visible widgets are processed per frame.
 
 A file worker retains validated prepared fine tiles in a separate RAM LRU after
@@ -48,7 +48,8 @@ plugin drains it. The existing disk LRU remains512 files, independent of RAM.
 Producer/IO scratch remains separately capped at64MiB, including a conservative
 3MiB loaded-capture reserve and cache metadata. The detailed raster/compositor
 adds2,884,080 owned GPU bytes when initialized. Native mesh buffers/textures have
-separate32MiB/64MiB retained-reference limits. These are resource payload bounds,
+legacy32MiB/64MiB retained-reference limits. The loaded-town packet alone uses
+fresh32/128MiB and overlapping old+fresh64/256MiB limits. These are resource payload bounds,
 not total game/driver RAM or VRAM guarantees. Viewer/layers have40MiB inside the
 selected aggregate. GPU retirement debt and failed-fence admission remain counted.
 Actual end-to-end town appearance, frame time and long-session growth require
@@ -100,8 +101,8 @@ RU
 запас для самой Kenshi и других программ. Вместимость GPU-кэша растёт от665
 до6144 плиток. В общий бюджет входят слои карты, подробные плитки, производитель
 и ресурсы, ожидающие завершения работы GPU. За кадр обрабатываются только видимые
-виджеты, а не все тысячи сохранённых плиток. Видимый план ограничен96 участками
-на каждый шаг разрешения.
+виджеты, а не все тысячи сохранённых плиток. План3м ограничен512 участками;
+для1м сохраняется предел96.
 
 Рабочий поток сохраняет проверенные готовые подробные плитки в RAM после
 производства или чтения с диска. Попадание в кэш обходится без диска; выданная
@@ -114,7 +115,8 @@ RU
 Рабочие буферы производителя и IO имеют отдельный предел64МиБ, включая метаданные
 и резерв3МиБ для снимка города. Новый растеризатор занимает2 884 080 GPU-байт.
 Для просмотра и слоёв отведено40МиБ внутри выбранного GPU-бюджета. Удерживаемые
-штатные буферы и текстуры имеют отдельные лимиты32/64МиБ. Это границы данных
+штатные буферы и текстуры сохраняют прежние лимиты32/64МиБ. Только для загруженного
+города свежий пакет ограничен32/128МиБ, старый вместе с новым64/256МиБ. Это границы данных
 ресурсов, а не всей памяти игры или видеодрайвера. Реальное изображение, FPS
 и рост памяти проверяются отдельно в игре.
 
@@ -122,3 +124,17 @@ RU
 23ГБ. Просмотр использует готовую сетку. Для этого обновления полный рендер не
 требуется. Туман исследования, биомы, дипломатические зоны и дороги - следующие
 необязательные слои. Публичного выпуска этого плагина пока нет.
+
+Development follow-up 2026-11-04 / Доработка 04.11.2026
+EN: Intermediate x2..x4 can now request the complete3m layer. Already-ready native
+work progresses in bounded batches (8 transitions/1.5ms), yielding on asynchronous
+waits. Fair shading gives newly arrived tiles priority without starving later
+tiles when lighting changes. Cold loading speed and the reported horizontal
+seam still require runtime acceptance. An explicit private debug request may
+save two final256px outputs (~512KiB) without a whole-atlas recapture.
+RU: На промежуточных x2..x4 теперь доступен полный3м слой. Готовые этапы обработки
+проходят ограниченной пачкой (до8 переходов/1,5мс), без ожидания диска или GPU
+в цикле. Равномерная отрисовка отдаёт приоритет новым плиткам, не оставляя хвост
+без обновления при смене света. Ускорение холодной загрузки и горизонтальный шов
+ещё проверяются в игре. По отдельному закрытому запросу отладки сохраняются два
+конечных изображения256px (~512КиБ); повторный захват всего атласа не нужен.

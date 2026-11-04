@@ -64,6 +64,7 @@
 #include "GsmFinePolicy.h"
 #include "GsmFineIndex.h"
 #include "GsmFineWidgetSlots.h"
+#include "GsmFineSeamReadback.h"
 #include "atlas-terrain/world-native/NativeProvider.h"
 #include "atlas-terrain/fine-coordinator/FineCoordinator.h"
 #include "atlas-terrain/native-region-material/NativeAdapter.h"
@@ -109,6 +110,7 @@ void ModelFailure(const char*why);
 const AtlasView::U64 ModelGpuBytes=AtlasModels::PrivateBytes+AtlasModelDecode::PrivateBytes+AtlasModelSurface::PrivateBytes;
 GsmCachedTownState::State cachedTown;std::string cachedSelectionError;
 GsmAtlas::Manifest manifest;
+GsmFineSeamReadback::Request seamReadback;GsmFineSeamReadback::Blob seamBlob;
 GsmLoadedTown::State loadedTown;LoadedInstances::Raster loadedRaster;TownCompose::Layer loadedCompose;AtlasView::Cell loadedCell;
 bool instanceAttempted=false,instanceFailed=false,instanceResolutionReady=false,loadedGpuReady=false;
 std::string loadedError;unsigned loadedRenders=0,modelEpoch=1;
@@ -134,7 +136,7 @@ GsmFineGpu::Retirements gpuRetired;bool gpuRetirementFailed=false;
 AtlasView::Com<ID3D11Device> gpuRetirementDevice;
 void RetireGpuCharge(AtlasView::U64 bytes){if(bytes&&!gpuRetired.Charge(bytes)){gpuRetirementFailed=true;ErrorLog("GlobalSatelliteMap: GPU retirement ledger full; further allocation blocked");}}
 AtlasView::U64 BaseGpuBytes(){AtlasView::U64 bytes=0;for(unsigned i=0;i<AtlasView::WindowSlots;++i)if(cache[i].key.Valid())bytes+=GsmFineGpu::WindowBytes;return bytes;}
-AtlasView::U64 ViewerGpuBytes(){return BaseGpuBytes()+(ready?GsmFineGpu::RelightBytes:0)+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0)+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0)+(loadedGpuReady?LoadedGpuBytes:0)+cachedTown.OwnedGpuBytes();}
+AtlasView::U64 ViewerGpuBytes(){return BaseGpuBytes()+(ready?GsmFineGpu::RelightBytes:0)+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0)+(localLayerReady?AtlasLocalLights::PrivateBytes:0)+(modelGpuReady?ModelGpuBytes:0)+(loadedGpuReady?LoadedGpuBytes:0)+cachedTown.OwnedGpuBytes()+seamReadback.GpuBytes()+seamReadback.PinnedSourceBytes();}
 AtlasView::U64 AggregateGpuBytes(){return ViewerGpuBytes()+FineGpuBytes()+gpuRetired.Bytes()+ProducerGpuBytes();}
 AtlasView::U64 OtherGpuBytes(AtlasView::U64 excluded){AtlasView::U64 total=AggregateGpuBytes();return total>=excluded?total-excluded:AtlasView::GpuCap;}
 bool AdmitGpu(AtlasView::U64 bytes){return !gpuRetirementFailed&&!gpuRetired.Failed()&&GsmFineGpu::Fits(ViewerGpuBytes()+FineGpuBytes(),gpuRetired.Bytes(),ProducerGpuBytes(),bytes);}

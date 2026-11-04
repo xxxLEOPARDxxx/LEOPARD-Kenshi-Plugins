@@ -5,51 +5,34 @@ The user is at the PC. Ask for scene preparation; use background telemetry and
 file requests. Do not take desktop focus or collide with Minecraft autotests.
 Always check the actual process immediately before replacing a loaded DLL.
 
-1. **Global satellite map — terrain/zoom accepted; detailed cities next.**
-   User confirms sharp detail at every fixed zoom step and warm return pans on
-   2026-11-04. Do not restart terrain redesign or full atlas capture without a
-   newly reported concrete defect. Keep the accepted atlas and cache behaviour.
+1. **Global satellite map — new reported zoom/seam defects, 2026-11-04.**
+   Current private installed build75f41fe, local VRAM8GiB/RAM32GiB. MCM offers
+   VRAM1..8 and RAM1..32 in1GiB restart-required steps; RAMLRU fills on demand,
+   not an eager32GiB allocation. Live232 entries/243478872B and418hits confirmed.
+   The accepted16-tile atlas is unchanged; no new full render is needed here.
 
-   A new detailed-city candidate is now locally installed: DLL SHA256
-   5cae6c2287c69f023e77950784210f0103d64af11c92b496532862521f2ce0c1,
-   1,226,752 bytes. It adds supported real plaster/Wall4/Gate4/market instance
-   geometry, native raw-RGB/translucency HDR composition and accepted height for
-   water/lamps. Other materials, ordinary non-instanced objects, all player
-   buildings and shadows are unfinished. This is a supported subset, not all
-   city objects. Native source resolution/hash/admission failures retain LOD.
-   Independent code/GPU reviews and focused lifecycle/packet/water controls pass;
-   actual loaded-town appearance and performance still await a game run. Three
-   catalogs and README are installed; personal INI and 16-tile atlas unchanged.
+   User reports x2..x4 blur, slow x6/x8 cold refinement and a horizontal seam.
+   Confirmed96-window planning cap rejected the entire3m intermediate view.
+   New bounded512 planner admits those views, retaining96 as the1m threshold.
+   NativeMain progresses up to8 already-ready transitions/1.5ms perframe, stops
+   immediately on unchanged asyncwait, and paints once. Fair initial-priority
+   round-robin shading prevents tail starvation with the wider visible set.
+   Source/host tests and independent reviews pass; new DLL runtime acceptance
+   is pending. No fivefold speedup/FPS or universally leak-free claim.
 
-   Current local GPU cap512MiB, fine residency256/visible96, disk512 files;
-   CPU fine cap64MiB includes conservative3MiB city-capture reserve. No native
-   world scan per tile; catalog/capture limited to existing1Hz model update.
-   Loaded snapshot content comparison avoids invalidating unchanged city windows.
-   Stale worker results after option toggles are discarded by epoch.
+   Hub supported geometry was rejected by its128MB-worth of existing texture
+   references; scoped loaded-town fresh32/128MiB and old+fresh64/256MiB bounds
+   now preserve legacy32/64 elsewhere. Native borrowed bytes are not newly
+   allocated mapGPU. Actual Hub scene acceptance still pending. Ordinary objects,
+   additional material families, full unloaded-city detail and shadows unfinished.
 
-   The first city candidate regressed x6/x8: measured viewer34,143,518B exceeded
-   its old32MiB sublimit. A checked repair is built6fdcf9b880e7cc8aadadc381339b172b374b3a3741dde81217153df75d0821f1:
-   viewer40MiB inside unchanged512MiB, separate fine-cache startup attribution,
-   and old-stamp retirement before fresh identity. Tests/review pass; installation
-   and live image acceptance are pending. Smaller selectable GPU budgets and
-   constrained-machine checks remain required before release, not implemented.
-   Final candidate retains the first nearer town refusal even when a later town
-   succeeds. RPM proves Hub2 first and131 active supported candidates; the old
-   log erased its exact refusal. Do not change ordering or bounds on a guess.
-
-   Latest user memory request supersedes the fixed512MiB development profile:
-   VRAM1..8GiB, RAM1..32GiB in1GiB MCM steps, immutable per session with restart
-   flags. Actual RAM LRU,665..6144 GPU slots,8..64 surrounding warmup pairs,
-   O(logN) resident index and192 reusable widgets are implemented and reviewed.
-   Installed02:47MSK, DLL75f41fe57b205592b6362e4d39bd3b56e2f2d7851273e30e87cbd25afb4d6cdd,
-   local8GiBVRAM/32GiBRAM. Atlas/other INI bytes preserved. Await user's scene
-   for RAM-hit/pan/reopen measurements; do not claim live performance yet.
-   See docs/verification/2026-11-04-gsm-memory-caches.md for current evidence.
-
-   Next: actual Hub buildings/walls/stalls picture, then remaining object/material
-   families and unloaded-city detail. Fog, biome/diplomatic zones and roads follow
-   core city coverage. DF remains paused. No satellite publication is authorized
-   or claimed. One prior DLL backup is kept at backup/gsm-loaded-town-20261104.
+   Current seam source planes are continuous, matching lightingepochs and GUI
+   bounds; finalRGBAoutput diagnosis is next, via explicitprivate two-tile512KiB
+   asynchronous readback. Do not claim seam fixed or recapture fullatlas onguess.
+   Detailed evidence: docs/verification/2026-11-04-gsm-zoom-followup.md and memory-
+   caches.md. Atlas, personalINI, unrelated mods and publishedjournal preserved.
+   Fog, biome/diplomaticzones androads after core fixes. DF remains paused.
+   No satellite public release authorized; private devbuild only.
 
 2. **KEO — after terrain/detail; satellite remains the main task.** User2026-11-02
    explicitly asks to read current Steam reports/source now: broken pathfinding,

@@ -1,0 +1,24 @@
+{
+  "format": "GSM_FINE_SHADE_CURSOR",
+  "version": 1,
+  "sources": {
+    "GsmFineShadeCursor.h": "339e816c177ea681779636d6489491ec721f0eb4e04d4f7ecaab2ffe4a146b2a",
+    "tests/fine-shade-cursor/cursor.cpp": "05ce95f0a71c93dcf7082009e928b8e25799868f4ef6b438b1feaa1b8b7ea363",
+    "tests/fine-shade-cursor/run.py": "580a4de30ba039c231501b5c429c0707ffa7b3d97a5b6bc26a4bd2a2b5362047",
+    "tests/fine-shade-cursor/README.md": "10b80a1b506d93c3972fb8055863d85ae166cef18acf48dfb1268e1ee968faef"
+  },
+  "results": {
+    "Od": 7202,
+    "O2": 7202,
+    "stateBytes": 12,
+    "maxPublishedPerFrame": 2,
+    "epochChangeFrames": 60,
+    "visible338AllRefreshedWithinFrames": 169,
+    "visible512AllRefreshedWithinFrames": 256,
+    "red": "Fixed index zero reproduces starvation",
+    "capacity": 1024,
+    "visible518AllRefreshedWithinFrames": 259,
+    "visible1024AllRefreshedWithinFrames": 512
+  },
+  "mainIntegration": false
+}

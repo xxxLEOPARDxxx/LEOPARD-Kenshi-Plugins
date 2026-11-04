@@ -1,0 +1,6 @@
+zoom=2.00 mpp=9.000 worst3=378 baseTexelPixels=1.00 fine=0 count=0 pairs=0 planBytes=10912
+zoom=2.50 mpp=7.200 worst3=242 baseTexelPixels=1.25 fine=0 count=0 pairs=0 planBytes=10912
+zoom=3.00 mpp=6.000 worst3=180 baseTexelPixels=1.50 fine=0 count=0 pairs=0 planBytes=10912
+zoom=4.00 mpp=4.500 worst3=112 baseTexelPixels=2.00 fine=0 count=0 pairs=0 planBytes=10912
+zoom=6.00 mpp=3.000 worst3=60 baseTexelPixels=3.00 fine=1 count=45 pairs=23 planBytes=10912
+zoom=8.00 mpp=2.250 worst3=40 baseTexelPixels=4.00 fine=1 count=28 pairs=14 planBytes=10912

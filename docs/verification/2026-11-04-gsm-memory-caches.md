@@ -11,6 +11,8 @@ because the process-session budget is immutable before workers start.
   aliases include all GPU layers and checked pending/retired/producer debt.
 - Real fine GPU capacity665..6144 lazy slots, bounded96 visible source plan.
   Resident validation uses a fixed hash table instead of quadratic comparisons.
+  The later same-day zoom follow-up expands the3m plan to512 (1m remains96);
+  see2026-11-04-gsm-zoom-followup.md.
 - Worker-owned prepared fine-tile RAM LRU after successful Put/validated Get.
   Cache hits avoid disk; published reads are separate scratch copies. Optional
   RAM allocation failures preserve valid disk results. Cache bytes include

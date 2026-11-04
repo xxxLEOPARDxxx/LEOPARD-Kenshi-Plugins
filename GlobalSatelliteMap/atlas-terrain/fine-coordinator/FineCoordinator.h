@@ -5,6 +5,14 @@
 namespace FineCoordinator {
 typedef FineStore::U64 U64;
 struct Residency {U64 viewerGpu,fineGpu,pendingGpu,retiredGpu;unsigned occupied;Residency():viewerGpu(0),fineGpu(0),pendingGpu(0),retiredGpu(0),occupied(0){}};
+// Serialized Main progress, not a completion/authentication receipt. Explicit
+// fields avoid hashes/padding and observe both source and file-worker readiness.
+struct Progress {
+ unsigned nativeState,view,stage,cursor,input,ownerFlags,stored;
+ LONG nativeWorkerState,consumerWorkerState;HRESULT error;
+ Progress():nativeState(0),view(0),stage(0),cursor(0),input(0),ownerFlags(0),stored(0),nativeWorkerState(0),consumerWorkerState(0),error(S_OK){}
+};
+inline bool SameProgress(const Progress&a,const Progress&b){return a.nativeState==b.nativeState&&a.view==b.view&&a.stage==b.stage&&a.cursor==b.cursor&&a.input==b.input&&a.ownerFlags==b.ownerFlags&&a.stored==b.stored&&a.nativeWorkerState==b.nativeWorkerState&&a.consumerWorkerState==b.consumerWorkerState&&a.error==b.error;}
 // Match MakeBudget's viewer/debt attribution without treating retained fine
 // images as viewer allocations. All measured owners and the actual K2 bank
 // still have to fit the shared GPU cap before starting another producer.
@@ -115,6 +123,13 @@ public:
  bool ReleaseRead(){if(!Main()||!owner_||quarantined_||!owner_->reading||!owner_->readReady||!owner_->worker.ReleaseRead())return false;owner_->reading=owner_->readReady=owner_->readExposed=false;return true;}
  void Cancel(){if(Main())Hard(E_ABORT);}bool Active()const{return owner_!=NULL;}bool Terminated()const{return Main()&&owner_&&owner_->terminated;}bool ReadReady()const{return Main()&&owner_&&owner_->readReady;}bool Quarantined()const{return quarantined_;}HRESULT Error()const{return error_;}unsigned StoredWindows()const{return Main()&&owner_?owner_->stored:0;}
  U64 ProducerGpuBytes()const{return Main()&&owner_?owner_->native.Cohort().ReservedGpuBytes():0;}U64 RetainedCpuBytes()const{return quarantined_?Debt().cpu:0;}U64 RetainedGpuBytes()const{return quarantined_?Debt().gpu:0;}
+ Progress ObserveProgress()const{
+  Progress p;if(!Main())return p;p.error=error_;p.ownerFlags=quarantined_?8192U:0U;if(!owner_)return p;
+  Owner&o=*owner_;const Producer&native=o.native.Cohort();
+  p.nativeState=unsigned(native.State());p.view=native.CurrentView();p.stage=native.CurrentStage();p.cursor=native.StageCursor();p.input=native.CurrentInput();p.nativeWorkerState=native.ProgressWorkerState();p.consumerWorkerState=o.worker.ProgressState();p.stored=o.stored;
+  p.ownerFlags|=1U|(o.workerReady?2U:0U)|(o.queued?4U:0U)|(o.writing?8U:0U)|(o.reading?16U:0U)|(o.readReady?32U:0U)|(o.readExposed?64U:0U)|(o.draining?128U:0U)|(o.soft?256U:0U)|(o.producerCancelled?512U:0U)|(o.stopping?1024U:0U)|(o.terminated?2048U:0U);
+  return p;
+ }
  FineWrite::RamStats MemoryStats()const{return Main()&&owner_&&!quarantined_?owner_->worker.MemoryStats():FineWrite::RamStats();}
  U64 RamBytes()const{return MemoryStats().bytes;}
  // Prepared RAM payload is separate from strict producer/scratch CPU debt.

@@ -1,0 +1,17 @@
+{
+  "productionSha256": "0584b2baec34dfb9aa0eec6b5e0aa0e063c618f332b1fc62f2e0e200a5c12f46",
+  "testsSha256": "86cded191084952a4a52144ff338fce5c97a9cde646445adad1d86472588e11f",
+  "runnerSha256": "0f46705f372b1091eb9624a9202abe1b893be8d4367b94c8cd60cb20bf1e819a",
+  "nativeControlsPerOptimization": 26,
+  "faultControlsPerOptimization": 41,
+  "optimizations": [
+    "Od",
+    "O2"
+  ],
+  "mutantsKilled": [
+    "row-copy",
+    "partial-unmap",
+    "fence-error-latch"
+  ],
+  "fixture": "Actual D3D11 WARP, two distinct continuous RGBA8 source planes; forced fault calls preserve real D3D otherwise."
+}

@@ -1,4 +1,6 @@
 #include "GsmFinePrefetch.h"
+#include "GsmFinePump.h"
+#include "GsmFineShadeCursor.h"
 // Included inside the viewer's private namespace, after its coarse renderer.
 // GPU work is admitted ONLY by the checked native Main workspace callback.
 typedef WorldNativeRebind::Session<WorldNative::StageAdapter<WorldNative::NativeStage> > FineNativeSession;
@@ -16,6 +18,7 @@ FineController*fineOwner=NULL;FineStore::Identity fineIdentity={};FineJob::Deman
 DWORD fineStatsAt=0,fineChangedAt=0;unsigned fineRetires=0,fineAhead=0,fineAheadRead=0;double fineMotionX=0,fineMotionZ=0;bool fineSpeculative=false,fineAheadMiss=false;FineJob::Plan fineAheadPlan;
 MapScreen*fineMap=NULL;WidgetRef fineMapWidget;DWORD fineThread=0;unsigned finePair=0,fineRead=0,finePhase=0;bool fineMiss=false,fineBlocked=false,fineClosing=false,fineCenter=true;
 __declspec(align(8)) volatile LONGLONG fineEpoch=0;FineWindows::U64 fineUseClock=0;
+bool fineDeferPaint=false;GsmFineShadeCursor::State fineShadeCursor;
 bool FinePending(){return fineOwner!=NULL;}
 bool FineQualified(){return ready&&manifest.fineVerified&&!fineBlocked&&!GetModuleHandleW(L"SatelliteCaptureProbe.dll")&&!GetModuleHandleW(L"PrivateSatelliteCaptureProbe.dll");}
 // Coarse zoom restores ordinary base LOD after the active producer is drained.
@@ -28,13 +31,13 @@ void FineDrop(unsigned n){FineEntry&f=fineCache[n];if(!f.valid)return;Entry&e=f.
  FineDetachWidget(n);MyGUI::RenderManager*rm=MyGUI::RenderManager::getInstancePtr();if(rm&&!e.name.empty()){MyGUI::ITexture*t=rm->getTexture(e.name);if(t)rm->destroyTexture(t);}RetireReads(e.output.p);e.output.Reset();e.gpu.Clear();e.texture.setNull();Ogre::TextureManager*tm=Ogre::TextureManager::getSingletonPtr();if(tm&&!e.name.empty()&&!tm->getByName(e.name).isNull())tm->remove(e.name);e.name.clear();e.shaded=0;fineIndex.Erase(f.key,n);f.valid=false;
 }
 bool FineRetire(unsigned n){if(fineRetires>=2)return false;bool was=fineCache[n].valid;FineDrop(n);if(was&&!fineCache[n].valid)++fineRetires;return !fineCache[n].valid;}
-void FineCancel(){if(fineOwner)fineOwner->Cancel();for(unsigned n=0;n<FineJob::ActiveSlots();++n){FineDrop(n);}for(unsigned p=0;p<GsmFineWidgets::MaxWidgets;++p)fineTiles[p].reset();fineWidgetSlots.Clear();fineMap=NULL;fineMapWidget.reset();finePhase=0;finePlan=FineJob::Plan();fineSpeculative=false;fineAhead=0;fineAheadPlan=FineJob::Plan();fineMotionX=fineMotionZ=0;}
+void FineCancel(){if(!seamReadback.Failed()){RetireGpuCharge(seamReadback.GpuBytes());seamReadback.Clear();seamBlob.Clear();}if(fineOwner)fineOwner->Cancel();for(unsigned n=0;n<FineJob::ActiveSlots();++n){FineDrop(n);}for(unsigned p=0;p<GsmFineWidgets::MaxWidgets;++p)fineTiles[p].reset();fineWidgetSlots.Clear();fineMap=NULL;fineMapWidget.reset();finePhase=0;finePlan=FineJob::Plan();fineSpeculative=false;fineAhead=0;fineAheadPlan=FineJob::Plan();fineMotionX=fineMotionZ=0;}
 int FineFind(const FineWindows::Key&key){return fineIndex.Find(key);}
 // Reserve requested layers before refining. Their user settings stay unchanged
 // when the remaining budget cannot admit the source bank.
 AtlasView::U64 FineLayerReserve(){AtlasView::U64 bytes=ViewerGpuBytes();if((waterOption||localOption||modelOption)&&!waterPipelineReady)bytes+=AtlasWater::PipelinePrivateBytes;if(modelOption&&!loadedGpuReady)bytes+=LoadedGpuBytes;if(localOption&&!localLayerReady)bytes+=AtlasLocalLights::PrivateBytes;if(modelOption&&!modelGpuReady)bytes+=ModelGpuBytes;if(modelOption&&cachedTown.OwnedGpuBytes()<3*PrivateTownLod::MaxBytes)bytes+=3*PrivateTownLod::MaxBytes-cachedTown.OwnedGpuBytes();return bytes;}
 FineCoordinator::Residency FineResidency(){FineCoordinator::Residency r;r.viewerGpu=FineLayerReserve();r.fineGpu=FineGpuBytes();r.retiredGpu=gpuRetired.Bytes();r.occupied=fineIndex.Count();return r;}
-FineStore::Ledger FineCpuLedger(){FineStore::Ledger l;l.other=sizeof(cache)+sizeof(fineCache)+sizeof(gpuRetired)+sizeof(models)+sizeof(finePlan)+sizeof(fineAheadPlan)+sizeof(manifest)+fineIndex.MetadataBytes()+sizeof(fineTiles)+sizeof(fineWidgetSlots)+sizeof(fineScratch)+sizeof(fineVisible)+manifest.windows.records.capacity()+cachedTown.CpuPayloadBytes()+sizeof(localDiagnostic)+sizeof(localRevision)+sizeof(nativeLight)+sizeof(relighter)+512*1024+(modelOption?3ULL*1024*1024:0);
+FineStore::Ledger FineCpuLedger(){FineStore::Ledger l;l.other=seamReadback.CpuBytes()+seamBlob.OwnedBytes()+sizeof(fineShadeCursor)+sizeof(cache)+sizeof(fineCache)+sizeof(gpuRetired)+sizeof(models)+sizeof(finePlan)+sizeof(fineAheadPlan)+sizeof(manifest)+fineIndex.MetadataBytes()+sizeof(fineTiles)+sizeof(fineWidgetSlots)+sizeof(fineScratch)+sizeof(fineVisible)+manifest.windows.records.capacity()+cachedTown.CpuPayloadBytes()+sizeof(localDiagnostic)+sizeof(localRevision)+sizeof(nativeLight)+sizeof(relighter)+512*1024+(modelOption?3ULL*1024*1024:0);
  GsmAtlas::Job*jobs[2]={job,completed};for(unsigned n=0;n<2;++n)if(jobs[n]){GsmAtlas::Job&j=*jobs[n];l.other+=sizeof(j)+j.manifest.windows.records.capacity()+j.cachedTownResult.bytes.capacity();for(unsigned p=0;p<3;++p)l.other+=j.read.plane[p].capacity();}return l;}
 bool FineGeometry(MapScreen*map,FineJob::Demand&next){if(!map||!map->mapImage||!map->mapScrollView||!FineStore::Valid(fineIdentity))return false;GSM::Rect cells[16];if(!Geometry(map,cells)||cells[0].w<=0||cells[0].h<=0)return false;MyGUI::IntCoord v=map->mapScrollView->getAbsoluteCoord();MyGUI::IntPoint origin=map->mapImage->getAbsolutePosition();if(v.width<=0||v.height<=0||v.width>8192||v.height>8192)return false;
  next=fineDemand;next.scope.thread=fineThread;next.scope.world=reinterpret_cast<FineStore::U64>(ou);next.scope.sourceEpoch=fineIdentity.sourceEpoch;next.scope.job=fineIdentity.sourceEpoch;next.view.stamp.source=fineIdentity.sourceEpoch;next.view.stamp.material=fineIdentity.materialGeneration;next.view.apron=false;next.view.screenWidth=v.width;next.view.screenHeight=v.height;
@@ -51,7 +54,7 @@ void FineVisibility(){
  fineVisibleCount=count;std::memcpy(fineVisible,next,count*sizeof(unsigned));
  fineVisibleDemand=fineDemand.revision;fineVisibleIndex=fineIndex.Revision();
 }
-void FinePresent(MapScreen*map){FineVisibility();for(unsigned at=0;at<fineVisibleCount;++at){const unsigned n=fineVisible[at];FineEntry&f=fineCache[n];if(!f.valid)continue;const int pool=fineWidgetSlots.Bind(n);if(pool<0)continue;if(!fineTiles[pool].get()&&layer.get()){MyGUI::ImageBox*w=layer.get()->createWidget<MyGUI::ImageBox>("ImageBox",MyGUI::IntCoord(),MyGUI::Align::Default,"");fineTiles[pool].set(w);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setDepth(f.key.spacing==1?-3:-2);}
+void FinePresent(MapScreen*map){if(fineDeferPaint)return;FineVisibility();for(unsigned at=0;at<fineVisibleCount;++at){const unsigned n=fineVisible[at];FineEntry&f=fineCache[n];if(!f.valid)continue;const int pool=fineWidgetSlots.Bind(n);if(pool<0)continue;if(!fineTiles[pool].get()&&layer.get()){MyGUI::ImageBox*w=layer.get()->createWidget<MyGUI::ImageBox>("ImageBox",MyGUI::IntCoord(),MyGUI::Align::Default,"");fineTiles[pool].set(w);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setDepth(f.key.spacing==1?-3:-2);}
  MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(fineTiles[pool].get());if(!w)continue;FineWindows::Rect bounds;bool show=FineContext()&&GsmFinePolicy::Intersects(f.key,fineDemand.view)&&FineWindows::Bounds(f.key,bounds)&&f.image.shaded;
  if(show){MyGUI::IntPoint a=map->worldToMapCoords(Ogre::Vector3(float(bounds.x),0,float(bounds.z))),b=map->worldToMapCoords(Ogre::Vector3(float(bounds.x+bounds.w),0,float(bounds.z+bounds.h)));MyGUI::IntCoord r(a.left,a.top,b.left-a.left,b.top-a.top);if(w->getCoord()!=r)w->setCoord(r);if(w->_getTextureName()!=f.image.name){w->setDepth(f.key.spacing==1?-3:-2);w->setImageTexture(f.image.name);}}if(w->getVisible()!=show)w->setVisible(show);}}
 bool FineUpload(const FineStore::View&v){if(FineFind(v.key)>=0)return true;if(!AdmitGpu(GsmFineGpu::WindowBytes))return false;unsigned slot=0;while(slot<FineJob::ActiveSlots()&&fineCache[slot].valid)++slot;if(slot==FineJob::ActiveSlots())return false;FineEntry&f=fineCache[slot];if(!fineIndex.Insert(v.key,slot))return false;f.valid=true;f.key=v.key;f.touch=++fineUseClock;Entry&e=f.image;e.hasHeight=false;for(unsigned i=0;i<256*256;++i)if(_finite(v.height[i])){if(!e.hasHeight||v.height[i]<e.minHeight)e.minHeight=v.height[i];e.hasHeight=true;}
@@ -60,8 +63,8 @@ bool FineUpload(const FineStore::View&v){if(FineFind(v.key)>=0)return true;if(!A
  }catch(...){FineDrop(slot);throw;}}
 void FineFail(const char*why);
 bool FineWantsLocal(Entry&e,const AtlasView::Uniforms&u){const NativeLocalLights::NativeSnapshot&s=localDiagnostic.Values();if(!localOption||localFailed||!localMapping.Matches(s,observedGeneration)||!s.Count())return false;if(e.localChecked==localVersion)return e.localAffects;AtlasLocalLights::Region region=LocalRegion(u);e.localAffects=false;for(unsigned i=0;i<s.Count();++i){AtlasLocalLights::GpuLight light;if(AtlasLocalLights::Pack(*s.Light(i),localMapping,light)&&AtlasLocalLights::Intersects(light,region,256,256)){e.localAffects=true;break;}}e.localChecked=localVersion;return e.localAffects;}
-void FineShade(){if(!haveLighting)return;FineVisibility();unsigned done=0;for(unsigned at=0;at<fineVisibleCount&&done<2;++at){const unsigned n=fineVisible[at];FineEntry&f=fineCache[n];if(!f.valid||!GsmFinePolicy::Intersects(f.key,fineDemand.view))continue;FineWindows::Rect b;if(!FineWindows::Bounds(f.key,b))continue;AtlasView::Uniforms u=lighting;u.referenceSide[3]=256;u.tileBounds[0]=float(b.x);u.tileBounds[1]=float(b.z);u.tileBounds[2]=float(b.w);u.tileBounds[3]=float(b.h);Entry&e=f.image;bool useWater=WantsWater(e),useLocal=FineWantsLocal(e,u);bool dirty=e.waterApplied!=useWater||(useWater&&e.waterStamp!=waterVersion)||e.localApplied!=useLocal||(useLocal&&e.localStamp!=localVersion)||(ModelsAvailable()?e.modelStamp!=models.Revision():e.modelApplied);if(e.shaded==lightVersion&&!dirty)continue;
- bool modelsApplied=false;HRESULT hr=PrepareModelCell(e,u,modelsApplied);if(FAILED(hr)){FineFail("fine model composition refused");return;}const AtlasView::Cell&cell=modelsApplied?modelCell:e.gpu;unsigned refusal=0;bool detailed=LoadedTouches(u);hr=(useWater||useLocal||detailed)?RenderLayers(e,cell,u,useWater,useLocal):relighter.Render(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);if(FAILED(hr)&&detailed){LoadedFailure("fine HDR composition refused");detailed=false;hr=(useWater||useLocal)?RenderLayers(e,cell,u,useWater,useLocal):relighter.Render(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);}if(FAILED(hr)){FineFail("fine illumination composition refused");return;}e.shaded=lightVersion;e.waterApplied=useWater;e.waterStamp=useWater?waterVersion:0;e.localApplied=useLocal;e.localStamp=useLocal?localVersion:0;e.modelApplied=modelsApplied||detailed;e.modelStamp=ModelsAvailable()?models.Revision():0;++done;}}
+void FineShade(){if(fineDeferPaint||!haveLighting)return;FineVisibility();unsigned done=0;fineShadeCursor.Cursor(fineVisibleCount);for(unsigned pass=0;pass<2&&done<2;++pass)for(unsigned scan=0;scan<fineVisibleCount&&done<2;++scan){const unsigned at=fineShadeCursor.Index(scan);if(at>=fineVisibleCount)break;const unsigned n=fineVisible[at];FineEntry&f=fineCache[n];if(!f.valid||(pass==0?f.image.shaded!=0:f.image.shaded==0)||!GsmFinePolicy::Intersects(f.key,fineDemand.view))continue;FineWindows::Rect b;if(!FineWindows::Bounds(f.key,b))continue;AtlasView::Uniforms u=lighting;u.referenceSide[3]=256;u.tileBounds[0]=float(b.x);u.tileBounds[1]=float(b.z);u.tileBounds[2]=float(b.w);u.tileBounds[3]=float(b.h);Entry&e=f.image;bool useWater=WantsWater(e),useLocal=FineWantsLocal(e,u);bool dirty=e.waterApplied!=useWater||(useWater&&e.waterStamp!=waterVersion)||e.localApplied!=useLocal||(useLocal&&e.localStamp!=localVersion)||(ModelsAvailable()?e.modelStamp!=models.Revision():e.modelApplied);if(e.shaded==lightVersion&&!dirty)continue;
+ bool modelsApplied=false;HRESULT hr=PrepareModelCell(e,u,modelsApplied);if(FAILED(hr)){FineFail("fine model composition refused");return;}const AtlasView::Cell&cell=modelsApplied?modelCell:e.gpu;unsigned refusal=0;bool detailed=LoadedTouches(u);hr=(useWater||useLocal||detailed)?RenderLayers(e,cell,u,useWater,useLocal):relighter.Render(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);if(FAILED(hr)&&detailed){LoadedFailure("fine HDR composition refused");detailed=false;hr=(useWater||useLocal)?RenderLayers(e,cell,u,useWater,useLocal):relighter.Render(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);}if(FAILED(hr)){FineFail("fine illumination composition refused");return;}e.shaded=lightVersion;e.waterApplied=useWater;e.waterStamp=useWater?waterVersion:0;e.localApplied=useLocal;e.localStamp=useLocal?localVersion:0;e.modelApplied=modelsApplied||detailed;e.modelStamp=ModelsAvailable()?models.Revision():0;fineShadeCursor.Published(at);++done;}}
 void FineFail(const char*why){bool first=!fineBlocked;fineBlocked=true;if(fineOwner)fineOwner->Cancel();if(first)ErrorLog(std::string("GlobalSatelliteMap: fine refinement stopped; coarse view retained: ")+why);}
 bool FineQueueRefused(const char*why,bool required){if(required)FineFail(why);else Diagnostic(std::string("fine cache-ahead skipped: ")+why);return false;}
 bool FineQueue(const FineJob::Plan&plan,unsigned pair,bool required=true){
@@ -107,8 +110,34 @@ void FineRenderTick(){
  }
  FineShade();FinePresent(fineMap);
 }
+#include "GsmFineSeamDiagnostic.h"
+// Explicit progress proves another ready transition is useful. Waiting on a
+// worker or a GPU fence ends this frame's batch; never poll in a busy loop.
+struct FineBatchProgress {
+ FineController*owner;FineCoordinator::Progress native;
+ FineWindows::U64 demand,index,planRevision;unsigned planSpacing,phase,pair,read,ahead,aheadRead,flags,planState,planCount,planPairs;
+ FineBatchProgress():owner(fineOwner),demand(fineDemand.revision),index(fineIndex.Revision()),planRevision(finePlan.demand.revision),planSpacing(finePlan.spacing),phase(finePhase),pair(finePair),read(fineRead),ahead(fineAhead),aheadRead(fineAheadRead),flags((fineMiss?1U:0U)|(fineBlocked?2U:0U)|(fineClosing?4U:0U)|(fineCenter?8U:0U)|(fineSpeculative?16U:0U)|(fineAheadMiss?32U:0U)),planState(unsigned(finePlan.state)),planCount(finePlan.count),planPairs(finePlan.pairCount){if(owner)native=owner->ObserveProgress();}
+ bool Same(const FineBatchProgress&b)const{return owner==b.owner&&FineCoordinator::SameProgress(native,b.native)&&demand==b.demand&&index==b.index&&planRevision==b.planRevision&&planSpacing==b.planSpacing&&phase==b.phase&&pair==b.pair&&read==b.read&&ahead==b.ahead&&aheadRead==b.aheadRead&&flags==b.flags&&planState==b.planState&&planCount==b.planCount&&planPairs==b.planPairs;}
+};
+struct FinePaintDeferral {bool previous;FinePaintDeferral():previous(fineDeferPaint){fineDeferPaint=true;}~FinePaintDeferral(){fineDeferPaint=previous;}};
+void FineRenderBatch(){
+ if(fineDeferPaint)return;
+ LARGE_INTEGER frequency,started,now;
+ if(!QueryPerformanceFrequency(&frequency)||frequency.QuadPart<=0||!QueryPerformanceCounter(&started)||started.QuadPart<0){FineRenderTick();return;}
+ {
+  FinePaintDeferral defer;
+  GsmFinePump::Budget budget(GsmFinePump::U64(started.QuadPart),GsmFinePump::U64(frequency.QuadPart));now=started;
+  while(budget.CanStep(GsmFinePump::U64(now.QuadPart))){
+   FineBatchProgress before;FineRenderTick();FineBatchProgress after;
+   if(!QueryPerformanceCounter(&now)||now.QuadPart<0||!budget.Finished(GsmFinePump::U64(now.QuadPart),!before.Same(after)))break;
+  }
+ }
+ // One shading budget and one UI pass per workspace frame, not per transition.
+ if(FineContext()){FineShade();FinePresent(fineMap);}
+ FineSeamTick();
+}
 struct FineListener:Ogre::CompositorWorkspaceListener {Ogre::CompositorWorkspace*workspace;Ogre::CompositorWorkspaceListener*previous;const void*renderer;bool active;FineListener():workspace(NULL),previous(NULL),renderer(NULL),active(false){}
- virtual void workspacePreUpdate(Ogre::CompositorWorkspace*w){if(previous)previous->workspacePreUpdate(w);if(!active||w!=workspace||fineThread!=GetCurrentThreadId()||!au||au->render!=renderer||au->render->workspace!=workspace||workspace->getListener()!=this)return;try{FineRenderTick();}catch(const std::exception&e){FineFail(e.what());}catch(...){FineFail("native fine callback failed");}}
+ virtual void workspacePreUpdate(Ogre::CompositorWorkspace*w){if(previous)previous->workspacePreUpdate(w);if(!active||w!=workspace||fineThread!=GetCurrentThreadId()||!au||au->render!=renderer||au->render->workspace!=workspace||workspace->getListener()!=this)return;try{FineRenderBatch();}catch(const std::exception&e){FineFail(e.what());}catch(...){FineFail("native fine callback failed");}}
  virtual void passPreExecute(Ogre::CompositorPass*p){if(previous)previous->passPreExecute(p);}
 }fineListener;
 void FineObserve(MapScreen*map){

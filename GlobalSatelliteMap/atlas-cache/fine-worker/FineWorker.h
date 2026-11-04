@@ -105,6 +105,7 @@ public:
  RamStats MemoryStats()const{RamStats s;if(!Main()||!work_||quarantined_)return s;s.bytes=FineStore::U64(InterlockedCompareExchange64(&work_->ramBytes,0,0));s.hits=FineStore::U64(InterlockedCompareExchange64(&work_->ramHits,0,0));s.misses=FineStore::U64(InterlockedCompareExchange64(&work_->ramMisses,0,0));s.entries=unsigned(InterlockedCompareExchange64(&work_->ramEntries,0,0));return s;}
  FineStore::U64 RamBytes()const{return MemoryStats().bytes;}FineStore::U64 RetainedRamBytes()const{return quarantined_&&work_?work_->ramBudget:0;}
  bool BorrowPending()const{return pendingPut_;}bool ReadPending()const{return pendingGet_;}
+ LONG ProgressState()const{return Main()&&work_?InterlockedCompareExchange(&work_->state,0,0):Stopped;}
  bool Start(const SourceReceipts::Scope&scope,const FineStore::Identity&identity,const FineStore::Config&config,const FineStore::Ledger&external){
   if(!Main()||work_||thread_||stopping_||failed_||quarantined_||Debt().work||scope.thread!=owner_||!SourceReceipts::ScopeValid(scope)||!FineStore::Valid(identity)||scope.sourceEpoch!=identity.sourceEpoch)return false;
   FineStore::Ledger ledger=external;if(!Add(ledger.other,FixedCpuBytes())||ledger.retainedRaw>SourceReceipts::CpuCap-ledger.other||FineStore::Session::FixedCpuBytes()>SourceReceipts::CpuCap-ledger.other-ledger.retainedRaw)return false;

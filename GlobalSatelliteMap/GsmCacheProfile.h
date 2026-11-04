@@ -3,7 +3,10 @@
 // These are ceilings for lazy owned caches, never eager multi-GiB allocations.
 namespace GsmCacheProfile {
 typedef unsigned long long U64;
-enum { MaxVisible=96,MaxFineCacheSlots=6144,FineCacheSlots=MaxFineCacheSlots,
+// The wider visible set closes the3m/9m gap at native x2..x4. Keep the old
+// bounded1m quality threshold: a larger cache must not silently multiply cold
+// x6/x8 rendering work by selecting1m for hundreds of windows.
+enum { MaxVisible=512,OneMetreVisible=96,MaxFineCacheSlots=6144,FineCacheSlots=MaxFineCacheSlots,
        DiskSlots=512,RetirementSlots=2*MaxFineCacheSlots+256 };
 const U64 GiB=1024ULL*1024*1024,FineWindowBytes=256ULL*256*20;
 // Covers actual K2 producer137,571,380B +40MiB viewer, with a safety margin.
