@@ -5,73 +5,28 @@ The user is at the PC. Ask for scene preparation; use background telemetry and
 file requests. Do not take desktop focus or collide with Minecraft autotests.
 Always check the actual process immediately before replacing a loaded DLL.
 
-1. **Global satellite map — new reported zoom/seam defects, 2026-11-04.**
-   Current private installed buildD4598BA5 (05a70ff),03:59MSK04Nov,
-   local VRAM8GiB/RAM32GiB. MCM offers
-   VRAM1..8 and RAM1..32 in1GiB restart-required steps; RAMLRU fills on demand,
-   not an eager32GiB allocation. Live232 entries/243478872B and418hits confirmed.
-   The accepted16-tile atlas is unchanged; no new full render is needed here.
+1. **Global satellite map — PAUSED BY USER, 2026-11-04.**
+   Final private installed build bdb15ea; preserve atlas/settings/source. Final
+   actual log: FinePresent about0.02ms percall, LoadedCapture about15ms each1s.
+   User still confirms FPS drops and map-icon flicker. No further map changes,
+   rendering, restart requests or speculative optimization until user resumes.
+   Evidence: game/_codex_work/20261104-satellite-pause/final_measurement.json and
+   PAUSED.md. Real1024px parent rendering remains unimplemented; AcceptedCrop
+   is only a tested prerequisite. No public release/personal changelog entry.
 
-   User reports x2..x4 blur, slow x6/x8 cold refinement and a horizontal seam.
-   Confirmed96-window planning cap rejected the entire3m intermediate view.
-   New bounded512 planner admits those views, retaining96 as the1m threshold.
-   NativeMain progresses up to8 already-ready transitions/1.5ms perframe, stops
-   immediately on unchanged asyncwait, and paints once. Fair initial-priority
-   round-robin shading prevents tail starvation with the wider visible set.
-   Source/host tests and independent reviews pass; new DLL runtime acceptance
-   is pending. No fivefold speedup/FPS or universally leak-free claim.
+2. **KEO — ACTIVE PRIMARY TASK, user2026-11-04.**
+   Continue verified routing, cancellation/worker lifecycle, town spawning and
+   excessive-squad investigation. First reconcile current source/installed DLL;
+   do not redo already fixed priority-publication or MCM work. Preserve native
+   multithreading and player intent. GOG support requires actual verified GOG
+   modules; it is not achieved by removing the platform gate. MCM/RU/EN/ZH and
+   detailed-log-last rules apply. This is a temporary maintenance fork: credit
+   the original author and withdraw our version if original development resumes.
+   Do not push to the author's origin. Other ordinary plugin tasks follow KEO.
 
-   Hub supported geometry was rejected by its128MB-worth of existing texture
-   references; scoped loaded-town fresh32/128MiB and old+fresh64/256MiB bounds
-   now preserve legacy32/64 elsewhere. Native borrowed bytes are not newly
-   allocated mapGPU. Actual Hub scene acceptance still pending. Ordinary objects,
-   additional material families, full unloaded-city detail and shadows unfinished.
+3. **Dynamic Factions — PAUSED BY USER.** Preserve all work and plans. No
+   new implementation, game testing or publication until explicitly resumed.
 
-   Current seam source planes are continuous, matching lightingepochs and GUI
-   bounds; finalRGBAoutput diagnosis is next, via explicitprivate two-tile512KiB
-   asynchronous readback. Do not claim seam fixed or recapture fullatlas onguess.
-   Detailed evidence: docs/verification/2026-11-04-gsm-zoom-followup.md and memory-
-   caches.md. Atlas, personalINI, unrelated mods and publishedjournal preserved.
-   Fog, biome/diplomaticzones androads after core fixes. DF remains paused.
-   No satellite public release authorized; private devbuild only.
-
-2. **KEO — after terrain/detail; satellite remains the main task.** User2026-11-02
-   explicitly asks to read current Steam reports/source now: broken pathfinding,
-   town inhabitants spawning outside and slowly returning, excess squads at normal
-   settings, GOG refusal, and possible mouse-input latency (unconfirmed). The user
-   has now explicitly requested parallel agent implementation. A scoped startup
-   routing-OFF fix has passed independent review; it is not a full KEO release.
-   Read-only spawn/GOG audits are in research/keo-spawn-audit-20261102 and
-   research/keo-gog-audit-20261102. Neither report proves the spawn defect fixed. Keep
-   player reports separate from verified causes; inspect native streaming/spawn
-   readiness, routing and build gates. Research: `research/keo-audit-20261102`.
-   New user request explicitly authorizes
-   a fork under MCM, bug fixes and compatibility. This supersedes the historical
-   local-only KEO intent. Before implementation read current upstream source,
-   license and player reports/issues; record actionable reports and reproduction
-   cases. Fix verified causes with performance/lifecycle review and game checks.
-   Do not claim every unknown report fixed merely because it was read. Apply
-   normal three-language, debug-last, release/credit and Nexus→Steam rules.
-   User clarification2026-11-02: this is a temporary maintenance fork, not an
-   independent development project. At release explicitly explain in EN/RU that
-   the fork is a necessary interim measure to fix bugs and let more players try
-   KEO. If the original author returns and continues development, withdraw our
-   version to avoid confusing players. Do not promise new independent features.
-   Preserve original authorship, license and source links; no withdrawal or
-   publication is authorized merely by recording this future release policy.
-   2026-11-03: reviewed local6e15b3a with MCM21player rows, three MO catalogues,
-   debug-last/defaultOFF and request-local path budgets is installed. Current
-   process loaded the module and MCM registered it; no ordinary diagnostic flood
-   with DebugOFF. Personal INI/KEOCompat preserved. One optional module-census
-   notice is overclassified as an error; correction is in the next scoped build.
-   Pre-enqueue priority publication race is reproduced; the scoped fix in local
-   commit680a2b5 passed independent review and awaits installation/game checks.
-   Do not confuse this with complete routing/spawn
-   repair or GOG support. Origin remains the author's repository; reviewed local
-   commits are backed up as exact patches in ours/tools/maintenance/keo and pushed
-   to our repository, never to the author's origin.
-3. **Dynamic Factions — PAUSED by user.** Preserve current work and plans;
-   resume when requested, after the satellite priority. No publication.
 4. **Save screenshot previews — IMPLEMENTED/USER ACCEPTED2026-11-01.** Capture the
    game window/frame when a save succeeds; display its preview below the save
    list when selecting that slot, both from the main menu and during play.
