@@ -156,3 +156,20 @@ RU: На промежуточных x2..x4 теперь доступен пол�
 без обновления при смене света. Ускорение холодной загрузки и горизонтальный шов
 ещё проверяются в игре. По отдельному закрытому запросу отладки сохраняются два
 конечных изображения256px (~512КиБ); повторный захват всего атласа не нужен.
+
+Private CPU timing / Частный замер времени CPU (04.11.2026)
+EN: With detailed logging enabled, aggregate CPU call durations are recorded
+for lighting, water, light/model snapshots, fine source progress, model
+composition, shading, presentation and coverage. One report per existing
+five-second interval; no per-call allocations or log writes. CPU submission
+time includes possible driver waits and is not a GPU duration measurement.
+Disabled logging makes no timing queries. Fixed counters are charged to RAM.
+This build measures the remaining periodic stalls; it does not claim to fix
+them or implement the requested real1024px parent render surface.
+RU: При подробном журнале измеряется время вызовов освещения, воды, снимков
+света и моделей, подготовки рельефа, сборки моделей, окраски и показа плиток.
+Сводка раз в пять секунд; отдельных записей и выделений памяти на вызов нет.
+Время CPU включает возможное ожидание драйвера, но не измеряет длительность
+работы GPU. При выключенном журнале таймеры не вызываются. Счётчики учтены
+в расходе RAM. Эта сборка измеряет оставшиеся статтеры, а не объявляет их
+исправленными. Настоящая поверхность рендера1024px ещё разрабатывается.

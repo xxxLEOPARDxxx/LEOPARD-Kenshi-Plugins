@@ -63,6 +63,7 @@
 #include "GsmMapInfo.h"
 #include "GsmFinePolicy.h"
 #include "GsmFineCoverage.h"
+#include "GsmCpuTiming.h"
 #include "GsmFineIndex.h"
 #include "GsmFineWidgetSlots.h"
 #include "GsmFineSeamReadback.h"
@@ -88,6 +89,7 @@ bool zoomStepHooksReady=false;unsigned zoomStepDepth=0;
 bool enabled=false,debug=false,sunlight=true,ambient=true,attempted=false,ready=false,failed=false,groupCreated=false,hookFailure=false,jobQuarantined=false;
 LONG observedGeneration=-1;DWORD statusUntil=0;GsmViewer::TickClock tickClock;GsmViewer::LightClock lightClock;
 unsigned serial=0,lightVersion=0,shadeCursor=0,cacheAge=0;
+GsmCpuTiming::Stats cpuTiming;
 unsigned coarseShadeCount=0,fineShadeCount=0;bool coarseCoveredByFine=false;
 bool FineCovers(MapScreen*map);
 unsigned windowReads=0;AtlasView::U64 windowBytes=0;DWORD statsAt=0;
@@ -220,7 +222,7 @@ void SetStage(ID3D11DeviceContext*c,unsigned stage,unsigned slot,ID3D11ShaderRes
 void RetireReads(ID3D11Texture2D*output){if(!output)return;AtlasView::Com<ID3D11Device>d;output->GetDevice(&d.p);AtlasView::Com<ID3D11DeviceContext>c;d.p->GetImmediateContext(&c.p);for(unsigned stage=0;stage<6;++stage){ID3D11ShaderResourceView*v[128]={0};switch(stage){case 0:c.p->VSGetShaderResources(0,128,v);break;case 1:c.p->HSGetShaderResources(0,128,v);break;case 2:c.p->DSGetShaderResources(0,128,v);break;case 3:c.p->GSGetShaderResources(0,128,v);break;case 4:c.p->PSGetShaderResources(0,128,v);break;default:c.p->CSGetShaderResources(0,128,v);}for(unsigned i=0;i<128;++i)if(v[i]){if(AtlasView::SameResource(v[i],output))SetStage(c.p,stage,i,NULL);v[i]->Release();}}}
 void DropEntry(int i){Entry&e=cache[i];if(!e.key.Valid())return;ID3D11Texture2D*planes[3]={e.gpu.texture[0].p,e.gpu.texture[1].p,e.gpu.texture[2].p};if(!gpuRetired.Add(planes,e.output.p,GsmFineGpu::WindowBytes)){gpuRetirementFailed=true;return;}if(tiles[i].get()){MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());w->setImageTexture("");w->setVisible(false);}MyGUI::RenderManager*rm=MyGUI::RenderManager::getInstancePtr();if(rm&&!e.name.empty()){MyGUI::ITexture*t=rm->getTexture(e.name);if(t)rm->destroyTexture(t);}RetireReads(e.output.p);e.output.Reset();e.gpu.Clear();e.texture.setNull();Ogre::TextureManager*tm=Ogre::TextureManager::getSingletonPtr();if(tm&&!e.name.empty()&&!tm->getByName(e.name).isNull())tm->remove(e.name);e.name.clear();e.key=AtlasView::WindowKey();e.shaded=e.age=0;}
 void Cancel(){if(job)InterlockedExchange(&job->read.cancel,1);if(completed){delete completed;completed=NULL;}}
-void Clear(){ClearMapInfo();presentationCurrent=false;FineCancel();Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();RetireGpuCharge((ready?GsmFineGpu::RelightBytes:0)+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0));ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
+void Clear(){cpuTiming.ResetSession();ClearMapInfo();presentationCurrent=false;FineCancel();Cancel();ResetModels();modelAttempted=modelFailed=false;modelRenders=0;townValuesLogged=false;distantModelDiagnostic.Reset();loadedModelDiagnostic.Reset();localRenders=localBatches=0;ResetLocal();localDiagnostic.Reset();localDiagnosticLogged=originDiagnosticLogged=false;tickClock.Reset();RetireGpuCharge((ready?GsmFineGpu::RelightBytes:0)+(waterPipelineReady?AtlasWater::PipelinePrivateBytes:0));ready=attempted=failed=false;haveLighting=false;lightClock.Reset();waterSnapshot.Clear();waterPipeline.Clear();waterPipelineReady=waterAttempted=waterFailed=false;waterClock.Reset();waterVersion=1;for(unsigned i=0;i<AtlasView::WindowSlots;++i)DropEntry(i);relighter.Clear();nativeLight.Clear();if(layer.get())MyGUI::Gui::getInstance().destroyWidget(layer.get());layer.reset();for(unsigned i=0;i<AtlasView::WindowSlots;++i)tiles[i].reset();if(status.get())MyGUI::Gui::getInstance().destroyWidget(status.get());status.reset();statusUntil=0;manifest=GsmAtlas::Manifest();}
 void Notice(MapScreen*map,bool drawFailure){if(!map||status.get()||!map->mainWidget)return;MyGUI::Widget*p=map->mainWidget;MyGUI::TextBox*w=p->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",MyGUI::IntCoord(12,12,p->getWidth()>24?p->getWidth()-24:300,56),MyGUI::Align::Default,"");status.set(w);w->setNeedMouseFocus(false);w->setNeedKeyFocus(false);w->setCaption(MyGUI::UString(drawFailure?Tr("Satellite terrain could not be drawn. Prepared data is retained. The normal map remains visible."):Tr("Satellite terrain is unavailable. Prepared terrain data is missing or does not match this game. The normal map remains visible.")));statusUntil=GetTickCount()+12000;}
 void Fail(MapScreen*map,const std::string&why){bool drawFailure=ready;Clear();attempted=failed=true;ErrorLog("GlobalSatelliteMap: "+why);Notice(map,drawFailure);}
 std::string ModulePath(const char*name){wchar_t path[MAX_PATH]={0};HMODULE h=GetModuleHandleA(name);DWORD n=h?GetModuleFileNameW(h,path,MAX_PATH):0;if(!n||n>=MAX_PATH)throw std::runtime_error("native renderer module path missing");return GsmAtlas::Utf8(std::wstring(path,n));}
@@ -644,7 +646,7 @@ void Draw(MapScreen*map,DWORD now){
         }
         if(!deferUpload){delete completed;completed=NULL;}
     }
-    TownValueDiagnostic();Lighting(now);WaterState(now);LocalDiagnostic(now);OriginDiagnostic(map,now);ModelState(now);
+    TownValueDiagnostic();{GsmCpuTiming::Scope t(debug,cpuTiming,GsmCpuTiming::Lighting);Lighting(now);}{GsmCpuTiming::Scope t(debug,cpuTiming,GsmCpuTiming::Water);WaterState(now);}{GsmCpuTiming::Scope t(debug,cpuTiming,GsmCpuTiming::LocalSnapshot);LocalDiagnostic(now);}OriginDiagnostic(map,now);{GsmCpuTiming::Scope t(debug,cpuTiming,GsmCpuTiming::ModelSnapshot);ModelState(now);}
     // Four256 windows have the same pixel budget as one former512 tile.
     coarseCoveredByFine=FineCovers(map);unsigned shaded=0,next=shadeCursor;
     if(!coarseCoveredByFine)for(unsigned pass=0;pass<3&&shaded<4;++pass)for(unsigned k=0;k<AtlasView::WindowSlots&&shaded<4;++k){unsigned i=(shadeCursor+k)%AtlasView::WindowSlots;Entry&e=cache[i];
@@ -705,7 +707,7 @@ void Draw(MapScreen*map,DWORD now){
         }
         std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" coarseHidden="<<coarseCoveredByFine<<" coarseShades="<<coarseShadeCount<<" fineShades="<<fineShadeCount<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" modelReady="<<modelGpuReady<<" modelCount="<<models.Valid(unsigned(observedGeneration))<<" modelRenders="<<modelRenders<<" modelBufferBytes="<<models.BorrowedBuffers()<<" modelTextureBytes="<<models.BorrowedTextures()<<" ownedGpuBytes="<<AggregateGpuBytes()<<" gpuCapBytes="<<AtlasView::GpuCap<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;
         message<<" cachedTown="<<(cachedTown.Valid(unsigned(observedGeneration))?cachedTown.TownId():0)<<" cachedTownGpu="<<cachedTown.OwnedGpuBytes()<<" loadedTown="<<loadedTown.TownId()<<" loadedRecords="<<(loadedTown.Geometry()?loadedTown.Geometry()->Count():0)<<" loadedRenders="<<loadedRenders;
-        message<<" coarseValid=0x"<<std::hex<<coarseValid<<" coarseShaded=0x"<<coarseShaded<<" coarseBound=0x"<<coarseBound<<" coarseVisible=0x"<<coarseVisible<<std::dec;Diagnostic(message.str());
+        message<<" coarseValid=0x"<<std::hex<<coarseValid<<" coarseShaded=0x"<<coarseShaded<<" coarseBound=0x"<<coarseBound<<" coarseVisible=0x"<<coarseVisible<<std::dec;Diagnostic(message.str());if(cpuTiming.Any()){Diagnostic(GsmCpuTiming::FormatReport(cpuTiming));cpuTiming.Reset();}
     }
 }
 #include "GsmFineViewer.h"

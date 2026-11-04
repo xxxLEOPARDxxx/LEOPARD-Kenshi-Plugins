@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "../../../GsmFineCoverage.h"
+#include "../../../GsmCpuTiming.h"
 #include <cstdio>
 #include <string>
 namespace Ogre {struct Vector3{float x,y,z;Vector3(float a,float b,float c):x(a),y(b),z(c){}};}
@@ -13,6 +14,7 @@ struct Entry{bool valid,opaque;struct{unsigned shaded;std::string name;}image;En
 struct WidgetRef{MyGUI::ImageBox*p;WidgetRef():p(NULL){}void*get(){return p;}}fineTiles[4];
 struct Slots{bool bound[4];Slots(){for(unsigned n=0;n<4;++n)bound[n]=true;}int Find(unsigned n){return n<4&&bound[n]?int(n):-1;}}fineWidgetSlots;
 MapScreen* fineMap=NULL;FineJob::Plan finePlan;FineJob::Demand currentDemand;bool fineCenter=false,context=true,geometry=true;unsigned finePhase=4;
+bool debug=false;GsmCpuTiming::Stats cpuTiming;
 static bool FineContext(){return context;}static bool FineGeometry(MapScreen*,FineJob::Demand&out){out=currentDemand;return geometry;}static int FineFind(const FineWindows::Key&key){return key.x<2&&key.z<2?int(key.z*2+key.x):-1;}
 // EXTRACTED_VISITOR
 // EXTRACTED_WRAPPER
