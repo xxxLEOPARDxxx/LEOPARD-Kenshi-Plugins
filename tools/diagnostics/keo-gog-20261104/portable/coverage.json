@@ -1,0 +1,598 @@
+{
+  "schema": 1,
+  "source_head": "57724259214d72c240ea37a6a030a4ffea50d522",
+  "manifest": [
+    {
+      "name": "showLoadingMessage",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x6e9110"
+      ]
+    },
+    {
+      "name": "isContentPending",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3ab110"
+      ]
+    },
+    {
+      "name": "isLoadedZoneScope",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3ac430"
+      ]
+    },
+    {
+      "name": "updateCameraZone",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0xa114c0"
+      ]
+    },
+    {
+      "name": "addOrderSelected",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x7f8bc0"
+      ]
+    },
+    {
+      "name": "destroyListInsert",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x799520"
+      ]
+    },
+    {
+      "name": "resetUnloadZones",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x36be00"
+      ]
+    },
+    {
+      "name": "processLoading",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0xa0e070"
+      ]
+    },
+    {
+      "name": "calculateCurrentPos",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x4fe5d0"
+      ]
+    },
+    {
+      "name": "getSpeed",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x7f44e0"
+      ]
+    },
+    {
+      "name": "factionRelationsUpdate",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x6b1d90"
+      ]
+    },
+    {
+      "name": "Character::giveItem",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5cac80"
+      ]
+    },
+    {
+      "name": "builderPlace",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "createBuilding",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x57c4f0"
+      ]
+    },
+    {
+      "name": "getDropped",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5cc420"
+      ]
+    },
+    {
+      "name": "takeOutsideTick",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "takeOutsidePathImpossible",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "findKOIntruderTown",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x99aaa0"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::saveGame",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x472fa0"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::loadGame",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x473f60"
+      ]
+    },
+    {
+      "name": "SaveFileSystem::newGame",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x470920"
+      ]
+    },
+    {
+      "name": "BackpackInventoryLayout::setupSections",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x150200"
+      ]
+    },
+    {
+      "name": "activateZoneMap",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0xa0d8d0"
+      ]
+    },
+    {
+      "name": "finalizeZoneResources",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "townListDestroy",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x929c10"
+      ]
+    },
+    {
+      "name": "zoneMapUpdate",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0xa0a080"
+      ]
+    },
+    {
+      "name": "unstitchCrossSection",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "nmgStitch",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3c5310"
+      ]
+    },
+    {
+      "name": "searchSetNodeCost",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphExpandNode",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphPositionLookup",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphHeuristicGoalAdjacent",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphHeuristicClusterCentre",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphHeuristicCoarseSeed",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "graphInstanceConnect",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "navMeshFaceAabb",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "removeInstance",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "createInstance",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3ac940"
+      ]
+    },
+    {
+      "name": "physicsUpdateUT",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x4cd350"
+      ]
+    },
+    {
+      "name": "hullPushHull",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushEntity",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushScythe",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushRoot",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "hullPushBase",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "nmgUpdate",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3c8790"
+      ]
+    },
+    {
+      "name": "wallAddProgress",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5597b0"
+      ]
+    },
+    {
+      "name": "navMeshGenerateAabb",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3a61a0"
+      ]
+    },
+    {
+      "name": "scoreFindFoodOnGround",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5975b0"
+      ]
+    },
+    {
+      "name": "operatorWantGone",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5a2510"
+      ]
+    },
+    {
+      "name": "deleteInstance",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3ab4c0"
+      ]
+    },
+    {
+      "name": "clearanceResetKeys",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "sectionCutLookup",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "loadPhysXResource",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x7e4190"
+      ]
+    },
+    {
+      "name": "haulAmount",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "isInIsland",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0xa075d0"
+      ]
+    },
+    {
+      "name": "getIsland",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0xa09200"
+      ]
+    },
+    {
+      "name": "setDestinationVec3",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x660af0"
+      ]
+    },
+    {
+      "name": "getZoneEdge",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3a35e0"
+      ]
+    },
+    {
+      "name": "charMovementUpdate",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x65f820"
+      ]
+    },
+    {
+      "name": "updateOnScreenCheck",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5c97e0"
+      ]
+    },
+    {
+      "name": "pausedUpdate",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x5c73a0"
+      ]
+    },
+    {
+      "name": "stopCharactersMovement",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x7f5210"
+      ]
+    },
+    {
+      "name": "addJobSelected",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x7f4830"
+      ]
+    },
+    {
+      "name": "addTaskNearest",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x7f9c10"
+      ]
+    },
+    {
+      "name": "dispatchJob",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3cdc50"
+      ]
+    },
+    {
+      "name": "navMeshGenerate",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3ab320"
+      ]
+    },
+    {
+      "name": "edgeProcess",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "nmResultPopulate",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "processJobAlt",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3cba80"
+      ]
+    },
+    {
+      "name": "buildCollision",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3cb320"
+      ]
+    },
+    {
+      "name": "buildCollisionInterior",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3cb6d0"
+      ]
+    },
+    {
+      "name": "stitchUnloadedZone",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3cad60"
+      ]
+    },
+    {
+      "name": "stitchWithInteriors",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3c5830"
+      ]
+    },
+    {
+      "name": "lockZone",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3c6fd0"
+      ]
+    },
+    {
+      "name": "navMeshStop",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3aaab0"
+      ]
+    },
+    {
+      "name": "getSeedPointsAdjacent",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3c9300"
+      ]
+    },
+    {
+      "name": "csFindPath",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3aa570"
+      ]
+    },
+    {
+      "name": "csCheckFaceConn",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3a5720"
+      ]
+    },
+    {
+      "name": "findPathFull",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "requestPath",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x145bd0"
+      ]
+    },
+    {
+      "name": "pathReqSubmit",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3aab10"
+      ]
+    },
+    {
+      "name": "csFindPathFallback",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3aa810"
+      ]
+    },
+    {
+      "name": "contentStreamCallee_0x8869",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": [
+        "0x3a9b40"
+      ]
+    },
+    {
+      "name": "addInstance",
+      "kind": "HOOK_FATAL",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "contentStream",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3adf70"
+      ]
+    },
+    {
+      "name": "dequeueWork",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "enqueueThreadSafe",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "gatesUpdateCodes",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "gatesFindPath",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "WaterOcclusionListener::frameRenderingQueued",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "CsmShadowMap::setupCascade",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "PagedGeometry::update",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": []
+    },
+    {
+      "name": "OptionsWindow::create",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3efd40"
+      ]
+    },
+    {
+      "name": "OptionsWindow::saveOptions",
+      "kind": "HOOK_DIAGNOSTIC",
+      "official_gog_rvas": [
+        "0x3ec570"
+      ]
+    }
+  ]
+}

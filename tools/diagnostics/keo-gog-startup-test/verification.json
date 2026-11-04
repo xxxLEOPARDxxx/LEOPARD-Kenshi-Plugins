@@ -1,0 +1,26 @@
+{
+  "archive": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\20261104-keo-gog-audit\\KEO-GOG-startup-test-20261105.zip",
+  "archive_bytes": 8297,
+  "archive_sha256": "3ef2989af7cad4e6d202edc119f59240ad45496dfbf6bdb01b77c769e8127d72",
+  "dll_bytes": 11264,
+  "dll_sha256": "9443b52f356a62682e2c607c07f563f202691ca3079b8beca34be64efb848927",
+  "exports": [
+    "?startPlugin@@YAXXZ",
+    "MCM_Describe"
+  ],
+  "kenshilib_imports": [
+    "??1BinaryVersion@KenshiLib@@QEAA@XZ",
+    "?DebugLog@@YAXPEBD@Z",
+    "?GetKenshiVersion@KenshiLib@@YA?AVBinaryVersion@1@XZ",
+    "?ErrorLog@@YAXPEBD@Z",
+    "?ToString@BinaryVersion@KenshiLib@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ"
+  ],
+  "actual_sdk_missing": [],
+  "sdk_sha256": "5b6240622d06801dc39896e385efb834b8e1fe2fcdf86067d071ae7a04f6c83b",
+  "mcm_header_sha256": "90060552da7f7144241443de48e12f73023c9c7667762e07b88b7606bf805aa9",
+  "crc_exact_contents": "PASS",
+  "host_tests": 29,
+  "gog_runtime_tested": false,
+  "game_hooks_workers": false,
+  "installed_locally": false
+}
