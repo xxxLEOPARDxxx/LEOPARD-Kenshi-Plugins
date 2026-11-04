@@ -1,0 +1,73 @@
+{
+  "time_msk": "2026-11-05T01:30:28.056196+03:00",
+  "version": "13",
+  "status": "installed_locally_pending_game_acceptance",
+  "imports": {
+    "KenshiLib.dll": 33,
+    "MyGUIEngine_x64.dll": 92
+  },
+  "catalogs": [
+    {
+      "language": "ru_RU",
+      "messages": 24,
+      "sha256": "ac5193c6638accc8d3df26a4494c0865f5edbf6c03a04295ba1dc76433b69b0f"
+    },
+    {
+      "language": "en_GB",
+      "messages": 24,
+      "sha256": "f69d17c8699ddb3eee76bae07081cf252602dde952060806c8ee4e94c2493c0e"
+    },
+    {
+      "language": "zh_CN",
+      "messages": 24,
+      "sha256": "ec258478e4e2e3aaea79b400c6ba6507188fb10de26d96376214107f88bb954d"
+    }
+  ],
+  "installed": [
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\ModConfigMenu.dll",
+      "sha256": "eceff075d5ae576dc66f0999049d872701da9eb846fcc8d01d8a6e8ed934e58b",
+      "bytes": 239104
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\README.txt",
+      "sha256": "7da89e83123b08ebd124e2454f1b6aaf34c83782a2a0fb3f3f429d62cd879d34",
+      "bytes": 28066
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\locale\\ru_RU\\LC_MESSAGES\\mod_config_menu.mo",
+      "sha256": "ac5193c6638accc8d3df26a4494c0865f5edbf6c03a04295ba1dc76433b69b0f",
+      "bytes": 2442
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\locale\\en_GB\\LC_MESSAGES\\mod_config_menu.mo",
+      "sha256": "f69d17c8699ddb3eee76bae07081cf252602dde952060806c8ee4e94c2493c0e",
+      "bytes": 1948
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\locale\\zh_CN\\LC_MESSAGES\\mod_config_menu.mo",
+      "sha256": "ec258478e4e2e3aaea79b400c6ba6507188fb10de26d96376214107f88bb954d",
+      "bytes": 1923
+    }
+  ],
+  "preserved": {
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\ModConfigMenu.ini": "13b379adec0d4f0cb66d9b280c455029310dfead149589a3e91573a730bcf614",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\ModConfigMenu\\RE_Kenshi.json": "58f83e000669bcba0fcc7b258dbd40332432c94e64718681d8c5601f02b44412",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\mods.cfg": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f"
+  },
+  "no_publication": true,
+  "checks": {
+    "reset_flow": {
+      "Od": 45,
+      "O2": 45
+    },
+    "modal_boundary": {
+      "Od": 51,
+      "O2": 51
+    },
+    "existing_list_layout": 19192,
+    "layout_negative_mutants": 4
+  },
+  "independent_review": "CLEAR; in-game input and visual acceptance still pending",
+  "release_package": "D:/DEV/Kenshi/workshop/nexus/ModConfigMenu-13.zip"
+}

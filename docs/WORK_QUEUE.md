@@ -1,6 +1,6 @@
 # Active work and next requested tasks
 
-Updated 2026-11-04. This is a private working queue, not a release announcement.
+Updated 2026-11-05. This is a private working queue, not a release announcement.
 The user is at the PC. Ask for scene preparation; use background telemetry and
 file requests. Do not take desktop focus or collide with Minecraft autotests.
 Always check the actual process immediately before replacing a loaded DLL.
@@ -14,15 +14,38 @@ Always check the actual process immediately before replacing a loaded DLL.
    PAUSED.md. Real1024px parent rendering remains unimplemented; AcceptedCrop
    is only a tested prerequisite. No public release/personal changelog entry.
 
-2. **KEO — ACTIVE PRIMARY TASK, user2026-11-04.**
-   Continue verified routing, cancellation/worker lifecycle, town spawning and
-   excessive-squad investigation. First reconcile current source/installed DLL;
-   do not redo already fixed priority-publication or MCM work. Preserve native
-   multithreading and player intent. GOG support requires actual verified GOG
-   modules; it is not achieved by removing the platform gate. MCM/RU/EN/ZH and
-   detailed-log-last rules apply. This is a temporary maintenance fork: credit
-   the original author and withdraw our version if original development resumes.
-   Do not push to the author's origin. Other ordinary plugin tasks follow KEO.
+2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
+   Gameplay priorities: (1) pathfinding: short-route detours, circling/stuck
+   movement, squad routing and avoiding water; (2) excess squads: distinguish
+   genuinely created platoons from existing platoons loaded earlier; (3) mouse
+   input lag is LOW PRIORITY, a single-player unconfirmed report, absent locally.
+   Investigate input only with a concrete lead or reproducible evidence.
+
+   The outside-Squin crowd also reproduced with ZERO KEO/KEOCompat modules in
+   actual PID30780. This excludes running KEO as necessary for that observation,
+   but not already displaced saved positions. By explicit user request both
+   spawn/readiness experiments5772425 andfb8c46a were rolled back. Current source
+   022bb70 has native src exactly5f68039, retaining MCM, compactRU/EN/ZH labels,
+   navmesh/priority/pause/TLS/jobcancel fixes. Installed DLL32c40117...653423.
+   Original personal INI and mod order were restored; no temporary test override
+   remains. Do not reintroduce these spawn experiments as a proven fix.
+
+   Personal keoRouting=false/plannerMode=on remains the user's choice. Recent
+   travel tests did not exercise the KEO routing master ON. Arrange an explicit
+   controlled ON test before interpreting route behavior or changing preferences.
+
+   GOG PORT IS NOW ACTIVE IN PARALLEL: user supplied game/DropMeFiles_VfFSw.zip
+   containing two EXEs. The smaller RE image36708352B matches GOG1.0.65 MD5
+   213349bf76a0a758067f9ed0aef2ab01. Sources were not executed. Evidence at
+   game/_codex_work/20261105-keo-gog-native. Build a verified native profile,
+   including raw-base accesses, inline patches and anonymous return/byte tables;
+   mapped exported entries alone are insufficient. Do not offer startup-only
+   stubs as a working GOG port. Keep other-module Ogre/PhysX checks separate.
+
+   Preserve native multithreading/player intent. MCM/RU/EN/ZH and detailed-log-last
+   rules apply. Temporary maintenance fork: credit the original author and
+   withdraw our version if original development resumes. Never push to the
+   author's origin. Back up local KEO commits as patches in our own repository.
 
 3. **Dynamic Factions — PAUSED BY USER.** Preserve all work and plans. No
    new implementation, game testing or publication until explicitly resumed.
@@ -64,8 +87,9 @@ Always check the actual process immediately before replacing a loaded DLL.
    bounded shared visible400ms snapshot and fail-closed unknown/refusal cases.
    Root and independent tests/native build pass; reviewed DLL and threeMO are
    installed and the user confirmed the known/unknown map check. Version7 ZIP,
-   bilingual guide and notes are prepared relative to published6. Await user's
-   Nexus upload; no Steam publication or personal release-journal entry yet.
+   bilingual guide and notes were published as version7 on2026-11-04 after the
+   user uploaded Nexus. Steam EN/RU and the personal release journal are updated.
+   Do not repackage this unchanged feature as a new release.
 
 ## Maintenance completed in this continuation
 
@@ -96,3 +120,21 @@ publish this same batch again or increment versions merely for local fixes.
 and road/path overlay layers, alongside the previously planned exploration fog.
 Separate MCM toggles; native source evidence and no atlas recapture. See
 GlobalSatelliteMap/PLAN.md. Future work after the active core coverage fixes.
+
+
+## New MCM task — reset confirmation (user2026-11-05)
+
+Implement centrally in Mod Config Menu for every plugin's common Reset button.
+Clicking Reset opens one modal with a red warning that this plugin's current
+settings will be lost. No setter, INI write, apply or reset before explicit
+confirmation. Cancel/default focus, Escape and close dismiss safely. Changing
+plugin/page, closing/rebuilding options or repeated clicks cannot reset another
+plugin or retain a dangling UI/plugin reference. RU/EN/ZH, inherited vanilla/Dark
+skins, bounded lifecycle and meaningful actual reset-flow tests. IMPLEMENTED and
+installed locally 05Nov01:30MSK; MCM13 ZIP/ENRU descriptions prepared. Independent
+review CLEAR; native VC10 GL/LTCG and actual reset45/modal51 checks Od/O2 pass.
+User in-game cancellation/appearance check pending. Private local installation
+receipt: docs/releases/2026-11-05-mcm-reset-confirmation.json.
+Published baseline is MCM12 (confirmed ledger); one next public package is13,
+not one increment per intermediate fix. No Nexus/Steam publication authorized
+for this new package yet; no personal ALL_CHANGELOG entry until published.

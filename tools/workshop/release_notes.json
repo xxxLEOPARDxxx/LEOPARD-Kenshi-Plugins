@@ -62,13 +62,13 @@
     ]
   },
   "ModConfigMenu": {
-    "version": "12",
-    "published_version": "11",
+    "version": "13",
+    "published_version": "12",
     "en": [
-      "[b]Mod-list scrolling.[/b] The scrollbar sits between the mod buttons and the divider without cutting their borders, in vanilla and modified interfaces."
+      "Reset to defaults now asks for confirmation with a red warning. Cancel or Escape keeps your settings; only the selected mod is reset after confirmation."
     ],
     "ru": [
-      "[b]Прокрутка списка модов.[/b] Ползунок располагается между кнопками модов и разделителем, не подрезая рамки, в ванильном и изменённых интерфейсах."
+      "Сброс по умолчанию теперь требует подтверждения с красным предупреждением. Отмена или Escape сохраняют настройки; после подтверждения сбрасывается только выбранный мод."
     ]
   },
   "BetterLooting": {

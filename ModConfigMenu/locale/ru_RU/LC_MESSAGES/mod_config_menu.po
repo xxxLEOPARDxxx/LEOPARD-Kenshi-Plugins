@@ -60,3 +60,12 @@ msgstr "Переключить: палитра или ввод кода цвет
 
 msgid "none"
 msgstr "нет"
+
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "All your settings for this mod will be lost. Restore its default values?"
+msgstr "Все ваши настройки этого мода будут потеряны. Восстановить значения по умолчанию?"

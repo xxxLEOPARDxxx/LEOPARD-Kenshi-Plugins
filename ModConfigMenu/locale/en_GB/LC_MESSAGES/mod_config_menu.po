@@ -60,3 +60,12 @@ msgstr "Switch between the palette and typing the colour code (#RRGGBB)"
 
 msgid "none"
 msgstr "none"
+
+msgid "Reset"
+msgstr "Reset"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "All your settings for this mod will be lost. Restore its default values?"
+msgstr "All your settings for this mod will be lost. Restore its default values?"

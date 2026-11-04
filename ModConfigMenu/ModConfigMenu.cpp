@@ -58,6 +58,9 @@
 #include <mygui/MyGUI_ImageBox.h>
 #include <mygui/MyGUI_ComboBox.h>
 #include <WidgetRef.h>
+#include <mygui/MyGUI_RenderManager.h>
+#include <mygui/MyGUI_ILayer.h>
+#include "ResetConfirmation.h"
 #include <FontRefresh.h>
 #include <GameTheme.h>
 
@@ -892,6 +895,14 @@ namespace
     // по старому указателю: вылет в UpdateScrollBar. WidgetRef обнуляется
     // сам, когда MyGUI удаляет виджет (см. WidgetRef.h).
     WidgetRef* g_tabRef = new WidgetRef();         // не разрушается
+    McmReset::Confirmation g_resetConfirmation;
+    unsigned long long g_pageGeneration = 1;
+    bool g_resetUiReady = false;
+    unsigned g_resetBlockedKeys = 0;
+    WidgetRef* g_resetTabsOwnerRef = new WidgetRef();
+    WidgetRef* g_resetModalRef = new WidgetRef();
+    WidgetRef* g_resetYesRef = new WidgetRef();
+    WidgetRef* g_resetCancelRef = new WidgetRef();
     WidgetRef* g_panelRootRef = new WidgetRef();   // корень панели строк в g_host
 
     // Подсказка в нижней панели окна настроек. Точку в конце игра красит
@@ -957,6 +968,9 @@ namespace
             ErrorLog("ModConfigMenu: apply crashed in " + m->id);
     }
 
+    void CancelResetConfirmation();
+    void InvalidateResetConfirmation();
+    void FinishResetConfirmation();
     void OnResetLine(DataPanelLine*);
     void OnActionLine(DataPanelLine*);
     void RunAction(Setting* s);
@@ -1183,6 +1197,7 @@ namespace
 
     bool RequestPanelDestroy(DatapanelGUI* panel)
     {
+        InvalidateResetConfirmation();
         if (panel == NULL || gui == NULL) return true;
         PanelBindings& owner = g_panelBindings[panel];
         if (owner.destroyRequested || owner.destroying) return true;
@@ -1726,8 +1741,24 @@ namespace
     void (*g_origKeyDown)(InputHandler*, OIS::KeyCode) = NULL;
     void (*g_origKeyUp)(InputHandler*, OIS::KeyCode) = NULL;
 
+    unsigned ResetCancelKeyBit(OIS::KeyCode key)
+    {
+        if (key == OIS::KC_ESCAPE) return 1;
+        if (key == OIS::KC_RETURN) return 2;
+        if (key == OIS::KC_NUMPADENTER) return 4;
+        return 0;
+    }
+
     void KeyDown_hook(InputHandler* self, OIS::KeyCode key)
     {
+        const unsigned resetKey = ResetCancelKeyBit(key);
+        if (resetKey && g_resetConfirmation.IsPending())
+        {
+            g_resetBlockedKeys |= resetKey;
+            g_resetConfirmation.Decide(false);
+            return;
+        }
+        if (resetKey && (g_resetBlockedKeys & resetKey)) return;
         if (g_capturedKeyDown == key) return; // OS repeat belongs to the captured press
         if (CaptureActive())
         {
@@ -1760,6 +1791,12 @@ namespace
 
     void KeyUp_hook(InputHandler* self, OIS::KeyCode key)
     {
+        const unsigned resetKey = ResetCancelKeyBit(key);
+        if (resetKey && (g_resetBlockedKeys & resetKey))
+        {
+            g_resetBlockedKeys &= ~resetKey;
+            return;
+        }
         if (g_capturedKeyDown == key) { g_capturedKeyDown = -1; return; }
         if (CaptureActive() && g_captureMod != 0 && key == g_captureMod)
         {
@@ -1831,6 +1868,7 @@ namespace
 
     bool RecreatePanel(ModEntry* m)
     {
+        InvalidateResetConfirmation();
         if (g_right == NULL || gui == NULL)
             return false;
         DropFocusInside();
@@ -1903,6 +1941,7 @@ namespace
 
     void AbortPage()
     {
+        InvalidateResetConfirmation();
         g_resetLine = NULL;
         g_actionLines.clear();
         ForgetOwnButtons();
@@ -2055,6 +2094,7 @@ namespace
 
     void ShowMod(ModEntry* m)
     {
+        InvalidateResetConfirmation();
         // Недописанное на прежней странице (ползунок, текст) - сейчас,
         // пока её строки живы.
         if (g_current != NULL && g_panel != NULL)
@@ -2256,9 +2296,139 @@ namespace
         }
     }
 
+    bool ResetPageLive()
+    {
+        return g_current != NULL && g_window != NULL && g_tab != NULL && g_panel != NULL
+            && g_tabRef->get() == g_tab && g_panelRootRef->get() != NULL
+            && g_tab->getInheritedVisible() && g_window->tabs != NULL
+            && g_window->tabs->getItemSelected() == g_tab;
+    }
+
+    bool ResetModalAlive() { return g_resetModalRef->get() != NULL; }
+
+    void DestroyResetModal()
+    {
+        MyGUI::Widget* const box = g_resetModalRef->get();
+        // Unlink before destruction: queued/stale button events cannot refer
+        // to a subsequent dialog. WidgetRef also handles external UI teardown.
+        g_resetModalRef->reset();
+        g_resetYesRef->reset();
+        g_resetCancelRef->reset();
+        if (box != NULL)
+        {
+            MyGUI::InputManager* const input = MyGUI::InputManager::getInstancePtr();
+            if (input != NULL) input->removeWidgetModal(box);
+            MyGUI::Gui* const manager = MyGUI::Gui::getInstancePtr();
+            if (manager != NULL) manager->destroyWidget(box);
+        }
+    }
+
+    void CancelResetConfirmation()
+    {
+        g_resetConfirmation.Cancel();
+        DestroyResetModal();
+    }
+
+    void InvalidateResetConfirmation()
+    {
+        ++g_pageGeneration;
+        if (g_pageGeneration == 0) ++g_pageGeneration;
+        CancelResetConfirmation();
+    }
+
+    void OnResetConfirm(MyGUI::Widget* sender)
+    {
+        if (sender == g_resetYesRef->get() && ResetModalAlive())
+            g_resetConfirmation.Decide(true);
+    }
+
+    void OnResetCancel(MyGUI::Widget* sender)
+    {
+        if (sender == g_resetCancelRef->get() && ResetModalAlive())
+            g_resetConfirmation.Decide(false);
+    }
+
+    void OnResetWindowButton(MyGUI::Window* sender, const std::string& name)
+    {
+        if (sender == g_resetModalRef->get() && name == "close")
+            g_resetConfirmation.Decide(false);
+    }
+
+    bool CreateResetConfirmation()
+    {
+        if (!g_resetUiReady)
+        {
+            ErrorLog("ModConfigMenu: reset confirmation unavailable; settings were not reset");
+            return false;
+        }
+        try
+        {
+            const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
+            const int width = std::min(640, view.width - 24);
+            const int height = std::min(290, view.height - 24);
+            if (width < 320 || height < 220) return false;
+            MyGUI::Window* const box = MyGUI::Gui::getInstance().createWidget<MyGUI::Window>(
+                "Kenshi_WindowCX", MyGUI::IntCoord((view.width-width)/2, (view.height-height)/2, width, height),
+                MyGUI::Align::Default, g_tab->getLayer() ? g_tab->getLayer()->getName() : "Window",
+                "MCM_ResetConfirmation");
+            g_resetModalRef->set(box);
+            if (!ResetModalAlive()) { MyGUI::Gui::getInstance().destroyWidget(box); return false; }
+            box->setCaption(Tr("Reset to defaults"));
+            box->eventWindowButtonPressed += MyGUI::newDelegate(&OnResetWindowButton);
+            const MyGUI::IntCoord client = box->getClientCoord();
+            const int pad = 16, buttonH = 34;
+            MyGUI::EditBox* const warning = box->createWidget<MyGUI::EditBox>("Kenshi_WordWrapEmpty",
+                MyGUI::IntCoord(pad, pad, client.width-pad*2, client.height-buttonH-pad*3), MyGUI::Align::Default);
+            warning->setEditMultiLine(true);
+            warning->setEditWordWrap(true);
+            warning->setEditStatic(true);
+            warning->setNeedMouseFocus(false);
+            warning->setNeedKeyFocus(false);
+            warning->setTextAlign(MyGUI::Align::Center);
+            // Deliberately red on every skin: this is a destructive-action warning.
+            warning->setTextColour(MyGUI::Colour(1.0f, 0.22f, 0.18f));
+            warning->setCaption(EscapeTags(std::string(Tr("All your settings for this mod will be lost. Restore its default values?"))
+                + "\n\n" + g_current->title));
+            const int buttonW = (client.width-pad*3)/2;
+            const int y = client.height-buttonH-pad;
+            MyGUI::Button* const yes = box->createWidget<MyGUI::Button>("Kenshi_Button1",
+                MyGUI::IntCoord(pad,y,buttonW,buttonH), MyGUI::Align::Default);
+            yes->setCaption(Tr("Reset"));
+            yes->setNeedKeyFocus(false); // only an explicit mouse click may reset
+            yes->eventMouseButtonClick += MyGUI::newDelegate(&OnResetConfirm);
+            g_resetYesRef->set(yes);
+            MyGUI::Button* const cancel = box->createWidget<MyGUI::Button>("Kenshi_Button1",
+                MyGUI::IntCoord(pad*2+buttonW,y,buttonW,buttonH), MyGUI::Align::Default);
+            cancel->setCaption(Tr("Cancel"));
+            cancel->eventMouseButtonClick += MyGUI::newDelegate(&OnResetCancel);
+            g_resetCancelRef->set(cancel);
+            MyGUI::InputManager& input = MyGUI::InputManager::getInstance();
+            input.addWidgetModal(box);
+            input.setKeyFocusWidget(cancel);
+            return true;
+        }
+        catch (...)
+        {
+            DestroyResetModal();
+            ErrorLog("ModConfigMenu: could not create reset confirmation");
+            return false;
+        }
+    }
+
     void OnResetLine(DataPanelLine*)
     {
-        ModEntry* const m = g_current;
+        if (!ResetPageLive() || g_hasPending) return;
+        if (g_resetConfirmation.Request(g_current->id, g_pageGeneration))
+        {
+            g_capture = NULL; // a key capture cannot write a setting behind this modal
+            g_captureMod = 0;
+            PlaceOwnButtons();
+            if (!CreateResetConfirmation()) CancelResetConfirmation();
+        }
+    }
+
+    void ResetModToDefaults(ModEntry* const m)
+    {
         if (m == NULL)
             return;
         for (size_t k = 0; k < m->settings.size(); ++k)
@@ -2283,6 +2453,27 @@ namespace
         ApplyMod(m);
         g_pendingShow = m;          // перечитать страницу - в следующем кадре
         g_hasPending = true;
+    }
+
+    void FinishResetConfirmation()
+    {
+        if (!g_resetConfirmation.IsPending()) return;
+        if (!ResetPageLive() || !ResetModalAlive() || g_hasPending
+            || !g_resetConfirmation.Matches(g_current->id, g_pageGeneration))
+        {
+            CancelResetConfirmation();
+            return;
+        }
+        if (!g_resetConfirmation.IsDecided()) return;
+        const std::string requestedId = g_current->id;
+        const unsigned long long requestedGeneration = g_pageGeneration;
+        const bool reset = g_resetConfirmation.Take(requestedId, requestedGeneration);
+        DestroyResetModal();
+        // Removing modal focus can synchronously run other UI delegates.
+        // Recheck identity after that boundary, before any setting is written.
+        if (reset && ResetPageLive() && !g_hasPending
+            && g_pageGeneration == requestedGeneration && g_current->id == requestedId)
+            ResetModToDefaults(g_current);
     }
 
     int SafeAction(MCM_ActionFn fn, void* ud, char* err, unsigned size)
@@ -2387,6 +2578,7 @@ namespace
         const size_t k = static_cast<size_t>(atoi(idx.c_str()));
         if (k < g_mods.size() && g_mods[k] != g_current)
         {
+            InvalidateResetConfirmation();
             g_pendingShow = g_mods[k];
             g_hasPending = true;
         }
@@ -2441,8 +2633,15 @@ namespace
         if (canvas.width != contentRight) g_list->setCanvasSize(contentRight, canvas.height);
     }
 
+    void OnMcmTabSelected(MyGUI::TabControl* tabs, size_t)
+    {
+        if (g_resetConfirmation.IsPending() && tabs->getItemSelected() != g_tab)
+            InvalidateResetConfirmation();
+    }
+
     void BuildTab(OptionsWindow* w)
     {
+        InvalidateResetConfirmation();
         g_captionFor = NULL;                // окно строится заново - заголовок ищем снова
         g_window = w;
         g_tab = NULL;
@@ -2464,6 +2663,11 @@ namespace
         g_tab = tabCount > 0 ? w->tabs->insertItemAt(tabCount - 1, "MCM")
                              : w->tabs->addItem("MCM");
         g_tabRef->set(g_tab);
+        if (g_resetTabsOwnerRef->get() != w->tabs)
+        {
+            w->tabs->eventTabChangeSelect += MyGUI::newDelegate(&OnMcmTabSelected);
+            g_resetTabsOwnerRef->set(w->tabs);
+        }
         const MyGUI::IntSize size = g_tab->getSize();
         const int listW = std::max(200, size.width / 4);
 
@@ -2550,6 +2754,7 @@ namespace
     // Изменения ловим опросом. force - писать и недоехавший ползунок.
     void Poll(bool force)
     {
+        if (g_resetConfirmation.IsPending()) return; // no setting writes behind a modal
         ModEntry* const m = g_current;
         if (m == NULL)
             return;
@@ -2613,6 +2818,7 @@ namespace
     void (*g_origCreate)(OptionsWindow* self) = NULL;
     void (*g_origUpdate)(OptionsWindow* self) = NULL;
     void (*g_origSave)(OptionsWindow* self) = NULL;
+    void (*g_origHide)(OptionsWindow* self) = NULL;
     void (*g_origDatapanelDtor)(DatapanelGUI* self) = NULL;
 
     // Игра удаляет нашу панель сама - по Esc (07.10.2026: в главном меню
@@ -2624,6 +2830,7 @@ namespace
     {
         if (self != NULL && self == g_panel)
         {
+            InvalidateResetConfirmation();
             if (g_debug)
                 DebugLog("ModConfigMenu: our datapanel is being destroyed - lines forgotten");
             if (g_current != NULL)
@@ -2896,6 +3103,7 @@ namespace
         const bool panelGone = g_panel != NULL && g_panelRootRef->get() == NULL;
         if (!tabGone && !panelGone)
             return;
+        InvalidateResetConfirmation();
         DebugLog("ModConfigMenu: the options window was torn down from outside - tab state reset");
         HideWindowCaption();
         g_areaOwner = NULL;                 // его виджетов уже нет - отключать нечего
@@ -2917,6 +3125,7 @@ namespace
     {
         g_origUpdate(self);
         ForgetIfDestroyed();
+        FinishResetConfirmation();
         if (g_debug)
         {
             static DWORD s_lastNoteMs = 0;
@@ -3006,8 +3215,17 @@ namespace
             HideWindowCaption();            // нашей вкладки в этом окне нет
     }
 
+    void Hide_hook(OptionsWindow* self)
+    {
+        // Hidden OptionsWindow need not update again. The root modal must
+        // leave InputManager's modal stack before the native window hides.
+        if (self == g_window) InvalidateResetConfirmation();
+        g_origHide(self);
+    }
+
     void Save_hook(OptionsWindow* self)
     {
+        InvalidateResetConfirmation();
         ForgetIfDestroyed();
         if (self == g_window && g_panel != NULL)
             Poll(true);
@@ -3028,6 +3246,7 @@ extern "C" __declspec(dllexport) void __cdecl MCM_OpenPage(const char* modId)
         w->show();
     if (w != g_window || g_tab == NULL || w->tabs == NULL)
         return;
+    InvalidateResetConfirmation();
     w->tabs->setItemSelected(g_tab);
     for (size_t k = 0; k < g_mods.size(); ++k)
         if (g_mods[k]->id == modId)
@@ -3082,15 +3301,23 @@ __declspec(dllexport) void startPlugin()
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::create, no Mods tab");
         return;
     }
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&OptionsWindow::_NV_update), Update_hook, &g_origUpdate))
+    const bool resetUpdate = KenshiLib::SUCCESS == KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&OptionsWindow::_NV_update), Update_hook, &g_origUpdate);
+    if (!resetUpdate)
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::update, changes saved only on close");
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&InputHandler::keyDownEvent), KeyDown_hook, &g_origKeyDown))
+    const bool resetHide = KenshiLib::SUCCESS == KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&OptionsWindow::hide), Hide_hook, &g_origHide);
+    if (!resetHide)
+        ErrorLog("ModConfigMenu: could not hook OptionsWindow::hide; reset confirmation disabled");
+    const bool resetKeyDown = KenshiLib::SUCCESS == KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&InputHandler::keyDownEvent), KeyDown_hook, &g_origKeyDown);
+    if (!resetKeyDown)
         ErrorLog("ModConfigMenu: could not hook InputHandler::keyDownEvent - keys cannot be assigned");
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&InputHandler::keyUpEvent), KeyUp_hook, &g_origKeyUp))
+    const bool resetKeyUp = KenshiLib::SUCCESS == KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&InputHandler::keyUpEvent), KeyUp_hook, &g_origKeyUp);
+    if (!resetKeyUp)
         ErrorLog("ModConfigMenu: could not hook InputHandler::keyUpEvent");
+    g_resetUiReady = resetUpdate && resetHide && resetKeyDown && resetKeyUp;
     if (KenshiLib::SUCCESS != KenshiLib::AddHook(
             KenshiLib::GetRealAddress(&OptionsWindow::saveOptions), Save_hook, &g_origSave))
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::saveOptions");

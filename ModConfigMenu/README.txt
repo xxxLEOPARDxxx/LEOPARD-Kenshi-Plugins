@@ -1,6 +1,6 @@
 ModConfigMenu (MCM) — настройки модов прямо в игре
 
-ИЗМЕНЕНИЯ ТЕКУЩЕЙ ВЕРСИИ 10 (29–30.10.2026)
+ИСТОРИЯ ВЕРСИИ 10 (29–30.10.2026)
 
   * Колесо над любой штатной строкой MCM прокручивает страницу: над
     подписью, флажком, ползунком, полем и кнопкой. Случайного изменения
@@ -86,6 +86,20 @@ VERSION 10 CHANGES (29–30 OCTOBER 2026)
     Updates preserve ModConfigMenu.ini. UI translations cover
     ru_RU/en_GB/zh_CN; releases contain .mo catalogs, .po stays in source.
 
+ПОДТВЕРЖДЕНИЕ СБРОСА НАСТРОЕК / RESET CONFIRMATION
+
+  «Сбросить по умолчанию» открывает подтверждение с красным предупреждением
+  о потере личных настроек выбранного мода. Значения меняются только после
+  нажатия «Сбросить». «Отмена», Escape, Enter и крестик отменяют запрос.
+  Закрытие настроек, смена вкладки/мода или перестройка страницы также
+  отменяют запрос. Повторное нажатие не создаёт дополнительных окон.
+
+  Reset to defaults opens a confirmation with a red warning that the selected
+  mod's personal settings will be lost. Values change only after clicking Reset.
+  Cancel, Escape, Enter and the close button cancel the request. Closing Options,
+  changing tabs/mods or rebuilding the page also cancels it. Repeated clicks
+  never create extra dialogs. No plugin API or release number has changed.
+
 СПРАВОЧНИК И ИСТОРИЯ
 
 Требуется RE_Kenshi.
@@ -111,7 +125,8 @@ MCM. Слева — список модов, у которых есть наст
 
 Изменение сразу записывается в ini мода и применяется. Помеченное
 звёздочкой (*) вступает в силу после перезапуска игры. Кнопка «Сбросить по
-умолчанию» внизу страницы возвращает все значения мода.
+умолчанию» внизу страницы сначала запрашивает подтверждение с красным
+предупреждением, затем возвращает значения мода.
 
 Разделы страницы — светло-жёлтым и в квадратных скобках: «[ ПАНЕЛЬ ]».
 Оформление одно на все моды, его задаёт MCM, авторам плагинов ничего
@@ -277,3 +292,14 @@ English
 Русский
 
 - Прокрутка списка модов. Ползунок располагается между кнопками модов и разделителем, не подрезая рамки, в ванильном и изменённых интерфейсах.
+
+
+Prepared release 13 / Подготовленный выпуск 13 (2026-11-05)
+
+English
+
+- Reset to defaults now asks for confirmation with a red warning. Cancel or Escape keeps your settings; only the selected mod is reset after confirmation.
+
+Русский
+
+- Сброс по умолчанию теперь требует подтверждения с красным предупреждением. Отмена или Escape сохраняют настройки; после подтверждения сбрасывается только выбранный мод.

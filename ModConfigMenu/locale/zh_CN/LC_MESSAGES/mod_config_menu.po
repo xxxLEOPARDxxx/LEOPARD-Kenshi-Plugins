@@ -60,3 +60,12 @@ msgstr "切换：调色板或输入颜色代码（#RRGGBB）"
 
 msgid "none"
 msgstr "无"
+
+msgid "Reset"
+msgstr "重置"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "All your settings for this mod will be lost. Restore its default values?"
+msgstr "此模组的所有个人设置都将丢失。是否恢复默认值？"

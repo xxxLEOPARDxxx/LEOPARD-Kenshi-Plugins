@@ -816,7 +816,7 @@ T["ModConfigMenu"] = ("""[h2]ЧТО ДЕЛАЕТ[/h2]
 [*][b]в заголовке окна[/b] - название выбранного мода.
 [/list]
 
-Изменение сразу сохраняется и применяется. Строки со звёздочкой (*) действуют после перезапуска игры. Кнопка «Сбросить по умолчанию» внизу страницы возвращает все значения мода.
+Изменение сразу сохраняется и применяется. Строки со звёздочкой (*) действуют после перезапуска игры. Кнопка «Сбросить по умолчанию» внизу страницы запрашивает подтверждение с красным предупреждением. Отмена или Escape сохраняют настройки. После подтверждения сбрасываются только настройки выбранного мода.
 
 [h2]КАКИЕ МОДЫ[/h2]
 
@@ -858,7 +858,7 @@ Every mod setting - right in the game. The Options window (main menu or Esc in g
 [*][b]window caption[/b] - the name of the selected mod.
 [/list]
 
-A change is saved and applied at once. Rows marked with an asterisk (*) take effect after a game restart. The "Reset to defaults" button at the bottom of the page returns all values of the mod.
+A change is saved and applied at once. Rows marked with an asterisk (*) take effect after a game restart. The "Reset to defaults" button at the bottom of the page asks for confirmation with a red warning. Cancel or Escape keeps your settings. Confirmation resets only the selected mod.
 
 [h2]WHICH MODS[/h2]
 
