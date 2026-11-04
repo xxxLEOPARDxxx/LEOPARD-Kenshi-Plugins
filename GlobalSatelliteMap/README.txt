@@ -10,6 +10,10 @@ still drain normally; context changes and terminal cancellation close the file.
 Consecutive same-cell visible pairs share one four-view source preparation when
 the actual four-view GPU reservation fits. Initial centre and speculative jobs
 stay at two views; all original 256px cache keys and per-view validation remain.
+When current fine tiles fully cover the viewport with matching visible widgets,
+coarse background shading pauses. Existing fallback textures stay resident;
+missing detail, panning or invalid presentation resumes their normal refresh.
+Fine day/night, water and local light updates are unchanged.
 The global map uses one 4x4 grid of 8192x8192 terrain tiles. Zooming and changing
 lighting reuse that grid; supported close views receive streamed finer materials.
 Fixed zoom steps preserve native centre/cursor anchors and marker alignment.
@@ -79,6 +83,8 @@ RU
 ресурсов и повторная полная проверка файла рельефа для каждой пары плиток.
 Соседние пары одного участка обрабатываются вместе, если хватает видеопамяти;
 первые центральные плитки и подгрузка окружения сохраняют прежнюю порцию.
+Полностью закрытый подробными плитками запасной слой больше не перерисовывается
+в фоне. При сдвиге карты или пропущенной плитке его обновление возобновляется.
 Закрытая разработка спутниковой глобальной карты. Миникарта использует прежний
 источник. Основа - одна сетка 4x4 из плиток 8192x8192. При зуме и смене света
 она используется повторно; вблизи подгружаются более подробные материалы.

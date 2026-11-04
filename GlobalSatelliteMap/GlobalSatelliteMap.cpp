@@ -62,6 +62,7 @@
 #include "GsmFineGpu.h"
 #include "GsmMapInfo.h"
 #include "GsmFinePolicy.h"
+#include "GsmFineCoverage.h"
 #include "GsmFineIndex.h"
 #include "GsmFineWidgetSlots.h"
 #include "GsmFineSeamReadback.h"
@@ -87,6 +88,8 @@ bool zoomStepHooksReady=false;unsigned zoomStepDepth=0;
 bool enabled=false,debug=false,sunlight=true,ambient=true,attempted=false,ready=false,failed=false,groupCreated=false,hookFailure=false,jobQuarantined=false;
 LONG observedGeneration=-1;DWORD statusUntil=0;GsmViewer::TickClock tickClock;GsmViewer::LightClock lightClock;
 unsigned serial=0,lightVersion=0,shadeCursor=0,cacheAge=0;
+unsigned coarseShadeCount=0,fineShadeCount=0;bool coarseCoveredByFine=false;
+bool FineCovers(MapScreen*map);
 unsigned windowReads=0;AtlasView::U64 windowBytes=0;DWORD statsAt=0;
 bool waterOption=false,waterAttempted=false,waterFailed=false,waterPipelineReady=false;
 unsigned waterVersion=1;GsmViewer::LightClock waterClock;
@@ -643,8 +646,8 @@ void Draw(MapScreen*map,DWORD now){
     }
     TownValueDiagnostic();Lighting(now);WaterState(now);LocalDiagnostic(now);OriginDiagnostic(map,now);ModelState(now);
     // Four256 windows have the same pixel budget as one former512 tile.
-    unsigned shaded=0,next=shadeCursor;
-    for(unsigned pass=0;pass<3&&shaded<4;++pass)for(unsigned k=0;k<AtlasView::WindowSlots&&shaded<4;++k){unsigned i=(shadeCursor+k)%AtlasView::WindowSlots;Entry&e=cache[i];
+    coarseCoveredByFine=FineCovers(map);unsigned shaded=0,next=shadeCursor;
+    if(!coarseCoveredByFine)for(unsigned pass=0;pass<3&&shaded<4;++pass)for(unsigned k=0;k<AtlasView::WindowSlots&&shaded<4;++k){unsigned i=(shadeCursor+k)%AtlasView::WindowSlots;Entry&e=cache[i];
         if(!e.key.Valid()||Superseded(e.key,plan.level))continue;
         bool onScreen=AtlasView::WindowVisible(AtlasView::SubWindow(cells[e.key.tile],e.key),clip);
         bool useWater=WantsWater(e),useLocal=WantsLocal(e);
@@ -665,7 +668,7 @@ void Draw(MapScreen*map,DWORD now){
         }
         if(!useWater&&!useLocal&&!useDetailed)hr=relighter.Render(cell,u,nativeLight.views,nativeLight.samplers,e.output.p,&refusal);
         if(FAILED(hr)){std::ostringstream error;error<<"terrain window relight failed HRESULT="<<std::hex<<unsigned(hr)<<" stage="<<refusal;throw std::runtime_error(error.str());}
-        e.shaded=lightVersion;e.waterApplied=useWater;e.waterStamp=useWater?waterVersion:0;e.localApplied=useLocal;e.localStamp=useLocal?localVersion:0;e.modelApplied=useModels||useDetailed;e.modelStamp=ModelsAvailable()?models.Revision():0;next=(i+1)%AtlasView::WindowSlots;++shaded;
+        e.shaded=lightVersion;e.waterApplied=useWater;e.waterStamp=useWater?waterVersion:0;e.localApplied=useLocal;e.localStamp=useLocal?localVersion:0;e.modelApplied=useModels||useDetailed;e.modelStamp=ModelsAvailable()?models.Revision():0;next=(i+1)%AtlasView::WindowSlots;++shaded;++coarseShadeCount;
     }shadeCursor=next;
     if(!job&&!completed){
         bool requested=false;
@@ -700,7 +703,7 @@ void Draw(MapScreen*map,DWORD now){
             coarseValid|=1u<<i;if(cache[i].shaded)coarseShaded|=1u<<i;
             MyGUI::ImageBox*w=static_cast<MyGUI::ImageBox*>(tiles[i].get());if(w){if(w->_getTextureName()==cache[i].name)coarseBound|=1u<<i;if(w->getVisible())coarseVisible|=1u<<i;}
         }
-        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" modelReady="<<modelGpuReady<<" modelCount="<<models.Valid(unsigned(observedGeneration))<<" modelRenders="<<modelRenders<<" modelBufferBytes="<<models.BorrowedBuffers()<<" modelTextureBytes="<<models.BorrowedTextures()<<" ownedGpuBytes="<<AggregateGpuBytes()<<" gpuCapBytes="<<AtlasView::GpuCap<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;
+        std::ostringstream message;message<<"view sourceLevel="<<plan.level<<" densityLevel="<<plan.densityLevel<<" detailReady="<<detailReady<<'/'<<plan.visibleCount<<" apron="<<plan.count-plan.visibleCount<<" resident="<<resident<<" reads="<<windowReads<<" bytes="<<windowBytes<<" coarseHidden="<<coarseCoveredByFine<<" coarseShades="<<coarseShadeCount<<" fineShades="<<fineShadeCount<<" localRenders="<<localRenders<<" localBatches="<<localBatches<<" localReady="<<localLayerReady<<" localProof="<<localMapping.verified<<" modelReady="<<modelGpuReady<<" modelCount="<<models.Valid(unsigned(observedGeneration))<<" modelRenders="<<modelRenders<<" modelBufferBytes="<<models.BorrowedBuffers()<<" modelTextureBytes="<<models.BorrowedTextures()<<" ownedGpuBytes="<<AggregateGpuBytes()<<" gpuCapBytes="<<AtlasView::GpuCap<<" primary="<<coords[0].w<<'x'<<coords[0].h<<" viewport="<<view.width<<'x'<<view.height;
         message<<" cachedTown="<<(cachedTown.Valid(unsigned(observedGeneration))?cachedTown.TownId():0)<<" cachedTownGpu="<<cachedTown.OwnedGpuBytes()<<" loadedTown="<<loadedTown.TownId()<<" loadedRecords="<<(loadedTown.Geometry()?loadedTown.Geometry()->Count():0)<<" loadedRenders="<<loadedRenders;
         message<<" coarseValid=0x"<<std::hex<<coarseValid<<" coarseShaded=0x"<<coarseShaded<<" coarseBound=0x"<<coarseBound<<" coarseVisible=0x"<<coarseVisible<<std::dec;Diagnostic(message.str());
     }
