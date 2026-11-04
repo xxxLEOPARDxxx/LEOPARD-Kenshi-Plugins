@@ -33,7 +33,7 @@ struct QuarantineRecord{Work*work;GpuOwners*gpu;HANDLE thread;U64 cpuBytes,gpuBy
 inline QuarantineRecord&Quarantine(){static QuarantineRecord q;return q;}
 template<class Provider>class Controller{
  GpuOwners*gpu_;Provider&provider_;SourceReceipts::MainGate<Provider>gate_;DWORD owner_;Status state_;HRESULT error_;Work*work_;HANDLE thread_;
- bool quarantined_,queryPending_,closeSent_;U64 bankEpoch_;Job job_;WorldNative::SourceFactory factory_;CapturedSources captured_;SourceReceipts::AcceptedReceipt accepted_[15];
+ bool quarantined_,queryPending_,closeSent_,retainHeight_,trimSent_;U64 bankEpoch_;Job job_;WorldNative::SourceFactory factory_;CapturedSources captured_;SourceReceipts::AcceptedReceipt accepted_[15];
  unsigned slot_,input_,cursor_,output_;DWORD shutdownAt_;BYTE shaderCopy_[21920];
  Controller(const Controller&);Controller&operator=(const Controller&);
  bool OnMain()const{return GetCurrentThreadId()==owner_;}
@@ -70,7 +70,7 @@ template<class Provider>class Controller{
   for(unsigned p=0;p<3&&SUCCEEDED(hr);++p){D3D11_TEXTURE2D_DESC t={};t.Width=t.Height=job_.frame[0].side;t.MipLevels=t.ArraySize=t.SampleDesc.Count=1;t.Usage=D3D11_USAGE_STAGING;t.CPUAccessFlags=D3D11_CPU_ACCESS_READ;t.Format=p==0?DXGI_FORMAT_R16G16B16A16_FLOAT:p==1?DXGI_FORMAT_R8G8B8A8_UNORM:DXGI_FORMAT_R32_FLOAT;hr=d->CreateTexture2D(&t,NULL,&gpu_->staging[p].p);}return hr;
  }
 public:
- explicit Controller(Provider&p):gpu_(new GpuOwners),provider_(p),gate_(p),owner_(GetCurrentThreadId()),state_(Stopped),error_(S_OK),work_(NULL),thread_(NULL),quarantined_(false),queryPending_(false),closeSent_(false),bankEpoch_(0),slot_(0),input_(0),cursor_(0),output_(0),shutdownAt_(0){std::memset(&job_,0,sizeof(job_));}
+ explicit Controller(Provider&p):gpu_(new GpuOwners),provider_(p),gate_(p),owner_(GetCurrentThreadId()),state_(Stopped),error_(S_OK),work_(NULL),thread_(NULL),quarantined_(false),queryPending_(false),closeSent_(false),retainHeight_(false),trimSent_(false),bankEpoch_(0),slot_(0),input_(0),cursor_(0),output_(0),shutdownAt_(0){std::memset(&job_,0,sizeof(job_));}
  ~Controller(){Shutdown();if(!quarantined_)delete gpu_;}
  Status State()const{return state_;}HRESULT Error()const{return error_;}bool Quarantined()const{return quarantined_;}unsigned CurrentView()const{return output_;}unsigned CurrentStage()const{return slot_;}unsigned StageCursor()const{return cursor_;}
  unsigned CurrentInput()const{return input_;}LONG ProgressWorkerState()const{return OnMain()?WorkerStatus():WorldStream::WStopped;}
@@ -93,11 +93,14 @@ public:
   for(unsigned s=0;s<j.plan.sidCount;++s)for(unsigned i=0;i<15;++i){SourceReceipts::WorkerRequest r;if(!tokens.token[s][i].Request(r)||!SourceReceipts::SameScope(r.scope,j.scope)||r.role.slot!=s||WorldNative::InputIndex(r.role)!=i||!factory.Matches(r))return E_INVALIDARG;}
   job_=j;factory_.Clear();if(FAILED(factory_.Init(job_.frame[0],job_.plan,job_.scope)))return E_INVALIDARG;
   std::memcpy(shaderCopy_,j.shaders.vertex.data,4440);std::memcpy(shaderCopy_+4440,j.shaders.partial.data,13208);std::memcpy(shaderCopy_+17648,j.shaders.tail.data,4272);job_.shaders.vertex.data=shaderCopy_;job_.shaders.partial.data=shaderCopy_+4440;job_.shaders.tail.data=shaderCopy_+17648;
-  captured_=tokens;error_=S_OK;closeSent_=false;slot_=input_=cursor_=output_=0;ResetEvent(work_->cancel);std::wcscpy(work_->path,j.heightPath);work_->epoch=now.sourceEpoch;work_->side=j.frame[0].side;
+  captured_=tokens;error_=S_OK;closeSent_=retainHeight_=trimSent_=false;slot_=input_=cursor_=output_=0;ResetEvent(work_->cancel);std::wcscpy(work_->path,j.heightPath);work_->epoch=now.sourceEpoch;work_->side=j.frame[0].side;
   const SatelliteRegion::Region&r=SatelliteRegion::Data.regions[j.frame[0].region];work_->region.x0=(r.worldX+147456)/18+(j.frame[0].cell%4)*512;work_->region.z0=(r.worldZ+147456)/18+(j.frame[0].cell/4)*512;work_->region.x1=work_->region.x0+512;work_->region.z1=work_->region.z0+512;
   if(!Send(WorldStream::Height))return Refuse(E_FAIL);state_=LoadingHeight;return S_OK;
  }
- void Cancel(){if(!OnMain()||!work_||quarantined_||state_==Booting||state_==Stopped||state_==Stopping)return;if(state_==Idle&&!gpu_->bank.OwnedGpuBytes()&&WorkerStatus()==WorldStream::WIdle&&!work_->height.Ready()&&!work_->pixels.capacity())return;SetEvent(work_->cancel);work_->operation.Cancel();CancelRasters();Fence();state_=Cancelling;}
+ void Cancel(){if(!OnMain()||!work_||quarantined_||state_==Booting||state_==Stopped||state_==Stopping)return;retainHeight_=false;if(state_==Idle&&!gpu_->bank.OwnedGpuBytes()&&WorkerStatus()==WorldStream::WIdle&&!work_->height.Ready()&&!work_->pixels.capacity())return;SetEvent(work_->cancel);work_->operation.Cancel();CancelRasters();Fence();state_=Cancelling;}
+ // Only successful completion after every borrowed consumer and ReleaseView.
+ // Main still drains all GPU owners; retaining a file never waives a GPU gate.
+ bool DrainCompleted(){if(!OnMain()||!work_||quarantined_||state_!=Idle||FAILED(error_)||WorkerStatus()!=WorldStream::WIdle||queryPending_||work_->accepted.Ready())return false;Cancel();if(state_!=Cancelling)return state_==Idle;retainHeight_=true;return true;}
  HRESULT Pump(bool enabled,ID3D11Device*d,const SourceReceipts::Scope&now,const WorldBank::Ledger&external){
   if(!OnMain())return RPC_E_WRONG_THREAD;if(state_==Stopping)return PollShutdown();if(quarantined_)return E_FAIL;if(!work_)return E_UNEXPECTED;LONG w=WorkerStatus();DWORD alive=WaitForSingleObject(thread_,0);if(alive==WAIT_FAILED){Fence();QuarantineOwners();return E_FAIL;}const bool exited=alive==WAIT_OBJECT_0;
   if(state_==Booting&&!exited){if(w==WorldStream::WBoot)return S_FALSE;if(w==WorldStream::WError){error_=work_->error;state_=Failed;return error_;}state_=Idle;return S_OK;}
@@ -105,7 +108,10 @@ public:
   if(exited){error_=FAILED(work_->error)?work_->error:E_FAIL;if(state_!=Cancelling){CancelRasters();Fence();state_=Cancelling;}}
   if(state_==Idle){if(!enabled||now.world!=job_.scope.world||now.sourceEpoch!=job_.scope.sourceEpoch)Cancel();if(state_==Idle)return S_FALSE;}
   if(state_==Stopped||state_==Failed)return S_FALSE;
-  if(state_==Cancelling){HRESULT drained=Drained();if(drained==S_FALSE||(!exited&&w==WorldStream::WBusy))return S_FALSE;if(FAILED(drained)&&gpu_->device.p&&SUCCEEDED(gpu_->device.p->GetDeviceRemovedReason())){QuarantineOwners();return E_FAIL;}if(exited){GpuClear();ReleaseJoinedWorker();state_=Failed;return error_;}if(!closeSent_){if(!Send(WorldStream::Close)){QuarantineOwners();return E_FAIL;}closeSent_=true;return S_FALSE;}if(w!=WorldStream::WClosed)return S_FALSE;GpuClear();captured_=CapturedSources();for(unsigned i=0;i<15;++i)accepted_[i].Clear();InterlockedExchange(&work_->state,WorldStream::WIdle);ResetEvent(work_->cancel);closeSent_=false;state_=Idle;return S_OK;}
+  if(state_==Cancelling){HRESULT drained=Drained();if(drained==S_FALSE||(!exited&&w==WorldStream::WBusy))return S_FALSE;if(FAILED(drained)&&gpu_->device.p&&SUCCEEDED(gpu_->device.p->GetDeviceRemovedReason())){QuarantineOwners();return E_FAIL;}if(FAILED(drained))retainHeight_=false;if(exited){GpuClear();ReleaseJoinedWorker();state_=Failed;return error_;}if(!closeSent_){trimSent_=retainHeight_;if(!Send(trimSent_?WorldStream::Trim:WorldStream::Close)){QuarantineOwners();return E_FAIL;}closeSent_=true;return S_FALSE;}if(w!=WorldStream::WClosed)return S_FALSE;
+    // Hard/context cancellation may supersede an already dispatched trim.
+    if(trimSent_&&!retainHeight_){trimSent_=false;if(!Send(WorldStream::Close)){QuarantineOwners();return E_FAIL;}return S_FALSE;}
+    GpuClear();captured_=CapturedSources();for(unsigned i=0;i<15;++i)accepted_[i].Clear();InterlockedExchange(&work_->state,WorldStream::WIdle);ResetEvent(work_->cancel);closeSent_=retainHeight_=trimSent_=false;state_=Idle;return S_OK;}
   if(!enabled||!Matches(now)||!d||(gpu_->device.p&&!gpu_->bank.SameDevice(d)))return Refuse(E_ABORT);
   WorldBank::Ledger l;if(!CountedLedger(external,l))return Refuse(E_OUTOFMEMORY);if(w==WorldStream::WError)return Refuse(work_->error);HRESULT hr=S_OK;bool progress=true;
   try{

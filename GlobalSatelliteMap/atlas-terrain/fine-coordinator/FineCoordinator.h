@@ -60,7 +60,7 @@ template<class NativeSession>class Controller {
  }
  int DrainStep(const WorldBank::Ledger&gpu){Owner&o=*owner_;Producer&p=o.native.Cohort();if(o.writing)return 0;
   if(o.reading){if(o.readReady)return 0;int r=o.worker.PollGet();if(r<0){Hard(o.worker.Error());if(o.worker.Quarantined())Retain();return 0;}if(r==1){o.readReady=true;if(!o.worker.ReleaseRead()){Hard(E_FAIL);return 0;}o.reading=o.readReady=false;}else if(r==2)o.reading=false;else return 0;}
-  if(!o.producerCancelled){p.Cancel();o.producerCancelled=true;}
+  if(!o.producerCancelled){if(o.soft)p.Cancel();else if(!p.DrainCompleted()){Hard(E_UNEXPECTED);return 0;}o.producerCancelled=true;}else if(o.soft)p.Cancel();
   HRESULT hr=p.Pump(false,NULL,o.scope,gpu);if(WorldCohort::Quarantine().marked){Retain();return -1;}if(FAILED(hr)){Hard(hr);return 0;}
   if(p.State()==WorldCohort::Idle&&p.ReservedGpuBytes()==0){o.draining=o.soft=o.queued=o.producerCancelled=false;o.plan=FineJob::Plan();return 2;}return 0;
  }
@@ -95,7 +95,7 @@ public:
   if(o.stopping){
    // A CPU read is no longer publishable; release only on serialized Main.
    if(o.worker.ReadPending()&&!o.readExposed)o.worker.ReleaseRead();int joined=o.worker.TryJoin();if(joined<0){Retain();return -1;}if(!joined){if(GetTickCount()-o.stopAt>=5000){Retain();return -1;}return 0;}
-   o.writing=o.reading=o.readReady=false;if(FAILED(o.worker.Error())&&SUCCEEDED(error_))error_=o.worker.Error();if(!o.producerCancelled){p.Cancel();o.producerCancelled=true;}
+   o.writing=o.reading=o.readReady=false;if(FAILED(o.worker.Error())&&SUCCEEDED(error_))error_=o.worker.Error();p.Cancel();o.producerCancelled=true;
    HRESULT hr=p.Pump(false,NULL,o.scope,gpu);if(WorldCohort::Quarantine().marked){Retain();return -1;}if(FAILED(hr)&&SUCCEEDED(error_))error_=hr;
    if((p.State()==WorldCohort::Idle||p.State()==WorldCohort::Stopped||p.State()==WorldCohort::Failed)&&p.ReservedGpuBytes()==0){o.terminated=true;return -1;}return 0;
   }
@@ -127,7 +127,8 @@ public:
   std::memset(&out,0,sizeof(out));if(!enabled||!Main()||!owner_||quarantined_||owner_->stopping||owner_->draining||!owner_->reading||!owner_->readReady||!CurrentBase(now,id))return false;FineJob::Budget b;if(!MakeBudget(r,external,b))return false;FineJob::UploadGate gate={owner_->native.Cohort().ReservedGpuBytes(),!owner_->writing&&!owner_->worker.BorrowPending()};if(!FineJob::CanUpload(owner_->plan,now,owner_->readingKey,b,gate)||!owner_->worker.PeekRead(true,now.scope,owner_->readingKey,id,out))return false;owner_->readExposed=true;return true;
  }
  bool ReleaseRead(){if(!Main()||!owner_||quarantined_||!owner_->reading||!owner_->readReady||!owner_->worker.ReleaseRead())return false;owner_->reading=owner_->readReady=owner_->readExposed=false;return true;}
- void Cancel(){if(Main())Hard(E_ABORT);}bool Active()const{return owner_!=NULL;}bool Terminated()const{return Main()&&owner_&&owner_->terminated;}bool ReadReady()const{return Main()&&owner_&&owner_->readReady;}bool Quarantined()const{return quarantined_;}HRESULT Error()const{return error_;}unsigned StoredWindows()const{return Main()&&owner_?owner_->stored:0;}
+  void Cancel(){if(Main())Hard(E_ABORT);}bool Active()const{return owner_!=NULL;}bool Terminated()const{return Main()&&owner_&&owner_->terminated;}bool ReadReady()const{return Main()&&owner_&&owner_->readReady;}bool Quarantined()const{return quarantined_;}HRESULT Error()const{return error_;}unsigned StoredWindows()const{return Main()&&owner_?owner_->stored:0;}
+  unsigned HeightAuthentications()const{return Main()&&owner_&&!quarantined_?owner_->native.Cohort().HeightAuthentications():0;}
  U64 ProducerGpuBytes()const{return Main()&&owner_?owner_->native.Cohort().ReservedGpuBytes():0;}U64 RetainedCpuBytes()const{return quarantined_?Debt().cpu:0;}U64 RetainedGpuBytes()const{return quarantined_?Debt().gpu:0;}
  Progress ObserveProgress()const{
   Progress p;if(!Main())return p;p.error=error_;p.ownerFlags=quarantined_?8192U:0U;if(!owner_)return p;

@@ -11,7 +11,7 @@ enum Status{Stopped, Booting, Idle, LoadingHeight, LoadingSource, AcceptingSourc
 struct Job{SourceReceipts::Scope scope;WorldRaster::Frame frame;WorldRaster::Material material;WorldRaster::Grid grid;WorldRaster::Shaders shaders;WorldMaterial::Plan plan;wchar_t heightPath[260];};
 struct CapturedSources{SourceReceipts::MainToken token[4][15];}; // Main only.
 enum WorkerState{WBoot,WIdle,WBusy,WHeight,WOpened,WDecoded,WReleased,WValidated,WClosed,WError,WStopped};
-enum Command{Height=1,Open,Decode,Release,Close,ValidatePixels,Stop};
+enum Command{Height=1,Open,Decode,Release,Close,ValidatePixels,Stop,Trim};
 // No Provider, native token, engine object or D3D object is reachable by Worker.
 struct Work{
  HANDLE wake,cancel;volatile LONG state,command;HRESULT error;WorldHeight::Source height;WorldHeight::Window window;WorldHeight::Operation operation;SourceReceipts::WorkerFileLease lease;PinnedPng::Decoder decoder;std::vector<BYTE>rgba,pixels;WorldPixels::Accepted accepted;SourceReceipts::Scope pixelScope;WorldRaster::Frame pixelFrame;U64 pixelOtherCpu;
@@ -24,7 +24,9 @@ struct Work{
  static DWORD WINAPI Run(void*p){Work&w=*static_cast<Work*>(p);bool stopped=false;w.error=w.decoder.Init();InterlockedExchange(&w.state,FAILED(w.error)?WError:WIdle);
   for(;;){if(WaitForSingleObject(w.wake,INFINITE)!=WAIT_OBJECT_0){w.error=E_FAIL;break;}const LONG command=InterlockedExchange(&w.command,0);if(command==Stop){stopped=true;break;}
    HRESULT hr=S_OK;LONG done=WIdle;try{
-    if(command==Close){w.accepted.Clear();w.DropInput();w.DropHeight();std::vector<BYTE>().swap(w.pixels);done=WClosed;}
+    // Completed-pair trim preserves only the locked, authenticated file object.
+    // Close/Stop remain terminal; no accepted samples or raw payload survive.
+    if(command==Close||command==Trim){w.accepted.Clear();w.DropInput();if(command==Close)w.DropHeight();else w.window.Clear();std::vector<BYTE>().swap(w.pixels);done=WClosed;}
     else if(command==Release){w.DropInput();done=WReleased;}
     else if(w.Cancelled())hr=HRESULT_FROM_WIN32(ERROR_CANCELLED);
     else if(command==Height){w.accepted.Clear();w.DropInput();w.operation.Reset();w.operation.Observe(Observe,&w);if(w.Cancelled())w.operation.Cancel();

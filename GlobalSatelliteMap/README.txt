@@ -4,6 +4,9 @@ EN
 Private development plugin. The minimap keeps its own existing map source.
 The private 2026-11-04 follow-up retries temporary source contention instead of
 permanently stopping fine detail; real source errors remain visible in the log.
+Completed fine pairs now retain the worker's authenticated, read-locked height
+file, avoiding repeated full-file hashing. All sample buffers and GPU owners
+still drain normally; context changes and terminal cancellation close the file.
 The global map uses one 4x4 grid of 8192x8192 terrain tiles. Zooming and changing
 lighting reuse that grid; supported close views receive streamed finer materials.
 Fixed zoom steps preserve native centre/cursor anchors and marker alignment.
