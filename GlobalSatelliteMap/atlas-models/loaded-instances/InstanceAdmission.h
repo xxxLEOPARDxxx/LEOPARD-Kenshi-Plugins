@@ -14,6 +14,6 @@ template<class Ops>HRESULT ReadRoute(bool enabled,bool verified,LONG generation,
   for(unsigned i=0;i<count;++i){if(out.selected==MaxRecords){out.incomplete=true;full=true;break;}++out.visited;hr=ops.Inspect(k,i,out);if(FAILED(hr)){ops.Clear();return hr;}}
  }
  if(InterlockedCompareExchange(live,0,0)!=generation||!ops.End()){ops.Clear();return E_ABORT;}
- if(!out.selected)return S_FALSE;hr=ops.Publish();if(FAILED(hr)||InterlockedCompareExchange(live,0,0)!=generation){ops.Clear();return FAILED(hr)?hr:E_ABORT;}return S_OK;
+ if(!out.selected)return S_FALSE;hr=ops.Publish();if(FAILED(hr)||InterlockedCompareExchange(live,0,0)!=generation){ops.Clear();return FAILED(hr)?hr:E_ABORT;}return hr==S_FALSE?S_FALSE:S_OK;
 }
 }

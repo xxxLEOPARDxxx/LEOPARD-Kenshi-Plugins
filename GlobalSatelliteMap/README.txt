@@ -173,3 +173,19 @@ RU: При подробном журнале измеряется время в�
 работы GPU. При выключенном журнале таймеры не вызываются. Счётчики учтены
 в расходе RAM. Эта сборка измеряет оставшиеся статтеры, а не объявляет их
 исправленными. Настоящая поверхность рендера1024px ещё разрабатывается.
+
+Private reuse changes / Частные изменения повторного использования (04.11.2026)
+EN: Fine tiles keep their projected rectangles while the map is stationary;
+pan, resize and new tiles still update their presentation. An unchanged loaded
+town retains its validated resource packet instead of creating samplers and
+admitting the same resources again each second. Native model/world checks
+remain active. Host controls and the native build pass; game FPS and marker
+flicker still require comparison. Cold rendering still uses the previous
+small surfaces; this is not the requested1024px surface implementation.
+RU: При неподвижной карте плитки сохраняют рассчитанное положение; движение,
+изменение размера и новые плитки обновляются как раньше. Неизменившийся город
+сохраняет проверенный пакет ресурсов вместо повторного создания sampler и
+приёма тех же ресурсов каждую секунду. Проверки игрового мира продолжаются.
+Проверки кода и сборки пройдены; FPS и мерцание значков ещё нужно сравнить
+в игре. Холодный рендер пока использует прежние маленькие поверхности;
+настоящая поверхность1024px в эту сборку ещё не входит.

@@ -23,6 +23,20 @@ public:Packet():draw_(NULL),count_(0),generation_(0),buffers_(0),textures_(0){st
  void Clear(){delete[]draw_;draw_=NULL;count_=generation_=0;buffers_=textures_=0;std::memset(origin_,0,12);}
  unsigned Count()const{return count_;}unsigned Generation()const{return generation_;}const float*SourceSceneOrigin()const{return origin_;}U64 BorrowedBuffers()const{return buffers_;}U64 BorrowedTextures()const{return textures_;}
  const float*RawSceneWorld(unsigned i)const{return i<count_?draw_[i].rawWorld:NULL;}const float*LocalBounds(unsigned i)const{return i<count_?draw_[i].localBounds:NULL;}
+ // Called only after the native capture's complete End validation. Exact COM
+ // interface pointer equality proves identity here: the old Draw owns each
+ // interface, so its address cannot be recycled during this synchronous read.
+ // Never dereference a fresh raw resource token on this reuse path. A different
+ // interface pointer takes normal admission even if it aliases the same image.
+ bool MatchesRaw(ID3D11Device*d,const RawDraw*raw,const D3D11_SAMPLER_DESC*samplers,unsigned count,const float*origin,unsigned generation)const{
+  if(!d||!raw||!samplers||!origin||!draw_||!count||count>MaxRecords||count_!=count||generation_!=generation||std::memcmp(origin_,origin,12)||!AtlasView::SameDevice(draw_[0].vertex.p,d))return false;
+  for(unsigned i=0;i<count;++i){const Draw&a=draw_[i];const RawDraw&b=raw[i];const Shape&x=a.shape,&y=b.shape;
+   if(!b.verifiedBlack||b.family>=5||b.batch>=MaxBatches||b.kind!=(b.family<2?Dual43:Alpha48)||a.kind!=b.kind||a.cullMode!=b.cullMode||a.vertex.p!=b.vertex||a.index.p!=b.index||x.layout!=y.layout||x.vertexStart!=y.vertexStart||x.vertexCount!=y.vertexCount||x.vertexBytes!=y.vertexBytes||x.vertexOffset!=y.vertexOffset||x.indexStart!=y.indexStart||x.indexCount!=y.indexCount||x.indexBytes!=y.indexBytes||x.indexFormat!=y.indexFormat)return false;
+   if(std::memcmp(&a.surface,&b.surface,sizeof(Surface))||std::memcmp(a.rawWorld,b.rawWorld,64)||std::memcmp(a.localBounds,b.localBounds,24))return false;
+   for(unsigned k=0;k<7;++k)if((k<TextureCount(a.kind)?a.texture[k].p:NULL)!=b.texture[k])return false;
+   D3D11_SAMPLER_DESC sampler={};a.sampler.p->GetDesc(&sampler);if(std::memcmp(&sampler,&samplers[i],sizeof(sampler)))return false;
+  }return true;
+ }
  bool SameContents(const Packet&other)const{
   if(count_!=other.count_||generation_!=other.generation_||std::memcmp(origin_,other.origin_,12))return false;
   for(unsigned i=0;i<count_;++i){const Draw&a=draw_[i],&b=other.draw_[i];const Shape&x=a.shape,&y=b.shape;

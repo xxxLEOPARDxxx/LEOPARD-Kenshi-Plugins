@@ -1,6 +1,6 @@
-# Registered instanced building prototype
+# Registered instanced building snapshot
 
-Isolated C++03/VC10 helper. Not connected to Main, the viewer, cache files or terrain capture. It uses already existing native geometry/materials; it does not load models, activate zones, clone native objects or substitute boxes. Cached whole-town LODs remain a separate fallback.
+C++03/VC10 helper used by `GsmLoadedTownState` at the serialized render boundary. It uses already existing native geometry/materials; it does not load models, activate zones, clone native objects or substitute boxes. Cached whole-town LODs remain a separate fallback; this snapshot does not write terrain capture files.
 
 Approved contract: `D:/DEV/Kenshi/research/gsm-loaded-render-20261102/instance-first-contract.md`. The saved actual Hub evidence has 131 eligible records /34batches /5selected material families before current in-use/manual-visibility/readiness admission. They include two plaster dual-texture families and Wall4/Gate4/market alpha families. This is not all loaded Hub geometry; current runtime admission is untested. The old ordinary windmill helper is unchanged.
 
@@ -12,12 +12,37 @@ Include `NativeInstances.h` only in the serialized render-thread adapter. `Loade
 HRESULT Read(bool enabled,Town* alreadyResolvedTown,Ogre::SceneManager*,
  LONG generation,volatile LONG*liveGeneration,bool verifiedSources,
  ID3D11Device*,U64 otherBorrowedBuffers=0,U64 otherBorrowedTextures=0,
- unsigned kindMask=3);
+ unsigned kindMask=3,const Packet* previous=NULL);
 const Packet& Geometry() const;
 const Stats& Values() const;
 const char* LastError() const;
+bool Unchanged() const;
 void Clear();
 ```
+
+The optional previous packet is borrowed only during the synchronous Read and
+must remain alive and unchanged until Read returns. The default API still
+captures a fresh packet. With a previous packet, the entire native Begin,
+membership/material/pose inspection and End validation still run. Only after
+End can exact copied descriptors return `S_FALSE` with `Unchanged()==true`,
+before creating copied samplers or repeating `Packet::Adopt`. That result owns
+no new geometry: the caller must keep its previous packet. An ordinary empty
+`S_FALSE` has `Unchanged()==false` and cannot preserve an unloaded old town.
+Generation changes and failures clear the receipt.
+
+The comparison checks every retained draw field, all copied surface values,
+sampler descriptors, origin, generation and device. Fresh resource tokens are
+compared with exact interfaces owned by the old packet and never dereferenced
+by the reuse gate. Strong COM references prevent address reuse during this
+synchronous comparison; a different SRV interface conservatively requires full
+admission, including a different view of the same texture. Existing total
+borrow limits are checked before reuse. The caller includes the old packet in
+`otherBorrowedBuffers/Textures`, as `GsmLoadedTownState` does.
+
+Focused tests are `tests/loaded-town/run_reuse.py`, `test_state_reuse.py`,
+`test_reuse_mutants.py`, the actual Publish recorder in `budget-tests/run.py`,
+and native Snapshot extraction in `test_native_extracted.py`. They establish
+descriptor/lifecycle behavior; in-game CPU/FPS comparisons remain necessary.
 
 `kindMask=1` admits only Dual43 plaster; `2` admits only Alpha48; default3 admits both raw native paths. Filtering precedes batch/material capture and is reported separately from unsupported records. `verifiedSources` means the caller validated all21 generated `InstanceAssetPins.h` entries **and their actual active resolution**, including the selected building textures and shader include closure. The existing unrelated model/terrain verification Boolean is not sufficient. The helper additionally compares cached native program source/variant/compile flags and all actual texture roles. A basename or base-data file hash alone does not prove a mod did not shadow a native resource.
 

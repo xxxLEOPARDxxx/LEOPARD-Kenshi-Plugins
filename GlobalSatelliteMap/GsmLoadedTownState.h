@@ -54,9 +54,10 @@ public:
                 const unsigned id=values.towns[chosen[k]].id;
                 Town*town=GsmModels::Resolve(king,GetModuleHandleA(NULL),id,generation,live);if(!town)continue;
                 std::auto_ptr<LoadedInstances::Snapshot>fresh(new LoadedInstances::Snapshot);
+                const LoadedInstances::Packet*previous=town_==id&&Valid(unsigned(generation),scene,origin)?Geometry():NULL;
                 // Include the old packet while both generations coexist.
                 HRESULT hr=fresh->Read(true,town,scene,generation,live,true,device,
-                    otherBuffers+BorrowedBuffers(),otherTextures+BorrowedTextures());
+                    otherBuffers+BorrowedBuffers(),otherTextures+BorrowedTextures(),3,previous);
                 if(!GsmTownValues::Generation(live,generation)){Clear();return E_ABORT;}
                 // A successful fallback must not erase the first nearer town's
                 // refusal. Keep one bounded reason for the caller's deduplicated
@@ -65,6 +66,10 @@ public:
                     const char*why=fresh->LastError();
                     if(error.empty()&&(hr!=E_ABORT||(why&&*why))){std::ostringstream row;row<<"town="<<id<<" hr="<<std::hex<<unsigned(hr)<<" "<<(why?why:"");error=row.str();}
                     continue;
+                }
+                if(hr==S_FALSE&&fresh->Unchanged()){
+                    if(previous&&town_==id&&Valid(unsigned(generation),scene,origin))return S_FALSE;
+                    Clear();return E_ABORT;
                 }
                 if(hr!=S_OK||!fresh->Geometry().Count())continue;
                 AtlasModelRegion::Bounds b;if(!Bounds(fresh->Geometry(),b)||std::memcmp(fresh->Geometry().SourceSceneOrigin(),origin,12))continue;

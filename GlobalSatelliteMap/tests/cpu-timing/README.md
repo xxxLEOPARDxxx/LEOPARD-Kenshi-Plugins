@@ -3,6 +3,8 @@
 `GsmCpuTiming.h` stores fixed Main/session aggregates for Lighting, Water,
 LocalSnapshot, ModelSnapshot, FineSourceTick, FineModelPrepare, FineLighting,
 FinePresent and FineCoverage.
+ModelSnapshot is further divided into TownCatalog, TownSelection, LoadedCapture
+and DistantCapture to distinguish native model inspection from other work.
 
 ```cpp
 GsmCpuTiming::Stats cpuTiming;

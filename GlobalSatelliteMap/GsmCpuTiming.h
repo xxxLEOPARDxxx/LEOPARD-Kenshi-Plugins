@@ -8,7 +8,7 @@
 #include <iomanip>
 namespace GsmCpuTiming {
 typedef unsigned long long U64;
-enum Stage {Lighting,Water,LocalSnapshot,ModelSnapshot,FineSourceTick,FineModelPrepare,FineLighting,FinePresent,FineCoverage,StageCount};
+enum Stage {Lighting,Water,LocalSnapshot,ModelSnapshot,FineSourceTick,FineModelPrepare,FineLighting,FinePresent,FineCoverage,TownCatalog,TownSelection,LoadedCapture,DistantCapture,StageCount};
 struct QpcClock {
  static bool Frequency(U64&out){LARGE_INTEGER value;if(!QueryPerformanceFrequency(&value)||value.QuadPart<=0)return false;out=U64(value.QuadPart);return true;}
  static bool Counter(U64&out){LARGE_INTEGER value;if(!QueryPerformanceCounter(&value)||value.QuadPart<0)return false;out=U64(value.QuadPart);return true;}
@@ -47,7 +47,7 @@ public:
 };
 typedef BasicStats<QpcClock> Stats;
 typedef BasicScope<Stats> Scope;
-inline const char*StageName(Stage stage){static const char*const names[]={"Lighting","Water","LocalSnapshot","ModelSnapshot","FineSourceTick","FineModelPrepare","FineLighting","FinePresent","FineCoverage"};return unsigned(stage)<unsigned(StageCount)?names[stage]:"Unknown";}
+inline const char*StageName(Stage stage){static const char*const names[]={"Lighting","Water","LocalSnapshot","ModelSnapshot","FineSourceTick","FineModelPrepare","FineLighting","FinePresent","FineCoverage","TownCatalog","TownSelection","LoadedCapture","DistantCapture"};return unsigned(stage)<unsigned(StageCount)?names[stage]:"Unknown";}
 // Formatting allocates only when explicitly called for the aggregated report.
 // Caller logs once per reporting interval and then calls Reset(). Nested stage
 // timings are inclusive and must not be added as if they were exclusive time.

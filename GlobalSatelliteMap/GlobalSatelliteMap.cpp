@@ -432,24 +432,24 @@ void ModelState(DWORD now){
     const void*scene=NULL,*camera=NULL;if(!DiagnosticScene(scene,camera)||scene!=modelProofScene){ModelFailure("scene identity changed");return;}
     try{
         if(!modelCatalogReady||DWORD(now-modelCatalogAt)>=1000){
-            GsmTownValues::Result values;HRESULT hr=GsmTownValues::Read(true,ready,shou,GetModuleHandleA(NULL),observedGeneration,&GSM::generation,values);
+            GsmTownValues::Result values;HRESULT hr;{GsmCpuTiming::Scope timer(debug,cpuTiming,GsmCpuTiming::TownCatalog);hr=GsmTownValues::Read(true,ready,shou,GetModuleHandleA(NULL),observedGeneration,&GSM::generation,values);}
             if(hr!=S_OK||!models.Catalog(values)){ModelFailure("coherent town catalog or fixed model capacity refused");return;}
             const unsigned before=cachedTown.Revision();
-            HRESULT selected=cachedTown.Select(values,lighting.referenceSide,modelMapping.sourceSceneOrigin,scene,observedGeneration,&GSM::generation,shou,GetModuleHandleA(NULL));
+            HRESULT selected;{GsmCpuTiming::Scope timer(debug,cpuTiming,GsmCpuTiming::TownSelection);selected=cachedTown.Select(values,lighting.referenceSide,modelMapping.sourceSceneOrigin,scene,observedGeneration,&GSM::generation,shou,GetModuleHandleA(NULL));}
             if(FAILED(selected)&&selected!=E_ABORT){
                 const char*why=cachedTown.LastError();if(cachedSelectionError!=why){cachedSelectionError=why;ErrorLog(std::string("GlobalSatelliteMap: cached town selection unavailable: ")+why);}
             }else cachedSelectionError.clear();
             if(cachedTown.Revision()!=before)models.Invalidate();
             if(manifest.instancesVerified&&!instanceFailed){
                 const unsigned previous=loadedTown.Revision();std::string why;
-                HRESULT detailed=loadedTown.Refresh(values,lighting.referenceSide,modelMapping.sourceSceneOrigin,static_cast<Ogre::SceneManager*>(const_cast<void*>(scene)),shou,observedGeneration,&GSM::generation,true,nativeLight.device.p,models.BorrowedBuffers(),models.BorrowedTextures(),why);
+                HRESULT detailed;{GsmCpuTiming::Scope timer(debug,cpuTiming,GsmCpuTiming::LoadedCapture);detailed=loadedTown.Refresh(values,lighting.referenceSide,modelMapping.sourceSceneOrigin,static_cast<Ogre::SceneManager*>(const_cast<void*>(scene)),shou,observedGeneration,&GSM::generation,true,nativeLight.device.p,models.BorrowedBuffers(),models.BorrowedTextures(),why);}
                 if(loadedTown.Revision()!=previous){models.Invalidate();if(debug){std::ostringstream row;row<<"loaded town snapshot id="<<loadedTown.TownId()<<" records="<<(loadedTown.Geometry()?loadedTown.Geometry()->Count():0);Diagnostic(row.str());}}
                 if(!why.empty()&&loadedError!=why){loadedError=why;ErrorLog(std::string("GlobalSatelliteMap: detailed town capture: ")+why);}else if(why.empty())loadedError.clear();
                 if(detailed==E_ABORT)loadedTown.Clear();
             }
             modelCatalogReady=true;modelCatalogAt=now;
         }
-        if(!models.Refresh(shou,GetModuleHandleA(NULL),static_cast<Ogre::SceneManager*>(const_cast<void*>(scene)),observedGeneration,&GSM::generation,&ModelSourceError))ModelFailure("world changed or global retained model budget exceeded");
+        {GsmCpuTiming::Scope timer(debug,cpuTiming,GsmCpuTiming::DistantCapture);if(!models.Refresh(shou,GetModuleHandleA(NULL),static_cast<Ogre::SceneManager*>(const_cast<void*>(scene)),observedGeneration,&GSM::generation,&ModelSourceError))ModelFailure("world changed or global retained model budget exceeded");}
     }catch(const std::exception&e){ModelFailure(e.what());}catch(...){ModelFailure("model admission exception");}
 }
 bool ModelsAvailable(){return modelOption&&!modelFailed&&manifest.modelVerified&&modelMapping.verified&&modelMapping.generation==unsigned(observedGeneration);}
