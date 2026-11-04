@@ -7,6 +7,9 @@ permanently stopping fine detail; real source errors remain visible in the log.
 Completed fine pairs now retain the worker's authenticated, read-locked height
 file, avoiding repeated full-file hashing. All sample buffers and GPU owners
 still drain normally; context changes and terminal cancellation close the file.
+Consecutive same-cell visible pairs share one four-view source preparation when
+the actual four-view GPU reservation fits. Initial centre and speculative jobs
+stay at two views; all original 256px cache keys and per-view validation remain.
 The global map uses one 4x4 grid of 8192x8192 terrain tiles. Zooming and changing
 lighting reuse that grid; supported close views receive streamed finer materials.
 Fixed zoom steps preserve native centre/cursor anchors and marker alignment.
@@ -72,6 +75,10 @@ UI: en_GB, ru_RU and zh_CN. Runtime catalogs are MO only. No personal INI or
 capture files belong in a public package. This module has no public release yet.
 
 RU
+Доработка 04.11.2026: устранены остановка загрузки при временной занятости
+ресурсов и повторная полная проверка файла рельефа для каждой пары плиток.
+Соседние пары одного участка обрабатываются вместе, если хватает видеопамяти;
+первые центральные плитки и подгрузка окружения сохраняют прежнюю порцию.
 Закрытая разработка спутниковой глобальной карты. Миникарта использует прежний
 источник. Основа - одна сетка 4x4 из плиток 8192x8192. При зуме и смене света
 она используется повторно; вблизи подгружаются более подробные материалы.

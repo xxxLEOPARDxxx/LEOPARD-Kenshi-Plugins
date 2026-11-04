@@ -47,10 +47,10 @@ template<class NativeSession>class Controller {
  void Retain(){quarantined_=true;if(SUCCEEDED(error_))error_=E_FAIL;Debt().owner=owner_;Debt().cpu=SourceReceipts::CpuCap;Debt().gpu=owner_?owner_->native.Cohort().ReservedGpuBytes():0;}
  void Hard(HRESULT hr){retryPending_=false;if(SUCCEEDED(error_))error_=FAILED(hr)?hr:E_ABORT;if(owner_&&!owner_->stopping){owner_->stopping=true;owner_->stopAt=GetTickCount();owner_->worker.Cancel();}}
  bool PairMatches(const FineJob::Plan&p,unsigned pair,const FineJob::Demand&now,const WorldCohort::Job&job)const{
-  if(!FineJob::Internal::Fresh(p,now)||pair>=p.pairCount||job.count!=2||!WorldCohort::ValidJob(job))return false;
+  if(!FineJob::Internal::Fresh(p,now)||pair>=p.pairCount||!WorldCohort::CountValid(job.count)||!WorldCohort::ValidJob(job))return false;
   FineJob::Snapshot snapshot={p.demand.view.stamp,job.material};FineJob::Settings settings={job.frame[0].cameraY,job.frame[0].farClip,job.frame[0].waterHeight,job.frame[0].wetness};WorldCohort::Job expected;
-  if(!FineJob::MakeJob(p,pair,now,snapshot,settings,job.shaders,job.heightPath,expected)||!SourceReceipts::SameScope(job.scope,expected.scope)||!WorldBank::EqualPlan(job.plan,expected.plan))return false;
-  for(unsigned n=0;n<2;++n){const WorldRaster::Grid&a=job.grid[n],&b=expected.grid[n];if(!WorldRaster::SameFrame(job.frame[n],expected.frame[n])||a.x!=b.x||a.z!=b.z||a.columns!=b.columns||a.rows!=b.rows||a.sourceEpoch!=b.sourceEpoch)return false;}return true;
+  if(!FineJob::MakeJob(p,pair,now,snapshot,settings,job.shaders,job.heightPath,expected,job.count/2)||!SourceReceipts::SameScope(job.scope,expected.scope)||!WorldBank::EqualPlan(job.plan,expected.plan))return false;
+  for(unsigned n=0;n<job.count;++n){const WorldRaster::Grid&a=job.grid[n],&b=expected.grid[n];if(!WorldRaster::SameFrame(job.frame[n],expected.frame[n])||a.x!=b.x||a.z!=b.z||a.columns!=b.columns||a.rows!=b.rows||a.sourceEpoch!=b.sourceEpoch)return false;}return true;
  }
  bool PollBoot(){if(owner_->workerReady)return true;int r=owner_->worker.PollBoot();if(r<0){Hard(owner_->worker.Error());if(owner_->worker.Quarantined())Retain();return false;}if(r==1)owner_->workerReady=true;return true;}
  bool PollWritten(){Owner&o=*owner_;FineStore::Receipt receipt={};int r=o.worker.PollPut(receipt);if(r<0){Hard(o.worker.Error());if(o.worker.Quarantined())Retain();return false;}if(r==1){
@@ -77,7 +77,7 @@ public:
  bool Ready()const{return Main()&&owner_&&!quarantined_&&!owner_->stopping&&!owner_->draining&&!owner_->queued&&!owner_->writing&&!owner_->reading&&owner_->workerReady&&owner_->native.Cohort().State()==WorldCohort::Idle;}
  bool Queue(const FineJob::Plan&p,unsigned pair,const FineJob::Demand&now,const FineStore::Identity&id,const WorldCohort::Job&job,const Residency&r,const FineStore::Ledger&external){
   if(!Main())return false;retryPending_=false;
-  if(!Ready()||!CurrentBase(now,id)||!PairMatches(p,pair,now,job))return false;FineJob::Budget budget;if(!MakeBudget(r,external,budget)||!FineJob::CanRender(p,now,budget))return false;
+  if(!Ready()||!CurrentBase(now,id)||!PairMatches(p,pair,now,job))return false;FineJob::Budget budget;if(!MakeBudget(r,external,budget)||!FineJob::CanRender(p,now,budget,job.count))return false;
   Owner&o=*owner_;o.plan=p;o.pair=pair;o.job=job;o.external=external;o.soft=false;
   std::memcpy(o.shaders,job.shaders.vertex.data,4440);std::memcpy(o.shaders+4440,job.shaders.partial.data,13208);std::memcpy(o.shaders+17648,job.shaders.tail.data,4272);o.job.shaders.vertex.data=o.shaders;o.job.shaders.partial.data=o.shaders+4440;o.job.shaders.tail.data=o.shaders+17648;
   HRESULT hr=o.native.RebindCapture(o.job,o.tokens);
@@ -107,15 +107,15 @@ public:
   if(o.draining)return DrainStep(gpu);
   FineJob::Budget budget;if(!MakeBudget(r,external,budget)){Residency empty;FineJob::Budget cpuOnly;if(!MakeBudget(empty,external,cpuOnly))Hard(E_OUTOFMEMORY);return 0;}
   if(o.writing){if(!PollWritten())return quarantined_?-1:0;if(o.writing)return 0;if(o.soft)return DrainStep(gpu);
-   if(!FineJob::CanRender(o.plan,now,budget)){Hard(E_OUTOFMEMORY);return 0;}unsigned n=p.CurrentView();HRESULT fresh=p.Pump(true,device,o.scope,gpu);if(FAILED(fresh)||n>=2||!p.Result(n,true,o.scope,o.job.frame[n])){Hard(FAILED(fresh)?fresh:E_ABORT);return 0;}HRESULT hr=p.ReleaseView(n,true,o.scope,o.job.frame[n]);if(FAILED(hr)){Hard(hr);return 0;}if(p.State()==WorldCohort::Idle){o.queued=false;return 1;}
+   if(!FineJob::CanRender(o.plan,now,budget,o.job.count)){Hard(E_OUTOFMEMORY);return 0;}unsigned n=p.CurrentView();HRESULT fresh=p.Pump(true,device,o.scope,gpu);if(FAILED(fresh)||n>=o.job.count||!p.Result(n,true,o.scope,o.job.frame[n])){Hard(FAILED(fresh)?fresh:E_ABORT);return 0;}HRESULT hr=p.ReleaseView(n,true,o.scope,o.job.frame[n]);if(FAILED(hr)){Hard(hr);return 0;}if(p.State()==WorldCohort::Idle){o.queued=false;return 1;}
   }
   if(o.draining)return DrainStep(gpu);
   if(o.reading){if(o.readReady)return 0;int rr=o.worker.PollGet();if(rr<0){Hard(o.worker.Error());if(o.worker.Quarantined())Retain();return quarantined_?-1:0;}if(rr==1){o.readReady=true;return 3;}if(rr==2){o.reading=false;return 4;}return 0;}
-  if(o.queued&&!FineJob::CanRender(o.plan,now,budget)){Hard(E_OUTOFMEMORY);return 0;}
+  if(o.queued&&!FineJob::CanRender(o.plan,now,budget,o.job.count)){Hard(E_OUTOFMEMORY);return 0;}
   if(p.State()==WorldCohort::Booting||o.queued){HRESULT hr=p.Pump(o.queued,device,o.scope,gpu);if(FAILED(hr)){Hard(hr);return 0;}}
-  if(o.queued&&p.State()==WorldCohort::Complete){unsigned n=p.CurrentView();if(n>=2||!p.Result(n,true,o.scope,o.job.frame[n])){Hard(E_ABORT);return 0;}const FineJob::Pair&pair=o.plan.pairs[o.pair];
-   if(!pair.wanted[n]){HRESULT hr=p.ReleaseView(n,true,o.scope,o.job.frame[n]);if(FAILED(hr)){Hard(hr);return 0;}if(p.State()==WorldCohort::Idle){o.queued=false;return 1;}return 0;}
-   WorldCohort::Borrowed borrow={};FineStore::Ledger ledger;if(!p.Borrow(n,true,o.scope,o.job.frame[n],borrow)||!CpuLedger(false,external,ledger)){Hard(E_OUTOFMEMORY);return 0;}o.writingKey=pair.key[n];o.writing=true;if(!o.worker.SubmitPut(borrow,o.writingKey,o.identity,ledger)){Hard(E_FAIL);if(o.worker.Quarantined())Retain();}
+  if(o.queued&&p.State()==WorldCohort::Complete){unsigned n=p.CurrentView();if(n>=o.job.count||!p.Result(n,true,o.scope,o.job.frame[n])){Hard(E_ABORT);return 0;}const FineJob::Pair&pair=o.plan.pairs[o.pair+n/2];const unsigned index=n%2;
+   if(!pair.wanted[index]){HRESULT hr=p.ReleaseView(n,true,o.scope,o.job.frame[n]);if(FAILED(hr)){Hard(hr);return 0;}if(p.State()==WorldCohort::Idle){o.queued=false;return 1;}return 0;}
+   WorldCohort::Borrowed borrow={};FineStore::Ledger ledger;if(!p.Borrow(n,true,o.scope,o.job.frame[n],borrow)||!CpuLedger(false,external,ledger)){Hard(E_OUTOFMEMORY);return 0;}o.writingKey=pair.key[index];o.writing=true;if(!o.worker.SubmitPut(borrow,o.writingKey,o.identity,ledger)){Hard(E_FAIL);if(o.worker.Quarantined())Retain();}
   }return quarantined_?-1:0;
  }
  bool Drain(){if(!Ready())return false;owner_->draining=true;return true;}

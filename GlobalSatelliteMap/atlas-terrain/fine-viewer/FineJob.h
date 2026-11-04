@@ -54,7 +54,7 @@ inline bool ResidentsValid(const FineWindows::Key*resident,unsigned count,const 
   index[at]=static_cast<unsigned short>(n+1);
  }return true;
 }
-inline bool ProducerFits(const Budget&b){return BudgetValid(b)&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WorldCohort::GpuReservation(2);}
+inline bool ProducerFits(const Budget&b,unsigned views=2){return WorldCohort::CountValid(views)&&BudgetValid(b)&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WorldCohort::GpuReservation(views);}
 inline bool Fresh(const Plan&p,const Demand&r){return p.state==Detail&&p.count&&p.count<=Slots&&p.pairCount&&p.pairCount<=p.count&&(p.spacing==1||p.spacing==3)&&SameDemand(p.demand,r);}
 inline bool Has(const Plan&p,const FineWindows::Key&k){if(p.count>Slots||!FineWindows::Valid(k)||!FineWindows::Same(k.stamp,p.demand.view.stamp)||k.spacing!=p.spacing)return false;for(unsigned n=0;n<p.count;++n)if(FineWindows::Equal(k,p.keys[n]))return true;return false;}
 inline bool SameCell(const FineWindows::Key&a,const FineWindows::Key&b){Placement x,y;return Map(a,x)&&Map(b,y)&&x.region==y.region&&x.cell==y.cell;}
@@ -98,7 +98,7 @@ inline Plan MakePlan(const Demand&r,const Budget&b,Mode mode,const FineWindows::
  if(!Internal::Group(p))return Plan();p.producerPeak=b.viewerGpu+b.fineGpu+WorldCohort::GpuReservation(2);p.publicationPeak=b.viewerGpu+b.fineGpu+U64(required-overlap)*WindowBytes;p.cpuPeak=b.producerCpu+b.otherCpu;p.state=Detail;return p;
 }
 inline bool Wanted(const Plan&p,const Demand&now,const FineWindows::Key&key){return Internal::Fresh(p,now)&&Internal::Has(p,key);}
-inline bool CanRender(const Plan&p,const Demand&now,const Budget&b){return Internal::Fresh(p,now)&&Internal::ProducerFits(b);}
+inline bool CanRender(const Plan&p,const Demand&now,const Budget&b,unsigned views=2){return Internal::Fresh(p,now)&&Internal::ProducerFits(b,views);}
 // Gate values must come from the real owner AFTER known consumer join and GPU
 // drain. These copied values are policy inputs, not fabricated native receipts.
 inline bool CanRead(const Plan&p,const Demand&now,const FineWindows::Key&key,const Budget&b,const UploadGate&gate){
@@ -108,13 +108,19 @@ inline bool CanUpload(const Plan&p,const Demand&now,const FineWindows::Key&key,c
  return Wanted(p,now,key)&&Internal::BudgetValid(b)&&gate.consumersJoined&&gate.producerReservedGpu==0&&b.occupied<ActiveSlots()&&
  b.fineGpu<=U64(ActiveSlots()-1)*WindowBytes&&b.viewerGpu+b.fineGpu<=AtlasView::GpuCap-WindowBytes;
 }
-inline bool MakeJob(const Plan&p,unsigned pair,const Demand&now,const Snapshot&snapshot,const Settings&settings,const WorldRaster::Shaders&shaders,const wchar_t*path,WorldCohort::Job&out){
- if(!Internal::Fresh(p,now)||pair>=p.pairCount||!FineWindows::Same(snapshot.stamp,p.demand.view.stamp)||!path)return false;
+// Reuse two existing consecutive pairs; Plan/Pair storage and cache keys stay256.
+inline bool CanBatchNext(const Plan&p,unsigned pair){
+ if(p.state!=Detail||p.count>Slots||p.pairCount>p.count||pair>=p.pairCount||p.pairCount-pair<2)return false;
+ const Pair&a=p.pairs[pair],&b=p.pairs[pair+1];if(a.region!=b.region||a.cell!=b.cell)return false;
+ for(unsigned n=0;n<4;++n){const FineWindows::Key&key=p.pairs[pair+n/2].key[n%2];Placement place;if(!Map(key,place)||place.region!=a.region||place.cell!=a.cell||!FineWindows::Same(key.stamp,p.demand.view.stamp))return false;for(unsigned k=0;k<n;++k)if(FineWindows::Equal(key,p.pairs[pair+k/2].key[k%2]))return false;}return true;
+}
+inline bool MakeJob(const Plan&p,unsigned pair,const Demand&now,const Snapshot&snapshot,const Settings&settings,const WorldRaster::Shaders&shaders,const wchar_t*path,WorldCohort::Job&out,unsigned pairSpan=1){
+ if(!Internal::Fresh(p,now)||pair>=p.pairCount||(pairSpan!=1&&pairSpan!=2)||(pairSpan==2&&!CanBatchNext(p,pair))||!FineWindows::Same(snapshot.stamp,p.demand.view.stamp)||!path)return false;
  unsigned length=0;while(length<260&&path[length])++length;if(length<3||length>=260||!((path[0]>=L'A'&&path[0]<=L'Z')||(path[0]>=L'a'&&path[0]<=L'z'))||path[1]!=L':'||(path[2]!=L'/'&&path[2]!=L'\\'))return false;
- const Pair&q=p.pairs[pair];Placement place[2];if(!q.wanted[0]||!Internal::Has(p,q.key[0])||q.wanted[1]!=Internal::Has(p,q.key[1])||!Map(q.key[0],place[0])||!Map(q.key[1],place[1])||!Internal::SameCell(q.key[0],q.key[1])||FineWindows::Equal(q.key[0],q.key[1])||q.region!=place[0].region||q.cell!=place[0].cell)return false;
+ const Pair&q=p.pairs[pair];Placement place[4];for(unsigned index=0;index<pairSpan;++index){const Pair&selected=p.pairs[pair+index];if(!selected.wanted[0]||!Internal::Has(p,selected.key[0])||selected.wanted[1]!=Internal::Has(p,selected.key[1])||!Map(selected.key[0],place[index*2])||!Map(selected.key[1],place[index*2+1])||!Internal::SameCell(selected.key[0],selected.key[1])||FineWindows::Equal(selected.key[0],selected.key[1])||selected.region!=place[index*2].region||selected.cell!=place[index*2].cell||selected.region!=q.region||selected.cell!=q.cell)return false;}
  if(snapshot.material.region!=q.region||snapshot.material.source.value!=now.scope.sourceEpoch||!WorldBank::ValidEpoch(snapshot.material.source))return false;
- WorldCohort::Job j={};j.scope=now.scope;j.material=snapshot.material;j.shaders=shaders;j.count=2;std::memcpy(j.heightPath,path,(length+1)*sizeof(wchar_t));
- for(unsigned n=0;n<2;++n){const Placement&a=place[n];WorldRaster::Frame&f=j.frame[n];f.source=j.material.source;f.generation=j.scope.job;f.materialGeneration=j.material.generation;f.region=a.region;f.cell=a.cell;f.side=256;f.x=a.x;f.z=a.z;f.spacing=float(q.key[n].spacing);f.cameraY=settings.cameraY;f.farClip=settings.farClip;f.waterHeight=settings.waterHeight;f.wetness=settings.wetness;j.grid[n]=a.grid;}
+ WorldCohort::Job j={};j.scope=now.scope;j.material=snapshot.material;j.shaders=shaders;j.count=2*pairSpan;std::memcpy(j.heightPath,path,(length+1)*sizeof(wchar_t));
+ for(unsigned n=0;n<j.count;++n){const Placement&a=place[n];WorldRaster::Frame&f=j.frame[n];f.source=j.material.source;f.generation=j.scope.job;f.materialGeneration=j.material.generation;f.region=a.region;f.cell=a.cell;f.side=256;f.x=a.x;f.z=a.z;f.spacing=float(p.pairs[pair+n/2].key[n%2].spacing);f.cameraY=settings.cameraY;f.farClip=settings.farClip;f.waterHeight=settings.waterHeight;f.wetness=settings.wetness;j.grid[n]=a.grid;}
  WorldMaterial::Planner planner;if(!planner.Init(j.scope.sourceEpoch)||!planner.Build(q.region,q.cell,j.scope.sourceEpoch,0,j.plan)||!WorldCohort::ValidJob(j))return false;out=j;return true;
 }
 }
