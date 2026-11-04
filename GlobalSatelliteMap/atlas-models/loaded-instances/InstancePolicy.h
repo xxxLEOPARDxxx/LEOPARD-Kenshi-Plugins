@@ -7,6 +7,20 @@ const unsigned MaxRecords=256,MaxBatches=64,MaxMaterials=16,EntryLimit=4096;
 const U64 PrivateBytes=1048576+160+64+48,BufferCap=32ULL*1024*1024,TextureCap=64ULL*1024*1024;
 const U64 RawRgbPrivateBytes=PrivateBytes+262144; // RT0 RGBA16F instead of RGBA8; other surfaces unchanged.
 const unsigned MaxTotalIndices=2097152,MaxTotalVertices=2097152;
+// Borrowed references retain native resources; they do not allocate GPU payload.
+// Legacy callers keep their original bounds. Loaded-town replacement needs room
+// for the old packet until the fresh packet has been validated and published.
+struct BorrowLimits {
+ U64 freshBuffers,freshTextures,totalBuffers,totalTextures;
+ BorrowLimits(U64 b=BufferCap,U64 t=TextureCap,U64 allB=BufferCap,U64 allT=TextureCap):freshBuffers(b),freshTextures(t),totalBuffers(allB),totalTextures(allT){}
+ bool Valid()const{return freshBuffers&&freshTextures&&freshBuffers<=BufferCap&&freshTextures<=128ULL*1024*1024&&freshBuffers<=totalBuffers&&freshTextures<=totalTextures&&totalBuffers<=64ULL*1024*1024&&totalTextures<=256ULL*1024*1024;}
+};
+inline BorrowLimits LoadedLimits(){return BorrowLimits(BufferCap,128ULL*1024*1024,64ULL*1024*1024,256ULL*1024*1024);}
+inline const char*BorrowRefusal(U64 fresh,U64 other,U64 singleCap,U64 totalCap,bool texture){
+ if(fresh>singleCap)return texture?"instance Adopt fresh texture reference cap":"instance Adopt fresh buffer reference cap";
+ if(other>totalCap||fresh>totalCap-other)return texture?"instance Adopt overlapping texture reference cap":"instance Adopt overlapping buffer reference cap";
+ return NULL;
+}
 enum Kind {Dual43,Alpha48};enum Layout {Coloured64,Plain60,Plain56};
 inline bool AllowsFamily(unsigned family,unsigned mask){return family<5&&mask&&!(mask&~3u)&&(mask&(family<2?1u:2u));}
 inline bool RequiresNativeLighting(Kind k){return k==Alpha48;}

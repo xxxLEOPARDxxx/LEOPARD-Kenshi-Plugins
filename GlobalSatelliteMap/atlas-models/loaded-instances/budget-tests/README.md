@@ -1,0 +1,11 @@
+# Scoped loaded-town borrowed-resource limits
+
+The actual Hub descriptor capture on 2026-11-04 contains 18,764,994 bytes of unique native buffers and 126,004,032 bytes of unique native textures. The historical 64 MiB texture-reference bound rejects this packet. Replacing an old Hub packet while retaining unrelated models conservatively accounts 38,314,896 buffer bytes and 252,357,616 texture bytes.
+
+Only NativeCapture.Publish selects the new scope: fresh buffers/textures 32/128 MiB; overlapping references 64/256 MiB. Legacy Packet.Adopt callers retain 32/64 MiB. These are bounds on retained references to existing native GPU resources, not newly allocated texture payload or the configurable terrain-cache budget. Limits remain fixed and bounded. The existing sampler creation call keeps its actual HRESULT; diagnostic stages distinguish sampler creation from fresh/overlap adoption limits.
+
+Run `python run.py`. The focused fixture executes the actual Packet.Adopt implementation using descriptor-only COM resources and a real WARP device/sampler. It allocates no large texture or buffer payload and does not render descriptor stubs. It checks actual captured totals, duplicate-resource accounting, old+fresh replacement, exact/+1 limits, malformed limits, unsigned overflow, and partial-publication cleanup. A second executable compiles the actual Publish body with call recorders to verify sampler HRESULT propagation and explicit loaded-limit selection.
+
+Historical RED is retained in `_generated/run-Od-red.log`: the old implementation rejects the captured Hub. The `--red` flag is for replay against the historical source, not the repaired source. Generated binaries/logs are ignored. Compact results and source hashes are recorded in verification.json.
+
+Existing loaded-instance policy/admission/WARP/raw-RGB executables and the real native adapter were additionally compiled and passed. The aggregate legacy runner stops at its historical immutable NativeInstances.h hash pin; this new additive verification records the intentional change rather than rewriting that earlier proof. No game rendering, installation, Main/Viewer source, native ABI or source resource creation was changed by this repair. A live Hub capture remains an integration check for the parent.

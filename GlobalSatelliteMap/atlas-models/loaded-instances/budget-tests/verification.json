@@ -1,0 +1,28 @@
+{
+  "format": "GSM_LOADED_REFERENCE_BUDGET_REPAIR",
+  "version": 1,
+  "production": {
+    "InstancePolicy.h": "0200bae4041b37f28a341d6c715b8cfe4e1de457c8652362fd210415d21feabd",
+    "InstanceRaster.h": "8f3772fcd4369d10ca1d3cda3a5eb7e5f5ae65cc7c78696a2a0f35fa8a4825ef",
+    "NativeInstances.h": "ccca1101b166e244ac4da94d237dd3509de5b1d56f9121cfc9e9531956c3aa6f"
+  },
+  "verificationSources": {
+    "budget-tests/packet.cpp": "34f0762b7bfd8ce44e493204703f189469aa14fb27ec39cbbe5733007c6075b7",
+    "budget-tests/run.py": "392e752fa6819ee53584e012c8698cbc85527e4380028120a161954159ed94a9",
+    "budget-tests/README.md": "b8f28e0741ee6e2f666a072674b9ae7bcbbcab593768e16cdde097a961965fa6"
+  },
+  "results": {
+    "packetOd": 55,
+    "packetO2": 55,
+    "actualPublishOd": 3,
+    "actualPublishO2": 3,
+    "legacyPolicy": 17,
+    "legacyAdmission": 8,
+    "legacyWarp": 4718646,
+    "rawRgbWarp": 13762792,
+    "nativeAdapterCompile": "PASS"
+  },
+  "historicalRed": "FAIL recorded Hub footprint can be admitted by loaded-town scope",
+  "legacyAggregateRunner": "Stopped at prior immutable NativeInstances.h hash pin as expected; existing executable suites and native compile checked separately.",
+  "liveGameValidation": false
+}
