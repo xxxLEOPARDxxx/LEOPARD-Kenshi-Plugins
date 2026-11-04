@@ -1,0 +1,321 @@
+{
+  "keo_head": "e6082d6264b68daaa4297ede7f6fe1cc5f9fb4f4",
+  "source_files": {
+    "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\KenshiQOL\\src\\KenshiQOL\\KenshiQOL.cpp": {
+      "bytes": 68828,
+      "sha256": "955b340eb25b0f66c1e08479ec2e8d4636a39f622962582d9bff8e6bed27363e"
+    },
+    "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\KenshiQOL\\src\\Common\\TaskTypeFactoryPatch.h": {
+      "bytes": 6259,
+      "sha256": "b5acaaf6068d1b1a1202e99bbdfdc5310e729965504d37ac97fad006fe43a7c1"
+    },
+    "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\KenshiQOL\\src\\Common\\CommonModMenu.h": {
+      "bytes": 19890,
+      "sha256": "70724d8935087e079f6d203fada4e6a213ef77d60ae19ee4dd00ceb6f7e0ff31"
+    },
+    "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\KenshiQOL\\src\\LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\KenshiQOL\\KenshiQOL.dll": {
+      "bytes": 369664,
+      "sha256": "cf2e0c6ca7c8e2cdb3fbcc0755de0f46e48562cd63547eb1f887859ac56a4bda"
+    },
+    "D:\\SteamLibrary\\steamapps\\workshop\\content\\233860\\KenshiQOL\\_KenshiQOL.info": {
+      "bytes": 440,
+      "sha256": "1b8a39289ab4760f1e1c1a8a099c2f8f3f9983f4d471dfc856dd48a53d57c701"
+    },
+    "D:\\DEV\\Kenshi\\forks\\KEO\\LICENSE": {
+      "bytes": 35823,
+      "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\KenshiLib.dll": {
+      "bytes": 951808,
+      "sha256": "5b6240622d06801dc39896e385efb834b8e1fe2fcdf86067d071ae7a04f6c83b"
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\RVAs\\Steam_1.0.65.br": {
+      "bytes": 30520,
+      "sha256": "573c395997ed8d93dd837e27f89a440323089edd1ba93f68291631b448f9cbd0"
+    },
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\RVAs\\GOG_1.0.65.br": {
+      "bytes": 30520,
+      "sha256": "a2a6394e95312a89e3d3f6842fbfda9c16e7d79749f1ee796fbd6168600bf347"
+    }
+  },
+  "sdk_hook_resolution": [
+    {
+      "symbol": "?_NV_tryAddItem@Inventory@@QEAA_NPEAVItem@@H@Z",
+      "steam_rva": "0x74b1e0",
+      "gog_rva": "0x74ab10",
+      "sdk_slot": 4197,
+      "pattern": "tryAddItem@Inventory"
+    },
+    {
+      "symbol": "?tryAddItem@Inventory@@UEAA_NPEAVItem@@H@Z",
+      "steam_rva": "0x74b1e0",
+      "gog_rva": "0x74ab10",
+      "sdk_slot": 4197,
+      "pattern": "tryAddItem@Inventory"
+    },
+    {
+      "symbol": "?update@AITaskSytem@@QEAAXVVector3@Ogre@@M@Z",
+      "steam_rva": "0x50ce90",
+      "gog_rva": "0x50d1a0",
+      "sdk_slot": 557,
+      "pattern": "update@AITaskSytem"
+    },
+    {
+      "symbol": "?_NV_loadFromSerialisePostCreationStage@Character@@QEAAXPEAVGameSaveState@@@Z",
+      "steam_rva": "0x6270a0",
+      "gog_rva": "0x6273b0",
+      "sdk_slot": 1656,
+      "pattern": "loadFromSerialisePostCreationStage@Character"
+    },
+    {
+      "symbol": "?loadFromSerialisePostCreationStage@Character@@UEAAXPEAVGameSaveState@@@Z",
+      "steam_rva": "0x6270a0",
+      "gog_rva": "0x6273b0",
+      "sdk_slot": 1656,
+      "pattern": "loadFromSerialisePostCreationStage@Character"
+    },
+    {
+      "symbol": "?show@ContextMenuGUI@@QEAAXAEBV?$lektor@H@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_N@Z",
+      "steam_rva": "0x7a7440",
+      "gog_rva": "0x7a6d80",
+      "sdk_slot": 2431,
+      "pattern": "show@ContextMenuGUI"
+    },
+    {
+      "symbol": "?addOrderSelectedCharacters@PlayerInterface@@QEAAXPEAVBuilding@@W4TaskType@@PEAVRootObject@@_N3AEBVVector3@Ogre@@@Z",
+      "steam_rva": "0x7f9280",
+      "gog_rva": "0x7f8bc0",
+      "sdk_slot": 5575,
+      "pattern": "addOrderSelectedCharacters@PlayerInterface"
+    },
+    {
+      "symbol": "?playerMove@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
+      "steam_rva": "0x7f9cb0",
+      "gog_rva": "0x7f95f0",
+      "sdk_slot": 5609,
+      "pattern": "playerMove@PlayerInterface"
+    },
+    {
+      "symbol": "?score@Tasker@@QEAAMPEAVAI@@@Z",
+      "steam_rva": "0x60f2f0",
+      "gog_rva": "0x60f600",
+      "sdk_slot": 6540,
+      "pattern": "score@Tasker"
+    },
+    {
+      "symbol": "?update@OrdersPanel@@QEAAXPEAVCharacter@@@Z",
+      "steam_rva": "0x725e00",
+      "gog_rva": "0x725760",
+      "sdk_slot": 5278,
+      "pattern": "update@OrdersPanel"
+    },
+    {
+      "symbol": "?update@OrderCellView@@QEAAXAEBUIBDrawItemInfo@MyGUI@@PEAVOrderData@@@Z",
+      "steam_rva": "0x7233b0",
+      "gog_rva": "0x722d10",
+      "sdk_slot": 5264,
+      "pattern": "update@OrderCellView"
+    },
+    {
+      "symbol": "?getDropped@Character@@QEAAX_N0@Z",
+      "steam_rva": "0x5cc110",
+      "gog_rva": "0x5cc420",
+      "sdk_slot": 1864,
+      "pattern": "getDropped@Character"
+    },
+    {
+      "symbol": "?show@LoadingWindow@@QEAAXXZ",
+      "steam_rva": "0x9124e0",
+      "gog_rva": "0x911c00",
+      "sdk_slot": 4619,
+      "pattern": "show@LoadingWindow"
+    },
+    {
+      "symbol": "?_NV_notifyConstructionComplete@Building@@QEAAXXZ",
+      "steam_rva": "0x5618b0",
+      "gog_rva": "0x561bc0",
+      "sdk_slot": 1251,
+      "pattern": "notifyConstructionComplete@Building"
+    },
+    {
+      "symbol": "?notifyConstructionComplete@Building@@UEAAXXZ",
+      "steam_rva": "0x5618b0",
+      "gog_rva": "0x561bc0",
+      "sdk_slot": 1251,
+      "pattern": "notifyConstructionComplete@Building"
+    },
+    {
+      "symbol": "?figureOutWhichTown@PreviewBuilding@@QEAAXXZ",
+      "steam_rva": "0x4d6300",
+      "gog_rva": "0x4d6610",
+      "sdk_slot": 5669,
+      "pattern": "figureOutWhichTown@PreviewBuilding"
+    },
+    {
+      "symbol": "?_NV_mainLoop_GPUSensitiveStuff@GameWorld@@QEAAXM@Z",
+      "steam_rva": "0x787e70",
+      "gog_rva": "0x7877a0",
+      "sdk_slot": 3649,
+      "pattern": "mainLoop_GPUSensitiveStuff@GameWorld"
+    },
+    {
+      "symbol": "?mainLoop_GPUSensitiveStuff@GameWorld@@UEAAXM@Z",
+      "steam_rva": "0x787e70",
+      "gog_rva": "0x7877a0",
+      "sdk_slot": 3649,
+      "pattern": "mainLoop_GPUSensitiveStuff@GameWorld"
+    },
+    {
+      "symbol": "?_activate@ZoneMap@@QEAA_NHW4ZoneActivationType@@M@Z",
+      "steam_rva": "0xa0d6a0",
+      "gog_rva": "0xa0cdc0",
+      "sdk_slot": 7527,
+      "pattern": "_activate@ZoneMap"
+    },
+    {
+      "symbol": "?getTotalWeight@Inventory@@QEAAMXZ",
+      "steam_rva": "0x746890",
+      "gog_rva": "0x7461c0",
+      "sdk_slot": 4234,
+      "pattern": "getTotalWeight@Inventory"
+    },
+    {
+      "symbol": "?_NV_show@TitleScreen@@QEAAX_N@Z",
+      "steam_rva": "0x911fb0",
+      "gog_rva": "0x9116d0",
+      "sdk_slot": 6631,
+      "pattern": "show@TitleScreen"
+    },
+    {
+      "symbol": "?show@TitleScreen@@UEAAX_N@Z",
+      "steam_rva": "0x911fb0",
+      "gog_rva": "0x9116d0",
+      "sdk_slot": 6631,
+      "pattern": "show@TitleScreen"
+    },
+    {
+      "symbol": "?_NV_update@OptionsWindow@@QEAAXXZ",
+      "steam_rva": "0x3e7120",
+      "gog_rva": "0x3e6d40",
+      "sdk_slot": 5246,
+      "pattern": "update@OptionsWindow"
+    },
+    {
+      "symbol": "?update@OptionsWindow@@UEAAXXZ",
+      "steam_rva": "0x3e7120",
+      "gog_rva": "0x3e6d40",
+      "sdk_slot": 5246,
+      "pattern": "update@OptionsWindow"
+    },
+    {
+      "symbol": "?fixInvalidInteriorFurnitureStates@LevelEditor@@QEBAHXZ",
+      "steam_rva": "0x771c70",
+      "gog_rva": "0x7715a0",
+      "sdk_slot": 4549,
+      "pattern": "fixInvalidInteriorFurnitureStates@LevelEditor"
+    }
+  ],
+  "qol_raw_native_keys": [
+    {
+      "steam_rva": "0x32ebe2",
+      "first16": "8d43ff4533ed3d210100000f87731500",
+      "pdata": [
+        "0x32eb90",
+        "0x3304ea"
+      ]
+    },
+    {
+      "steam_rva": "0x32ebe8",
+      "first16": "3d210100000f87731500004898488d15",
+      "pdata": [
+        "0x32eb90",
+        "0x3304ea"
+      ]
+    },
+    {
+      "steam_rva": "0x330161",
+      "first16": "4885db752eb978000000ff150f60f101",
+      "pdata": [
+        "0x32eb90",
+        "0x3304ea"
+      ]
+    },
+    {
+      "steam_rva": "0x332000",
+      "first16": "48895c24084889742410574883ec2041",
+      "pdata": [
+        "0x332000",
+        "0x33206d"
+      ]
+    },
+    {
+      "steam_rva": "0x2246180",
+      "first16": "70a9240200000000bea9240200000000",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x60df70",
+      "first16": "488bc489480855574154488bec4883ec",
+      "pdata": [
+        "0x60df70",
+        "0x60e628"
+      ]
+    },
+    {
+      "steam_rva": "0x215e4",
+      "first16": "e9f76c2f00e912a77600e9adeb2200e9",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x16bd798",
+      "first16": "0570044001000000c771044001000000",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x16be4c8",
+      "first16": "c2a2004001000000f6ba044001000000",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x16bcd88",
+      "first16": "57b30040010000003c09024001000000",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x26003",
+      "first16": "e988bf2500e9338e9300e97edd7900e9",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x1ce80f0",
+      "first16": "000000000000000008ac674101000000",
+      "pdata": null
+    },
+    {
+      "steam_rva": "0x79a730",
+      "first16": "4055565741544155488dac2480e1ffff",
+      "pdata": [
+        "0x79a730",
+        "0x79b517"
+      ]
+    },
+    {
+      "steam_rva": "0x9124e0",
+      "first16": "c20000cccccccccccccccccccccccccc",
+      "pdata": null
+    }
+  ],
+  "native_exe": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\Kenshi_x64.exe",
+    "sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e"
+  },
+  "loading_path_verified": {
+    "navmesh_generate_call": "3AB758 -> thunk47677 -> showLoadingMessage6E9800",
+    "showLoadingMessage_virtual_call": "6E9878 calls [r8+18] with bool; direct relationship to LoadingWindow::show() not established",
+    "LoadingWindow_show_9124E0": "C2 00 00 (ret0), no pdata entry; do not treat the hook name as save-only proof"
+  }
+}

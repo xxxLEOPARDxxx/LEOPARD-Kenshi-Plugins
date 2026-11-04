@@ -30,11 +30,19 @@ Always check the actual process immediately before replacing a loaded DLL.
    Original personal INI and mod order were restored; no temporary test override
    remains. Do not reintroduce these spawn experiments as a proven fix.
 
-   Personal keoRouting=false/plannerMode=on remains the user's choice. Recent
-   travel tests did not exercise the KEO routing master ON. Arrange an explicit
-   controlled ON test before interpreting route behavior or changing preferences.
+   Latest actual INI check05Nov: keoRouting=true/plannerMode=on, enabled by the
+   user. The user says routing currently appears to work, but broad gameplay
+   testing remains required; do not equate this with proving every route fixed.
+   Preserve the user's settings and measure the active loaded DLL each session.
 
-   GOG PORT IS NOW ACTIVE IN PARALLEL: user supplied game/DropMeFiles_VfFSw.zip
+   GOG NATIVE CANDIDATE READY05Nov: local source e6082d6, full production DLL
+   eaa75821e941f85fe95b4e3a7ce7fa3fde17c564d03a508a48132b85303b2859.
+   Private tester ZIP workshop/testing/KEO/KEO-GOG-test-20261105.zip, CRC/exact11
+   files/144SDK+29MyGUI imports verified. Real GOG gameplay remains UNVERIFIED;
+   package is not installed or published. Patch backup is under
+   tools/maintenance/keo/native-gog-e6082d6264b6.patch in our own repository.
+
+   GOG provenance: user supplied game/DropMeFiles_VfFSw.zip
    containing two EXEs. The smaller RE image36708352B matches GOG1.0.65 MD5
    213349bf76a0a758067f9ed0aef2ab01. Sources were not executed. Evidence at
    game/_codex_work/20261105-keo-gog-native. Build a verified native profile,
@@ -46,6 +54,23 @@ Always check the actual process immediately before replacing a loaded DLL.
    rules apply. Temporary maintenance fork: credit the original author and
    withdraw our version if original development resumes. Never push to the
    author's origin. Back up local KEO commits as patches in our own repository.
+
+   NEW05Nov user request: compare actual KenshiQOL sources with KEO and port
+   useful missing features carefully, including dynamic carried-body weight.
+   Source: workshop/content/233860/KenshiQOL/src, Workshop3772744830, author
+   Steel confirmed by its original page; bundled GPLv3 retained. Read-only audit:
+   game/_codex_work/20261105-kenshi-qol-audit/report.md and evidence.json.
+   Identified overlaps: global backpack routing vs KEO wearer choice; QOL zone
+   auto-rebuild triggered by KEO preload; nearest-town preview overwrite;
+   shared getDropped/order hooks. Do not copy the combined navmesh switch.
+   First implementation: opt-in dynamic body/inventory weight, startup-only,
+   bounded allocation-free traversal and thread-local recursion protection;
+   disable this feature if the original KenshiQOL DLL is loaded. Preserve native
+   inventory weight semantics, robot/hunger distinction and save data.
+   Next isolated candidates: gate registration and post-drop building handle.
+   New jobs require separate all-or-nothing capability/save-lifecycle design:
+   Gather Output first, shop-counter stocking second, queued movement last.
+   Do not silently migrate all native task242 rows or modify saves with OFF.
 
 3. **Dynamic Factions — PAUSED BY USER.** Preserve all work and plans. No
    new implementation, game testing or publication until explicitly resumed.

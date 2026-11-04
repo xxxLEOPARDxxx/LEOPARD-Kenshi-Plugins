@@ -1,0 +1,14 @@
+{
+  "archive": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-GOG-test-20261105.zip",
+  "sha256": "fab7d355f35a829e7bceaf4fbfc4ad83c584c1ced449a8e05adfde910bfd4c22",
+  "crc": "passed",
+  "exact_files": 11,
+  "dll_sha256": "eaa75821e941f85fe95b4e3a7ce7fa3fde17c564d03a508a48132b85303b2859",
+  "exports": "passed",
+  "game_imports": {
+    "KenshiLib.dll": 144,
+    "MyGUIEngine_x64.dll": 29
+  },
+  "installed": false,
+  "gog_runtime_tested": false
+}
