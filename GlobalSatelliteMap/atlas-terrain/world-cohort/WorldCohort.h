@@ -59,7 +59,7 @@ template<class Provider>class Controller{
  bool ValidRequest(unsigned slot,unsigned index,const SourceReceipts::WorkerRequest&r)const{return SourceReceipts::Valid(r)&&SourceReceipts::SameScope(r.scope,job_.scope)&&r.role.slot==slot&&WorldNative::InputIndex(r.role)==index&&factory_.Matches(r);}
  HRESULT RequestInput(){if(!captured_.token[slot_][input_].Request(work_->request)||!ValidRequest(slot_,input_,work_->request))return E_INVALIDARG;if(!Send(WorldStream::Open))return E_FAIL;state_=LoadingSource;return S_OK;}
  HRESULT NextInput(const SourceReceipts::Scope&now,const WorldBank::Ledger&l){
-  if(++input_<15)return RequestInput();HRESULT hr=gate_.CommitBank(accepted_,15,now);if(SUCCEEDED(hr))hr=gpu_->bank.Complete(job_.frame[0].source,slot_,l);
+  if(++input_<15)return RequestInput();HRESULT hr=gate_.CommitBank(accepted_,15,now);if(hr==HRESULT_FROM_WIN32(ERROR_BUSY)){--input_;return S_FALSE;}if(SUCCEEDED(hr))hr=gpu_->bank.Complete(job_.frame[0].source,slot_,l);
   if(SUCCEEDED(hr)){cursor_=0;state_=slot_==0?BeginningViews:DrawingStage;}return hr;
  }
  HRESULT InitializeGpu(ID3D11Device*d,const WorldBank::Ledger&l){
@@ -78,6 +78,7 @@ public:
  U64 MaximumGpuReservation()const{return GpuReservation(CountValid(job_.count)?job_.count:4);}
  U64 OwnedGpuBytes()const{U64 n=gpu_->bank.OwnedGpuBytes();for(unsigned k=0;k<4;++k)n+=gpu_->raster[k].OwnedGpuBytes();for(unsigned p=0;p<3;++p)if(gpu_->staging[p].p)n+=U64(job_.frame[0].side)*job_.frame[0].side*(p?4:8);return n;}
  U64 ReservedGpuBytes()const{return quarantined_||queryPending_||OwnedGpuBytes()||(state_!=Idle&&state_!=Booting&&state_!=Stopped&&state_!=Failed&&state_!=Stopping)?MaximumGpuReservation():0;}
+ bool KnownStoppedAndJoined()const{return OnMain()&&!quarantined_&&!work_&&!thread_&&!queryPending_&&(state_==Stopped||state_==Failed)&&OwnedGpuBytes()==0;}
  bool CountedLedger(const WorldBank::Ledger&external,WorldBank::Ledger&out)const{out=external;const unsigned n=CountValid(job_.count)?job_.count:4;return WorldStream::Add(out.carry,U64(n)*WorldRaster::CarryBytes(512))&&WorldStream::Add(out.raster,U64(n)*WorldRaster::MeshBytes(16))&&WorldStream::Add(out.outputs,U64(n)*WorldRaster::TargetBytes(512))&&WorldStream::Add(out.readback,512ULL*512*16)&&WorldBank::Fits(out);}
  HRESULT Start(){
   if(!OnMain()||work_||thread_||quarantined_||CpuReservation()>SourceReceipts::CpuCap||InterlockedCompareExchange(&WorldStream::WorkerSlot(),1,0)!=0)return E_UNEXPECTED;
@@ -110,7 +111,7 @@ public:
   try{
    if(state_==LoadingHeight&&w==WorldStream::WHeight){hr=InitializeGpu(d,l);if(SUCCEEDED(hr)){cursor_=0;state_=InitializingViews;}}
    else if(state_==InitializingViews){hr=gpu_->raster[cursor_].Init(d,job_.frame[cursor_].side,job_.shaders,work_->window.View(),job_.grid[cursor_],l);if(SUCCEEDED(hr)&&++cursor_==job_.count){hr=gpu_->bank.BeginStage(job_.plan,job_.frame[0].source,0,l);if(SUCCEEDED(hr))hr=RequestInput();}}
-   else if(state_==LoadingSource&&w==WorldStream::WOpened){hr=gate_.Accept(captured_.token[slot_][input_],work_->lease,now,accepted_[input_]);if(SUCCEEDED(hr)){if(input_<3&&gpu_->bank.NeedsRgba(input_)){work_->pin=input_==2?128:input_*64+job_.frame[0].region;if(!Send(WorldStream::Decode))hr=E_FAIL;else state_=DecodingSource;}else if(input_<3){if(!Send(WorldStream::Release))hr=E_FAIL;else state_=ReleasingSource;}else state_=UploadingSource;}}
+   else if(state_==LoadingSource&&w==WorldStream::WOpened){hr=gate_.Accept(captured_.token[slot_][input_],work_->lease,now,accepted_[input_]);if(hr==HRESULT_FROM_WIN32(ERROR_BUSY))return S_FALSE;if(SUCCEEDED(hr)){if(input_<3&&gpu_->bank.NeedsRgba(input_)){work_->pin=input_==2?128:input_*64+job_.frame[0].region;if(!Send(WorldStream::Decode))hr=E_FAIL;else state_=DecodingSource;}else if(input_<3){if(!Send(WorldStream::Release))hr=E_FAIL;else state_=ReleasingSource;}else state_=UploadingSource;}}
    else if(state_==DecodingSource&&w==WorldStream::WDecoded)state_=UploadingSource;
    else if(state_==UploadingSource){if(input_<3)hr=gpu_->bank.UploadRgba(job_.frame[0].source,slot_,input_,&work_->rgba[0],work_->rgba.size(),l);else hr=gpu_->bank.UploadDds(job_.frame[0].source,slot_,(input_-3)/6,(input_-3)%6,work_->lease.Data(),size_t(work_->lease.Request().pin.bytes),l);if(SUCCEEDED(hr)){if(!Send(WorldStream::Release))hr=E_FAIL;else state_=ReleasingSource;}}
    else if(state_==ReleasingSource&&w==WorldStream::WReleased)hr=NextInput(now,l);

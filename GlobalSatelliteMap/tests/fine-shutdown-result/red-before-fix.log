@@ -1,0 +1,10 @@
+FAIL historical ERROR_BUSY known join is not quarantined
+FAIL already joined owner deleted once
+FAIL request preserves native operation error
+FAIL empty owner poll is idempotent
+FAIL first controller error is not overwritten
+FAIL poll guards main/join/exposed
+FAIL poll guard has no native call/delete
+FAIL poll guards main/join/exposed
+FAIL poll guard has no native call/delete
+shutdown production-body controls=39 failures=9 deletes=14

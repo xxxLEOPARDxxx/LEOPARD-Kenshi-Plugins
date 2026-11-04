@@ -2,6 +2,8 @@ Global Satellite Map (development)
 
 EN
 Private development plugin. The minimap keeps its own existing map source.
+The private 2026-11-04 follow-up retries temporary source contention instead of
+permanently stopping fine detail; real source errors remain visible in the log.
 The global map uses one 4x4 grid of 8192x8192 terrain tiles. Zooming and changing
 lighting reuse that grid; supported close views receive streamed finer materials.
 Fixed zoom steps preserve native centre/cursor anchors and marker alignment.

@@ -36,7 +36,7 @@ template<class NativeSession>class Controller {
  };
  struct Retained {Owner*owner;U64 cpu,gpu;Retained():owner(NULL),cpu(0),gpu(0){}};
  static Retained&Debt(){static Retained d;return d;}
- Owner*owner_;DWORD thread_;HRESULT error_;bool quarantined_;
+ Owner*owner_;DWORD thread_;HRESULT error_;bool quarantined_,retryPending_;
  Controller(const Controller&);Controller&operator=(const Controller&);
  bool Main()const{return GetCurrentThreadId()==thread_;}
  static bool Add(U64&a,U64 b,U64 cap){if(b>cap||a>cap-b)return false;a+=b;return true;}
@@ -45,7 +45,7 @@ template<class NativeSession>class Controller {
  bool CpuLedger(bool wholeNative,const FineStore::Ledger&external,FineStore::Ledger&out)const{out=external;return Add(out.other,Extra(),SourceReceipts::CpuCap)&&Add(out.other,wholeNative?owner_->native.CpuReservation():owner_->native.ExtraCpuPeakBytes(),SourceReceipts::CpuCap);}
  bool GpuLedger(const Residency&r,WorldBank::Ledger&out)const{std::memset(&out,0,sizeof(out));out.retained=r.viewerGpu;if(!Add(out.retained,r.fineGpu,AtlasView::GpuCap))return false;out.pending=r.pendingGpu;out.retired=r.retiredGpu;U64 total=r.viewerGpu;if(!Add(total,r.fineGpu,AtlasView::GpuCap)||!Add(total,r.pendingGpu,AtlasView::GpuCap)||!Add(total,r.retiredGpu,AtlasView::GpuCap))return false;return r.occupied<=FineJob::ActiveSlots()&&r.fineGpu>=U64(r.occupied)*FineJob::WindowBytes&&r.fineGpu<=U64(FineJob::ActiveSlots())*FineJob::WindowBytes;}
  void Retain(){quarantined_=true;if(SUCCEEDED(error_))error_=E_FAIL;Debt().owner=owner_;Debt().cpu=SourceReceipts::CpuCap;Debt().gpu=owner_?owner_->native.Cohort().ReservedGpuBytes():0;}
- void Hard(HRESULT hr){if(SUCCEEDED(error_))error_=FAILED(hr)?hr:E_ABORT;if(owner_&&!owner_->stopping){owner_->stopping=true;owner_->stopAt=GetTickCount();owner_->worker.Cancel();}}
+ void Hard(HRESULT hr){retryPending_=false;if(SUCCEEDED(error_))error_=FAILED(hr)?hr:E_ABORT;if(owner_&&!owner_->stopping){owner_->stopping=true;owner_->stopAt=GetTickCount();owner_->worker.Cancel();}}
  bool PairMatches(const FineJob::Plan&p,unsigned pair,const FineJob::Demand&now,const WorldCohort::Job&job)const{
   if(!FineJob::Internal::Fresh(p,now)||pair>=p.pairCount||job.count!=2||!WorldCohort::ValidJob(job))return false;
   FineJob::Snapshot snapshot={p.demand.view.stamp,job.material};FineJob::Settings settings={job.frame[0].cameraY,job.frame[0].farClip,job.frame[0].waterHeight,job.frame[0].wetness};WorldCohort::Job expected;
@@ -65,7 +65,7 @@ template<class NativeSession>class Controller {
   if(p.State()==WorldCohort::Idle&&p.ReservedGpuBytes()==0){o.draining=o.soft=o.queued=o.producerCancelled=false;o.plan=FineJob::Plan();return 2;}return 0;
  }
 public:
- Controller():owner_(NULL),thread_(GetCurrentThreadId()),error_(S_OK),quarantined_(false){}~Controller(){Shutdown();}
+ Controller():owner_(NULL),thread_(GetCurrentThreadId()),error_(S_OK),quarantined_(false),retryPending_(false){}~Controller(){Shutdown();}
  bool Begin(const SourceReceipts::Scope&scope,const FineStore::Identity&id,const FineStore::Config&config,const FineStore::Ledger&external){
   if(!Main()||owner_||quarantined_||Debt().owner||WorldCohort::Quarantine().marked||scope.thread!=thread_||!SourceReceipts::ScopeValid(scope)||!FineStore::Valid(id)||scope.sourceEpoch!=id.sourceEpoch)return false;
   try{owner_=new Owner;owner_->scope=scope;owner_->identity=id;owner_->external=external;error_=S_OK;HRESULT hr=owner_->native.Init(scope);FineStore::Ledger ledger;if(FAILED(hr)||!CpuLedger(true,external,ledger)||!owner_->worker.Start(scope,id,config,ledger)){Hard(FAILED(hr)?hr:E_FAIL);return false;}return true;}catch(...){Hard(E_OUTOFMEMORY);return false;}
@@ -76,11 +76,17 @@ public:
  }
  bool Ready()const{return Main()&&owner_&&!quarantined_&&!owner_->stopping&&!owner_->draining&&!owner_->queued&&!owner_->writing&&!owner_->reading&&owner_->workerReady&&owner_->native.Cohort().State()==WorldCohort::Idle;}
  bool Queue(const FineJob::Plan&p,unsigned pair,const FineJob::Demand&now,const FineStore::Identity&id,const WorldCohort::Job&job,const Residency&r,const FineStore::Ledger&external){
+  if(!Main())return false;retryPending_=false;
   if(!Ready()||!CurrentBase(now,id)||!PairMatches(p,pair,now,job))return false;FineJob::Budget budget;if(!MakeBudget(r,external,budget)||!FineJob::CanRender(p,now,budget))return false;
   Owner&o=*owner_;o.plan=p;o.pair=pair;o.job=job;o.external=external;o.soft=false;
   std::memcpy(o.shaders,job.shaders.vertex.data,4440);std::memcpy(o.shaders+4440,job.shaders.partial.data,13208);std::memcpy(o.shaders+17648,job.shaders.tail.data,4272);o.job.shaders.vertex.data=o.shaders;o.job.shaders.partial.data=o.shaders+4440;o.job.shaders.tail.data=o.shaders+17648;
-  HRESULT hr=o.native.RebindCapture(o.job,o.tokens);if(SUCCEEDED(hr))hr=o.native.Cohort().Submit(true,o.job,o.tokens,o.scope);if(FAILED(hr)){Hard(hr);return false;}o.queued=true;return true;
+  HRESULT hr=o.native.RebindCapture(o.job,o.tokens);
+  // Only synchronous metadata contention at a proven empty Idle boundary is
+  // retryable. Never hide a GPU/worker/identity failure behind a BUSY flag.
+  if(hr==HRESULT_FROM_WIN32(ERROR_BUSY)&&o.native.Cohort().State()==WorldCohort::Idle&&o.native.Cohort().ReservedGpuBytes()==0){retryPending_=true;return false;}
+  if(SUCCEEDED(hr))hr=o.native.Cohort().Submit(true,o.job,o.tokens,o.scope);if(FAILED(hr)){Hard(hr);return false;}o.queued=true;return true;
  }
+ bool RetryPending()const{return Main()&&retryPending_;}
  //1 pair acknowledged;2 source GPU fully drained;3 read ready;4 cache miss;
  //0 pending/idle;-1 failure/terminated. None of these publishes a GPU texture.
  int Tick(bool admitted,ID3D11Device*device,const FineJob::Demand&now,const FineStore::Identity&id,const Residency&r,const FineStore::Ledger&external){
@@ -136,8 +142,26 @@ public:
  U64 RetainedRamBytes()const{return Main()&&owner_?(quarantined_?GsmCacheProfile::RamBudgetBytes():owner_->worker.RetainedRamBytes()):0;}
  // After consumer join and GPU bank drain, finish the idle source worker with
  // zero-timeout polling. This is the normal-frame close/re-enable path.
- HRESULT RequestShutdown(){if(!Main()||!owner_||quarantined_||!owner_->terminated||owner_->readExposed||owner_->native.Cohort().ReservedGpuBytes())return E_UNEXPECTED;if(owner_->native.Cohort().State()==WorldCohort::Stopped){delete owner_;owner_=NULL;return S_OK;}HRESULT hr=owner_->native.Cohort().RequestShutdown();if(FAILED(hr)){error_=hr;Retain();}return hr;}
- HRESULT PollShutdown(){if(!Main()||quarantined_)return E_UNEXPECTED;if(!owner_)return S_OK;HRESULT hr=owner_->native.Cohort().PollShutdown();if(hr==S_FALSE)return hr;if(owner_->native.Cohort().Quarantined()){error_=hr;Retain();return FAILED(hr)?hr:E_FAIL;}if(FAILED(hr)){error_=hr;Retain();return hr;}delete owner_;owner_=NULL;return S_OK;}
+ HRESULT RequestShutdown(){
+  if(!Main()||!owner_||quarantined_||!owner_->terminated||owner_->readExposed||owner_->native.Cohort().ReservedGpuBytes())return E_UNEXPECTED;
+  if(owner_->native.Cohort().KnownStoppedAndJoined()){
+   const HRESULT operation=owner_->native.Cohort().Error();if(FAILED(operation)&&SUCCEEDED(error_))error_=operation;
+   delete owner_;owner_=NULL;return S_OK;
+  }
+  HRESULT hr=owner_->native.Cohort().RequestShutdown();if(FAILED(hr)){if(SUCCEEDED(error_))error_=hr;Retain();}return hr;
+ }
+ HRESULT PollShutdown(){
+  if(!Main()||quarantined_)return E_UNEXPECTED;if(!owner_)return S_OK;
+  if(!owner_->terminated||owner_->readExposed)return E_UNEXPECTED;
+  HRESULT hr=owner_->native.Cohort().PollShutdown();if(hr==S_FALSE)return hr;
+  // A joined source may return its historical operation error. It is still a
+  // proven completion, rather than unknown lifetime requiring quarantine.
+  if(owner_->native.Cohort().KnownStoppedAndJoined()){
+   if(FAILED(hr)&&SUCCEEDED(error_))error_=hr;delete owner_;owner_=NULL;return hr;
+  }
+  if(owner_->native.Cohort().Quarantined()){if(SUCCEEDED(error_))error_=hr;Retain();return FAILED(hr)?hr:E_FAIL;}
+  if(FAILED(hr)){if(SUCCEEDED(error_))error_=hr;Retain();return hr;}delete owner_;owner_=NULL;return S_OK;
+ }
  // Explicit final teardown only; NEVER call from normal live-viewer Tick.
  void Shutdown(){if(!owner_||quarantined_)return;if(!Main()){Retain();return;}Hard(E_ABORT);if(owner_->readExposed){Retain();return;}if(owner_->worker.ReadPending())owner_->worker.ReleaseRead();if(!owner_->worker.Join()){Retain();return;}owner_->native.Cohort().Shutdown();if(WorldCohort::Quarantine().marked){Retain();return;}delete owner_;owner_=NULL;}
 };

@@ -1,0 +1,13 @@
+{
+  "controlsPerOptimization": 53,
+  "optimizations": [
+    "Od",
+    "O2"
+  ],
+  "sha256": {
+    "tests\\fine-shutdown-result\\run.py": "0f8932684a980b8169ffb2b1012e4f9665d0f4f2d6fadb2d801a8bcd7dab44e8",
+    "tests\\fine-shutdown-result\\shutdown.cpp": "55030d15f795850ad858d463f7b856c5fd9d5dbbdc4219d45cd2eb2d604cc1d2",
+    "tests\\fine-shutdown-result\\README.md": "1afabb3e9b634dd7bd51e7b1d0f6ef3bcdc88d580a7a611b087e09c822da4a10",
+    "atlas-terrain\\fine-coordinator\\FineCoordinator.h": "88e67ed258e971f4a0d9f91181cb3235099f32bc5940601e411f8befea33813e"
+  }
+}

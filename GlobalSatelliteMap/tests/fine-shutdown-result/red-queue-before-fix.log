@@ -1,0 +1,5 @@
+FAIL busy capture leaves reusable healthy owner
+FAIL next queue retries successfully
+FAIL successful retry resets transient flag and submits once
+FAIL rejected new queue clears old retry flag
+shutdown production-body controls=53 failures=4 deletes=20
