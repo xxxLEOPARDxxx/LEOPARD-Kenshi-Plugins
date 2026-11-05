@@ -1,0 +1,87 @@
+{
+  "source_commit": "2bf6df98d96b7764c617a6b8ce04d25cc8fc4bf6",
+  "dll_sha256": "0e86f8a6b779543a8ca7fdd055ebf307829e762c4168e635aa93c0be59534c56",
+  "dll_bytes": 1489920,
+  "zip": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-GOG-test-20261105.zip",
+  "zip_bytes": 767654,
+  "zip_sha256": "af4fb6d80697e18541ac384219329330989dafb764353fd37a9e738f6886c191",
+  "crc": "PASS",
+  "changed_members": 3,
+  "no_game_install": true,
+  "steel_jobs_included": false,
+  "runtime_gog_verified": false,
+  "members": [
+    {
+      "name": "KEO/KEO.dll",
+      "bytes": 1489920,
+      "sha256": "0e86f8a6b779543a8ca7fdd055ebf307829e762c4168e635aa93c0be59534c56",
+      "changed": true
+    },
+    {
+      "name": "KEO/KEO.mod",
+      "bytes": 2530,
+      "sha256": "3b97cc21fd4000eeb9987bfca3b9e426cc3deca1e312a84c7f536c22293c5c82",
+      "changed": false
+    },
+    {
+      "name": "KEO/RE_Kenshi.json",
+      "bytes": 27,
+      "sha256": "84fd987ad40531cb01bc35fb8c54adff11be12bd2d2f2a8badc6e0c67ed4fea3",
+      "changed": false
+    },
+    {
+      "name": "KEO/KEO.ini.template",
+      "bytes": 38137,
+      "sha256": "42e2d7a1245bf2ba2a804a553dada0c716e4212a98a8e2d2ad50309db368cebc",
+      "changed": false
+    },
+    {
+      "name": "KEO/README.md",
+      "bytes": 17606,
+      "sha256": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca",
+      "changed": false
+    },
+    {
+      "name": "KEO/LICENSE",
+      "bytes": 35823,
+      "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809",
+      "changed": false
+    },
+    {
+      "name": "TEST_README_RU_EN.txt",
+      "bytes": 10225,
+      "sha256": "4fea81a78f8c524e2dffa0c345f19fc74c278d5fbd9e6e291d50670e2bb1de15",
+      "changed": true
+    },
+    {
+      "name": "KEO/locale/ru_RU/LC_MESSAGES/keo.mo",
+      "bytes": 15126,
+      "sha256": "8b490400f28262efccfd130aa34f4e01da33b3e43583a4f61a9771c922523562",
+      "changed": false
+    },
+    {
+      "name": "KEO/locale/en_GB/LC_MESSAGES/keo.mo",
+      "bytes": 11209,
+      "sha256": "9a7bb3a20aaad4bfd13607e7eb91e4736e06e897d79cd599d5d292ff02ec6355",
+      "changed": false
+    },
+    {
+      "name": "KEO/locale/zh_CN/LC_MESSAGES/keo.mo",
+      "bytes": 10986,
+      "sha256": "b1b477f8687c962c238db0aed9b897f05ec7add061ab385245100aeba2c675e6",
+      "changed": false
+    },
+    {
+      "name": "GOG_PROFILE_RU_EN.txt",
+      "bytes": 2397,
+      "sha256": "4f99f700b389ab400cc84556d54831a968f018e9c639f4dbcd4309949732cbfb",
+      "changed": true
+    },
+    {
+      "name": "KEO/leopard/carried_weight/ORIGIN.md",
+      "bytes": 2525,
+      "sha256": "1f0ba9f50f4df277d6e1f2790b54bf3a01c5be5d86b9380ee423e6b9058b7632",
+      "changed": false
+    }
+  ]
+}

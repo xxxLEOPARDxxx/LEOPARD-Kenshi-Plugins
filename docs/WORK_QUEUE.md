@@ -15,21 +15,47 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
-   LATEST GOG TESTER FAILURE/FIX05Nov03:26: initial archive fab7... failed
-   startup with MISMATCH au ours=0, not a successful GOG runtime test. The native
-   profile omitted au storage21322B0; exact official SDK slot7627 and both EXE
-   RIP references prove GOG2130220. Local commit84056bcb adds only that mapping
-   plus reverse; startup guard is unchanged. All107 actual Resolve entries now
-   tested, including its9-global loop; old-profile RED and removed/wrong/null
-   target controls catch the former coverage blindspot. Independent review CLEAR.
-   Rebuilt PROD0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766;
-   both private GOG/weight test ZIPs refreshed, each762976B SHA
-   ff14c090184028d6165f03b68dfbdec07fefe84698c6af04877238c9c4009a18.
-   The current local Steam game PID20904 still runs weight buildd530..., which
-   is unaffected by the GOG-only table entry. No local replacement while running.
-   Tester must retry actual GOG startup; do not claim the port now runs in-game.
-   Three Steel jobs are NOT implemented: owner had misunderstood prior wording,
-   corrected explicitly. Only carried weight is installed, OFF by default.
+   Runtime follow-up04:58: initial MCM-visible candidate refused actual job
+   registration because existing StackSort/Rotate/KEP hooks changed four checked
+   inventory entries. Corrected in c6802ea: exact audited module identities and
+   hook chains admitted; native callbacks/predicates remain active. Six native
+   mutation/helper guards remain exact, unknown owners still refused. Startup
+   hashing only; no hot file/module lookups. Fresh205shared+310runtime controls
+   eachOd/O2, DEV/PROD and independent review passed. Corrected DLL E3F64A0B
+   INSTALLED04:58 while game absent, all personal config preserved; real job
+   registration and gameplay acceptance pending next launch.
+   Previous04:39: three Steel jobs IMPLEMENTED and INSTALLED LOCALLY in a
+   private candidate. Source ac2c92e7 (after770f8d2 integration and2bf6df9 SDK fix),
+   PROD abf949c03c829dd23a737e41286293cc6cfb3009e9bb168caa863d4c9789db20.
+   MCM has independent live/default-OFF Gather Output291, Stock Counter293
+   (physical own-counter deposit, NO monetary trade) and cyclic Waypoints292.
+   Native rows survive OFF; route coordinates restore from native saved hand
+   payload; no242 migration. Native factory/common initialization is retained.
+   Bounded whole-stack transfer restores the same remainder to the reserved
+   source footprint, measures charges/quantity conservation and refuses unknown
+   inventory handlers/provenance. Foreign TaskData ids are passed through.
+   DEV/PROD351-source builds/180 SDK0.5 imports passed; focused actual-code,
+   input/caption/lifecycle/ownership/transfer and exact Steam/GOG PE controls
+   passed; independent scoped reviews completed. In-game acceptance pending.
+   Private jobs ZIP: workshop/testing/KEO/KEO-jobs-test-20261105.zip,786224B,
+   SHA0087cc0e67a470b7e5cdf69cefafb64aa7a832cfcea28b771eeb9e38e64fa3b7.
+   All four personal INI/REjson/mod order files byte-preserved; backup
+   D:/DEV/Kenshi/backup/keo-jobs-20261105-043907. User asked to launch/open MCM;
+   no game process was present at installation. Do not reuse historical PIDs.
+
+   LATEST GOG retry: tester got GetRealAddress assert KEO.dll+F1880 and weight
+   contract refusal. Exact delivered DLL resolves that address to a LOCAL
+   virtual getAge thunk; getRace was likewise wrong. Source2bf6df9 uses exported
+   _NV_getAge/_NV_getRace ONLY for address checks, preserving virtual gameplay
+   calls and every guard. Actual old-code RED/new-code GREEN verified.
+   SEPARATE fix-only GOG ZIP rebuilt from committed2bf6df9 export WITHOUT the
+   three jobs: workshop/testing/KEO/KEO-GOG-test-20261105.zip,767654B,
+   SHAaf4fb6d80697e18541ac384219329330989dafb764353fd37a9e738f6886c191;
+   DLL0e86f8a6b779543a8ca7fdd055ebf307829e762c4168e635aa93c0be59534c56,
+   150 SDK imports,12filesCRC. Real GOG startup still requires tester retry.
+   Earlier au-mapping fix84056bcb remains; this is a distinct feature-specific
+   SDK usage error, not a reason to disable the startup guard.
+   No public release/version increment/personal published changelog entry.
    Gameplay priorities: (1) pathfinding: short-route detours, circling/stuck
    movement, squad routing and avoiding water; (2) excess squads: distinguish
    genuinely created platoons from existing platoons loaded earlier; (3) mouse
@@ -87,7 +113,8 @@ Always check the actual process immediately before replacing a loaded DLL.
    config/layout/MCM regressions PASS. Private test ZIP
    workshop/testing/KEO/KEO-weight-test-20261105.zip, CRC12files verified.
    Real weight gameplay/FPS/memory/save-load acceptance is still pending.
-   New jobs/gate/drop changes are NOT installed. Gate native registration gap
+   The three jobs are now installed as described above; gate/drop changes are
+   NOT ported. Gate native registration gap
    depends on data flags; do not claim universal missing registration.
    Upstream post-drop copy treats native query -1 as success; never copy that.
    Implementation: opt-in dynamic body/inventory weight, startup-only,
@@ -95,8 +122,8 @@ Always check the actual process immediately before replacing a loaded DLL.
    disable this feature if the original KenshiQOL DLL is loaded. Preserve native
    inventory weight semantics, robot/hunger distinction and save data.
    Next isolated candidates: gate registration and post-drop building handle.
-   New jobs require separate all-or-nothing capability/save-lifecycle design:
-   Gather Output first, shop-counter stocking second, queued movement last.
+   Implemented design constraints for the new jobs: separate capability and
+   save-lifecycle admission; Gather Output, counter stocking and queued movement.
    Do not silently migrate all native task242 rows or modify saves with OFF.
    User clarified05Nov: expose all three jobs as separate MCM switches with
    meaningful descriptions. Actual upstream job291 Gather Output empties machine
