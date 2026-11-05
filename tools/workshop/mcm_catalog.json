@@ -751,6 +751,8 @@
     ],
     "dll_export_verified": true,
     "public": false,
-    "release_authorized": true
+    "release_authorized": true,
+    "nexus_url": "https://www.nexusmods.com/kenshi/mods/2271",
+    "nexus_published_version": "1"
   }
 ]

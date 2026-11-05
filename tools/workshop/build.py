@@ -221,7 +221,7 @@ ITEMS.extend([
          en="Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors."),
 ])
 
-ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=None, version="1",
+ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="1",
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="A maintenance fork of Kenshi Engine Optimizations with MCM settings, translations and optional inventory jobs."))
 

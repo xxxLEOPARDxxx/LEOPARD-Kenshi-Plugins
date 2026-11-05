@@ -1,0 +1,13 @@
+{
+  "mod": "KEO",
+  "version": "1",
+  "nexus": 2271,
+  "nexus_url": "https://www.nexusmods.com/kenshi/mods/2271",
+  "nexus_status": "published_confirmed_by_owner",
+  "steam_status": "pending_client_restart",
+  "steam_submission_started": false,
+  "steam_client": "Stale active-session PID prevented API initialization. Graceful shutdown completed; automatic tool review rejected relaunch. Owner asked to open the client manually.",
+  "corresponding_source_repository_commit": "5981aad",
+  "binary_zip_sha256": "056ce5221db971e0ee9fde0b98378174191f77a371197a88f1e8cb9bcb72e16f",
+  "personal_changelog": "KEO v1 recorded after owner's Nexus publication confirmation; do not duplicate for Steam."
+}

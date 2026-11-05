@@ -88,7 +88,7 @@ class PublicCatalogTests(unittest.TestCase):
         self.assertEqual(len(items), 1)
         self.assertEqual(items[0]["title"], "KEO (MCM fork) (QoL)")
         self.assertEqual(items[0]["version"], "1")
-        self.assertIsNone(items[0]["nexus"])
+        self.assertEqual(items[0]["nexus"], 2271)
         self.assertIs(items[0]["lang"], True)
         self.assertEqual(Path(build.source_dir("KEO")).resolve(), Path("D:/DEV/Kenshi/forks/KEO").resolve())
         self.assertEqual(Path(build.defaults_ini("KEO")).resolve(), Path("D:/DEV/Kenshi/forks/KEO/KEO.ini").resolve())
