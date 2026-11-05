@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-04",
+  "date": "2026-11-05",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -208,6 +208,11 @@
       "nexus": 2203,
       "workshop_id": 3813761812,
       "version": "7"
+    },
+    "KEO": {
+      "nexus": 2271,
+      "workshop_id": 3834042449,
+      "version": "1"
     }
   }
 }

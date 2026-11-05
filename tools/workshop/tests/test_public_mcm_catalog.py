@@ -1,6 +1,7 @@
 """Public descriptions must never expose the internal development catalog."""
 import sys
 import importlib.util
+import json
 import unittest
 from unittest.mock import patch
 from pathlib import Path
@@ -9,7 +10,7 @@ import publication_sections as sections
 import validate_descriptions as validator
 
 REPOS = "https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks"
-PRIVATE = ("Dynamic Factions", "Global Satellite Map", "KEO", "XP Overhaul", "Organize the Inventory")
+PRIVATE = ("Dynamic Factions", "Global Satellite Map", "XP Overhaul", "Organize the Inventory")
 
 class PublicCatalogTests(unittest.TestCase):
     def test_actual_supported_sections_never_disclose_private_work(self):
@@ -24,19 +25,33 @@ class PublicCatalogTests(unittest.TestCase):
     def test_validator_rejects_private_names_in_every_public_output(self):
         for mod in ("ModConfigMenu", "AssignedWorkers"):
             for name in PRIVATE:
-                if name == "KEO" and mod != "ModConfigMenu":
-                    continue
                 with self.subTest(mod=mod, name=name):
                     with self.assertRaisesRegex(ValueError, "[Pp]rivate"):
                         validator.player_feature_claims(mod, (REPOS if mod == "ModConfigMenu" else "") + " " + name, "output.txt")
 
-    def test_original_public_keo_compatibility_is_not_our_private_fork(self):
-        for mod in ("BetterLooting", "StackSort"):
-            validator.player_feature_claims(mod, "Compatible with the original KEO plugin.", "output.txt")
-            for announcement in ("KEO: Kenshi Engine Optimizations", "Kenshi Engine Optimizations", "KEO is our local fork", "Наш локальный форк KEO"):
-                with self.subTest(mod=mod, announcement=announcement):
-                    with self.assertRaisesRegex(ValueError, "Private"):
-                        validator.player_feature_claims(mod, announcement, "output.txt")
+    def test_simulated_private_keo_allows_only_original_compatibility_references(self):
+        private = [dict(package="KEO", id="KEO", name="KEO: Kenshi Engine Optimizations", public=False)]
+        with patch.object(validator, "mcm_catalog", return_value=private), patch.object(validator, "public_mcm_catalog", return_value=[]):
+            for mod in ("BetterLooting", "StackSort"):
+                validator.player_feature_claims(mod, "Compatible with the original KEO plugin.", "output.txt")
+                for announcement in ("KEO: Kenshi Engine Optimizations", "Kenshi Engine Optimizations", "KEO is our local fork", "Наш локальный форк KEO"):
+                    with self.subTest(mod=mod, announcement=announcement):
+                        with self.assertRaisesRegex(ValueError, "Private"):
+                            validator.player_feature_claims(mod, announcement, "output.txt")
+
+    def test_published_keo_is_public_and_has_confirmed_release_identity(self):
+        public = sections.public_mcm_catalog()
+        entry = next(item for item in public if item["package"] == "KEO")
+        self.assertIs(entry["public"], True)
+        self.assertEqual(entry["group"], "other_fork")
+        published = json.loads((sections.HERE / "published_releases.json").read_text(encoding="utf-8"))["mods"]["KEO"]
+        self.assertEqual(str(published["workshop_id"]), "3834042449")
+        self.assertEqual(str(published["nexus"]), "2271")
+        self.assertEqual(str(published["version"]), "1")
+        for lang in ("ru", "en"):
+            self.assertIn(entry["name"], sections.supported_section(lang))
+        validator.player_feature_claims("KEO", entry["name"], "KEO.en")
+        validator.player_feature_claims("AssignedWorkers", entry["name"], "other.en")
 
     def test_real_generator_outputs_and_private_identifiers(self):
         path = sections.HERE / "desc/make_desc.py"
@@ -121,7 +136,7 @@ class PublicCatalogTests(unittest.TestCase):
         internal = sections.mcm_catalog()
         self.assertTrue(all(any(e["name"] == name or e["id"] == name for e in internal) for name in PRIVATE))
         public = sections.public_mcm_catalog()
-        self.assertEqual(len(public), 38)
+        self.assertEqual(len(public), 39)
         for lang in ("ru", "en"):
             text = sections.supported_section(lang) + REPOS
             validator.validate_public_mcm_text(text, "output.txt", require_all=True)

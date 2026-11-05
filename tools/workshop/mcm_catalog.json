@@ -739,7 +739,7 @@
     "name": "KEO: Kenshi Engine Optimizations",
     "id": "KEO",
     "group": "other_fork",
-    "status": "release_candidate",
+    "status": "canonical_supported",
     "author": "Jakematt2004 (jacobericson)",
     "source": "D:/DEV/Kenshi/forks/KEO",
     "source_export": [
@@ -750,9 +750,11 @@
       }
     ],
     "dll_export_verified": true,
-    "public": false,
+    "public": true,
     "release_authorized": true,
     "nexus_url": "https://www.nexusmods.com/kenshi/mods/2271",
-    "nexus_published_version": "1"
+    "nexus_published_version": "1",
+    "published_version": "1",
+    "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834042449"
   }
 ]

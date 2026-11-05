@@ -11,6 +11,7 @@ sys.path.insert(0,str(W))
 import steam_upload as u
 import personal_changelog as journal
 import validate_descriptions
+from steam_pipe_upload import Steam
 OWNER=76561198098571264
 REPORT=O/'docs/releases/2026-11-05-keo-1-publication.json'
 def stamp():return datetime.now(timezone(timedelta(hours=3))).isoformat()
@@ -50,7 +51,7 @@ def main():
     assert state.get('steam_status') not in ('published_verified','submitting'), 'Inspect earlier submission before retry'
     state.update(mod='KEO',version='1',nexus=2271,nexus_status='published_confirmed_by_owner',steam_status='connecting',time_msk=stamp())
     save(state)
-    st=u.Steam()
+    st=Steam()
     try:
         user=bind(st,'SteamAPI_ISteamClient_GetISteamUser',ctypes.c_void_p,ctypes.c_void_p,ctypes.c_int,ctypes.c_int,ctypes.c_char_p)(st.SteamClient(),st.HUser(),st.HPipe(),b'SteamUser019')
         assert user and bind(st,'SteamAPI_ISteamUser_GetSteamID',ctypes.c_uint64,ctypes.c_void_p)(user)==OWNER
