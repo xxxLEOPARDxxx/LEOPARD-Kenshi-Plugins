@@ -1,0 +1,23 @@
+{
+  "pid": 10344,
+  "identity": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\RE_Kenshi\\Kenshi_x64.exe",
+    "sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
+    "created_filetime": 134383188099261688
+  },
+  "keo_module": {
+    "name": "KEO.dll",
+    "path": "d:\\steamlibrary\\steamapps\\common\\kenshi\\mods\\KEO\\KEO.dll",
+    "base": 140732429369344,
+    "size": 10366976
+  },
+  "dll_sha256": "3beef25dc5b4674f4c33efd1c022358a16b9e69146f14c949707a8fb60ce2cff",
+  "log": [
+    "17.697 KEO: Steel jobs: metadata registered; waiting for native world task templates",
+    "43.803 KEO: Steel jobs: registered three native task types; independent live switches ready"
+  ],
+  "registration": "confirmed in actual Steam process",
+  "gameplay_save_load_fps_memory": "pending; user checking now",
+  "process_writes": false,
+  "native_calls": false
+}

@@ -24,8 +24,11 @@ Always check the actual process immediately before replacing a loaded DLL.
    registration and once-only template publication after load or first saved
    custom-task construction; no native calls/logger under publication lock.
    Fresh170factory+319runtime controls, DEV/PROD builds/imports and independent
-   review pass. All four personal configuration files preserved. Next user launch
-   requested; actual registration/gameplay/FPS/save-load acceptance still pending.
+   review pass. All four personal configuration files preserved. Actual Steam
+   PID10344 (05:20) loaded exact3BEEF25D: metadata registered17.697s and all
+   three native task types ready43.803s, no registration error. User checking
+   cyclic route and physical machine/counter actions; gameplay/FPS/save-load
+   acceptance remains pending.
    Previous04:39: three Steel jobs IMPLEMENTED and INSTALLED LOCALLY in a
    private candidate. Source ac2c92e7 (after770f8d2 integration and2bf6df9 SDK fix),
    PROD abf949c03c829dd23a737e41286293cc6cfb3009e9bb168caa863d4c9789db20.
