@@ -21,12 +21,16 @@ def balanced(text,path):
         else:stack.append(tag)
     if stack:raise ValueError('Unclosed BBCode: '+str(path))
 
-def validate_public_mcm_text(text,path,require_all=False,allow_original_keo=False):
+def validate_public_mcm_text(text,path,require_all=False,allow_original_keo=False,current_mod=None):
     """Reject private catalog references anywhere in public Steam/Nexus text."""
     public=public_mcm_catalog()
     packages={entry['package'] for entry in public}
     for entry in mcm_catalog():
         if entry['package'] in packages:continue
+        # Explicit release preparation permits only KEO's own description.
+        # It does not publish KEO in MCM or authorize any other private project.
+        if entry['package']=='KEO' and current_mod=='KEO' and entry.get('release_authorized') is True:
+            continue
         aliases={entry['name'],entry['package'],entry['id']}
         if entry['package']=='XP_Overhaul':aliases.add('XPO')
         if entry['package']=='KEO':aliases.add('Kenshi Engine Optimizations')
@@ -46,7 +50,7 @@ def validate_public_mcm_text(text,path,require_all=False,allow_original_keo=Fals
                 raise ValueError('Missing supported MCM page: '+entry['name']+' in '+str(path))
 
 def player_feature_claims(mod,text,path):
-    validate_public_mcm_text(text,path,require_all=(mod=='ModConfigMenu'),allow_original_keo=(mod!='ModConfigMenu'))
+    validate_public_mcm_text(text,path,require_all=(mod=='ModConfigMenu'),allow_original_keo=(mod!='ModConfigMenu'),current_mod=mod)
     if mod=='ModConfigMenu':
         required=('https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins',
                   'https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Forks')

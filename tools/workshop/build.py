@@ -20,6 +20,7 @@ import shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODS = r"D:\SteamLibrary\steamapps\common\Kenshi\mods"
 OURS = r"D:\DEV\Kenshi\ours"
+KEO_SOURCE = r"D:\DEV\Kenshi\forks\KEO"
 # Mod Config Menu - ссылка в шапке описания всех остальных модов.
 MCM_STEAM_URL = "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584"
 MCM_NEXUS_URL = "https://www.nexusmods.com/kenshi/mods/2202"
@@ -220,6 +221,10 @@ ITEMS.extend([
          en="Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors."),
 ])
 
+ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=None, version="1",
+                  tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
+                  en="A maintenance fork of Kenshi Engine Optimizations with MCM settings, translations and optional inventory jobs."))
+
 SKIP = re.compile(r"(^_.*\.(info|img)$)|(\.bak$)|(\.pre[^.]*$)|(\.prelog$)|"
                   r"(\.bak-[^.]*$)|(\.log$)|(_runtime_table\.txt$)|"
                   # mod-config.json у форков Emkej - личные настройки; плагин
@@ -269,6 +274,8 @@ def runtime_file_allowed(mod, folder, name):
     return not SKIP.search(name)
 
 def source_dir(mod):
+    if mod == "KEO":
+        return KEO_SOURCE if os.path.isdir(KEO_SOURCE) else None
     for folder in (os.path.join(OURS,mod), os.path.join(FORKS,"CharacterInspector" if mod=="Character Inspector" else mod)):
         if os.path.isdir(folder):
             return folder
@@ -408,6 +415,9 @@ FORKS = r"D:\DEV\Kenshi\forks\LEOPARD-Kenshi-Forks"
 def defaults_ini(mod):
     """Эталон настроек по умолчанию - ours/<Mod>/<Mod>.ini (у наших плагинов)
     или forks/<Mod>/mod/<Mod>.ini (форки на IniDefaults, KenshiJobManagement)."""
+    if mod == "KEO":
+        path = os.path.join(KEO_SOURCE, "KEO.ini")
+        return path if os.path.isfile(path) else None
     base_name = "CharacterInspector" if mod == "Character Inspector" else mod
     for path in (os.path.join(OURS, mod, base_name + ".ini"),
                  os.path.join(FORKS, mod, "mod", base_name + ".ini"),

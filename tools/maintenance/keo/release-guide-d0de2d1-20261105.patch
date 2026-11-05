@@ -1,0 +1,517 @@
+From d0de2d19f3ba88d9315dcfafa361507fe89ab288 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 08:31:51 +0300
+Subject: [PATCH] docs: prepare KEO maintenance fork release 1 guide and source
+ build reference
+
+---
+ BUILD_RELEASE.md   |  40 +++++
+ README.md          | 356 +++++++++++++++++----------------------------
+ README_UPSTREAM.md |  72 +++++++++
+ 3 files changed, 244 insertions(+), 224 deletions(-)
+ create mode 100644 BUILD_RELEASE.md
+ create mode 100644 README_UPSTREAM.md
+
+diff --git a/BUILD_RELEASE.md b/BUILD_RELEASE.md
+new file mode 100644
+index 0000000..ee595e0
+--- /dev/null
++++ b/BUILD_RELEASE.md
+@@ -0,0 +1,40 @@
++# Building maintenance release 1
++
++This source tree corresponds to the KEO v1 maintenance package. The production
++DLL was built from code commit `7609b76e125ab0709a804325fc7e631064875eeb`;
++the release-preparation commit changes documentation only. Its SHA-256 is
++`ea56647bb504a5287ee2589b815d9b1ac1cef6e760d6921048420908ede86751`.
++
++Use Windows x64, Visual C++ 2010 x64 and Windows SDK 7.1. Set `KENSHILIB`
++to the KenshiLib development tree containing `Include/kenshi/GameWorld.h`
++and `Libraries/KenshiLib/KenshiLib.lib`; set `BOOST_ROOT` to Boost 1.60.0.
++The original build scripts describe the required KenshiLib 0.5.1 header layout;
++the admitted GOG runtime profile uses KenshiLib 0.5.0. Development headers and
++the runtime DLL are separate requirements. Do not replace a runtime library
++merely to match the development-header label.
++
++With compiler/SDK INCLUDE, LIB and PATH initialized, run:
++
++```bat
++set BUILD_MP=6
++build_step4_noenv.bat
++```
++
++The default zone-handoff stage is 3. Output is
++`build/KEO_step4_prod/KEO.dll` (production) and
++`build/KEO_step4_dev/KEO.dll` (diagnostic development build).
++Use the production DLL for distribution. `tools/build` and `tools/kenshilib`
++contain the actual build and dependency checks. External SDKs, game executable
++files and proprietary game libraries are not redistributed in this archive.
++
++The `leopard` folder retains focused host checks and native-contract tests.
++Tests that inspect Steam/GOG executables require the user's own admitted files;
++they read those files and do not execute or distribute them. Native profile
++checks do not replace game testing on either store.
++
++Original KEO source: https://github.com/jacobericson/KEO
++KenshiQOL by Steel distributes its source with the original mod:
++https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830
++See LICENSE and the Steel provenance files. The source archive contains the
++modification sources and build scripts; README_UPSTREAM.md preserves the
++original author's documentation separately from the current release guide.
+diff --git a/README.md b/README.md
+index 5112f39..c6b5be8 100644
+--- a/README.md
++++ b/README.md
+@@ -1,239 +1,147 @@
+-# KEO: Kenshi Engine Optimizations
++# KEO (MCM fork) (QoL) - release 1
+ 
+-> **Temporary maintenance fork / Временный сопровождающий форк.**
+-> Original KEO by **jacobericson**. Thank you for the original optimizations and
+-> source release. [Original mod](https://steamcommunity.com/sharedfiles/filedetails/?id=3802456502)
+-> · **Original source:** [jacobericson/KEO](https://github.com/jacobericson/KEO).
+-> This local fork maintains bug fixes and interface/accessibility compatibility;
+-> it is not an independent feature-development branch. If the original author
+-> returns and continues development, our version will be withdrawn to avoid
+-> confusing players. No local candidate described below is a published release.
+->
+-> Автор оригинала KEO — **jacobericson**. Спасибо автору за оптимизации и открытые
+-> исходники. Этот временный форк предназначен для исправления ошибок и
+-> совместимости интерфейса/доступности, а не отдельного развития возможностей.
+-> Если автор вернётся и продолжит разработку, наша версия будет снята, чтобы
+-> не путать игроков. Описанная ниже локальная сборка ещё не опубликована.
+-
+-## THIS MOD IS STILL IN BETA
+-
+-> **Beta.** This mod is still in testing. Stability is not guaranteed.
+-
+-A performance and stability mod for Kenshi, built as an RE_Kenshi plugin.
+-
+-KEO makes moving between areas of the map smoother. It loads areas before your squads reach them, gets pathing for new ground ready sooner, and adds frame-rate optimizations that you can switch on and off individually.
+-
+-- **Area transitions:** about 94 % faster on a first visit (2.5 s → 0.15 s on average), with the world no longer freezing while you travel (58 s of freeze over a test walk → none).
+-- **Frame rate:** 13 to 19 fps higher in a swamp, 4 to 7 fps in a town, and 1.5 to 10 fps in a crowded desert town, with every render optimization on against all of them off.
+-
+-## Features
+-
+-- **Faster area loading.** Areas around your camera and your squads are loaded ahead of time, so crossing into a new one is much quicker.
+-- **Pathing ready sooner.** Walkable ground for a new area is prepared faster and saved to disk, so an area you have visited before is ready right away.
+-- **Route planning for long orders.** A move order across several areas is planned over the whole map before your squad sets off, so it crosses area borders without zig-zags or doubling back, and each next stretch of the route is ready before your squad reaches the border.
+-- **Water and acid on routes.** Routes weigh water by each character's own swimming speed and keep characters out of acidic water that would burn them.
+-- **Better squad movement.** A squad running together gathers on one route and arrives together, a move order onto a building stops at its door, and long move orders the game drops partway are re-issued.
+-- **Higher frame rate.** Render and particle optimizations. Any change that causes a noticeable drop in quality is off by default.
+-- **Stability fixes** for several of the vanilla bugs and crashes.
+-- **KEO tab** in the game's Options window, grouped into sections like the game's own tabs, with an **in-game benchmark** that measures the frame-rate optimizations on your own machine.
+-
+-## Requirements
+-
+-- Kenshi 1.0.65 (Steam baseline). The exact pinned GOG1.0.65 build is an offline-verified, gameplay-unverified candidate; see the native-profile limitations below.
+-- [RE_Kenshi](https://github.com/BFrizzleFoShizzle/RE_Kenshi) ([Nexus](https://www.nexusmods.com/kenshi/mods/847)) 0.3.5 or later.
+-
+-## Installation
+-
+-- **[Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3802456502):** subscribe, and enable the mod in the launcher.
+-- **Manual:** download the latest release, copy the `KEO` folder into Kenshi's `mods\` directory, and launch Kenshi through the RE_Kenshi launcher.
+-
+-## Configuration
+-
+-Every setting is optional and has a default. Use one of these editors:
+-
+-- the **Mod Config Menu → KEO** page when MCM is installed;
+-- the original **Options → KEO** tab when MCM is unavailable;
+-- `KEO.ini` in the mod folder, where each setting is explained above its line. Some settings take effect only after a restart; the file says which.
+-
+-If you used an earlier version, your settings in `KenshiZoneOpt.ini` are carried into `KEO.ini` once, on the first launch, and the old file is kept as `KenshiZoneOpt.ini.imported`.
+-
+-## Optional carried weight (unpublished candidate)
+-
+-**Carried body and container weight** is OFF by default and requires restart.
+-It includes contents of loose carried containers and carried characters, and
+-scales body weight by race, age/size and hunger (robots use higher density).
+-Native worn-backpack weight reductions remain in effect. Loaded `KenshiQOL.dll`
+-disables the option regardless of its toggle; choose one weight implementation
+-and restart. Game-session performance, UI and save/load acceptance are pending.
+-
+-Adapted from **KenshiQOL by Steel**. Thank you to Steel for the original feature
+-and source release. [Original mod](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830).
+-**Original source:** bundled `src/KenshiQOL/KenshiQOL.cpp` distributed with the
+-original; [author's source-release comment](https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830).
+-No separate source repository is verified. Provenance: `leopard/carried_weight/ORIGIN.md`;
+-GPLv3: `LICENSE`.
+-
+-### Переносимый вес (неопубликованный кандидат)
+-
+-**Вес переносимых тел и контейнеров** по умолчанию выключен; нужен перезапуск.
+-Учитывает содержимое переносимых контейнеров и персонажей, а вес тела меняет по
+-расе, возрасту/размеру и голоду; у роботов выше плотность. Штатное снижение веса
+-надетых рюкзаков сохраняется. При загруженной `KenshiQOL.dll` функция отключается
+-независимо от настройки того плагина: оставьте один расчёт веса и перезапустите игру.
+-Игровые проверки производительности, интерфейса и загрузки сохранений ещё впереди.
+-
+-Перенесено из **KenshiQOL автора Steel**. Спасибо Steel за оригинальную возможность
+-и исходники. [Оригинал](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830).
+-**Исходники оригинала:** `src/KenshiQOL/KenshiQOL.cpp` в поставке оригинала;
+-[комментарий автора](https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830).
+-Отдельный репозиторий не подтверждён. Происхождение: `leopard/carried_weight/ORIGIN.md`;
+-GPLv3: `LICENSE`.
+-
+-## Maintenance settings and diagnostics (unpublished)
+-
+-The MCM page offers the original 20 player settings, optional carried weight,
+-and three independent job switches, followed by **Detailed log**
+-(`Debug=false`). MCM saves requested preferences separately from startup
+-restrictions, uses its standard restart markers, and applies live settings only
+-on an admitted runtime. Unsupported builds may save preferences for a later
+-start, but never enter native locale/game calls from the page. The original KEO
+-settings tab remains a fallback. Both editors preserve unrelated INI lines.
+-
+-The interface and validation messages are supplied in **English, Russian and
+-Simplified Chinese** (`en_GB`, `ru_RU`, `zh_CN`). Source PO catalogs stay in the
+-repository; native builds compile and include only `locale/*/LC_MESSAGES/keo.mo`.
+-The shared loader loads once on the admitted UI thread. Returned strings remain
+-valid for the session; enabling Detailed log later replays its cached load
+-summary without reopening catalogs or replacing their strings.
+-
+-Detailed log is **off by default in both DEV and PROD** and changes immediately.
+-It gates diagnostic producers and expensive report scans/formatting. Existing
+-per-feature diagnostic options remain available and still determine their own
+-recording modes. Errors, guarded native faults, fatal captures and bounded
+-worker-retirement evidence remain independent. Queue storage stays bounded;
+-main-thread flushing retains the original thread restrictions. Disabled logging
+-continues zone-retention refresh/release, render counter drains, particle timeout
+-restoration, shader-copy cleanup and world/save-load maintenance. Optional DEV
+-movement-trace storage is cleared while detailed logging is off.
++## English
+ 
+-`KEO.ini` remains the detailed reference for original advanced settings. Enabling
+-diagnostics can change timing and is intended for a diagnostic session. Existing
+-performance figures above are the original author's results, not measurements of
+-this maintenance candidate. Static review/host tests do not establish in-game
+-FPS, skin layout, route behavior or absence of all memory leaks.
++A temporary maintenance fork of **KEO by jacobericson**. Thank you to the original author for the optimizations and public source release.
+ 
+-Priority 45 for an eligible player order is now initialized before the native
+-input queue publishes the request. Admission requires the exact supported native
+-contract and all three hooks; refused admission retains the native priority.
+-Nested and exceptional calls restore their prior context. NPC requests, routing
+-OFF, group/water settings and the separate request-local search budget keep their
+-existing behavior. The optional bounded module-census summary is detailed output;
+-its raw and curated tables and crash attribution are unchanged.
+-
+-### Локальные изменения сопровождения (ещё не опубликованы)
++- [Original KEO](https://steamcommunity.com/sharedfiles/filedetails/?id=3802456502)
++- **Original source:** [jacobericson/KEO](https://github.com/jacobericson/KEO)
+ 
+-- Добавлена страница **Mod Config Menu → KEO** с 20 исходными игровыми настройками
+-  и последним переключателем **«Подробный журнал»**. При отсутствии MCM работает
+-  исходная вкладка **Настройки → KEO**. Изменяются только выбранные строки INI.
+-- Сохраняются запрошенные значения, даже если текущая сборка запрещает их
+-  применение; MCM сам отмечает настройки, требующие перезапуска. Живые изменения
+-  применяются только после допуска игры; проверка значений и ошибки переведены.
+-- Интерфейс поддерживает русский, английский и упрощённый китайский. В сборке
+-  только MO; PO остаются в исходниках. Каталог загружается один раз в потоке UI;
+-  включение журнала позже показывает сохранённую сводку без повторной загрузки.
+-- Подробный журнал по умолчанию выключен в DEV и PROD, переключается без
+-  перезапуска. Ошибки, аварийные записи и ограниченный журнал завершения рабочих
+-  потоков остаются доступны. Существующие подробные диагностические режимы
+-  сохранены; служебные сообщения и дорогие отчёты подчиняются `Debug`.
+-- При выключенном журнале продолжаются очистка графических ресурсов,
+-  обслуживание удерживаемых зон и освобождение записей, обработка смены мира и
+-  загрузки сохранения. Диагностические данные трассировки движения освобождаются.
+-
+-Приоритет 45 подходящего приказа игрока теперь задаётся до передачи запроса в
+-исходную очередь. Для допуска нужны проверенный код поддерживаемой игры и все три
+-перехвата; при отказе остаётся исходный приоритет. Вложенные вызовы и исключения
+-восстанавливают прежний контекст. Поведение NPC, отключённой маршрутизации,
+-групповых и водных настроек и отдельный бюджет текущего поиска сохраняются.
+-Необязательная сводка ограниченного списка модулей относится к подробному журналу;
+-таблицы и определение модуля при аварии не меняются.
+-
+-Эта заметка относится к локальной подготовке, а не выпуску. Указанные выше
+-замеры скорости принадлежат оригинальному автору. Проверки исходников и тесты
+-вне игры не подтверждают FPS, отсутствие любых утечек, раскладку на разных
+-скинах или полное устранение остановок персонажей. Для GOG 1.0.65 подготовлен
+-отдельный нативный профиль: запуск и игровой результат ещё должны подтвердить тестеры.
+-
+-## Optional jobs from KenshiQOL (private test)
+-
+-Thanks to **Steel**, author of [KenshiQOL](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830).
+-**Original source:** the `src` folder distributed with the original mod; see `ORIGIN_Steel_jobs.md` in the test package for attribution and integration details. No separate source repository is verified.
+-
+-All three switches are under **MCM → KEO → Backpacks and jobs**, independently OFF by default. They change during play. Disabling one keeps its queued job rows and pauses its execution; it does not clear other orders. Do not enable the original KenshiQOL alongside these features.
+-
+-- **Gather Output:** right-click a machine with an output inventory and choose **Gather output**. SHIFT adds it to the ordinary Jobs queue. Uses native collection and movement.
+-- **Stock Counter:** right-click your own shop counter and choose **Stock shop counter**. SHIFT makes it a recurring job. Deposits carried products from assigned Gather Output machines; without such machine jobs, uses native resource classification. This is stocking, not selling: no money changes hands. Filled or incompatible counters are skipped. Unequipped ordinary inventory grids are supported; foreign ownership and custom inventory callbacks are conservatively refused.
+-- **Cyclic waypoints:** with its switch ON, SHIFT + right-click on open ground appends a waypoint for the characters selected at that click. The ordinary Jobs panel supports reordering and removal. Rows show coordinates; native saves retain the route. Existing ordinary movement orders are unaffected when this feature is OFF. Up to64 points per character are accepted.
+-
+-Use a separate test save for the first collection → counter delivery → save/load check. Offline checks passed; this is not yet an in-game acceptance claim.
+-
+-### Задания из KenshiQOL (закрытый тест)
+-
+-Спасибо **Steel**, автору оригинального KenshiQOL. **Исходники оригинала:** папка `src` в поставке мода по ссылке выше; подробное происхождение кода - в `ORIGIN_Steel_jobs.md` тестового пакета.
+-
+-Три отдельных переключателя находятся в **MCM → KEO → Рюкзаки и работа**. По умолчанию выключены, меняются без перезапуска. Выключение сохраняет строки в очереди и приостанавливает соответствующее задание. Оригинальный KenshiQOL одновременно включать не нужно.
+-
+-- **Забирать продукцию:** ПКМ по машине с выходным инвентарём, затем одноимённая команда. SHIFT добавляет постоянное задание в штатную очередь.
+-- **Пополнять прилавок:** ПКМ по собственному торговому прилавку. SHIFT добавляет постоянное задание. Переносятся продукты машин из задач сбора, а без таких задач - штатные ресурсы. Это пополнение запасов, не денежная продажа. Заполненный прилавок не вызывает потери предметов. Пока принимаются обычные ненадетые ячейки инвентаря; чужая собственность и нестандартные обработчики инвентаря отклоняются.
+-- **Маршрут по точкам:** при включённой опции SHIFT + ПКМ по земле добавляет точки выбранным в этот момент персонажам. Точки видны в штатном списке задач, переставляются и удаляются там же; сохраняются с игрой. До64 точек на персонажа. При выключенной опции обычные приказы движения сохраняют прежнее поведение.
+-
+-Первую проверку сбора, переноса и сохранения/загрузки проводить в отдельном тестовом слоте. Проверки вне игры пройдены; игровой результат ещё нужно подтвердить.
+-
+-## Known defects
+-
+-- **GOG candidate is unverified in game.** The fork has an exact native GOG1.0.65 profile, not a startup-only stub. Only the supplied RE_Kenshi-compatible EXE (SHA256 `2defc287c813798b9682b93acf68d340da895cf5164d342145ba0faeb9024681`) and the pinned KenshiLib0.5.0 DLL (SHA256 `5b6240622d06801dc39896e385efb834b8e1fe2fcdf86067d071ae7a04f6c83b`) are accepted. Unknown files stay inactive. Offline byte and host tests are not a GOG gameplay test. The optional PhysX caller-role diagnostic reports GOG EXE callers as unknown; native calls and gameplay are unaffected.
+-- **Long move orders can still stop short.** Now and then a squad on a long order stops before its destination; giving the order again continues it.
+-
+-## Bug reports
+-
+-If you run into a problem, [open an issue](../../issues/new) and include:
+-
+-- enable **Detailed log**, reproduce the problem, then include `KEO.log` and,
+-  if present, `crash_dump.txt`, both from the mod's folder;
+-- `RE_Kenshi_log.txt`, from the Kenshi game directory;
+-- the list of other mods you have enabled;
+-- what you were doing when it happened (crossing into a new area, a long move order, loading a save, …).
++This fork is a temporary measure to maintain bug fixes, MCM configuration and supported Steam/GOG compatibility. It is not intended as a separately developed successor. If the original author returns and continues development, we will remove our version to avoid confusing players.
+ 
+-## Building from source
++### Features and settings
+ 
+-Requires Visual Studio 2010 (v100 x64 toolset, default install path), Python 3.7 or later, the [KenshiLib v0.5.1](https://github.com/BFrizzleFoShizzle/KenshiLib/releases/tag/v0.5.1) release archive and the Boost 1.60.0 headers.
++KEO retains the original area preloading, path preparation, route planning, squad movement, rendering options, gameplay fixes and backpack handling. These features belong to the original author. Use **MCM > KEO** to configure them; without MCM, the original **Options > KEO** tab remains available. The interface supports English, Russian and Simplified Chinese. Other game-interface languages use English.
+ 
+-```bat
+-set KENSHILIB=C:\path\to\KenshiLib
+-set BOOST_ROOT=C:\path\to\boost_1_60_0
+-build_opt_step4.bat
+-```
++The settings are grouped as follows:
+ 
+-Catalogs can be compiled separately with `python tools/localization/compile_catalogs.py --output build/locale`; no third-party gettext tool is needed.
++- **Zone loading:** preloading, path-preparation workers, retained area radii and limits, route look-ahead, and the disk-cache limit.
++- **Performance:** particle and scenery processing budgets. No fixed FPS gain is promised.
++- **Squad movement:** optional KEO routing, group cohesion, gathering pace, resuming move orders after combat and route-planner mode. Swimming and dangerous water affect route choices. Long trips may still stop short; a repeated move order can continue them.
++- **Gameplay fixes:** player-building ownership, repeated throw-out handling and paths around walls. Native city path-readiness checks are retained when areas reload.
++- **Backpacks and jobs:** backpack handling, the operator's maximum collection load, optional carried weight and three independent jobs.
++- **Logging:** Detailed log is last and OFF by default. Errors remain visible. Enable it to reproduce a report, then disable it after collecting the logs.
+ 
+-The mod is built into `build\KEO_step4_prod\`. To install it, copy that folder into Kenshi's `mods\` directory. `build.bat` builds the optional `KEOProfiler` diagnostics plugin into `build\KEOProfiler\`, and `tools\tests\build_tests.bat` runs the unit tests. Builds reuse unchanged objects from a cache under `%LOCALAPPDATA%\KEO\objcache` (`KEO_CACHE_DIR` moves it, `BUILD_CACHE=off` makes a clean build); deleting it is always safe.
++MCM marks settings requiring a restart. The carried-weight option requires one; the three job switches take effect during play. Advanced settings are documented in the packaged `KEO.defaults.ini` template. KEO creates your personal `KEO.ini` for configuration. Preserve that personal file when updating.
+ 
+-## License
++### Optional carried weight and jobs
+ 
+-GPL-3.0; see [LICENSE](LICENSE).
++This package combines KEO with useful features adapted from **KenshiQOL by Steel**. Thank you to Steel for releasing the original features and source.
+ 
++- [Original KenshiQOL](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830)
++- **Original source:** the `src` folder distributed with that mod, including `KenshiQOL.cpp` and `TaskTypeFactoryPatch.h`. [Original distribution/source release](https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830). A separate source repository has not been verified.
+ 
+-### Maintenance rollback / Откат экспериментов, 05.11.2026
++All four additions are **OFF by default**. Enable the required ones under **Backpacks and jobs**.
+ 
+-The Squin crowd was reproduced with KEO and KEOCompat absent from the running
+-process. The two experimental spawn-related readiness/activation changes have
+-therefore been removed. Native feature code is restored exactly to 5f68039;
+-MCM integration, shorter RU/EN/ZH labels, and the earlier navmesh/pathfinding
+-corrections are retained. This does not identify the cause of the observed crowd
+-or claim any spawn fix. Already displaced saved actors are not changed.
++**Carried body and container weight** counts the contents of loose carried containers and carried characters. Body weight follows race, age/size and hunger. Worn-backpack weight reductions remain in effect. Restart after changing this option.
+ 
+-Толпа у Скуина воспроизвелась при фактическом отсутствии KEO и KEOCompat в
+-процессе игры. Два экспериментальных изменения готовности/активации против
+-этого спавна удалены. Native-код возвращён точно к состоянию 5f68039; MCM,
+-короткие подписи RU/EN/ZH и прежние исправления навмеша/маршрутизации сохранены.
+-Причина толпы этим не установлена; исправление спавна не заявляется. Ранее
+-сохранённые позиции персонажей не меняются.
++**Gather output:** use a production machine's right-click command; SHIFT adds a standing job. Assign several machines to the same collector. This uses ordinary production output rather than creating new items.
++
++**Stock shop counter:** use the right-click command on your own shop counter; SHIFT adds a standing job. It delivers carried items matching products from assigned Gather Output machines. Without those assignments, it uses the game's resource classification. Assign both collection and stocking to supply a counter from production. This does not fetch arbitrary equipment from storage, make a monetary trade, or generate income. Equipped gear is not stock. Full/incompatible counters are skipped; a transfer error stops this stocking operation rather than repeatedly retrying it.
++
++**Waypoint route:** SHIFT + right-click on open ground appends a point for the characters selected at that click. Each point is an ordinary Jobs-panel row with coordinates. Drag rows to reorder them or remove individual rows to change the route. The route loops and is saved with the game. Up to 64 points per character are accepted. Turning the feature off pauses it without deleting the queued rows. Ordinary movement remains available when it is off.
++
++Use a separate save for the first collection-to-counter test. The cyclic route and its restoration through ordinary save/load were confirmed in the local Steam test. Physical collection/counter delivery, every mod combination and long-session performance are not claimed universally verified.
++
++### Installation and compatibility
++
++1. Install **RE_Kenshi 0.3.5 or later** and a supported **Kenshi 1.0.65** installation. [RE_Kenshi](https://www.nexusmods.com/kenshi/mods/847).
++2. Disable the original KEO and KenshiQOL. Use one KEO implementation at a time.
++3. Extract the `KEO` folder into the game's `mods` directory and enable it in the Kenshi launcher. Use the RE_Kenshi launch method for your installation.
++4. Install Mod Config Menu if you want its settings page. MCM is optional; default settings and the fallback KEO tab work without it.
++
++One DLL selects the supported Steam/GOG profile automatically. Matching RE_Kenshi/KenshiLib files are required. The GOG profile currently accepts the verified RE_Kenshi-compatible GOG 1.0.65 executable and **KenshiLib 0.5.0**. Other executables or SDK files are refused rather than treated as a known build. Game executables and SDK DLLs are not bundled.
++
++GOG works on the supported build, but has not been comprehensively tested. Startup of an earlier GOG candidate was confirmed by a player. The complete current release feature set has not been retested on GOG, so broader GOG gameplay feedback is still needed. This is not a claim that every GOG revision works.
++
++Do not run the original KenshiQOL alongside the weight/jobs integration. Existing routes use ordinary saved job records; a world import is not a promise to preserve those records. Do not overwrite personal settings with a template during an update.
++
++### Reporting a problem
++
++Enable Detailed log, reproduce once, then provide the mod-folder `KEO.log`, the game's `RE_Kenshi_log.txt`, and `crash_dump.txt` if present. Include the store/version, active mod list and exact steps. Do not infer the responsible mod from a nearby log line alone.
++
++### Release 1 changes
++
++- First maintenance fork of KEO with optional MCM configuration, English/Russian/Simplified Chinese interface, and detailed logging off by default.
++- Steam and GOG are supported in one package. GOG works, with startup confirmed on an earlier candidate; broad testing of the current gameplay features is not complete.
++- Corrected route ownership for selected actors outside the formation limit, stale route-point application, and handling of native path readiness when cities reload.
++- Optional carried-body/container weight and three independently switched jobs adapted from Steel's KenshiQOL: Gather Output, Stock Shop Counter and cyclic waypoints. All are off by default.
++- Cyclic routes use ordinary job rows, retain distinct points and survive normal saving/loading. Counter stocking physically delivers items and does not create a sale or income.
++
++### License and corresponding source
++
++GPL-3.0; see `LICENSE`. Attribution/provenance files accompany the package. Corresponding source and build scripts for this release are provided separately as **`KEO-1-source.zip`** alongside the release. The original KEO and KenshiQOL source links above identify the authors' code; this package contains a modified integration.
++
++---
++
++## Русский
++
++Временный сопровождающий форк **KEO автора jacobericson**. Спасибо автору за оптимизации и открытые исходники.
++
++- [Оригинальный KEO](https://steamcommunity.com/sharedfiles/filedetails/?id=3802456502)
++- **Исходники оригинала:** [jacobericson/KEO](https://github.com/jacobericson/KEO)
++
++Это вынужденная временная мера для исправления ошибок, настройки через MCM и совместимости поддерживаемых сборок Steam/GOG. Отдельного преемника мы не развиваем. Если автор вернётся и продолжит разработку, наша версия будет удалена, чтобы не путать игроков.
++
++### Возможности и настройки
++
++Сохранены исходные возможности автора: предварительная загрузка местности, подготовка путей, планирование маршрутов, движение отрядов, графические оптимизации, игровые правки и работа с рюкзаками. Настраиваются в **MCM > KEO**; без MCM остаётся исходная вкладка **Настройки > KEO**. Интерфейс поддерживает русский, английский и упрощённый китайский; для остальных языков используется английский.
++
++Группы настроек:
++
++- **Загрузка местности:** предварительная подгрузка, потоки подготовки путей, радиусы и лимиты удерживаемых областей, подготовка маршрута вперёд и размер дискового кэша.
++- **Производительность:** бюджеты обработки частиц и окружения. Фиксированный прирост FPS не обещается.
++- **Движение отряда:** маршрутизация KEO, согласованное движение, темп сбора группы, возобновление движения после боя и режим планировщика. При выборе пути учитываются плавание и опасная вода. Дальние переходы ещё могут прерываться; повторный приказ помогает продолжить движение.
++- **Игровые исправления:** принадлежность построек игрока, повторяющийся вынос нарушителей и пути возле стен. При повторной загрузке городов сохраняются штатные проверки готовности пути.
++- **Рюкзаки и работа:** работа с рюкзаками, предел нагрузки перед доставкой, переносимый вес и три независимых задания.
++- **Журнал:** последний переключатель, по умолчанию выключен. Ошибки остаются видимыми. Включайте подробный журнал для воспроизведения проблемы и выключайте после сбора данных.
++
++MCM отмечает параметры, которым нужен перезапуск. Переносимый вес требует перезапуска; три задания включаются и выключаются во время игры. Расширенные настройки описаны в шаблоне `KEO.defaults.ini` из пакета. KEO создаёт личный файл настроек `KEO.ini`; сохраняйте его при обновлении.
++
++### Необязательный вес и задания
++
++В одном пакете с KEO объединены полезные функции **KenshiQOL автора Steel**. Спасибо Steel за исходные возможности и предоставленный код.
++
++- [Оригинальный KenshiQOL](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830)
++- **Исходники оригинала:** папка `src` в поставке мода, в том числе `KenshiQOL.cpp` и `TaskTypeFactoryPatch.h`. [Поставка/публикация исходников автора](https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830). Отдельный репозиторий не подтверждён.
++
++Все четыре добавления **по умолчанию выключены**. Включайте нужные в разделе **Рюкзаки и работа**.
++
++**Вес переносимых тел и контейнеров** учитывает содержимое переносимых контейнеров и персонажей. Вес тела зависит от расы, возраста/размера и голода. Снижение веса надетым рюкзаком сохраняется. После изменения нужен перезапуск.
++
++**Забирать продукцию:** команда ПКМ производственной машины; с SHIFT добавляется постоянная задача. Несколько машин можно назначить одному сборщику. Используется настоящая продукция машин, новые предметы не создаются.
++
++**Пополнять прилавок:** команда ПКМ собственного торгового прилавка; с SHIFT добавляется постоянная задача. Доставляются имеющиеся у работника предметы, соответствующие продуктам назначенных задач сбора. Без таких задач используется штатная классификация ресурсов. Для доставки от производства назначьте и сбор, и пополнение. Произвольные вещи из хранилищ не забираются; денежная сделка и доход не создаются. Надетое снаряжение не является товаром. Заполненные и несовместимые прилавки пропускаются; ошибка переноса останавливает эту операцию вместо повторяющихся попыток.
++
++**Маршрут по точкам:** SHIFT + ПКМ по свободной земле добавляет точку выбранным в этот момент персонажам. Каждая точка - обычная строка задач с координатами. Перетаскивайте строки для смены порядка или удаляйте отдельные точки. Маршрут зациклен и сохраняется вместе с игрой. До 64 точек на персонажа. Выключение приостанавливает его, сохраняя строки. При выключенной функции обычное передвижение доступно как прежде.
++
++Первую проверку сбора и доставки выполняйте в отдельном сейве. Циклический маршрут и восстановление при обычном сохранении/загрузке подтверждены локальным тестом Steam. Физический цикл сбора/пополнения, все сочетания модов и производительность долгих сессий не заявляются универсально проверенными.
++
++### Установка и совместимость
++
++1. Установите **RE_Kenshi 0.3.5 или новее** для поддерживаемой **Kenshi 1.0.65**. [RE_Kenshi](https://www.nexusmods.com/kenshi/mods/847).
++2. Отключите оригинальный KEO и KenshiQOL. Используйте одну реализацию KEO.
++3. Распакуйте папку `KEO` в игровой каталог `mods`, включите мод в лаунчере Kenshi и запускайте игру способом, предусмотренным RE_Kenshi для вашей установки.
++4. Для страницы настроек установите Mod Config Menu. Он необязателен: без него действуют значения по умолчанию и исходная вкладка KEO.
++
++Одна DLL автоматически выбирает поддерживаемый профиль Steam/GOG. Нужны соответствующие RE_Kenshi/KenshiLib. Для GOG сейчас допускается проверенный совместимый с RE_Kenshi исполняемый файл GOG 1.0.65 и **KenshiLib 0.5.0**. Другие файлы игры и SDK не принимаются за заведомо совместимые. Исполняемые файлы игры и DLL библиотеки в пакет не входят.
++
++GOG работает на поддерживаемой сборке, но ещё не прошёл всестороннюю проверку. Запуск более раннего кандидата GOG подтверждён игроком. Полный нынешний набор возможностей повторно на GOG ещё не проверен; нужны отзывы по игровому поведению. Совместимость со всеми редакциями GOG этим не заявляется.
++
++Оригинальный KenshiQOL одновременно с перенесёнными весом/заданиями не запускайте. Маршруты хранятся в обычных записях задач; импорт мира не гарантирует сохранность таких записей. При обновлении не заменяйте личные настройки шаблоном.
++
++### Сообщение о проблеме
++
++Включите подробный журнал, воспроизведите проблему один раз и приложите `KEO.log` из папки мода, игровой `RE_Kenshi_log.txt` и `crash_dump.txt`, если он есть. Укажите магазин/версию, список модов и точные действия. Ближайшая строка журнала сама по себе не доказывает виновника ошибки.
++
++### Изменения выпуска 1
++
++- Первый сопровождающий форк KEO: необязательная настройка через MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию.
++- Steam и GOG поддерживаются одним пакетом. GOG работает: запуск более ранней сборки подтверждён, но широкая проверка нынешних игровых возможностей ещё не завершена.
++- Исправлены старое управление маршрутом у персонажей сверх лимита группы, применение устаревшей точки пути и обработка штатной готовности пути при повторной загрузке городов.
++- Необязательный вес переносимых тел/контейнеров и три отдельных задания из KenshiQOL автора Steel: сбор продукции, пополнение прилавка и циклический маршрут. По умолчанию выключены.
++- Циклический маршрут использует обычные строки задач, различает отдельные точки и сохраняется при обычном сохранении/загрузке. Пополнение прилавка физически переносит вещи и не создаёт сделку или доход.
++
++### Лицензия и соответствующие исходники
++
++GPL-3.0, файл `LICENSE`. Файлы авторства и происхождения кода входят в пакет. Соответствующие исходники и скрипты сборки этого выпуска предоставлены отдельно в **`KEO-1-source.zip`** рядом с выпуском. Ссылки на исходные KEO и KenshiQOL выше указывают код авторов; в этом пакете содержится изменённая интеграция.
+diff --git a/README_UPSTREAM.md b/README_UPSTREAM.md
+new file mode 100644
+index 0000000..b9b5def
+--- /dev/null
++++ b/README_UPSTREAM.md
+@@ -0,0 +1,72 @@
++# KEO: Kenshi Engine Optimizations
++
++## THIS MOD IS STILL IN BETA
++
++> **Beta.** This mod is still in testing. Stability is not guaranteed.
++
++A performance and stability mod for Kenshi, built as an RE_Kenshi plugin.
++
++KEO makes moving between areas of the map smoother. It loads areas before your squads reach them, gets pathing for new ground ready sooner, and adds frame-rate optimizations that you can switch on and off individually.
++
++- **Area transitions:** about 94 % faster on a first visit (2.5 s → 0.15 s on average), with the world no longer freezing while you travel (58 s of freeze over a test walk → none).
++- **Frame rate:** 13 to 19 fps higher in a swamp, 4 to 7 fps in a town, and 1.5 to 10 fps in a crowded desert town, with every render optimization on against all of them off.
++
++## Features
++
++- **Faster area loading.** Areas around your camera and your squads are loaded ahead of time, so crossing into a new one is much quicker.
++- **Pathing ready sooner.** Walkable ground for a new area is prepared faster and saved to disk, so an area you have visited before is ready right away.
++- **Route planning for long orders.** A move order across several areas is planned over the whole map before your squad sets off, so it crosses area borders without zig-zags or doubling back, and each next stretch of the route is ready before your squad reaches the border.
++- **Water and acid on routes.** Routes weigh water by each character's own swimming speed and keep characters out of acidic water that would burn them.
++- **Better squad movement.** A squad running together gathers on one route and arrives together, a move order onto a building stops at its door, and long move orders the game drops partway are re-issued.
++- **Higher frame rate.** Render and particle optimizations. Any change that causes a noticeable drop in quality is off by default.
++- **Stability fixes** for several of the vanilla bugs and crashes.
++- **KEO tab** in the game's Options window, grouped into sections like the game's own tabs, with an **in-game benchmark** that measures the frame-rate optimizations on your own machine.
++
++## Requirements
++
++- Kenshi 1.0.65 (Steam).
++- [RE_Kenshi](https://github.com/BFrizzleFoShizzle/RE_Kenshi) ([Nexus](https://www.nexusmods.com/kenshi/mods/847)) 0.3.5 or later.
++
++## Installation
++
++- **[Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3802456502):** subscribe, and enable the mod in the launcher.
++- **Manual:** download the latest release, copy the `KEO` folder into Kenshi's `mods\` directory, and launch Kenshi through the RE_Kenshi launcher.
++
++## Configuration
++
++Every setting is optional and has a default. There are two ways to change one:
++
++- the **Options → KEO** tab in game;
++- `KEO.ini` in the mod folder, where each setting is explained above its line. Some settings take effect only after a restart; the file says which.
++
++If you used an earlier version, your settings in `KenshiZoneOpt.ini` are carried into `KEO.ini` once, on the first launch, and the old file is kept as `KenshiZoneOpt.ini.imported`.
++
++## Known defects
++
++- **GOG version not supported.** On the GOG build of Kenshi, KEO stays inactive: it detects the version at startup and changes nothing.
++- **Long move orders can still stop short.** Now and then a squad on a long order stops before its destination; giving the order again continues it.
++
++## Bug reports
++
++If you run into a problem, [open an issue](../../issues/new) and include:
++
++- `KEO.log` and, if present, `crash_dump.txt`, both from the mod's folder;
++- `RE_Kenshi_log.txt`, from the Kenshi game directory;
++- the list of other mods you have enabled;
++- what you were doing when it happened (crossing into a new area, a long move order, loading a save, …).
++
++## Building from source
++
++Requires Visual Studio 2010 (v100 x64 toolset, default install path), Python 3.7 or later, the [KenshiLib v0.5.1](https://github.com/BFrizzleFoShizzle/KenshiLib/releases/tag/v0.5.1) release archive and the Boost 1.60.0 headers.
++
++```bat
++set KENSHILIB=C:\path\to\KenshiLib
++set BOOST_ROOT=C:\path\to\boost_1_60_0
++build_opt_step4.bat
++```
++
++The mod is built into `build\KEO_step4_prod\`. To install it, copy that folder into Kenshi's `mods\` directory. `build.bat` builds the optional `KEOProfiler` diagnostics plugin into `build\KEOProfiler\`, and `tools\tests\build_tests.bat` runs the unit tests. Builds reuse unchanged objects from a cache under `%LOCALAPPDATA%\KEO\objcache` (`KEO_CACHE_DIR` moves it, `BUILD_CACHE=off` makes a clean build); deleting it is always safe.
++
++## License
++
++GPL-3.0; see [LICENSE](LICENSE).
+-- 
+2.46.0.windows.1
+

@@ -1,0 +1,45 @@
+{
+  "version": "1",
+  "status": "prepared_not_published",
+  "time_msk": "2026-11-05T08:35:19.623355+03:00",
+  "binary_code_commit": "7609b76e125ab0709a804325fc7e631064875eeb",
+  "source_archive_commit": "d0de2d19f3ba88d9315dcfafa361507fe89ab288",
+  "code_change": "No new runtime changes: release packaging of the already built and locally accepted readiness fix; current pathfinding investigation explicitly deferred by owner.",
+  "archives": [
+    {
+      "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\KEO-1.zip",
+      "bytes": 815984,
+      "sha256": "056ce5221db971e0ee9fde0b98378174191f77a371197a88f1e8cb9bcb72e16f",
+      "crc": "passed"
+    },
+    {
+      "path": "D:\\DEV\\Kenshi\\workshop\\nexus\\KEO-1-source.zip",
+      "bytes": 3061560,
+      "sha256": "70f529b29ed60464e9438e57e87e466e75d243c4eee1dd0ab10c70a1a88ac309",
+      "crc": "passed"
+    }
+  ],
+  "source_files": 1041,
+  "runtime_files": 11,
+  "art": {
+    "steam": {
+      "path": "D:\\DEV\\Kenshi\\workshop\\steam-covers\\KEO\\000_LEOPARD_Steam_Cover.png",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "sha256": "143aa10da68898f6f1036fd7a76a2f198f08c4f9c083b9562ae7cb8dda0353ac"
+    },
+    "nexus": {
+      "path": "D:\\DEV\\Kenshi\\workshop\\images\\KEO\\000_LEOPARD_Nexus_Cover.png",
+      "pixels": [
+        1672,
+        941
+      ],
+      "sha256": "ca8d4c1d25d4fc74ef48846bf47677f12f1dc739b006c80b9c5bc0a008ed4132"
+    }
+  },
+  "screenshots": "Two generated covers ready; no gameplay screenshots supplied for this fork.",
+  "gog": "Earlier test candidate accepted by tester; unified current code verified against pinned native Steam/GOG contracts, broad gameplay not tested.",
+  "publication": "Nexus by owner first; Steam content prepared only. No publication and no ALL_CHANGELOG_MODS entry."
+}

@@ -1625,5 +1625,66 @@
     "nexus_url": "https://www.nexusmods.com/kenshi/mods/2265",
     "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831174059",
     "published_version": "1"
+  },
+  "KEO": {
+    "name": "KEO: Kenshi Engine Optimizations",
+    "author": "Jakematt2004 (jacobericson)",
+    "original_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3802456502",
+    "source_url": "https://github.com/jacobericson/KEO",
+    "source_note": {
+      "en": "Original source code is available in the linked repository.",
+      "ru": "Исходный код оригинала доступен в указанном репозитории."
+    },
+    "version": "1",
+    "changes": {
+      "en": [
+        "Optional MCM page; the original KEO tab remains a fallback.",
+        "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
+        "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
+        "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
+        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling."
+      ],
+      "ru": [
+        "Необязательная страница MCM; без неё остаётся исходная вкладка KEO.",
+        "Русский, английский и китайский интерфейс, английский для остальных языков и подробный журнал, выключенный по умолчанию.",
+        "Steam/GOG в одном пакете. GOG работает, но широкое игровое тестирование ещё не завершено.",
+        "Полезные функции KenshiQOL автора Steel объединены с KEO: переносимый вес, сбор продукции, пополнение прилавка и циклические маршруты.",
+        "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах."
+      ]
+    },
+    "player_changes": {
+      "en": [
+        "Optional MCM page; the original KEO tab remains a fallback.",
+        "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
+        "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
+        "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
+        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling."
+      ],
+      "ru": [
+        "Необязательная страница MCM; без неё остаётся исходная вкладка KEO.",
+        "Русский, английский и китайский интерфейс, английский для остальных языков и подробный журнал, выключенный по умолчанию.",
+        "Steam/GOG в одном пакете. GOG работает, но широкое игровое тестирование ещё не завершено.",
+        "Полезные функции KenshiQOL автора Steel объединены с KEO: переносимый вес, сбор продукции, пополнение прилавка и циклические маршруты.",
+        "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах."
+      ]
+    },
+    "history": {
+      "1": {
+        "en": [
+          "Optional MCM page; the original KEO tab remains a fallback.",
+          "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
+          "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
+          "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
+          "Route-ownership and stale-point checks, plus corrections to city path-readiness handling."
+        ],
+        "ru": [
+          "Необязательная страница MCM; без неё остаётся исходная вкладка KEO.",
+          "Русский, английский и китайский интерфейс, английский для остальных языков и подробный журнал, выключенный по умолчанию.",
+          "Steam/GOG в одном пакете. GOG работает, но широкое игровое тестирование ещё не завершено.",
+          "Полезные функции KenshiQOL автора Steel объединены с KEO: переносимый вес, сбор продукции, пополнение прилавка и циклические маршруты.",
+          "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах."
+        ]
+      }
+    }
   }
 }

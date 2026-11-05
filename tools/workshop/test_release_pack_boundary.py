@@ -21,6 +21,10 @@ try:
         os.environ['KENSHI_RELEASE_INPUT_ROOT']=str(root/'inputs')
         output=root/'nexus';output.mkdir();nexus_pack.OUT=str(output)
         old_zip=output/'UITweaks-12.zip';old_zip.write_bytes(b'preserve old release until verified')
+        protected = {name: ("keep " + name).encode("ascii") for name in (
+            "UITweaks-13-source.zip", "UITweaks-12-source.zip", "UITweaks-10-SOURCE.zip",
+            "KEO-1-source.zip", "OtherMod-1.zip", "OtherMod-2-source.zip")}
+        for name, data in protected.items(): (output/name).write_bytes(data)
         item={'mod':'UITweaks','version':'13'}
         try:nexus_pack.pack(item)
         except RuntimeError as exc:assert 'three runtime languages' in str(exc)
@@ -42,6 +46,13 @@ try:
         build.defaults_ini=real_defaults
         path,count=nexus_pack.pack(item)
         assert Path(path).is_file() and count==7 and not old_zip.exists()
+        for name, data in protected.items():
+            assert (output/name).is_file() and (output/name).read_bytes()==data, "Source/unrelated archive deleted: " + name
+        # A canonical rerun replaces only the same binary, preserving current sources too.
+        rerun, rerun_count=nexus_pack.pack(item)
+        assert rerun==path and rerun_count==count
+        for name, data in protected.items():
+            assert (output/name).read_bytes()==data, "Rerun changed protected archive: " + name
         # Execute the real preparation caller, replacing only its subprocesses
         # and metadata writer. It must resolve selected runtime input fail-closed.
         prepare_release.HERE=root/'prepare';prepare_release.HERE.mkdir()

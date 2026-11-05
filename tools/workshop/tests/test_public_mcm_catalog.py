@@ -2,6 +2,7 @@
 import sys
 import importlib.util
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import publication_sections as sections
@@ -44,9 +45,7 @@ class PublicCatalogTests(unittest.TestCase):
         spec.loader.exec_module(source)
         for mod, pair in source.T.items():
             for lang, text in zip(("ru", "en"), pair):
-                validator.validate_public_mcm_text(text, mod + "." + lang,
-                                                   require_all=(mod == "ModConfigMenu"),
-                                                   allow_original_keo=(mod != "ModConfigMenu"))
+                validator.player_feature_claims(mod, text, mod + "." + lang)
         public = {entry["package"] for entry in sections.public_mcm_catalog()}
         for entry in sections.mcm_catalog():
             if entry["package"] in public:
@@ -55,6 +54,51 @@ class PublicCatalogTests(unittest.TestCase):
                 with self.subTest(alias=alias):
                     with self.assertRaisesRegex(ValueError, "Private"):
                         validator.validate_public_mcm_text("[b]" + alias + "[/b]", "nexus.txt")
+
+    def test_keo_release_preparation_is_self_only_and_requires_explicit_authorization(self):
+        private = [dict(package="KEO", id="KEO", name="KEO: Kenshi Engine Optimizations",
+                        public=False, release_authorized=True),
+                   dict(package="DynamicFactions", id="Dynamic Factions", name="Dynamic Factions",
+                        public=False, release_authorized=True),
+                   dict(package="GlobalSatelliteMap", id="Global Satellite Map", name="Global Satellite Map",
+                        public=False, release_authorized=True)]
+        with patch.object(validator, "mcm_catalog", return_value=private), patch.object(validator, "public_mcm_catalog", return_value=[]):
+            validator.player_feature_claims("KEO", "KEO: Kenshi Engine Optimizations - our fork.", "KEO.en")
+            for other in ("AssignedWorkers", "ModConfigMenu"):
+                with self.subTest(other=other), self.assertRaisesRegex(ValueError, "Private"):
+                    validator.player_feature_claims(other, "KEO: Kenshi Engine Optimizations - our fork.", "other.en")
+            for name in ("Dynamic Factions", "Global Satellite Map"):
+                with self.subTest(name=name), self.assertRaisesRegex(ValueError, "Private"):
+                    validator.player_feature_claims("KEO", "KEO " + name, "KEO.en")
+                with self.subTest(self_project=name), self.assertRaisesRegex(ValueError, "Private"):
+                    validator.player_feature_claims(name, name, "other.en")
+            for unauthorized in (False, None, "true", 1):
+                private[0]["release_authorized"] = unauthorized
+                with self.subTest(unauthorized=unauthorized), self.assertRaisesRegex(ValueError, "Private"):
+                    validator.player_feature_claims("KEO", "KEO: Kenshi Engine Optimizations", "KEO.en")
+            private[0]["release_authorized"] = True
+            with self.assertRaisesRegex(ValueError, "Private"):
+                validator.validate_public_mcm_text("KEO", "raw-public-text")
+        published = {"KEO": dict(workshop_id=123, nexus=456, version="1")}
+        self.assertEqual(sections.public_mcm_catalog(private, published), [])
+
+    def test_keo_release_input_uses_canonical_fork_and_commented_defaults(self):
+        build = validator.build
+        items = [item for item in build.ITEMS if item["mod"] == "KEO"]
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["title"], "KEO (MCM fork) (QoL)")
+        self.assertEqual(items[0]["version"], "1")
+        self.assertIsNone(items[0]["nexus"])
+        self.assertIs(items[0]["lang"], True)
+        self.assertEqual(Path(build.source_dir("KEO")).resolve(), Path("D:/DEV/Kenshi/forks/KEO").resolve())
+        self.assertEqual(Path(build.defaults_ini("KEO")).resolve(), Path("D:/DEV/Kenshi/forks/KEO/KEO.ini").resolve())
+        canonical = Path(build.defaults_ini("KEO")).read_text(encoding="utf-8-sig")
+        active = [line for line in canonical.splitlines() if "=" in line and not line.lstrip().startswith((";", "#"))]
+        self.assertEqual(active, [], "KEO release defaults must remain commented, never personal overrides")
+        with patch.object(build.os.path, "isfile", return_value=False):
+            self.assertIsNone(build.defaults_ini("KEO"))
+        with patch.object(build.os.path, "isdir", return_value=False):
+            self.assertIsNone(build.source_dir("KEO"))
 
     def test_shipped_mcm_readme_keeps_private_projects_internal(self):
         readme = (Path(__file__).resolve().parents[3] / "ModConfigMenu/README.txt").read_text(encoding="utf-8")

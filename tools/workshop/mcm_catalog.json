@@ -738,9 +738,9 @@
     "package": "KEO",
     "name": "KEO: Kenshi Engine Optimizations",
     "id": "KEO",
-    "group": "optional_experimental",
-    "status": "local_development",
-    "author": "jacobericson / Jakematt2004; LEOPARD maintenance",
+    "group": "other_fork",
+    "status": "release_candidate",
+    "author": "Jakematt2004 (jacobericson)",
     "source": "D:/DEV/Kenshi/forks/KEO",
     "source_export": [
       {
@@ -750,6 +750,7 @@
       }
     ],
     "dll_export_verified": true,
-    "public": false
+    "public": false,
+    "release_authorized": true
   }
 ]

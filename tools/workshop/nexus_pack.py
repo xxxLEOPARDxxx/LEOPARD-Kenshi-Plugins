@@ -50,7 +50,8 @@ def pack(item):
     os.replace(temporary,path)
     pattern=re.compile(r"^"+re.escape(mod)+r"-[0-9][^/\\]*\.zip$")
     for old in out.iterdir():
-        if old==path or not pattern.fullmatch(old.name):continue
+        # Binary repacking must never retire corresponding-source archives.
+        if old==path or old.name.lower().endswith("-source.zip") or not pattern.fullmatch(old.name):continue
         if old.resolve().parent!=out or old.suffix.lower()!=".zip":raise RuntimeError("Unsafe old archive path")
         old.unlink()
         print("Removed superseded archive:",old.name)
