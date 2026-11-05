@@ -1,0 +1,352 @@
+From 3e5a11d41a9e54462067a36b5efb21a7227b6094 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 06:27:56 +0300
+Subject: [PATCH] fix(pathfinding): retire superseded move owners and recheck
+ snapped plans
+
+---
+ .../path-ownership-maintenance-20261105.md    |  68 +++++++++++
+ leopard/path_same_leg_cancel_red.py           |  79 +++++++++++++
+ leopard/test_order_capture_ownership.py       | 106 ++++++++++++++++++
+ src/pathfind/order_hook.cpp                   |  12 +-
+ src/planner/planner_hooks.cpp                 |  13 ++-
+ 5 files changed, 276 insertions(+), 2 deletions(-)
+ create mode 100644 leopard/path-ownership-maintenance-20261105.md
+ create mode 100644 leopard/path_same_leg_cancel_red.py
+ create mode 100644 leopard/test_order_capture_ownership.py
+
+diff --git a/leopard/path-ownership-maintenance-20261105.md b/leopard/path-ownership-maintenance-20261105.md
+new file mode 100644
+index 0000000..634e194
+--- /dev/null
++++ b/leopard/path-ownership-maintenance-20261105.md
+@@ -0,0 +1,68 @@
++# Private KEO path ownership repairs, 05 Nov 2026
++
++The user authorized continued KEO fixes and autonomous testing. Dynamic Factions
++and the satellite map remain paused. These are private test changes, not a public
++release, version increment, or entry in ALL_CHANGELOG_MODS.txt.
++
++## Changes and evidence
++
++* A MOVE selection larger than the formation/planner capture cap of 30 could
++  leave an excess selected actor attached to an older formation and route.
++  Native receives the entire selection; KEO previously updated only the first
++  30 owners. Now the existing selection walk retires excess actors' old planner
++  and formation ownership and refreshes their click destination. The first-30
++  planning/merge behavior and all capacities remain unchanged. Custom route
++  input still returns before this bookkeeping. Native receives unchanged
++  arguments exactly once. This does not add formation planning for actors over
++  the cap.
++* getZoneEdge retained a plan snapshot across native getClosestPoint. A cancel,
++  replacement, or leg change during that call could publish retired steering.
++  Immediately after the native call, validate mode, TLS owner, slot key, epoch
++  and expected current leg before writing either snapped or fallback point.
++  Otherwise retain the previously computed native pointer/output. The hook's
++  own successful advance remains valid. There are no native retries or locks.
++
++The first defect was RED with the actual extracted hook plus actual formation
++eligibility/detach and store helpers: selection 30 passes, selection 31 leaves
++the excess actor eligible for the previous formation's send. The repaired
++production extraction passes 345 controls in both /Od and /O2, including all
++Shift/add combinations, grouping off, full click table, unaffected unselected
++owners and consumed custom-route input. Removing only overflow cleanup returns
++RED in both builds.
++
++The second defect was RED for cancel and replace inside the owned native snap
++boundary. The actual repaired hook linked with unmodified PlanStore/PlanPolicy
++passes 186 controls per /Od and /O2, including snap success/failure, slot reuse,
++leg change and own advance. --old-guard-control returns RED in both builds.
++This check does not make publication atomic with cancellation after the final
++read; native game-thread overlap and gameplay impact require runtime evidence.
++
++Existing job cancellation (142), TLS unwind (51) and paused-clock (18) controls
++pass in each /Od and /O2; their negative controls reject the previous failure
++patterns. Both changes received independent read-only review.
++
++DEV and PROD build all 351 translation units, reusing 349 validated cached
++objects and recompiling the two changed units. PROD SHA256:
++f8074f907b3527d4d1848ae68ffd6824d9b9ad8d2d7f0be2944c2748316d65b6.
++
++## Performance and outstanding runtime work
++
++No per-frame scan, heap allocation, retained pointer, thread or cache was added.
++Overflow work runs only during the existing explicit MOVE selection walk and
++uses bounded planner/formation/click stores. Post-snap checks are constant-time
++reads. This is code/lifecycle review, not measured FPS or a proof of no leaks.
++
++The previous real-game log shows NPC native A* STATE-FULL (status3/cause3), not
++proof of unreachable paths: 57 new capped searches consumed 5.4785 of 5.6271
++path-thread busy seconds over 297..327s. NPC budget was not expanded and each
++KEO NPC branch called native once. Repeated face keys do not identify one actor;
++43.3 is Havok-scaled distance, not 43 meters. No retry suppression or geometry
++rewrite is justified by that log alone. Existing DEV NpcCapWho can identify
++requesters in a future 30..45s unpaused capture; DEV overhead must not be used
++as a PROD FPS comparison.
++
++Window automation failed before initialization with kernel-assets OS error3,
++including after a kernel reset. No UI input or game launch occurred during this
++audit. Runtime route quality, production-job delivery, FPS/memory and GOG tester
++acceptance remain pending. The prior accepted two-point save/load route remains
++historical acceptance of df07c25, not acceptance of this candidate.
+diff --git a/leopard/path_same_leg_cancel_red.py b/leopard/path_same_leg_cancel_red.py
+new file mode 100644
+index 0000000..ee2320c
+--- /dev/null
++++ b/leopard/path_same_leg_cancel_red.py
+@@ -0,0 +1,79 @@
++"""Actual hook_getZoneEdge extraction + unchanged PlanStore/PlanPolicy, VC10 Od/O2.
++Converted from the preserved 2026-11-05 same-leg RED after baseline reproduction:
++old hook SHA2561921b63e8239dc2754e3e7fa2fca13e71bfadeb82e4fcd3f5e8499176427541d.
++Baseline cancellation/replacement each published retired1000 over native111.
++Owned worker pauses at fake native snap while the sole Main writer changes real
++PlanStore. This proves a boundary contract, not actual engine-frame reachability
++or elimination of the remaining check-to-publication race.
++"""
++from pathlib import Path
++import hashlib,json,os,subprocess,sys
++ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/path-same-leg-red';OUT.mkdir(parents=True,exist_ok=True)
++s=(ROOT/'src/planner/planner_hooks.cpp').read_text(encoding='utf-8-sig');a=s.index('static float* hook_getZoneEdge(');b=s.index('{',a);e=b+1;depth=1
++while depth:depth+=(s[e]=='{')-(s[e]=='}');e+=1
++actual=s[a:e]
++if '--old-guard-control'in sys.argv:
++ start=actual.index('\n\t// Revalidate the plan after the native snap');end=actual.index('\n\tif (got == 1)',start);actual=actual[:start]+actual[end:]
++fixture=r'''
++#include <windows.h>
++#include <stdint.h>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <new>
++#include "planner/plan_store.h"
++using namespace planner;
++struct PlannerTls{uintptr_t cm;float dest[3];int haveDest,slot,islandSeen,flipped,edgeSeen;};
++__declspec(thread) PlannerTls t_plan;
++struct DoorHitFilterBytes{const void*vtable;unsigned refAndFlags,pad;};
++const int OFF_CMOV_POS=0xC4,CG_EXTERIOR_SLOTS=4096;
++int s_mode=PLANNER_ON,s_legSpan=2,s_legAim=0;uintptr_t s_retRecheck=0x222,s_retCompute=0x111,returnSite=0x111;const void*s_doorFilterVtable=NULL;
++#define _ReturnAddress() ((void*)returnSite)
++static HANDLE entered,changed,finished;static bool blockSnap=false,separateNative=false;static int snapResult=1,tlsChange=0;
++static int nativeCalls=0,snapCalls=0,checks=0,allocs=0;static float returned[3],nativeOther[3]={222,3,4};static float*returnedPointer=NULL;
++static unsigned char cmBytes[512],otherCmBytes[512];static int workerSlot=-1;
++void*operator new(size_t n){++allocs;void*p=malloc(n);if(!p)throw std::bad_alloc();return p;}void operator delete(void*p){free(p);}
++void C(bool b,const char*t){++checks;if(!b){printf("FAIL %s\n",t);exit(1);}}
++float*NativeEdge(void*,float*out,const float*,const float*,float){++nativeCalls;out[0]=111;out[1]=2;out[2]=3;return separateNative?nativeOther:out;}
++float*(*orig_getZoneEdge)(void*,float*,const float*,const float*,float)=NativeEdge;
++int Snap(void*,const float*point,float,float,void*,float*out,unsigned*key){++snapCalls;if(blockSnap){SetEvent(entered);if(WaitForSingleObject(changed,5000)!=WAIT_OBJECT_0)ExitProcess(90);}memcpy(out,point,12);out[0]+=10;*key=7;if(tlsChange)t_plan.cm=(uintptr_t)otherCmBytes;return snapResult;}
++int(*fn_getClosestPoint)(void*,const float*,float,float,void*,float*,unsigned*)=Snap;
++@ACTUAL@
++int Write(uintptr_t cm,float point){PlanWrite w;memset(&w,0,sizeof(w));w.cm=cm;w.verdict=PV_LEGGED;w.legCount=2;w.loadedMask=3;w.finalDest[0]=5000;w.legs[0].point[0]=point;w.legs[0].edgeA[0]=w.legs[0].edgeB[0]=point;w.legs[1].point[0]=5000;w.legs[1].isDestination=1;PlanCellOf(point,0,&w.legs[0].cellX,&w.legs[0].cellY);PlanCellOf(5000,0,&w.legs[1].cellX,&w.legs[1].cellY);return PlanStoreWrite(w);}
++DWORD WINAPI Call(void*){t_plan.cm=(uintptr_t)cmBytes;t_plan.slot=PlanStoreFind(t_plan.cm);workerSlot=t_plan.slot;t_plan.haveDest=1;t_plan.dest[0]=5000;t_plan.dest[1]=t_plan.dest[2]=0;float dest[3]={5000,0,0};returnedPointer=hook_getZoneEdge(NULL,returned,(float*)(cmBytes+OFF_CMOV_POS),dest,0);SetEvent(finished);return 0;}
++void Setup(){PlanStoreTestPauseInRewrite(NULL,NULL);PlanStoreReset();PlanStoreArm(PLANNER_ON);memset(cmBytes,0,sizeof(cmBytes));memset(otherCmBytes,0,sizeof(otherCmBytes));returnSite=s_retCompute;blockSnap=false;separateNative=false;snapResult=1;tlsChange=0;ResetEvent(entered);ResetEvent(changed);ResetEvent(finished);Write((uintptr_t)cmBytes,1000);}
++void Wait(HANDLE h,const char*t){C(WaitForSingleObject(h,5000)==WAIT_OBJECT_0,t);}
++void ReleaseDuringRewrite(void*){SetEvent(changed);if(WaitForSingleObject(finished,5000)!=WAIT_OBJECT_0)ExitProcess(91);}
++void Stale(int change,int snap,bool otherReturn){Setup();snapResult=snap;separateNative=otherReturn;int slot=PlanStoreFind((uintptr_t)cmBytes);PlanView before;C(PlanStoreRead(slot,&before),"real initial store read");int nc=nativeCalls,sc=snapCalls;blockSnap=true;HANDLE worker=CreateThread(NULL,0,Call,NULL,0,NULL);C(worker!=NULL,"owned worker created");Wait(entered,"worker reached real fake-native snap boundary");
++ if(change==0)PlanStoreDrop((uintptr_t)cmBytes);
++ else if(change==1)Write((uintptr_t)cmBytes,2000);
++ else if(change==2){PlanStoreDrop((uintptr_t)cmBytes);C(Write((uintptr_t)otherCmBytes,2000)==slot,"same slot reused by another identity");}
++ else if(change==3)C(PlanStoreAdvance(slot,before.epoch,0,1),"sameepoch current leg changed by other valid actor");
++ else if(change==4)PlanStoreReset();
++ else if(change==5)PlanStoreArm(PLANNER_OFF);
++ else if(change==6){PlanStoreTestPauseInRewrite(ReleaseDuringRewrite,NULL);Write((uintptr_t)cmBytes,2000);PlanStoreTestPauseInRewrite(NULL,NULL);}
++ SetEvent(changed);Wait(worker,"owned worker joined");CloseHandle(worker);blockSnap=false;C(nativeCalls==nc+1&&snapCalls==sc+1,"native edge and snap each once, no retry on stale plan");
++ C(returnedPointer==(otherReturn?nativeOther:returned)&&returned[0]==111&&returned[1]==2&&returned[2]==3,"stale plan preserves original native pointer and all output coordinates");
++ if(change==1||change==6){PlanView after;C(PlanStoreRead(slot,&after)&&after.epoch!=before.epoch,"replacement has fresh epoch");Call(NULL);C(returned[0]==(snap==1?2010:2000),"next request independently steers replacement plan");}
++ if(change==3){unsigned epoch;int leg;C(PlanStoreLeg(slot,&epoch,&leg)&&epoch==before.epoch&&leg==1,"sameepoch replacement leg remains untouched");}
++ if(change==0||change==2||change==4||change==5){nc=nativeCalls;sc=snapCalls;Call(NULL);C(returned[0]==111&&nativeCalls==nc+1&&snapCalls==sc,"next cancelled/unowned/disarmed request is native pass-through");}
++}
++int main(){entered=CreateEvent(NULL,TRUE,FALSE,NULL);changed=CreateEvent(NULL,TRUE,FALSE,NULL);finished=CreateEvent(NULL,TRUE,FALSE,NULL);C(entered&&changed&&finished,"owned event handles created");
++ for(int result=-1;result<=1;++result){Setup();snapResult=result;int nc=nativeCalls,sc=snapCalls;Call(NULL);C(returnedPointer==returned&&returned[0]==(result==1?1010:1000),"stable snap success/failure preserves existing planned steering");C(nativeCalls==nc+1&&snapCalls==sc+1,"stable request each native boundary once");}
++ for(int snap=-1;snap<=1;++snap)for(int change=0;change<=6;++change)Stale(change,snap,false);
++ Stale(0,1,true);Stale(1,0,true);
++ Setup();returnSite=s_retRecheck;((float*)(cmBytes+OFF_CMOV_POS))[0]=1000;Call(NULL);PlanView advanced;C(PlanStoreRead(workerSlot,&advanced)&&advanced.legIndex==1&&returned[0]==5010,"hook own successful advance validates new leg, not old snapshot leg");
++ Setup();tlsChange=1;Call(NULL);C(returned[0]==111,"changed synchronous TLS identity cannot publish old steering");
++ Setup();returnSite=0x333;int sc=snapCalls;Call(NULL);C(returned[0]==111&&snapCalls==sc,"unknown native callsite stays native");
++ Setup();s_mode=PLANNER_OBSERVE;sc=snapCalls;Call(NULL);C(returned[0]==111&&snapCalls==sc,"observe mode never publishes planned point");s_mode=PLANNER_ON;
++ Setup();int before=allocs;for(int i=0;i<100;++i)Call(NULL);C(allocs==before,"post-snap freshness check allocates no heap");
++ CloseHandle(entered);CloseHandle(changed);CloseHandle(finished);printf("PASS %d actual same-leg steering controls; worker/event handles closed\n",checks);}
++'''.replace('@ACTUAL@',actual)
++cpp=OUT/'path_same_leg.cpp';cpp.write_text(fixture)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{ROOT}/src;{VC}/include;{SDK}/Include',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++for opt in ('Od','O2'):
++ label=('OLD-'if '--old-guard-control'in sys.argv else '')+opt;exe=OUT/('path_same_leg_'+label+'.exe');r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(cpp),str(ROOT/'src/planner/plan_store.cpp'),str(ROOT/'src/planner/plan_policy.cpp'),'/Fo'+str(OUT)+'/', '/Fe'+str(exe)],env=env,capture_output=True,text=True);(OUT/(label+'-build.log')).write_text(r.stdout+r.stderr);assert not r.returncode,r.stdout+r.stderr
++ r=subprocess.run([str(exe)],capture_output=True,text=True);print(label,r.stdout.strip());(OUT/(label+'-run.log')).write_text(r.stdout+r.stderr)
++ if '--old-guard-control'in sys.argv:assert r.returncode==1 and'stale plan preserves original native pointer'in r.stdout
++ else:assert not r.returncode,r.stdout+r.stderr
++print(json.dumps({'hook_sha256':hashlib.sha256(actual.encode()).hexdigest(),'source_store':'unmodified src/planner/plan_store.cpp','source_policy':'unmodified src/planner/plan_policy.cpp','engine_frame_reachability':'not established by owned callback-boundary controls'}))
+diff --git a/leopard/test_order_capture_ownership.py b/leopard/test_order_capture_ownership.py
+new file mode 100644
+index 0000000..3a488b1
+--- /dev/null
++++ b/leopard/test_order_capture_ownership.py
+@@ -0,0 +1,106 @@
++"""Actual order/ownership handlers with owned native seams. No game calls.
++Runs current production plus compiled old-overflow-behavior negative control.
++"""
++from pathlib import Path
++import os,subprocess,hashlib
++R=Path(__file__).resolve().parents[1];O=R/'build/order-ownership-tests';O.mkdir(parents=True,exist_ok=True)
++def body(file,marker):
++ s=(R/file).read_text(encoding='utf-8-sig');a=s.index(marker);b=s.index('{',a);n=1;e=b+1
++ while n:
++  n+=(s[e]=='{')-(s[e]=='}');e+=1
++ return s[a:e]
++hook=body('src/pathfind/order_hook.cpp','void hook_addOrderSelected(')
++detach=body('src/movement/formation_query.cpp','void FormationDetachCharacters(')
++collect=body('src/movement/formation.cpp','static int CollectTravelMembers(')
++click=body('src/pathfind/player_task_snap.cpp','void StorePlayerClickDest(')
++island=body('src/movement/island_orders.cpp','void IslandNoteOrder(')
++diag=(R/'src/pathfind/pathfind_diag.h').read_text();a=diag.index('struct TrackedPlayerDest {');b=diag.index('};',a)+2;tracked=diag[a:b]
++code=r'''
++#define NOMINMAX
++#include <Windows.h>
++#include <stdint.h>
++#include <stddef.h>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <sstream>
++#include <iomanip>
++#include "movement/formation_members.h"
++#include "planner/plan_store.h"
++#define KEO_DETAIL(x) ((void)0)
++const int MAX_FORMATION_MEMBERS=30,MAX_FORMATION_MEMBERS_LIMIT=64,MAX_FORMATION_GROUPS=8,MOVESPEED_GROUPED=3,FFR_ORDER=1,FFS_SEND=1;
++struct Movement{int speed;};struct Actor{uintptr_t cm;float x,z;};
++struct Node{Node*next;uintptr_t padding;Actor*actor;int type;};struct PI{uintptr_t count,index,array;};
++#define KLIB_MEMBER(domain,base,name,offset) ((uintptr_t)(base)+(offset))
++const size_t OFF_PI_SEL_COUNT=offsetof(PI,count),OFF_PI_SEL_INDEX=offsetof(PI,index),OFF_PI_SEL_ARRAY=offsetof(PI,array),OFF_SEL_NODE_TYPE=offsetof(Node,type),OFF_SEL_NODE_HANDLE=offsetof(Node,actor),OFF_CHAR_MOVEMENT=offsetof(Actor,cm),OFF_CMOV_SPEED_MODE=0;
++const size_t RVA_HANDLE_SENTINEL=0;static uintptr_t gameBase=0,emptySentinel=0;
++uintptr_t NativeProfileAddress(uintptr_t,size_t){return (uintptr_t)&emptySentinel;}void*KlibSelectedCharacter(const void*p){return *(void*const*)p;}
++struct FormationMember{uintptr_t character,charMovement;bool alone,dispatched,holdAtCreation,inSomethingAtCreation;};
++struct FormationGroup{FormationMember members[64];int count;bool active;};FormationGroup formationGroups[8];
++void FormationFollowRelease(const uintptr_t*,int,int){}void DeactivateFormationGroup(int g){formationGroups[g].active=false;}
++bool FormationOwnsFollower(uintptr_t,int){return false;}bool CharacterNewlyHeld(uintptr_t,bool,bool){return false;}
++DETACH
++COLLECT
++static bool consumed=false;static unsigned checks=0;void C(bool b,const char*t){++checks;if(!b){printf("FAIL %s\n",t);fflush(stdout);ExitProcess(1);}}
++namespace keo_jobs{bool SteelJobsConsumeMove(void*,void*,void*,const float*,bool){return consumed;}}
++namespace zone{struct Config{bool preloadEnabled,movementAwareEnabled;};Config g_zoneCfg={false,false};}
++namespace movement{struct Config{bool groupCohesionEnabled;};Config g_movementCfg={true};}
++namespace navmesh{struct Config{bool reprioFastEnabled;};Config g_navmeshCfg={false};}
++static int captureN=0,islandN=0,nativeN=0,hookOrderCount=0;static bool expectedShift=false,expectedAdd=false;static void*expectedPI=NULL;static const float*expectedDest=NULL;static volatile LONG reprioOrderFires=0;bool scatterPatchApplied=true,gridCalibrated=false;
++void BenchNotifyPlayerOrder(){}bool WorldToZoneGrid(float,float,int*,int*){return false;}float GetCharPosX(uintptr_t a){return ((Actor*)a)->x;}float GetCharPosZ(uintptr_t a){return ((Actor*)a)->z;}
++double ElapsedSec(){return 10;}
++struct IslandOrder{bool active;uintptr_t character;float destX,destY,destZ;double orderTime,k7ArrivalWaitSince;};
++const int MAX_ISLAND_ORDERS=64,ISLAND_OVERTAKEN_CLICK=1;static IslandOrder g_orders[64];static int g_orderCount=0,g_k7ArrivalResumed=0;
++void IslandFlagReissueOvertaken(uintptr_t,int){++islandN;}
++ISLAND
++TRACKED
++const int MAX_TRACKED_PLAYERS=256;
++namespace pathfind{struct State{TrackedPlayerDest trackedPlayers[256];int trackedPlayerCount;};static State g_pathDiag={};}
++void EdgeLegsForget(int){}
++CLICK
++bool AddWatchedCharacter(uintptr_t,uintptr_t,int,int,int,int,bool){return false;}
++static void WritePlan(uintptr_t cm,float x){planner::PlanWrite w={};w.cm=cm;w.verdict=planner::PV_DIRECT;w.finalDest[0]=x;w.legCount=1;w.legs[0].isDestination=1;w.legs[0].point[0]=x;C(planner::PlanStoreWrite(w)>=0,"bounded actual planner store");}
++namespace planner{void PlannerDrop(uintptr_t actor){PlanStoreDrop(((Actor*)actor)->cm);}int PlannerNoteOrder(const uintptr_t*chars,int n,const float*,void*,bool,bool,bool){captureN=n;for(int i=0;i<n;++i)WritePlan(((Actor*)chars[i])->cm,4000);return 0;}}
++void OrderOutcomeBegin(const uintptr_t*,int,float,float,double){}
++void CreateFormationGroup(const float*,uintptr_t*chars,int n){FormationDetachCharacters(chars,n);}
++void FormationFollowAfterOrder(const uintptr_t*,int){}void DropSelectedCharacterOrders(void*){}void CallPrioritizeNavMeshQueue(){}
++void Original(void*pi,void*building,int type,void*subject,bool shift,bool add,const float*loc){++nativeN;C(pi==expectedPI&&!building&&type==29&&!subject&&loc==expectedDest&&shift==expectedShift&&add==expectedAdd,"native MOVE arguments and queue flags unchanged");}
++namespace game{struct Orig{void(*orig_addOrderSelected)(void*,void*,int,void*,bool,bool,const float*);}g_hookOrig={Original};}
++HOOK
++static Actor actors[64];static Movement moves[64];static Node nodes[64];
++static void Case(int count,bool shift,bool add,bool grouped,bool cohesion,bool capacityFull=false){
++ planner::PlanStoreReset();planner::PlanStoreArm(planner::PLANNER_ON);consumed=false;memset(formationGroups,0,sizeof(formationGroups));memset(g_orders,0,sizeof(g_orders));g_orderCount=0;memset(&pathfind::g_pathDiag,0,sizeof(pathfind::g_pathDiag));movement::g_movementCfg.groupCohesionEnabled=cohesion;
++ for(int i=0;i<64;++i){moves[i].speed=grouped?MOVESPEED_GROUPED:2;actors[i].cm=(uintptr_t)&moves[i];actors[i].x=actors[i].z=0;nodes[i].next=i+1<count?&nodes[i+1]:NULL;nodes[i].actor=&actors[i];nodes[i].type=1;}
++ FormationGroup&old=formationGroups[0];old.active=true;old.count=2;old.members[0].character=(uintptr_t)&actors[63];old.members[0].charMovement=actors[63].cm;old.members[1].character=(uintptr_t)&actors[count-1];old.members[1].charMovement=actors[count-1].cm;
++ WritePlan(actors[63].cm,9000);WritePlan(actors[count-1].cm,9000);float oldDest[3]={9000,10,8000};StorePlayerClickDest((uintptr_t)&actors[count-1],oldDest,1);StorePlayerClickDest((uintptr_t)&actors[63],oldDest,1);IslandNoteOrder((uintptr_t)&actors[count-1],oldDest);
++ if(capacityFull){pathfind::g_pathDiag.trackedPlayerCount=MAX_TRACKED_PLAYERS;for(int i=2;i<MAX_TRACKED_PLAYERS;++i){pathfind::g_pathDiag.trackedPlayers[i].character=(uintptr_t)(0x10000+i);pathfind::g_pathDiag.trackedPlayers[i].active=true;}}
++ Node*first=&nodes[0];PI pi={(uintptr_t)count,0,(uintptr_t)&first};float dest[3]={4000,20,5000};captureN=islandN=nativeN=0;expectedPI=&pi;expectedDest=dest;expectedShift=shift;expectedAdd=add;
++ hook_addOrderSelected(&pi,NULL,29,NULL,shift,add,dest);
++ int sendable[64];int n=CollectTravelMembers(old,sendable);bool stale=false;for(int i=0;i<n;++i)if(old.members[sendable[i]].character==(uintptr_t)&actors[count-1])stale=true;
++ C(islandN==count&&nativeN==1,"all selected Island orders updated, native once");C(captureN==(count>30?30:count),"planner/cohort capacity remains30");C(!stale&&!old.members[1].character,"every selected new MOVE retires old formation send ownership");C(old.active&&old.members[0].character==(uintptr_t)&actors[63],"unselected old leader retains its formation");
++ planner::PlanView view;int slot=planner::PlanStoreFind(actors[count-1].cm);if(count>30)C(slot<0,"excess selected actor cannot retain an old route plan");else C(slot>=0&&planner::PlanStoreRead(slot,&view)&&view.finalDest[0]==4000,"cohort actor keeps new route plan");C(planner::PlanStoreFind(actors[63].cm)>=0,"unselected old route untouched");
++ TrackedPlayerDest&click=pathfind::g_pathDiag.trackedPlayers[0];C(click.character==(uintptr_t)&actors[count-1]&&click.destX==4000&&click.destY==20&&click.destZ==5000&&click.clickTime==10,"existing click destination updated beyond cohort cap");C(pathfind::g_pathDiag.trackedPlayerCount<=MAX_TRACKED_PLAYERS,"click table stays bounded");C(pathfind::g_pathDiag.trackedPlayers[1].destX==9000,"unselected diagnostic destination untouched");
++ C(g_orders[0].character==(uintptr_t)&actors[count-1]&&g_orders[0].destX==4000&&g_orders[0].destZ==5000,"actual IslandNoteOrder already owns latest target");
++ printf("PASS selection=%d shift=%d add=%d grouped=%d cohesion=%d full=%d\n",count,shift,add,grouped,cohesion,capacityFull);
++}
++int main(){Case(30,false,false,true,true);for(int shift=0;shift<2;++shift)for(int add=0;add<2;++add)Case(31,shift!=0,add!=0,true,true);Case(31,true,true,false,true);Case(31,true,false,true,false);Case(31,false,true,true,true,true);
++ // A consumed custom-input event represents an already accepted different route
++ // owner; this early return must not retire its pending/queued native orders.
++ consumed=true;int calls=nativeN;uintptr_t prior=formationGroups[0].members[0].character;PI pi={};float d[3]={1,2,3};hook_addOrderSelected(&pi,NULL,29,NULL,true,true,d);C(nativeN==calls&&formationGroups[0].members[0].character==prior,"consumed input returns before new-MOVE ownership bookkeeping");
++ printf("PASS %u actual order ownership controls\n",checks);return 0;}
++
++'''.replace('DETACH',detach).replace('COLLECT',collect).replace('HOOK',hook).replace('\nISLAND\n','\n'+island+'\n').replace('\nTRACKED\n','\n'+tracked+'\n').replace('\nCLICK\n','\n'+click+'\n')
++V=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');W=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{R}/src;{V}/include;{W}/Include',LIB=f'{V}/lib/amd64;{W}/Lib/x64')
++variants=[('green',code,False)]
++if '// BEGIN excess MOVE ownership' in hook:
++ start=hook.index('// BEGIN excess MOVE ownership');end=hook.index('// END excess MOVE ownership',start)+len('// END excess MOVE ownership')
++ old=hook[:start]+hook[end:];variants.append(('old-overflow',code.replace(hook,old,1),True))
++for name,source,negative in variants:
++ cpp=O/(name+'.cpp');cpp.write_text(source,encoding='utf-8')
++ for opt in ('Od','O2'):
++  exe=O/(name+'-'+opt+'.exe');cmd=[str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT','/'+opt,str(cpp),str(R/'src/movement/formation_members.cpp')]+[str(R/'src/planner'/file)for file in ['plan_store.cpp','plan_policy.cpp']]+['/Fo'+str(O)+'/', '/Fe'+str(exe)]
++  q=subprocess.run(cmd,env=env,capture_output=True,text=True);assert not q.returncode,q.stdout+q.stderr
++  q=subprocess.run([str(exe)],capture_output=True,text=True);print(name,opt,q.stdout.strip())
++  if negative:assert q.returncode==1 and'every selected new MOVE retires old formation send ownership'in q.stdout,q.stdout+q.stderr
++  else:assert not q.returncode,q.stdout+q.stderr
++print('actual order hook SHA256',hashlib.sha256(hook.encode()).hexdigest())
+diff --git a/src/pathfind/order_hook.cpp b/src/pathfind/order_hook.cpp
+index 6e75299..2ba1f93 100644
+--- a/src/pathfind/order_hook.cpp
++++ b/src/pathfind/order_hook.cpp
+@@ -115,6 +115,7 @@ void hook_addOrderSelected(void* thisPI, void* destIndoors, int task,
+ 	if (task == 29 && location
+ 	)
+ 	{
++		const double clickNow = ElapsedSec();
+ 		float destX = (*(const float*)KLIB_MEMBER(5, location, Ogre__Vector3_x, 0));
+ 		float destZ = (*(const float*)KLIB_MEMBER(5, location, Ogre__Vector3_z, 8));  // Ogre: Y is up, Z is horizontal
+ 
+@@ -155,6 +156,16 @@ void hook_addOrderSelected(void* thisPI, void* destIndoors, int task,
+ 						// Collect for formation group + pending-order buffer
+ 						if (collectedCount < MAX_FORMATION_MEMBERS)
+ 							collectedChars[collectedCount++] = character;
++						else
++						{
++							// Native MOVE replaces every selected destination, including Shift/add.
++							// Keep the new cohort bounded while retiring excess actors' old owners.
++							// BEGIN excess MOVE ownership
++							planner::PlannerDrop(character);
++							FormationDetachCharacters(&character, 1);
++							StorePlayerClickDest(character, location, clickNow);
++							// END excess MOVE ownership
++						}
+ 						// Island re-issue tracker
+ 						IslandNoteOrder(character, location);
+ 
+@@ -230,7 +241,6 @@ void hook_addOrderSelected(void* thisPI, void* destIndoors, int task,
+ 		// Stuck recovery: store click destination per character
+ 		if (location && collectedCount > 0)
+ 		{
+-			double clickNow = ElapsedSec();
+ 			for (int c = 0; c < collectedCount; ++c)
+ 				StorePlayerClickDest(collectedChars[c], location, clickNow);
+ 		}
+diff --git a/src/planner/planner_hooks.cpp b/src/planner/planner_hooks.cpp
+index 6aec044..fe5f5f2 100644
+--- a/src/planner/planner_hooks.cpp
++++ b/src/planner/planner_hooks.cpp
+@@ -140,7 +140,18 @@ static float* hook_getZoneEdge(void* nm, float* retstr, const float* start, cons
+ 	DoorHitFilterBytes f = { s_doorFilterVtable, 0xFFFF0001u, 0 };
+ 	float snapped[3];
+ 	unsigned key = 0;
+-	if (fn_getClosestPoint(nm, o.point, 300.0f, 5.0f, &f, snapped, &key) == 1)
++	const int got = fn_getClosestPoint(nm, o.point, 300.0f, 5.0f, &f, snapped, &key);
++	// Revalidate the plan after the native snap, before publishing either its
++	// snapped point or the raw fallback. Bracket the identity read with the
++	// packed epoch/leg loads; an advance by this call expects o.newLegIndex.
++	// This is a freshness check, not an atomic commit with a later cancellation.
++	unsigned liveEpoch = 0; int liveLeg = -1;
++	if (PlanStoreMode() != PLANNER_ON || t.slot != v.slot || t.cm != v.cm
++	    || !PlanStoreLeg(v.slot, &liveEpoch, &liveLeg) || liveEpoch != v.epoch || liveLeg != o.newLegIndex
++	    || PlanStoreKey(v.slot) != v.cm
++	    || !PlanStoreLeg(v.slot, &liveEpoch, &liveLeg) || liveEpoch != v.epoch || liveLeg != o.newLegIndex)
++		return r;
++	if (got == 1)
+ 	{
+ 		retstr[0] = snapped[0]; retstr[1] = snapped[1]; retstr[2] = snapped[2];
+ 		PlannerNoteSnap(PlanSnapDistance(o.point, snapped));
+-- 
+2.46.0.windows.1
+

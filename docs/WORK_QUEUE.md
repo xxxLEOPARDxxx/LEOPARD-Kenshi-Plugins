@@ -1,8 +1,12 @@
 # Active work and next requested tasks
 
 Updated 2026-11-05. This is a private working queue, not a release announcement.
-The user is at the PC. Ask for scene preparation; use background telemetry and
-file requests. Do not take desktop focus or collide with Minecraft autotests.
+Latest user instruction, 05 Nov: user is asleep and authorizes autonomous PC
+testing of KEO. Do not resume DF or the satellite map until the user returns.
+Avoid taking input from neighboring Minecraft autotests. Window-control tools
+currently fail before initialization (kernel assets: OS error 3), including
+after one kernel reset; no game launch or UI input has been performed in this
+pathfinding audit. Code/build verification can continue independently.
 Always check the actual process immediately before replacing a loaded DLL.
 
 1. **Global satellite map — PAUSED BY USER, 2026-11-04.**
@@ -15,6 +19,27 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
+   LATEST05Nov06:29: private path candidate3e5a11d installed, DLLF8074F90.
+   Two concrete source defects fixed: selected actors beyond the first30 no
+   longer retain previous formation/planner ownership after a new MOVE; a
+   cancellation/replacement during native waypoint snap preserves native output
+   instead of publishing stale steering. Cohort and cache caps unchanged.
+   345+186 production-extracted controls perOd/O2; old-behavior negative controls
+   fail as intended, independent review CLEAR, DEV/PROD351-source builds and
+   180SDK/29MyGUI/1Ogre imports verified. No measured gameplay/FPS/leak claim.
+   Installed only DLL after fresh Kenshi*process count0; all four personal
+   configuration files byte-preserved. Backup DDEV/backup/keo-path-20261105-062901.
+   Private archive workshop/testing/KEO/KEO-path-test-20261105.zip:791284B,
+   SHA9a32dbd9955297c8e24d9b34875b29fb62837c2c69de0fa66abb1c19d8b324f7.
+   Original route-accepted df07c25 package remains available separately.
+   Existing NPC log shows STATE-FULL caps, native once/unboosted; repeated faces
+   do not prove one retrying NPC. Need existing DEV NpcCapWho ownership capture
+   before any suppression or geometry rewrite. Do not call43.3Havok units43m.
+   Window tools failed before initialization even after reset, so no game launch
+   or input occurred. User asleep: do not ask for scene preparation overnight.
+   GOG tester reply still pending; separate GOG archive unchanged. No publication,
+   public version bump, or ALL_CHANGELOG entry. Map/DF remain paused.
+
    LATEST05Nov05:48: installed private DLLFB42DE66, sourcedf07c25.
    User confirms fixed-vtable build no longer crashes when adding a waypoint,
    but only one row appeared. Actual read-only PID13116 proved one292 row with
