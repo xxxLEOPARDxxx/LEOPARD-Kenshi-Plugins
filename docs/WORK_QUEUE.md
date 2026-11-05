@@ -1,8 +1,8 @@
 # Active work and next requested tasks
 
 Updated 2026-11-05. This is a private working queue, not a release announcement.
-Latest user instruction, 05 Nov: user is asleep and authorizes autonomous PC
-testing of KEO. Do not resume DF or the satellite map until the user returns.
+Latest user instruction, 05 Nov: user is back and running controlled KEO tests.
+Do not resume DF or the satellite map without an explicit request.
 Avoid taking input from neighboring Minecraft autotests. Window-control tools
 currently fail before initialization (kernel assets: OS error 3), including
 after one kernel reset; no game launch or UI input has been performed in this
@@ -19,6 +19,49 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
+   CONTROL ACTIVE05Nov07:25: after confirmed diagnostic repro PID26768, changed
+   ONLY KEO.ini readinessOverrides=false, same D2EC DLL/mod list/LoK. Exact
+   original INI backup game/_codex_work/20261105-squin-second-load/
+   KEO.ini.before-native-ready-control; originalSHA2e3480c8, controlSHA8fe46f1d.
+   Restore with native_ready_control.py restore ONLY while closed and current
+   hash still matches; do not blindly overwrite later user settings. User now
+   repeating freshIMPORT->Squin->Hubunload->Squin; may pause at Шпилька detour.
+   Actual ON trace preserved: 1994bypasses=557rows+1437coalesced,0drops. First
+   Squin18,35outdoorADD49.554 beforebypass49.572; return outdoorRET101.741,
+   Mainstate4OUTDOOR_MISSINGbypass120.123,transitionend120.136,ADD120.928.
+   This proves early-ready behavior, not yet exactNPCplacementcausality.
+   Snapshot557actors;46home-town actors nearSEcellcorner. TownGuard refusals
+   all20,31range0; customunload/save0, so no directprivateunloadpath observed.
+
+   LATEST05Nov07:15: diagnostics-only candidate3c54bd6 INSTALLED while Kenshi*
+   freshly absent. DLLD2EC3531, all four personal config files byte-preserved.
+   Private ZIP KEO-reload-diagnostic-20261105.zip796379B15filesCRC,
+   SHA009745173bdea9b982d814e62ffa12612e20b23290bb57652f6a25d71895a7e2.
+   Source readiness/town/handoff behavior unchanged: new bounded PROD Debug
+   readiness nativefalse->KEOtrue event queue; town refusal arguments/cell;
+   private finalize/handoff repeated-load events. Existing unload(save) retained.
+   Readiness1536paritycases eachOd/O2, concurrent8000writes and removedrecordRED;
+   lifecycle111eachOd/O2+OLDRED; independentreviewsCLEAR; DEV/PROD351/importsPASS.
+   User asked to do one importLEO4->Squin->Hubuntilunload->Squin, pause atcrowd
+   and leaveopen. CopyONlogs/readactors BEFOREanyOFFcontrol. No spawn fixclaim.
+   BaselineON/OFF logs backed under _codex_work/20261105-squin-second-load.
+   LoK new upstream prepared in parallel, ACTIVEFILESHELDUNCHANGED untilthis
+   KEOtracecopied. RU/NCE/animation targets current; avoid confounding repeat.
+
+   LATEST user repro05Nov: independent MAIN-MENU IMPORT of LEO4 changes prior
+   conclusion. KEO ON: first Squin approach residents inside; return to Hub until
+   Squin unloads, then return Squin -> residents outside. KEO OFF with same fresh
+   import/repeat cycle -> residents inside. Therefore running KEO is implicated
+   in unload/reload scenario; older comparison on already-saved state did not
+   exclude KEO. Building diagnostics only, no speculative spawn fix yet.
+   Preserve ON mods/KEO/KEO.log before OFF control overwrites RE_Kenshi log.
+   Copies saved _codex_work/20261105-squin-second-load/*before-diag.log.
+   Other new request: compare Steel navmesh regeneration with existing KEO
+   wallSpliceFix/spliceSeamFull (already enabled by default). Steel schedules a
+   zone rebuild after activation/neighbor readiness and calls furniture repair;
+   this is not simply a construction-completion event. Audit missing safe
+   coverage separately AFTER spawn diagnostic to avoid changing test behavior.
+
    LATEST05Nov06:29: private path candidate3e5a11d installed, DLLF8074F90.
    Two concrete source defects fixed: selected actors beyond the first30 no
    longer retain previous formation/planner ownership after a new MOVE; a

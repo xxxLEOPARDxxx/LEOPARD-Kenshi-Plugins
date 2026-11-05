@@ -1,0 +1,26 @@
+{
+  "time_msk": "2026-11-05T07:15:51.353014+03:00",
+  "source_commit": "3c54bd6566d0dab95f3ebde04a75655a1a89d24c",
+  "status": "installed_private_diagnostic_not_published",
+  "dll_sha256": "d2ec35317bd913c76f5df67a968f5c7cc0b760630eda989ac0dc7cecb764e665",
+  "archive": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-reload-diagnostic-20261105.zip",
+  "archive_sha256": "009745173bdea9b982d814e62ffa12612e20b23290bb57652f6a25d71895a7e2",
+  "archive_bytes": 796379,
+  "files": 15,
+  "crc": "passed",
+  "imports": {
+    "KenshiLib.dll": 180,
+    "MyGUIEngine_x64.dll": 29,
+    "OgreMain_x64.dll": 1
+  },
+  "backup": "D:\\DEV\\Kenshi\\backup\\keo-reload-diag-20261105-071551",
+  "preserved_sha256": {
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "2e3480c877eceb736b0f3442420a9fa58b7dbd9c90edb5ae8ef3a9c73aadd72a",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\RE_Kenshi.json": "46dba618bbfac3e915141a0277a1106a3c30ed2d5fa8e6920782ea89ad6c2e68",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\mods.cfg": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f"
+  },
+  "behavior_changes": "none; diagnostics only",
+  "lok_status": "prepared separately; active files held unchanged for controlled KEO reproduction",
+  "runtime_acceptance": "pending user import/out/back reproduction"
+}

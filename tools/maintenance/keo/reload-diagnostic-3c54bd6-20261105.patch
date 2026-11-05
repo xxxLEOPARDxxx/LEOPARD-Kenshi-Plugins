@@ -1,0 +1,666 @@
+From 3c54bd6566d0dab95f3ebde04a75655a1a89d24c Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 07:14:58 +0300
+Subject: [PATCH] diagnostics(zone): trace readiness and town handoff on
+ repeated city loads
+
+---
+ leopard/squin-reload-diagnostic-20261105.md |  64 ++++++++++++
+ leopard/test_readiness_diagnostic.py        | 110 ++++++++++++++++++++
+ leopard/zone_lifecycle/test_diagnostics.py  |  75 +++++++++++++
+ src/zone/handoff/zone_first_time.cpp        |  51 ++++-----
+ src/zone/handoff/zone_lifecycle_diag.h      |  32 ++++++
+ src/zone/handoff/zone_lifecycle_hooks.cpp   |  20 ++++
+ src/zone/preload/preload_internal.h         |   2 -
+ src/zone/preload/preload_prepare.cpp        |   4 +-
+ src/zone/readiness/readiness_bypass_queue.h |  72 +++++++++++++
+ src/zone/readiness/readiness_hook.cpp       |  70 +++++++++++++
+ 10 files changed, 467 insertions(+), 33 deletions(-)
+ create mode 100644 leopard/squin-reload-diagnostic-20261105.md
+ create mode 100644 leopard/test_readiness_diagnostic.py
+ create mode 100644 leopard/zone_lifecycle/test_diagnostics.py
+ create mode 100644 src/zone/handoff/zone_lifecycle_diag.h
+ create mode 100644 src/zone/readiness/readiness_bypass_queue.h
+
+diff --git a/leopard/squin-reload-diagnostic-20261105.md b/leopard/squin-reload-diagnostic-20261105.md
+new file mode 100644
+index 0000000..518a5d4
+--- /dev/null
++++ b/leopard/squin-reload-diagnostic-20261105.md
+@@ -0,0 +1,64 @@
++# Squin second-load diagnostic, 05 Nov 2026
++
++User's controlled reproduction supersedes the earlier saved-state comparison:
++main-menu import of LEO4, first Squin approach inside, unload via Hub, return
++outside with KEO; independent same import/cycle stays inside without KEO.
++Running KEO is implicated in that unload/reload scenario. Placement mechanism
++is not yet established; this candidate deliberately does not change loading,
++readiness, town activation or NPC positioning behavior.
++
++## Trace
++
++With the existing detailed log enabled, the production build emits:
++
++* `ReadinessBypass`: only actual native-false / KEO-true outcomes, with cell,
++  raw EXE return RVA, thread ID, main-thread state, existing readiness/ledger
++  classification, section count and just-loaded flag. QPC first/last and repeat
++  count identify event time independently of delayed print time.
++* `ReadinessBypassQueue`: dropped, coalesced and Debug-off-discarded rows.
++  Fixed 128 POD rows, one non-waiting try-CAS; Main drains at most 16 per .5s
++  and formats only after releasing the gate. No engine pointers are retained.
++* `ZoneTownRefuse`: an existing TownGuard refusal with cell, epoch, arguments
++  and main phase. The original remains skipped exactly as before.
++* `FirstTime`: private processContent finalization flags, town/file predictor
++  inputs and epoch. Repeated cell visits remain observable, replacing the
++  former DEV-only once-ever latch. Actual handoff events also carry epoch.
++* Existing `ZoneLife unload ... save=` and retention/transition summaries remain.
++
++Lifecycle events use two fixed 32-key budgets, each at most 64 per minute and
++one identical kind/cell every 5s. Debug OFF gates extra lifecycle queries and
++readiness QPC/TID/state reads; the readiness reporter retains a small constant
++try-CAS/discard step. Logs are diagnostic samples with explicit queue losses,
++not an exhaustive history of every callback.
++
++Caller class 0 is Main with zone-manager state4, not proof of a particular
++native caller. Raw 3AC822 on Steam is the shared wrapper return; it cannot
++distinguish its upstream caller. Readiness classes: 0=no section, 1=outdoor
++missing, 2=outdoor present/buildings pending, 3=not in world, 4=unknown,
++-1=off-thread classification not sampled. Readiness rows do not contain world
++epoch; QPC timestamps must be used across imports and delayed drains.
++
++## Verification and scope
++
++Actual extracted readiness hook parity: 1536 combinations in each /Od and /O2
++against the pre-change body, including identical native/classify invocation
++counts and return values. Queue concurrency covers four producers/8000 write
++attempts, bounded drain/full/coalescing/Debug lifecycle. Removing the recording
++call returns RED. Lifecycle actual handlers: 111 controls each /Od and /O2,
++with old event behavior returning RED. Independent reviews of both scopes
++found no blocker. This does not establish the root cause or constitute an FPS
++benchmark. No new native hook/address/ABI was added.
++
++Native audit in `_codex_work/20261105-squin-second-load` verifies the readiness
++to B3 publication and unloaded-platoon admission chain on the actual Steam
++image. The native fallback checks generator work as well as section count;
++the current unknown-cell KEO bypass does not. Town coverage is another
++candidate: listed town cells are protected, not every physical building cell.
++Neither candidate is treated as the proven cause before the controlled trace.
++
++Use one fresh game session: import LEO4 from main menu; first Squin; Hub until
++Squin unloads; return Squin; pause immediately at the outside crowd and leave
++the process open for read-only inspection. Do not run an OFF control before
++the ON log is copied. Active LoK files are deliberately unchanged for this run;
++its independently prepared update is held to avoid a second changed variable.
++No public release/version/ALL_CHANGELOG change. DF and satellite remain paused.
+diff --git a/leopard/test_readiness_diagnostic.py b/leopard/test_readiness_diagnostic.py
+new file mode 100644
+index 0000000..dc28718
+--- /dev/null
++++ b/leopard/test_readiness_diagnostic.py
+@@ -0,0 +1,110 @@
++from pathlib import Path
++import os,subprocess,sys,hashlib
++R=Path('D:/DEV/Kenshi/forks/KEO');O=Path('D:/SteamLibrary/steamapps/common/Kenshi/_codex_work/20261105-squin-readiness-diag');O.mkdir(parents=True,exist_ok=True)
++candidate='--candidate' in sys.argv
++P=O/'readiness_hook.cpp' if candidate else R/'src/zone/readiness/readiness_hook.cpp'
++s=P.read_text()
++legacy='bool hook_isContentPending(void* manager, void* zonePos)\n{\n\tbool onMainThread = IsMainThread();\n\n\t// Prioritize navmesh queue once per transition, at start of state 4.\n\t// By state 4, processState3 has finished registerZoneSections ->\n\t// contentStream has submitted all navmesh jobs for this transition.\n\t// Reordering now promotes the transition zone\'s jobs to the front.\n\tif (onMainThread && isTransitionActive && !prioritizedThisTransition)\n\t{\n\t\tCallPrioritizeNavMeshQueue();\n\t\tprioritizedThisTransition = true;\n\t}\n\n\tbool result = game::g_hookOrig.orig_isContentPending(manager, zonePos);\n\tint sectionCount = *(int*)(KLIB_MEMBER(4, (uintptr_t)manager, NavMesh_addList_count, OFF_RDY_SM_PENDING_SECTIONS));\n\tIslandCountReadiness(!result, !result && sectionCount > 0);\n\n#if ZONEHAND_STEP >= 2\n\t// The contract\'s two inputs, read for every call the hook is asked\n\t// about -- ahead of the answers that are already settled (the original\n\t// said ready, or deferral and the overrides switch are off). Both reads\n\t// are single aligned loads with no side effect and no lock, so no answer\n\t// on any path changes by taking them here; what changes is that the\n\t// counters report the class of every cell the hook was asked about,\n\t// instead of only the cells whose answer the contract got as far as\n\t// deciding. A cell class of zero means the hook was asked about a cell\n\t// the ledger does not know, which is most calls and takes no atomic.\n\t//\n\t// ZM+8 is read live rather than from a per-frame mirror: a save load\n\t// sets the flag partway through its own synchronous body, with no frame\n\t// boundary inside that call for a sample to observe it at, so a mirror\n\t// can read stale for the whole span of the load. Reading it once here\n\t// and using that value at the decision point below keeps a single call\'s\n\t// two uses consistent with each other.\n\tint gxContract = *(const int*)KLIB_MEMBER(5, (const int*)zonePos, iVector2_x, 0);\n\tint gyContract = *(const int*)KLIB_MEMBER(5, (const int*)zonePos, iVector2_y, 4);\n\tuintptr_t zmForContract = (uintptr_t)g_cachedZoneMgr;\n\tbool justLoadedAGame = zmForContract != 0\n\t\t&& *(unsigned char*)(KLIB_MEMBER(2, zmForContract, ZoneManager_justLoadedAGame, OFF_ZM_LOADING)) != 0;\n\tint cellClassContract = ZoneReadinessBridgeClassOf(gxContract, gyContract);\n\tswitch (ZoneReadinessContractBucket(cellClassContract, justLoadedAGame))\n\t{\n\tcase ZONE_READY_BUCKET_GLOBAL:  InterlockedIncrement(&g_rdyContract.g_rdyContractGlobal);  break;\n\tcase ZONE_READY_BUCKET_ADOPTED: InterlockedIncrement(&g_rdyContract.g_rdyContractAdopted); break;\n\tcase ZONE_READY_BUCKET_PRIVATE: InterlockedIncrement(&g_rdyContract.g_rdyContractPrivate); break;\n\tcase ZONE_READY_BUCKET_NONE:    break;   // no counter: the bypass count already covers these\n\t}\n#endif\n\n\tif (result)\n\t\treturn true;\n\n\tif (!zone::g_zoneCfg.deferralEnabled)\n\t\treturn false;\n\n\t// Classification. The caller class uses the thread and, on the main\n\t// thread, the zone manager state (never read off it, where the class is\n\t// always "off"). Main-thread calls are always classified, and so is every\n\t// call while the rule is on (its answer depends on the class). Off the\n\t// main thread with the rule off, only 1 call in 16 is classified; the other\n\t// 15 take neither lock and are not counted, and their answer (today\'s\n\t// rule, below) does not depend on the class.\n\tconst int* pos = (const int*)zonePos;\n\tint caller = RC_OFF;\n\tif (onMainThread)\n\t\tcaller = IsStatePoll4() ? RC_POLL4 : RC_MAIN;\n\tbool classify = onMainThread || zone::g_zoneCfg.islandReadinessRuleEnabled\n\t             || (InterlockedIncrement(&g_rdy.g_rdyOffSample) & RDY_OFF_SAMPLE_MASK) == 0;\n\t// The +0x1E0 split (diagnostic) runs on the main thread and in the sampled\n\t// rule-off calls; off the main thread with the rule on it is skipped, so\n\t// the rule path adds no contention against the game\'s blocking map lookups.\n\tbool splitMap = onMainThread || !zone::g_zoneCfg.islandReadinessRuleEnabled;\n\tint cls = RZ_UNKNOWN;\n\tif (classify)\n\t{\n\t\tcls = ClassifyZoneReadiness((uintptr_t)manager, pos, splitMap);\n\t\tInterlockedIncrement(&g_rdy.g_rdyCls[caller][cls]);\n\t}\n\n\t// readinessOverrides off: the original\'s answer for every caller. The queue\n\t// reprioritization above has already run.\n\tif (!zone::g_zoneCfg.readinessOverridesEnabled)\n\t\treturn false;\n\n#if ZONEHAND_STEP >= 2\n\t// The readiness contract: the per-cell class wins over islandReadinessRule\n\t// outright, for every cell -- see zone_readiness_contract.h. Below step 2\n\t// the contract does not exist at all (the #else arm below), and the rule\n\t// alone decides.\n\t//\n\t// The inputs were read at the top of this call and are used here as read:\n\t// neither depends on `classify`/`caller` (thread- and sample-dependent\n\t// diagnostics) or on which thread calls, so the same (gx, gy, classWord,\n\t// ZM+8) always gives the same answer. classWord is published once per\n\t// main-thread frame (lock-free, no lock), so a call on another thread can\n\t// see last frame\'s class until the next publish -- never a torn one.\n\t// Adopted and private cells, and every cell while ZM+8 is set, answer\n\t// false here (the original already said so, unmodified); every other cell\n\t// drops straight to today\'s sections==0 bypass below.\n\tif (ZoneReadinessContractDecide(cellClassContract, justLoadedAGame) == ZONE_READY_ANSWER_ORIGINAL)\n\t\treturn false;\n\t// Today\'s bypass otherwise: fall to the sections==0 tail below.\n\t// islandReadinessRule is not consulted at this step -- see the #else arm.\n#else\n\t// The per-caller rule: every caller but the state-4 poll (main thread in\n\t// state 4, any zone) is ready exactly when the zone\'s outdoor instance is\n\t// in the world, whatever the global section count. noSection,\n\t// outdoorMissing and notInWorld all answer 0; only RZ_UNKNOWN (the outdoor\n\t// fact was not read) falls through to today\'s rule.\n\tif (zone::g_zoneCfg.islandReadinessRuleEnabled && classify && caller != RC_POLL4 && cls != RZ_UNKNOWN)\n\t{\n\t\tbool ready = (cls == RZ_BUILDINGS_PENDING);\n\t\tInterlockedIncrement(ready ? &g_rdy.g_rdyRuleReady : &g_rdy.g_rdyRuleWait);\n\t\treturn ready;\n\t}\n#endif\n\n\tif (sectionCount > 0)\n\t\treturn false;\n\tInterlockedIncrement(&g_rdy.g_rdyBypass);\n\n\t// Sections drained: return ready regardless of navmesh state.\n\t// Macro-transitions: the original navmesh-wait deferral (95% faster state 4).\n\t// Micro-transitions (platoon activation bumps state 0->1 without\n\t// showLoadingMessage): prevents NavMeshGenerator idle stall from\n\t// causing state 4 pause. NPCs use fallback pathfinding briefly.\n\tif (!onMainThread)\n\t\treturn true;\n\n\tif (isTransitionActive)\n\t\tdeferredFrameCount++;\n\telse\n\t{\n\t\tstatic double lastMicroDeferLog = 0.0;\n\t\tdouble t = ElapsedSec();\n\t\tif (t - lastMicroDeferLog > 5.0)\n\t\t{\n\t\t\tKEO_DETAIL("Micro-transition deferral: sections=0, skipping navmesh wait");\n\t\t\tlastMicroDeferLog = t;\n\t\t}\n\t}\n\treturn true;\n}'
++def body(text,marker):
++ a=text.index(marker);b=text.index('{',a);n=1;e=b+1
++ while n:n+=(text[e]=='{')-(text[e]=='}');e+=1
++ return text[a:e]
++hook=body(s,'bool hook_isContentPending(')
++record=body(s,'static void ReadinessNoteBypass(')
++report=body(s,'static void ReadinessBypassReportTick(')
++mainreport=body(s,'void ReadinessReportTick(')
++assert mainreport.index('ReadinessBypassReportTick(now)')<mainreport.index('if (!DetailedLogEnabled())')<mainreport.index('now - lastLog')
++fixture=r"""
++#define WIN32_LEAN_AND_MEAN
++#define NOMINMAX
++#include <windows.h>
++#include <intrin.h>
++#pragma intrinsic(_ReturnAddress)
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdint.h>
++#include <sstream>
++#include <iomanip>
++#include "zone/readiness/zone_readiness_contract.h"
++#include "readiness_bypass_queue.h"
++#define ZONEHAND_STEP 3
++#define KLIB_MEMBER(category,base,name,offset) ((uintptr_t)(base)+(offset))
++#define OFF_RDY_SM_PENDING_SECTIONS 0
++#define OFF_ZM_LOADING 8
++enum {RC_POLL4,RC_MAIN,RC_OFF,RC_COUNT};
++enum {RZ_UNKNOWN,RZ_NO_SECTION,RZ_OUTDOOR_MISSING,RZ_NOT_IN_WORLD,RZ_BUILDINGS_PENDING,RZ_COUNT};
++enum {RDY_OFF_SAMPLE_MASK=15};
++static unsigned checks=0;static volatile LONG allocations=0;
++void* operator new(size_t n){InterlockedIncrement(&allocations);return malloc(n);}void operator delete(void*p){free(p);}
++void C(bool b,const char*why){++checks;if(!b){printf("FAIL %s\n",why);fflush(stdout);ExitProcess(1);}}
++namespace zone {struct Cfg{bool deferralEnabled,readinessOverridesEnabled,islandReadinessRuleEnabled;}g_zoneCfg;}
++static bool nativeResult,mainThread,isTransitionActive,prioritizedThisTransition,debugOn=true;
++static int calls,prioritized,deferredFrameCount,cellClass,classifyCalls,logCalls,bypassLines;
++static unsigned char world[16];static void*g_cachedZoneMgr=world;static uintptr_t gameBase=0;
++static int GetZoneState(void*){C(mainThread,"state is never read off Main");return world[12];}
++static bool Original(void*,void*){++calls;return nativeResult;}
++namespace game {struct Orig{bool(*orig_isContentPending)(void*,void*);}g_hookOrig={Original};}
++static struct {volatile LONG g_rdyContractGlobal,g_rdyContractAdopted,g_rdyContractPrivate;}g_rdyContract;
++static struct {volatile LONG g_rdyOffSample,g_rdyCls[RC_COUNT][RZ_COUNT],g_rdyRuleReady,g_rdyRuleWait,g_rdyBypass,g_rdyScans;volatile LONG64 g_rdyScanTicks,g_rdyScanMax,g_rdyScanSlots;}g_rdy;
++static bool IsMainThread(){return mainThread;}static bool DetailedLogEnabled(){return debugOn;}
++static void CallPrioritizeNavMeshQueue(){++prioritized;}static void IslandCountReadiness(bool,bool){}
++static int ZoneReadinessBridgeClassOf(int,int){return cellClass;}
++static bool IsStatePoll4(){return world[12]==4;}
++static int ClassifyZoneReadiness(uintptr_t,const int*,bool){++classifyCalls;return RZ_OUTDOOR_MISSING;}
++static double ElapsedSec(){return 0.;}
++static ReadinessBypassQueue s_bypassQueue={0};
++static void LogDebug(const std::string&s){C(s_bypassQueue.gate==0,"format/log after queue release");++logCalls;if(s.find("ReadinessBypass: ")==0)++bypassLines;}
++#define KEO_DETAIL(message) do{if(DetailedLogEnabled())LogDebug(message);}while(0)
++static LARGE_INTEGER qpcFrequency={0};static void FlushPendingTransitionLines(){}
++static LONG ReadCounter(volatile LONG*p){return InterlockedCompareExchange(p,0,0);}
++@RECORD@
++@REPORT@
++@MAINREPORT@
++@LEGACY@
++@HOOK@
++static ReadinessBypassEvent E(int x,int y=0){ReadinessBypassEvent e={0};e.gx=x;e.gy=y;e.tid=3;e.firstQpc=e.lastQpc=x+1;e.returnRva=0x3ac822;return e;}
++static void QueueCases(){
++ ReadinessBypassQueue q={0};ReadinessBypassEvent e=E(0),out[128];
++ q.gate=1;C(!ReadinessBypassPush(&q,e,false)&&q.dropped==0&&q.gate==1,"OFF touches no gate/counters");C(!ReadinessBypassPush(&q,e,true)&&q.dropped==1,"busy producer drops immediately");C(ReadinessBypassDrain(&q,out,16)==0&&q.gate==1,"busy drain returns without releasing owner");q.gate=0;
++ for(int i=0;i<128;++i)C(ReadinessBypassPush(&q,E(i),true),"fill capacity");C(!ReadinessBypassPush(&q,E(128),true)&&q.dropped==2,"full queue drops");e=E(127);e.lastQpc=999;C(ReadinessBypassPush(&q,e,true)&&q.coalesced==1&&q.count==128,"full adjacent duplicate coalesces");
++ C(ReadinessBypassDrain(&q,out,128)==16&&out[0].gx==0&&out[15].gx==15,"drain cap16 FIFO");for(int i=128;i<144;++i)C(ReadinessBypassPush(&q,E(i),true),"ring wraps after drain");int expected=16;while(q.count){unsigned n=ReadinessBypassDrain(&q,out,16);for(unsigned i=0;i<n;++i){C(out[i].gx==expected,"ring FIFO after wrap");if(expected==127)C(out[i].repeats==2&&out[i].firstQpc==128&&out[i].lastQpc==999,"coalescing keeps first/last/repeat");++expected;}}C(expected==144&&q.gate==0,"empty drain releases gate");
++ ReadinessBypassPush(&q,E(9),true);ReadinessBypassDiscard(&q);C(q.count==0&&q.discarded==1,"OFF lifecycle discards pending records");ReadinessBypassPush(&q,E(10),true);C(ReadinessBypassDrain(&q,out,16)==1&&out[0].gx==10,"re-enable contains only fresh event");
++}
++static ReadinessBypassQueue concurrent={0};static volatile LONG accepted=0;
++static DWORD WINAPI Producer(void*p){int id=(int)(uintptr_t)p;for(int i=0;i<2000;++i){ReadinessBypassEvent e=E(i,id);e.tid=id+1;e.contractClass=i^id;if(ReadinessBypassPush(&concurrent,e,true))InterlockedIncrement(&accepted);}return 0;}
++static void ConcurrentCases(){HANDLE threads[4];static bool seen[4][2000]={0};for(int i=0;i<4;++i){threads[i]=CreateThread(NULL,0,Producer,(void*)(uintptr_t)i,0,NULL);C(threads[i]!=NULL,"create bounded producer");}unsigned received=0;bool done=false;do{ReadinessBypassEvent rows[16];unsigned n=ReadinessBypassDrain(&concurrent,rows,16);for(unsigned i=0;i<n;++i){ReadinessBypassEvent&e=rows[i];C(e.gx>=0&&e.gx<2000&&e.gy>=0&&e.gy<4&&e.tid==(DWORD)e.gy+1&&e.contractClass==(e.gx^e.gy)&&e.repeats==1,"concurrent POD not torn");C(!seen[e.gy][e.gx],"concurrent no duplicate delivery");seen[e.gy][e.gx]=true;++received;}done=WaitForMultipleObjects(4,threads,TRUE,0)==WAIT_OBJECT_0;SwitchToThread();}while(!done||concurrent.count);C(received==(unsigned)accepted&&accepted+concurrent.dropped==8000,"every concurrent attempt delivered or counted dropped");for(int i=0;i<4;++i)CloseHandle(threads[i]);}
++static void HookCases(){int pos[2]={5,8};unsigned cases=0;ReadinessBypassEvent rows[16];
++ for(int debug=0;debug<2;++debug)for(int thread=0;thread<2;++thread)for(int original=0;original<2;++original)for(int sections=0;sections<3;++sections)for(int cls=0;cls<4;++cls)for(int loading=0;loading<2;++loading)for(int def=0;def<2;++def)for(int overrides=0;overrides<2;++overrides)for(int rule=0;rule<2;++rule){
++  mainThread=thread!=0;debugOn=debug!=0;nativeResult=original!=0;cellClass=cls;world[8]=(unsigned char)loading;world[12]=4;
++  zone::g_zoneCfg.deferralEnabled=def!=0;zone::g_zoneCfg.readinessOverridesEnabled=overrides!=0;zone::g_zoneCfg.islandReadinessRuleEnabled=rule!=0;isTransitionActive=false;
++  calls=classifyCalls=0;memset(&g_rdy,0,sizeof(g_rdy));int manager=sections;bool before=baseline_hook(&manager,pos);int baselineClassify=classifyCalls;
++  ReadinessBypassDiscard(&s_bypassQueue);calls=classifyCalls=0;memset(&g_rdy,0,sizeof(g_rdy));LONG priorAlloc=allocations;bool result=hook_isContentPending(&manager,pos);
++  C(before==result,"actual hook result parity with original source");C(calls==1,"exactly one native original");C(classifyCalls==baselineClassify,"no extra Classify calls");C(allocations==priorAlloc,"hook diagnostic performs no C++ allocation");
++  bool expected=original||(def&&overrides&&!loading&&cls!=1&&cls!=2&&sections==0);C(result==expected,"readiness truth table unchanged");unsigned n=ReadinessBypassDrain(&s_bypassQueue,rows,16);bool trace=debug&&!original&&result;
++  C(n==(trace?1u:0u),"ONLY Debug nativefalse to KEOtrue recorded");if(trace){ReadinessBypassEvent&e=rows[0];C(e.gx==5&&e.gy==8&&e.contractClass==cls&&!e.justLoaded&&e.sections==0&&e.onMain==thread,"existing hook fields preserved");C(e.mainState==(thread?4:-1)&&e.tid==GetCurrentThreadId()&&e.firstQpc>0&&e.firstQpc==e.lastQpc,"timestamp thread and Main-only state");C(e.readyClass==((thread||rule)?RZ_OUTDOOR_MISSING:-1),"unclassified sample explicitly minus1");}++cases;
++ }
++ printf("PASS %u actual hook parity cases\n",cases);
++ // Main drain runs before the aggregate30s gate, is bounded and releases before format.
++ debugOn=true;mainThread=true;ReadinessBypassDiscard(&s_bypassQueue);logCalls=bypassLines=0;for(int i=0;i<20;++i)ReadinessBypassPush(&s_bypassQueue,E(i),true);ReadinessReportTick(0.01);C(bypassLines==16&&s_bypassQueue.count==4,"main drain precedes aggregate interval and caps16");ReadinessReportTick(0.1);C(bypassLines==16,"main drain respects0.5sec");ReadinessReportTick(0.51);C(bypassLines==20&&s_bypassQueue.count==0,"next bounded drain");ReadinessBypassPush(&s_bypassQueue,E(9),true);debugOn=false;int oldLogs=logCalls;ReadinessReportTick(0.6);C(!s_bypassQueue.count&&logCalls==oldLogs,"Debug OFF clears pending without logging");debugOn=true;ReadinessBypassPush(&s_bypassQueue,E(10),true);ReadinessReportTick(0.61);C(bypassLines==21,"re-enable drains fresh event immediately");
++}
++int main(){QueueCases();ConcurrentCases();HookCases();printf("PASS %u diagnostic controls\n",checks);return 0;}
++"""
++fixture=fixture.replace('@RECORD@',record).replace('@REPORT@',report).replace('@MAINREPORT@',mainreport).replace('@LEGACY@',legacy.replace('hook_isContentPending(','baseline_hook(',1)).replace('@HOOK@',hook)
++V=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');S=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1')
++headerDir=O if candidate else R/'src/zone/readiness'
++env=dict(os.environ,INCLUDE=f'{V}/include;{S}/Include;{R}/src;{headerDir}',LIB=f'{V}/lib/amd64;{S}/Lib/x64')
++fixture=fixture.replace('#include "readiness_bypass_queue.h"','#include "'+str(headerDir/'readiness_bypass_queue.h')+'"')
++variants=[('actual',fixture,False),('record-removed',fixture.replace('ReadinessNoteBypass((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,','ReadinessNoteBypass_DISABLED((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,',1),True)]
++# This mutation removes the captured production call without changing readiness.
++variants[1]=('record-removed',variants[1][1].replace('@unused@',''),True)
++variants[1]=(variants[1][0],variants[1][1].replace('static void ReadinessNoteBypass(', 'static void ReadinessNoteBypass_DISABLED(uintptr_t,const int*,bool,int,int,int,bool,int) {}\nstatic void ReadinessNoteBypass(',1),True)
++outputs=[]
++for name,text,negative in variants:
++ for opt in ['Od','O2']:
++  cpp=O/(name+'-'+opt+'.cpp');exe=O/(name+'-'+opt+'.exe');cpp.write_text(text)
++  q=subprocess.run([str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT','/'+opt,str(cpp),str(R/'src/zone/readiness/zone_readiness_contract.cpp'),'/Fo'+str(O)+'/', '/Fe'+str(exe)],env=env,cwd=O,capture_output=True,text=True);assert not q.returncode,q.stdout+q.stderr
++  q=subprocess.run([str(exe)],capture_output=True,text=True);out=name+' '+opt+' '+q.stdout.strip();print(out);outputs.append(out)
++  if negative:assert q.returncode==1 and'ONLY Debug nativefalse to KEOtrue recorded'in q.stdout,q.stdout+q.stderr
++  else:assert not q.returncode,q.stdout+q.stderr
++(O/'diagnostic-tests.txt').write_text(('CANDIDATE ONLY\n'if candidate else'ACTUAL PRODUCTION\n')+'\n'.join(outputs)+'\nsourceSHA256 '+hashlib.sha256(s.encode()).hexdigest()+'\n')
+diff --git a/leopard/zone_lifecycle/test_diagnostics.py b/leopard/zone_lifecycle/test_diagnostics.py
+new file mode 100644
+index 0000000..1fbff37
+--- /dev/null
++++ b/leopard/zone_lifecycle/test_diagnostics.py
+@@ -0,0 +1,75 @@
++"""Actual production handlers + bounded header, PROD (no KEO_DEBUG), VC10 Od/O2.
++--old-control suppresses only the added refusal event to prove the regression RED.
++No game/native calls: boundaries are counted fakes, actual handler bodies unchanged.
++"""
++from pathlib import Path
++import os,subprocess,sys
++root=Path(__file__).resolve().parents[2];out=root/'build/zone-lifecycle-diag';out.mkdir(parents=True,exist_ok=True)
++def body(file,name):
++ s=(root/file).read_text(encoding='utf-8-sig');a=s.index(name);a=s.rfind('\n',0,a)+1;b=s.index('{',a);e=b+1;n=1
++ while n:n+=(s[e]=='{')-(s[e]=='}');e+=1
++ return s[a:e]
++hook=body('src/zone/handoff/zone_lifecycle_hooks.cpp','static bool __fastcall hook_activateZoneMap(')
++if '--old-control' in sys.argv:hook=hook.replace('if (DetailedLogEnabled() && IsMainThread())','if (false && DetailedLogEnabled() && IsMainThread())')
++first=body('src/zone/handoff/zone_first_time.cpp','void ZlLogFirstTimeDiag(')
++give=body('src/zone/handoff/zone_first_time.cpp','bool ZlGiveToGame(')
++# Actual PROD caller/declaration must both expose the private finalize event.
++for name in ['src/zone/preload/preload_prepare.cpp','src/zone/preload/preload_internal.h']:
++ s=(root/name).read_text(encoding='utf-8-sig');line=s.index('ZlLogFirstTimeDiag(');assert s.rfind('#ifdef KEO_DEBUG',0,line)<=s.rfind('#endif',0,line)
++fixture=r"""
++#include <windows.h>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <sstream>
++#include <string>
++#include <vector>
++#include "zone/handoff/zone_lifecycle_diag.h"
++static int checks=0,queries=0,clocks=0,originalCalls=0,takeCalls=0,drops=0,touches=0,flagsCalls=0,fileCalls=0,townCalls=0;
++static bool debug=false,mainThread=true,refuse=false,take=false,originalAnswer=false,inA=false,inB=false,untouched=true,readOk=true,latePossible=true;
++static unsigned epoch=1;static double now=0;static int ft=0,ld=1,act=0;static std::vector<std::string> logs;
++void C(bool b,const char*t){++checks;if(!b){printf("FAIL %s\n",t);exit(1);}}
++bool DetailedLogEnabled(){return debug;}bool IsMainThread(){return mainThread;}unsigned ZoneHandoffWorldEpoch(){return epoch;}
++double ElapsedSec(){++clocks;return now;}void LogMsg(const std::string&s){logs.push_back(s);}
++#define KEO_DETAIL(line) do{if(DetailedLogEnabled())LogMsg(line);}while(0)
++struct Zone{int x,y;unsigned char loading;};
++int GetZoneGridX(void*p){++queries;return ((Zone*)p)->x;}int GetZoneGridY(void*p){++queries;return ((Zone*)p)->y;}int GetZoneState(void*){++queries;return 2;}
++bool ZoneHandoffTownGuardRefuses(int,float){return refuse;}bool ZoneHandoffTakeover(void*,void*,int){++takeCalls;return take;}
++bool Native(void*,void*,__int64,int,int,float){++originalCalls;return originalAnswer;}
++bool(*orig_activateZoneMap)(void*,void*,__int64,int,int,float)=Native;
++@HOOK@
++struct Preloaded{int gridX,gridY;bool contentProcessed,pending;};static Preloaded preloadedZones[4];
++static ZoneLifecycleDiagBudget g_firstTimeDiagBudget;static unsigned char g_ftLateCell[4096];static int pendingCount=0,g_ftCleared=0,g_ftLate=0;
++int ZoneCell(int x,int y){return x<0||x>63||y<0||y>63?-1:x*64+y;}
++bool ReadContentLifeFlags(void*,int*f,int*l,int*a){++flagsCalls;*f=ft;*l=ld;*a=act;return readOk;}
++int ZlCellTownCount(int){++townCalls;return 0;}int ZlZoneFileExists(int,int){++fileCalls;return 1;}
++bool ZlLateHandoffPossible(){return latePossible;}
++bool ZoneInSetA(void*,void*){return inA;}bool ZoneInSetB(void*,void*){return inB;}bool ContentUntouched(void*){return untouched;}
++void DropTrackedZone(int){++drops;}void ZlTouchZone(void*,int){++touches;}
++const int ZL_HANDOFF=32;
++#define KLIB_MEMBER(t,base,member,off) ((base)+offsetof(Zone,loading))
++@FIRST@
++@GIVE@
++int main(){Zone z={30,31,1};
++ debug=false;refuse=true;int q=queries,c=clocks;C(!hook_activateZoneMap(NULL,&z,123,4,2,0),"OFF refusal result unchanged");C(queries==q&&clocks==c&&logs.empty()&&originalCalls==0&&takeCalls==0,"OFF refusal no diagnostic queries, native retry, or output");
++ debug=true;C(!hook_activateZoneMap(NULL,&z,123,4,2,0),"ON refusal result unchanged");C(logs.size()==1&&logs.back().find("ZoneTownRefuse: zone(30,31)")!=std::string::npos&&logs.back().find("range=4 type=2 timer=0 phase=2")!=std::string::npos,"PROD refused activation identifies cell and actual arguments");
++ size_t n=logs.size();for(int i=0;i<1000;++i)hook_activateZoneMap(NULL,&z,123,4,2,0);C(logs.size()==n,"same-cell every-frame refusal suppressed");
++ now=6;hook_activateZoneMap(NULL,&z,123,4,2,0);C(logs.size()==n+1,"returning cell remains observable");++epoch;hook_activateZoneMap(NULL,&z,123,4,2,0);C(logs.size()==n+2,"world epoch rearms diagnostics");
++ n=logs.size();q=queries;c=clocks;mainThread=false;hook_activateZoneMap(NULL,&z,123,4,2,0);C(logs.size()==n&&queries==q&&clocks==c,"foreign-thread refusal cannot inspect map");mainThread=true;
++ refuse=false;originalAnswer=true;take=false;n=logs.size();q=queries;c=clocks;C(hook_activateZoneMap(NULL,&z,123,4,2,1)&&originalCalls==1&&takeCalls==1,"accepted activation native and takeover exactly once");C(logs.size()==n&&queries==q&&clocks==c,"accepted activation adds no diagnostics");
++ originalAnswer=false;take=true;C(hook_activateZoneMap(NULL,&z,123,4,2,1)&&originalCalls==2&&takeCalls==2,"takeover preserves successful return");
++ preloadedZones[0].gridX=30;preloadedZones[0].gridY=31;preloadedZones[0].contentProcessed=true;debug=false;q=flagsCalls;c=clocks;ZlLogFirstTimeDiag(0,&z);C(flagsCalls==q&&clocks==c&&fileCalls==0&&townCalls==0,"OFF private finalize zero added native/clock queries");
++ debug=true;n=logs.size();ZlLogFirstTimeDiag(0,&z);C(logs.size()==n+1&&logs.back().find("source=private-processContent ft=0 loaded=1 activation=0 towns=0 file=1")!=std::string::npos,"PROD private finalize records actual flags and predictor inputs");
++ q=fileCalls;ZlLogFirstTimeDiag(0,&z);C(logs.size()==n+1&&fileCalls==q,"finalize duplicate does not query file/town");now+=6;ft=1;ZlLogFirstTimeDiag(0,&z);C(logs.size()==n+2&&logs.back().find("lateHandoffEligible=1")!=std::string::npos,"repeat private finalize in same cell is observable");
++ ++epoch;ZlLogFirstTimeDiag(0,&z);C(logs.size()==n+3,"import rearms private finalize");ld=0;now+=6;ZlLogFirstTimeDiag(0,&z);C(logs.size()==n+3,"unfinished shell never reported as finalized");ld=1;
++ for(int enabled=0;enabled<=1;++enabled){debug=enabled!=0;for(int branch=0;branch<3;++branch){++epoch;inA=branch==0;inB=false;untouched=branch==1;z.loading=1;preloadedZones[0].pending=true;pendingCount=1;int d=drops,t=touches,f=g_ftCleared,l=g_ftLate;q=clocks;n=logs.size();bool r=ZlGiveToGame(NULL,0,&z,&z,"test boundary");C(r==(branch!=2),"handoff return unchanged");C(drops==d+(branch!=2)&&touches==t+(branch==1)&&g_ftCleared==f+(branch==1)&&g_ftLate==l+(branch==2),"handoff branch ownership/mutation unchanged");C(pendingCount==(branch==2?0:1)&&z.loading==(branch==1?0:1),"handoff pending/loading state unchanged");C(enabled?logs.size()==n+1:logs.size()==n&&clocks==q,"handoff diagnostic enabled only");}}
++ ZoneLifecycleDiagBudget b;for(int i=0;i<64;++i)C(b.Admit(1,0,i,1,0),"bounded unique events admitted");C(!b.Admit(1,0,90,1,0)&&b.emitted==64,"64-event minute cap");C(b.Admit(1,0,90,1,60),"minute budget rearms");C(!b.Admit(1,0,90,1,61),"per-cell suppression survives window");C(b.Admit(2,0,90,1,61),"world reset rearms budget");C(b.Admit(2,0,90,1,0),"clock rewind resets budget");C(!b.Admit(2,0,90,1,-1),"invalid clock refused");
++ printf("PASS %d PROD extracted lifecycle controls; fixed budget bytes=%u\n",checks,(unsigned)sizeof(b));}
++""".replace('@HOOK@',hook).replace('@FIRST@',first).replace('@GIVE@',give)
++cpp=out/'diagnostics.cpp';cpp.write_text(fixture)
++vc=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');sdk=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{root}/src;{vc}/include;{sdk}/Include',LIB=f'{vc}/lib/amd64;{sdk}/Lib/x64')
++for opt in ('Od','O2'):
++ label=('OLD-'if '--old-control'in sys.argv else '')+opt;exe=out/(label+'.exe');p=subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(cpp),'/Fo'+str(out)+'/', '/Fe'+str(exe)],env=env,capture_output=True,text=True);(out/(label+'-build.log')).write_text(p.stdout+p.stderr);assert not p.returncode,p.stdout+p.stderr
++ p=subprocess.run([str(exe)],capture_output=True,text=True);(out/(label+'-run.log')).write_text(p.stdout+p.stderr);print(label,p.stdout.strip())
++ if '--old-control'in sys.argv:assert p.returncode==1 and'PROD refused activation identifies'in p.stdout
++ else:assert not p.returncode,p.stdout+p.stderr
+diff --git a/src/zone/handoff/zone_first_time.cpp b/src/zone/handoff/zone_first_time.cpp
+index 77c2c00..86af897 100644
+--- a/src/zone/handoff/zone_first_time.cpp
++++ b/src/zone/handoff/zone_first_time.cpp
+@@ -5,8 +5,11 @@
+ #include <cstring>
+ #include "zone/zone_life.h"
+ #include "zone/zone_life_internal.h"
++#include "zone/handoff/zone_handoff.h"
++#include "zone/handoff/zone_lifecycle_diag.h"
+ 
+ namespace zone_life_detail {
++static ZoneLifecycleDiagBudget g_firstTimeDiagBudget;
+ static unsigned char g_ftLateCell[ZONE_GRID_COUNT];     // cells caught late: predicted first-time from then on
+ static unsigned char g_ftKeptLateCell[ZONE_GRID_COUNT]; // cells counted in keptLate (once each)
+ }
+@@ -178,40 +181,25 @@ int ZlPredictFirstTime(int gx, int gy)
+ 	return ZlZoneFileExists(gx, gy) == 1 ? 0 : 1;
+ }
+ 
+-#ifdef KEO_DEBUG
+-// Tests the premise "does a first-time town the mod preloads get its
+-// residents and barflies?", DEV only, one line per cell per session: once the
+-// mod's own processContent has finalized a zone's content (loaded == 1), log
+-// what the game will have decided (content+0xA8) beside the two inputs the
+-// prediction reads, and whether the mod keeps the zone registered (kept=1) or
+-// the first-time rule gives it to the game here (kept=0). The rule is
+-// unconditional, zoneLifeUnload=false included (the game's
+-// phase-B spawn runs only for zones it loads itself), so kept=1 only for a
+-// zone that reads not-first-time after the finalize, or one caught late where
+-// the unload protocol can never pass (kept). A zone the
+-// prediction already gave to the game never reaches this line.
++// PROD+DEV Debug-only bounded events. Repeated loads remain observable; no once-ever cell latch.
+ void ZlLogFirstTimeDiag(int i, void* content)
+ {
+ 	if (!DetailedLogEnabled()) return;
+-	static unsigned char logged[ZONE_GRID_COUNT] = { 0 };
+ 	int gx = preloadedZones[i].gridX;
+ 	int gy = preloadedZones[i].gridY;
+ 	int cell = ZoneCell(gx, gy);
+-	if (cell < 0 || logged[cell] || !preloadedZones[i].contentProcessed)
+-		return;
++	if (cell < 0 || !preloadedZones[i].contentProcessed) return;
+ 	int ft = 0, ld = 0, act = 0;
+-	if (!ReadContentLifeFlags(content, &ft, &ld, &act) || ld != 1)
+-		return;   // not finalized yet: the line waits for loaded == 1
+-	logged[cell] = 1;
+-	int kept = (ZlFirstTimeRuleOn() && ft != 0 && ZlLateHandoffPossible()) ? 0 : 1;   // the block below the call
++	if (!ReadContentLifeFlags(content, &ft, &ld, &act) || ld != 1) return;
++	unsigned epoch = ZoneHandoffWorldEpoch();
++	if (!g_firstTimeDiagBudget.Admit(epoch, 1, gx, gy, ElapsedSec())) return;
+ 	std::ostringstream ss;
+-	ss << "FirstTime: zone(" << gx << "," << gy << ") ft=" << ft
+-	   << " towns=" << ZlCellTownCount(cell)
+-	   << " file=" << ZlZoneFileExists(gx, gy)
+-	   << " kept=" << kept;
++	ss << "FirstTime: zone(" << gx << "," << gy << ") epoch=" << epoch
++	   << " source=private-processContent ft=" << ft << " loaded=" << ld << " activation=" << act
++	   << " towns=" << ZlCellTownCount(cell) << " file=" << ZlZoneFileExists(gx, gy)
++	   << " lateHandoffEligible=" << ((ft != 0 && ZlLateHandoffPossible()) ? 1 : 0);
+ 	KEO_DETAIL(ss.str());
+ }
+-#endif
+ 
+ // A zone that never gets a mod processContent: hand it back untouched.
+ // Returns true when the table entry was dropped (the caller moves on).
+@@ -260,9 +248,16 @@ bool ZlGiveToGame(void* zoneMgr, int i, void* ze, void* content, const char* why
+ 		what = "left to the zombie unload";
+ 		dropped = false;
+ 	}
+-	std::ostringstream ss;
+-	ss << "First-time zone (" << gx << "," << gy << ") " << why
+-	   << ": given to the game (" << what << ")";
+-	KEO_DETAIL(ss.str());
++	if (DetailedLogEnabled())
++	{
++		unsigned epoch = ZoneHandoffWorldEpoch();
++		if (g_firstTimeDiagBudget.Admit(epoch, 2, gx, gy, ElapsedSec()))
++		{
++			std::ostringstream ss;
++			ss << "First-time zone (" << gx << "," << gy << ") " << why
++			   << ": given to the game (" << what << ") epoch=" << epoch;
++			KEO_DETAIL(ss.str());
++		}
++	}
+ 	return dropped;
+ }
+diff --git a/src/zone/handoff/zone_lifecycle_diag.h b/src/zone/handoff/zone_lifecycle_diag.h
+new file mode 100644
+index 0000000..c91038a
+--- /dev/null
++++ b/src/zone/handoff/zone_lifecycle_diag.h
+@@ -0,0 +1,32 @@
++// Bounded diagnostic admission only. Main-thread caller; no native queries or allocations.
++#ifndef KEO_ZONE_LIFECYCLE_DIAG_H
++#define KEO_ZONE_LIFECYCLE_DIAG_H
++struct ZoneLifecycleDiagBudget
++{
++    struct Key { int kind, x, y; double at; bool used; } keys[32];
++    unsigned epoch, emitted, next;
++    double windowAt;
++    bool initialized;
++    ZoneLifecycleDiagBudget() : epoch(0), emitted(0), next(0), windowAt(0), initialized(false)
++    { for (int i=0;i<32;++i) keys[i].used=false; }
++    bool Admit(unsigned worldEpoch, int kind, int x, int y, double now)
++    {
++        if (!(now >= 0.0 && now < 1.0e100)) return false;
++        if (!initialized || epoch != worldEpoch || now < windowAt)
++        {
++            initialized=true; epoch=worldEpoch; emitted=next=0; windowAt=now;
++            for (int i=0;i<32;++i) keys[i].used=false;
++        }
++        if (now-windowAt >= 60.0) { windowAt=now; emitted=0; }
++        if (emitted >= 64) return false;
++        int found=-1;
++        for (int i=0;i<32;++i)
++            if (keys[i].used && keys[i].kind==kind && keys[i].x==x && keys[i].y==y)
++            { if (now-keys[i].at < 5.0) return false; found=i; break; }
++        if (found<0) { found=(int)next; next=(next+1)%32; }
++        keys[found].used=true; keys[found].kind=kind; keys[found].x=x; keys[found].y=y; keys[found].at=now;
++        ++emitted;
++        return true;
++    }
++};
++#endif
+diff --git a/src/zone/handoff/zone_lifecycle_hooks.cpp b/src/zone/handoff/zone_lifecycle_hooks.cpp
+index 6a6104f..6cba469 100644
+--- a/src/zone/handoff/zone_lifecycle_hooks.cpp
++++ b/src/zone/handoff/zone_lifecycle_hooks.cpp
+@@ -10,6 +10,8 @@
+ #if ZONEHAND_STEP >= 2
+ 
+ #include "zone/handoff/zone_handoff.h"
++#include "zone/handoff/zone_lifecycle_diag.h"
++#include <sstream>
+ #include "zone/retention/zone_retention.h"
+ #include "zone/retention/zone_expiry_guard.h"
+ #include "zone/retention/zone_expiry_guard_policy.h"
+@@ -50,7 +52,25 @@ static bool __fastcall hook_activateZoneMap(void* zoneMgr, void* map, __int64 ce
+                                             int range, int type, float deactivationTimer)
+ {
+ 	if (ZoneHandoffTownGuardRefuses(type, deactivationTimer))
++	{
++		// Debug off adds no clock/map/native reads. Never query a foreign-thread map.
++		if (DetailedLogEnabled() && IsMainThread())
++		{
++			static ZoneLifecycleDiagBudget budget;
++			int gx = map ? GetZoneGridX(map) : -1;
++			int gy = map ? GetZoneGridY(map) : -1;
++			unsigned epoch = ZoneHandoffWorldEpoch();
++			if (budget.Admit(epoch, 0, gx, gy, ElapsedSec()))
++			{
++				std::ostringstream ss;
++				ss << "ZoneTownRefuse: zone(" << gx << "," << gy << ") epoch=" << epoch
++				   << " centre=" << centre << " range=" << range << " type=" << type
++				   << " timer=" << deactivationTimer << " phase=" << GetZoneState(zoneMgr);
++				KEO_DETAIL(ss.str());
++			}
++		}
+ 		return false;
++	}
+ 
+ 	bool activated = orig_activateZoneMap(zoneMgr, map, centre, range, type, deactivationTimer);
+ 
+diff --git a/src/zone/preload/preload_internal.h b/src/zone/preload/preload_internal.h
+index 9f41822..01bdeb8 100644
+--- a/src/zone/preload/preload_internal.h
++++ b/src/zone/preload/preload_internal.h
+@@ -108,8 +108,6 @@ bool ZlLateHandoffPossible();
+ int  ZlPredictFirstTime(int gx, int gy);
+ bool ZlGiveToGame(void* zoneMgr, int i, void* ze, void* content, const char* why);
+ void ZlKeepLate(int i);
+-#ifdef KEO_DEBUG
+ void ZlLogFirstTimeDiag(int i, void* content);
+-#endif
+ 
+ #endif // KEO_PRELOAD_INTERNAL_H
+diff --git a/src/zone/preload/preload_prepare.cpp b/src/zone/preload/preload_prepare.cpp
+index 0b0d962..bde4afe 100644
+--- a/src/zone/preload/preload_prepare.cpp
++++ b/src/zone/preload/preload_prepare.cpp
+@@ -173,9 +173,7 @@ void TryRegisterPreloadedZones(void* zoneMgr, double now)
+ 				g_pipe.notReadyAtCall++;
+ 		}
+ 
+-#ifdef KEO_DEBUG
+-		ZlLogFirstTimeDiag(i, content);   // FirstTime: line, once per cell
+-#endif
++		ZlLogFirstTimeDiag(i, content);   // bounded PROD+DEV Debug event
+ 		// The handoff rule, after the finalize: every zone the mod registers
+ 		// is one the game would not populate as first-time,
+ 		// and is saveable if the step-3 pass unloads it. Two kinds are not and
+diff --git a/src/zone/readiness/readiness_bypass_queue.h b/src/zone/readiness/readiness_bypass_queue.h
+new file mode 100644
+index 0000000..f0083dd
+--- /dev/null
++++ b/src/zone/readiness/readiness_bypass_queue.h
+@@ -0,0 +1,72 @@
++#pragma once
++// Fixed diagnostic records only. One CAS try-gate; never wait or call native code.
++#include <windows.h>
++#include <stdint.h>
++
++enum { READINESS_BYPASS_CAPACITY = 128, READINESS_BYPASS_DRAIN_MAX = 16 };
++struct ReadinessBypassEvent
++{
++ LONGLONG firstQpc, lastQpc;
++ uintptr_t returnRva;
++ DWORD tid, repeats;
++ int gx, gy, caller, readyClass, contractClass, sections, mainState;
++ unsigned char onMain, justLoaded;
++};
++struct ReadinessBypassQueue
++{
++ volatile LONG gate, dropped, coalesced, discarded;
++ unsigned read, write, count;
++ ReadinessBypassEvent rows[READINESS_BYPASS_CAPACITY];
++};
++inline bool ReadinessBypassSame(const ReadinessBypassEvent& a, const ReadinessBypassEvent& b)
++{
++ return a.returnRva==b.returnRva && a.tid==b.tid && a.gx==b.gx && a.gy==b.gy &&
++  a.caller==b.caller && a.readyClass==b.readyClass && a.contractClass==b.contractClass &&
++  a.sections==b.sections && a.mainState==b.mainState && a.onMain==b.onMain && a.justLoaded==b.justLoaded;
++}
++inline bool ReadinessBypassPush(ReadinessBypassQueue* q, const ReadinessBypassEvent& event, bool enabled)
++{
++ if (!enabled) return false;
++ if (InterlockedCompareExchange(&q->gate,1,0)!=0) { InterlockedIncrement(&q->dropped); return false; }
++ if (q->count)
++ {
++  unsigned last=q->write ? q->write-1 : READINESS_BYPASS_CAPACITY-1;
++  if (ReadinessBypassSame(q->rows[last],event))
++  {
++   if (q->rows[last].repeats!=0xFFFFFFFFu) ++q->rows[last].repeats;
++   q->rows[last].lastQpc=event.lastQpc;
++   InterlockedIncrement(&q->coalesced);
++   InterlockedExchange(&q->gate,0);
++   return true;
++  }
++ }
++ if (q->count==READINESS_BYPASS_CAPACITY)
++ {
++  InterlockedIncrement(&q->dropped); InterlockedExchange(&q->gate,0); return false;
++ }
++ q->rows[q->write]=event;
++ q->rows[q->write].repeats=1;
++ q->write=(q->write+1)%READINESS_BYPASS_CAPACITY; ++q->count;
++ InterlockedExchange(&q->gate,0);
++ return true;
++}
++inline unsigned ReadinessBypassDrain(ReadinessBypassQueue* q, ReadinessBypassEvent* out, unsigned capacity)
++{
++ if (!out || !capacity || InterlockedCompareExchange(&q->gate,1,0)!=0) return 0;
++ if (capacity>READINESS_BYPASS_DRAIN_MAX) capacity=READINESS_BYPASS_DRAIN_MAX;
++ unsigned n=q->count<capacity?q->count:capacity;
++ for (unsigned i=0;i<n;++i)
++ {
++  out[i]=q->rows[q->read]; q->read=(q->read+1)%READINESS_BYPASS_CAPACITY;
++ }
++ q->count-=n;
++ InterlockedExchange(&q->gate,0);
++ return n;
++}
++inline void ReadinessBypassDiscard(ReadinessBypassQueue* q)
++{
++ if (InterlockedCompareExchange(&q->gate,1,0)!=0) return;
++ InterlockedExchangeAdd(&q->discarded,(LONG)q->count);
++ q->read=q->write=q->count=0;
++ InterlockedExchange(&q->gate,0);
++}
+diff --git a/src/zone/readiness/readiness_hook.cpp b/src/zone/readiness/readiness_hook.cpp
+index 62b3022..555ca1e 100644
+--- a/src/zone/readiness/readiness_hook.cpp
++++ b/src/zone/readiness/readiness_hook.cpp
+@@ -8,6 +8,9 @@
+ #include "zone/transition.h"
+ #include "zone/transition_hook.h"
+ #include "zone/readiness/readiness_hook.h"
++#include "zone/readiness/readiness_bypass_queue.h"
++#include <intrin.h>
++#pragma intrinsic(_ReturnAddress)
+ #include "zone/hooks_internal.h"
+ #include "movement/islands.h"
+ #include "zone/readiness/zone_readiness_contract.h"
+@@ -284,6 +287,64 @@ static bool IsStatePoll4()
+ 	return zm && GetZoneState(zm) == 4;
+ }
+ 
++
++// Diagnostic queue owns values only, never a zone/manager pointer. Calls from every
++// thread are bounded and may drop. A shared-wrapper return does not identify its caller.
++static ReadinessBypassQueue s_bypassQueue = {0};
++static void ReadinessNoteBypass(uintptr_t returnAddress, const int* pos, bool onMain,
++ int caller, int readyClass, int contractClass, bool justLoaded, int sections)
++{
++ if (!DetailedLogEnabled()) return;
++ ReadinessBypassEvent e = {0};
++ LARGE_INTEGER stamp;
++ QueryPerformanceCounter(&stamp);
++ e.firstQpc=e.lastQpc=stamp.QuadPart;
++ e.returnRva=returnAddress >= gameBase ? returnAddress-gameBase : 0;
++ e.tid=GetCurrentThreadId();
++ e.gx=pos ? pos[0] : -1; e.gy=pos ? pos[1] : -1;
++ e.caller=caller; e.readyClass=readyClass; e.contractClass=contractClass;
++ e.sections=sections; e.onMain=onMain ? 1 : 0; e.justLoaded=justLoaded ? 1 : 0;
++ // GetZoneState is the existing raw field accessor. Never read it off Main.
++ e.mainState=onMain && g_cachedZoneMgr ? GetZoneState(g_cachedZoneMgr) : -1;
++ ReadinessBypassPush(&s_bypassQueue,e,true);
++}
++static void ReadinessBypassReportTick(double now)
++{
++ static double lastDrain=-1.0;
++ static LONG lastDropped=0, lastCoalesced=0, lastDiscarded=0;
++ if (!DetailedLogEnabled())
++ {
++  ReadinessBypassDiscard(&s_bypassQueue); lastDrain=-1.0; return;
++ }
++ if (lastDrain>=0.0 && now>=lastDrain && now-lastDrain<0.5) return;
++ lastDrain=now;
++ ReadinessBypassEvent rows[READINESS_BYPASS_DRAIN_MAX];
++ unsigned n=ReadinessBypassDrain(&s_bypassQueue,rows,READINESS_BYPASS_DRAIN_MAX);
++ // Drain released its gate before any formatting or logging.
++ for (unsigned i=0;i<n;++i)
++ {
++  const ReadinessBypassEvent& e=rows[i];
++  std::ostringstream ss;
++  ss << "ReadinessBypass: cell=(" << e.gx << "," << e.gy << ") raRva=0x"
++   << std::hex << e.returnRva << std::dec << " tid=" << e.tid << " main=" << (int)e.onMain
++   << " zmState=" << e.mainState << " callerClass=" << e.caller
++   << " readyClass=" << e.readyClass << " contractClass=" << e.contractClass
++   << " justLoaded=" << (int)e.justLoaded << " sections=" << e.sections
++   << " qpc=" << e.firstQpc << "/" << e.lastQpc << " n=" << e.repeats;
++  KEO_DETAIL(ss.str());
++ }
++ LONG dropped=InterlockedCompareExchange(&s_bypassQueue.dropped,0,0);
++ LONG coalesced=InterlockedCompareExchange(&s_bypassQueue.coalesced,0,0);
++ LONG discarded=InterlockedCompareExchange(&s_bypassQueue.discarded,0,0);
++ if (dropped!=lastDropped || coalesced!=lastCoalesced || discarded!=lastDiscarded)
++ {
++  lastDropped=dropped; lastCoalesced=coalesced; lastDiscarded=discarded;
++  std::ostringstream ss;
++  ss << "ReadinessBypassQueue: dropped=" << dropped << " coalesced=" << coalesced << " discarded=" << discarded;
++  KEO_DETAIL(ss.str());
++ }
++}
++
+ static inline LONG ReadCounter(volatile LONG* c)
+ {
+ 	return InterlockedCompareExchange(c, 0, 0);
+@@ -300,6 +361,7 @@ namespace hooks_detail
+ // (10 s DEV, 30 s PROD, only when a counter moved).
+ void ReadinessReportTick(double now)
+ {
++	ReadinessBypassReportTick(now);
+ 	if (!DetailedLogEnabled()) return;
+ 	static bool configLogged = false;
+ 	if (!configLogged)
+@@ -552,6 +614,14 @@ bool hook_isContentPending(void* manager, void* zonePos)
+ 	if (sectionCount > 0)
+ 		return false;
+ 	InterlockedIncrement(&g_rdy.g_rdyBypass);
++ ReadinessNoteBypass((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,
++#if ZONEHAND_STEP >= 2
++  cellClassContract,justLoadedAGame,
++#else
++  -1,false,
++#endif
++  sectionCount);
++
+ 
+ 	// Sections drained: return ready regardless of navmesh state.
+ 	// Macro-transitions: the original navmesh-wait deferral (95% faster state 4).
+-- 
+2.46.0.windows.1
+

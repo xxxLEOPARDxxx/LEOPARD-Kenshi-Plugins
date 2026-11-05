@@ -1,0 +1,21 @@
+{
+  "log_sha256": "3448456862f0a1230931e9a66e460107bdbefd21d616f3bbe3408551bee1d6b0",
+  "re_log_sha256": "ddffccdfcf4d6456444cd52346ca978e229c79d5673575fd979307543e8cfb2c",
+  "snapshot_sha256": "cec7a5092857420c58a376444a3edbb2f12345f5f24665ce2602096a47a83408",
+  "rows": 557,
+  "attempts": 1994,
+  "derived_coalesced": 1437,
+  "queue_reported": {
+    "dropped": 0,
+    "coalesced": 1437,
+    "discarded": 0
+  },
+  "aggregate_bypass_final": 1994,
+  "max_first_to_flush_seconds": 3.454992499999989,
+  "qpc_frequency_host": 10000000,
+  "event_time_anchor": {
+    "elapsed": 3.29,
+    "qpc": 445326121576
+  },
+  "scope": "read-only file analysis; host QueryPerformanceFrequency only; no Kenshi native calls, process reads or writes"
+}
