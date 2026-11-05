@@ -24,7 +24,11 @@ Always check the actual process immediately before replacing a loaded DLL.
    jobs; distinct targets permitted, identical targets still rejected.
    206actual factory controls + false-only RED and DEV/PROD passed. Installed
    while fresh process absent; all four personal configuration files preserved.
-   User asked to repeat two points and observe cycle; gameplay/save-load pending.
+   User CONFIRMED corrected two-point loop works, then saved a separate
+   KEO-route-test-20261105 slot and loaded without import: both points restored
+   and route continues. Steam route creation/repetition/save-load accepted.
+   Exact installed DLL verified; full production transfer/GOG/FPS/leak acceptance
+   remains separate, not implied by this route test.
    Previous actual crash: truncated derived vtable, fixedb59ab75/5E01E06E.
    Early metadata/late template registration now confirmed in actual Steam.
    Counter hold-RMB command exists/adds; no physical delivery acceptance yet.

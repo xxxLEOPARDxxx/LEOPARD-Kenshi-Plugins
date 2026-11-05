@@ -1,0 +1,20 @@
+{
+  "time_msk": "2026-11-05T06:01:06",
+  "source_commit": "df07c25009555e4d6bd7a69e17f175360ac0bbd6",
+  "installed_dll_sha256": "fb42de66f98894e690bc4d5fd6d117ae9dee318a6a60cb9d07b6e7b550ebee9e",
+  "status": "local_private_not_published",
+  "actual_steam_process": 27756,
+  "registration_log": [
+    "16.935 KEO: Steel jobs: metadata registered; waiting for native world task templates",
+    "33.675 KEO: Steel jobs: registered three native task types; independent live switches ready"
+  ],
+  "user_confirmed": [
+    "Two different route points appear and the character repeats the route.",
+    "Saved new KEO-route-test-20261105 slot, loaded without import; both points restored and the character continues the route."
+  ],
+  "not_yet_verified": [
+    "Physical machine collection and counter stocking end-to-end.",
+    "Real GOG startup retry of separate SDK-fix archive.",
+    "Dedicated long FPS and memory measurements."
+  ]
+}
