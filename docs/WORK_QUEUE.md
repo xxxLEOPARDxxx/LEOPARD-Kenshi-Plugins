@@ -19,6 +19,33 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
+   LATEST05Nov07:41: permanent fix7609b76 INSTALLED, PROD SHA
+   ea56647bb504a5287ee2589b815d9b1ac1cef6e760d6921048420908ede86751.
+   All current>=2classes preserve native readiness; hiddenINIkeys cannot opt
+   back into false-ready; workers/preload/cache/priorities unchanged. Actual
+   hook6144cases eachOd/O2 +OLDpolicyRED +legacydiagnosticfixture passed;
+   independentreviewCLEAR, DEV/PROD351/imports180SDK29MyGUI1Ogre passed.
+   Original pre-control INI restored EXACT2e3480c8; temporarycontrolinactive.
+   Other3personalconfigs unchanged. BackupDDEV/backup/keo-native-ready-20261105-074130.
+   Private ZIP KEO-native-readiness-test-20261105.zip793227B14filesCRC,
+   SHA4ae278c0fb2662f928e34f4c54af5c9aa5103f4a544ffff734791f1ee3adcdf7.
+   Usernowrepeatingfreshimport/outbackforEXACTnewDLLacceptance (notyetconfirmed).
+   Both capturedbaseline/control logs preserved. LoK HOLD lifted only AFTER
+   controlledtraces saved: exactly3verifiedauthorfiles installedviaPWsh at07:42;
+   RU/NCE/Anim/Robot/modlist unchanged. FirstlegacyPowerShellattempt failed at
+   Get-FileHash beforeLoKwrites; correctedPWsh installPASS. No publicrelease.
+
+   USER ACCEPTANCE05Nov: single-variable fresh-import control with native
+   readiness succeeded: NPC in city after unload/return. Logs frozen at
+   KEO-native-ready-20844.log / RE_Kenshi-native-ready-20844.log, bypass=0,
+   overrides=off. Runtime Шпилька route quality NOT compared yet (user explicitly
+   answered 'Пока не проверял'). Permanent fix being prepared: retire false-ready
+   contract for ALL current>=2classes; original answer and backgroundworkers/
+   preloading/cache/priorities preserved. Do not use outdoor-only shortcut.
+   GOG tester now reports latest supplied GOG test has no errors/crashes.
+   Record acceptance of supplied isolated GOG test, not yet new city fix or all
+   production jobs; tester DLL SHA was not independently returned.
+
    CONTROL ACTIVE05Nov07:25: after confirmed diagnostic repro PID26768, changed
    ONLY KEO.ini readinessOverrides=false, same D2EC DLL/mod list/LoK. Exact
    original INI backup game/_codex_work/20261105-squin-second-load/

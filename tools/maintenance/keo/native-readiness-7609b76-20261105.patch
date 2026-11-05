@@ -1,0 +1,565 @@
+From 7609b76e125ab0709a804325fc7e631064875eeb Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 07:39:43 +0300
+Subject: [PATCH] fix(zone): preserve native navmesh readiness for every city
+ reload
+
+---
+ leopard/native-readiness-fix-20261105.md      | 60 +++++++++++++++++
+ leopard/test_readiness_diagnostic.py          | 33 ++++++----
+ src/base/config.h                             |  9 ++-
+ src/zone/readiness/readiness_hook.cpp         | 63 ++++++------------
+ .../readiness/zone_readiness_contract.cpp     | 17 ++---
+ src/zone/readiness/zone_readiness_contract.h  | 64 +++++--------------
+ .../readiness/zone_readiness_ledger_bridge.h  | 23 ++-----
+ src/zone/zone_config.cpp                      | 17 ++---
+ src/zone/zone_config.h                        | 10 +--
+ src/zone/zone_ledger_core.h                   | 24 ++-----
+ tools/tests/zone_readiness_contract_units.cpp | 19 ++++--
+ 11 files changed, 164 insertions(+), 175 deletions(-)
+ create mode 100644 leopard/native-readiness-fix-20261105.md
+
+diff --git a/leopard/native-readiness-fix-20261105.md b/leopard/native-readiness-fix-20261105.md
+new file mode 100644
+index 0000000..bda3d53
+--- /dev/null
++++ b/leopard/native-readiness-fix-20261105.md
+@@ -0,0 +1,60 @@
++# Preserve native readiness on city reload, 05 Nov 2026
++
++The user's independent main-menu IMPORT LEO4 reproduction is decisive:
++KEO ON first enters Squin normally, but after Hub unload/re-entry residents
++appear outside; fresh identical import with KEO OFF stays inside. The earlier
++comparison on an already persisted save did not exclude KEO.
++
++Diagnostic D2EC3531 captured native-owned Squin cell(18,35). First approach:
++outdoor navmesh ADD49.554 before KEO readiness override49.572. Reload:
++outdoor RET101.741, Main state4 override while outdoor missing120.123,
++transition end120.136, outdoor ADD120.928. No sampled bypass loss:1994calls,
++557rows+1437coalesced,0dropped. Actual read-only snapshot557actors included
++46 common-home actors from multiple platoons near the cell's southeast edge.
++TownGuard refusals affected another cell(20,31); custom unload/save counters0.
++The actual per-platoon placement call was not instrumented, so the trace alone
++does not establish its exact timing. The subsequent single-variable control
++does: same D2EC DLL/assembly and fresh import/out-back cycle with only
++readinessOverrides=false retained NPC inside, confirmed by the user. Control
++log shows bypass0/overridesoff. Original INI is backed up byte-exactly.
++
++## Fix
++
++ZoneReadinessContractDecide always returns ORIGINAL for every cell class and
++just-loaded state. Current shipping builds use ZONEHAND_STEP=3 (contract is
++consulted for >=2); original true remains true, original false remains false.
++This applies to unclassified/game-owned and invalid classes as well. A drained
++add list does not mean outdoor and building navmesh has finished generation.
++There is intentionally no outdoor-only exception: interiors matter too.
++
++The original readiness function is still called exactly once. Preloading,
++worker generation, caches and queue prioritization remain unchanged. No new
++allocation, lock, scan, native call or hook is introduced. State4 may wait
++longer because the invalid readiness shortcut is removed. Existing hidden
++INI flags are accepted but cannot re-enable early readiness at >=2; help and
++comments mark that behavior retired. The old enum value is retained for
++compatibility. Pre-step2 development code remains legacy, outside this fix.
++
++## Verification and boundaries
++
++The actual extracted hook links the real changed contract and tests6144 cases
++per /Od and /O2: main/off-main, main phases, all flags, native answers, section
++counts, loading states and valid/invalid ownership classes. Every result equals
++native, the original and classification counts are preserved and queue
++priority still runs once when eligible. Reintroducing the old policy returns
++RED. Legacy diagnostic capture is retained as a separately linked old-policy
++fixture with6144 cases per optimization and its missing-record negative test.
++Pure contract units and cross-TU ledger/bucket tests also pass. Independent
++review found no blocker.
++
++The controlled native-wait INI is temporary and must be restored byte-exactly
++after closing the game and installing this DLL. New-build gameplay acceptance
++is still pending; do not treat the control as having executed the newly built
++binary. No global path-quality, FPS/leak or GOG-new-jobs claim follows from it.
++The user reports no errors/crashes with the last separately supplied GOG test;
++the new readiness fix is not that accepted binary.
++
++LoK update was prepared independently and its active files were held unchanged
++through both captured spawn tests. It can be installed after these logs are
++preserved. No public release/version bump/ALL_CHANGELOG entry. DF and satellite
++remain paused.
+diff --git a/leopard/test_readiness_diagnostic.py b/leopard/test_readiness_diagnostic.py
+index dc28718..ce0cd13 100644
+--- a/leopard/test_readiness_diagnostic.py
++++ b/leopard/test_readiness_diagnostic.py
+@@ -4,6 +4,7 @@ R=Path('D:/DEV/Kenshi/forks/KEO');O=Path('D:/SteamLibrary/steamapps/common/Kensh
+ candidate='--candidate' in sys.argv
+ P=O/'readiness_hook.cpp' if candidate else R/'src/zone/readiness/readiness_hook.cpp'
+ s=P.read_text()
++legacy_contract='#include "zone/readiness/zone_readiness_contract.h"\n#include "zone/zone_ledger_core.h"\n\nZoneReadinessAnswer ZoneReadinessContractDecide(int cellClass, bool globalGameOwnedBypass)\n{\n\tif (globalGameOwnedBypass)\n\t\treturn ZONE_READY_ANSWER_ORIGINAL;\n\n\tswitch (cellClass)\n\t{\n\tcase ZONE_CLASS_PRIVATE:\n\tcase ZONE_CLASS_ADOPTED:\n\t\treturn ZONE_READY_ANSWER_ORIGINAL;\n\tdefault:   // ZONE_CLASS_NONE, or a value the enum does not have: the game\'s own to load\n\t\treturn ZONE_READY_ANSWER_TODAY_BYPASS;\n\t}\n}\n\nZoneReadinessBucket ZoneReadinessContractBucket(int cellClass, bool globalGameOwnedBypass)\n{\n\tif (globalGameOwnedBypass)\n\t\treturn ZONE_READY_BUCKET_GLOBAL;\n\n\tswitch (cellClass)\n\t{\n\tcase ZONE_CLASS_PRIVATE: return ZONE_READY_BUCKET_PRIVATE;\n\tcase ZONE_CLASS_ADOPTED: return ZONE_READY_BUCKET_ADOPTED;\n\tdefault:                 return ZONE_READY_BUCKET_NONE;\n\t}\n}\n'
+ legacy='bool hook_isContentPending(void* manager, void* zonePos)\n{\n\tbool onMainThread = IsMainThread();\n\n\t// Prioritize navmesh queue once per transition, at start of state 4.\n\t// By state 4, processState3 has finished registerZoneSections ->\n\t// contentStream has submitted all navmesh jobs for this transition.\n\t// Reordering now promotes the transition zone\'s jobs to the front.\n\tif (onMainThread && isTransitionActive && !prioritizedThisTransition)\n\t{\n\t\tCallPrioritizeNavMeshQueue();\n\t\tprioritizedThisTransition = true;\n\t}\n\n\tbool result = game::g_hookOrig.orig_isContentPending(manager, zonePos);\n\tint sectionCount = *(int*)(KLIB_MEMBER(4, (uintptr_t)manager, NavMesh_addList_count, OFF_RDY_SM_PENDING_SECTIONS));\n\tIslandCountReadiness(!result, !result && sectionCount > 0);\n\n#if ZONEHAND_STEP >= 2\n\t// The contract\'s two inputs, read for every call the hook is asked\n\t// about -- ahead of the answers that are already settled (the original\n\t// said ready, or deferral and the overrides switch are off). Both reads\n\t// are single aligned loads with no side effect and no lock, so no answer\n\t// on any path changes by taking them here; what changes is that the\n\t// counters report the class of every cell the hook was asked about,\n\t// instead of only the cells whose answer the contract got as far as\n\t// deciding. A cell class of zero means the hook was asked about a cell\n\t// the ledger does not know, which is most calls and takes no atomic.\n\t//\n\t// ZM+8 is read live rather than from a per-frame mirror: a save load\n\t// sets the flag partway through its own synchronous body, with no frame\n\t// boundary inside that call for a sample to observe it at, so a mirror\n\t// can read stale for the whole span of the load. Reading it once here\n\t// and using that value at the decision point below keeps a single call\'s\n\t// two uses consistent with each other.\n\tint gxContract = *(const int*)KLIB_MEMBER(5, (const int*)zonePos, iVector2_x, 0);\n\tint gyContract = *(const int*)KLIB_MEMBER(5, (const int*)zonePos, iVector2_y, 4);\n\tuintptr_t zmForContract = (uintptr_t)g_cachedZoneMgr;\n\tbool justLoadedAGame = zmForContract != 0\n\t\t&& *(unsigned char*)(KLIB_MEMBER(2, zmForContract, ZoneManager_justLoadedAGame, OFF_ZM_LOADING)) != 0;\n\tint cellClassContract = ZoneReadinessBridgeClassOf(gxContract, gyContract);\n\tswitch (ZoneReadinessContractBucket(cellClassContract, justLoadedAGame))\n\t{\n\tcase ZONE_READY_BUCKET_GLOBAL:  InterlockedIncrement(&g_rdyContract.g_rdyContractGlobal);  break;\n\tcase ZONE_READY_BUCKET_ADOPTED: InterlockedIncrement(&g_rdyContract.g_rdyContractAdopted); break;\n\tcase ZONE_READY_BUCKET_PRIVATE: InterlockedIncrement(&g_rdyContract.g_rdyContractPrivate); break;\n\tcase ZONE_READY_BUCKET_NONE:    break;   // no counter: the bypass count already covers these\n\t}\n#endif\n\n\tif (result)\n\t\treturn true;\n\n\tif (!zone::g_zoneCfg.deferralEnabled)\n\t\treturn false;\n\n\t// Classification. The caller class uses the thread and, on the main\n\t// thread, the zone manager state (never read off it, where the class is\n\t// always "off"). Main-thread calls are always classified, and so is every\n\t// call while the rule is on (its answer depends on the class). Off the\n\t// main thread with the rule off, only 1 call in 16 is classified; the other\n\t// 15 take neither lock and are not counted, and their answer (today\'s\n\t// rule, below) does not depend on the class.\n\tconst int* pos = (const int*)zonePos;\n\tint caller = RC_OFF;\n\tif (onMainThread)\n\t\tcaller = IsStatePoll4() ? RC_POLL4 : RC_MAIN;\n\tbool classify = onMainThread || zone::g_zoneCfg.islandReadinessRuleEnabled\n\t             || (InterlockedIncrement(&g_rdy.g_rdyOffSample) & RDY_OFF_SAMPLE_MASK) == 0;\n\t// The +0x1E0 split (diagnostic) runs on the main thread and in the sampled\n\t// rule-off calls; off the main thread with the rule on it is skipped, so\n\t// the rule path adds no contention against the game\'s blocking map lookups.\n\tbool splitMap = onMainThread || !zone::g_zoneCfg.islandReadinessRuleEnabled;\n\tint cls = RZ_UNKNOWN;\n\tif (classify)\n\t{\n\t\tcls = ClassifyZoneReadiness((uintptr_t)manager, pos, splitMap);\n\t\tInterlockedIncrement(&g_rdy.g_rdyCls[caller][cls]);\n\t}\n\n\t// readinessOverrides off: the original\'s answer for every caller. The queue\n\t// reprioritization above has already run.\n\tif (!zone::g_zoneCfg.readinessOverridesEnabled)\n\t\treturn false;\n\n#if ZONEHAND_STEP >= 2\n\t// The readiness contract: the per-cell class wins over islandReadinessRule\n\t// outright, for every cell -- see zone_readiness_contract.h. Below step 2\n\t// the contract does not exist at all (the #else arm below), and the rule\n\t// alone decides.\n\t//\n\t// The inputs were read at the top of this call and are used here as read:\n\t// neither depends on `classify`/`caller` (thread- and sample-dependent\n\t// diagnostics) or on which thread calls, so the same (gx, gy, classWord,\n\t// ZM+8) always gives the same answer. classWord is published once per\n\t// main-thread frame (lock-free, no lock), so a call on another thread can\n\t// see last frame\'s class until the next publish -- never a torn one.\n\t// Adopted and private cells, and every cell while ZM+8 is set, answer\n\t// false here (the original already said so, unmodified); every other cell\n\t// drops straight to today\'s sections==0 bypass below.\n\tif (ZoneReadinessContractDecide(cellClassContract, justLoadedAGame) == ZONE_READY_ANSWER_ORIGINAL)\n\t\treturn false;\n\t// Today\'s bypass otherwise: fall to the sections==0 tail below.\n\t// islandReadinessRule is not consulted at this step -- see the #else arm.\n#else\n\t// The per-caller rule: every caller but the state-4 poll (main thread in\n\t// state 4, any zone) is ready exactly when the zone\'s outdoor instance is\n\t// in the world, whatever the global section count. noSection,\n\t// outdoorMissing and notInWorld all answer 0; only RZ_UNKNOWN (the outdoor\n\t// fact was not read) falls through to today\'s rule.\n\tif (zone::g_zoneCfg.islandReadinessRuleEnabled && classify && caller != RC_POLL4 && cls != RZ_UNKNOWN)\n\t{\n\t\tbool ready = (cls == RZ_BUILDINGS_PENDING);\n\t\tInterlockedIncrement(ready ? &g_rdy.g_rdyRuleReady : &g_rdy.g_rdyRuleWait);\n\t\treturn ready;\n\t}\n#endif\n\n\tif (sectionCount > 0)\n\t\treturn false;\n\tInterlockedIncrement(&g_rdy.g_rdyBypass);\n\n\t// Sections drained: return ready regardless of navmesh state.\n\t// Macro-transitions: the original navmesh-wait deferral (95% faster state 4).\n\t// Micro-transitions (platoon activation bumps state 0->1 without\n\t// showLoadingMessage): prevents NavMeshGenerator idle stall from\n\t// causing state 4 pause. NPCs use fallback pathfinding briefly.\n\tif (!onMainThread)\n\t\treturn true;\n\n\tif (isTransitionActive)\n\t\tdeferredFrameCount++;\n\telse\n\t{\n\t\tstatic double lastMicroDeferLog = 0.0;\n\t\tdouble t = ElapsedSec();\n\t\tif (t - lastMicroDeferLog > 5.0)\n\t\t{\n\t\t\tKEO_DETAIL("Micro-transition deferral: sections=0, skipping navmesh wait");\n\t\t\tlastMicroDeferLog = t;\n\t\t}\n\t}\n\treturn true;\n}'
+ def body(text,marker):
+  a=text.index(marker);b=text.index('{',a);n=1;e=b+1
+@@ -29,6 +30,7 @@ fixture=r"""
+ #include "zone/readiness/zone_readiness_contract.h"
+ #include "readiness_bypass_queue.h"
+ #define ZONEHAND_STEP 3
++#define EXPECT_NATIVE 1
+ #define KLIB_MEMBER(category,base,name,offset) ((uintptr_t)(base)+(offset))
+ #define OFF_RDY_SM_PENDING_SECTIONS 0
+ #define OFF_ZM_LOADING 8
+@@ -74,17 +76,19 @@ static void QueueCases(){
+ static ReadinessBypassQueue concurrent={0};static volatile LONG accepted=0;
+ static DWORD WINAPI Producer(void*p){int id=(int)(uintptr_t)p;for(int i=0;i<2000;++i){ReadinessBypassEvent e=E(i,id);e.tid=id+1;e.contractClass=i^id;if(ReadinessBypassPush(&concurrent,e,true))InterlockedIncrement(&accepted);}return 0;}
+ static void ConcurrentCases(){HANDLE threads[4];static bool seen[4][2000]={0};for(int i=0;i<4;++i){threads[i]=CreateThread(NULL,0,Producer,(void*)(uintptr_t)i,0,NULL);C(threads[i]!=NULL,"create bounded producer");}unsigned received=0;bool done=false;do{ReadinessBypassEvent rows[16];unsigned n=ReadinessBypassDrain(&concurrent,rows,16);for(unsigned i=0;i<n;++i){ReadinessBypassEvent&e=rows[i];C(e.gx>=0&&e.gx<2000&&e.gy>=0&&e.gy<4&&e.tid==(DWORD)e.gy+1&&e.contractClass==(e.gx^e.gy)&&e.repeats==1,"concurrent POD not torn");C(!seen[e.gy][e.gx],"concurrent no duplicate delivery");seen[e.gy][e.gx]=true;++received;}done=WaitForMultipleObjects(4,threads,TRUE,0)==WAIT_OBJECT_0;SwitchToThread();}while(!done||concurrent.count);C(received==(unsigned)accepted&&accepted+concurrent.dropped==8000,"every concurrent attempt delivered or counted dropped");for(int i=0;i<4;++i)CloseHandle(threads[i]);}
+-static void HookCases(){int pos[2]={5,8};unsigned cases=0;ReadinessBypassEvent rows[16];
+- for(int debug=0;debug<2;++debug)for(int thread=0;thread<2;++thread)for(int original=0;original<2;++original)for(int sections=0;sections<3;++sections)for(int cls=0;cls<4;++cls)for(int loading=0;loading<2;++loading)for(int def=0;def<2;++def)for(int overrides=0;overrides<2;++overrides)for(int rule=0;rule<2;++rule){
+-  mainThread=thread!=0;debugOn=debug!=0;nativeResult=original!=0;cellClass=cls;world[8]=(unsigned char)loading;world[12]=4;
++static void HookCases(){int pos[2]={5,8};unsigned cases=0;ReadinessBypassEvent rows[16];int classes[]={0,1,2,3,-1,99,(-2147483647-1),2147483647};
++ for(int phase=0;phase<2;++phase)for(int debug=0;debug<2;++debug)for(int thread=0;thread<2;++thread)for(int original=0;original<2;++original)for(int sections=0;sections<3;++sections)for(int ci=0;ci<8;++ci)for(int loading=0;loading<2;++loading)for(int def=0;def<2;++def)for(int overrides=0;overrides<2;++overrides)for(int rule=0;rule<2;++rule){
++  int cls=classes[ci];mainThread=thread!=0;debugOn=debug!=0;nativeResult=original!=0;cellClass=cls;world[8]=(unsigned char)loading;world[12]=phase?4:0;
+   zone::g_zoneCfg.deferralEnabled=def!=0;zone::g_zoneCfg.readinessOverridesEnabled=overrides!=0;zone::g_zoneCfg.islandReadinessRuleEnabled=rule!=0;isTransitionActive=false;
+   calls=classifyCalls=0;memset(&g_rdy,0,sizeof(g_rdy));int manager=sections;bool before=baseline_hook(&manager,pos);int baselineClassify=classifyCalls;
+-  ReadinessBypassDiscard(&s_bypassQueue);calls=classifyCalls=0;memset(&g_rdy,0,sizeof(g_rdy));LONG priorAlloc=allocations;bool result=hook_isContentPending(&manager,pos);
++  ReadinessBypassDiscard(&s_bypassQueue);calls=classifyCalls=0;memset(&g_rdy,0,sizeof(g_rdy));memset(&g_rdyContract,0,sizeof(g_rdyContract));LONG priorAlloc=allocations;bool result=hook_isContentPending(&manager,pos);
+   C(before==result,"actual hook result parity with original source");C(calls==1,"exactly one native original");C(classifyCalls==baselineClassify,"no extra Classify calls");C(allocations==priorAlloc,"hook diagnostic performs no C++ allocation");
+-  bool expected=original||(def&&overrides&&!loading&&cls!=1&&cls!=2&&sections==0);C(result==expected,"readiness truth table unchanged");unsigned n=ReadinessBypassDrain(&s_bypassQueue,rows,16);bool trace=debug&&!original&&result;
+-  C(n==(trace?1u:0u),"ONLY Debug nativefalse to KEOtrue recorded");if(trace){ReadinessBypassEvent&e=rows[0];C(e.gx==5&&e.gy==8&&e.contractClass==cls&&!e.justLoaded&&e.sections==0&&e.onMain==thread,"existing hook fields preserved");C(e.mainState==(thread?4:-1)&&e.tid==GetCurrentThreadId()&&e.firstQpc>0&&e.firstQpc==e.lastQpc,"timestamp thread and Main-only state");C(e.readyClass==((thread||rule)?RZ_OUTDOOR_MISSING:-1),"unclassified sample explicitly minus1");}++cases;
++  bool expected=EXPECT_NATIVE ? original!=0 : original||(def&&overrides&&!loading&&cls!=1&&cls!=2&&sections==0);C(result==expected,"current contract preserves native readiness");C(g_rdy.g_rdyBypass==(!original&&result?1:0),"bypass counter follows actual answer");C(g_rdyContract.g_rdyContractGlobal==(loading?1:0)&&g_rdyContract.g_rdyContractPrivate==(!loading&&cls==1?1:0)&&g_rdyContract.g_rdyContractAdopted==(!loading&&cls==2?1:0),"classification buckets preserved even when native/off settles answer");unsigned n=ReadinessBypassDrain(&s_bypassQueue,rows,16);bool trace=debug&&!original&&result;
++  C(n==(trace?1u:0u),"ONLY Debug nativefalse to KEOtrue recorded");if(trace){ReadinessBypassEvent&e=rows[0];C(e.gx==5&&e.gy==8&&e.contractClass==cls&&!e.justLoaded&&e.sections==0&&e.onMain==thread,"existing hook fields preserved");C(e.mainState==(thread?world[12]:-1)&&e.tid==GetCurrentThreadId()&&e.firstQpc>0&&e.firstQpc==e.lastQpc,"timestamp thread and Main-only state");C(e.readyClass==((thread||rule)?RZ_OUTDOOR_MISSING:-1),"unclassified sample explicitly minus1");}++cases;
+  }
+  printf("PASS %u actual hook parity cases\n",cases);
++ mainThread=true;nativeResult=false;isTransitionActive=true;prioritizedThisTransition=false;prioritized=0;zone::g_zoneCfg.deferralEnabled=false;zone::g_zoneCfg.readinessOverridesEnabled=false;int manager=0;calls=0;
++ C(!hook_isContentPending(&manager,pos)&&prioritized==1&&calls==1,"native false with feature flags OFF still reprioritizes once");hook_isContentPending(&manager,pos);C(prioritized==1&&calls==2,"repeat query does not reprioritize twice");mainThread=false;prioritizedThisTransition=false;hook_isContentPending(&manager,pos);C(prioritized==1&&calls==3,"off Main original once and no queue reprioritization");isTransitionActive=false;
+  // Main drain runs before the aggregate30s gate, is bounded and releases before format.
+  debugOn=true;mainThread=true;ReadinessBypassDiscard(&s_bypassQueue);logCalls=bypassLines=0;for(int i=0;i<20;++i)ReadinessBypassPush(&s_bypassQueue,E(i),true);ReadinessReportTick(0.01);C(bypassLines==16&&s_bypassQueue.count==4,"main drain precedes aggregate interval and caps16");ReadinessReportTick(0.1);C(bypassLines==16,"main drain respects0.5sec");ReadinessReportTick(0.51);C(bypassLines==20&&s_bypassQueue.count==0,"next bounded drain");ReadinessBypassPush(&s_bypassQueue,E(9),true);debugOn=false;int oldLogs=logCalls;ReadinessReportTick(0.6);C(!s_bypassQueue.count&&logCalls==oldLogs,"Debug OFF clears pending without logging");debugOn=true;ReadinessBypassPush(&s_bypassQueue,E(10),true);ReadinessReportTick(0.61);C(bypassLines==21,"re-enable drains fresh event immediately");
+ }
+@@ -95,16 +99,19 @@ V=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');S=Path('C:/Prog
+ headerDir=O if candidate else R/'src/zone/readiness'
+ env=dict(os.environ,INCLUDE=f'{V}/include;{S}/Include;{R}/src;{headerDir}',LIB=f'{V}/lib/amd64;{S}/Lib/x64')
+ fixture=fixture.replace('#include "readiness_bypass_queue.h"','#include "'+str(headerDir/'readiness_bypass_queue.h')+'"')
+-variants=[('actual',fixture,False),('record-removed',fixture.replace('ReadinessNoteBypass((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,','ReadinessNoteBypass_DISABLED((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,',1),True)]
+-# This mutation removes the captured production call without changing readiness.
+-variants[1]=('record-removed',variants[1][1].replace('@unused@',''),True)
+-variants[1]=(variants[1][0],variants[1][1].replace('static void ReadinessNoteBypass(', 'static void ReadinessNoteBypass_DISABLED(uintptr_t,const int*,bool,int,int,int,bool,int) {}\nstatic void ReadinessNoteBypass(',1),True)
++legacy_fixture=fixture.replace('#define EXPECT_NATIVE 1','#define EXPECT_NATIVE 0')
++removed=legacy_fixture.replace('ReadinessNoteBypass((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,','ReadinessNoteBypass_DISABLED((uintptr_t)_ReturnAddress(),pos,onMainThread,caller,classify ? cls : -1,',1)
++removed=removed.replace('static void ReadinessNoteBypass(', 'static void ReadinessNoteBypass_DISABLED(uintptr_t,const int*,bool,int,int,int,bool,int) {}\nstatic void ReadinessNoteBypass(',1)
++# Preserve explicit legacy diagnostic capture coverage after current policy retires bypass.
++legacy_cpp=O/'legacy-readiness-contract.cpp';legacy_cpp.write_text(legacy_contract)
++variants=[('actual',fixture,False,R/'src/zone/readiness/zone_readiness_contract.cpp',''),('legacy-diagnostic',legacy_fixture,False,legacy_cpp,''),('old-policy-refused',fixture,True,legacy_cpp,'current contract preserves native readiness'),('record-removed',removed,True,legacy_cpp,'ONLY Debug nativefalse to KEOtrue recorded')]
++if '--expect-current-red' in sys.argv:variants=[('actual-old-policy-red',fixture,True,R/'src/zone/readiness/zone_readiness_contract.cpp','current contract preserves native readiness')]
+ outputs=[]
+-for name,text,negative in variants:
++for name,text,negative,policy,reason in variants:
+  for opt in ['Od','O2']:
+   cpp=O/(name+'-'+opt+'.cpp');exe=O/(name+'-'+opt+'.exe');cpp.write_text(text)
+-  q=subprocess.run([str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT','/'+opt,str(cpp),str(R/'src/zone/readiness/zone_readiness_contract.cpp'),'/Fo'+str(O)+'/', '/Fe'+str(exe)],env=env,cwd=O,capture_output=True,text=True);assert not q.returncode,q.stdout+q.stderr
++  q=subprocess.run([str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MT','/'+opt,str(cpp),str(policy),'/Fo'+str(O)+'/', '/Fe'+str(exe)],env=env,cwd=O,capture_output=True,text=True);assert not q.returncode,q.stdout+q.stderr
+   q=subprocess.run([str(exe)],capture_output=True,text=True);out=name+' '+opt+' '+q.stdout.strip();print(out);outputs.append(out)
+-  if negative:assert q.returncode==1 and'ONLY Debug nativefalse to KEOtrue recorded'in q.stdout,q.stdout+q.stderr
++  if negative:assert q.returncode==1 and reason in q.stdout,q.stdout+q.stderr
+   else:assert not q.returncode,q.stdout+q.stderr
+ (O/'diagnostic-tests.txt').write_text(('CANDIDATE ONLY\n'if candidate else'ACTUAL PRODUCTION\n')+'\n'.join(outputs)+'\nsourceSHA256 '+hashlib.sha256(s.encode()).hexdigest()+'\n')
+diff --git a/src/base/config.h b/src/base/config.h
+index ba865ed..0ab70f7 100644
+--- a/src/base/config.h
++++ b/src/base/config.h
+@@ -12,11 +12,10 @@
+ // measurement (ZoneCycle:, ZoneCycleSum:, ZonePriv: and the ZoneLeak: setBsz=
+ // token); it reads state and changes no behaviour. 2 = the handoff itself:
+ // preparation and cohort adoption (zone_handoff.cpp) publish a per-cell
+-// class (private/adopted) into the ledger, and hook_isContentPending's
+-// readiness contract (zone_readiness_contract.h) consults that class
+-// instead of islandReadinessRule -- private and adopted cells hear the
+-// original, every other cell keeps today's sections==0 bypass -- plus the
+-// global game-owned bypass (ZM+8) read fresh at the same call site. 3 is
++// class (private/adopted) into the ledger for readiness diagnostics. The
++// readiness contract preserves the original answer for EVERY cell and caller,
++// including unknown/game-owned cells; the early-ready override is retired.
++// Live ZM+8 is still counted separately. 3 is
+ // the retention hold that keeps an admitted cell from being evicted on its
+ // first native pass (zone_retention.h).
+ // build_opt_step4.bat and build_opt.bat set 3.
+diff --git a/src/zone/readiness/readiness_hook.cpp b/src/zone/readiness/readiness_hook.cpp
+index 555ca1e..f9a1002 100644
+--- a/src/zone/readiness/readiness_hook.cpp
++++ b/src/zone/readiness/readiness_hook.cpp
+@@ -271,16 +271,10 @@ int ClassifyZoneReadiness(uintptr_t mgr, const int* pos, bool splitMap)
+ 
+ namespace readiness_hook_detail {
+ 
+-// Main thread only. The "state-4 poll" class: main thread and zone manager in
+-// state 4, for ANY zone. The zone's accessibility
+-// is deliberately not tested: the state machine (0xA0E950) can poll a zone
+-// that is already accessible, and giving that call the rule's per-zone answer
+-// would put an uncapped wait into the state-4 answer, which can freeze the
+-// game (the pause near inaccessible zones while the state is not 0). The
+-// accepted cost: a main-thread setDestination during state 4 keeps today's
+-// lenient sections == 0 answer. A flag set by a hook around
+-// ZoneManager__stateMachineDriver 0xA0E950 would tell the poll apart exactly
+-// (not done now).
++// Main-thread diagnostic heuristic only: any query while the manager is in
++// state 4. It does not prove the loading driver's call site. At step >= 2
++// every query still preserves native readiness, irrespective of this class.
++// Older steps retain their legacy per-caller behavior below.
+ static bool IsStatePoll4()
+ {
+ 	void* zm = g_cachedZoneMgr;
+@@ -473,12 +467,11 @@ using namespace ::hooks_detail;
+ //
+ // When the original says 0 (and deferral is on):
+ //   - readinessOverrides=false: 0, for every caller.
+-//   - ZONEHAND_STEP >= 2: the readiness contract (zone_readiness_contract.h)
+-//     decides for every cell, and the rule below is never reached. While
+-//     ZM+8 (justLoadedAGame) is set, or the cell is classified private or
+-//     adopted, 0 unmodified; every other cell (unclassified, i.e. the mod
+-//     never reached it) falls to the sections==0 bypass below. Below step 2
+-//     the contract is skipped and the next two rules decide.
++//   - ZONEHAND_STEP >= 2: always 0, for every cell and caller, including
++//     unknown/game-owned cells. The early-ready override is retired. The
++//     ledger and ZM+8 still feed diagnostics; hidden readiness keys cannot
++//     re-enable the override. Workers/cache/preload/reprioritization remain.
++//   - Below step 2 only, legacy behavior remains:
+ //   - islandReadinessRule=true, any caller but the state-4 poll (main thread
+ //     with the zone manager in state 4, any zone), outdoor fact read (class
+ //     not RZ_UNKNOWN): 1 iff the zone's outdoor instance is in the world.
+@@ -539,7 +532,7 @@ bool hook_isContentPending(void* manager, void* zonePos)
+ 	case ZONE_READY_BUCKET_GLOBAL:  InterlockedIncrement(&g_rdyContract.g_rdyContractGlobal);  break;
+ 	case ZONE_READY_BUCKET_ADOPTED: InterlockedIncrement(&g_rdyContract.g_rdyContractAdopted); break;
+ 	case ZONE_READY_BUCKET_PRIVATE: InterlockedIncrement(&g_rdyContract.g_rdyContractPrivate); break;
+-	case ZONE_READY_BUCKET_NONE:    break;   // no counter: the bypass count already covers these
++	case ZONE_READY_BUCKET_NONE:    break;   // NONE has no separate diagnostic bucket counter
+ 	}
+ #endif
+ 
+@@ -549,13 +542,9 @@ bool hook_isContentPending(void* manager, void* zonePos)
+ 	if (!zone::g_zoneCfg.deferralEnabled)
+ 		return false;
+ 
+-	// Classification. The caller class uses the thread and, on the main
+-	// thread, the zone manager state (never read off it, where the class is
+-	// always "off"). Main-thread calls are always classified, and so is every
+-	// call while the rule is on (its answer depends on the class). Off the
+-	// main thread with the rule off, only 1 call in 16 is classified; the other
+-	// 15 take neither lock and are not counted, and their answer (today's
+-	// rule, below) does not depend on the class.
++	// Existing diagnostic classification/sampling is retained. At step >= 2
++	// it cannot change the answer; below 2 the legacy rule still consults it.
++	// Main always classifies; off Main the rule flag selects full versus 1/16.
+ 	const int* pos = (const int*)zonePos;
+ 	int caller = RC_OFF;
+ 	if (onMainThread)
+@@ -579,24 +568,11 @@ bool hook_isContentPending(void* manager, void* zonePos)
+ 		return false;
+ 
+ #if ZONEHAND_STEP >= 2
+-	// The readiness contract: the per-cell class wins over islandReadinessRule
+-	// outright, for every cell -- see zone_readiness_contract.h. Below step 2
+-	// the contract does not exist at all (the #else arm below), and the rule
+-	// alone decides.
+-	//
+-	// The inputs were read at the top of this call and are used here as read:
+-	// neither depends on `classify`/`caller` (thread- and sample-dependent
+-	// diagnostics) or on which thread calls, so the same (gx, gy, classWord,
+-	// ZM+8) always gives the same answer. classWord is published once per
+-	// main-thread frame (lock-free, no lock), so a call on another thread can
+-	// see last frame's class until the next publish -- never a torn one.
+-	// Adopted and private cells, and every cell while ZM+8 is set, answer
+-	// false here (the original already said so, unmodified); every other cell
+-	// drops straight to today's sections==0 bypass below.
++	// Every cell and caller retains native false, even NONE/invalid classes.
++	// Existing class/loading inputs and counters remain diagnostic only.
+ 	if (ZoneReadinessContractDecide(cellClassContract, justLoadedAGame) == ZONE_READY_ANSWER_ORIGINAL)
+ 		return false;
+-	// Today's bypass otherwise: fall to the sections==0 tail below.
+-	// islandReadinessRule is not consulted at this step -- see the #else arm.
++	// Retired answer value/tail kept for compatibility with steps below 2.
+ #else
+ 	// The per-caller rule: every caller but the state-4 poll (main thread in
+ 	// state 4, any zone) is ready exactly when the zone's outdoor instance is
+@@ -623,11 +599,8 @@ bool hook_isContentPending(void* manager, void* zonePos)
+   sectionCount);
+ 
+ 
+-	// Sections drained: return ready regardless of navmesh state.
+-	// Macro-transitions: the original navmesh-wait deferral (95% faster state 4).
+-	// Micro-transitions (platoon activation bumps state 0->1 without
+-	// showLoadingMessage): prevents NavMeshGenerator idle stall from
+-	// causing state 4 pause. NPCs use fallback pathfinding briefly.
++	// Legacy tail, unreachable under the current step >= 2 contract. Older
++	// steps may still bypass the navmesh wait once sections have drained.
+ 	if (!onMainThread)
+ 		return true;
+ 
+diff --git a/src/zone/readiness/zone_readiness_contract.cpp b/src/zone/readiness/zone_readiness_contract.cpp
+index 98e0f26..0c3b7f0 100644
+--- a/src/zone/readiness/zone_readiness_contract.cpp
++++ b/src/zone/readiness/zone_readiness_contract.cpp
+@@ -3,17 +3,12 @@
+ 
+ ZoneReadinessAnswer ZoneReadinessContractDecide(int cellClass, bool globalGameOwnedBypass)
+ {
+-	if (globalGameOwnedBypass)
+-		return ZONE_READY_ANSWER_ORIGINAL;
+-
+-	switch (cellClass)
+-	{
+-	case ZONE_CLASS_PRIVATE:
+-	case ZONE_CLASS_ADOPTED:
+-		return ZONE_READY_ANSWER_ORIGINAL;
+-	default:   // ZONE_CLASS_NONE, or a value the enum does not have: the game's own to load
+-		return ZONE_READY_ANSWER_TODAY_BYPASS;
+-	}
++ // A drained add list is not proof that outdoor AND building meshes are ready.
++ // Keep the engine's answer for every caller and ownership class, including
++ // unknown/invalid classes. The bucket inputs remain diagnostic only.
++ (void)cellClass;
++ (void)globalGameOwnedBypass;
++ return ZONE_READY_ANSWER_ORIGINAL;
+ }
+ 
+ ZoneReadinessBucket ZoneReadinessContractBucket(int cellClass, bool globalGameOwnedBypass)
+diff --git a/src/zone/readiness/zone_readiness_contract.h b/src/zone/readiness/zone_readiness_contract.h
+index edce140..48e5372 100644
+--- a/src/zone/readiness/zone_readiness_contract.h
++++ b/src/zone/readiness/zone_readiness_contract.h
+@@ -1,59 +1,29 @@
+ #pragma once
+-// The readiness contract for hook_isContentPending: what the hook answers
+-// once deferral is on and the original has already said "not ready". Only
+-// consulted at ZONEHAND_STEP >= 2 (readiness_hook.cpp); below that the hook keeps its
+-// pre-existing islandReadinessRule/today's-bypass behaviour untouched.
+-//
+-// Ruling: adopted and private cells hear the original (no override: the
+-// hook's answer here is false, since the original already said so); every
+-// other cell -- unclassified, because the mod never reached it -- is the
+-// game's own to load and keeps today's sections==0 bypass. There is no
+-// third answer: a distinct "game-owned" class is buildable (a writer could
+-// observe every native activation, not only mod-held cells), but it would
+-// be behaviourally inert, since it would answer identically to unclassified
+-// -- today's bypass -- so islandReadinessRule is not consulted from this
+-// contract at all, for either. The global game-owned bypass (ZM+8,
+-// justLoadedAGame) is not per-class: while it is set, every cell hears the
+-// original, checked before the per-cell class is even asked.
+-//
+-// Pure decision logic: no game or KenshiLib headers, no allocation, no side
+-// effects. Given the same two inputs it returns the same answer regardless
+-// of which thread calls it, which is what lets hook_isContentPending keep
+-// its "same return value on every thread" rule. Host-tested under
+-// tools/tests/zone_readiness_contract_units.cpp. The caller supplies
+-// cellClass from the ledger (zone_readiness_ledger_bridge.h, a separate
+-// non-host-tested unit, the same split zone_cycle_math.h/zone_cycle_stats.h
+-// already use) and globalGameOwnedBypass from a direct ZM+8 read -- see
+-// readiness_hook.cpp's call site for why that flag is read fresh rather than
+-// mirrored.
++// Supported builds (ZONEHAND_STEP >= 2) preserve native readiness for every
++// caller and cell, including NONE/game-owned and invalid classes. A zero
++// pending-section count does not prove outdoor and building navmesh readiness.
++// The historical early-ready override is retired; workers, caching, preload
++// and queue prioritization are independent. Steps below 2 keep their legacy
++// hook behavior and are outside this correction.
++// Pure policy: no game calls, locks, allocation or side effects.
+ 
+ enum ZoneReadinessAnswer
+ {
+-	ZONE_READY_ANSWER_ORIGINAL,     // hear the original: the hook returns false, no override
+-	ZONE_READY_ANSWER_TODAY_BYPASS  // apply today's sections==0 bypass; islandReadinessRule is not consulted
++ ZONE_READY_ANSWER_ORIGINAL = 0,
++ ZONE_READY_ANSWER_TODAY_BYPASS = 1 // Retired. Numeric value retained for compatibility; never returned.
+ };
+ 
+-// cellClass carries a ZoneReadinessClass value (zone_ledger_core.h): 0 =
+-// none/unknown, 1 = private, 2 = adopted, passed as a plain int so this
+-// declaration needs no ledger include. Any value outside that range is
+-// treated the same as none (today's bypass), never as a crash or an
+-// assumption about a class the enum does not have.
++// Inputs are retained for source compatibility and classification diagnostics.
++// Every value of cellClass and globalGameOwnedBypass returns ORIGINAL.
+ ZoneReadinessAnswer ZoneReadinessContractDecide(int cellClass, bool globalGameOwnedBypass);
+ 
+-// Which class the contract saw for a cell it was consulted about -- the
+-// classification itself, not the decision taken from it. The caller reads
+-// this for every call it is asked about, including calls whose answer was
+-// already settled before the decision point, so a bucket reading zero means
+-// no cell of that class was consulted, never that the counting path was
+-// skipped. GLOBAL masks the per-cell class: while the bypass is set, a
+-// private or adopted cell reports GLOBAL, so a reading taken during a load
+-// says nothing about whether the other two arms are reachable.
++// Diagnostic classification only; does not grant readiness. GLOBAL reports
++// live ZM+8 (justLoadedAGame) and masks the per-cell bucket as before.
+ enum ZoneReadinessBucket
+ {
+-	ZONE_READY_BUCKET_NONE = 0,   // unclassified, or a value the enum does not have
+-	ZONE_READY_BUCKET_PRIVATE,
+-	ZONE_READY_BUCKET_ADOPTED,
+-	ZONE_READY_BUCKET_GLOBAL      // the bypass is set: the per-cell class is not what would decide
++ ZONE_READY_BUCKET_NONE = 0,
++ ZONE_READY_BUCKET_PRIVATE,
++ ZONE_READY_BUCKET_ADOPTED,
++ ZONE_READY_BUCKET_GLOBAL
+ };
+-
+ ZoneReadinessBucket ZoneReadinessContractBucket(int cellClass, bool globalGameOwnedBypass);
+diff --git a/src/zone/readiness/zone_readiness_ledger_bridge.h b/src/zone/readiness/zone_readiness_ledger_bridge.h
+index e70a249..cff8672 100644
+--- a/src/zone/readiness/zone_readiness_ledger_bridge.h
++++ b/src/zone/readiness/zone_readiness_ledger_bridge.h
+@@ -1,22 +1,9 @@
+ #pragma once
+-// Supplies zone_readiness_contract.h's per-cell input from the ledger
+-// (zone_prep_ledger.h's shared g_zonePrepLedger instance). Gated
+-// ZONEHAND_STEP >= 2; below that step every cell classifies as unknown, so
+-// hook_isContentPending's existing behaviour (islandReadinessRule or
+-// today's bypass, unchanged) is exactly what runs. Not a header-clean unit
+-// (needs config.h and, at step 2, the ledger): declared separately from
+-// zone_readiness_contract.h so that pure decision stays host-testable
+-// without this file.
+-//
+-// The global game-owned bypass (ZM+8, justLoadedAGame) is read directly at
+-// the decision point instead of through this ledger's mirrored copy: a
+-// synchronous call (SaveManager::loadGame) sets the live flag well before
+-// any frame boundary the ledger could observe it at, so a once-per-frame
+-// mirror can lag behind the live flag for the whole span of that call --
+-// exactly the window this bypass exists to cover. See readiness_hook.cpp's use of
+-// KLIB_MEMBER(..., ZoneManager_justLoadedAGame, OFF_ZM_LOADING) on
+-// g_cachedZoneMgr, alongside the other live ZoneManager fields that
+-// hook already reads on whatever thread calls it.
++// Per-cell ledger input for readiness diagnostics (ZONEHAND_STEP >= 2).
++// It no longer grants a readiness bypass: every class preserves the native
++// answer. Below step 2 the bridge returns NONE and legacy hook rules remain.
++// Live ZM+8 is sampled separately for the diagnostic GLOBAL bucket, avoiding
++// a frame-old ledger mirror during a synchronous load. No native query here.
+ 
+ #include "base/config.h"
+ 
+diff --git a/src/zone/zone_config.cpp b/src/zone/zone_config.cpp
+index 04bda78..ebe8e55 100644
+--- a/src/zone/zone_config.cpp
++++ b/src/zone/zone_config.cpp
+@@ -62,9 +62,9 @@ static_assert(__alignof(ZoneConfig) >= 8, "ZoneConfig must be 8-byte aligned");
+ const ConfigKey g_zoneConfigKeys[] =
+ {
+ 	CFG_OBOOL("deferral", ZoneConfig, deferralEnabled,              NDOC, DEVROW,
+-	  "Navmesh readiness deferral",
+-	  "Lets a zone count as ready while its navmesh work is still pending, once its content sections"
+-	  " have drained."),
++	  "Legacy readiness deferral (retired)",
++	  "At zone handoff step 2 or later, readiness stays native for every caller. This legacy key cannot"
++	  " enable early readiness; steps below 2 retain the old deferral."),
+ 	CFG_OBOOL("preload", ZoneConfig, preloadEnabled,               NDOC, SHOW,
+ 	  "Preload nearby zones",
+ 	  "Loads the zones around the camera and the player's characters before they are needed."),
+@@ -88,12 +88,13 @@ const ConfigKey g_zoneConfigKeys[] =
+ 	  "Holds a cell the game has taken over from the mod past its countdowns, for as long as the"
+ 	  " retention policy says."),
+ 	CFG_OBOOL("islandReadinessRule", ZoneConfig, islandReadinessRuleEnabled,   NDOC, DEVROW,
+-	  "Per-caller readiness rule",
+-	  "Answers the content readiness check by the caller's class instead of one answer for every"
+-	  " caller."),
++	  "Legacy readiness rule (retired)",
++	  "At zone handoff step 2 or later, native readiness is always preserved. This key only affects"
++	  " diagnostic classification sampling there; steps below 2 retain the legacy rule."),
+ 	CFG_OBOOL("readinessOverrides", ZoneConfig, readinessOverridesEnabled,    NDOC, DEVROW,
+-	  "Readiness deferral override",
+-	  "Lets the readiness deferral override the game's answer. Off leaves the game's own answer."),
++	  "Legacy readiness override (retired)",
++	  "At zone handoff step 2 or later, both values preserve the game's answer for every cell and caller."
++	  " Only older steps retain the early-ready override."),
+ 	CFG_OBOOL("zoneLifeUnload", ZoneConfig, zoneLifeUnloadEnabled,        NDOC, DEVROW,
+ 	  "Unload idle mod zones",
+ 	  "Unloads the zones the mod loaded once they are idle and outside the camera's and the squads'"
+diff --git a/src/zone/zone_config.h b/src/zone/zone_config.h
+index 93cbd3c..7c647ef 100644
+--- a/src/zone/zone_config.h
++++ b/src/zone/zone_config.h
+@@ -51,12 +51,14 @@ struct ZoneConfig
+ 	// (zone_expiry_guard.cpp).
+ 	bool zoneRetentionEnabled;
+ 
+-	// islandReadinessRule: per-caller readiness rule in hook_isContentPending.
+-	// Off by default; read by hook_isContentPending (readiness_hook.cpp).
++	// Legacy readiness key. At ZONEHAND_STEP >= 2 it cannot change the native
++	// answer; it still controls existing classification diagnostic sampling.
++	// Below step 2 the old per-caller rule remains. Off by default.
+ 	bool islandReadinessRuleEnabled;
+ 
+-	// readinessOverrides: false turns off the isContentPending deferral's
+-	// override. On by default; read by readiness_hook.cpp.
++	// Legacy readiness key retained for INI compatibility. At ZONEHAND_STEP
++	// >= 2 both values preserve native readiness; below 2 it gates the old
++	// override. Default unchanged; no caller may opt back into early readiness.
+ 	bool readinessOverridesEnabled;
+ 
+ 	// zoneLifeUnload: the mod unloads the zones it loaded once they are idle and
+diff --git a/src/zone/zone_ledger_core.h b/src/zone/zone_ledger_core.h
+index 8742f92..71c8073 100644
+--- a/src/zone/zone_ledger_core.h
++++ b/src/zone/zone_ledger_core.h
+@@ -92,24 +92,14 @@ const char* ZoneLifecycleStateName(int state);
+ // attempt as a new incarnation.
+ bool ZoneLifecycleCanTransition(int from, int to);
+ 
+-// Per-cell classification a non-owning reader may consult from any thread
+-// with no lock: written only by the main thread as a single aligned store of
+-// a plain int (never a struct, never multiple fields), so a reader on
+-// another thread sees either this frame's value or last frame's, never a
+-// torn one. This is `hook_isContentPending`'s classifier (main + AI + spawn
+-// threads all read it): a private cell hears the truthful readiness answer,
+-// an adopted cell is ready by construction, and a cell the mod never reached
+-// (still NONE) keeps today's bypass. There is no separate "game-owned"
+-// class: a writer for one is possible (the native activation detour already
+-// resolves gx/gy and reads +176/+177 for every activation, not only
+-// mod-held cells), but it would be behaviourally inert, since NONE and a
+-// hypothetical game-owned class would answer identically -- today's bypass
+-// -- so a writer would only add a ledger publish on the hottest detour for
+-// no change in outcome. The `justLoadedAGame` bypass is global and carried
+-// separately (see ZonePrepLedger::globalGameOwnedBypass).
++// Per-cell diagnostic classification, published by Main and read without
++// a lock by readiness callers. All classes now preserve native readiness;
++// NONE includes never-touched and fully retired cells. No readiness override
++// is inferred from ownership. The separate justLoadedAGame mirror remains
++// available to lifecycle diagnostics; the readiness hook samples it live.
+ enum ZoneReadinessClass
+ {
+-	ZONE_CLASS_NONE = 0,     // never touched, or fully retired: keeps today's bypass
++	ZONE_CLASS_NONE = 0,     // never touched or fully retired; native answer
+ 	ZONE_CLASS_PRIVATE,      // mod-owned, not in Set A/B: hears the truth
+-	ZONE_CLASS_ADOPTED       // ready by construction: hears the truth
++	ZONE_CLASS_ADOPTED       // adopted by the game; native answer
+ };
+diff --git a/tools/tests/zone_readiness_contract_units.cpp b/tools/tests/zone_readiness_contract_units.cpp
+index 2bcd71e..d11fc7c 100644
+--- a/tools/tests/zone_readiness_contract_units.cpp
++++ b/tools/tests/zone_readiness_contract_units.cpp
+@@ -59,18 +59,23 @@ int main()
+ 	ExpectDecide(ZONE_CLASS_PRIVATE,    true, ZONE_READY_ANSWER_ORIGINAL, "bypass set: private cell hears the original");
+ 	ExpectDecide(ZONE_CLASS_ADOPTED,    true, ZONE_READY_ANSWER_ORIGINAL, "bypass set: adopted cell hears the original");
+ 
+-	// Bypass clear: the per-class contract applies. A cell the mod never
+-	// reached is the game's own to load and keeps today's bypass.
++	// Loading flag clear: ALL cells preserve native readiness, including
++	// game-owned/NONE cells. Ownership never grants an early-ready answer.
+ 	ExpectDecide(ZONE_CLASS_PRIVATE,    false, ZONE_READY_ANSWER_ORIGINAL,     "private cell hears the original");
+ 	ExpectDecide(ZONE_CLASS_ADOPTED,    false, ZONE_READY_ANSWER_ORIGINAL,     "adopted cell hears the original");
+-	ExpectDecide(ZONE_CLASS_NONE,       false, ZONE_READY_ANSWER_TODAY_BYPASS, "unclassified cell keeps today's bypass");
++	ExpectDecide(ZONE_CLASS_NONE,       false, ZONE_READY_ANSWER_ORIGINAL, "unclassified cell preserves native readiness");
+ 
+ 	// A class value the enum does not have is treated the same as
+-	// unclassified, not as a crash or an assumption about a class that does
+-	// not exist -- both with and without the global bypass.
+-	ExpectDecide(99, false, ZONE_READY_ANSWER_TODAY_BYPASS, "out-of-range class keeps today's bypass (bypass clear)");
++	// unclassified: both preserve native readiness, with and without the
++	// loading flag.
++	ExpectDecide(99, false, ZONE_READY_ANSWER_ORIGINAL, "out-of-range class preserves native readiness");
+ 	ExpectDecide(99, true,  ZONE_READY_ANSWER_ORIGINAL,     "out-of-range class still hears the original under the bypass");
+-	ExpectDecide(-1, false, ZONE_READY_ANSWER_TODAY_BYPASS, "negative class keeps today's bypass (bypass clear)");
++	ExpectDecide(-1, false, ZONE_READY_ANSWER_ORIGINAL, "negative class preserves native readiness");
++
++	Check((int)ZONE_READY_ANSWER_ORIGINAL == 0 && (int)ZONE_READY_ANSWER_TODAY_BYPASS == 1,
++		"retired answer keeps numeric compatibility");
++	ExpectDecide((-2147483647 - 1), false, ZONE_READY_ANSWER_ORIGINAL, "minimum int class preserves native readiness");
++	ExpectDecide(2147483647, false, ZONE_READY_ANSWER_ORIGINAL, "maximum int class preserves native readiness");
+ 
+ 	// Decisive check for single-instance wiring: publish a class from one
+ 	// translation unit (zone_readiness_writer_stub.cpp, standing in for the
+-- 
+2.46.0.windows.1
+
