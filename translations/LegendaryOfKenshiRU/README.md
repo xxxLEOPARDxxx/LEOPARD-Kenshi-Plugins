@@ -23,16 +23,21 @@ NCE повторно создан по прежней формуле для ед
 брони: результат побайтно совпадает с установленным патчем. Патчи анимаций
 и робо-модулей также не требуют изменений: затронутые ими записи не менялись.
 
-Обнова оригинала **подготовлена, но пока не установлена**. Активные файлы
-мода, русификатор, NCE и порядок загрузки не изменены. Проверка DLL ограничена
-её составом импортов и экспортов; игровые изменения и производительность
-новой DLL в этом проходе не проверялись. Подробности: `verification-20261105.json`.
+Обнова оригинала **установлена локально 05.11.2026 в 07:41 МСК**:
+заменены только три обновлённых файла оригинала, остальные 238 прежних файлов
+сохранены. Русификатор, NCE, оба сопутствующих патча и текущий порядок загрузки
+не изменены; итоговые хеши проверены. Резервная копия трёх файлов сохранена.
+Проверка DLL ограничена составом импортов и экспортов; игровые изменения
+и производительность новой DLL в этом проходе не проверялись. Подробности:
+`verification-20261105.json`, подтверждение установки: `installation-20261105.json`.
 
 English: the newly downloaded upstream contains 14 added and 14 changed
 records. All 1326 translated fields remain valid; no new visible strings.
 The existing NCE output is byte-identical after regeneration; animation and
-robot-module patches need no data changes. The original update is prepared
-but not installed. No new translation release or runtime test is claimed.
+robot-module patches need no data changes. The three original update files
+were installed locally on November 5 at 07:41 MSK, with the other 238 prior
+files and all five protected files verified unchanged. Exact backups remain
+available. No new translation release, publication or runtime test is claimed.
 
 ## Что обновлено в переводе
 

@@ -1,7 +1,6 @@
 {
   "date": "2026-11-05",
-  "status": "prepared_not_installed",
-  "reason_install_held": "Preserve current assembly for the active independent test; no installed LoK files changed.",
+  "status": "installed_locally",
   "upstream_before_sha256": "c9e757bc334688ce01724b0cf3e58ec4f8ab6ae6361255cb2fbc23cac6a04ca3",
   "upstream_current_sha256": "c17b0b37ecdf7c6a65b7e52b7a0773a3bbe44e9108fa28282c0aacec58d8ab14",
   "records_before": 1891,
@@ -133,7 +132,6 @@
     "character/meshes/robot/lok_slaughter unit.mesh"
   ],
   "mods_cfg_sha256": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f",
-  "installed_unchanged": true,
   "author_dll": {
     "old_sha256": "1c363e9299b20dae5034af5052166c7364e834d3563023f9e90850e36f06a6e1",
     "new_sha256": "397ffa4bfa91dce81ae91416eed3a3d5e93a3e18e7ebbe483652b1f11aaf7976",
@@ -219,5 +217,16 @@
     "AI_package": 1
   },
   "backup": "D:\\DEV\\Kenshi\\backup\\LoK before update 2026-11-05",
-  "staging": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\20261105-lok-update\\prepared\\Legendary of Kenshi"
+  "staging": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\20261105-lok-update\\prepared\\Legendary of Kenshi",
+  "preparation_status": "prepared_not_installed",
+  "preparation_hold_reason": "Preserve current assembly for the active independent test; no installed LoK files changed.",
+  "installed_unchanged_at_preparation": true,
+  "installation": {
+    "receipt": "installation-20261105.json",
+    "time": "2026-11-05T07:41:59.6065951+03:00",
+    "three_installed_hashes_verified": true,
+    "protected_files_verified": 5,
+    "other_baseline_files_unchanged": 238,
+    "publication": false
+  }
 }

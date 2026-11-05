@@ -1,0 +1,36 @@
+{
+  "status": "installed_locally",
+  "time": "2026-11-05T07:41:59.6065951+03:00",
+  "files": [
+    {
+      "path": "Legendary of Kenshi.mod",
+      "before_sha256": "c9e757bc334688ce01724b0cf3e58ec4f8ab6ae6361255cb2fbc23cac6a04ca3",
+      "prepared_sha256": "c17b0b37ecdf7c6a65b7e52b7a0773a3bbe44e9108fa28282c0aacec58d8ab14",
+      "before_bytes": 1056754,
+      "prepared_bytes": 1061393
+    },
+    {
+      "path": "_Legendary of Kenshi.info",
+      "before_sha256": "806bf3e402765dac65386a212808d2c2711dc496d6e445c458506fcc4d6cf408",
+      "prepared_sha256": "ada3f5f614a3e01e80e1bc8d933fe72a47e65f3705386fe4bcbaa046866c90ec",
+      "before_bytes": 666,
+      "prepared_bytes": 666
+    },
+    {
+      "path": "lok_npcs.dll",
+      "before_sha256": "1c363e9299b20dae5034af5052166c7364e834d3563023f9e90850e36f06a6e1",
+      "prepared_sha256": "397ffa4bfa91dce81ae91416eed3a3d5e93a3e18e7ebbe483652b1f11aaf7976",
+      "before_bytes": 247296,
+      "prepared_bytes": 250368
+    }
+  ],
+  "protected_hashes": {
+    "mods\\THE_NCE_Patch\\THE_NCE_Patch.mod": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002",
+    "mods\\Legendary of Kenshi All Robots Module Patch\\Legendary of Kenshi All Robots Module Patch.mod": "ff0a4ce786390e78087ebeabe885d277dab997cd4849da5807df3cf6213c75b3",
+    "mods\\Legendary of Kenshi All Anim patch\\Legendary of Kenshi All Anim patch.mod": "ad753449345d1ead740025d8433ad2977a5bc279cbcf4a36a1a5532152841f2e",
+    "mods\\Legendary of Kenshi RU\\Legendary of Kenshi RU.mod": "22a23238bf77347df3b3bdb8a246f4089e555c10677aed8155ed5dc9ed6661cb",
+    "data\\mods.cfg": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f"
+  },
+  "other_baseline_files_unchanged": 238,
+  "backup": "D:\\DEV\\Kenshi\\backup\\LoK before update 2026-11-05"
+}
