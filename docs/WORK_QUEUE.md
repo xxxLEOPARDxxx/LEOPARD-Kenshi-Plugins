@@ -15,15 +15,17 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
-   Runtime follow-up04:58: initial MCM-visible candidate refused actual job
-   registration because existing StackSort/Rotate/KEP hooks changed four checked
-   inventory entries. Corrected in c6802ea: exact audited module identities and
-   hook chains admitted; native callbacks/predicates remain active. Six native
-   mutation/helper guards remain exact, unknown owners still refused. Startup
-   hashing only; no hot file/module lookups. Fresh205shared+310runtime controls
-   eachOd/O2, DEV/PROD and independent review passed. Corrected DLL E3F64A0B
-   INSTALLED04:58 while game absent, all personal config preserved; real job
-   registration and gameplay acceptance pending next launch.
+   LATEST05Nov05:19: installed corrected private DLL3BEEF25D, source869b571.
+   Initial MCM-visible candidate refused registration because StackSort/Rotate/
+   KEP hooks changed four checked entries; c6802ea admits exact audited chains
+   while retaining six native guards and zero hot file/module queries.
+   Next actual launch exposed a second lifecycle error: title-screen registration
+   required world-only native templates. Fixed with early task identity/factory
+   registration and once-only template publication after load or first saved
+   custom-task construction; no native calls/logger under publication lock.
+   Fresh170factory+319runtime controls, DEV/PROD builds/imports and independent
+   review pass. All four personal configuration files preserved. Next user launch
+   requested; actual registration/gameplay/FPS/save-load acceptance still pending.
    Previous04:39: three Steel jobs IMPLEMENTED and INSTALLED LOCALLY in a
    private candidate. Source ac2c92e7 (after770f8d2 integration and2bf6df9 SDK fix),
    PROD abf949c03c829dd23a737e41286293cc6cfb3009e9bb168caa863d4c9789db20.

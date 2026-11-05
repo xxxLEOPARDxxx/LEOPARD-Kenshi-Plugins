@@ -1,7 +1,7 @@
 From 2bf6df98d96b7764c617a6b8ce04d25cc8fc4bf6 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:25:21 +0300
-Subject: [PATCH 1/4] Fix SDK address checks for carried weight virtual methods
+Subject: [PATCH 1/5] Fix SDK address checks for carried weight virtual methods
 
 ---
  leopard/test_carried_weight_sdk_bindings.py | 66 +++++++++++++++++++++
@@ -103,7 +103,7 @@ index b5022a9..0e9aa5c 100644
 From 770f8d272930063ab0466ac931cec04f3538703f Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:32:31 +0300
-Subject: [PATCH 2/4] Integrate three independently configurable Steel jobs
+Subject: [PATCH 2/5] Integrate three independently configurable Steel jobs
  with native persistence
 
 ---
@@ -2535,7 +2535,7 @@ index 011b8c7..3919470 100644
 From ac2c92e7f177928911c7e94a3129d7e61cbf5bff Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:38:46 +0300
-Subject: [PATCH 3/4] Preserve foreign custom jobs when KEO admission is
+Subject: [PATCH 3/5] Preserve foreign custom jobs when KEO admission is
  refused
 
 ---
@@ -2699,7 +2699,7 @@ index baebd17..0912071 100644
 From c6802eaa4457f6d29942b6f60642213625be01d9 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:57:42 +0300
-Subject: [PATCH 4/4] fix(jobs): admit audited inventory hook chains without
+Subject: [PATCH 4/5] fix(jobs): admit audited inventory hook chains without
  bypassing them
 
 ---
@@ -2941,6 +2941,310 @@ index 5b2c323..6be1f9a 100644
   InterlockedExchange(&s_transferReady,1);if(NativeContractReady())return true;InterlockedExchange(&s_transferReady,0);return false;
  }
  static void ResetTransferTicket(){s_quarantined=NULL;s_quarantineEpoch=0;InterlockedExchange(&s_transferFault,0);InterlockedExchange(&s_resetPending,0);}
+-- 
+2.46.0.windows.1
+
+
+From 869b5714a5c4f715cca709e63b3bb1a0a41c504b Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 05:18:20 +0300
+Subject: [PATCH 5/5] fix(jobs): register save identities before world
+ templates are ready
+
+---
+ leopard/steel_jobs/PLAN.md         |  2 ++
+ leopard/steel_jobs/test_factory.py | 22 +++++++++-----
+ leopard/steel_jobs/test_runtime.py | 19 ++++++++++--
+ src/jobs/steel_jobs.cpp            | 18 ++++++++++-
+ src/jobs/steel_jobs_factory.cpp    | 49 ++++++++++++++++++++++++------
+ src/jobs/steel_jobs_factory.h      |  7 +++--
+ 6 files changed, 95 insertions(+), 22 deletions(-)
+
+diff --git a/leopard/steel_jobs/PLAN.md b/leopard/steel_jobs/PLAN.md
+index 030b823..0494a96 100644
+--- a/leopard/steel_jobs/PLAN.md
++++ b/leopard/steel_jobs/PLAN.md
+@@ -16,3 +16,5 @@ Rulings: new features default OFF and use separate live switches. Native custom-
+ Constraints: bounded fixed actor/route/pending tables, no retained native actor/widget pointers, no native calls while state lock held, epoch invalidation on world change. OFF retains native rows and prevents new assignments/execution. Factory/decoder remain available to load saved rows even when OFF. Refuse simultaneous KenshiQOL ownership. Performance and game save/load acceptance must be reported separately from host controls.
+ 
+ Map and Dynamic Factions remain paused. No publication, release version increment or personal published changelog entry for this private candidate.
++
++Runtime lifecycle follow-up05Nov: early title registration originally required world-only task templates and refused before a save could load. Restored two-phase ownership: early metadata/factory registration supports saved custom types; native template conditions publish once when available, including first saved-task construction before MainTick. No native call/logger under publication lock. 170 actual-source factory checks and 319 runtime controls eachOd/O2 pass; final native acceptance pending.
+diff --git a/leopard/steel_jobs/test_factory.py b/leopard/steel_jobs/test_factory.py
+index 32d446b..2236d2f 100644
+--- a/leopard/steel_jobs/test_factory.py
++++ b/leopard/steel_jobs/test_factory.py
+@@ -9,7 +9,7 @@ code=r'''
+ #include <stdio.h>
+ #include <stdlib.h>
+ static int checks=0,calls=0,deleted=0,registrations=0,hasCalls=0;
+-static bool allowCustom=true,allowBase=true,wrongClass=false,failNative=false,failRegister=false,badFactory=false;
++static bool allowCustom=true,allowBase=true,wrongClass=false,failNative=false,failRegister=false,badFactory=false,templateReady=true,reenterOnGet=false;
+ static int lastType=0;static uintptr_t realBase=1;
+ static unsigned long long dataBytes[5][64],taskBytes[32];static TaskData*registry[3]={0};
+ static void*vtables[3][6];
+@@ -19,7 +19,7 @@ static void Delete(void*,unsigned flag){C(flag==1,"original deleting destructor
+ static void Body(void*,void*){}
+ static void CallbackG(void*,void*){} static void CallbackM(void*,void*){} static void CallbackS(void*,void*){}
+ static bool Has(void*,int type){++hasCalls;return type>=291?allowCustom:allowBase;}
+-static TaskData*Get(int type){if(type>=291&&type<=293)return registry[type-291];if(type==(int)COLLECT_OUTPUT_RESOURCE)return Data(3);if(type==(int)MOVE_CUS_ORDERED)return Data(4);return 0;}
++static TaskData*Get(int type){if(reenterOnGet&&type==(int)COLLECT_OUTPUT_RESOURCE){reenterOnGet=false;C(keo_jobs::PrepareFactoryTasks(),"same-slot native lookup reentry without our lock");}if(type>=291&&type<=293)return registry[type-291];if(type==(int)COLLECT_OUTPUT_RESOURCE)return templateReady?Data(3):0;if(type==(int)MOVE_CUS_ORDERED)return templateReady?Data(4):0;return 0;}
+ static void Score(){}
+ static TaskData*Reg(int type,const keo_jobs::ScorePmf*p,bool func,bool target,const std::string*caption,unsigned flags){
+  ++registrations;C(!func&&target&&flags==1&&caption&&!caption->empty(),"native registration flags preserved");
+@@ -45,18 +45,24 @@ intptr_t GetRealAddress(void*){return 0;}
+ HookStatus AddHook(void*target,void*detour,void**orig){C(target==(void*)&Native&&detour!=0,"full native factory entry hook");*orig=(void*)&Native;return SUCCESS;}
+ HookStatus QueueHook(void*,void*,void**){return FAIL;}HookStatus ApplyQueuedHooks(){return FAIL;}
+ }
+-static void Reset(){using namespace keo_jobs;memset(slots,0,sizeof(slots));base=0;prepared=installed=false;original=0;memset(registry,0,sizeof(registry));memset(dataBytes,0,sizeof(dataBytes));calls=deleted=registrations=hasCalls=0;allowCustom=allowBase=true;wrongClass=failNative=failRegister=badFactory=false;
++static void Reset(){using namespace keo_jobs;memset(slots,0,sizeof(slots));base=0;prepared=installed=false;original=0;memset(registry,0,sizeof(registry));memset(dataBytes,0,sizeof(dataBytes));calls=deleted=registrations=hasCalls=0;allowCustom=allowBase=true;wrongClass=failNative=failRegister=badFactory=false;templateReady=true;
+  for(unsigned i=0;i<3;++i){vtables[i][0]=(void*)(uintptr_t)(0x1000+i);vtables[i][1]=(void*)&Delete;for(unsigned j=2;j<6;++j)vtables[i][j]=(void*)&Body;}
+  Data(3)->key=COLLECT_OUTPUT_RESOURCE;Data(4)->key=MOVE_CUS_ORDERED;for(unsigned i=3;i<5;++i){Data(i)->hasAction=true;Data(i)->numRequirements=1;Data(i)->requirements[0].key=AT_LOCATION;Data(i)->requirements[0].val=true;Data(i)->numResults=1;Data(i)->results[0].key=AT_LOCATION;}
+ }
+ static bool Init(){keo_jobs::FactoryCallbacks cb={CallbackG,CallbackM,CallbackS};return keo_jobs::InitializeFactory(realBase,cb,0);}
+ static void RegisterAll(){for(int t=291;t<=293;++t)C(keo_jobs::RegisterFactoryTask(t,"job"),"register native job metadata");C(keo_jobs::InstallFactory(),"install after all metadata");}
+-int main(){using namespace keo_jobs;Reset();C(!InstallFactory(),"no hook before prepare");badFactory=true;C(!Init(),"bad startup profile refuses");badFactory=false;C(Init(),"valid startup");C(!InstallFactory(),"no hook with missing metadata");
+- Data(3)->numRequirements=11;C(!RegisterFactoryTask(291,"g")&&!registrations&&!registry[0],"capacity rejected before native allocation/publication");Data(3)->numRequirements=1;
++int main(){using namespace keo_jobs;
++ unsigned long long handBytes[4]={0x11111111,0x22222222,0x33333333,0x44444444};const hand&subject=*(hand*)handBytes;Ogre::Vector3 point(123,456,789);void*self[2]={(void*)&Delete,(void*)&Has};void*repertoire=self;
++ Reset();templateReady=false;C(Init(),"early factory preflight");RegisterAll();C(!PrepareFactoryTasks(),"early native templates not ready");
++ C(!Create(&repertoire,291,subject,7,3.25f,point,11,22)&&!calls,"no native task allocation before base template readiness");
++ templateReady=true;reenterOnGet=true;for(int type=291;type<=293;++type){Tasker*t=Create(&repertoire,type,subject,7,3.25f,point,11,22);C(t&&t->taskData==FactoryTaskData(type),"saved custom rows configure before MainTick");}
++ C(PrepareFactoryTasks()&&Data(0)->numRequirements==2,"late preparation idempotent, no duplicate gather requirement");
++ Reset();C(!InstallFactory(),"no hook before prepare");badFactory=true;C(!Init(),"bad startup profile refuses");badFactory=false;C(Init(),"valid startup");C(!InstallFactory(),"no hook with missing metadata");
+  registry[0]=Data(0);C(!RegisterFactoryTask(291,"g")&&!registrations,"foreign custom id never overwritten");registry[0]=0;
+- RegisterAll();C(registrations==3,"exactly three bounded native data allocations");C(RegisterFactoryTask(291,"renamed")&&registrations==3,"idempotent registration no new allocations");C(InstallFactory(),"idempotent hook install");
++ Data(3)->numRequirements=11;RegisterAll();C(!PrepareFactoryTasks()&&!calls,"invalid source capacity refuses before native task allocation");Data(3)->numRequirements=1;C(PrepareFactoryTasks(),"valid template finalizes later");
++ C(registrations==3,"exactly three bounded native data allocations");C(RegisterFactoryTask(291,"renamed")&&registrations==3,"idempotent registration no new allocations");C(InstallFactory(),"idempotent hook install");
+  C(Data(0)->numRequirements==2&&Data(0)->requirements[1].key==MACHINES_OUTPUTS_EMPTY&&!Data(0)->requirements[1].val,"gather empty-output skip requirement");C(Data(1)->_resultsAlwaysFalse&&Data(2)->_resultsAlwaysFalse,"waypoint and stock own completion");C(Data(2)->numResults==0&&Data(2)->numRequirements==1&&Data(2)->requirements[0].key==AT_LOCATION,"stock walks to counter without native242 migration");
+- unsigned long long handBytes[4]={0x11111111,0x22222222,0x33333333,0x44444444};const hand&subject=*(hand*)handBytes;Ogre::Vector3 point(123,456,789);void*self[2]={(void*)&Delete,(void*)&Has};void*repertoire=self;
++
+  for(int type=291;type<=293;++type){Tasker*t=Create(&repertoire,type,subject,7,3.25f,point,11,22);C(t&&t->taskData==FactoryTaskData(type),"custom metadata identity");C(lastType==(type==291?(int)COLLECT_OUTPUT_RESOURCE:type==292?(int)MOVE_CUS_ORDERED:293),"native construction alias");C(t->priority==7&&t->weight==3.25f&&t->startTime==11&&t->endTime==22&&!memcmp(&t->location,&point,sizeof(point))&&!memcmp(&t->subject,&subject,sizeof(hand)),"native common argument initialization preserved");C((*(void***)t)[2]==(void*)(type==291?CallbackG:type==292?CallbackM:CallbackS),"only native body virtual slot replaced");C(FactoryNativeBody(type)==Body,"native body retained");if(type==291)C(*((unsigned char*)t+0x78)==1,"native empty-machine take output flag");}
+  int before=calls;allowCustom=false;C(!Create(&repertoire,291,subject,1,1,point,0,0)&&calls==before,"custom repertoire refusal before alias");allowCustom=true;allowBase=false;C(!Create(&repertoire,291,subject,1,1,point,0,0),"native base capability refusal retained");allowBase=true;
+  wrongClass=true;C(!Create(&repertoire,292,subject,1,1,point,0,0)&&deleted==1,"mismatched native class deleted exactly once");wrongClass=false;failNative=true;C(!Create(&repertoire,292,subject,1,1,point,0,0)&&deleted==1,"native null no destructor call");failNative=false;
+@@ -70,6 +76,6 @@ if RED:
+ V=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');S=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{V}/include;{S}/Include',LIB=f'{V}/lib/amd64;{S}/Lib/x64')
+ args=[str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/O2','/MD','/DBOOST_ALL_NO_LIB','/I'+str(R/'src'),'/ID:/DEV/Kenshi/deps/KenshiLib_keo/Include','/ID:/DEV/Kenshi/deps/KenshiLib_keo/Include/ogre','/ID:/DEV/Kenshi/deps/boost_1_60_0',str(O/'factory.cpp'),'/Fo'+str(O/'factory.obj'),'/Fe'+str(O/'factory.exe')]
+ p=subprocess.run(args,env=env,capture_output=True,text=True);(O/'build.log').write_text(p.stdout+p.stderr,encoding='utf8');assert not p.returncode,p.stdout+p.stderr
+-p=subprocess.run([str(O/'factory.exe')],capture_output=True,text=True);print(p.stdout);(O/'run.log').write_text(p.stdout+p.stderr,encoding='utf8')
++p=subprocess.run([str(O/'factory.exe')],capture_output=True,text=True,timeout=10);print(p.stdout);(O/'run.log').write_text(p.stdout+p.stderr,encoding='utf8')
+ if RED:assert p.returncode==1 and'custom repertoire refusal before alias'in p.stdout
+ else:assert not p.returncode,p.stdout+p.stderr
+diff --git a/leopard/steel_jobs/test_runtime.py b/leopard/steel_jobs/test_runtime.py
+index 4eac1dd..f1d1fc7 100644
+--- a/leopard/steel_jobs/test_runtime.py
++++ b/leopard/steel_jobs/test_runtime.py
+@@ -14,7 +14,7 @@ def function(marker):
+   at+=1
+  return s[start:at]
+ globals=s[s.index('enum { ACTOR_CAP'):s.index('Switches SwitchesNow()')]
+-names=['Switches SwitchesNow()','ActorId Identity(','hand NativeHand(','WaypointSubject Payload(','bool Decode(','bool Custom(','int Type(','bool Ours(','OrdersReceiver* Orders(','bool Player(','bool ReadRoute(','bool Snapshot(','float HookScore(','void RestoreLocations(','void ApplyPending(','uint64_t SteelJobsEpoch()','bool SteelJobsAdmitted()','void SteelJobsWorldHooksReady(','void SteelJobsWorldReset()','bool SteelJobsConsumeMove(','void SteelJobsMainTick(','void HookPlayerMove(','void* HookCaption(']
++names=['Switches SwitchesNow()','ActorId Identity(','hand NativeHand(','WaypointSubject Payload(','bool Decode(','bool Custom(','int Type(','bool Ours(','OrdersReceiver* Orders(','bool Player(','bool ReadRoute(','bool Snapshot(','float HookScore(','void RestoreLocations(','void ApplyPending(','uint64_t SteelJobsEpoch()','bool SteelJobsAdmitted()','void SteelJobsWorldHooksReady(','void SteelJobsWorldReset()','bool SteelJobsConsumeMove(','void TryPrepareJobs(', 'void SteelJobsMainTick(','void HookPlayerMove(','void* HookCaption(']
+ production='\n'.join(function(n)for n in names)
+ order=(R/'src/pathfind/order_hook.cpp').read_text(encoding='utf-8-sig')
+ a=order.index('void hook_addOrderSelected(');b=order.index('BenchNotifyPlayerOrder();',a)
+@@ -32,6 +32,8 @@ prefix=r"""
+ #include <new>
+ #include "jobs/steel_jobs_policy.h"
+ static int checks=0,nativeMoves=0,nativeOrders=0,resetCalls=0,captionCalls=0,translatedCalls=0,errors=0;
++static bool templatesAvailable=false;static int prepareCalls=0;
++#define KEO_DETAIL(x) ((void)0)
+ static bool captionConstructed=false;static double now=0;static int scoreCalls=0,stockChecks=0;
+ void C(bool b,const char*s){++checks;if(!b){printf("FAIL %s\n",s);exit(1);}}
+ namespace OIS{enum KeyCode{KC_LSHIFT,KC_RSHIFT};struct Keyboard{bool shift;Keyboard():shift(true){}bool isKeyDown(KeyCode){return shift;}};}
+@@ -62,6 +64,7 @@ void NativeMove(PlayerInterface*,const Ogre::Vector3&,Building*){++nativeMoves;}
+ void* NativeCaption(std::string*out,int,void*){C(!captionConstructed,"native caption constructor exactly once");new(out)std::string("native caption");captionConstructed=true;++captionCalls;return (void*)0x9876;}
+ namespace keo_jobs{
+ uint64_t SteelJobsEpoch();bool SteelJobsAdmitted();bool SteelJobsConsumeMove(void*,void*,void*,const float*,bool);
++bool PrepareFactoryTasks(){++prepareCalls;return templatesAvailable;}
+ void ResetStockTransfer(){++resetCalls;}
+ void*FactoryTaskData(int type){return type>=291&&type<=293&&factoryPresent[type-291]?&ownedData[type-291]:NULL;}
+ bool SteelStockEligible(Character*,Tasker*){++stockChecks;return true;}
+@@ -79,7 +82,19 @@ using namespace keo_jobs;
+ static void Fresh(PlayerInterface&pi){SteelJobsWorldReset();InterlockedExchange(&s_loading,0);InterlockedExchange(&s_ready,1);InterlockedExchange(&s_worldHooks,1);InterlockedExchange(&s_conflict,0);s_installed=true;s_nextCompatibilityCheck=1000000;now=0;s_inputFrame=10;s_pressFrame=0;s_pressAccepted=false;input.mRight=true;input.keyboard=&keyboard;key=&input;keyboard.shift=true;pi.mRightDown=true;pi.selectedCharacters.clear();for(unsigned i=0;i<130;++i){actors[i].id=hand(i+1,200+i,CHARACTER,7,8);actors[i].player=true;actors[i].animal=false;actors[i].orders.permajobs.count=actors[i].orders.added=0;}pi.selectedCharacters.insert(actors[0].id);keo_inventory::g_inventoryCfg.gatherOutputJobEnabled=keo_inventory::g_inventoryCfg.stockCounterJobEnabled=false;keo_inventory::g_inventoryCfg.waypointRouteJobEnabled=true;for(unsigned i=0;i<3;++i)factoryPresent[i]=true;nativeMoves=nativeOrders=0;}
+ static bool Click(PlayerInterface&pi,const Ogre::Vector3&p){return SteelJobsConsumeMove(&pi,NULL,NULL,&p.x,false);}
+ static void CaptionCase(int type,const char*expected,bool custom){__declspec(align(16))unsigned char storage[sizeof(std::string)];memset(storage,0xDD,sizeof(storage));captionConstructed=false;int before=captionCalls,tr=translatedCalls;std::string*out=(std::string*)storage;void*ret=HookCaption(out,type,NULL);C(captionCalls==before+1&&captionConstructed,"caption native constructor preserved");C(*out==expected,"caption exact contents");C(ret==(custom?(void*)out:(void*)0x9876),"caption return convention preserved");C(translatedCalls==tr+(custom?1:0),"only custom captions replaced");out->~basic_string();captionConstructed=false;memset(storage,0xA7,sizeof(storage));}
+-int main(){PlayerInterface pi;Ogre::Vector3 p(50,2,-70);Fresh(pi);
++static void DeferredCase(){
++ SteelJobsWorldReset();InterlockedExchange(&s_ready,0);InterlockedExchange(&s_conflict,0);InterlockedExchange(&s_worldHooks,1);s_installed=true;s_metadataReady=true;s_templateAttempted=false;s_nextCompatibilityCheck=1000000;templatesAvailable=false;prepareCalls=0;
++ TryPrepareJobs(false);C(prepareCalls==1&&!SteelJobsAdmitted()&&s_templateAttempted,"early metadata exists but missing native templates stays dormant");
++ for(unsigned i=0;i<30;++i)SteelJobsMainTick(false);C(prepareCalls==1,"missing templates are not polled every frame");
++ templatesAvailable=true;SteelJobsWorldReset();C(!s_templateAttempted,"world transition rearms one native preparation attempt");
++ SteelJobsMainTick(true);C(prepareCalls==1,"no template preparation while world loading");
++ SteelJobsMainTick(false);C(prepareCalls==2&&SteelJobsAdmitted(),"postload templates activate existing metadata exactly once");
++ for(unsigned i=0;i<30;++i)SteelJobsMainTick(false);C(prepareCalls==2,"admitted jobs never rebuild native templates per frame");
++ SteelJobsWorldReset();InterlockedExchange(&s_ready,0);InterlockedExchange(&s_conflict,1);TryPrepareJobs(true);C(prepareCalls==2,"competing original prevents deferred activation");
++ InterlockedExchange(&s_conflict,0);InterlockedExchange(&s_worldHooks,0);TryPrepareJobs(true);C(prepareCalls==2,"missing world hooks prevent deferred activation");
++ s_metadataReady=false;InterlockedExchange(&s_worldHooks,1);TryPrepareJobs(true);C(prepareCalls==2,"partial registration prevents deferred activation");
++}
++int main(){DeferredCase();PlayerInterface pi;Ogre::Vector3 p(50,2,-70);Fresh(pi);
+  CaptionCase(291,"translated:Gather output",true);CaptionCase(292,"translated:Waypoint route",true);CaptionCase(293,"translated:Stock shop counter",true);CaptionCase(29,"native caption",false);CaptionCase(242,"native caption",false);
+  // Caption IDs alone are insufficient: registration and active admission own it.
+  InterlockedExchange(&s_ready,0);for(int type=291;type<=293;++type)CaptionCase(type,"native caption",false);InterlockedExchange(&s_ready,1);
+diff --git a/src/jobs/steel_jobs.cpp b/src/jobs/steel_jobs.cpp
+index 0912071..dce2608 100644
+--- a/src/jobs/steel_jobs.cpp
++++ b/src/jobs/steel_jobs.cpp
+@@ -42,6 +42,7 @@ SRWLOCK s_lock=SRWLOCK_INIT;
+ __declspec(align(8)) volatile LONG64 s_epoch=1;
+ volatile LONG s_ready=0,s_loading=0,s_conflict=0,s_worldHooks=0;
+ bool s_installed=false;
++bool s_metadataReady=false,s_templateAttempted=false;
+ double s_nextCompatibilityCheck=0;
+ unsigned long long s_clock=0;
+ struct RouteSlot {
+@@ -146,10 +147,23 @@ void(*s_load)(Character*,GameSaveState*)=NULL;
+ void HookLoad(Character*c,GameSaveState*state){s_load(c,state);RestoreLocations(c);}
+ void(*s_title)(TitleScreen*,bool)=NULL;
+ void FactoryLog(const char*msg){LogError(std::string("Steel jobs: ")+msg);}
++void TryPrepareJobs(bool reportFailure){
++ if(!s_metadataReady||s_templateAttempted||InterlockedCompareExchange(&s_ready,0,0)
++  ||InterlockedCompareExchange(&s_conflict,0,0)||!InterlockedCompareExchange(&s_worldHooks,0,0))return;
++ // Native task metadata must exist before saved orders are deserialised. The
++ // vanilla template records themselves may be created later than TitleScreen.
++ // Attempt once here and once after an actual world-load transition, not per frame.
++ s_templateAttempted=true;
++ if(PrepareFactoryTasks()){
++  InterlockedExchange(&s_ready,1);
++  KEO_DETAIL("Steel jobs: registered three native task types; independent live switches ready");
++ }else if(reportFailure)FactoryLog("native task templates unavailable after loading; custom assignments disabled");
++ else KEO_DETAIL("Steel jobs: metadata registered; waiting for native world task templates");
++}
+ void HookTitle(TitleScreen*self,bool on){s_title(self,on);if(!on||!s_installed||!InterlockedCompareExchange(&s_worldHooks,0,0)||GetModuleHandleW(L"KenshiQOL.dll"))return;
+  if(RegisterFactoryTask(GATHER_OUTPUT,KeoTr("Gather output"))&&RegisterFactoryTask(WAYPOINT_ROUTE,KeoTr("Waypoint route"))
+   &&RegisterFactoryTask(STOCK_COUNTER,KeoTr("Stock shop counter"))&&InstallFactory()){
+-  if(!InterlockedExchange(&s_ready,1))KEO_DETAIL("Steel jobs: registered three native task types; independent live switches ready");
++  s_metadataReady=true;s_templateAttempted=false;TryPrepareJobs(false);
+  }else FactoryLog("registration refused; custom assignments disabled");
+ }
+ void*(*s_caption)(std::string*,int,void*)=NULL;
+@@ -202,6 +216,7 @@ uint64_t SteelJobsEpoch(){return (uint64_t)InterlockedCompareExchange64(&s_epoch
+ bool SteelJobsAdmitted(){return InterlockedCompareExchange(&s_ready,0,0)&&InterlockedCompareExchange(&s_worldHooks,0,0)&&!InterlockedCompareExchange(&s_loading,0,0)&&!InterlockedCompareExchange(&s_conflict,0,0);}
+ void SteelJobsWorldHooksReady(bool ready){InterlockedExchange(&s_worldHooks,ready?1:0);}
+ void SteelJobsWorldReset(){InterlockedIncrement64(&s_epoch);InterlockedExchange(&s_loading,1);
++ s_templateAttempted=false;
+  AcquireSRWLockExclusive(&s_lock);memset(s_routes,0,sizeof(s_routes));s_pendingHead=s_pendingCount=0;s_pressAccepted=false;ReleaseSRWLockExclusive(&s_lock);
+  ResetStockTransfer();
+ }
+@@ -234,6 +249,7 @@ void SteelJobsMainTick(bool loading){
+  const double now=ElapsedSec();if(now>=s_nextCompatibilityCheck){s_nextCompatibilityCheck=now+1;
+   if(GetModuleHandleW(L"KenshiQOL.dll")&&!InterlockedExchange(&s_conflict,1))FactoryLog("KenshiQOL.dll loaded; custom jobs stopped to avoid duplicate ownership");
+  }
++ if(!loading)TryPrepareJobs(true);
+  if(!SteelJobsAdmitted())return;
+  // One bounded click per frame, no world/character scan.
+  Pending p={};bool have=false;AcquireSRWLockExclusive(&s_lock);
+diff --git a/src/jobs/steel_jobs_factory.cpp b/src/jobs/steel_jobs_factory.cpp
+index f636c56..e96e14e 100644
+--- a/src/jobs/steel_jobs_factory.cpp
++++ b/src/jobs/steel_jobs_factory.cpp
+@@ -21,11 +21,12 @@ static_assert(offsetof(TaskData,hasAction)==0x134,"TaskData action layout");
+ static_assert(sizeof(TaskStateData)==8,"Native state record layout");
+ namespace keo_jobs {
+ namespace {
+-struct Slot {int type;TaskData*data;uintptr_t table;void*privateTable[6];FactoryBody body,nativeBody;};
++struct Slot {int type;TaskData*data;uintptr_t table;void*privateTable[6];FactoryBody body,nativeBody;volatile LONG configured,faultReported;};
+ static Slot slots[3];static uintptr_t base=0;static bool gog=false,prepared=false,installed=false;
+ static void(*logger)(const char*)=0;
+ typedef Tasker*(*CreateFn)(void*,int,const hand&,int,float,Ogre::Vector3,int,int);
+ static CreateFn original=0;
++static SRWLOCK templateLock=SRWLOCK_INIT;
+ typedef TaskData*(*GetDataFn)(int);
+ // MSVC x64 passes the native 24-byte general PMF by reference. Keeping it an
+ // explicit storage object avoids changing its representation with AI headers.
+@@ -39,9 +40,41 @@ static bool Read(void*ctx,uintptr_t rva,void*out,size_t count){uintptr_t b=(uint
+  if(!out||!count||rva>0x232C000||count>0x232C000-rva||b>~uintptr_t(0)-rva)return false;
+  __try{memcpy(out,(const void*)(b+rva),count);return true;}__except(EXCEPTION_EXECUTE_HANDLER){return false;}}
+ static void Report(const char*message){if(logger)logger(message);}
++// Native lookup/validation is outside our short publication lock. After one
++// successful publication the hot path reads only the interlocked ready flag.
++static bool PrepareSlot(Slot*slot){
++ if(!slot||!slot->data)return false;
++ if(InterlockedCompareExchange(&slot->configured,0,0))return true;
++ int nativeType=slot->type==291?(int)COLLECT_OUTPUT_RESOURCE:(int)MOVE_CUS_ORDERED;
++ const TaskData*source=((GetDataFn)Address(JobsProfile::GET_DATA))(nativeType);
++ if(!source)return false;
++ if(source->key!=(TaskType)nativeType||source->numResults<0||source->numResults>11||source->numRequirements<0||source->numRequirements>11
++    ||(slot->type==291&&source->numRequirements>=11)){
++  if(!InterlockedCompareExchange(&slot->faultReported,1,0))Report("KEO jobs: native GOAP template shape refused; custom task not created");
++  return false;
++ }
++ if(!source->hasAction||!source->numResults||!source->numRequirements)return false;
++ const int results=source->numResults,requirements=source->numRequirements;
++ unsigned char resultBytes[88],requirementBytes[88];
++ memcpy(resultBytes,source->results,sizeof(resultBytes));memcpy(requirementBytes,source->requirements,sizeof(requirementBytes));
++ AcquireSRWLockExclusive(&templateLock);
++ // POD writes only: no game call, logger, allocator or callback under this lock.
++ if(!InterlockedCompareExchange(&slot->configured,0,0)){
++  TaskData*data=slot->data;data->hasAction=true;
++  if(slot->type!=293){data->numResults=results;memcpy(data->results,resultBytes,sizeof(resultBytes));
++   data->numRequirements=requirements;memcpy(data->requirements,requirementBytes,sizeof(requirementBytes));}
++  if(slot->type==291){
++   // Exact native addRequirement success path (Steam60DF26..60DF4B):
++   // requirements[n].key/val/progressionOnly, then count++. Bounds above.
++   TaskStateData*entry=&data->requirements[data->numRequirements];entry->key=MACHINES_OUTPUTS_EMPTY;entry->val=false;entry->progressionOnly=false;++data->numRequirements;
++  }
++  InterlockedExchange(&slot->configured,1);
++ }
++ ReleaseSRWLockExclusive(&templateLock);return true;
++}
+ static Tasker* Create(void*self,int type,const hand&subject,int priority,float weight,Ogre::Vector3 location,int start,int end){
+  Slot*slot=Find(type);if(!slot)return original(self,type,subject,priority,weight,location,start,end);
+- if(!slot->data||!slot->body||!self)return 0;
++ if(!slot->data||!slot->body||!self||!PrepareSlot(slot))return 0;
+  // Respect the original repertoire's custom-id capability before aliasing.
+  typedef bool(*HasTask)(void*,int);void**vptr=*(void***)self;
+  if(!vptr||!((HasTask)vptr[1])(self,type))return 0;
+@@ -76,23 +109,21 @@ bool RegisterFactoryTask(int type,const std::string&caption){
+  Slot*slot=Find(type);if(!prepared||!slot||caption.empty())return false;if(slot->data)return true;
+  GetDataFn get=(GetDataFn)Address(JobsProfile::GET_DATA);
+  TaskData*existing=get(type);if(existing){Report("KEO jobs: custom TaskType id already owned; registration refused");return false;}
+- int nativeType=type==291?(int)COLLECT_OUTPUT_RESOURCE:(int)MOVE_CUS_ORDERED;
+- const TaskData*source=get(nativeType);if(!source||source->key!=(TaskType)nativeType||source->numResults<0||source->numResults>11||source->numRequirements<0||source->numRequirements>11)return false;
+- if(type==291&&source->numRequirements>=11)return false;
+  // The same generic AI virtual-score thunk as QOL's 0x215E4 jump target,
+  // not a specialized COLLECT score which may reject the new TaskType.
+  ScorePmf score;memset(score.bytes,0,sizeof(score.bytes));uintptr_t scoreAddress=Address(JobsProfile::DEFAULT_SCORE);memcpy(score.bytes,&scoreAddress,sizeof(scoreAddress));
+  TaskData*data=((RegisterFn)Address(JobsProfile::REGISTER_DATA))(type,&score,false,true,&caption,1);
+  if(!data||data->key!=(TaskType)type)return false;
+  ((PermaFn)Address(JobsProfile::SET_PERMAJOB))(data,PERMAJOB_NORMAL,false,0,0);
+- data->hasAction=source->hasAction;
+- if(type!=293){data->numResults=source->numResults;memcpy(data->results,source->results,sizeof(data->results));
+-  data->numRequirements=source->numRequirements;memcpy(data->requirements,source->requirements,sizeof(data->requirements));}
+- if(type==291)((RequirementFn)Address(JobsProfile::ADD_REQUIREMENT))(data,MACHINES_OUTPUTS_EMPTY,false,false);
++ // Native ctor leaves hasAction false until world-ready template publication.
+  if(type==293)((RequirementFn)Address(JobsProfile::ADD_REQUIREMENT))(data,AT_LOCATION,true,false);
+  if(type!=291)data->_resultsAlwaysFalse=true;
+  slot->data=data;return true;
+ }
++bool PrepareFactoryTasks(){
++ if(!prepared||!slots[0].data||!slots[1].data||!slots[2].data)return false;
++ bool ok=true;for(unsigned i=0;i<3;++i)if(!PrepareSlot(&slots[i]))ok=false;return ok;
++}
+ bool InstallFactory(){
+  if(installed)return true;if(!prepared||!slots[0].data||!slots[1].data||!slots[2].data)return false;
+  // Revalidate immediately before publication; a competing custom factory patch
+diff --git a/src/jobs/steel_jobs_factory.h b/src/jobs/steel_jobs_factory.h
+index b4a06ba..a0127f1 100644
+--- a/src/jobs/steel_jobs_factory.h
++++ b/src/jobs/steel_jobs_factory.h
+@@ -6,11 +6,14 @@ typedef void (*FactoryBody)(void*task,void*runner);
+ struct FactoryCallbacks {FactoryBody gather,waypoint,stock;};
+ // Main-thread startup/world-ready registration only. No UI/INI/worker ownership.
+ bool InitializeFactory(uintptr_t base,const FactoryCallbacks&,void(*log)(const char*));
+-// May return false while native GOAP templates are not created; retry only from
+-// a later world-ready lifecycle event, never a frame polling loop.
++// Early title-screen metadata registration. Native GOAP templates are not
++// required here; saved custom task identities must exist before deserialization.
+ bool RegisterFactoryTask(int type,const std::string&caption);
+ // Install once, only after all three TaskData records are published.
+ bool InstallFactory();
++// Complete the registered metadata once native GOAP templates exist. No frame
++// polling: use a world-ready event. Create also ensures its own slot is ready.
++bool PrepareFactoryTasks();
+ void* FactoryTaskData(int type);
+ FactoryBody FactoryNativeBody(int type);
+ uintptr_t FactoryCaptionAddress();
 -- 
 2.46.0.windows.1
 

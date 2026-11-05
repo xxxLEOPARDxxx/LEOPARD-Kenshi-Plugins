@@ -1,11 +1,11 @@
 {
-  "time_msk": "2026-11-05T04:58:06.066620+03:00",
-  "source_commit": "c6802eaa4457f6d29942b6f60642213625be01d9",
+  "time_msk": "2026-11-05T05:19:40.932509+03:00",
+  "source_commit": "869b5714a5c4f715cca709e63b3bb1a0a41c504b",
   "status": "installed_local_private_not_published",
-  "dll_sha256": "e3f64a0bc0719d3038da592f53bbde68340bc35566ce892fdc0651e59e6a6243",
+  "dll_sha256": "3beef25dc5b4674f4c33efd1c022358a16b9e69146f14c949707a8fb60ce2cff",
   "archive": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-jobs-test-20261105.zip",
-  "archive_bytes": 788106,
-  "archive_sha256": "9081a9c2ba7ba91fb98ed483b9984765f2d8dd13e3d1dee4b2b8e50e38403c5a",
+  "archive_bytes": 788624,
+  "archive_sha256": "1c0ae42c330a3fcd2598d769b0721eafd8a21b96082232e58c96e8c1293afe22",
   "files": 13,
   "imports": {
     "KenshiLib.dll": 180,
@@ -16,11 +16,12 @@
     "Три отдельные живые опции: забор продукции, пополнение своего прилавка без денежной сделки, циклический маршрут по точкам.",
     "Выключение сохраняет очередь; маршрут хранится в обычном сохранении.",
     "Исправлен некорректный вызов SDK проверки веса (адрес 0xf1880).",
-    "Регистрация заданий совместима с проверенными обработчиками Stack Sort, Rotate Items и Kenshi Extension Plugin."
+    "Регистрация заданий совместима с проверенными обработчиками Stack Sort, Rotate Items и Kenshi Extension Plugin.",
+    "Исправлен порядок регистрации заданий при запуске и загрузке сохранения."
   ],
   "runtime_acceptance": "pending; no game FPS/leak/save-load claim",
   "crc": "passed",
-  "backup": "D:\\DEV\\Kenshi\\backup\\keo-jobs-20261105-045806",
+  "backup": "D:\\DEV\\Kenshi\\backup\\keo-jobs-20261105-051940",
   "preserved_sha256": {
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "ca4cacec14b6af68f2ac3f5c03de012c39b6a3f04f1f3569d9fa280cd92082c8",
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",
