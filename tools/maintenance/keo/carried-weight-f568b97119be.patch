@@ -1,0 +1,848 @@
+From f568b97119befe0397504a027257c14a05f88aa7 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 03:05:39 +0300
+Subject: [PATCH] Add optional bounded carried body and container weight
+ accounting
+
+---
+ KEO.ini                                       |   7 +
+ README.md                                     |  37 +++++-
+ leopard/carried_weight/ORIGIN.md              |  17 +++
+ leopard/carried_weight/test_adapter.py        |  47 +++++++
+ leopard/carried_weight/test_admission.py      |  46 +++++++
+ .../carried_weight/test_native_contract.py    |  32 +++++
+ leopard/carried_weight/test_policy.py         |  60 +++++++++
+ leopard/carried_weight/test_settings.py       |  11 ++
+ leopard/carried_weight/verification.json      |  33 +++++
+ locale/en_GB/LC_MESSAGES/keo.po               |   7 +
+ locale/ru_RU/LC_MESSAGES/keo.po               |   7 +
+ locale/zh_CN/LC_MESSAGES/keo.po               |   7 +
+ src/gui/settings_layout.cpp                   |   1 +
+ src/inventory/backpack_sidecar.cpp            |   2 +
+ src/inventory/carried_weight.cpp              | 121 ++++++++++++++++++
+ src/inventory/carried_weight.h                |   7 +
+ src/inventory/carried_weight_policy.cpp       |  57 +++++++++
+ src/inventory/carried_weight_policy.h         |  15 +++
+ src/inventory/inventory_config.cpp            |   4 +
+ src/inventory/inventory_config.h              |   3 +
+ src/plugin/hook_manifest.cpp                  |   2 +
+ tools/build/coresrc.txt                       |   3 +
+ tools/build/profsrc.txt                       |   3 +
+ tools/tests/config_modules_units.cpp          |   3 +-
+ tools/tests/mcm_bridge_units.cpp              |   5 +-
+ tools/tests/settings_units_common.h           |   4 +-
+ 26 files changed, 534 insertions(+), 7 deletions(-)
+ create mode 100644 leopard/carried_weight/ORIGIN.md
+ create mode 100644 leopard/carried_weight/test_adapter.py
+ create mode 100644 leopard/carried_weight/test_admission.py
+ create mode 100644 leopard/carried_weight/test_native_contract.py
+ create mode 100644 leopard/carried_weight/test_policy.py
+ create mode 100644 leopard/carried_weight/test_settings.py
+ create mode 100644 leopard/carried_weight/verification.json
+ create mode 100644 src/inventory/carried_weight.cpp
+ create mode 100644 src/inventory/carried_weight.h
+ create mode 100644 src/inventory/carried_weight_policy.cpp
+ create mode 100644 src/inventory/carried_weight_policy.h
+
+diff --git a/KEO.ini b/KEO.ini
+index 8d63883..d225653 100644
+--- a/KEO.ini
++++ b/KEO.ini
+@@ -463,6 +463,13 @@
+ ; weight never sends it. Applies at once from the KEO tab.
+ # operatorHoldUntil=heavy
+ 
++; carriedWeight: optional body and loose-container weight accounting. Includes
++; carried inventories; scales body weight by race, age/size and hunger while
++; preserving native worn-backpack reductions. OFF by default, startup only.
++; Refused when KenshiQOL.dll is loaded, regardless of that plugin's toggle.
++; Native weighing is retained when the exact supported contract is unavailable.
++# carriedWeight=false
++
+ ; camFocus: predict the camera's zone from its orbit/follow anchor (where it
+ ; is pointed) instead of its own position, so a zoomed-out, rearward-pitched
+ ; camera still preloads the zone the squad is walking into. false reverts to
+diff --git a/README.md b/README.md
+index f7c6276..46a4b21 100644
+--- a/README.md
++++ b/README.md
+@@ -39,7 +39,7 @@ KEO makes moving between areas of the map smoother. It loads areas before your s
+ 
+ ## Requirements
+ 
+-- Kenshi 1.0.65 (Steam).
++- Kenshi 1.0.65 (Steam baseline). The exact pinned GOG1.0.65 build is an offline-verified, gameplay-unverified candidate; see the native-profile limitations below.
+ - [RE_Kenshi](https://github.com/BFrizzleFoShizzle/RE_Kenshi) ([Nexus](https://www.nexusmods.com/kenshi/mods/847)) 0.3.5 or later.
+ 
+ ## Installation
+@@ -57,9 +57,42 @@ Every setting is optional and has a default. Use one of these editors:
+ 
+ If you used an earlier version, your settings in `KenshiZoneOpt.ini` are carried into `KEO.ini` once, on the first launch, and the old file is kept as `KenshiZoneOpt.ini.imported`.
+ 
++## Optional carried weight (unpublished candidate)
++
++**Carried body and container weight** is OFF by default and requires restart.
++It includes contents of loose carried containers and carried characters, and
++scales body weight by race, age/size and hunger (robots use higher density).
++Native worn-backpack weight reductions remain in effect. Loaded `KenshiQOL.dll`
++disables the option regardless of its toggle; choose one weight implementation
++and restart. Game-session performance, UI and save/load acceptance are pending.
++
++Adapted from **KenshiQOL by Steel**. Thank you to Steel for the original feature
++and source release. [Original mod](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830).
++**Original source:** bundled `src/KenshiQOL/KenshiQOL.cpp` distributed with the
++original; [author's source-release comment](https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830).
++No separate source repository is verified. Provenance: `leopard/carried_weight/ORIGIN.md`;
++GPLv3: `LICENSE`.
++
++### Переносимый вес (неопубликованный кандидат)
++
++**Вес переносимых тел и контейнеров** по умолчанию выключен; нужен перезапуск.
++Учитывает содержимое переносимых контейнеров и персонажей, а вес тела меняет по
++расе, возрасту/размеру и голоду; у роботов выше плотность. Штатное снижение веса
++надетых рюкзаков сохраняется. При загруженной `KenshiQOL.dll` функция отключается
++независимо от настройки того плагина: оставьте один расчёт веса и перезапустите игру.
++Игровые проверки производительности, интерфейса и загрузки сохранений ещё впереди.
++
++Перенесено из **KenshiQOL автора Steel**. Спасибо Steel за оригинальную возможность
++и исходники. [Оригинал](https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830).
++**Исходники оригинала:** `src/KenshiQOL/KenshiQOL.cpp` в поставке оригинала;
++[комментарий автора](https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830).
++Отдельный репозиторий не подтверждён. Происхождение: `leopard/carried_weight/ORIGIN.md`;
++GPLv3: `LICENSE`.
++
+ ## Maintenance settings and diagnostics (unpublished)
+ 
+-The MCM page offers the original 20 player settings, followed by **Detailed log**
++The MCM page offers the original 20 player settings, the optional carried-weight
++setting below, followed by **Detailed log**
+ (`Debug=false`). MCM saves requested preferences separately from startup
+ restrictions, uses its standard restart markers, and applies live settings only
+ on an admitted runtime. Unsupported builds may save preferences for a later
+diff --git a/leopard/carried_weight/ORIGIN.md b/leopard/carried_weight/ORIGIN.md
+new file mode 100644
+index 0000000..821bb0b
+--- /dev/null
++++ b/leopard/carried_weight/ORIGIN.md
+@@ -0,0 +1,17 @@
++# Carried weight provenance and scope
++
++KenshiQOL by Steel. Thanks to Steel for the original feature and bundled source release.
++Original mod: https://steamcommunity.com/sharedfiles/filedetails/?id=3772744830
++Original source: bundled src/KenshiQOL/KenshiQOL.cpp, lines176-227 and1343-1369.
++Author source-release comment: https://steamcommunity.com/sharedfiles/filedetails/comments/3772744830
++No separate source repository has been verified.
++Audited source SHA256: 955b340eb25b0f66c1e08479ec2e8d4636a39f622962582d9bff8e6bed27363e
++Original src/LICENSE and KEO LICENSE are GPLv3. This is a modified integration.
++
++Preserved: volume/age/Height/Frame body scaling, hunger and robot factor; native Inventory weighing and worn-backpack reductions. Native body extra is observed from a paired unmodified Inventory call inside native CharacterCarry; no body constant is guessed. Root Inventory may return signed correction only when final CharacterCarry is finite/nonnegative. Carried-child queries add their own held native body exactly once.
++
++Changed: fixed query-local64-inventory/4096-item/8-level budget; duplicate inventories counted once; cycles/budget/nonfinite failures return original whole-query weight. No temporary item collections, retained actor pointers, world scans or hot module lookups. TLS restores on C++ and SEH unwind. Equipped containers are not added twice. Animation and appearance intermediates are NULL-guarded; absent data uses native-size defaults.
++
++Default OFF, startup-only. Existing non-live ConfigKey sets MCM restart flag. Loaded KenshiQOL.dll refuses installation/admission regardless of its toggle. Admission stays false until first Main tick; module check at most1Hz thereafter, permanent refusal once observed. Covers normal startup order; arbitrary late injection between checks is not promised. Unknown SDK/native contracts refuse. Full carry44-byte contract includes runtime float32 addition and pinned inventory jump thunk; actual Steam/GOG EXEs are tested by test_native_contract.py. No runtime body value is inferred.
++
++Focused controls: test_policy.py, test_adapter.py (actual HookWeight/ReadNativeBody extraction), test_admission.py (actual Install/Tick extraction), test_native_contract.py (actual EXEs). Compact receipt is build/carried-weight-tests/native-receipt.json. Static/host controls are not in-game FPS/memory/UI/save-load proof. No release or install by this task. The parent authorized a narrow local leopard commit after independent review; no upstream push.
+diff --git a/leopard/carried_weight/test_adapter.py b/leopard/carried_weight/test_adapter.py
+new file mode 100644
+index 0000000..1910f74
+--- /dev/null
++++ b/leopard/carried_weight/test_adapter.py
+@@ -0,0 +1,47 @@
++"""Actual hook/TLS native-body boundary over owned buffers; no game or plugin build."""
++from pathlib import Path
++import os,subprocess,sys
++ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'build/carried-weight-tests/adapter';OUT.mkdir(parents=True,exist_ok=True)
++s=(ROOT/'src/inventory/carried_weight.cpp').read_text(encoding='utf-8-sig')if(ROOT/'src/inventory/carried_weight.cpp').exists()else''
++def body(sig):
++ a=s.index(sig);b=s.index('{',a)+1;d=1
++ while d:d+=(s[b]=='{')-(s[b]=='}');b+=1
++ return s[a:b]
++code=r'''
++#include <windows.h>
++#include <stdint.h>
++#include <cstdio>
++#include <cstring>
++#include <stdexcept>
++#include "inventory/carried_weight_policy.h"
++using namespace keo_inventory;
++static volatile LONG calls=0,carryCalls=0,checks=0,s_admitted=1;
++static __declspec(thread) int failMode=0;
++void C(bool b,const char*s){InterlockedIncrement(&checks);if(!b){printf("FAIL %s\n",s);std::exit(1);}}
++float Original(void*inv){InterlockedIncrement(&calls);return (uintptr_t)inv==3?30.0f:20.0f;}
++static float(*s_originalWeight)(void*)=Original;
++static bool RootInventory(void*i){return i==(void*)1;}
++struct WeightScope{WeightScope*previous;bool raw,seen;uintptr_t target;float nativeInv;};
++static __declspec(thread) WeightScope*t_weightScope=NULL;
++static float HookWeight(void*);
++static float GetNativeCarryWeight(uintptr_t){InterlockedIncrement(&carryCalls);float base=HookWeight((void*)1);if(failMode==1)throw std::runtime_error("owned native throw");if(failMode==2)RaiseException(0xe1122334,0,0,NULL);return base+30;}
++RAWBODY
++float Native(void*,uintptr_t i){return s_originalWeight((void*)i);}uintptr_t Owner(void*,uintptr_t i){return i==1?1:0;}int Count(void*,uintptr_t){return 0;}uintptr_t Child(void*,uintptr_t,int){return 0;}uintptr_t Carried(void*,uintptr_t){return 2;}uintptr_t Inventory(void*,uintptr_t){return 3;}bool Body(void*,uintptr_t,WeightBody*b){WeightBody h={5,17,5,1,100,100,3,0};*b=h;return true;}
++static WeightOps WeightOpsForGame(){WeightOps o={NULL,Native,Owner,Count,Child,Carried,Inventory,Body,ReadNativeBody};return o;}
++HOOK
++void Seh(){__try{HookWeight((void*)1);}__except(GetExceptionCode()==0xe1122334?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH){}}
++DWORD WINAPI Worker(void*){for(int i=0;i<100;++i){C(HookWeight((void*)1)==50,"owned thread calculates corrected weight");C(t_weightScope==NULL,"thread scope restored after each query");}return 0;}
++int main(){C(HookWeight((void*)1)==50,"adapter adds carried inventory while body baseline is captured without recursion/doublecount");C(calls==3&&carryCalls==1,"one original per invocation: root+child+one paired baseline only");C(!t_weightScope,"normal query leaves no stack pointer");s_admitted=0;LONG before=calls;C(HookWeight((void*)1)==20&&calls==before+1,"not admitted is exactly one native call");s_admitted=1;before=calls;C(HookWeight((void*)3)==30&&calls==before+1,"bag queries retain native result");
++ WeightScope prior={};t_weightScope=&prior;C(HookWeight((void*)1)==20&&t_weightScope==&prior,"nested active query is native only and keeps outer context");t_weightScope=NULL;
++ failMode=1;try{HookWeight((void*)1);C(false,"C++ original throw propagated");}catch(const std::runtime_error&){}C(!t_weightScope,"C++ unwind restores both TLS frames");failMode=2;Seh();C(!t_weightScope,"SEH unwind restores both TLS frames");failMode=0;
++ HANDLE t[2]={CreateThread(NULL,0,Worker,NULL,0,NULL),CreateThread(NULL,0,Worker,NULL,0,NULL)};C(t[0]&&t[1],"two owned concurrent query threads");C(WaitForMultipleObjects(2,t,TRUE,5000)==WAIT_OBJECT_0,"owned threads joined");CloseHandle(t[0]);CloseHandle(t[1]);C(!t_weightScope,"other threads cannot publish into Main scope");printf("PASS %ld actual hook/TLS controls\n",checks);}
++'''
++if s:code=code.replace('RAWBODY',body('static bool ReadNativeBody(')).replace('HOOK',body('static float HookWeight(void* inventory)'))
++else:code=code.replace('RAWBODY','static bool ReadNativeBody(void*,uintptr_t,uintptr_t,float*b){*b=30;return true;}').replace('HOOK','static float HookWeight(void*inventory){return s_originalWeight(inventory);}')
++cpp=OUT/'adapter.cpp';cpp.write_text(code)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{ROOT}/src;{VC}/include;{SDK}/Include',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++for opt in ['Od','O2']:
++ exe=OUT/('adapter-'+opt+'.exe');r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(cpp),str(ROOT/'src/inventory/carried_weight_policy.cpp'),'/Fo'+str(OUT)+'/', '/Fe'+str(exe)],env=env,capture_output=True,text=True);(OUT/('build-'+opt+'.log')).write_text(r.stdout+r.stderr);assert r.returncode==0,r.stdout+r.stderr
++ r=subprocess.run([str(exe)],capture_output=True,text=True);print(opt,r.stdout.strip());(OUT/('run-'+opt+'.log')).write_text(r.stdout+r.stderr)
++ if '--expect-red'in sys.argv:assert r.returncode==1 and'adapter adds' in r.stdout
++ else:assert r.returncode==0,r.stdout+r.stderr
+diff --git a/leopard/carried_weight/test_admission.py b/leopard/carried_weight/test_admission.py
+new file mode 100644
+index 0000000..23f9bc6
+--- /dev/null
++++ b/leopard/carried_weight/test_admission.py
+@@ -0,0 +1,46 @@
++"""Actual startup/tick extraction; owned module/native-hook boundaries, no game calls."""
++from pathlib import Path
++import os,subprocess
++ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'build/carried-weight-tests';OUT.mkdir(parents=True,exist_ok=True)
++s=(ROOT/'src/inventory/carried_weight.cpp').read_text()
++def body(needle):
++ start=s.index(needle);opening=s.index('{',start);n=1;i=opening+1
++ while n:
++  n+=(s[i]=='{')-(s[i]=='}');i+=1
++ return s[start:i]
++assert 'GetModuleHandle' not in body('static float HookWeight(void* inventory)')
++side=(ROOT/'src/inventory/backpack_sidecar.cpp').read_text();assert side.index('CarriedWeightTick(now);')<side.index('if (InterlockedCompareExchange(&s_armed',side.index('void BackpackRekeyTick'))
++main=(ROOT/'src/zone/camera_zone_hook.cpp').read_text();assert 'keo_inventory::BackpackRekeyTick(tickNow, saveLoading);'in main
++code=r'''
++#include <windows.h>
++#include <cstdio>
++#include <cstdlib>
++#include <new>
++#include <stdint.h>
++static int checks=0,moduleCalls=0,errors=0,hookCalls=0,allocs=0;static bool loaded=false,binding=true,hookOk=true;
++void*operator new(size_t n){++allocs;void*p=malloc(n);if(!p)throw std::bad_alloc();return p;}void operator delete(void*p){free(p);}
++void C(bool b,const char*s){++checks;if(!b){printf("FAIL %s\n",s);exit(1);}}
++static HMODULE FakeModule(const wchar_t*){++moduleCalls;return loaded?(HMODULE)1:NULL;}
++#define GetModuleHandleW FakeModule
++#define KEO_DETAIL(s) ((void)0)
++void LogError(const char*){++errors;}
++struct Config{bool carriedWeightEnabled;}g_inventoryCfg={true};
++static volatile LONG s_admitted=0;static bool s_installed=false,s_blocked=false;static double s_nextCheck=0;static float(*s_originalWeight)(void*)=NULL;
++static float HookWeight(void*){return 0;}
++bool Bindings(uintptr_t*p){*p=7;return binding;}
++namespace KenshiLib{enum {SUCCESS=0};int AddHook(void*,float(*)(void*),float(**)(void*)){++hookCalls;return hookOk?0:1;}}
++TICK
++INSTALL
++void Fresh(){s_admitted=0;s_installed=s_blocked=loaded=false;binding=hookOk=true;s_nextCheck=0;moduleCalls=errors=hookCalls=0;g_inventoryCfg.carriedWeightEnabled=true;}
++int main(){int installed=0,total=0;Fresh();g_inventoryCfg.carriedWeightEnabled=false;InstallCarriedWeight(&installed,&total);CarriedWeightTick(0);C(!total&&!moduleCalls&&!hookCalls&&!s_admitted,"default OFF no loader or hook work");
++ Fresh();loaded=true;InstallCarriedWeight(&installed,&total);C(!installed&&s_blocked&&errors==1&&hookCalls==0,"already loaded QOL refuses hook regardless toggle");CarriedWeightTick(3);C(moduleCalls==1&&!s_admitted,"startup refused stays blocked");
++ Fresh();binding=false;InstallCarriedWeight(&installed,&total);C(!s_installed&&errors==1&&hookCalls==0,"unknown native contract fails closed");
++ Fresh();hookOk=false;InstallCarriedWeight(&installed,&total);C(!s_installed&&!s_originalWeight&&errors==1,"failed hook remains native");
++ Fresh();InstallCarriedWeight(&installed,&total);C(s_installed&&!s_admitted&&hookCalls==1,"installed native-only until first Main check");int before=allocs;CarriedWeightTick(10);C(s_admitted&&moduleCalls==2,"first post-startup Main check admits");for(int i=0;i<1000;++i)CarriedWeightTick(10.0+i*.0009);C(moduleCalls==2,"1000 frame calls below one second do not query loader");CarriedWeightTick(11);C(moduleCalls==3&&s_admitted,"one second performs exactly one check");loaded=true;CarriedWeightTick(12);C(!s_admitted&&s_blocked&&errors==1,"later observed QOL closes admission once");loaded=false;CarriedWeightTick(50);C(moduleCalls==4&&!s_admitted&&errors==1,"conflict never silently readmits");C(allocs==before,"compatibility tick has zero allocations");
++ Fresh();InstallCarriedWeight(&installed,&total);loaded=true;CarriedWeightTick(0);C(!s_admitted&&s_blocked,"DLL loaded after KEO startup but before Main never enables correction");printf("PASS %d actual startup/admission controls\n",checks);}
++'''.replace('TICK',body('void CarriedWeightTick(')).replace('INSTALL',body('void InstallCarriedWeight('))
++cpp=OUT/'admission.cpp';cpp.write_text(code)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++for opt in ['Od','O2']:
++ exe=OUT/('admission-'+opt+'.exe');r=subprocess.run([str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(cpp),'/Fo'+str(OUT)+'/', '/Fe'+str(exe)],env=env,capture_output=True,text=True);(OUT/('admission-build-'+opt+'.log')).write_text(r.stdout+r.stderr);assert r.returncode==0,r.stdout+r.stderr
++ r=subprocess.run([str(exe)],capture_output=True,text=True);print(opt,r.stdout.strip());(OUT/('admission-run-'+opt+'.log')).write_text(r.stdout+r.stderr);assert r.returncode==0,r.stdout+r.stderr
+diff --git a/leopard/carried_weight/test_native_contract.py b/leopard/carried_weight/test_native_contract.py
+new file mode 100644
+index 0000000..f14c542
+--- /dev/null
++++ b/leopard/carried_weight/test_native_contract.py
+@@ -0,0 +1,32 @@
++"""Pinned actual EXEs + SDK receipt; no native execution, no generated fixture asset."""
++from pathlib import Path
++import hashlib,struct,re,json
++ROOT=Path(__file__).resolve().parents[2];s=(ROOT/'src/inventory/carried_weight.cpp').read_text();out=[];checks=0
++def check(b):
++ global checks
++ assert b;checks+=1
++for name,path,sha,carry,weight,thunk,glob,appfn in (
++('Steam',Path(r'D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/Kenshi_x64.exe'),'504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e',0x5c7f40,0x746890,0x443c8,0x2132ea0,0x5b17f0),
++('Gog',Path(r'D:/SteamLibrary/steamapps/common/Kenshi/_codex_work/20261105-keo-gog-native/re_kenshi/kenshi_GOG_x64.exe'),'2defc287c813798b9682b93acf68d340da895cf5164d342145ba0faeb9024681',0x5c8250,0x7461c0,0x4443b,0x2130e10,0x5b1b00)):
++ b=path.read_bytes();check(hashlib.sha256(b).hexdigest()==sha);pe=struct.unpack_from('<I',b,60)[0];n=struct.unpack_from('<H',b,pe+6)[0];off=pe+24+struct.unpack_from('<H',b,pe+20)[0];sections=[struct.unpack_from('<IIII',b,off+j*40+8)for j in range(n)]
++ def read(r,k):
++  for vs,va,rs,raw in sections:
++   if va<=r<va+rs:return b[raw+r-va:raw+r-va+k]
++  raise AssertionError(hex(r))
++ def pin(key):return bytes(int(x,16)for x in re.search(r'k'+key+name+r'\[\d+\]=\{([^}]+)',s)[1].split(','))
++ c=read(carry,44);check(c==pin('Carry'));check(read(weight,32)==pin('Weight'));t=read(thunk,5);check(t==pin('Thunk'))
++ check(c[16]==0xe8 and carry+21+struct.unpack_from('<i',c,17)[0]==thunk)
++ check(t[0]==0xe9 and thunk+5+struct.unpack_from('<i',t,1)[0]==weight)
++ check(c[21:30]==bytes.fromhex('80bb48030000007408'))
++ check(c[30:34]==bytes.fromhex('f30f5805') and carry+38+struct.unpack_from('<i',c,34)[0]==glob)
++ check(c[38:]==bytes.fromhex('4883c4205bc3'))
++ # The float global is zero-fill at runtime; disk cannot establish body weight.
++ check(any(va<=glob<va+vs and glob>=va+rs for vs,va,rs,raw in sections))
++ app=read(0xcd330,12);check(app[:8]==bytes.fromhex('488b8948040000e9'));a=0xcd330+12+struct.unpack_from('<i',app,8)[0];j=read(a,5);check(j[0]==0xe9 and a+5+struct.unpack_from('<i',j,1)[0]==appfn)
++ check(read(appfn,15)==bytes.fromhex('488b81e8000000488b8048010000c3'))
++ # Full pin rejects mutations in the global scalar opcode and thunk target too.
++ mutated=bytearray(c);mutated[31]^=1;check(mutated!=pin('Carry'));mutated=bytearray(t);mutated[1]^=1;check(mutated!=pin('Thunk'))
++ out.append(dict(profile=name,sha256=sha,carryRva=hex(carry),inventoryRva=hex(weight),thunkRva=hex(thunk),runtimeFloatRva=hex(glob),appearanceGetter=hex(appfn)))
++check('c->animation&&c->animation->appearance?'in s)
++receipt=ROOT/'build/carried-weight-tests/native-receipt.json';receipt.write_text(json.dumps(dict(checks=checks,profiles=out,contract='native carry = original inventory + runtime float32 iff carrying; appearance is nonallocating pointer loads; no runtime body value assumed'),indent=2))
++print('PASS',checks,'actual Steam/GOG native boundary controls')
+diff --git a/leopard/carried_weight/test_policy.py b/leopard/carried_weight/test_policy.py
+new file mode 100644
+index 0000000..ed0e950
+--- /dev/null
++++ b/leopard/carried_weight/test_policy.py
+@@ -0,0 +1,60 @@
++"""Bounded production carried-weight policy over owned native facts; no game calls."""
++from pathlib import Path
++import os,subprocess,sys
++ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'build/carried-weight-tests';OUT.mkdir(parents=True,exist_ok=True)
++header=ROOT/'src/inventory/carried_weight_policy.h'
++api=r'''#include <stdint.h>
++namespace keo_inventory {struct WeightBody{float x,y,z,scale,height,frame,hunger;int robot;};struct WeightOps{void*ctx;float(*nativeWeight)(void*,uintptr_t);uintptr_t(*owner)(void*,uintptr_t);int(*count)(void*,uintptr_t);uintptr_t(*child)(void*,uintptr_t,int);uintptr_t(*carried)(void*,uintptr_t);uintptr_t(*inventory)(void*,uintptr_t);bool(*body)(void*,uintptr_t,WeightBody*);bool(*nativeBody)(void*,uintptr_t,uintptr_t,float*);};float CarriedWeightEvaluate(const WeightOps&,uintptr_t,float);float CarriedBodyFactor(const WeightBody&);}
++'''
++code=r'''
++#include <windows.h>
++#include <cstdio>
++#include <cstdlib>
++#include <cmath>
++#include <cstring>
++#include <new>
++API
++using namespace keo_inventory;
++static volatile LONG checks=0,allocs=0;
++void*operator new(size_t n){InterlockedIncrement(&allocs);void*p=std::malloc(n);if(!p)throw std::bad_alloc();return p;}void operator delete(void*p){std::free(p);}void*operator new[](size_t n){return ::operator new(n);}void operator delete[](void*p){::operator delete(p);}
++void C(bool b,const char*s){InterlockedIncrement(&checks);if(!b){printf("FAIL %s\n",s);std::exit(1);}}
++bool Near(float a,float b){return std::fabs(a-b)<0.002f;}
++struct Inv{float base;uintptr_t who;int n;uintptr_t children[70];};struct Actor{uintptr_t held,inv;WeightBody body;};struct Fixture{Inv invs[90];Actor actors[90];int originals;bool readable;};
++WeightBody Human(){WeightBody b={5,17,5,1,100,100,3,0};return b;}
++float Native(void*c,uintptr_t i){Fixture*f=(Fixture*)c;++f->originals;return f->invs[i].base;}
++uintptr_t Owner(void*c,uintptr_t i){return ((Fixture*)c)->invs[i].who;}
++int Count(void*c,uintptr_t i){return ((Fixture*)c)->invs[i].n;}
++uintptr_t Child(void*c,uintptr_t i,int k){return ((Fixture*)c)->invs[i].children[k];}
++uintptr_t Carried(void*c,uintptr_t a){return ((Fixture*)c)->actors[a].held;}
++uintptr_t Inventory(void*c,uintptr_t a){return ((Fixture*)c)->actors[a].inv;}
++bool Body(void*c,uintptr_t a,WeightBody*b){*b=((Fixture*)c)->actors[a].body;return true;}
++bool NativeBody(void*c,uintptr_t,uintptr_t,float*b){Fixture*f=(Fixture*)c;*b=30;return f->readable;}
++WeightOps Ops(Fixture*f){WeightOps o={f,Native,Owner,Count,Child,Carried,Inventory,Body,NativeBody};return o;}
++void Fresh(Fixture&f){std::memset(&f,0,sizeof(f));f.readable=true;for(int i=0;i<90;++i)f.actors[i].body=Human();f.invs[1].base=20;f.invs[1].who=1;f.actors[1].inv=1;}
++void Rows(){Fixture f;Fresh(f);
++ f.invs[1].base=0;f.actors[1].held=2;f.actors[2].inv=2;f.actors[2].body.hunger=0;
++ C(Near(CarriedWeightEvaluate(Ops(&f),1,0),-9),"empty carrier inventory must preserve signed -9 body delta; native outer+30 gives21");
++ f.invs[1].base=2;C(Near(CarriedWeightEvaluate(Ops(&f),1,2),-7),"low inventory preserves signed body delta without arbitrary clamp");
++ Fresh(f);f.actors[1].held=2;f.actors[2].inv=2;f.invs[2].who=2;f.invs[2].base=3;f.actors[2].held=3;f.actors[3].inv=3;f.invs[3].who=3;f.invs[3].base=5;
++ C(Near(CarriedWeightEvaluate(Ops(&f),1,20),58),"A carrying B carrying C includes C body30 once, B body stays native outer30");
++ f.actors[3].body.hunger=0;C(Near(CarriedWeightEvaluate(Ops(&f),1,20),49),"nested carried child's hunger scales its full body, not only an unpaired delta");
++ Fresh(f);f.invs[1].n=1;f.invs[1].children[0]=2;f.invs[2].base=10;f.actors[1].held=2;f.actors[2].inv=3;f.invs[3].base=30;
++ C(Near(CarriedWeightEvaluate(Ops(&f),1,20),60),"missing loose contents and carried inventory count once; native body30 is not added twice");
++ f.actors[2].body.hunger=0;C(Near(CarriedWeightEvaluate(Ops(&f),1,20),51),"starved body uses0.7 native body delta, inventory unchanged");f.actors[2].body=Human();f.actors[2].body.robot=1;f.actors[2].body.hunger=0;C(Near(CarriedWeightEvaluate(Ops(&f),1,20),66),"robot density1.2 ignores hunger");
++ WeightBody b=Human();b.x*=4;C(Near(CarriedBodyFactor(b),2),"race hull sqrt(volume ratio)");b=Human();b.scale=2;C(Near(CarriedBodyFactor(b),std::sqrt(8.0f)),"animal model scale cubed before sqrt");b=Human();b.height=200;b.frame=400;C(Near(CarriedBodyFactor(b),std::sqrt(32.0f)),"Height cubed and Frame linear");b=Human();b.hunger=-10;C(Near(CarriedBodyFactor(b),.7f),"hunger low clamp");b.hunger=30;C(Near(CarriedBodyFactor(b),1),"hunger high clamp");b.x=-1;C(Near(CarriedBodyFactor(b),1),"invalid hull keeps neutral volume");b=Human();b.height=0;C(Near(CarriedBodyFactor(b),1),"missing slider staysneutral");unsigned nanBits=0x7fc00000;float nan;std::memcpy(&nan,&nanBits,4);b=Human();b.scale=nan;C(Near(CarriedBodyFactor(b),1),"NaN scale never poisons weight");b.hunger=nan;C(Near(CarriedBodyFactor(b),1),"NaN hunger neutral");
++ Fresh(f);C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"empty noncarrier preserves exact native");f.invs[1].n=2;f.invs[1].children[0]=f.invs[1].children[1]=2;f.invs[2].base=10;C(CarriedWeightEvaluate(Ops(&f),1,20)==30&&f.originals==1,"duplicate looseinventory reference is counted once");f.invs[2].n=1;f.invs[2].children[0]=1;C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"inventory cycle refuses augmentation");Fresh(f);f.invs[1].n=5000;C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"item scan budget fails closed");Fresh(f);for(int i=1;i<15;++i){f.invs[i].n=1;f.invs[i].children[0]=i+1;f.invs[i+1].base=1;}C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"depth budget refuses without unbounded recursion");
++ Fresh(f);f.actors[1].held=2;f.actors[2].inv=2;f.invs[2].base=15;f.readable=false;C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"unverified native body capture refuses whole augmentation");f.readable=true;f.invs[2].base=nan;C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"nonfinite child weight preserves baseline");f.invs[2].base=-1;C(CarriedWeightEvaluate(Ops(&f),1,20)==20,"negative native child refuses");
++ Fresh(f);f.invs[1].n=1;f.invs[1].children[0]=2;f.invs[2].base=10;LONG before=allocs;for(int i=0;i<100;++i)C(CarriedWeightEvaluate(Ops(&f),1,20)==30,"repeat computes current native facts");C(allocs==before,"no hot-path heap allocation");}
++int main(){Rows();printf("PASS %ld production carried weight controls\n",checks);return 0;}
++'''
++code=code.replace('API','#include "inventory/carried_weight_policy.h"' if header.exists() else api+'\nnamespace keo_inventory {float CarriedWeightEvaluate(const WeightOps&,uintptr_t,float native){return native;}float CarriedBodyFactor(const WeightBody&){return 1;}}')
++cpp=OUT/'policy.cpp';cpp.write_text(code)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{ROOT}/src;{VC}/include;{SDK}/Include',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++for opt in ['Od','O2']:
++ cmd=[str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/'+opt,'/MT',str(cpp)]
++ if header.exists():cmd.append(str(ROOT/'src/inventory/carried_weight_policy.cpp'))
++ exe=OUT/('policy-'+opt+'.exe');cmd+=['/Fo'+str(OUT)+'/', '/Fe'+str(exe)]
++ r=subprocess.run(cmd,env=env,capture_output=True,text=True);(OUT/('build-'+opt+'.log')).write_text(r.stdout+r.stderr);assert r.returncode==0,r.stdout+r.stderr
++ r=subprocess.run([str(exe)],capture_output=True,text=True);print(opt,r.stdout.strip());(OUT/('run-'+opt+'.log')).write_text(r.stdout+r.stderr)
++ if '--expect-red' in sys.argv:assert r.returncode==1 and ('missing loose contents' in r.stdout or 'empty carrier inventory' in r.stdout)
++ else:assert r.returncode==0,r.stdout+r.stderr
+diff --git a/leopard/carried_weight/test_settings.py b/leopard/carried_weight/test_settings.py
+new file mode 100644
+index 0000000..b0bc95c
+--- /dev/null
++++ b/leopard/carried_weight/test_settings.py
+@@ -0,0 +1,11 @@
++"""Existing production config/layout/MCM suites, limited to added metadata integration."""
++from pathlib import Path
++import os,subprocess
++ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'build/carried-weight-tests/settings';OUT.mkdir(parents=True,exist_ok=True)
++VC=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');SDK=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=f'{VC}/include;{SDK}/Include;{ROOT}/src;{ROOT}/tools/tests',LIB=f'{VC}/lib/amd64;{SDK}/Lib/x64')
++lines=(ROOT/'tools/tests/suites.txt').read_text().splitlines()
++for name in ('config_modules_units','settings_layout_units','settings_layout_prod_units','mcm_bridge_units','mcm_bridge_dev_units'):
++ p=next(x for x in lines if x.startswith(name+' |')).split('|');folder=OUT/name;folder.mkdir(exist_ok=True);exe=folder/'test.exe'
++ cmd=[str(VC/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/W3',*p[3].split(),str(ROOT/p[1].strip()),*[str(ROOT/x)for x in p[2].split()],'/Fo'+str(folder)+'/', '/Fe'+str(exe)]
++ r=subprocess.run(cmd,env=env,cwd=ROOT,capture_output=True,text=True);(folder/'build.log').write_text(r.stdout+r.stderr);assert not r.returncode,r.stdout+r.stderr
++ r=subprocess.run([str(exe)],cwd=ROOT,capture_output=True,text=True);(folder/'run.log').write_text(r.stdout+r.stderr);print(name,r.stdout.strip(),flush=True);assert not r.returncode,r.stdout+r.stderr
+diff --git a/leopard/carried_weight/verification.json b/leopard/carried_weight/verification.json
+new file mode 100644
+index 0000000..d3ab87f
+--- /dev/null
++++ b/leopard/carried_weight/verification.json
+@@ -0,0 +1,33 @@
++{
++  "status": "implemented, independently reviewed, locally built; not installed or published",
++  "policyControlsPerOptimization": 125,
++  "adapterControlsPerOptimization": 411,
++  "admissionControlsPerOptimization": 13,
++  "optimizations": [
++    "Od",
++    "O2"
++  ],
++  "actualNativeControls": 31,
++  "existingSuites": [
++    "config_modules_units",
++    "settings_layout_units",
++    "settings_layout_prod_units",
++    "mcm_bridge_units",
++    "mcm_bridge_dev_units"
++  ],
++  "profile": "exact Steam/GOG SDK bindings, full44-byte carry and5-byte thunk pins",
++  "limits": "64 inventories,4096 items,8 levels; fixed stack only; native result on malformed graph; no persistent actors or query allocation",
++  "startup": "carriedWeight=false, restart-only; loaded KenshiQOL blocks; first Main then1Hz, no dynamic-injection race guarantee",
++  "hashes": {
++    "dev": {
++      "KEO.dll": "c79f78588ff19191d2e469df658316d2fc49df8ea7bdcd1bf586170763c4bc26",
++      "KEO.ini.template": "42e2d7a1245bf2ba2a804a553dada0c716e4212a98a8e2d2ad50309db368cebc",
++      "README.md": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca"
++    },
++    "prod": {
++      "KEO.dll": "d53062b8bc2b0dee5107ad5cc4174de10b73a7267507411042fb57e20bb58f37",
++      "KEO.ini.template": "42e2d7a1245bf2ba2a804a553dada0c716e4212a98a8e2d2ad50309db368cebc",
++      "README.md": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca"
++    }
++  }
++}
+\ No newline at end of file
+diff --git a/locale/en_GB/LC_MESSAGES/keo.po b/locale/en_GB/LC_MESSAGES/keo.po
+index 688a2ba..29f21a0 100644
+--- a/locale/en_GB/LC_MESSAGES/keo.po
++++ b/locale/en_GB/LC_MESSAGES/keo.po
+@@ -206,3 +206,10 @@ msgstr "Write detailed diagnostics to KEO.log. Errors are always logged."
+ 
+ msgid "Logging"
+ msgstr "Logging"
++
++# Optional carried weight; startup-only.
++msgid "Carried body and container weight"
++msgstr "Carried body and container weight"
++
++msgid "Include contents of carried containers and people, and scale body weight by race, size and hunger. Keeps native backpack weight reductions. Off by default; disabled if KenshiQOL.dll is loaded, regardless of its settings. Requires restart."
++msgstr "Include contents of carried containers and people, and scale body weight by race, size and hunger. Keeps native backpack weight reductions. Off by default; disabled if KenshiQOL.dll is loaded, regardless of its settings. Requires restart."
+diff --git a/locale/ru_RU/LC_MESSAGES/keo.po b/locale/ru_RU/LC_MESSAGES/keo.po
+index d87d0d0..44cf08f 100644
+--- a/locale/ru_RU/LC_MESSAGES/keo.po
++++ b/locale/ru_RU/LC_MESSAGES/keo.po
+@@ -206,3 +206,10 @@ msgstr "Записывать подробную диагностику в KEO.lo
+ 
+ msgid "Logging"
+ msgstr "Журнал"
++
++# Optional carried weight; startup-only.
++msgid "Carried body and container weight"
++msgstr "Вес переносимых тел и контейнеров"
++
++msgid "Include contents of carried containers and people, and scale body weight by race, size and hunger. Keeps native backpack weight reductions. Off by default; disabled if KenshiQOL.dll is loaded, regardless of its settings. Requires restart."
++msgstr "Учитывать содержимое переносимых контейнеров и персонажей, а вес тела менять по расе, размеру и голоду. Сохраняет штатное снижение веса рюкзаков. По умолчанию выключено; отключается при загруженной KenshiQOL.dll независимо от её настроек. Нужен перезапуск."
+diff --git a/locale/zh_CN/LC_MESSAGES/keo.po b/locale/zh_CN/LC_MESSAGES/keo.po
+index 35b3d83..11eaddd 100644
+--- a/locale/zh_CN/LC_MESSAGES/keo.po
++++ b/locale/zh_CN/LC_MESSAGES/keo.po
+@@ -206,3 +206,10 @@ msgstr "将详细诊断信息写入 KEO.log。错误始终会被记录。"
+ 
+ msgid "Logging"
+ msgstr "日志"
++
++# Optional carried weight; startup-only.
++msgid "Carried body and container weight"
++msgstr "搬运身体和容器重量"
++
++msgid "Include contents of carried containers and people, and scale body weight by race, size and hunger. Keeps native backpack weight reductions. Off by default; disabled if KenshiQOL.dll is loaded, regardless of its settings. Requires restart."
++msgstr "计入搬运容器及人物的物品重量，并根据种族、体型和饥饿程度调整体重。保留原版背包减重。默认关闭；检测到已加载 KenshiQOL.dll 时禁用，不受其设置影响。需要重启。"
+diff --git a/src/gui/settings_layout.cpp b/src/gui/settings_layout.cpp
+index 80ad801..0b3140d 100644
+--- a/src/gui/settings_layout.cpp
++++ b/src/gui/settings_layout.cpp
+@@ -25,6 +25,7 @@ const SettingsPlace kSettingsPlaces[] =
+ 	{ "Gameplay fixes",     "navmesh",   "wallSpliceFix" },
+ 	{ "Backpacks and jobs", "inventory", "backpackFixes",       "backpack" },
+ 	{ "Backpacks and jobs", "inventory", "operatorHoldUntil",   "backpack" },
++	{ "Backpacks and jobs", "inventory", "carriedWeight" },
+ 	{ "Logging", "gui", "Debug" },
+ 	{ NULL, NULL, NULL, NULL }
+ };
+diff --git a/src/inventory/backpack_sidecar.cpp b/src/inventory/backpack_sidecar.cpp
+index 8836abf..30b9013 100644
+--- a/src/inventory/backpack_sidecar.cpp
++++ b/src/inventory/backpack_sidecar.cpp
+@@ -8,6 +8,7 @@
+ // entry. Everything here runs on the main thread, the table's only writer, and takes no lock of
+ // its own (writeFile takes SaveFileSystem's currentMutex inside the game).
+ #include "inventory/backpack_sidecar.h"
++#include "inventory/carried_weight.h"
+ #include "inventory/backpack_sidecar_policy.h"
+ #include "inventory/backpack_table.h"
+ #include "inventory/backpack_first.h"
+@@ -288,6 +289,7 @@ int BackpackRekeyNow(bool dropUnresolved)
+ 
+ void BackpackRekeyTick(double now, bool saveLoading)
+ {
++	CarriedWeightTick(now);
+ 	if (InterlockedCompareExchange(&s_armed, 0, 0) && !saveLoading && now >= s_nextRekey)
+ 	{
+ 		s_nextRekey = now + kRekeySeconds;
+diff --git a/src/inventory/carried_weight.cpp b/src/inventory/carried_weight.cpp
+new file mode 100644
+index 0000000..b5022a9
+--- /dev/null
++++ b/src/inventory/carried_weight.cpp
+@@ -0,0 +1,121 @@
++// Missing weight accounting adapted from KenshiQOL, with bounded query-local
++// traversal and thread-local native-baseline capture. No actor/cache survives a call.
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
++#include "inventory/carried_weight.h"
++#include "inventory/carried_weight_policy.h"
++#include "inventory/inventory_config.h"
++#include "game/game.h"
++#include "game/native_profile.h"
++#include "base/log_admission.h"
++#include "base/klib_include.h"
++#include <core/Functions.h>
++#include <kenshi/Inventory.h>
++#include <kenshi/Character.h>
++#include <kenshi/Animation/AnimationClass.h>
++#include <kenshi/CharStats.h>
++#include <kenshi/MedicalSystem.h>
++#include <kenshi/RaceData.h>
++#include <kenshi/GameData.h>
++#include "base/klib_include_end.h"
++#include <string.h>
++#include <string>
++namespace keo_inventory {
++namespace {
++static float(*s_originalWeight)(void*)=NULL;
++static volatile LONG s_admitted=0;
++static bool s_installed=false,s_blocked=false;
++static double s_nextCheck=0;
++struct WeightScope {WeightScope*previous;bool raw,seen;uintptr_t target;float nativeInv;};
++static __declspec(thread) WeightScope*t_weightScope=NULL;
++static const std::string kHullX("hull size X"),kHullY("hull size Y"),kHullZ("hull size Z"),kHeight("Height"),kFrame("Frame");
++static float GetNativeCarryWeight(uintptr_t actor){return ((Character*)actor)->getTotalCarryWeight();}
++static bool ReadNativeBody(void*,uintptr_t actor,uintptr_t inventory,float*out){
++ WeightScope local={};local.previous=t_weightScope;local.raw=true;local.target=inventory;
++ t_weightScope=&local;float carry=0;
++ __try {carry=GetNativeCarryWeight(actor);}
++ __finally {t_weightScope=local.previous;}
++ if(!local.seen)return false;
++ *out=carry-local.nativeInv;return true;
++}
++static uintptr_t Owner(void*,uintptr_t inv){
++ Inventory*i=(Inventory*)inv;if(!i||!i->callbackObject)return 0;
++ Character*c=i->getCallbackCharacter();return c&&c->inventory==i?(uintptr_t)c:0;
++}
++static bool RootInventory(void*i){return Owner(NULL,(uintptr_t)i)!=0;}
++static float NativeWeight(void*,uintptr_t i){return s_originalWeight((void*)i);}
++static int ItemCount(void*,uintptr_t i){const lektor<Item*>&items=((Inventory*)i)->_allItems;
++ return items.count>4096||items.count>items.maxSize||(items.count&&!items.stuff)?-1:(int)items.count;}
++static uintptr_t ChildInventory(void*,uintptr_t i,int n){
++ const lektor<Item*>&items=((Inventory*)i)->_allItems;Item*item=items.stuff[n];
++ // Equipped bag contents already contribute through native sections/reductions.
++ return item&&!item->isEquipped&&item->objectType==CONTAINER?(uintptr_t)item->getInventory():0;
++}
++static uintptr_t Carried(void*,uintptr_t a){Character*c=(Character*)a;return c->isCarryingSomething?(uintptr_t)c->carryingObject.getCharacter():0;}
++static uintptr_t InventoryOf(void*,uintptr_t a){return a?(uintptr_t)((Character*)a)->inventory:0;}
++static float FloatField(GameData*d,const std::string&key,float fallback){
++ if(!d)return fallback;
++ boost::unordered::unordered_map<std::string,float,boost::hash<std::string>,std::equal_to<std::string>,Ogre::STLAllocator<std::pair<std::string const,float>,Ogre::GeneralAllocPolicy> >::const_iterator i=d->fdata.find(key);
++ return i==d->fdata.end()?fallback:i->second;
++}
++static bool Body(void*,uintptr_t a,WeightBody*out){
++ Character*c=(Character*)a;if(!c)return false;RaceData*r=c->getRace();
++ out->x=FloatField(r?r->data:NULL,kHullX,5);out->y=FloatField(r?r->data:NULL,kHullY,17);out->z=FloatField(r?r->data:NULL,kHullZ,5);
++ out->scale=c->getAge();out->height=out->frame=100;
++ GameDataCopyStandalone*appearance=c->animation&&c->animation->appearance?c->getAppearanceData():NULL;
++ out->height=FloatField(appearance,kHeight,100);out->frame=FloatField(appearance,kFrame,100);
++ out->robot=r&&r->robot?1:0;out->hunger=c->stats&&c->stats->medical?c->stats->medical->hunger:3;
++ return true;
++}
++static WeightOps WeightOpsForGame(){WeightOps o={NULL,NativeWeight,Owner,ItemCount,ChildInventory,Carried,InventoryOf,Body,ReadNativeBody};return o;}
++static float HookWeight(void* inventory){
++ const float base=s_originalWeight(inventory);
++ WeightScope*const outer=t_weightScope;
++ if(outer&&outer->raw){if(outer->target==(uintptr_t)inventory){outer->seen=true;outer->nativeInv=base;}return base;}
++ if(outer||!InterlockedCompareExchange(&s_admitted,0,0)||!inventory||!RootInventory(inventory))return base;
++ WeightScope local={};local.previous=outer;t_weightScope=&local;float value=base;
++ __try {value=CarriedWeightEvaluate(WeightOpsForGame(),(uintptr_t)inventory,base);}
++ __finally {t_weightScope=local.previous;}
++ return value;
++}
++static const unsigned char kWeightSteam[32]={0x33,0xC0,0x4C,0x8B,0xC1,0x89,0x81,0x90,0x00,0x00,0x00,0x48,0x39,0x41,0x48,0x74,0x13,0x48,0x8B,0x51,0x40,0x48,0x8B,0x41,0x60,0x48,0x8B,0x14,0xD0,0x48,0x89,0x54};
++static const unsigned char kWeightGog[32]={0x33,0xC0,0x4C,0x8B,0xC1,0x89,0x81,0x90,0x00,0x00,0x00,0x48,0x39,0x41,0x48,0x74,0x13,0x48,0x8B,0x51,0x40,0x48,0x8B,0x41,0x60,0x48,0x8B,0x14,0xD0,0x48,0x89,0x54};
++static const unsigned char kCarrySteam[44]={0x40,0x53,0x48,0x83,0xEC,0x20,0x48,0x8B,0xD9,0x48,0x8B,0x89,0xE8,0x02,0x00,0x00,0xE8,0x73,0xC4,0xA7,0xFF,0x80,0xBB,0x48,0x03,0x00,0x00,0x00,0x74,0x08,0xF3,0x0F,0x58,0x05,0x3A,0xAF,0xB6,0x01,0x48,0x83,0xC4,0x20,0x5B,0xC3};
++static const unsigned char kThunkSteam[5]={0xE9,0xC3,0x24,0x70,0x00};
++static const unsigned char kCarryGog[44]={0x40,0x53,0x48,0x83,0xEC,0x20,0x48,0x8B,0xD9,0x48,0x8B,0x89,0xE8,0x02,0x00,0x00,0xE8,0xD6,0xC1,0xA7,0xFF,0x80,0xBB,0x48,0x03,0x00,0x00,0x00,0x74,0x08,0xF3,0x0F,0x58,0x05,0x9A,0x8B,0xB6,0x01,0x48,0x83,0xC4,0x20,0x5B,0xC3};
++static const unsigned char kThunkGog[5]={0xE9,0x80,0x1D,0x70,0x00};
++
++bool SdkAt(uintptr_t address,uintptr_t steam,uintptr_t gog){return address==gameBase+(NativeProfileIsGog()?gog:steam);}
++bool Bindings(uintptr_t*weight){
++ *weight=(uintptr_t)KlibRealAddress(&Inventory::getTotalWeight);
++ const uintptr_t carry=(uintptr_t)KlibRealAddress(&Character::getTotalCarryWeight);
++ return SdkAt(*weight,0x746890,0x7461C0)&&SdkAt(carry,0x5C7F40,0x5C8250)
++  &&SdkAt((uintptr_t)KlibRealAddress(&Inventory::getCallbackCharacter),0x70C320,0x70BC80)
++  &&SdkAt((uintptr_t)KlibRealAddress(&Character::getAppearanceData),0xCD330,0xCD330)
++  &&SdkAt((uintptr_t)KlibRealAddress(&Character::getAge),0x5E4EF0,0x5E5200)
++  &&SdkAt((uintptr_t)KlibRealAddress(&Character::getRace),0x5E1470,0x5E1780)
++  &&memcmp((void*)*weight,NativeProfileIsGog()?kWeightGog:kWeightSteam,32)==0
++  &&memcmp((void*)carry,NativeProfileIsGog()?kCarryGog:kCarrySteam,44)==0
++  &&memcmp((void*)(gameBase+(NativeProfileIsGog()?0x4443B:0x443C8)),NativeProfileIsGog()?kThunkGog:kThunkSteam,5)==0;
++}
++}
++void CarriedWeightTick(double now){
++ if(!s_installed||s_blocked||now<s_nextCheck)return;s_nextCheck=now+1;
++ if(GetModuleHandleW(L"KenshiQOL.dll")!=NULL){InterlockedExchange(&s_admitted,0);s_blocked=true;
++  LogError("Carried weight: disabled because KenshiQOL.dll is loaded; only one weight implementation may run");return;}
++ InterlockedExchange(&s_admitted,1);
++}
++void InstallCarriedWeight(int*installed,int*total){
++ if(!g_inventoryCfg.carriedWeightEnabled)return;
++ if(total)++*total;
++ if(GetModuleHandleW(L"KenshiQOL.dll")!=NULL){s_blocked=true;LogError("Carried weight: KenshiQOL.dll is loaded; KEO weight hook refused to prevent double counting");return;}
++ uintptr_t target=0;
++ if(!Bindings(&target)){LogError("Carried weight: exact Steam/GOG SDK or native weight contract refused; native weight retained");return;}
++ if(KenshiLib::AddHook((void*)target,HookWeight,&s_originalWeight)!=KenshiLib::SUCCESS){s_originalWeight=NULL;LogError("Carried weight: Inventory::getTotalWeight hook failed; native weight retained");return;}
++ s_installed=true;if(installed)++*installed;
++ // The first Main lifecycle check runs after normal startup DLL load order.
++ // Until then the hook is a native-only pass-through.
++ KEO_DETAIL("Carried weight: installed, waiting for post-startup compatibility check");
++}
++}
+diff --git a/src/inventory/carried_weight.h b/src/inventory/carried_weight.h
+new file mode 100644
+index 0000000..d14a0f4
+--- /dev/null
++++ b/src/inventory/carried_weight.h
+@@ -0,0 +1,7 @@
++#pragma once
++namespace keo_inventory {
++void InstallCarriedWeight(int* installed,int* total);
++// Existing Main lifecycle callback; no engine actors retained. First post-startup
++// check publishes admission; at most one exact module lookup per second later.
++void CarriedWeightTick(double now);
++}
+diff --git a/src/inventory/carried_weight_policy.cpp b/src/inventory/carried_weight_policy.cpp
+new file mode 100644
+index 0000000..2ff595a
+--- /dev/null
++++ b/src/inventory/carried_weight_policy.cpp
+@@ -0,0 +1,57 @@
++#include "inventory/carried_weight_policy.h"
++#include <float.h>
++#include <math.h>
++namespace keo_inventory {
++namespace {
++bool Finite(float v){return v>=-FLT_MAX&&v<=FLT_MAX;}
++bool Nonnegative(float v){return v>=0.0f&&v<=FLT_MAX;}
++bool Positive(float v){return v>0.0f&&v<=FLT_MAX;}
++float OrOne(float v){return Positive(v)?v:1.0f;}
++struct Query {uintptr_t seen[64],path[8];int seenCount,items;bool good;};
++bool Seen(Query&q,uintptr_t inv){for(int i=0;i<q.seenCount;++i)if(q.seen[i]==inv)return true;return false;}
++float Visit(const WeightOps&o,uintptr_t inv,float base,Query&q,int depth,bool carriedLoad);
++float Child(const WeightOps&o,uintptr_t inv,Query&q,int depth,bool carriedLoad){
++ if(!inv)return 0;
++ for(int i=0;i<depth&&i<8;++i)if(q.path[i]==inv){q.good=false;return 0;}
++ if(Seen(q,inv))return 0;
++ if(depth>=8||q.seenCount==64){q.good=false;return 0;}
++ return Visit(o,inv,o.nativeWeight(o.ctx,inv),q,depth,carriedLoad);
++}
++float Visit(const WeightOps&o,uintptr_t inv,float base,Query&q,int depth,bool carriedLoad){
++ if(!Nonnegative(base)||depth>=8||q.seenCount==64){q.good=false;return 0;}
++ q.seen[q.seenCount++]=inv;q.path[depth]=inv;
++ float total=base,nativeBody=0;int n=o.count(o.ctx,inv);
++ if(n<0||n>4096-q.items){q.good=false;return 0;}q.items+=n;
++ for(int i=0;i<n&&q.good;++i){uintptr_t bag=o.child(o.ctx,inv,i);if(bag)total+=Child(o,bag,q,depth+1,false);}
++ uintptr_t owner=o.owner(o.ctx,inv);uintptr_t held=owner?o.carried(o.ctx,owner):0;
++ if(held&&q.good){
++  total+=Child(o,o.inventory(o.ctx,held),q,depth+1,true);
++  WeightBody b={5,17,5,1,100,100,3,0};
++  if(!o.nativeBody(o.ctx,owner,inv,&nativeBody)||!Nonnegative(nativeBody)){q.good=false;return 0;}
++  float factor=o.body(o.ctx,held,&b)?CarriedBodyFactor(b):1.0f;
++  // A carried inventory contributes its complete load, including its own held body.
++  // The root remains a signed correction: native CharacterCarry adds that body.
++  total+=nativeBody*(factor-(carriedLoad?0.0f:1.0f));
++ }
++ double finalCarry=(double)total+(carriedLoad?0.0:nativeBody);
++ if(!Finite(total)||finalCarry<0||finalCarry>FLT_MAX)q.good=false;
++ return total;
++}
++}
++float CarriedBodyFactor(const WeightBody&b){
++ double volume=1.0;
++ if(Positive(b.x)&&Positive(b.y)&&Positive(b.z))volume=(double)b.x*b.y*b.z/425.0;
++ double scale=OrOne(b.scale),height=OrOne(b.height)/100.0,frame=OrOne(b.frame)/100.0;
++ // Missing/nonpositive sliders are native defaults, not1percent.
++ if(!Positive(b.height))height=1;if(!Positive(b.frame))frame=1;
++ volume*=scale*scale*scale*height*height*height*frame;
++ double factor=volume>0?sqrt(volume):1.0;
++ if(b.robot)factor*=1.2;
++ else if(b.hunger>=-FLT_MAX&&b.hunger<=FLT_MAX){float h=b.hunger;if(h<0)h=0;if(h>3)h=3;factor*=.7+.3*(double)h/3.0;}
++ return factor>0&&factor<=FLT_MAX?(float)factor:1.0f;
++}
++float CarriedWeightEvaluate(const WeightOps&o,uintptr_t inv,float base){
++ if(!inv||!Nonnegative(base)||!o.nativeWeight||!o.owner||!o.count||!o.child||!o.carried||!o.inventory||!o.body||!o.nativeBody)return base;
++ Query q={};q.good=true;float value=Visit(o,inv,base,q,0,false);return q.good?value:base;
++}
++}
+diff --git a/src/inventory/carried_weight_policy.h b/src/inventory/carried_weight_policy.h
+new file mode 100644
+index 0000000..178b7f2
+--- /dev/null
++++ b/src/inventory/carried_weight_policy.h
+@@ -0,0 +1,15 @@
++#pragma once
++#include <stdint.h>
++namespace keo_inventory {
++struct WeightBody {float x,y,z,scale,height,frame,hunger;int robot;};
++// Native callbacks own no pointers beyond this synchronous query. child() returns
++// only an unequipped container's inventory; nativeWeight preserves game reductions.
++struct WeightOps {
++ void*ctx;float(*nativeWeight)(void*,uintptr_t);uintptr_t(*owner)(void*,uintptr_t);
++ int(*count)(void*,uintptr_t);uintptr_t(*child)(void*,uintptr_t,int);
++ uintptr_t(*carried)(void*,uintptr_t);uintptr_t(*inventory)(void*,uintptr_t);
++ bool(*body)(void*,uintptr_t,WeightBody*);bool(*nativeBody)(void*,uintptr_t,uintptr_t,float*);
++};
++float CarriedBodyFactor(const WeightBody& body);
++float CarriedWeightEvaluate(const WeightOps& ops,uintptr_t inventory,float nativeWeight);
++}
+diff --git a/src/inventory/inventory_config.cpp b/src/inventory/inventory_config.cpp
+index ecad3e2..a4a326a 100644
+--- a/src/inventory/inventory_config.cpp
++++ b/src/inventory/inventory_config.cpp
+@@ -16,6 +16,7 @@ const InventoryConfig kInventoryDefaults =
+ 	true, // operatorFillBeforeDeliverEnabled
+ 	OPERATOR_HOLD_HEAVY, // operatorHoldUntil
+ 	true, // backpackFixesEnabled
++	false, // carriedWeightEnabled: optional candidate, requires restart
+ };
+ 
+ InventoryConfig g_inventoryCfg = kInventoryDefaults;
+@@ -72,6 +73,9 @@ const ConfigKey g_inventoryConfigKeys[] =
+ 	  "Operators fill up to",
+ 	  "A machine operator keeps collecting until its load passes this tier, the word on its character panel, then delivers. Overloaded: weight never sends it.",
+ 	  kOperatorHoldChoices),
++	CFG_OBOOL("carriedWeight", InventoryConfig, carriedWeightEnabled, DOC, SHOW,
++	  "Carried body and container weight",
++	  "Include contents of carried containers and people, and scale body weight by race, size and hunger. Keeps native backpack weight reductions. Off by default; disabled if KenshiQOL.dll is loaded, regardless of its settings. Requires restart."),
+ 	{ NULL, CK_BOOL, 0, 0, 0.0f, 0.0f, false, NULL, NULL, false, 0.0f, 0, NULL, INT_MIN, false, false, false, NULL, NULL, NULL, NULL, 0 }
+ };
+ 
+diff --git a/src/inventory/inventory_config.h b/src/inventory/inventory_config.h
+index a7ebc5b..4a47510 100644
+--- a/src/inventory/inventory_config.h
++++ b/src/inventory/inventory_config.h
+@@ -40,6 +40,9 @@ struct InventoryConfig
+ 	// loads it once per call (AI back thread and main thread). A part whose own install key was off
+ 	// at startup is not installed, and this switch does not install it.
+ 	bool backpackFixesEnabled;
++
++	// Optional body/loose-container accounting. Startup-only; native weight while OFF.
++	bool carriedWeightEnabled;
+ };
+ 
+ extern InventoryConfig g_inventoryCfg;
+diff --git a/src/plugin/hook_manifest.cpp b/src/plugin/hook_manifest.cpp
+index 7a815da..20f36fc 100644
+--- a/src/plugin/hook_manifest.cpp
++++ b/src/plugin/hook_manifest.cpp
+@@ -43,6 +43,7 @@
+ #include "fixes/world/corpse_pin.h"
+ #include "fixes/world/faction_relations.h"
+ #include "inventory/backpack_first.h"
++#include "inventory/carried_weight.h"
+ #include "fixes/world/town_claim.h"
+ #include "fixes/world/throwout.h"
+ #include "inventory/backpack_sidecar.h"
+@@ -675,6 +676,7 @@ static void (*const kInstallSteps[])(int*, int*) =
+ 	InstallZoneLifecycleHooks,
+ 	InstallCorpsePin,
+ 	keo_inventory::InstallBackpackFirst,
++	keo_inventory::InstallCarriedWeight,
+ 	fixes::InstallTownClaim,
+ 	keo_inventory::InstallBackpackSidecar,
+ 	keo_inventory::InstallBackpackWindow,
+diff --git a/tools/build/coresrc.txt b/tools/build/coresrc.txt
+index f1f0067..690805b 100644
+--- a/tools/build/coresrc.txt
++++ b/tools/build/coresrc.txt
+@@ -343,3 +343,6 @@ src\pathfind\path_priority_publication.cpp
+ 
+ src/game/gog_profile.cpp
+ src/game/native_profile.cpp
++
++src/inventory/carried_weight_policy.cpp
++src/inventory/carried_weight.cpp
+diff --git a/tools/build/profsrc.txt b/tools/build/profsrc.txt
+index 499dc93..d8fb1b5 100644
+--- a/tools/build/profsrc.txt
++++ b/tools/build/profsrc.txt
+@@ -40,3 +40,6 @@ src\base\legacy_ini_import.cpp
+ src/game/gog_profile.cpp
+ 
+ src/game/native_profile.cpp
++
++src/inventory/carried_weight_policy.cpp
++src/inventory/carried_weight.cpp
+diff --git a/tools/tests/config_modules_units.cpp b/tools/tests/config_modules_units.cpp
+index d265d19..5015d4b 100644
+--- a/tools/tests/config_modules_units.cpp
++++ b/tools/tests/config_modules_units.cpp
+@@ -137,6 +137,7 @@ static const Owner kOwners[] =
+ 	{ "operatorFillBeforeDeliver", "inventory" },
+ 	{ "operatorHoldUntil", "inventory" },
+ 	{ "backpackFixes", "inventory" },
++	{ "carriedWeight", "inventory" },
+ };
+ static const Expected kExpected[] =
+ {
+@@ -415,7 +416,7 @@ int main()
+ 		}
+ 		if (i == CONFIG_STAGE_MAX) Fail(mod.name, "no table end within stage capacity");
+ 	}
+-	Check(moduleKeys == 116 && activeCore == 2 && retiredCore == 23 && debug == 4, "module and core row counts");
++	Check(moduleKeys == 117 && activeCore == 2 && retiredCore == 23 && debug == 4, "module and core row counts");
+ 	const char* const removed[] = { "npcFailMemo", "rqStructClear", "ogreWorkerPriority", "factionSelfGuard" };
+ 	for (int i = 0; i < 4; ++i)
+ 		Check(FindConfigKey(removed[i], NULL) == NULL, "removed switches have no config row");
+diff --git a/tools/tests/mcm_bridge_units.cpp b/tools/tests/mcm_bridge_units.cpp
+index 6d95cfb..73f8a9b 100644
+--- a/tools/tests/mcm_bridge_units.cpp
++++ b/tools/tests/mcm_bridge_units.cpp
+@@ -33,9 +33,10 @@ static void Describe(MCM_Api&api){rows.clear();KeoMcmDescribe(&api);}
+ int main(){MCM_Api api={};api.version=5;api.beginMod=Begin;api.section=Section;api.info=Info;api.toggleFn=Toggle;api.integerFn=Integer;api.choiceFn=Choice;api.numberFn=Number;api.defaultValue=Default;
+  KeoMcmDescribe(NULL);Describe(api);Check(rows.empty(),"early discovery has no unsafe callbacks");
+  movement::g_movementCfg.routingEnabled=false;movement::g_movementCfg.groupCohesionEnabled=true;Check(CaptureRequestedSettings(),"requested captured before runtime refusal");movement::ApplyRoutingSwitch(NULL);
+- api.version=2;Describe(api);Check(rows.empty(),"API2 retains fallback only");api.version=3;Describe(api);Check(rows.size()==21&&rows.back().label=="Detailed log"&&rows.back().def.empty(),"v3 exact compact21 and Debug last");
+- api.version=5;Describe(api);unsigned restart=0;for(size_t i=0;i<rows.size();++i){restart+=(rows[i].flags&MCM_RESTART)!=0;Check(rows[i].label.find('*')==std::string::npos,"MCM owns restart marker");}Check(restart==13&&rows.back().flags==0&&rows.back().def=="0","13 startup rows and live defaultOFF Debug");
++ api.version=2;Describe(api);Check(rows.empty(),"API2 retains fallback only");api.version=3;Describe(api);Check(rows.size()==22&&rows.back().label=="Detailed log"&&rows.back().def.empty(),"v3 exact compact22 and Debug last");
++ api.version=5;Describe(api);unsigned restart=0;for(size_t i=0;i<rows.size();++i){restart+=(rows[i].flags&MCM_RESTART)!=0;Check(rows[i].label.find('*')==std::string::npos,"MCM owns restart marker");}Check(restart==14&&rows.back().flags==0&&rows.back().def=="0","14 startup rows and live defaultOFF Debug");
+  for(unsigned p=0;keo_gui::kSettingsPlaces[p].section;++p){const ConfigKey*k=FindConfigKey(keo_gui::kSettingsPlaces[p].key,NULL);Row*r=Find(k->name);Check(r&&r->flags==(k->live?0:MCM_RESTART),"each original player row preserves exact live/restart classification");if(r&&r->kind==2)Check(r->lo==int(k->lo)&&r->hi==int(k->hi),"integer range comes from original loader metadata");}
++ Check(Find("carriedWeight")&&Find("carriedWeight")->def=="0"&&Find("carriedWeight")->flags==MCM_RESTART&&!keo_inventory::g_inventoryCfg.carriedWeightEnabled,"carried weight defaultOFF and restart-only, no runtime activation");
+  Check(Find("k7PostDeathHold")->def=="2","custom choice default uses integer callback value not INI word");
+ #ifndef KEO_DEBUG
+  Check(Find("k7PostDeathHold")->choices.size()==2,"PROD hides unselected observe choice");
+diff --git a/tools/tests/settings_units_common.h b/tools/tests/settings_units_common.h
+index 5c0ec00..011b8c7 100644
+--- a/tools/tests/settings_units_common.h
++++ b/tools/tests/settings_units_common.h
+@@ -43,11 +43,11 @@ static const ProdRow kProdPage[] =
+ 	{ "k7PostDeathHold", "Squad movement" }, { "plannerMode", "Squad movement" },
+ 	{ "townClaimFix", "Gameplay fixes" }, { "throwOutFix", "Gameplay fixes" },
+ 	{ "throwOutHoldMinutes", "Gameplay fixes" }, { "wallSpliceFix", "Gameplay fixes" },
+-	{ "backpackFixes", "Backpacks and jobs" }, { "operatorHoldUntil", "Backpacks and jobs" },
++	{ "carriedWeight", "Backpacks and jobs" }, { "backpackFixes", "Backpacks and jobs" }, { "operatorHoldUntil", "Backpacks and jobs" },
+ 	{ "Debug", "Logging" },
+ 	{ NULL, NULL }
+ };
+-static const int PROD_PAGE_ROWS = 21;
++static const int PROD_PAGE_ROWS = 22;
+ static const char* const PROD_SECTIONS[] = { "Zone loading", "Performance", "Squad movement", "Gameplay fixes",
+ 	"Backpacks and jobs", "Logging" };
+ 
+-- 
+2.46.0.windows.1
+

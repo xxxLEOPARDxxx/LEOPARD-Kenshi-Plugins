@@ -1,0 +1,62 @@
+{
+  "time_msk": "2026-11-05T03:07:00.008538+03:00",
+  "status": "installed_locally_new_weight_default_off_not_published",
+  "dll_sha256": "d53062b8bc2b0dee5107ad5cc4174de10b73a7267507411042fb57e20bb58f37",
+  "native_imports": {
+    "KenshiLib.dll": 148,
+    "MyGUIEngine_x64.dll": 29
+  },
+  "files": [
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.dll",
+      "bytes": 1489920,
+      "sha256": "d53062b8bc2b0dee5107ad5cc4174de10b73a7267507411042fb57e20bb58f37"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\README.md",
+      "bytes": 17606,
+      "sha256": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\leopard\\carried_weight\\ORIGIN.md",
+      "bytes": 2525,
+      "sha256": "1f0ba9f50f4df277d6e1f2790b54bf3a01c5be5d86b9380ee423e6b9058b7632"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\locale\\en_GB\\LC_MESSAGES\\keo.mo",
+      "bytes": 11209,
+      "sha256": "9a7bb3a20aaad4bfd13607e7eb91e4736e06e897d79cd599d5d292ff02ec6355"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\locale\\ru_RU\\LC_MESSAGES\\keo.mo",
+      "bytes": 15126,
+      "sha256": "8b490400f28262efccfd130aa34f4e01da33b3e43583a4f61a9771c922523562"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\locale\\zh_CN\\LC_MESSAGES\\keo.mo",
+      "bytes": 10986,
+      "sha256": "b1b477f8687c962c238db0aed9b897f05ec7add061ab385245100aeba2c675e6"
+    }
+  ],
+  "preserved": {
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "bca1a0fc42b4e3acc2bd45eec727b2bb66c898928ef9d963ce19e1376df1b1a3",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\RE_Kenshi.json": "46dba618bbfac3e915141a0277a1106a3c30ed2d5fa8e6920782ea89ad6c2e68",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\mods.cfg": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f"
+  },
+  "checks": {
+    "policy_Od_O2": 125,
+    "adapter_Od_O2": 411,
+    "admission_Od_O2": 13,
+    "native_boundaries": 31
+  },
+  "independent_review": "CLEAR",
+  "runtime_weight_FPS_memory_save_load": "not_yet_verified",
+  "test_archive": {
+    "path": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-weight-test-20261105.zip",
+    "sha256": "bf267f6ea7820eccecce8b6bfac145461818435dc498e31bb3e0b63f7c06a8b9",
+    "bytes": 762816,
+    "files": 12,
+    "crc": "passed"
+  }
+}

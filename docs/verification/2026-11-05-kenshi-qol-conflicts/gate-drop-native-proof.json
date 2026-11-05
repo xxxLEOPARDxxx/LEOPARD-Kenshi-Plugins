@@ -1,0 +1,128 @@
+{
+  "steam_sha256": "504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e",
+  "gog_sha256": "2defc287c813798b9682b93acf68d340da895cf5164d342145ba0faeb9024681",
+  "windows": [
+    {
+      "name": "notifyConstructionComplete",
+      "steam": "0x5618b0",
+      "gog": "0x561bc0",
+      "bytes": 348,
+      "instructions": 84,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "53df8ad3b5ae10fd9848b3bc100014eec601e97f3686070e524743a2bf299346",
+      "gog_sha256": "883fa6ae7d4bec89dc6c5aac22ff91e31422f67254b92d3ef25f45ab2aaf5234"
+    },
+    {
+      "name": "Gateway_setup",
+      "steam": "0x552740",
+      "gog": "0x552a50",
+      "bytes": 56,
+      "instructions": 15,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "ca6d6363a88a16695cb44e30df96d9746c95799185e96d5a4b0f5dd8f2d190bd",
+      "gog_sha256": "05a3cc5d0a3fddedd515ac9bcf468473c4b26d48314590a08bbfe6305355f591"
+    },
+    {
+      "name": "Town_addGate",
+      "steam": "0x9512f0",
+      "gog": "0x950a10",
+      "bytes": 39,
+      "instructions": 9,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "afdd7d7381b8bda0dba44386aee7659535caa6c2d70577fed6c06abce1b1d101",
+      "gog_sha256": "fada8d88194f781111ebc495acab236ec67f020fa692d7b426b254b903d8aa63"
+    },
+    {
+      "name": "Building_setup_registration_window",
+      "steam": "0x551090",
+      "gog": "0x5513a0",
+      "bytes": 286,
+      "instructions": 76,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "f9579dfe580209ef788d728208e17dfd7435169edd33c5ff952f69701f9e3774",
+      "gog_sha256": "5b80643546a87387f12a9afdc95a77995af02cc25f4e51dffa10bf41a41f63aa"
+    },
+    {
+      "name": "Building_ctor_before_derived_vtable",
+      "steam": "0x55c000",
+      "gog": "0x55c310",
+      "bytes": 1035,
+      "instructions": 207,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "463a64501603d1cccc0bc8fe0a49f6d12d80a80b611ec681d5cbac7a1eefa8c4",
+      "gog_sha256": "0eab72bf54c7c20ed8ea3287d5372ad606a264abd699bfd3bb82f4c9f44b5227"
+    },
+    {
+      "name": "Gateway_ctor",
+      "steam": "0x5626b0",
+      "gog": "0x5629c0",
+      "bytes": 127,
+      "instructions": 27,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "d77e683b4d723bdafb915db4b900117144d9c09759d59ba49a61e7517491c216",
+      "gog_sha256": "3e1700841128a17b1676f40c5eb1c47fa6996a219fe8238e9e85a0645d5faba5"
+    },
+    {
+      "name": "drop",
+      "steam": "0x5cc110",
+      "gog": "0x5cc420",
+      "bytes": 487,
+      "instructions": 94,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "9ee097530905e0759cf822a1aa99466120a45ceb47e416ef0ffac6c42ff6d0d4",
+      "gog_sha256": "86d9658fcf703dc3f84571e068ed3695e9c3632ec3b6717410ebc81758ec729b"
+    },
+    {
+      "name": "closest_wrapper",
+      "steam": "0x3a2e60",
+      "gog": "0x3a2a80",
+      "bytes": 224,
+      "instructions": 57,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "bbb0aa6d86ec899b06190fa1910cde88cf73c7a0dee3b607f856ff010c2caef2",
+      "gog_sha256": "59523f22573a74d9422e358e97107bb42348db98e029414d86ec21a084679694"
+    },
+    {
+      "name": "closest_core",
+      "steam": "0x3a21c0",
+      "gog": "0x3a1de0",
+      "bytes": 804,
+      "instructions": 206,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "c8994b0b8607c8d617caa4b88d227f348b1e349aa869fdf8832aa99fecdc8c98",
+      "gog_sha256": "17945c18f9a33647d2d931dbda6384c60880939a21a9a772b3b5b3f1afab69cf"
+    },
+    {
+      "name": "getHandle",
+      "steam": "0x3a4280",
+      "gog": "0x3a3ea0",
+      "bytes": 370,
+      "instructions": 102,
+      "masked_only_rip_or_external_relative": true,
+      "same": true,
+      "steam_sha256": "971a4f9281feb21042cc0ae3cacc9696e372edc408f6e942f08000eda455563a",
+      "gog_sha256": "e3a8cf7b2955a98b15d6014a4a82ba3d5d59178b3882418e03a59b074feb7190"
+    },
+    {
+      "name": "Steam_set_insert",
+      "rva": "0x293b90",
+      "bytes": 469,
+      "sha256": "754ccf0da9952a95005ece27fec78c49b0f60dfae9effecdb0cdf6c806d98fed"
+    },
+    {
+      "name": "GOG_set_insert",
+      "rva": "0x293720",
+      "bytes": 469,
+      "sha256": "1d5cdc4b09f3fc08c97722ee7b399b6d2df94c8e6c3a07449287fe92e6d7abe8"
+    }
+  ]
+}

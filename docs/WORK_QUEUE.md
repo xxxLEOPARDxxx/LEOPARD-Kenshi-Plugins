@@ -63,7 +63,19 @@ Always check the actual process immediately before replacing a loaded DLL.
    Identified overlaps: global backpack routing vs KEO wearer choice; QOL zone
    auto-rebuild triggered by KEO preload; nearest-town preview overwrite;
    shared getDropped/order hooks. Do not copy the combined navmesh switch.
-   First implementation: opt-in dynamic body/inventory weight, startup-only,
+   FIRST TRANSFER INSTALLED05Nov03:07MSK: source f568b971, PROD DLL
+   d53062b8bc2b0dee5107ad5cc4174de10b73a7267507411042fb57e20bb58f37,
+   1489920B; opt-in carriedWeight default OFF and MCM restart marker. Personal
+   KEO.ini/KEOCompat.ini/REjson/mods.cfg byte-preserved, backup
+   D:/DEV/Kenshi/backup/keo-weight-20261105. Root repeated125/411/13 Od/O2 and31
+   native contract controls; independent review CLEAR; both native builds and
+   config/layout/MCM regressions PASS. Private test ZIP
+   workshop/testing/KEO/KEO-weight-test-20261105.zip, CRC12files verified.
+   Real weight gameplay/FPS/memory/save-load acceptance is still pending.
+   New jobs/gate/drop changes are NOT installed. Gate native registration gap
+   depends on data flags; do not claim universal missing registration.
+   Upstream post-drop copy treats native query -1 as success; never copy that.
+   Implementation: opt-in dynamic body/inventory weight, startup-only,
    bounded allocation-free traversal and thread-local recursion protection;
    disable this feature if the original KenshiQOL DLL is loaded. Preserve native
    inventory weight semantics, robot/hunger distinction and save data.
@@ -71,6 +83,16 @@ Always check the actual process immediately before replacing a loaded DLL.
    New jobs require separate all-or-nothing capability/save-lifecycle design:
    Gather Output first, shop-counter stocking second, queued movement last.
    Do not silently migrate all native task242 rows or modify saves with OFF.
+   User clarified05Nov: expose all three jobs as separate MCM switches with
+   meaningful descriptions. Actual upstream job291 Gather Output empties machine
+   outputs even without a matching storage demand; job293 Stock Shop Counter
+   moves the output types of that actor's Gather jobs (or native ditchable
+   resources when none exist) into a counter, without money changing hands;
+   job292 Waypoint Route loops through its Jobs-panel waypoint rows. Preserve
+   saved rows when OFF, suspend only our own task execution/assignment, and keep
+   dormant deserialization safe. Never turn unrelated native jobs into ours.
+   For stocking, verify ownership and capacity, bounded transfers and loss-free
+   rollback; do not inherit upstream's unguarded arbitrary shop destination.
 
 3. **Dynamic Factions — PAUSED BY USER.** Preserve all work and plans. No
    new implementation, game testing or publication until explicitly resumed.

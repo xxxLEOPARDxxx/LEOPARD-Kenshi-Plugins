@@ -1,0 +1,33 @@
+{
+  "status": "implemented, independently reviewed, locally built; not installed or published",
+  "policyControlsPerOptimization": 125,
+  "adapterControlsPerOptimization": 411,
+  "admissionControlsPerOptimization": 13,
+  "optimizations": [
+    "Od",
+    "O2"
+  ],
+  "actualNativeControls": 31,
+  "existingSuites": [
+    "config_modules_units",
+    "settings_layout_units",
+    "settings_layout_prod_units",
+    "mcm_bridge_units",
+    "mcm_bridge_dev_units"
+  ],
+  "profile": "exact Steam/GOG SDK bindings, full44-byte carry and5-byte thunk pins",
+  "limits": "64 inventories,4096 items,8 levels; fixed stack only; native result on malformed graph; no persistent actors or query allocation",
+  "startup": "carriedWeight=false, restart-only; loaded KenshiQOL blocks; first Main then1Hz, no dynamic-injection race guarantee",
+  "hashes": {
+    "dev": {
+      "KEO.dll": "c79f78588ff19191d2e469df658316d2fc49df8ea7bdcd1bf586170763c4bc26",
+      "KEO.ini.template": "42e2d7a1245bf2ba2a804a553dada0c716e4212a98a8e2d2ad50309db368cebc",
+      "README.md": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca"
+    },
+    "prod": {
+      "KEO.dll": "d53062b8bc2b0dee5107ad5cc4174de10b73a7267507411042fb57e20bb58f37",
+      "KEO.ini.template": "42e2d7a1245bf2ba2a804a553dada0c716e4212a98a8e2d2ad50309db368cebc",
+      "README.md": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca"
+    }
+  }
+}
