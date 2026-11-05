@@ -1,0 +1,223 @@
+{
+  "date": "2026-11-05",
+  "status": "prepared_not_installed",
+  "reason_install_held": "Preserve current assembly for the active independent test; no installed LoK files changed.",
+  "upstream_before_sha256": "c9e757bc334688ce01724b0cf3e58ec4f8ab6ae6361255cb2fbc23cac6a04ca3",
+  "upstream_current_sha256": "c17b0b37ecdf7c6a65b7e52b7a0773a3bbe44e9108fa28282c0aacec58d8ab14",
+  "records_before": 1891,
+  "records_current": 1905,
+  "added_records": 14,
+  "changed_records": 14,
+  "removed_records": 0,
+  "added_visible_translation_fields": 0,
+  "translation": {
+    "english_records": 1905,
+    "overlay_records": 1102,
+    "translated_names": 638,
+    "translated_fields": 1326,
+    "previous_fields_preserved": 1326,
+    "new_fields": 0,
+    "revised_fields": 0,
+    "stale_anchors": 0,
+    "missing_player_strings": 0,
+    "gameplay_overrides": 0,
+    "intentional_internal_labels": [
+      {
+        "id": "GENERATION_TEMPLATE_CHARACTER",
+        "name": "GENERATION_TEMPLATE_CHARACTER"
+      },
+      {
+        "id": "1532951-__world reactions.mod",
+        "name": "Okran's Fist (override) half destroyed"
+      },
+      {
+        "id": "1532952-__world reactions.mod",
+        "name": "Okran's Fist (override) half destroyed"
+      },
+      {
+        "id": "1533314-__world reactions Shek.mod",
+        "name": "Admag (override) Seto"
+      },
+      {
+        "id": "1533587-__world reactions Slavers.mod",
+        "name": "Heft (override) malnourished"
+      },
+      {
+        "id": "1533590-__world reactions Slavers.mod",
+        "name": "Heft (override) malnourished 2"
+      },
+      {
+        "id": "1533591-__world reactions Slavers.mod",
+        "name": "Heft (override) malnourished 3"
+      },
+      {
+        "id": "5131575-A_BossPlus.mod",
+        "name": "FISTS- robo tinfist"
+      },
+      {
+        "id": "5131624-A_BossPlus.mod",
+        "name": "1testc"
+      },
+      {
+        "id": "5131658-A_BossPlus.mod",
+        "name": "1testa"
+      },
+      {
+        "id": "5131716-A_BossPlus.mod",
+        "name": "_spider type small bugbd"
+      },
+      {
+        "id": "5131825-A_BossPlus.mod",
+        "name": "1testb"
+      },
+      {
+        "id": "5131884-A_BossPlus.mod",
+        "name": "_gorillo king"
+      },
+      {
+        "id": "5131936-A_BossPlus.mod",
+        "name": "_dog type weapon dogmeat"
+      },
+      {
+        "id": "5132177-A_BossPlus.mod",
+        "name": "_robot spider type KC"
+      }
+    ],
+    "english_sha256": "c17b0b37ecdf7c6a65b7e52b7a0773a3bbe44e9108fa28282c0aacec58d8ab14",
+    "overlay_sha256": "22a23238bf77347df3b3bdb8a246f4089e555c10677aed8155ed5dc9ed6661cb"
+  },
+  "nce": {
+    "affected_armour_records": 1,
+    "changed_entries": 0,
+    "baseline_mismatches": 0,
+    "regenerated_byte_identical": true,
+    "installed_sha256": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002"
+  },
+  "companion_patches": [
+    {
+      "name": "Legendary of Kenshi All Anim patch",
+      "sha256": "ad753449345d1ead740025d8433ad2977a5bc279cbcf4a36a1a5532152841f2e",
+      "upstream_targets_unchanged": true
+    },
+    {
+      "name": "Legendary of Kenshi All Robots Module Patch",
+      "sha256": "ff0a4ce786390e78087ebeabe885d277dab997cd4849da5807df3cf6213c75b3",
+      "upstream_targets_unchanged": true
+    }
+  ],
+  "staged_files": [
+    {
+      "path": "Legendary of Kenshi.mod",
+      "before_sha256": "c9e757bc334688ce01724b0cf3e58ec4f8ab6ae6361255cb2fbc23cac6a04ca3",
+      "prepared_sha256": "c17b0b37ecdf7c6a65b7e52b7a0773a3bbe44e9108fa28282c0aacec58d8ab14",
+      "before_bytes": 1056754,
+      "prepared_bytes": 1061393
+    },
+    {
+      "path": "_Legendary of Kenshi.info",
+      "before_sha256": "806bf3e402765dac65386a212808d2c2711dc496d6e445c458506fcc4d6cf408",
+      "prepared_sha256": "ada3f5f614a3e01e80e1bc8d933fe72a47e65f3705386fe4bcbaa046866c90ec",
+      "before_bytes": 666,
+      "prepared_bytes": 666
+    },
+    {
+      "path": "lok_npcs.dll",
+      "before_sha256": "1c363e9299b20dae5034af5052166c7364e834d3563023f9e90850e36f06a6e1",
+      "prepared_sha256": "397ffa4bfa91dce81ae91416eed3a3d5e93a3e18e7ebbe483652b1f11aaf7976",
+      "before_bytes": 247296,
+      "prepared_bytes": 250368
+    }
+  ],
+  "installed_extra_files_preserved": [
+    "Legendary of Kenshi.mod.premapnames",
+    "character/meshes/robot/lok_slaughter unit.mesh"
+  ],
+  "mods_cfg_sha256": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f",
+  "installed_unchanged": true,
+  "author_dll": {
+    "old_sha256": "1c363e9299b20dae5034af5052166c7364e834d3563023f9e90850e36f06a6e1",
+    "new_sha256": "397ffa4bfa91dce81ae91416eed3a3d5e93a3e18e7ebbe483652b1f11aaf7976",
+    "export": "?startPlugin@@YAXXZ",
+    "import_module_and_symbol_set_unchanged": true,
+    "executed": false,
+    "performance_or_gameplay_tested": false
+  },
+  "changed_record_index": [
+    {
+      "id": "5132479-Legendary of Kenshi.mod",
+      "type": 10,
+      "name": "Shek Kingdom"
+    },
+    {
+      "id": "5133112-Legendary of Kenshi.mod",
+      "type": 2,
+      "name": "Hookblade"
+    },
+    {
+      "id": "5132541-Legendary of Kenshi.mod",
+      "type": 10,
+      "name": "United Cities"
+    },
+    {
+      "id": "11623-Dialogue (10).mod",
+      "type": 1,
+      "name": "Hundred Guardian"
+    },
+    {
+      "id": "5132481-Legendary of Kenshi.mod",
+      "type": 52,
+      "name": "Damo the bronze"
+    },
+    {
+      "id": "5132796-Legendary of Kenshi.mod",
+      "type": 2,
+      "name": "Empire Oodachi"
+    },
+    {
+      "id": "5132542-Legendary of Kenshi.mod",
+      "type": 52,
+      "name": "Duty-Free"
+    },
+    {
+      "id": "5131746-A_BossPlus.mod",
+      "type": 3,
+      "name": "Protection of The Holy Flame"
+    },
+    {
+      "id": "5133140-Legendary of Kenshi.mod",
+      "type": 2,
+      "name": "Riftstone Greatsword"
+    },
+    {
+      "id": "5132521-Legendary of Kenshi.mod",
+      "type": 46,
+      "name": "Shopkeeper goods bag"
+    },
+    {
+      "id": "5132544-Legendary of Kenshi.mod",
+      "type": 49,
+      "name": "duty-free vendor (original)"
+    },
+    {
+      "id": "5132487-Legendary of Kenshi.mod",
+      "type": 52,
+      "name": "Okhuran"
+    },
+    {
+      "id": "5133124-Legendary of Kenshi.mod",
+      "type": 25,
+      "name": "Cygore stats"
+    },
+    {
+      "id": "5132486-Legendary of Kenshi.mod",
+      "type": 10,
+      "name": "The Holy Nation"
+    }
+  ],
+  "new_records_by_type": {
+    "vendor_templates": 13,
+    "AI_package": 1
+  },
+  "backup": "D:\\DEV\\Kenshi\\backup\\LoK before update 2026-11-05",
+  "staging": "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\_codex_work\\20261105-lok-update\\prepared\\Legendary of Kenshi"
+}
