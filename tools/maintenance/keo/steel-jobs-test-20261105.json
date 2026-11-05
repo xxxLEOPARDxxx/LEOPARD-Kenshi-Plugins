@@ -1,11 +1,11 @@
 {
-  "time_msk": "2026-11-05T05:37:10.364033+03:00",
-  "source_commit": "b59ab75e5f7731222e1d760d95e1fe374197f1e9",
+  "time_msk": "2026-11-05T05:48:22.485142+03:00",
+  "source_commit": "df07c25009555e4d6bd7a69e17f175360ac0bbd6",
   "status": "installed_local_private_not_published",
-  "dll_sha256": "5e01e06e6fca640e5166292d7d752e66e6ed56f4591dca4f22c8da3d67315aa3",
+  "dll_sha256": "fb42de66f98894e690bc4d5fd6d117ae9dee318a6a60cb9d07b6e7b550ebee9e",
   "archive": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-jobs-test-20261105.zip",
   "archive_bytes": 788911,
-  "archive_sha256": "de6bbaff502b3a25ab57332545d6e28dfcf6b89ef3b8afd4c729904b73eeaccd",
+  "archive_sha256": "8dac3fce6779f22b6906482eb644e55be9085af4c374b85896599f82b69e6f69",
   "files": 13,
   "imports": {
     "KenshiLib.dll": 180,
@@ -18,11 +18,12 @@
     "Исправлен некорректный вызов SDK проверки веса (адрес 0xf1880).",
     "Регистрация заданий совместима с проверенными обработчиками Stack Sort, Rotate Items и Kenshi Extension Plugin.",
     "Исправлен порядок регистрации заданий при запуске и загрузке сохранения.",
-    "Исправлено переполнение стека при первом запуске циклического маршрута."
+    "Исправлено переполнение стека при первом запуске циклического маршрута.",
+    "Разрешены несколько точек маршрута и несколько производственных целей; одинаковые задания не дублируются."
   ],
   "runtime_acceptance": "pending; no game FPS/leak/save-load claim",
   "crc": "passed",
-  "backup": "D:\\DEV\\Kenshi\\backup\\keo-jobs-20261105-053710",
+  "backup": "D:\\DEV\\Kenshi\\backup\\keo-jobs-20261105-054822",
   "preserved_sha256": {
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "2e3480c877eceb736b0f3442420a9fa58b7dbd9c90edb5ae8ef3a9c73aadd72a",
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",

@@ -1,7 +1,7 @@
 From 2bf6df98d96b7764c617a6b8ce04d25cc8fc4bf6 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:25:21 +0300
-Subject: [PATCH 1/6] Fix SDK address checks for carried weight virtual methods
+Subject: [PATCH 1/7] Fix SDK address checks for carried weight virtual methods
 
 ---
  leopard/test_carried_weight_sdk_bindings.py | 66 +++++++++++++++++++++
@@ -103,7 +103,7 @@ index b5022a9..0e9aa5c 100644
 From 770f8d272930063ab0466ac931cec04f3538703f Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:32:31 +0300
-Subject: [PATCH 2/6] Integrate three independently configurable Steel jobs
+Subject: [PATCH 2/7] Integrate three independently configurable Steel jobs
  with native persistence
 
 ---
@@ -2535,7 +2535,7 @@ index 011b8c7..3919470 100644
 From ac2c92e7f177928911c7e94a3129d7e61cbf5bff Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:38:46 +0300
-Subject: [PATCH 3/6] Preserve foreign custom jobs when KEO admission is
+Subject: [PATCH 3/7] Preserve foreign custom jobs when KEO admission is
  refused
 
 ---
@@ -2699,7 +2699,7 @@ index baebd17..0912071 100644
 From c6802eaa4457f6d29942b6f60642213625be01d9 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:57:42 +0300
-Subject: [PATCH 4/6] fix(jobs): admit audited inventory hook chains without
+Subject: [PATCH 4/7] fix(jobs): admit audited inventory hook chains without
  bypassing them
 
 ---
@@ -2948,7 +2948,7 @@ index 5b2c323..6be1f9a 100644
 From 869b5714a5c4f715cca709e63b3bb1a0a41c504b Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 05:18:20 +0300
-Subject: [PATCH 5/6] fix(jobs): register save identities before world
+Subject: [PATCH 5/7] fix(jobs): register save identities before world
  templates are ready
 
 ---
@@ -3252,7 +3252,7 @@ index b4a06ba..a0127f1 100644
 From b59ab75e5f7731222e1d760d95e1fe374197f1e9 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 05:35:43 +0300
-Subject: [PATCH 6/6] fix(jobs): retain derived virtual methods in native task
+Subject: [PATCH 6/7] fix(jobs): retain derived virtual methods in native task
  adapters
 
 ---
@@ -3510,6 +3510,130 @@ index e96e14e..d06a855 100644
    slots[i].nativeBody=(FactoryBody)slots[i].privateTable[3];slots[i].privateTable[3]=(void*)bodies[i];}
   prepared=true;return true;
  }
+-- 
+2.46.0.windows.1
+
+
+From df07c25009555e4d6bd7a69e17f175360ac0bbd6 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 05:47:43 +0300
+Subject: [PATCH 7/7] fix(jobs): distinguish permanent jobs by their fixed
+ target
+
+---
+ leopard/steel_jobs/test_factory.py | 50 ++++++++++++++++++++++++++++--
+ src/jobs/steel_jobs_factory.cpp    |  2 +-
+ 2 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/leopard/steel_jobs/test_factory.py b/leopard/steel_jobs/test_factory.py
+index b268c10..ce17e47 100644
+--- a/leopard/steel_jobs/test_factory.py
++++ b/leopard/steel_jobs/test_factory.py
+@@ -3,7 +3,20 @@ from pathlib import Path
+ import os,subprocess,sys
+ RED='--red-control'in sys.argv
+ OLD='--old-vtable-control'in sys.argv
++FIXED_RED='--old-fixed-target-control'in sys.argv
+ R=Path('D:/DEV/Kenshi/forks/KEO');O=R/('build/steel-jobs-factory-old-vtable'if OLD else'build/steel-jobs-factory-red'if RED else'build/steel-jobs-factory');O.mkdir(parents=True,exist_ok=True)
++
++# Frozen actual native loop and hand comparator; keeps the model tied to this EXE.
++import hashlib
++sys.path.insert(0,'D:/DEV/Kenshi/ours/SkillLevelUpInfo/tests/_tools')
++import pefile
++_native=Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/Kenshi_x64.exe')
++assert hashlib.sha256(_native.read_bytes()).hexdigest()=='504b362cde850d56afb1cea6f5b7b0ee014d9dd7b47e188599d91c804502cd3e'
++_pe=pefile.PE(str(_native),fast_load=True)
++assert _pe.get_data(5274976,66).hex()=='488b8398000000488b0c06488b41703968447520807808000f8449010000488b41104883c110498bd4ff500884c00f8533010000ffc74883c6083bbb9000000072be'
++assert _pe.get_data(839712,60).hex()=='448b42084183f80b7509443941087503b001c38b410c39420c751e8b411439421475168b4118394218750e8b421039411075064439410874d732c0c3'
++assert _pe.get_data(3242784,19).hex()=='8b442428895104448841088941104489490cc3'
++
+ code=r'''
+ #define KENSHILIB_EXPORT
+ #include "jobs/steel_jobs_factory.cpp"
+@@ -31,7 +44,7 @@ static TaskData*Reg(int type,const keo_jobs::ScorePmf*p,bool func,bool target,co
+  for(unsigned i=8;i<24;++i)C(!p->bytes[i],"general PMF adjustment zero");
+  if(failRegister)return 0;TaskData*d=Data(type-291);memset(d,0,sizeof(TaskData));d->key=(TaskType)type;registry[type-291]=d;return d;
+ }
+-static void Perma(TaskData*d,int mode,bool fixed,int associated,int secondary){C(mode==1&&!fixed&&!associated&&!secondary,"native permajob setter args");d->permaJob=(PermajobType)mode;}
++static void Perma(TaskData*d,int mode,bool fixed,int associated,int secondary){C(mode==1&&!associated&&!secondary,"native permajob setter args");d->permaJob=(PermajobType)mode;d->permaJob_FixedTarget=fixed;}
+ static void Req(TaskData*d,int key,bool value,bool progression){C(d->numRequirements<11,"requirement capacity before native mutation");TaskStateData*r=&d->requirements[d->numRequirements++];r->key=(StateType)key;r->val=value;r->progressionOnly=progression;}
+ static Tasker*Native(void*self,int type,const hand&subject,int priority,float weight,Ogre::Vector3 location,int start,int end){
+  ++calls;lastType=type;if(failNative||!Has(self,type))return 0;memset(taskBytes,0,sizeof(taskBytes));Tasker*t=(Tasker*)taskBytes;
+@@ -54,6 +67,34 @@ static void Reset(){using namespace keo_jobs;memset(slots,0,sizeof(slots));base=
+  for(unsigned i=0;i<3;++i){vtables[i][0]=(void*)(uintptr_t)(0x1000+i);vtables[i][1]=(void*)&Delete;for(unsigned j=2;j<6;++j)vtables[i][j]=(void*)&Body;vtables[i][6]=(void*)&Extra5;vtables[i][7]=(void*)&Extra6;}
+  Data(3)->key=COLLECT_OUTPUT_RESOURCE;Data(4)->key=MOVE_CUS_ORDERED;for(unsigned i=3;i<5;++i){Data(i)->hasAction=true;Data(i)->numRequirements=1;Data(i)->requirements[0].key=AT_LOCATION;Data(i)->requirements[0].val=true;Data(i)->numResults=1;Data(i)->results[0].key=AT_LOCATION;}
+ }
++// Byte-pinned native admission model: Steam507D60..507DA2 checks existing
++// key then +8; false rejects by type, true compares all five hand words.
++// Native hand==CD020 special-cases two NULL_ITEM hands; no game code executes.
++struct NativeJobRow{TaskData*data;unsigned words[5];};
++static bool NativePermanentAdmission(NativeJobRow*rows,unsigned&count,TaskData*data,const hand&subject){
++ unsigned words[5];memcpy(words,(const char*)&subject+8,20);
++ for(unsigned i=0;i<count;++i)if(rows[i].data->key==data->key){
++  if(!rows[i].data->permaJob_FixedTarget)return false;
++  if((rows[i].words[0]==11&&words[0]==11)||!memcmp(rows[i].words,words,20))return false;
++ }
++ C(count<4,"bounded native-admission fixture rows");rows[count].data=data;memcpy(rows[count].words,words,20);++count;return true;
++}
++static void DistinctTargets(){
++ unsigned long long firstBytes[4]={},secondBytes[4]={};hand&first=*(hand*)firstBytes;hand&second=*(hand*)secondBytes;
++ first.type=____XXX___;first.container=0x41200000;first.containerSerial=0;first.index=0x41A00000;first.serial=1;memcpy(&second,&first,sizeof(hand));second.serial=2;
++ NativeJobRow rows[4]={};unsigned count=0;
++ C(NativePermanentAdmission(rows,count,Data(1),first)&&count==1,"first waypoint admitted");
++ C(NativePermanentAdmission(rows,count,Data(1),second)&&count==2,"second distinct waypoint admitted by native fixed-target branch");
++ C(!NativePermanentAdmission(rows,count,Data(1),second)&&count==2,"exact duplicate waypoint hand rejected");
++ for(unsigned i=0;i<3;i+=2){count=0;first.type=BUILDING;first.container=1;first.containerSerial=2;first.index=3;first.serial=4;memcpy(&second,&first,sizeof(hand));second.index=5;
++  C(NativePermanentAdmission(rows,count,Data(i),first),"first output/counter subject admitted");
++  C(NativePermanentAdmission(rows,count,Data(i),second)&&count==2,"distinct output/counter subject admitted");
++  C(!NativePermanentAdmission(rows,count,Data(i),second)&&count==2,"same output/counter subject remains duplicate");
++ }
++ bool saved=Data(1)->permaJob_FixedTarget;Data(1)->permaJob_FixedTarget=false;count=0;
++ C(NativePermanentAdmission(rows,count,Data(1),first),"native false-control first accepted");
++ C(!NativePermanentAdmission(rows,count,Data(1),second)&&count==1,"native false-control rejects second by type");Data(1)->permaJob_FixedTarget=saved;
++}
+ static bool Init(){keo_jobs::FactoryCallbacks cb={CallbackG,CallbackM,CallbackS};return keo_jobs::InitializeFactory(realBase,cb,0);}
+ static void RegisterAll(){for(int t=291;t<=293;++t)C(keo_jobs::RegisterFactoryTask(t,"job"),"register native job metadata");C(keo_jobs::InstallFactory(),"install after all metadata");}
+ int main(){using namespace keo_jobs;
+@@ -65,6 +106,7 @@ int main(){using namespace keo_jobs;
+  Reset();C(!InstallFactory(),"no hook before prepare");badFactory=true;C(!Init(),"bad startup profile refuses");badFactory=false;C(Init(),"valid startup");C(!InstallFactory(),"no hook with missing metadata");
+  registry[0]=Data(0);C(!RegisterFactoryTask(291,"g")&&!registrations,"foreign custom id never overwritten");registry[0]=0;
+  Data(3)->numRequirements=11;RegisterAll();C(!PrepareFactoryTasks()&&!calls,"invalid source capacity refuses before native task allocation");Data(3)->numRequirements=1;C(PrepareFactoryTasks(),"valid template finalizes later");
++ DistinctTargets();
+  C(registrations==3,"exactly three bounded native data allocations");C(RegisterFactoryTask(291,"renamed")&&registrations==3,"idempotent registration no new allocations");C(InstallFactory(),"idempotent hook install");
+  C(Data(0)->numRequirements==2&&Data(0)->requirements[1].key==MACHINES_OUTPUTS_EMPTY&&!Data(0)->requirements[1].val,"gather empty-output skip requirement");C(Data(1)->_resultsAlwaysFalse&&Data(2)->_resultsAlwaysFalse,"waypoint and stock own completion");C(Data(2)->numResults==0&&Data(2)->numRequirements==1&&Data(2)->requirements[0].key==AT_LOCATION,"stock walks to counter without native242 migration");
+ 
+@@ -82,6 +124,9 @@ int main(){using namespace keo_jobs;
+ if OLD:
+  production=(R/'src/jobs/steel_jobs_factory.cpp').read_text(encoding='utf8');changed=production.replace('void*privateTable[9]','void*privateTable[6]').replace('JobsProfile::TableCount(keys[i])*sizeof(void*)','sizeof(slots[i].privateTable)');assert changed!=production
+  code=code.replace('#include "jobs/steel_jobs_factory.cpp"',changed)
++if FIXED_RED:
++ production=(R/'src/jobs/steel_jobs_factory.cpp').read_text(encoding='utf8');changed=production.replace('(data,PERMAJOB_NORMAL,true,0,0);','(data,PERMAJOB_NORMAL,false,0,0);');assert changed!=production
++ code=code.replace('#include "jobs/steel_jobs_factory.cpp"',changed)
+ if RED:
+  production=(R/'src/jobs/steel_jobs_factory.cpp').read_text(encoding='utf8');changed=production.replace('if(!vptr||!((HasTask)vptr[1])(self,type))return 0;','if(false)return 0;');assert changed!=production
+  code=code.replace('#include "jobs/steel_jobs_factory.cpp"',changed)
+@@ -90,6 +135,7 @@ V=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');S=Path('C:/Prog
+ args=[str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/O2','/MD','/DBOOST_ALL_NO_LIB','/I'+str(R/'src'),'/ID:/DEV/Kenshi/deps/KenshiLib_keo/Include','/ID:/DEV/Kenshi/deps/KenshiLib_keo/Include/ogre','/ID:/DEV/Kenshi/deps/boost_1_60_0',str(O/'factory.cpp'),'/Fo'+str(O/'factory.obj'),'/Fe'+str(O/'factory.exe')]
+ p=subprocess.run(args,env=env,capture_output=True,text=True);(O/'build.log').write_text(p.stdout+p.stderr,encoding='utf8');assert not p.returncode,p.stdout+p.stderr
+ p=subprocess.run([str(O/'factory.exe')],capture_output=True,text=True,timeout=10);print(p.stdout);(O/'run.log').write_text(p.stdout+p.stderr,encoding='utf8')
+-if OLD:assert p.returncode==1 and'complete derived move virtuals preserved'in p.stdout
++if FIXED_RED:assert p.returncode==1 and'second distinct waypoint admitted by native fixed-target branch'in p.stdout
++elif OLD:assert p.returncode==1 and'complete derived move virtuals preserved'in p.stdout
+ elif RED:assert p.returncode==1 and'custom repertoire refusal before alias'in p.stdout
+ else:assert not p.returncode,p.stdout+p.stderr
+diff --git a/src/jobs/steel_jobs_factory.cpp b/src/jobs/steel_jobs_factory.cpp
+index d06a855..ecabf55 100644
+--- a/src/jobs/steel_jobs_factory.cpp
++++ b/src/jobs/steel_jobs_factory.cpp
+@@ -114,7 +114,7 @@ bool RegisterFactoryTask(int type,const std::string&caption){
+  ScorePmf score;memset(score.bytes,0,sizeof(score.bytes));uintptr_t scoreAddress=Address(JobsProfile::DEFAULT_SCORE);memcpy(score.bytes,&scoreAddress,sizeof(scoreAddress));
+  TaskData*data=((RegisterFn)Address(JobsProfile::REGISTER_DATA))(type,&score,false,true,&caption,1);
+  if(!data||data->key!=(TaskType)type)return false;
+- ((PermaFn)Address(JobsProfile::SET_PERMAJOB))(data,PERMAJOB_NORMAL,false,0,0);
++ ((PermaFn)Address(JobsProfile::SET_PERMAJOB))(data,PERMAJOB_NORMAL,true,0,0);
+  // Native ctor leaves hasAction false until world-ready template publication.
+  if(type==293)((RequirementFn)Address(JobsProfile::ADD_REQUIREMENT))(data,AT_LOCATION,true,false);
+  if(type!=291)data->_resultsAlwaysFalse=true;
 -- 
 2.46.0.windows.1
 

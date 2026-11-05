@@ -15,16 +15,20 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
-   LATEST05Nov05:37: installed private DLL5E01E06E, sourceb59ab75.
-   Registration is now confirmed in realSteam10344, but actual waypoint testing
-   exposed STACK_OVERFLOW in native Move.runAction3545C6. The copied vtable
-   omitted derived virtuals: slot6 aliased the adjacent nativeBody and recursed.
-   Corrected exact class extents (COL+entries7/8/6, storage9), verified all slots
-   against both EXEs. 188factory/123profile controls and old6entryRED pass;
-   DEV/PROD build and independent review clear. All personal settings preserved.
-   User asked to repeat two waypoints; corrected gameplay acceptance pending.
+   LATEST05Nov05:48: installed private DLLFB42DE66, sourcedf07c25.
+   User confirms fixed-vtable build no longer crashes when adding a waypoint,
+   but only one row appeared. Actual read-only PID13116 proved one292 row with
+   valid subject/serial/coordinates and TaskData.fixedTarget=false. Native
+   OrdersReceiver.addJob507D74 rejects same-type rows without comparing targets
+   when that flag is false. Changed only factory fixedTarget=true for all three
+   jobs; distinct targets permitted, identical targets still rejected.
+   206actual factory controls + false-only RED and DEV/PROD passed. Installed
+   while fresh process absent; all four personal configuration files preserved.
+   User asked to repeat two points and observe cycle; gameplay/save-load pending.
+   Previous actual crash: truncated derived vtable, fixedb59ab75/5E01E06E.
+   Early metadata/late template registration now confirmed in actual Steam.
    Counter hold-RMB command exists/adds; no physical delivery acceptance yet.
-   User does not personally need those production jobs; keep optional/defaultOFF.
+   Production jobs remain optional/defaultOFF; user doesn't personally need them.
    Previous04:39: three Steel jobs IMPLEMENTED and INSTALLED LOCALLY in a
    private candidate. Source ac2c92e7 (after770f8d2 integration and2bf6df9 SDK fix),
    PROD abf949c03c829dd23a737e41286293cc6cfb3009e9bb168caa863d4c9789db20.
