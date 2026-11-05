@@ -1,0 +1,78 @@
+{
+  "time_msk": "2026-11-05T03:26:48.617888+03:00",
+  "source_commit": "84056bcb2da7954600458c483fcdbc56b2f5fdb5",
+  "status": "prepared_private_gog_retry_not_installed_not_published",
+  "dll_sha256": "0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766",
+  "change_ru": "Исправлен отсутствовавший адрес au в профиле GOG; проверка запуска не отключена. Вес по умолчанию выключен; новые задания Steel не перенесены.",
+  "native_imports": {
+    "KenshiLib.dll": 148,
+    "MyGUIEngine_x64.dll": 29
+  },
+  "files": 12,
+  "crc": "passed",
+  "archives": [
+    {
+      "path": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-GOG-test-20261105.zip",
+      "bytes": 762976,
+      "sha256": "ff14c090184028d6165f03b68dfbdec07fefe84698c6af04877238c9c4009a18",
+      "replaced_sha256": "fab7d355f35a829e7bceaf4fbfc4ad83c584c1ced449a8e05adfde910bfd4c22"
+    },
+    {
+      "path": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-weight-test-20261105.zip",
+      "bytes": 762976,
+      "sha256": "ff14c090184028d6165f03b68dfbdec07fefe84698c6af04877238c9c4009a18",
+      "replaced_sha256": "bf267f6ea7820eccecce8b6bfac145461818435dc498e31bb3e0b63f7c06a8b9"
+    }
+  ],
+  "gog_runtime": "tester retry required",
+  "files_manifest": {
+    "KEO/KEO.dll": {
+      "bytes": 1489920,
+      "sha256": "0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766"
+    },
+    "KEO/KEO.mod": {
+      "bytes": 2530,
+      "sha256": "3b97cc21fd4000eeb9987bfca3b9e426cc3deca1e312a84c7f536c22293c5c82"
+    },
+    "KEO/RE_Kenshi.json": {
+      "bytes": 27,
+      "sha256": "84fd987ad40531cb01bc35fb8c54adff11be12bd2d2f2a8badc6e0c67ed4fea3"
+    },
+    "KEO/KEO.ini.template": {
+      "bytes": 38137,
+      "sha256": "42e2d7a1245bf2ba2a804a553dada0c716e4212a98a8e2d2ad50309db368cebc"
+    },
+    "KEO/README.md": {
+      "bytes": 17606,
+      "sha256": "8aed1727184fe7db48f4d047978b44eb7f454323e903a097273aa459c6ba1eca"
+    },
+    "KEO/LICENSE": {
+      "bytes": 35823,
+      "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+    },
+    "TEST_README_RU_EN.txt": {
+      "bytes": 9085,
+      "sha256": "5beb2b023a1c3dd1997cb963cf7b974dd8fc3a77bfa3a6f658cc5c6591c177bc"
+    },
+    "KEO/locale/ru_RU/LC_MESSAGES/keo.mo": {
+      "bytes": 15126,
+      "sha256": "8b490400f28262efccfd130aa34f4e01da33b3e43583a4f61a9771c922523562"
+    },
+    "KEO/locale/en_GB/LC_MESSAGES/keo.mo": {
+      "bytes": 11209,
+      "sha256": "9a7bb3a20aaad4bfd13607e7eb91e4736e06e897d79cd599d5d292ff02ec6355"
+    },
+    "KEO/locale/zh_CN/LC_MESSAGES/keo.mo": {
+      "bytes": 10986,
+      "sha256": "b1b477f8687c962c238db0aed9b897f05ec7add061ab385245100aeba2c675e6"
+    },
+    "GOG_PROFILE_RU_EN.txt": {
+      "bytes": 2397,
+      "sha256": "297aed8982a13961adc6ec65e1af8d0d39a90df12b218883723a0fb3d796a0de"
+    },
+    "KEO/leopard/carried_weight/ORIGIN.md": {
+      "bytes": 2525,
+      "sha256": "1f0ba9f50f4df277d6e1f2790b54bf3a01c5be5d86b9380ee423e6b9058b7632"
+    }
+  }
+}

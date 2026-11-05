@@ -1,0 +1,329 @@
+From 84056bcb2da7954600458c483fcdbc56b2f5fdb5 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 03:25:55 +0300
+Subject: [PATCH] Fix missing GOG au storage and exercise complete native
+ startup registry
+
+---
+ leopard/gog_native/README.txt                 |  8 +-
+ leopard/gog_native/audit_source_coverage.py   |  7 ++
+ leopard/gog_native/byte-contract.json         |  7 +-
+ leopard/gog_native/integration-checklist.txt  | 18 +++--
+ leopard/gog_native/profile_fixture.cpp        |  2 +-
+ leopard/gog_native/run_tests.py               |  4 +
+ leopard/gog_native/test_resolve_registry.py   | 78 +++++++++++++++++++
+ leopard/gog_native/verification-20261105.json |  4 +-
+ .../verification-au-fix-20261105.json         | 40 ++++++++++
+ src/game/gog_profile_data.inc                 |  8 +-
+ 10 files changed, 161 insertions(+), 15 deletions(-)
+ create mode 100644 leopard/gog_native/test_resolve_registry.py
+ create mode 100644 leopard/gog_native/verification-au-fix-20261105.json
+
+diff --git a/leopard/gog_native/README.txt b/leopard/gog_native/README.txt
+index 058540a..1122a71 100644
+--- a/leopard/gog_native/README.txt
++++ b/leopard/gog_native/README.txt
+@@ -3,7 +3,7 @@ Real native profile for supplied RE_Kenshi-compatible GOG1.0.65; not the old sta
+ 
+ python leopard/gog_native/run_tests.py --gog-exe <path-to-pinned-GOG-EXE>
+ Requires VC10+SDK7.1. The supplied EXE is read-only and NEVER executed or redistributed.
+-Production fixture:392 map/reverse pairs,344 real-byte windows,28 priority contracts,
++Production fixture:393 map/reverse pairs,344 real-byte windows,28 priority contracts,
+ TownClaim/Stitch/PhysQuery/Dialog native builders and corruption/refusal tests.
+ Windows host test checks Steam behavior and persistent failed-GOG refusal.
+ 
+@@ -18,3 +18,9 @@ GOG PhysX caller-role diagnostics report unknown EXE callers rather than Steam r
+ Host/byte tests do not prove GOG startup/gameplay, FPS, leak freedom or spawn correctness.
+ Real GOG testers and Steam gameplay regression after installation are still required.
+ No publication has occurred; this candidate does not create a personal changelog entry.
++
++The first e6082d6 tester candidate omitted au from its profile. That error is
++reproduced by --check-old-profile in test_resolve_registry.py. The current test
++executes the actual Resolve/Add/global loop and startup comparison, covering all
++107 entries rather than only enumerating existing profile entries. The runtime
++comparison remains strict and unchanged. Real GOG retest is still required.
+diff --git a/leopard/gog_native/audit_source_coverage.py b/leopard/gog_native/audit_source_coverage.py
+index 0e33eb4..5b61063 100644
+--- a/leopard/gog_native/audit_source_coverage.py
++++ b/leopard/gog_native/audit_source_coverage.py
+@@ -65,3 +65,10 @@ result['raw_profile_sites']=raw_sites
+ result['literal_functional_keys']=[hex(key)for key in functional]
+ (root/'build/gog-native-tests/source-coverage.json').write_text(json.dumps(result,indent=2)+'\n')
+ print('PASS direct raw access:',len(raw_sites),'sites; functional literals:',len(functional))
++
++# Resolve's global Add loop must be included, not merely literal Bind/Add calls.
++startup=(root/'src/game/klib_bindings.cpp').read_text(encoding='utf8')
++match=re.search(r'const uintptr_t globals\[\]\s*=\s*\{([^}]+)\}',startup,re.S);assert match
++globals_=[int(v,16)for v in re.findall(r'0x[0-9A-Fa-f]+',match[1])];assert len(globals_)==9
++assert all(value in pairs for value in globals_),('missing startup global',[hex(v)for v in globals_ if v not in pairs])
++print('PASS all9 actual Resolve-loop global keys covered')
+diff --git a/leopard/gog_native/byte-contract.json b/leopard/gog_native/byte-contract.json
+index d55b3df..fe856ef 100644
+--- a/leopard/gog_native/byte-contract.json
++++ b/leopard/gog_native/byte-contract.json
+@@ -4,8 +4,8 @@
+   "gog_sha256": "2defc287c813798b9682b93acf68d340da895cf5164d342145ba0faeb9024681",
+   "gog_timestamp": "0x65d60519",
+   "gog_image_size": "0x232a000",
+-  "address_count": 392,
+-  "reverse_exact_count": 392,
++  "address_count": 393,
++  "reverse_exact_count": 393,
+   "code_window_count": 344,
+   "manifest_count": 93,
+   "manifest": [
+@@ -954,5 +954,6 @@
+     }
+   ],
+   "native_runtime_tested": false,
+-  "scope": "Exact native GOG address and window profile integrated with raw/caller/inline paths; offline/source reviewed, GOG runtime and gameplay unverified."
++  "scope": "Includes all107 actual Resolve entries (98 functions+9 globals), with official SDK slot7627 au mapping; GOG gameplay and startup still require tester confirmation.",
++  "sdk_startup_global_count": 9
+ }
+diff --git a/leopard/gog_native/integration-checklist.txt b/leopard/gog_native/integration-checklist.txt
+index cc9fd71..9c37a5a 100644
+--- a/leopard/gog_native/integration-checklist.txt
++++ b/leopard/gog_native/integration-checklist.txt
+@@ -2,7 +2,7 @@ KEO GOG native profile integration - 2026-11-05
+ Baseline022bb701: native EXACT5f68039, retained three MCM labels.
+ 
+ DONE: actual pinned GOG/Steam EXEs and unique SAME-SLOT official SDK0.5.0 tables.
+-DONE:392 explicit EXE mappings,392 inverse keys,344 actual-GOG32B windows.
++DONE:393 explicit EXE mappings,393 inverse keys,344 actual-GOG32B windows.
+ DONE:107 SDK registry entries validated before any hook; unknown GOG key has no Steam fallback.
+ DONE: one-time pinned EXE SHA/PE and exact SDK DLL SHA, before native binding resolution.
+ DONE: translated TLS once; raw global/scratch/handle sites; container field offsets unchanged.
+@@ -11,9 +11,9 @@ DONE:28 PathPriority windows, inventory interior expressions, overlapping fog+7
+ DONE: actual-GOG TownClaim/Stitch/PhysQuery/Dialog builder contracts, no native execution.
+ DONE: separate Ogre/PhysX/D3D gates preserved; their RVAs excluded from EXE translation.
+ DONE: PhysX GOG diagnostic caller roles report unknown rather than incorrect Steam ranges.
+-DONE: final source coverage392 keys,270 static GameAddr,11 finite domains,23 direct raw sites,8 functional literal keys.
+-DONE: DEV and PROD343-source builds;144 KenshiLib imports; startPlugin and MCM_Describe exports.
+-DONE:2673 GOG actual-file/production checks plus actual Windows persistent-refusal tests.
++DONE: final source coverage393 keys,270 static GameAddr,11 finite domains,23 direct raw sites,8 functional literal keys.
++DONE: DEV and PROD345-source builds;148 KenshiLib imports; startPlugin and MCM_Describe exports.
++DONE:2676 GOG actual-file/production checks plus actual Windows persistent-refusal tests.
+ DONE: Steam priority195, planner TLS51 each/Od+O2, job cancellation142 each/Od+O2, MCM adapter DEV/PROD; negative controls failed as expected.
+ DONE: independent address/raw/byte/lifetime/caller review; encoding corrections retained.
+ 
+@@ -21,5 +21,11 @@ PENDING: actual GOG startup and gameplay by testers. No supplied EXE has been ex
+ PENDING: Steam in-game regression after candidate installation. Source/host tests do not prove FPS or universal leak freedom.
+ PENDING: private tester archive packaging/CRC by root; no publication or personal changelog entry.
+ 
+-PROD DLL SHA256:eaa75821e941f85fe95b4e3a7ce7fa3fde17c564d03a508a48132b85303b2859
+-DLL bytes:1480192
++PROD DLL SHA256:0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766
++DLL bytes:1489920
++
++2026-11-05 au startup correction: official SDK slot7627 mapping21322B0->2130220.
++Full extracted production Resolve/Add/global loop and startup guard now execute
++against official SDK targets:107 entries,114 checks; old e608 profile RED reproduced.
++Lost au/nested key and wrong/null SDK pointer refuse startup; bypass mutant rejected.
++No runtime guard relaxation and no change to INI or package/install state.
+diff --git a/leopard/gog_native/profile_fixture.cpp b/leopard/gog_native/profile_fixture.cpp
+index fd7d855..40abea5 100644
+--- a/leopard/gog_native/profile_fixture.cpp
++++ b/leopard/gog_native/profile_fixture.cpp
+@@ -56,7 +56,7 @@ int main(int argc,char**argv){
+   for(unsigned i=0;i<U16(pe+6);++i){Section s;s.virtualSize=U32(sec+i*40+8);s.rva=U32(sec+i*40+12);s.diskSize=U32(sec+i*40+16);s.disk=U32(sec+i*40+20);Check(s.disk+s.diskSize<=image.size(),"fixture section bound");sections.push_back(s);}
+   Check(!GogProfile::MatchesImage(0x65D60518,0x232A000,GogProfile::ExecutableSha256()),"timestamp refused");Check(!GogProfile::MatchesImage(0x65D60519,0x232A001,GogProfile::ExecutableSha256()),"image size refused");Check(!GogProfile::MatchesImage(0x65D60519,0x232A000,NULL),"null digest refused");Check(!GogProfile::MatchesImage(0x65D60519,0x232A000,"bad"),"wrong digest refused");
+   uintptr_t out=123;Check(!GogProfile::Translate(0,&out)&&out==0,"unknown zero refused");Check(!GogProfile::Translate(0xDEADBEEF,&out)&&out==0,"unknown cannot use Steam fallback");Check(!GogProfile::Translate(1,NULL),"null output");Check(!GogProfile::Absolute(0,0xDD92F0,&out)&&out==0,"zero base refused");Check(!GogProfile::Absolute((uintptr_t)-1,0xDD92F0,&out)&&out==0,"overflow refused");
+-  Check(!GogProfile::Translate(0x3B40D0,&out)&&out==0,"PhysX concrete vtable is not EXE");Check(!GogProfile::Translate(0x40AF80,&out)&&out==0,"PhysX handler slot is not EXE");Check(!GogProfile::Translate(0x3B3F90,&out)&&out==0,"PhysX abstract vtable is not EXE");Check(!GogProfile::Translate(0x47624,&out)&&out==0,"PhysX purecall is not EXE");Check(GogProfile::AddressCount()==392,"explicit address count");Check(GogProfile::WindowCount()==344,"window count");Check(!GogProfile::AddressAt(GogProfile::AddressCount()),"address index bound");Check(!GogProfile::WindowKeyAt(GogProfile::WindowCount()),"window index bound");
++  Check(!GogProfile::Translate(0x3B40D0,&out)&&out==0,"PhysX concrete vtable is not EXE");Check(!GogProfile::Translate(0x40AF80,&out)&&out==0,"PhysX handler slot is not EXE");Check(!GogProfile::Translate(0x3B3F90,&out)&&out==0,"PhysX abstract vtable is not EXE");Check(!GogProfile::Translate(0x47624,&out)&&out==0,"PhysX purecall is not EXE");Check(GogProfile::AddressCount()==393,"explicit address count");Check(GogProfile::WindowCount()==344,"window count");Check(!GogProfile::AddressAt(GogProfile::AddressCount()),"address index bound");Check(!GogProfile::WindowKeyAt(GogProfile::WindowCount()),"window index bound");
+   for(size_t i=0;i<GogProfile::AddressCount();++i){const GogProfile::AddressPair*p=GogProfile::AddressAt(i);Check(p&&GogProfile::Translate(p->from,&out)&&out==p->to,"address lookup");Check(GogProfile::CanonicalExact(p->to,&out)&&out==p->from,"exact reverse");Check(GogProfile::Absolute(0x140000000ULL,p->from,&out)&&out==0x140000000ULL+p->to,"absolute translated");}
+   Check(GogProfile::Translate(0xDD92F0,&out)&&out==0xDD8A10,"edgeProcess actual GOG");Check(GogProfile::Translate(0x214853E,&out)&&out==0x21464AE,"keycode flag actual GOG");Check(GogProfile::Translate(0x212D358,&out)&&out==0x212B298,"gates singleton is not blanket delta");
+   for(size_t i=0;i<GogProfile::WindowCount();++i){uintptr_t key=GogProfile::WindowKeyAt(i);Check(GogProfile::VerifyWindow(Read,NULL,key,32),"actual GOG bytes match frozen profile");Check(GogProfile::VerifyWindow(Read,NULL,key,5),"bounded prefix");flipByte=true;Check(!GogProfile::VerifyWindow(Read,NULL,key,32),"tampered window refused");flipByte=false;failRead=true;Check(!GogProfile::VerifyWindow(Read,NULL,key,32),"unreadable window refused");failRead=false;}
+diff --git a/leopard/gog_native/run_tests.py b/leopard/gog_native/run_tests.py
+index 625a962..f5cc3af 100644
+--- a/leopard/gog_native/run_tests.py
++++ b/leopard/gog_native/run_tests.py
+@@ -10,3 +10,7 @@ def test(name,sources,args):
+ files=['game/gog_profile.cpp','pathfind/path_priority_publication.cpp','fixes/world/town_claim_policy.cpp','fixes/stitch/stitch_byte_guard_policy.cpp','fixes/physx/physx_query_guard_policy.cpp','inventory/dialogue_thunk_policy.cpp']
+ test('profile',[root/'src'/f for f in files]+[here/'profile_fixture.cpp'],[str(a.gog_exe.resolve())])
+ test('refusal',[root/'src/game/native_profile.cpp',root/'src/game/gog_profile.cpp',here/'runtime_refusal.cpp'],[])
++
++# Actual production Resolve/Add/global loop and startup comparison, not profile self-enumeration.
++import sys
++subprocess.run([sys.executable,str(here/"test_resolve_registry.py")],cwd=root,check=True)
+diff --git a/leopard/gog_native/test_resolve_registry.py b/leopard/gog_native/test_resolve_registry.py
+new file mode 100644
+index 0000000..25c7464
+--- /dev/null
++++ b/leopard/gog_native/test_resolve_registry.py
+@@ -0,0 +1,78 @@
++"""Execute extracted production Resolve/Add/global loop and startup guard, not a reconstructed registry.
++Supplied game code is never executed. SDK targets come from the actual official paired RVA tables.
++"""
++from pathlib import Path
++import argparse,collections,hashlib,os,struct,subprocess
++p=argparse.ArgumentParser();p.add_argument('--rva-dir',type=Path,default=Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/RVAs'));p.add_argument('--skip-mutant',action='store_true');p.add_argument('--check-old-profile',action='store_true');a=p.parse_args()
++here=Path(__file__).resolve().parent;root=here.parents[1];out=root/'build/gog-native-registry';out.mkdir(exist_ok=True)
++s=(root/'src/game/klib_bindings.cpp').read_text(encoding='utf8');gs=(root/'src/game/klib_globals.cpp').read_text(encoding='utf8')
++def body(text,marker):
++ start=text.index('{',text.index(marker));at=start+1;depth=1
++ while depth:depth+=(text[at]=='{')-(text[at]=='}');at+=1
++ return text[start:at]
++resolve=body(s,'static void Resolve()');add=body(s,'static void Add(');glob=body(gs,'uintptr_t KlibGlobalAddress(')
++init=body(s,'bool InitKlibBindings(');guard=body(init,'for (size_t i = 0; i < s_count; ++i)')
++st=(a.rva_dir/'Steam_1.0.65.br').read_bytes();gt=(a.rva_dir/'GOG_1.0.65.br').read_bytes();assert len(st)==len(gt)==7630*4
++assert hashlib.sha256(gt).hexdigest()=='a2a6394e95312a89e3d3f6842fbfda9c16e7d79749f1ee796fbd6168600bf347'
++pairs=collections.defaultdict(set)
++for x,y in zip(struct.unpack('<7630I',st),struct.unpack('<7630I',gt)):
++ if x and y:pairs[x].add(y)
++# Do not choose from an ambiguous symbol. This fails if Resolve newly consumes one.
++rows='\n'.join('{0x%Xu,0x%Xu},'%(x,next(iter(ys)))for x,ys in sorted(pairs.items())if len(ys)==1)
++code=r'''#include "game/gog_profile.h"
++#include "game/klib_address_policy.h"
++#include <stdio.h>
++#include <string.h>
++#include <vector>
++#include <new>
++struct Pair {uintptr_t steam,gog;};static const Pair sdk[]={SDK_ROWS};
++static std::vector<unsigned char> owned(0x232A000u);static uintptr_t gameBase=(uintptr_t)&owned[0];
++static uintptr_t maskedKey=0;static KlibAddressEntry s_entries[160];static size_t s_count=0;static bool s_overflow=false;static uintptr_t s_globals[9]={0};
++static uintptr_t OfficialSdkTarget(uintptr_t steam){for(size_t i=0;i<sizeof(sdk)/sizeof(sdk[0]);++i)if(sdk[i].steam==steam)return gameBase+sdk[i].gog;return 0;}
++struct FakeWorld {char a[0x18];void*physics;char b[0x4B0-0x20];void*navmesh;char c[0x580-0x4B8];void*player;};
++struct FakeRender{char a[8];void*render;};struct FakeShared{char a[8];void*townList;};
++static_assert(offsetof(FakeWorld,physics)==0x18,"physics offset");static_assert(offsetof(FakeWorld,navmesh)==0x4B0,"navmesh offset");static_assert(offsetof(FakeWorld,player)==0x580,"player offset");
++static FakeWorld*ou;static void*options;static FakeRender*au;static FakeShared*shou;
++uintptr_t KlibGlobalAddress(uintptr_t rva) GLOBAL_BODY
++uintptr_t KlibWeatherAddress(bool mainThread){return OfficialSdkTarget(mainThread?0x9E9540:0x9E80A0);}
++static void Add(const char*name,uintptr_t legacy,uintptr_t impl,uintptr_t resolved) ADD_BODY
++// Native member-pointer expressions are discarded by preprocessing; all runtime
++// calls from this body are owned fixtures. The actual Add/global array/loop run.
++#define Bind(name,legacy,impl,...) Add(name,legacy,impl,OfficialSdkTarget(impl))
++static void Resolve() RESOLVE_BODY
++#undef Bind
++uintptr_t NativeProfileAddress(uintptr_t base,uintptr_t key){uintptr_t out=0;if(key==maskedKey)return 0;return GogProfile::Absolute(base,key,&out)?out:0;}
++static void Log(const char*line){puts(line);}typedef void(*KlibLogFn)(const char*);
++static bool StartupMatches(){uintptr_t base=gameBase;bool ok=!s_overflow;KlibLogFn log=Log;
++for(size_t i=0;i<s_count;++i) STARTUP_GUARD
++return ok;}
++static unsigned checks=0;static bool Check(bool x,const char*why){++checks;if(!x){printf("FAIL %s\n",why);return false;}return true;}
++int main(){
++ ou=new((void*)OfficialSdkTarget(0x21330B0))FakeWorld;options=(void*)OfficialSdkTarget(0x2132440);au=new((void*)OfficialSdkTarget(0x21322B0))FakeRender;shou=new((void*)OfficialSdkTarget(0x2133098))FakeShared;
++ Resolve();bool ok=Check(!s_overflow&&s_count==107,"actual Resolve captures98 functions and9 globals");
++ size_t auIndex=160,nested=160;unsigned globals=0;
++ for(size_t i=0;i<s_count;++i){ok=Check(s_entries[i].resolved!=0,"official SDK target is nonzero")&&ok;if(s_entries[i].implementationRva>=0x2000000)++globals;if(strcmp(s_entries[i].name,"au")==0)auIndex=i;if(strcmp(s_entries[i].name,"au.render")==0)nested=i;}
++ ok=Check(globals==9&&auIndex<107&&nested<107,"actual global names and loop captured")&&ok;
++ // This positive assertion is RED on the released missing-au table.
++ ok=Check(StartupMatches(),"complete actual Resolve is admitted by actual production startup guard")&&ok;
++ maskedKey=0x21322B0;ok=Check(!StartupMatches(),"lost au key refuses startup")&&ok;
++ maskedKey=0x21322B8;ok=Check(!StartupMatches(),"lost nested global key refuses startup")&&ok;maskedKey=0;
++ if(auIndex<107){uintptr_t save=s_entries[auIndex].resolved;s_entries[auIndex].resolved=save+8;ok=Check(!StartupMatches(),"wrong SDK pointer refuses startup")&&ok;s_entries[auIndex].resolved=0;ok=Check(!StartupMatches(),"null SDK pointer refuses startup")&&ok;s_entries[auIndex].resolved=save;}
++ printf("%s %u checks,107 actual production Resolve entries; no game code executed\n",ok?"PASS":"FAIL",checks);return ok?0:1;
++}
++'''
++for old,new in [('SDK_ROWS',rows),('GLOBAL_BODY',glob),('ADD_BODY',add),('RESOLVE_BODY',resolve),('STARTUP_GUARD',guard)]:assert old in code;code=code.replace(old,new)
++vc=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');w=Path('C:/Program Files/Microsoft SDKs/Windows/v7.1');env=dict(os.environ,INCLUDE=str(vc/'include')+';'+str(w/'Include'),LIB=str(vc/'lib/amd64')+';'+str(w/'Lib/x64'));env['PATH']=str(vc/'bin/amd64')+';'+env.get('PATH','')
++def run(name,text,expected=0,profile_source=None):
++ cpp=out/(name+'.cpp');cpp.write_text(text,encoding='utf8');cmd=[str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2','/GL','/I'+str(root/'src'),str(cpp),str(profile_source or root/'src/game/gog_profile.cpp'),'/Fe'+name+'.exe','/link','/LTCG'];subprocess.run(cmd,cwd=out,env=env,check=True);result=subprocess.run([str(out/(name+'.exe'))],cwd=out,capture_output=True,text=True);(out/(name+'.log')).write_text(result.stdout+result.stderr,encoding='utf8');print(result.stdout);assert result.returncode==expected,(name,result.returncode,expected)
++run('actual-resolve',code)
++if not a.skip_mutant:
++ bad=code.replace('if (!s_entries[i].resolved || s_entries[i].resolved != NativeProfileAddress(base,s_entries[i].implementationRva))','if (false)');assert bad!=code;run('mutant-bypass',bad,1);print('PASS compiled startup-bypass negative control')
++
++if a.check_old_profile:
++ old=out/'old-e608-profile';old.mkdir(exist_ok=True)
++ for name in ('gog_profile.cpp','gog_profile.h','gog_profile_data.inc'):
++  data=subprocess.check_output(['git','-C',str(root),'show','e6082d6264b68daaa4297ede7f6fe1cc5f9fb4f4:src/game/'+name]);(old/name).write_bytes(data)
++ run('old-profile-RED',code,1,old/'gog_profile.cpp')
++ assert 'MISMATCH au ours=0x0'in(out/'old-profile-RED.log').read_text(encoding='utf8')
++ print('PASS old released profile RED reproduces missing-au startup refusal')
+diff --git a/leopard/gog_native/verification-20261105.json b/leopard/gog_native/verification-20261105.json
+index 1cd6b31..319fd33 100644
+--- a/leopard/gog_native/verification-20261105.json
++++ b/leopard/gog_native/verification-20261105.json
+@@ -24,5 +24,7 @@
+     "mcm_adapter": "DEV/PROD PASS; deliberate mutants failed as expected",
+     "source_coverage": "392 keys /270 static /11 finite /23 raw /8 literal functional"
+   },
+-  "review": "Independent address/byte/raw/lifetime/caller scoped reviews; GOG gameplay unverified"
++  "review": "Independent address/byte/raw/lifetime/caller scoped reviews; GOG gameplay unverified",
++  "historical": true,
++  "superseded_reason": "Actual GOG tester exposed missing au global21322B0; profile self-enumeration had not covered complete Resolve global loop. See verification-au-fix-20261105.json."
+ }
+diff --git a/leopard/gog_native/verification-au-fix-20261105.json b/leopard/gog_native/verification-au-fix-20261105.json
+new file mode 100644
+index 0000000..592dbb6
+--- /dev/null
++++ b/leopard/gog_native/verification-au-fix-20261105.json
+@@ -0,0 +1,40 @@
++{
++  "status": "narrow_au_global_mapping_candidate_not_installed_not_published",
++  "time_msk": "2026-11-05T03:25:12.988999+03:00",
++  "parent_source_commit": "f568b97119befe0397504a027257c14a05f88aa7",
++  "dll_sha256": "0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766",
++  "dll_bytes": 1489920,
++  "profile_addresses": 393,
++  "profile_windows": 344,
++  "sdk_registry_entries": 107,
++  "sdk_import_count": 148,
++  "native_guard_changed": false,
++  "change": "SDK slot7627:Steam21322B0->GOG2130220, with exact reverse key",
++  "proof": {
++    "actual_resolve_checks": 114,
++    "actual_resolve_body": "extracted unchanged Resolve/Add/KlibGlobalAddress and startup for-loop",
++    "sdk_targets": "actual official7630 paired RVA tables; owned SDK-layout object fixtures",
++    "prior_e608_red": "reproduces MISMATCH au ours=0",
++    "negative_controls": [
++      "missing au key",
++      "missing nested au.render key",
++      "wrong SDK pointer",
++      "null SDK pointer",
++      "compiled comparison bypass rejected"
++    ],
++    "actual_exe_profile_checks": 2676,
++    "source_coverage": "393 keys;270 static GameAddr;11 finite domains;23 direct raw sites;8 functional literals;all9 actual global-loopkeys",
++    "build": "DEV+PROD345-source PASS;148 SDK imports compatible0.5.0;startPlugin+MCM exports present"
++  },
++  "game_exe_executed": false,
++  "real_gog_retest_required": true,
++  "preserved": [
++    "runtime startup guard",
++    "exact EXE/SDK identity pins",
++    "personal INI",
++    "running game",
++    "test archives",
++    "published state"
++  ],
++  "old_receipt": "verification-20261105.json is historical and contains pre-fix artifact identity"
++}
+diff --git a/src/game/gog_profile_data.inc b/src/game/gog_profile_data.inc
+index 28f4c4e..430080e 100644
+--- a/src/game/gog_profile_data.inc
++++ b/src/game/gog_profile_data.inc
+@@ -370,9 +370,10 @@ static const AddressPair addresses[]={
+  {0x212F3C0u,0x212D300u}, // RVA_SKY_INSTANCE
+  {0x2131E88u,0x212FDF8u}, // RVA_USER_PAUSE_SPEED
+  {0x2131E8Cu,0x212FDFCu}, // RVA_USER_PAUSE_GUARD
++ {0x21322B0u,0x2130220u}, // SDK-global-loop
+  {0x21322B8u,0x2130228u}, // RVA_RENDERER
+  {0x2132320u,0x2130290u}, // RVA_GLOBAL_INPUT
+- {0x2132440u,0x21303B0u}, // RVA_GLOBAL_OPTIONS
++ {0x2132440u,0x21303B0u}, // RVA_GLOBAL_OPTIONS,SDK-global-loop
+  {0x2132730u,0x21306A0u}, // RVA_GLOBAL_FRAME_TIME
+  {0x2132734u,0x21306A4u}, // RVA_GLOBAL_GAME_FRAME_TIME
+  {0x2132750u,0x21306C0u}, // RVA_GLOBAL_GUI
+@@ -380,9 +381,9 @@ static const AddressPair addresses[]={
+  {0x2132F30u,0x2130EA0u}, // RVA_GLOBAL_HANDLE_MANAGER
+  {0x2132F38u,0x2130EA8u}, // RVA_HANDLE_TABLE
+  {0x2132F50u,0x2130EC0u}, // RVA_ZONEMAP_HANDLE_LIST
+- {0x2133098u,0x2131008u}, // RVA_GLOBAL_AREA_SECTOR_GRID
++ {0x2133098u,0x2131008u}, // RVA_GLOBAL_AREA_SECTOR_GRID,SDK-global-loop
+  {0x21330A0u,0x2131010u}, // RVA_GLOBAL_TOWN_LIST
+- {0x21330B0u,0x2131020u}, // RVA_GLOBAL_GAMEWORLD
++ {0x21330B0u,0x2131020u}, // RVA_GLOBAL_GAMEWORLD,SDK-global-loop
+  {0x21330C8u,0x2131038u}, // RVA_PAUSESTATE_PHYSICS
+  {0x2133560u,0x21314D0u}, // RVA_GLOBAL_SECTION_MGR
+  {0x2133630u,0x21315A0u}, // RVA_GLOBAL_PLAYER
+@@ -764,6 +765,7 @@ static const AddressPair reverseAddresses[]={
+  {0x212D300u,0x212F3C0u},
+  {0x212FDF8u,0x2131E88u},
+  {0x212FDFCu,0x2131E8Cu},
++ {0x2130220u,0x21322B0u},
+  {0x2130228u,0x21322B8u},
+  {0x2130290u,0x2132320u},
+  {0x21303B0u,0x2132440u},
+-- 
+2.46.0.windows.1
+

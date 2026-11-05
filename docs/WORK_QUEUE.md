@@ -15,6 +15,21 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
+   LATEST GOG TESTER FAILURE/FIX05Nov03:26: initial archive fab7... failed
+   startup with MISMATCH au ours=0, not a successful GOG runtime test. The native
+   profile omitted au storage21322B0; exact official SDK slot7627 and both EXE
+   RIP references prove GOG2130220. Local commit84056bcb adds only that mapping
+   plus reverse; startup guard is unchanged. All107 actual Resolve entries now
+   tested, including its9-global loop; old-profile RED and removed/wrong/null
+   target controls catch the former coverage blindspot. Independent review CLEAR.
+   Rebuilt PROD0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766;
+   both private GOG/weight test ZIPs refreshed, each762976B SHA
+   ff14c090184028d6165f03b68dfbdec07fefe84698c6af04877238c9c4009a18.
+   The current local Steam game PID20904 still runs weight buildd530..., which
+   is unaffected by the GOG-only table entry. No local replacement while running.
+   Tester must retry actual GOG startup; do not claim the port now runs in-game.
+   Three Steel jobs are NOT implemented: owner had misunderstood prior wording,
+   corrected explicitly. Only carried weight is installed, OFF by default.
    Gameplay priorities: (1) pathfinding: short-route detours, circling/stuck
    movement, squad routing and avoiding water; (2) excess squads: distinguish
    genuinely created platoons from existing platoons loaded earlier; (3) mouse

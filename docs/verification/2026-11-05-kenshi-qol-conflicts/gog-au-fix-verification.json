@@ -1,0 +1,40 @@
+{
+  "status": "narrow_au_global_mapping_candidate_not_installed_not_published",
+  "time_msk": "2026-11-05T03:25:12.988999+03:00",
+  "parent_source_commit": "f568b97119befe0397504a027257c14a05f88aa7",
+  "dll_sha256": "0d0ff2b79838d74db4236662f7d8cefa702e2162bdd732d592be22487fd1d766",
+  "dll_bytes": 1489920,
+  "profile_addresses": 393,
+  "profile_windows": 344,
+  "sdk_registry_entries": 107,
+  "sdk_import_count": 148,
+  "native_guard_changed": false,
+  "change": "SDK slot7627:Steam21322B0->GOG2130220, with exact reverse key",
+  "proof": {
+    "actual_resolve_checks": 114,
+    "actual_resolve_body": "extracted unchanged Resolve/Add/KlibGlobalAddress and startup for-loop",
+    "sdk_targets": "actual official7630 paired RVA tables; owned SDK-layout object fixtures",
+    "prior_e608_red": "reproduces MISMATCH au ours=0",
+    "negative_controls": [
+      "missing au key",
+      "missing nested au.render key",
+      "wrong SDK pointer",
+      "null SDK pointer",
+      "compiled comparison bypass rejected"
+    ],
+    "actual_exe_profile_checks": 2676,
+    "source_coverage": "393 keys;270 static GameAddr;11 finite domains;23 direct raw sites;8 functional literals;all9 actual global-loopkeys",
+    "build": "DEV+PROD345-source PASS;148 SDK imports compatible0.5.0;startPlugin+MCM exports present"
+  },
+  "game_exe_executed": false,
+  "real_gog_retest_required": true,
+  "preserved": [
+    "runtime startup guard",
+    "exact EXE/SDK identity pins",
+    "personal INI",
+    "running game",
+    "test archives",
+    "published state"
+  ],
+  "old_receipt": "verification-20261105.json is historical and contains pre-fix artifact identity"
+}
