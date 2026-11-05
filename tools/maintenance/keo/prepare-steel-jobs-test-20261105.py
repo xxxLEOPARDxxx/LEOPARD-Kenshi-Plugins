@@ -9,9 +9,9 @@ SHA=lambda b:hashlib.sha256(b).hexdigest()
 def main():
  p=argparse.ArgumentParser();p.add_argument('--install',action='store_true');a=p.parse_args()
  commit=subprocess.check_output(['git','-C',str(R),'rev-parse','HEAD'],text=True).strip()
- assert commit=='869b5714a5c4f715cca709e63b3bb1a0a41c504b',commit
+ assert commit=='b59ab75e5f7731222e1d760d95e1fe374197f1e9',commit
  data=(R/'build/KEO_step4_prod/KEO.dll').read_bytes()
- assert SHA(data)=='3beef25dc5b4674f4c33efd1c022358a16b9e69146f14c949707a8fb60ce2cff'
+ assert SHA(data)=='5e01e06e6fca640e5166292d7d752e66e6ed56f4591dca4f22c8da3d67315aa3'
  sys.path.insert(0,'D:/DEV/Kenshi/tools');from qol_binary_check import PE
  pe=PE(R/'build/KEO_step4_prod/KEO.dll');assert {'?startPlugin@@YAXXZ','MCM_Describe'}<=pe.exports()
  imports={}
@@ -61,7 +61,7 @@ The 0xf1880 SDK fix is included. The separate KEO-GOG-test-20261105.zip remains 
  now=datetime.now(timezone(timedelta(hours=3)))
  receipt={'time_msk':now.isoformat(),'source_commit':commit,'status':'prepared_private_not_published',
   'dll_sha256':SHA(data),'archive':str(path),'archive_bytes':path.stat().st_size,'archive_sha256':SHA(path.read_bytes()),'files':len(files),'imports':imports,
-  'changes_ru':['Три отдельные живые опции: забор продукции, пополнение своего прилавка без денежной сделки, циклический маршрут по точкам.','Выключение сохраняет очередь; маршрут хранится в обычном сохранении.','Исправлен некорректный вызов SDK проверки веса (адрес 0xf1880).','Регистрация заданий совместима с проверенными обработчиками Stack Sort, Rotate Items и Kenshi Extension Plugin.','Исправлен порядок регистрации заданий при запуске и загрузке сохранения.'],
+  'changes_ru':['Три отдельные живые опции: забор продукции, пополнение своего прилавка без денежной сделки, циклический маршрут по точкам.','Выключение сохраняет очередь; маршрут хранится в обычном сохранении.','Исправлен некорректный вызов SDK проверки веса (адрес 0xf1880).','Регистрация заданий совместима с проверенными обработчиками Stack Sort, Rotate Items и Kenshi Extension Plugin.','Исправлен порядок регистрации заданий при запуске и загрузке сохранения.','Исправлено переполнение стека при первом запуске циклического маршрута.'],
   'runtime_acceptance':'pending; no game FPS/leak/save-load claim','crc':'passed'}
  if a.install:
   count=subprocess.check_output(['powershell','-NoProfile','-Command','@(Get-Process kenshi_x64 -ErrorAction SilentlyContinue).Count'],text=True).strip()

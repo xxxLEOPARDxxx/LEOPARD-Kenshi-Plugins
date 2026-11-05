@@ -1,11 +1,11 @@
 {
-  "time_msk": "2026-11-05T05:19:40.932509+03:00",
-  "source_commit": "869b5714a5c4f715cca709e63b3bb1a0a41c504b",
+  "time_msk": "2026-11-05T05:37:10.364033+03:00",
+  "source_commit": "b59ab75e5f7731222e1d760d95e1fe374197f1e9",
   "status": "installed_local_private_not_published",
-  "dll_sha256": "3beef25dc5b4674f4c33efd1c022358a16b9e69146f14c949707a8fb60ce2cff",
+  "dll_sha256": "5e01e06e6fca640e5166292d7d752e66e6ed56f4591dca4f22c8da3d67315aa3",
   "archive": "D:\\DEV\\Kenshi\\workshop\\testing\\KEO\\KEO-jobs-test-20261105.zip",
-  "archive_bytes": 788624,
-  "archive_sha256": "1c0ae42c330a3fcd2598d769b0721eafd8a21b96082232e58c96e8c1293afe22",
+  "archive_bytes": 788911,
+  "archive_sha256": "de6bbaff502b3a25ab57332545d6e28dfcf6b89ef3b8afd4c729904b73eeaccd",
   "files": 13,
   "imports": {
     "KenshiLib.dll": 180,
@@ -17,13 +17,14 @@
     "Выключение сохраняет очередь; маршрут хранится в обычном сохранении.",
     "Исправлен некорректный вызов SDK проверки веса (адрес 0xf1880).",
     "Регистрация заданий совместима с проверенными обработчиками Stack Sort, Rotate Items и Kenshi Extension Plugin.",
-    "Исправлен порядок регистрации заданий при запуске и загрузке сохранения."
+    "Исправлен порядок регистрации заданий при запуске и загрузке сохранения.",
+    "Исправлено переполнение стека при первом запуске циклического маршрута."
   ],
   "runtime_acceptance": "pending; no game FPS/leak/save-load claim",
   "crc": "passed",
-  "backup": "D:\\DEV\\Kenshi\\backup\\keo-jobs-20261105-051940",
+  "backup": "D:\\DEV\\Kenshi\\backup\\keo-jobs-20261105-053710",
   "preserved_sha256": {
-    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "ca4cacec14b6af68f2ac3f5c03de012c39b6a3f04f1f3569d9fa280cd92082c8",
+    "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "2e3480c877eceb736b0f3442420a9fa58b7dbd9c90edb5ae8ef3a9c73aadd72a",
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEOCompat.ini": "2e2aa455c9627aa5a70edfdefc78842420356f82f7bed66a777314e6128dab82",
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\RE_Kenshi.json": "46dba618bbfac3e915141a0277a1106a3c30ed2d5fa8e6920782ea89ad6c2e68",
     "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\mods.cfg": "695237c00c85284290fe1789c5b9131417baa197b28d494afb44eab79f34fa4f"

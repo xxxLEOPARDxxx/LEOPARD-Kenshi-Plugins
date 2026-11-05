@@ -1,7 +1,7 @@
 From 2bf6df98d96b7764c617a6b8ce04d25cc8fc4bf6 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:25:21 +0300
-Subject: [PATCH 1/5] Fix SDK address checks for carried weight virtual methods
+Subject: [PATCH 1/6] Fix SDK address checks for carried weight virtual methods
 
 ---
  leopard/test_carried_weight_sdk_bindings.py | 66 +++++++++++++++++++++
@@ -103,7 +103,7 @@ index b5022a9..0e9aa5c 100644
 From 770f8d272930063ab0466ac931cec04f3538703f Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:32:31 +0300
-Subject: [PATCH 2/5] Integrate three independently configurable Steel jobs
+Subject: [PATCH 2/6] Integrate three independently configurable Steel jobs
  with native persistence
 
 ---
@@ -2535,7 +2535,7 @@ index 011b8c7..3919470 100644
 From ac2c92e7f177928911c7e94a3129d7e61cbf5bff Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:38:46 +0300
-Subject: [PATCH 3/5] Preserve foreign custom jobs when KEO admission is
+Subject: [PATCH 3/6] Preserve foreign custom jobs when KEO admission is
  refused
 
 ---
@@ -2699,7 +2699,7 @@ index baebd17..0912071 100644
 From c6802eaa4457f6d29942b6f60642213625be01d9 Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 04:57:42 +0300
-Subject: [PATCH 4/5] fix(jobs): admit audited inventory hook chains without
+Subject: [PATCH 4/6] fix(jobs): admit audited inventory hook chains without
  bypassing them
 
 ---
@@ -2948,7 +2948,7 @@ index 5b2c323..6be1f9a 100644
 From 869b5714a5c4f715cca709e63b3bb1a0a41c504b Mon Sep 17 00:00:00 2001
 From: xxxLEOPARDxxx <riperblazer@narod.ru>
 Date: Thu, 5 Nov 2026 05:18:20 +0300
-Subject: [PATCH 5/5] fix(jobs): register save identities before world
+Subject: [PATCH 5/6] fix(jobs): register save identities before world
  templates are ready
 
 ---
@@ -3245,6 +3245,271 @@ index b4a06ba..a0127f1 100644
  void* FactoryTaskData(int type);
  FactoryBody FactoryNativeBody(int type);
  uintptr_t FactoryCaptionAddress();
+-- 
+2.46.0.windows.1
+
+
+From b59ab75e5f7731222e1d760d95e1fe374197f1e9 Mon Sep 17 00:00:00 2001
+From: xxxLEOPARDxxx <riperblazer@narod.ru>
+Date: Thu, 5 Nov 2026 05:35:43 +0300
+Subject: [PATCH 6/6] fix(jobs): retain derived virtual methods in native task
+ adapters
+
+---
+ leopard/steel_jobs/PLAN.md                 |  2 ++
+ leopard/steel_jobs/native_contract.json    | 23 +++++++++++++++-------
+ leopard/steel_jobs/test_factory.py         | 22 +++++++++++++++++----
+ leopard/steel_jobs/test_native_contract.py |  6 +++---
+ src/game/gog_jobs_profile.cpp              | 11 ++++++-----
+ src/game/gog_jobs_profile.h                |  4 +++-
+ src/jobs/steel_jobs_factory.cpp            |  4 ++--
+ 7 files changed, 50 insertions(+), 22 deletions(-)
+
+diff --git a/leopard/steel_jobs/PLAN.md b/leopard/steel_jobs/PLAN.md
+index 0494a96..a1edc0b 100644
+--- a/leopard/steel_jobs/PLAN.md
++++ b/leopard/steel_jobs/PLAN.md
+@@ -18,3 +18,5 @@ Constraints: bounded fixed actor/route/pending tables, no retained native actor/
+ Map and Dynamic Factions remain paused. No publication, release version increment or personal published changelog entry for this private candidate.
+ 
+ Runtime lifecycle follow-up05Nov: early title registration originally required world-only task templates and refused before a save could load. Restored two-phase ownership: early metadata/factory registration supports saved custom types; native template conditions publish once when available, including first saved-task construction before MainTick. No native call/logger under publication lock. 170 actual-source factory checks and 319 runtime controls eachOd/O2 pass; final native acceptance pending.
++
++05Nov actual gameplay: metadata registration succeeded in PID10344, but adding waypoints caused STACK_OVERFLOW at native Move.runAction3545C6. Root and independent review proved the copied vtable had only five base methods; native Move calls derived slots5/6 and aliased the adjacent stored callback/nativeBody. Corrected to bounded storage9 with exact class-specific COL+method extents7/8/6, all original derived entries validated against both EXEs. 188 factory and123 profile checks pass; old truncated-vtable control fails. Actual route repetition/save-load still pending corrected DLL. User confirmed hold-RMB counter command appears/adds; no counter execution acceptance yet.
+diff --git a/leopard/steel_jobs/native_contract.json b/leopard/steel_jobs/native_contract.json
+index 4362651..fa34e7b 100644
+--- a/leopard/steel_jobs/native_contract.json
++++ b/leopard/steel_jobs/native_contract.json
+@@ -138,7 +138,8 @@
+           291271,
+           278076,
+           337261,
+-          235221
++          235221,
++          338006
+         ],
+         [
+           25294656,
+@@ -146,9 +147,11 @@
+           291386,
+           278186,
+           337376,
+-          235326
++          235326,
++          338121
+         ]
+-      ]
++      ],
++      "count": 7
+     },
+     {
+       "name": "MOVE_VTABLE",
+@@ -163,7 +166,9 @@
+           133436,
+           10041,
+           319336,
+-          223356
++          223356,
++          116941,
++          207056
+         ],
+         [
+           25289048,
+@@ -171,9 +176,12 @@
+           133551,
+           10041,
+           319456,
+-          223461
++          223461,
++          116936,
++          207166
+         ]
+-      ]
++      ],
++      "count": 8
+     },
+     {
+       "name": "BLANK_VTABLE",
+@@ -198,7 +206,8 @@
+           103721,
+           235326
+         ]
+-      ]
++      ],
++      "count": 6
+     }
+   ]
+ }
+diff --git a/leopard/steel_jobs/test_factory.py b/leopard/steel_jobs/test_factory.py
+index 2236d2f..b268c10 100644
+--- a/leopard/steel_jobs/test_factory.py
++++ b/leopard/steel_jobs/test_factory.py
+@@ -2,7 +2,8 @@
+ from pathlib import Path
+ import os,subprocess,sys
+ RED='--red-control'in sys.argv
+-R=Path('D:/DEV/Kenshi/forks/KEO');O=R/('build/steel-jobs-factory-red'if RED else'build/steel-jobs-factory');O.mkdir(parents=True,exist_ok=True)
++OLD='--old-vtable-control'in sys.argv
++R=Path('D:/DEV/Kenshi/forks/KEO');O=R/('build/steel-jobs-factory-old-vtable'if OLD else'build/steel-jobs-factory-red'if RED else'build/steel-jobs-factory');O.mkdir(parents=True,exist_ok=True)
+ code=r'''
+ #define KENSHILIB_EXPORT
+ #include "jobs/steel_jobs_factory.cpp"
+@@ -12,11 +13,14 @@ static int checks=0,calls=0,deleted=0,registrations=0,hasCalls=0;
+ static bool allowCustom=true,allowBase=true,wrongClass=false,failNative=false,failRegister=false,badFactory=false,templateReady=true,reenterOnGet=false;
+ static int lastType=0;static uintptr_t realBase=1;
+ static unsigned long long dataBytes[5][64],taskBytes[32];static TaskData*registry[3]={0};
+-static void*vtables[3][6];
++static void*vtables[3][9];
+ static void C(bool x,const char*s){++checks;if(!x){printf("FAIL %s\n",s);exit(1);}}
+ static TaskData*Data(unsigned n){return (TaskData*)dataBytes[n];}
+ static void Delete(void*,unsigned flag){C(flag==1,"original deleting destructor flag");++deleted;}
+ static void Body(void*,void*){}
++static int extendedCalls=0;
++static void Extra5(void*,void*){++extendedCalls;}
++static void Extra6(void*,void*){extendedCalls+=10;}
+ static void CallbackG(void*,void*){} static void CallbackM(void*,void*){} static void CallbackS(void*,void*){}
+ static bool Has(void*,int type){++hasCalls;return type>=291?allowCustom:allowBase;}
+ static TaskData*Get(int type){if(reenterOnGet&&type==(int)COLLECT_OUTPUT_RESOURCE){reenterOnGet=false;C(keo_jobs::PrepareFactoryTasks(),"same-slot native lookup reentry without our lock");}if(type>=291&&type<=293)return registry[type-291];if(type==(int)COLLECT_OUTPUT_RESOURCE)return templateReady?Data(3):0;if(type==(int)MOVE_CUS_ORDERED)return templateReady?Data(4):0;return 0;}
+@@ -36,6 +40,7 @@ static Tasker*Native(void*self,int type,const hand&subject,int priority,float we
+ }
+ namespace JobsProfile {
+ uintptr_t Rva(bool,Key k){uintptr_t a=0;switch(k){case FACTORY:a=(uintptr_t)&Native;break;case GET_DATA:a=(uintptr_t)&Get;break;case REGISTER_DATA:a=(uintptr_t)&Reg;break;case SET_PERMAJOB:a=(uintptr_t)&Perma;break;case ADD_REQUIREMENT:a=(uintptr_t)&Req;break;case DEFAULT_SCORE:a=(uintptr_t)&Score;break;case EMPTY_VTABLE:a=(uintptr_t)&vtables[0][1];break;case MOVE_VTABLE:a=(uintptr_t)&vtables[1][1];break;case BLANK_VTABLE:a=(uintptr_t)&vtables[2][1];break;default:a=(uintptr_t)&Body;}return a-realBase;}
++unsigned TableCount(Key k){return k==EMPTY_VTABLE?7:k==MOVE_VTABLE?8:k==BLANK_VTABLE?6:0;}
+ bool Validate(bool,uintptr_t,Reader,void*){return !badFactory;}
+ bool ValidateForInstall(bool,uintptr_t,Reader,void*){return !badFactory;}
+ }
+@@ -46,7 +51,7 @@ HookStatus AddHook(void*target,void*detour,void**orig){C(target==(void*)&Native&
+ HookStatus QueueHook(void*,void*,void**){return FAIL;}HookStatus ApplyQueuedHooks(){return FAIL;}
+ }
+ static void Reset(){using namespace keo_jobs;memset(slots,0,sizeof(slots));base=0;prepared=installed=false;original=0;memset(registry,0,sizeof(registry));memset(dataBytes,0,sizeof(dataBytes));calls=deleted=registrations=hasCalls=0;allowCustom=allowBase=true;wrongClass=failNative=failRegister=badFactory=false;templateReady=true;
+- for(unsigned i=0;i<3;++i){vtables[i][0]=(void*)(uintptr_t)(0x1000+i);vtables[i][1]=(void*)&Delete;for(unsigned j=2;j<6;++j)vtables[i][j]=(void*)&Body;}
++ for(unsigned i=0;i<3;++i){vtables[i][0]=(void*)(uintptr_t)(0x1000+i);vtables[i][1]=(void*)&Delete;for(unsigned j=2;j<6;++j)vtables[i][j]=(void*)&Body;vtables[i][6]=(void*)&Extra5;vtables[i][7]=(void*)&Extra6;}
+  Data(3)->key=COLLECT_OUTPUT_RESOURCE;Data(4)->key=MOVE_CUS_ORDERED;for(unsigned i=3;i<5;++i){Data(i)->hasAction=true;Data(i)->numRequirements=1;Data(i)->requirements[0].key=AT_LOCATION;Data(i)->requirements[0].val=true;Data(i)->numResults=1;Data(i)->results[0].key=AT_LOCATION;}
+ }
+ static bool Init(){keo_jobs::FactoryCallbacks cb={CallbackG,CallbackM,CallbackS};return keo_jobs::InitializeFactory(realBase,cb,0);}
+@@ -64,11 +69,19 @@ int main(){using namespace keo_jobs;
+  C(Data(0)->numRequirements==2&&Data(0)->requirements[1].key==MACHINES_OUTPUTS_EMPTY&&!Data(0)->requirements[1].val,"gather empty-output skip requirement");C(Data(1)->_resultsAlwaysFalse&&Data(2)->_resultsAlwaysFalse,"waypoint and stock own completion");C(Data(2)->numResults==0&&Data(2)->numRequirements==1&&Data(2)->requirements[0].key==AT_LOCATION,"stock walks to counter without native242 migration");
+ 
+  for(int type=291;type<=293;++type){Tasker*t=Create(&repertoire,type,subject,7,3.25f,point,11,22);C(t&&t->taskData==FactoryTaskData(type),"custom metadata identity");C(lastType==(type==291?(int)COLLECT_OUTPUT_RESOURCE:type==292?(int)MOVE_CUS_ORDERED:293),"native construction alias");C(t->priority==7&&t->weight==3.25f&&t->startTime==11&&t->endTime==22&&!memcmp(&t->location,&point,sizeof(point))&&!memcmp(&t->subject,&subject,sizeof(hand)),"native common argument initialization preserved");C((*(void***)t)[2]==(void*)(type==291?CallbackG:type==292?CallbackM:CallbackS),"only native body virtual slot replaced");C(FactoryNativeBody(type)==Body,"native body retained");if(type==291)C(*((unsigned char*)t+0x78)==1,"native empty-machine take output flag");}
++ Tasker*derived=Create(&repertoire,292,subject,7,3.25f,point,11,22);void**dv=*(void***)derived;
++ C(dv[5]==(void*)&Extra5&&dv[6]==(void*)&Extra6,"complete derived move virtuals preserved, no callback/nativeBody alias");
++ ((FactoryBody)dv[5])(derived,0);((FactoryBody)dv[6])(derived,0);C(extendedCalls==11,"native move derived slot5/6 dispatch without recursion");
++ C(dv[7]==0,"move vtable tail stays zero, no adjacent RTTI copied");
++ for(int type=291;type<=293;++type){Tasker*t=Create(&repertoire,type,subject,7,3.25f,point,11,22);Slot*s=Find(type);unsigned count=JobsProfile::TableCount((JobsProfile::Key)(JobsProfile::EMPTY_VTABLE+type-291));for(unsigned j=1;j<count;++j)if(j!=3)C(s->privateTable[j]==vtables[type-291][j],"every original class-specific virtual retained");}
+  int before=calls;allowCustom=false;C(!Create(&repertoire,291,subject,1,1,point,0,0)&&calls==before,"custom repertoire refusal before alias");allowCustom=true;allowBase=false;C(!Create(&repertoire,291,subject,1,1,point,0,0),"native base capability refusal retained");allowBase=true;
+  wrongClass=true;C(!Create(&repertoire,292,subject,1,1,point,0,0)&&deleted==1,"mismatched native class deleted exactly once");wrongClass=false;failNative=true;C(!Create(&repertoire,292,subject,1,1,point,0,0)&&deleted==1,"native null no destructor call");failNative=false;
+  Create(&repertoire,242,subject,1,1,point,0,0);C(lastType==242,"native242 passed through unchanged");C(!FactoryTaskData(242)&&!FactoryNativeBody(242),"no ownership of unrelated task");printf("PASS %d unchanged production factory checks\n",checks);
+ }
+ '''
++if OLD:
++ production=(R/'src/jobs/steel_jobs_factory.cpp').read_text(encoding='utf8');changed=production.replace('void*privateTable[9]','void*privateTable[6]').replace('JobsProfile::TableCount(keys[i])*sizeof(void*)','sizeof(slots[i].privateTable)');assert changed!=production
++ code=code.replace('#include "jobs/steel_jobs_factory.cpp"',changed)
+ if RED:
+  production=(R/'src/jobs/steel_jobs_factory.cpp').read_text(encoding='utf8');changed=production.replace('if(!vptr||!((HasTask)vptr[1])(self,type))return 0;','if(false)return 0;');assert changed!=production
+  code=code.replace('#include "jobs/steel_jobs_factory.cpp"',changed)
+@@ -77,5 +90,6 @@ V=Path('C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC');S=Path('C:/Prog
+ args=[str(V/'bin/amd64/cl.exe'),'/nologo','/EHsc','/O2','/MD','/DBOOST_ALL_NO_LIB','/I'+str(R/'src'),'/ID:/DEV/Kenshi/deps/KenshiLib_keo/Include','/ID:/DEV/Kenshi/deps/KenshiLib_keo/Include/ogre','/ID:/DEV/Kenshi/deps/boost_1_60_0',str(O/'factory.cpp'),'/Fo'+str(O/'factory.obj'),'/Fe'+str(O/'factory.exe')]
+ p=subprocess.run(args,env=env,capture_output=True,text=True);(O/'build.log').write_text(p.stdout+p.stderr,encoding='utf8');assert not p.returncode,p.stdout+p.stderr
+ p=subprocess.run([str(O/'factory.exe')],capture_output=True,text=True,timeout=10);print(p.stdout);(O/'run.log').write_text(p.stdout+p.stderr,encoding='utf8')
+-if RED:assert p.returncode==1 and'custom repertoire refusal before alias'in p.stdout
++if OLD:assert p.returncode==1 and'complete derived move virtuals preserved'in p.stdout
++elif RED:assert p.returncode==1 and'custom repertoire refusal before alias'in p.stdout
+ else:assert not p.returncode,p.stdout+p.stderr
+diff --git a/leopard/steel_jobs/test_native_contract.py b/leopard/steel_jobs/test_native_contract.py
+index b1ba638..ed8f7f0 100644
+--- a/leopard/steel_jobs/test_native_contract.py
++++ b/leopard/steel_jobs/test_native_contract.py
+@@ -10,7 +10,7 @@ images=[pefile.PE(str(q),fast_load=True)for q in[a.steam_exe,a.gog_exe]]
+ for i,im in enumerate(images):
+  for row in d['code']:assert im.get_data(row['rva'][i],len(bytes.fromhex(row['bytes'][i])))==bytes.fromhex(row['bytes'][i]),row['name']
+  for row in d['vtables']:
+-  vals=struct.unpack('<6Q',im.get_data(row['rva'][i]-8,48));assert list(v-im.OPTIONAL_HEADER.ImageBase for v in vals)==row['slots'][i]
++  vals=struct.unpack('<%dQ'%row['count'],im.get_data(row['rva'][i]-8,row['count']*8));assert list(v-im.OPTIONAL_HEADER.ImageBase for v in vals)==row['slots'][i]
+   col=row['slots'][i][0];sig,off,cd,td,ch,selfr=struct.unpack('<6I',im.get_data(col,24));assert sig==1 and off==cd==0 and selfr==col
+   name=im.get_data(td+16,80).split(b'\0')[0];assert name=={'EMPTY_VTABLE':b'.?AVTask_EmptyMachine@@','MOVE_VTABLE':b'.?AVTask_Move@@','BLANK_VTABLE':b'.?AVTask_Blank@@'}[row['name']]
+ # The factory's two switch arrays are the only layout-dependent operands in its
+@@ -50,13 +50,13 @@ static int checks=0;
+ static void C(bool b,const char*s){++checks;if(!b){printf("FAIL %s\n",s);exit(1);}}
+ static bool Read(void*c,uintptr_t r,void*out,size_t n){Image*i=(Image*)c;if(r==i->refuse)return false;for(unsigned k=0;k<i->nt->FileHeader.NumberOfSections;++k){IMAGE_SECTION_HEADER&s=i->sections[k];if(r>=s.VirtualAddress&&r-s.VirtualAddress<=s.SizeOfRawData&&n<=s.SizeOfRawData-(r-s.VirtualAddress)){
+  size_t at=s.PointerToRawData+r-s.VirtualAddress;if(at>i->raw.size()||n>i->raw.size()-at)return false;memcpy(out,&i->raw[at],n);
+- if(i->relocate&&n==8){for(int t=JobsProfile::EMPTY_VTABLE;t<=JobsProfile::BLANK_VTABLE;++t){uintptr_t a=JobsProfile::Rva(i->gog,(JobsProfile::Key)t)-8;if(r>=a&&r<a+48)*(uintptr_t*)out+=i->base-i->nt->OptionalHeader.ImageBase;}}
++ if(i->relocate&&n==8){for(int t=JobsProfile::EMPTY_VTABLE;t<=JobsProfile::BLANK_VTABLE;++t){uintptr_t a=JobsProfile::Rva(i->gog,(JobsProfile::Key)t)-8;if(r>=a&&r<a+JobsProfile::TableCount((JobsProfile::Key)t)*8)*(uintptr_t*)out+=i->base-i->nt->OptionalHeader.ImageBase;}}
+  if(r==i->corrupt)((unsigned char*)out)[0]^=1;return true;}}return false;}
+ static void Run(const char*file,bool gog){Image i={};i.gog=gog;std::ifstream f(file,std::ios::binary);i.raw.assign(std::istreambuf_iterator<char>(f),std::istreambuf_iterator<char>());C(i.raw.size()>1000000,"actual fixture file");i.nt=(IMAGE_NT_HEADERS64*)(&i.raw[0]+((IMAGE_DOS_HEADER*)&i.raw[0])->e_lfanew);i.sections=IMAGE_FIRST_SECTION(i.nt);i.base=i.nt->OptionalHeader.ImageBase;
+  C(JobsProfile::Validate(gog,i.base,Read,&i),"all actual windows/vtables accepted");C(JobsProfile::ValidateForInstall(gog,i.base,Read,&i),"actual install contract accepted");
+  C(!JobsProfile::Validate(gog,0,Read,&i)&&!JobsProfile::Validate(gog,i.base,0,&i),"invalid input refused");
+  for(int k=0;k<JobsProfile::EMPTY_VTABLE;++k){i.corrupt=JobsProfile::Rva(gog,(JobsProfile::Key)k);C(!JobsProfile::Validate(gog,i.base,Read,&i),"every changed actual code window refused");C(JobsProfile::ValidateForInstall(gog,i.base,Read,&i)==(k==JobsProfile::CAPTION||k==JobsProfile::CONTEXT_SHOW),"install ignores only our prior caption/context detours");i.corrupt=0;i.refuse=JobsProfile::Rva(gog,(JobsProfile::Key)k);C(!JobsProfile::Validate(gog,i.base,Read,&i),"reader failure refused");i.refuse=0;}
+- for(int k=JobsProfile::EMPTY_VTABLE;k<=JobsProfile::BLANK_VTABLE;++k)for(unsigned j=0;j<6;++j){i.corrupt=JobsProfile::Rva(gog,(JobsProfile::Key)k)-8+j*8;C(!JobsProfile::Validate(gog,i.base,Read,&i)&&!JobsProfile::ValidateForInstall(gog,i.base,Read,&i),"every RTTI/deleting/body/finish vtable slot changed is refused");i.corrupt=0;}
++ for(int k=JobsProfile::EMPTY_VTABLE;k<=JobsProfile::BLANK_VTABLE;++k)for(unsigned j=0;j<JobsProfile::TableCount((JobsProfile::Key)k);++j){i.corrupt=JobsProfile::Rva(gog,(JobsProfile::Key)k)-8+j*8;C(!JobsProfile::Validate(gog,i.base,Read,&i)&&!JobsProfile::ValidateForInstall(gog,i.base,Read,&i),"every RTTI/deleting/body/finish vtable slot changed is refused");i.corrupt=0;}
+  C(!JobsProfile::Rva(gog,(JobsProfile::Key)-1)&&!JobsProfile::Rva(gog,JobsProfile::KEY_COUNT),"unknown key no fallback");
+  i.base+=0x20000000;i.relocate=true;C(JobsProfile::Validate(gog,i.base,Read,&i),"real ASLR relocation normalized");i.relocate=false;C(!JobsProfile::Validate(gog,i.base,Read,&i),"wrong base refused");
+ }
+diff --git a/src/game/gog_jobs_profile.cpp b/src/game/gog_jobs_profile.cpp
+index 382701f..dd76521 100644
+--- a/src/game/gog_jobs_profile.cpp
++++ b/src/game/gog_jobs_profile.cpp
+@@ -15,18 +15,19 @@ static const Code code[]={
+ {{0x3182E0,0x317E70},9,{{0x48,0x8b,0x01,0xff,0xa0,0x98,0x00,0x00,0x00},{0x48,0x8b,0x01,0xff,0xa0,0x98,0x00,0x00,0x00}}}, // DEFAULT_SCORE
+ {{0x32EBE2,0x32E772},6,{{0x8d,0x43,0xff,0x45,0x33,0xed},{0x8d,0x43,0xff,0x45,0x33,0xed}}}, // FACTORY_DISPATCH
+ };
+-struct Table {uintptr_t rva[2];uintptr_t slots[2][6];};
++struct Table {uintptr_t rva[2];unsigned count;uintptr_t slots[2][8];};
+ static const Table tables[]={
+-{{0x16BD798,0x16BC4A8},{{0x1820BA0,0x47005,0x471C7,0x43E3C,0x5256D,0x396D5},{0x181F740,0x47078,0x4723A,0x43EAA,0x525E0,0x3973E}}}, // EMPTY_VTABLE
+-{{0x16BCD88,0x16BBA98},{{0x181F5B8,0xB357,0x2093C,0x2739,0x4DF68,0x3687C},{0x181E158,0xB352,0x209AF,0x2739,0x4DFE0,0x368E5}}}, // MOVE_VTABLE
+-{{0x16BE4C8,0x16BD1D8},{{0x18229C0,0xA2C2,0x4BAF6,0x1E65,0x1952E,0x396D5},{0x1821560,0xA2BD,0x4BB6E,0x1E65,0x19529,0x3973E}}}, // BLANK_VTABLE
++{{0x16BD798,0x16BC4A8},7,{{0x1820BA0,0x47005,0x471C7,0x43E3C,0x5256D,0x396D5,0x52856},{0x181F740,0x47078,0x4723A,0x43EAA,0x525E0,0x3973E,0x528C9}}}, // EMPTY_VTABLE
++{{0x16BCD88,0x16BBA98},8,{{0x181F5B8,0xB357,0x2093C,0x2739,0x4DF68,0x3687C,0x1C8CD,0x328D0},{0x181E158,0xB352,0x209AF,0x2739,0x4DFE0,0x368E5,0x1C8C8,0x3293E}}}, // MOVE_VTABLE
++{{0x16BE4C8,0x16BD1D8},6,{{0x18229C0,0xA2C2,0x4BAF6,0x1E65,0x1952E,0x396D5},{0x1821560,0xA2BD,0x4BB6E,0x1E65,0x19529,0x3973E}}}, // BLANK_VTABLE
+ };
+ uintptr_t Rva(bool gog,Key key) {unsigned k=(unsigned)key,p=gog?1:0; if(k<11)return code[k].rva[p];if(k<KEY_COUNT)return tables[k-11].rva[p];return 0;}
++unsigned TableCount(Key key){unsigned k=(unsigned)key;return k>=EMPTY_VTABLE&&k<=BLANK_VTABLE?tables[k-EMPTY_VTABLE].count:0;}
+ static bool Check(bool gog,uintptr_t base,Reader read,void*ctx,bool installation) {
+  if(!base||!read)return false;unsigned p=gog?1:0;unsigned char bytes[32];
+  for(unsigned i=0;i<11;++i){if(installation&&(i==CAPTION||i==CONTEXT_SHOW))continue;
+   if(!read(ctx,code[i].rva[p],bytes,code[i].count)||memcmp(bytes,code[i].bytes[p],code[i].count))return false;}
+- for(unsigned t=0;t<3;++t)for(unsigned j=0;j<6;++j){uintptr_t v=0;
++ for(unsigned t=0;t<3;++t)for(unsigned j=0;j<tables[t].count;++j){uintptr_t v=0;
+   if(!read(ctx,tables[t].rva[p]-8+j*8,&v,8)||v<base||v-base!=tables[t].slots[p][j])return false;
+  }
+  return true;
+diff --git a/src/game/gog_jobs_profile.h b/src/game/gog_jobs_profile.h
+index b494211..98fb3fd 100644
+--- a/src/game/gog_jobs_profile.h
++++ b/src/game/gog_jobs_profile.h
+@@ -5,8 +5,10 @@ namespace JobsProfile {
+ enum Key { FACTORY,REGISTER_DATA,GET_DATA,CAPTION,CONTEXT_SHOW,ADD_REQUIREMENT,SET_PERMAJOB,TASK_KEY,SET_LOCATION,DEFAULT_SCORE,FACTORY_DISPATCH,EMPTY_VTABLE,MOVE_VTABLE,BLANK_VTABLE,KEY_COUNT };
+ typedef bool (*Reader)(void*,uintptr_t,void*,size_t);
+ // Caller has already verified the selected executable with NativeProfile.
+-// Startup-only; all physical code bytes and six vtable entries are checked.
++// Startup-only; all physical code bytes and complete class-specific vtable entries are checked.
+ uintptr_t Rva(bool gog,Key key);
++// Includes the RTTI locator: Empty=7, Move=8, Blank=6.
++unsigned TableCount(Key key);
+ bool Validate(bool gog,uintptr_t base,Reader reader,void*ctx);
+ // Caption/context may already hold our admitted detours at install time.
+ bool ValidateForInstall(bool gog,uintptr_t base,Reader reader,void*ctx);
+diff --git a/src/jobs/steel_jobs_factory.cpp b/src/jobs/steel_jobs_factory.cpp
+index e96e14e..d06a855 100644
+--- a/src/jobs/steel_jobs_factory.cpp
++++ b/src/jobs/steel_jobs_factory.cpp
+@@ -21,7 +21,7 @@ static_assert(offsetof(TaskData,hasAction)==0x134,"TaskData action layout");
+ static_assert(sizeof(TaskStateData)==8,"Native state record layout");
+ namespace keo_jobs {
+ namespace {
+-struct Slot {int type;TaskData*data;uintptr_t table;void*privateTable[6];FactoryBody body,nativeBody;volatile LONG configured,faultReported;};
++struct Slot {int type;TaskData*data;uintptr_t table;void*privateTable[9];FactoryBody body,nativeBody;volatile LONG configured,faultReported;};
+ static Slot slots[3];static uintptr_t base=0;static bool gog=false,prepared=false,installed=false;
+ static void(*logger)(const char*)=0;
+ typedef Tasker*(*CreateFn)(void*,int,const hand&,int,float,Ogre::Vector3,int,int);
+@@ -101,7 +101,7 @@ bool InitializeFactory(uintptr_t imageBase,const FactoryCallbacks&cb,void(*log)(
+  const JobsProfile::Key keys[3]={JobsProfile::EMPTY_VTABLE,JobsProfile::MOVE_VTABLE,JobsProfile::BLANK_VTABLE};
+  const FactoryBody bodies[3]={cb.gather,cb.waypoint,cb.stock};
+  for(unsigned i=0;i<3;++i){slots[i].type=291+i;slots[i].table=Address(keys[i]);slots[i].body=bodies[i];
+-  memcpy(slots[i].privateTable,(const void*)(slots[i].table-8),sizeof(slots[i].privateTable));
++  memcpy(slots[i].privateTable,(const void*)(slots[i].table-8),JobsProfile::TableCount(keys[i])*sizeof(void*));
+   slots[i].nativeBody=(FactoryBody)slots[i].privateTable[3];slots[i].privateTable[3]=(void*)bodies[i];}
+  prepared=true;return true;
+ }
 -- 
 2.46.0.windows.1
 

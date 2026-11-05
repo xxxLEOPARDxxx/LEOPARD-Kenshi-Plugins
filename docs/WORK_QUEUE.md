@@ -15,20 +15,16 @@ Always check the actual process immediately before replacing a loaded DLL.
    is only a tested prerequisite. No public release/personal changelog entry.
 
 2. **KEO — ACTIVE PRIMARY TASK, refined by user2026-11-05.**
-   LATEST05Nov05:19: installed corrected private DLL3BEEF25D, source869b571.
-   Initial MCM-visible candidate refused registration because StackSort/Rotate/
-   KEP hooks changed four checked entries; c6802ea admits exact audited chains
-   while retaining six native guards and zero hot file/module queries.
-   Next actual launch exposed a second lifecycle error: title-screen registration
-   required world-only native templates. Fixed with early task identity/factory
-   registration and once-only template publication after load or first saved
-   custom-task construction; no native calls/logger under publication lock.
-   Fresh170factory+319runtime controls, DEV/PROD builds/imports and independent
-   review pass. All four personal configuration files preserved. Actual Steam
-   PID10344 (05:20) loaded exact3BEEF25D: metadata registered17.697s and all
-   three native task types ready43.803s, no registration error. User checking
-   cyclic route and physical machine/counter actions; gameplay/FPS/save-load
-   acceptance remains pending.
+   LATEST05Nov05:37: installed private DLL5E01E06E, sourceb59ab75.
+   Registration is now confirmed in realSteam10344, but actual waypoint testing
+   exposed STACK_OVERFLOW in native Move.runAction3545C6. The copied vtable
+   omitted derived virtuals: slot6 aliased the adjacent nativeBody and recursed.
+   Corrected exact class extents (COL+entries7/8/6, storage9), verified all slots
+   against both EXEs. 188factory/123profile controls and old6entryRED pass;
+   DEV/PROD build and independent review clear. All personal settings preserved.
+   User asked to repeat two waypoints; corrected gameplay acceptance pending.
+   Counter hold-RMB command exists/adds; no physical delivery acceptance yet.
+   User does not personally need those production jobs; keep optional/defaultOFF.
    Previous04:39: three Steel jobs IMPLEMENTED and INSTALLED LOCALLY in a
    private candidate. Source ac2c92e7 (after770f8d2 integration and2bf6df9 SDK fix),
    PROD abf949c03c829dd23a737e41286293cc6cfb3009e9bb168caa863d4c9789db20.
