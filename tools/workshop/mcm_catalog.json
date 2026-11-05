@@ -162,7 +162,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "13"
   },
   {
     "package": "MultiXPMining",
