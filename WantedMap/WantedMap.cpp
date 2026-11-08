@@ -314,6 +314,23 @@ namespace
         return false;
     }
 
+    // Разделитель «Префикс: имя» у листовок: ASCII ':' либо полноширинное
+    // двоеточие U+FF1A из китайской локали (в UTF-8 это EF BC 9A).
+    std::string::size_type FindTitleColon(const std::string& name, size_t* colonBytes)
+    {
+        const std::string::size_type ascii = name.find(':');
+        const std::string::size_type wide = name.find("\xEF\xBC\x9A");
+        if (ascii == std::string::npos && wide == std::string::npos)
+            return std::string::npos;
+        if (wide == std::string::npos || (ascii != std::string::npos && ascii < wide))
+        {
+            *colonBytes = 1;
+            return ascii;
+        }
+        *colonBytes = 3;
+        return wide;
+    }
+
     std::string ModOf(const std::string& sid)
     {
         const std::string::size_type d = sid.find('-');
@@ -417,14 +434,15 @@ namespace
             GameData* const d = items[i];
             if (d == NULL || IntField(d, "item function", 0) != ITEM_BOOK)
                 continue;
-            const std::string::size_type colon = d->name.find(':');
+            size_t colonBytes = 0;
+            const std::string::size_type colon = FindTitleColon(d->name, &colonBytes);
             if (colon == std::string::npos)
                 continue;
             books.push_back(d);
             const std::wstring prefix = Lower(Wide(d->name.substr(0, colon)));
             if (overrides.count(d->stringID))
                 prefixVotes[prefix] += 2;
-            else if (byName.count(Lower(Wide(d->name.substr(colon + 1)))))
+            else if (byName.count(Lower(Wide(d->name.substr(colon + colonBytes)))))
                 prefixVotes[prefix] += 1;
         }
 
@@ -432,7 +450,8 @@ namespace
         for (size_t i = 0; i < books.size(); ++i)
         {
             GameData* const d = books[i];
-            const std::string::size_type colon = d->name.find(':');
+            size_t colonBytes = 0;
+            const std::string::size_type colon = FindTitleColon(d->name, &colonBytes);
             const bool posterPrefix = prefixVotes[Lower(Wide(d->name.substr(0, colon)))] >= 2;
             std::vector<std::string> hits;
 
@@ -442,7 +461,7 @@ namespace
                 hits = ov->second;
                 ++byOverride;
             }
-            const std::wstring target = Lower(Wide(d->name.substr(colon + 1)));
+            const std::wstring target = Lower(Wide(d->name.substr(colon + colonBytes)));
             if (hits.empty())
             {
                 std::map<std::wstring, std::vector<std::string> >::const_iterator n = byName.find(target);
@@ -802,8 +821,9 @@ namespace
 
     std::string StripPrefix(const std::string& name)
     {
-        const std::string::size_type colon = name.find(':');
-        std::string s = colon == std::string::npos ? name : name.substr(colon + 1);
+        size_t colonBytes = 0;
+        const std::string::size_type colon = FindTitleColon(name, &colonBytes);
+        std::string s = colon == std::string::npos ? name : name.substr(colon + colonBytes);
         while (!s.empty() && s[0] == ' ')
             s.erase(0, 1);
         return s;
