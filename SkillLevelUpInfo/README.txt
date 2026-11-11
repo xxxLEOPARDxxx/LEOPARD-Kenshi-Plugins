@@ -67,7 +67,8 @@ This plugin observes resulting base skill gains without changing XP formulas.
 
 All original skill enums are covered: 34 distinct supported base fields on
 Steam 1.0.65, including hidden MassCombat. HiveMedic/Vet alias Medic; the unused
-Survival dummy is excluded. Equipment/injury modifiers are excluded. A native stat
+Survival dummy is excluded. Equipment, injury and age modifiers are excluded.
+Both polling and the XP hook read the same raw skill field. A native stat
 reference index filters unrelated increaseStat events before formatting or
 allocating. Worker hooks update only scalar accumulators. Native Character,
 MyGUI and Ogre operations stay on the GUI thread. A 250ms baseline fallback
@@ -137,7 +138,8 @@ SelectedOnly ограничивает надписи; исходные знач�
 
 Полный набор оригинальных навыков: 34 различных базовых поля Steam 1.0.65,
 включая скрытый MassCombat. HiveMedic/Vet используют поле медицины, пустышка
-Survival исключается. Бонусы экипировки и ранений не учитываются. Индекс полей
+Survival исключается. Экипировка, ранения и возраст не влияют на расчёт опыта.
+Опрос и перехват прибавок читают одно базовое поле навыка. Индекс полей
 своих героев отсекает чужие increaseStat до текста и выделения памяти.
 Рабочие потоки меняют только накопители. Character/MyGUI/Ogre используются
 в потоке GUI. Запасной опрос раз в 250мс учитывает прибавки вне хука без

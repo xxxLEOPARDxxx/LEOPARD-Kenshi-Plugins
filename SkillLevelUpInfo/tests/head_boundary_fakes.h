@@ -13,7 +13,8 @@ DWORD fakeNow=10000;
 DWORD ProbeTick(){return fakeNow;}
 #define GetTickCount ProbeTick
 void DebugLog(const std::string&){}
-const char* Tr(const char* s){return s;}
+bool translateMassCombat=false;
+const char* Tr(const char* s){return translateMassCombat && std::string(s)=="Mass combat"?"Localized mass combat":s;}
 namespace PluginDiagnostics {bool enabled=false;bool Enabled(){return enabled;}void Write(const char*){}void Configure(const char*,const std::string&) {}}
 namespace MyGUI {struct Colour {float r,g,b;Colour(float a,float c,float d):r(a),g(c),b(d){}};}
 class Character;
@@ -31,9 +32,9 @@ struct hand {
 template<class T>struct lektor:std::vector<T>{};
 typedef int StatsEnumerated;
 struct CharStats {
- float value;Character* me;float refs[64];int firstRef,alias[64],unsupported;bool independent;
- CharStats():value(1.5f),me(NULL),firstRef(-1),unsupported(-1),independent(false){for(int i=0;i<64;++i){refs[i]=0;alias[i]=-1;}}
- float getStat(int index,bool base){if(!base)abort();return independent?getStatRef(index):value;}
+ float value;Character* me;float refs[64];int firstRef,alias[64],unsupported;float displayMultiplier;
+ CharStats():value(1.5f),me(NULL),firstRef(-1),unsupported(-1),displayMultiplier(1){for(int i=0;i<64;++i){refs[i]=0;alias[i]=-1;}}
+ float getStat(int index,bool base){if(!base)abort();return getStatRef(index)*(index==firstRef?displayMultiplier:1);}
  float& getStatRef(int index){static float outside=0;if(index==unsupported)return outside;if(alias[index]>=0)index=alias[index];if(firstRef<0)firstRef=index;return index==firstRef?value:refs[index];}
 };
 struct Character {
@@ -72,6 +73,15 @@ struct ForgottenGUI {
  }
 };
 ForgottenGUI*gui=NULL;
-struct CharacterStatsWindow {struct Stat {std::string name;};static Stat*getStat(int){return NULL;}};
+struct CharacterStatsWindow {
+ struct Stat {std::string name;};
+ static int nativeNameIndex;
+ static Stat*getStat(int index){
+  static Stat english;
+  english.name="Mass combat";
+  return index==nativeNameIndex?&english:NULL;
+ }
+};
+int CharacterStatsWindow::nativeNameIndex=-1;
 int failures=0;
 void check(bool ok,const char*description){printf("%s %s\n",ok?"PASS":"FAIL",description);if(!ok)++failures;}

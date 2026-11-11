@@ -146,6 +146,8 @@ namespace
     }
     std::string Name(size_t index)
     {
+        // The base-game Russian catalogue no longer translates this hidden stat.
+        if (kStats[index] == STAT_MASSCOMBAT) return Tr(kStatNames[index]);
         CharacterStatsWindow::Stat* const s = CharacterStatsWindow::getStat(kStats[index]);
         return s != NULL && !s->name.empty() ? s->name : Tr(kStatNames[index]);
     }
@@ -261,10 +263,13 @@ namespace
                     std::map<float*,Binding>::iterator registration=g_index.find(ref);
                     if(state.refs[j]!=ref || registration==g_index.end() || registration->second.owner!=&state || registration->second.statIndex!=j){
                         RemoveRef(state.refs[j],&state.skills[j]);
+                        state.skills[j]=XpInfoCore::Skill();
                         state.refs[j]=ref;g_index[ref]=Binding(&state,j,++g_nextBindingToken);
                     }
                     XpInfoCore::Skill& s=state.skills[j];
-                    s.Observe(stats->getStat(kStats[j],true),now);
+                    // increaseStat writes this raw field. Even getStat(true) applies
+                    // ageMult to Strength and Dexterity, so polling it would mix scales.
+                    s.Observe(*ref,now);
                     if(s.pending>0)state.pending=true;
                 }
             }

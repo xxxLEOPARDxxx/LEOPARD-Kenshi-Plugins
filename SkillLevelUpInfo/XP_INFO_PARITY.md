@@ -21,7 +21,7 @@ Original DLL SHA-256: `7d76575c0e167e96d219a02c4ee069c92abb69f690b08d96f38cf6f22
 | Level-up text | `%s %d`, positive integer-level crossings | Immediate final reached level; crossing suppresses fractional text for that event |
 | Merging | Per-character maps, four lines then `\n+%d more` | Separate gain and level labels, four lines then localized original remainder summary |
 | Appearance | Level gold `(1,.84,.35)` medium; XP blue `(.62,.86,1)` small; native RS_NORMAL | Same colors/sizes/rise/fade; preserve accepted current model-relative placement |
-| XP accumulation | Original RVA 13b0/1de0, 120-second stale pending expiry | Hook real increaseStat; native baseline polling fallback; no XP formula replacement |
+| XP accumulation | Original RVA 13b0/1de0, 120-second stale pending expiry | Hook real increaseStat; polling observes the same raw getStatRef; no XP formula replacement |
 | Stat coverage | Original RVA 15f0 indexes enums 1..38 except generic Weapons, checks CharStats bounds and deduplicates native refs | All 37 candidate enums; 34 distinct valid fields on Steam 1.0.65, including hidden MassCombat. HiveMedic/Vet alias Medic; Survival is a global dummy and excluded |
 | Panel | getGUIDataForMainInfo hook, native progress rows, divider | Recent skills under vanilla character stats, native progress widgets, divider, adaptive capacity |
 | Panel order | Stable slots; replacement only after old slot idle >5 seconds | Stable slots with same hold period and newest eligible skill replacement |

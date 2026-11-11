@@ -3,7 +3,7 @@ int main(){
  setvbuf(stdout,NULL,_IONBF,0);
  InitializeCriticalSection(&g_lock);XpPanelTextStyle::g_nativeProfile=true;g_uiThread=GetCurrentThreadId();g_origPanel=NoopPanel;
  PlayerInterface player;GameWorld world;world.player=&player;ou=&world;ForgottenGUI ui;gui=&ui;
- Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;Scan();
+ Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;c.stats.getStatRef(STAT_TOUGHNESS)+=.03f;Scan();
  DatapanelGUI panel;panel.Vanilla(10);panel.Vanilla(30);Panel(&c.stats,&panel,0,false);
  check(g_slots.count==2&&panel.named.size()==2,"recent training creates at most configured native rows");
  DataPanelLine_Progress*row=static_cast<DataPanelLine_Progress*>(panel.getLine(SlotKey(0),0));
@@ -41,7 +41,7 @@ int main(){
  DataPanelLine_Progress*second=shuffled.lineExists(SlotKey(1),0)?static_cast<DataPanelLine_Progress*>(shuffled.getLine(SlotKey(1),0)):NULL;
  check(second&&second->progress->getBottom()<=160,"second recent skill fits actual native viewport after unordered vanilla rows");
  // Slow XP at level86 must activate a row before the1percent announcement threshold.
- Reset();player.playerCharacters.clear();Character runner;runner.stats.independent=true;runner.stats.firstRef=1000;
+ Reset();player.playerCharacters.clear();Character runner;runner.stats.firstRef=1000;
  runner.stats.refs[STAT_ATHLETICS]=86.911f;player.playerCharacters.push_back(&runner);Scan();
  runner.stats.refs[STAT_ATHLETICS]+=0.00000762939453125f;Scan();Panel(&runner.stats,&shuffled,0,false);
  Snapshot&runState=g_seen[hand(&runner)];
@@ -52,7 +52,7 @@ int main(){
        "slow-XP row survives300 unchanged refreshes instead of depending on another XP gain");
  // Two same-named characters have distinct hand identities and per-skill baselines.
  Character robotA,robotB;robotA.displayName=robotB.displayName="same robot";
- robotA.stats.independent=robotB.stats.independent=true;robotA.stats.firstRef=robotB.stats.firstRef=1000;
+ robotA.stats.firstRef=robotB.stats.firstRef=1000;
  player.playerCharacters.push_back(&robotA);player.playerCharacters.push_back(&robotB);Scan();
  robotA.stats.refs[STAT_DEXTERITY]=81.138f;robotA.stats.refs[STAT_MARTIALARTS]=66.031f;
  robotB.stats.refs[STAT_DEXTERITY]=81.117f;robotB.stats.refs[STAT_MARTIALARTS]=65.999f;Scan();

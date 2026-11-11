@@ -26,7 +26,7 @@ int GeometryWrites(DatapanelGUI& panel){
 int main(){
  InitializeCriticalSection(&g_lock);XpPanelTextStyle::g_nativeProfile=true;g_uiThread=GetCurrentThreadId();g_origPanel=NoopPanel;
  PlayerInterface player;GameWorld world;world.player=&player;ou=&world;ForgottenGUI ui;gui=&ui;
- Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;Scan();
+ Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;c.stats.getStatRef(STAT_TOUGHNESS)+=.03f;Scan();
  for(size_t profile=0;profile<sizeof(profiles)/sizeof(profiles[0]);++profile){
   const UiProfile&p=profiles[profile];printf("PROFILE %s\n",p.name);MyGUI::vanillaUiProfile=p.stock;
   DatapanelGUI&panel=*new DatapanelGUI;panel.root.coord=MyGUI::IntCoord(0,0,p.width,p.height);

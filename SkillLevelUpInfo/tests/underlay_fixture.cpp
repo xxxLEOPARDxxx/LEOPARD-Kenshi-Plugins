@@ -15,7 +15,7 @@ void UnderlayRow(DatapanelGUI&panel,int y){
 }
 int main(){
  InitializeCriticalSection(&g_lock);XpPanelTextStyle::g_nativeProfile=true;g_uiThread=GetCurrentThreadId();g_origPanel=NoopPanel;MyGUI::vanillaUiProfile=true;
- PlayerInterface player;GameWorld world;world.player=&player;ou=&world;ForgottenGUI ui;gui=&ui;Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;Scan();
+ PlayerInterface player;GameWorld world;world.player=&player;ou=&world;ForgottenGUI ui;gui=&ui;Character c;player.playerCharacters.push_back(&c);Scan();c.stats.value+=.03f;c.stats.getStatRef(STAT_TOUGHNESS)+=.03f;Scan();
  MyGUI::ResourceSkin stock;stock.texture="Kenshi_UI.png";stock.basis.push_back(MyGUI::SubWidgetInfo());MyGUI::SubSkinStateInfo normal;
  normal.rect=MyGUI::FloatRect(0,907.f/1080,240.f/1920,1072.f/1080);stock.states["normal"].push_back(&normal);MyGUI::ResourceManager::getInstancePtr()->skin=&stock;
  MyGUI::Widget bg;bg.coord=MyGUI::IntCoord(0,1228,324,219);bg.textureName="Kenshi_UI.png";MyGUI::SubSkin main;main.coord=MyGUI::IntCoord(0,0,324,219);bg.mainSkin=&main;

@@ -15,7 +15,7 @@ int main(){
  fakeNow=15001;Increase(c.stats.value,1,100);Update(&ui);check(labels>0&&lastGold,"level crossing emits next GUI update without a polling delay");
  Reset();labels=0;g_emit=1000;fakeNow=20000;Update(&ui);Increase(c.stats.value,.02f,100);fakeNow=23000;Update(&ui);
  check(labels>0,"pending XP survives a3-second GUI gap");check(g_seen.begin()->second.skills[0].active,"120-second recent activity survives a3-second GUI gap");
- Reset();fakeNow=30000;Scan();c.stats.value+=.03f;Scan();DatapanelGUI panel;MyGUI::Widget viewport;viewport.coord.height=75;panel.Vanilla(10);panel.Vanilla(30);
+ Reset();fakeNow=30000;Scan();c.stats.value+=.03f;c.stats.getStatRef(STAT_TOUGHNESS)+=.03f;Scan();DatapanelGUI panel;MyGUI::Widget viewport;viewport.coord.height=75;panel.Vanilla(10);panel.Vanilla(30);
  for(size_t i=0;i<panel.lines.size();++i)panel.lines[i]->w1->parent=panel.lines[i]->w2->parent=&viewport;
  Panel(&c.stats,&panel,0,false);
  check(g_slots.count==2,"nested75px viewport bounds the reversible native reflow independently of300px outer window");
