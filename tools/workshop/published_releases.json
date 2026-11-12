@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-05",
+  "date": "2026-11-12",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -39,7 +39,7 @@
     "SkillLevelUpInfo": {
       "nexus": 2257,
       "workshop_id": 3829848328,
-      "version": "3"
+      "version": "4"
     },
     "MultiXPMining": {
       "nexus": 2258,
@@ -54,7 +54,7 @@
     "KenshiRotate": {
       "nexus": 2260,
       "workshop_id": 3829848534,
-      "version": "2"
+      "version": "3"
     },
     "KillCounter": {
       "nexus": 2261,
@@ -69,7 +69,7 @@
     "Character-Highlight": {
       "nexus": 2233,
       "workshop_id": 3820546396,
-      "version": "3"
+      "version": "4"
     },
     "Container-Highlight": {
       "nexus": 2207,
@@ -99,7 +99,7 @@
     "Loot-Scoot-Execute": {
       "nexus": 2210,
       "workshop_id": 3813852124,
-      "version": "6"
+      "version": "7"
     },
     "Map-markers": {
       "nexus": 2211,
@@ -130,7 +130,7 @@
     "Vital-Sense": {
       "nexus": 2214,
       "workshop_id": 3813852288,
-      "version": "7"
+      "version": "8"
     },
     "Wall-B-Gone": {
       "nexus": 2215,
@@ -207,12 +207,12 @@
     "WantedMap": {
       "nexus": 2203,
       "workshop_id": 3813761812,
-      "version": "7"
+      "version": "8"
     },
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "1"
+      "version": "2"
     }
   }
 }
