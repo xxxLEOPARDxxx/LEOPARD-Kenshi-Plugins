@@ -50,6 +50,25 @@ int main()
         Check(AboveGateDeck(281.3f,168.1f,207.6f), "live unsupported buyer is high above the lower gate platform");
         Check(!AboveGateDeck(207.8f,168.1f,207.6f), "actor already on the gate platform is excluded");
         Check(!AboveGateDeck(340.0f,168.1f,207.6f), "unsupported recovery cannot drop from arbitrarily high above terrain");
+        Observation guard;
+        for (unsigned i=0; i<=16; ++i)
+            Check(!guard.SampleGuard(at, 30.0+i*.25, 1000+i*1000, false, false), "a guard at a valid post does not start recovery");
+        Check(!guard.SampleGuard(at, 35.0, 20000, true, false), "an outstanding path request starts observation but does not prove failure");
+        for (unsigned i=1; i<16; ++i)
+            Check(!guard.SampleGuard(at, 35.0+i*.25, 20000+i*1000, i%4<=1, i%4==1), "post and no-goal cycles preserve but do not shorten the four-hour wait");
+        Check(guard.SampleGuard(at, 39.0, 36000, true, false), "fresh failure survives a resumed guard request after four stationary hours");
+        Check(!guard.SampleGuard(at, 39.5, 37000, false, false), "old failure cannot move a guard who has returned to a post");
+        Check(!guard.SampleGuard(AIFixedGate::Point(106,200,300), 39.75, 38000, false, true), "movement discards stale failed guard intent");
+        Observation staleGuard;
+        Check(!staleGuard.SampleGuard(at, 40.0, 40000, true, true), "an active failed guard request starts its own four-hour watch");
+        for (unsigned i=1; i<=20; ++i)
+            Check(!staleGuard.SampleGuard(at, 40.0+i*.25, 40000+i*1000, false, true),
+                "a stale failed path retained during no-goal idle never renews failure evidence");
+        Check(staleGuard.guardFailure==40.0, "no-goal samples preserve the original failure timestamp");
+        const AIFixedGate::Point slope(-.8357f,.5356f,-.1212f);
+        Check(GuardLeavesSlope(at,AIFixedGate::Point(88,82,297),slope), "a downhill landing leaves the observed platform slope");
+        Check(!GuardLeavesSlope(at,AIFixedGate::Point(112,82,303),slope), "an uphill landing cannot move through a platform");
+        Check(!GuardLeavesSlope(at,AIFixedGate::Point(88,82,297),AIFixedGate::Point(0,1,0)), "ordinary level guard posts are never eligible");
         Check(LeavesSupportingWall(8.9f, -14.4f, -1.0f, true), "wall top can drop to confirmed exterior");
         Check(!LeavesSupportingWall(8.9f, -14.4f, -1.0f, false), "no cross-wall landing without exterior proof");
         Check(!LeavesSupportingWall(-8.9f, 14.4f, -1.0f, true), "never drop from wall top into enclosure");

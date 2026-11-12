@@ -101,6 +101,11 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     застревание по коллизии даже при потере опоры в данных движения. Выход
     сохраняет сторону ворот и область навмеша. Пробы при наличии лица навмеша
     ограничены одной в секунду отдельно от обычной проверки вне навмеша.
+    Стражник, у которого срываются попытки пройти к посту, может спуститься с
+    крутого склона платформы на свободную сушу в той же загруженной зоне,
+    без пересечения стен и закрытых ворот. Для спуска нужны четыре часа
+    без продвижения, подтверждённая коллизия склона и недавний отказ пути
+    при активной задаче поста или городского патруля.
   * SleepFix.dll/GateFix.dll подавляют соответствующую автоматику AI Fixed
     для исключения конкурирующих приказов. Не используйте две реализации
     одной механики. Gate Push Guard исправляет другой случай: выталкивание
@@ -161,6 +166,11 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     elevated entrapment after a load loses the standing support handle. The
     landing must stay on the same side and navmesh region. Valid-face probes
     are limited to one per second independently of ordinary off-mesh recovery.
+    Guards repeatedly failing to reach their posts can leave a steep platform
+    slope for clear, dry ground in the same loaded zone while preserving wall
+    and closed-gate boundaries. Recovery requires four hours without progress,
+    confirmation of the slope by collision and a recent path failure during
+    an active guard-post or town-patrol task.
   * Original SleepFix.dll/GateFix.dll suppress the corresponding AI Fixed
     automation to avoid competing orders. Do not combine both implementations.
     Gate Push Guard handles pushing through closed gates, a different feature.

@@ -9,11 +9,11 @@ namespace AIFixedUnstuck
     struct Observation
     {
         Point anchor;
-        double since, previous, nextProbe;
+        double since, previous, nextProbe, guardFailure;
         unsigned sampledAt;
         bool active;
 
-        Observation():since(0),previous(0),nextProbe(0),sampledAt(0),active(false){}
+        Observation():since(0),previous(0),nextProbe(0),guardFailure(0),sampledAt(0),active(false){}
 
         bool Sample(const Point& position,double hours,unsigned now)
         {
@@ -30,11 +30,27 @@ namespace AIFixedUnstuck
                 anchor=position;
                 since=hours;
                 nextProbe=hours+4.0;
+                guardFailure=hours-2.0;
                 active=true;
             }
             previous=hours;
             sampledAt=now;
             return hours>=nextProbe;
+        }
+
+        bool SampleGuard(const Point& position,double hours,unsigned now,bool startsAttempt,bool failed)
+        {
+            if (!active && !startsAttempt) return false;
+            const bool continued=active;
+            const double started=since;
+            const bool due=Sample(position,hours,now);
+            if (!active || ((!continued || since!=started) && !startsAttempt))
+            {
+                active=false;
+                return false;
+            }
+            if (startsAttempt && failed) guardFailure=hours;
+            return due && guardFailure>=since && hours-guardFailure<=1.0;
         }
 
         void Probed(bool exhausted) { nextProbe=previous+(exhausted?.75:.05); }
@@ -71,6 +87,17 @@ namespace AIFixedUnstuck
         return _finite(height) && _finite(ground) && _finite(deck) &&
             height-ground>=WorldUnits(5.0f) && height-ground<=WorldUnits(14.0f) &&
             height-deck>=WorldUnits(5.0f);
+    }
+
+    inline bool IsSteepGuardSlope(const Point& normal)
+    {
+        return AIFixedGate::Finite(normal) && normal.y>=.2f && normal.y<=.60f;
+    }
+
+    inline bool GuardLeavesSlope(const Point& from,const Point& to,const Point& normal)
+    {
+        return AIFixedGate::Finite(from) && AIFixedGate::Finite(to) && IsSteepGuardSlope(normal) &&
+            (to.x-from.x)*normal.x+(to.z-from.z)*normal.z>=WorldUnits(.2f);
     }
 
     inline bool LeavesSupportingWall(float from,float to,float outsideSide,bool exteriorConfirmed)

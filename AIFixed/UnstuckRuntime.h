@@ -37,7 +37,8 @@ namespace Unstuck
         AIFixedGate::Point destination;
         AIFixedUnstuck::Observation watch;
         unsigned probeSite;
-        History():goal(NULL_TASK),probeSite(0){}
+        bool guard;
+        History():goal(NULL_TASK),probeSite(0),guard(false){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -193,12 +194,18 @@ namespace Unstuck
                 PathBlocked(leader->movement->havokCharacter,true));
     }
 
-    bool ReadIntent(Character* c,CharMovement* movement,TaskType& task,Identity& subject,
-                    AIFixedGate::Point& destination)
+    const TaskMatch* CurrentGoal(Character* c)
     {
         const OrdersReceiver* orders=c->getOrdersReciever();
-        const TaskMatch* goal=orders?&orders->getCurrentGoal():NULL;
-        task=goal && goal->taskData ? goal->key() : NULL_TASK;
+        return orders?&orders->getCurrentGoal():NULL;
+    }
+
+    TaskType GoalTask(const TaskMatch* goal)
+    { return goal && goal->taskData ? goal->key() : NULL_TASK; }
+
+    bool ReadIntent(Character* c,CharMovement* movement,const TaskMatch* goal,TaskType task,
+                    Identity& subject,AIFixedGate::Point& destination)
+    {
         if (task==NULL_TASK || task==IDLE)
         {
             // The engine can cancel an order while the NPC is inside solid rock.
@@ -226,6 +233,36 @@ namespace Unstuck
         }
         return !reached && AIFixedGate::Finite(destination) &&
             AIFixedGate::DistanceSq(Point(here),destination)>=400.0f;
+    }
+
+    Building* ReadGuardCycle(Character* c,CharMovement* movement,TaskType task,bool tracked,
+                            bool& attempt,bool& failed)
+    {
+        const bool guardTask=task==STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE || task==PATROL_TOWN;
+        if (!guardTask && !(tracked && (task==NULL_TASK || task==IDLE))) return NULL;
+        HavokCharacter* navigation=movement->havokCharacter;
+        const HavokCharacter::CharacterState state=navigation->getState();
+        if (state!=HavokCharacter::IDLE) return NULL;
+        const HavokCharacter::PathState path=navigation->getPathState();
+        if (!tracked && path!=HavokCharacter::WAITING && path!=HavokCharacter::FAILED &&
+            path!=HavokCharacter::BROKEN && path!=HavokCharacter::INCOMPLETE) return NULL;
+        Building* support=movement->isStandingOnSomething().getBuilding();
+        if (!support || support->getSpecialFunction()!=BF_FLUFF || support->isDisabled() ||
+            !support->_buildState.isComplete || c->isAnimal()) return NULL;
+
+        // The movement request may reset to the feet before the asynchronous
+        // failure arrives. The native Havok goal still identifies that path.
+        // Both vectors share the same space, with one Havok unit per metre.
+        const float* dest=navigation->goal.m_quad.m128_f32;
+        const float* here=navigation->position.m_quad.m128_f32;
+        const AIFixedGate::Point delta(dest[0]-here[0],dest[1]-here[1],dest[2]-here[2]);
+        const bool away=AIFixedGate::Finite(delta) &&
+            AIFixedGate::DistanceSq(delta,AIFixedGate::Point())>=4.0f;
+        failed=guardTask && away &&
+            (path==HavokCharacter::FAILED || path==HavokCharacter::BROKEN || path==HavokCharacter::INCOMPLETE);
+        attempt=guardTask && (failed || (away && path==HavokCharacter::WAITING));
+        if (guardTask && !attempt) return NULL;
+        return tracked || attempt ? support : NULL;
     }
 
     bool SameIntent(const History& entry,TaskType task,const Identity& subject,const AIFixedGate::Point& destination)
@@ -451,8 +488,19 @@ namespace Unstuck
         return !solid.traceWasAborted() && !solid.hit;
     }
 
+    bool ReadPlatformSlope(Building* support,const Ogre::Vector3& here,AIFixedGate::Point& normal)
+    {
+        physHit footing(false,true,here.y);
+        UtilityT::sphereTrace(footing,here+Ogre::Vector3(0,6,0),Ogre::Vector3(0,-12,0),.75f,~0u,true);
+        if (footing.traceWasAborted() || !footing.hit || footing.getBuilding()!=support ||
+            !AIFixedGate::Finite(Point(footing.position)) || std::fabs(footing.position.y-here.y)>5.0f)
+            return false;
+        normal=Point(footing.normal);
+        return AIFixedUnstuck::IsSteepGuardSlope(normal);
+    }
+
     bool FindLanding(GameWorld* world,Character* actor,Building* support,const Ogre::Vector3& here,
-                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount)
+                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard)
     {
         NavMesh* nav=world->navmesh;
         ZoneMap* zone=world->zoneMgr?world->zoneMgr->getZoneMap(here):NULL;
@@ -462,6 +510,8 @@ namespace Unstuck
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
         if (!_finite(ground)) return false;
         if (here.y-ground<50.0f) support=NULL;
+        AIFixedGate::Point slope;
+        if (guard && (!support || !ReadPlatformSlope(support,here,slope))) return false;
         Building* inferredGate=!support && !movement->isStandingOnSomething()?FindElevatedGate(here,ground):NULL;
         if (inferredGate) support=inferredGate;
         const float maximumDrop=support?14.0f:8.0f;
@@ -490,10 +540,15 @@ namespace Unstuck
         static const float shifts[5][2]={{0,0},{offset,0},{-offset,0},{0,offset},{0,-offset}};
         Ogre::Vector3 below=embedded?rockExit:
             Ogre::Vector3(here.x+shifts[probeSite][0],ground,here.z+shifts[probeSite][1]);
+        if (guard && probeSite==0)
+        {
+            below.x+=55.0f*slope.x;
+            below.z+=55.0f*slope.z;
+        }
         if (world->zoneMgr->getZoneMap(below)!=zone) return false;
         below.y=UtilityT::getTerrainHeight(below.x,below.z);
         if (!_finite(below.y)) return false;
-        const float search=embedded?AIFixedGate::WorldUnits(1.0f):(probeSite==0?60.0f:30.0f);
+        const float search=embedded?AIFixedGate::WorldUnits(1.0f):(probeSite==0&&!guard?60.0f:30.0f);
         if (nav->getClosestExteriorPoint(below,search,clearance,landing)!=1 ||
             !AIFixedGate::Finite(Point(landing)) ||
             world->zoneMgr->getZoneMap(landing)!=zone || UtilityT::getPositionInWater(landing.x,landing.z))
@@ -516,6 +571,9 @@ namespace Unstuck
         if (!allowed || (embedded && !StandingSpaceClear(landing,clearance,80.0f))) return false;
         const int destinationGate=nav->getGateCode(landing);
         if (destinationGate<0) return false;
+        if (guard && (destinationGate!=nav->getGateCode(here) ||
+            !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope) ||
+            !StandingSpaceClear(landing,clearance,here.y-landing.y+clearance))) return false;
         if (inferredGate)
         {
             DoorStuff* door=inferredGate->getDoor();
@@ -534,7 +592,7 @@ namespace Unstuck
                 ? actor->amInsideTownWalls() : nav->getGateCode(here);
             if (destinationGate!=sourceGate) return false;
         }
-        return !CrossesBarrier(world,here,landing,support,destinationGate==0) && zone->isLoadedMT() &&
+        return !CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0) && zone->isLoadedMT() &&
             !zone->isBeingLoadedMT() && nav->isLoaded(zone);
     }
 
@@ -556,7 +614,22 @@ namespace Unstuck
         Identity subject;
         AIFixedGate::Point destination;
         if (!c || !(Identity(c->handle)==actor) || c->isPlayerCharacter() || !c->movement ||
-            !c->movement->havokCharacter || !ReadIntent(c,c->movement,task,subject,destination) ||
+            !c->movement->havokCharacter)
+        {
+            if (entry.actor==actor) entry.watch.active=false;
+            return;
+        }
+        const TaskMatch* goal=CurrentGoal(c);
+        task=GoalTask(goal);
+        bool attempt=false,failed=false;
+        Building* guard=ReadGuardCycle(c,c->movement,task,entry.actor==actor && entry.guard &&
+            entry.watch.active,attempt,failed);
+        if (guard)
+        {
+            task=STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE;
+            subject=Identity(guard->handle);
+        }
+        if ((!guard && !ReadIntent(c,c->movement,goal,task,subject,destination)) ||
             !CanTravel(c,c->movement,task))
         {
             if (entry.actor==actor) entry.watch.active=false;
@@ -564,21 +637,23 @@ namespace Unstuck
         }
         const Ogre::Vector3 here=c->getPosition();
         const AIFixedGate::Point position=Point(here);
-        if (!(entry.actor==actor) || !SameIntent(entry,task,subject,destination))
+        if (!(entry.actor==actor) || entry.guard!=(guard!=NULL) || !SameIntent(entry,task,subject,destination))
         {
             entry.watch.active=false;
             entry.actor=actor;
             entry.goal=task;
             entry.subject=subject;
             entry.destination=destination;
+            entry.guard=guard!=NULL;
         }
         const bool previouslyActive=entry.watch.active;
         const double priorStart=entry.watch.since;
-        const bool due=entry.watch.Sample(position,hours,activeMs);
+        const bool due=guard?entry.watch.SampleGuard(position,hours,activeMs,attempt,failed):
+            entry.watch.Sample(position,hours,activeMs);
         if (!previouslyActive || entry.watch.since!=priorStart) entry.probeSite=0;
         if (!due) return;
 
-        Building* support=BlockedSupport(c,c->movement,task,here);
+        Building* support=guard?guard:BlockedSupport(c,c->movement,task,here);
         // Keep the new valid-face collision probes from delaying the existing
         // off-mesh and fortification recovery slots in crowded settlements.
         const bool validFace=!support && NativePositionAgrees(c->movement->havokCharacter,here);
@@ -588,16 +663,27 @@ namespace Unstuck
         Ogre::Vector3 landing;
         const unsigned probeSite=entry.probeSite;
         unsigned siteCount=0;
-        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount);
+        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount,guard!=NULL);
         entry.probeSite=siteCount?(probeSite+1)%siteCount:0;
         entry.watch.Probed(entry.probeSite==0);
         if (!found) return;
         if (currentGeneration!=InterlockedCompareExchange(&g_loadGeneration,0,0) ||
             InterlockedCompareExchange(&g_loading,0,0) || world->isPaused() ||
             actor.Handle().getCharacter()!=c || !c->movement || !c->movement->havokCharacter ||
-            !ReadIntent(c,c->movement,task,subject,destination) || !CanTravel(c,c->movement,task) ||
-            !SameIntent(entry,task,subject,destination) ||
             AIFixedGate::DistanceSq(position,Point(c->getPosition()))>1.0f) return;
+        goal=CurrentGoal(c);
+        if (guard)
+        {
+            Building* current=ReadGuardCycle(c,c->movement,GoalTask(goal),true,attempt,failed);
+            if (!current || !(Identity(current->handle)==subject)) return;
+        }
+        else
+        {
+            task=GoalTask(goal);
+            if (!ReadIntent(c,c->movement,goal,task,subject,destination) ||
+                !SameIntent(entry,task,subject,destination)) return;
+        }
+        if (!CanTravel(c,c->movement,task)) return;
         entry.watch.active=false;
         c->teleport(landing);
         if (g_debug)
