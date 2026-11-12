@@ -18,15 +18,24 @@ namespace AIFixedGate
         const float dot=(p.x-(inside.x+outside.x)*.5f)*nx+(p.z-(inside.z+outside.z)*.5f)*nz;
         return dot>.1f?1:dot<-.1f?-1:0;
     }
-    inline bool Crosses(const Point& from,const Point& dest,const Point& inside,const Point& outside,float corridor)
+    inline bool Crosses(const Point& from,const Point& dest,const Point& inside,const Point& outside,float corridor,float* missSquared=0)
     {
         const int a=Side(from,inside,outside),b=Side(dest,inside,outside);
-        if(!a||!b||a==b||corridor<=0||!_finite(corridor)||std::fabs(from.y-inside.y)>8)return false;
+        if(!a||!b||a==b||corridor<=0||!_finite(corridor))return false;
         const float nx=outside.x-inside.x,nz=outside.z-inside.z;
         const float cx=(inside.x+outside.x)*.5f,cz=(inside.z+outside.z)*.5f;
         const float da=(from.x-cx)*nx+(from.z-cz)*nz,db=(dest.x-cx)*nx+(dest.z-cz)*nz;
         const float t=da/(da-db),x=from.x+(dest.x-from.x)*t-cx,z=from.z+(dest.z-from.z)*t-cz;
-        return _finite(t)&&x*x+z*z<=corridor*corridor;
+        const float miss=x*x+z*z;
+        const float y=from.y+(dest.y-from.y)*t;
+        if(!_finite(t)||!(miss<=corridor*corridor)||!(std::fabs(y-inside.y)<=8.0f))return false;
+        if(missSquared)*missSquared=miss;
+        return true;
+    }
+    inline bool ConnectsRegions(int source,int destination,int inside,int outside)
+    {
+        return source>=0 && destination>=0 && inside>=0 && outside>=0 && source!=destination &&
+            ((source==inside && destination==outside) || (source==outside && destination==inside));
     }
     inline bool Ready(unsigned now,unsigned lastInput,unsigned sampledAt,float movedSq)
     {return unsigned(now-lastInput)>=400&&unsigned(now-sampledAt)>=250&&movedSq<=.25f;}

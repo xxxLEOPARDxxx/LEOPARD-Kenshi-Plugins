@@ -52,6 +52,13 @@ namespace AIFixedUnstuck
             AIFixedGate::DistanceSq(origin,target)>=WorldUnits(.25f)*WorldUnits(.25f);
     }
 
+    inline bool EntersSolid(float distance,float normalAlongRay,float span)
+    {
+        const float margin=WorldUnits(.15f);
+        return _finite(distance) && _finite(normalAlongRay) &&
+            distance>=margin && distance<=span-margin && normalAlongRay<-.1f;
+    }
+
     inline bool LeavesSupportingWall(float from,float to,float outsideSide,bool exteriorConfirmed)
     {
         if (!_finite(from) || !_finite(to) || !_finite(outsideSide)) return false;

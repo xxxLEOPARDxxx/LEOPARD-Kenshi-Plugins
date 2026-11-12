@@ -4,8 +4,8 @@
 struct GateState
 {
     hand actor,gate,leaf;Ogre::Vector3 destination,sample;
-    DWORD created,inputAt,sampledAt,checkedAt,passedAt;
-    unsigned serial,doorSerial;int stage,startSide;bool wasLocked;
+    DWORD stageStartedAt,inputAt,sampledAt,checkedAt,passedAt;
+    unsigned serial,doorSerial;int stage,startSide,targetRegion;bool wasLocked,taskMissing;
 };
 typedef std::map<hand,GateState,HandIdentityLess> GateMap;
 GateMap g_gateStates;hand g_gateCursor;DWORD g_lastGateScan=0;unsigned g_gateQueryBudget=0;
@@ -111,10 +111,17 @@ Character* LiveGateActor(const hand& actor)
 DoorStuff* LiveGate(const GateState& state)
 {
     Building* b=state.gate.getBuilding();
-    if(!b||!SameIdentity(hand(b),state.gate)||b->getSpecialFunction()!=BF_GATE||!b->isGate())return NULL;
+    if(!b||!SameIdentity(hand(b),state.gate)||b->isDisabled()||b->getSpecialFunction()!=BF_GATE||!b->isGate())return NULL;
     DoorStuff* door=b->getDoor();
-    if(!door||!SameIdentity(hand(door),state.leaf)||!door->isSetupComplete||door->isBroken())return NULL;
+    if(!door||!SameIdentity(hand(door),state.leaf)||!door->isSetupComplete||door->isBroken()||
+       door->getFaction()!=b->getFaction())return NULL;
     return door;
+}
+bool GateDoorUnchanged(const GateState& state)
+{
+    IntentGuard guard;
+    GateDoorChanges::const_iterator changed=g_gateDoorChanges.find(state.leaf);
+    return changed!=g_gateDoorChanges.end()&&changed->second==state.doorSerial;
 }
 bool OwnOpenOrder(OrdersReceiver* orders,const GateState& state)
 {
@@ -146,90 +153,224 @@ void OwnLockGate(DoorStuff* door)
     const bool old=t_ownOrder;t_ownOrder=true;
     __try{door->lockDoor();}__finally{t_ownOrder=old;}
 }
+void RetireGateLock(const GateState& state)
+{
+    if(!state.wasLocked||!g_gateRelock||!GateDoorUnchanged(state))return;
+    DoorStuff* door=LiveGate(state);
+    if(!door||door->getFaction()!=ou->player->getFaction()||door->isLocked())return;
+    // Keep the original lock responsibility with any other active passage.
+    for(GateMap::iterator it=g_gateStates.begin();it!=g_gateStates.end();++it)
+    {
+        GateState& other=it->second;
+        if(&other==&state||!other.stage||other.doorSerial!=state.doorSerial||!SameIdentity(other.leaf,state.leaf))continue;
+        other.wasLocked=true;
+        return;
+    }
+    if(door->getDoorOpenAmount()<=.01f)OwnLockGate(door);
+}
+void SafeRetireGateLock(const GateState& state)
+{
+    __try{RetireGateLock(state);}
+    __except(NativeFaultFilter(GetExceptionCode()))
+    {ErrorLog("AIFixed: gate object invalidated during lock restoration");}
+}
 bool GateOccupied(DoorStuff* door)
 {
     if(!g_gateQueryBudget)return true;
     --g_gateQueryBudget;
+    const Ogre::Vector3 inside=door->getDoorPosInside(),outside=door->getDoorPosOutside();
+    const Ogre::Vector3 center=(inside+outside)*.5f;
+    const float x=outside.x-inside.x,z=outside.z-inside.z;
+    const float width=std::sqrt(x*x+z*z);
+    if(!_finite(width)||width<=1.0f)return true;
     lektor<RootObject*>& occupants=GateObjects();
-    ou->getObjectsWithinSphere(occupants,door->getDoorPosition(),8.0f,CHARACTER,128,NULL);
-    // Native ignores maxNumber. Any returned actor means occupied.
-    return occupants.size()!=0;
+    ou->getObjectsWithinSphere(occupants,center,AIFixedGate::WorldUnits(8.0f),CHARACTER,128,NULL);
+    if(occupants.size()>=128)return true;
+    for(unsigned i=0;i<occupants.size();++i)
+    {
+        Character* actor=static_cast<Character*>(occupants[i]);
+        if(!actor)continue;
+        const Ogre::Vector3 p=actor->getPosition()-center;
+        const float radius=actor->getRadius();
+        if(!AIFixedGate::Finite(GatePoint(p))||!_finite(radius)||radius<0)return true;
+        if(std::fabs(p.y)>AIFixedGate::WorldUnits(2.0f))continue;
+        if(std::fabs(p.x*x+p.z*z)<=width*(width*.5f+radius) &&
+           std::fabs(p.z*x-p.x*z)<=width*(AIFixedGate::WorldUnits(5.5f)+radius))return true;
+    }
+    return false;
+}
+
+DoorStuff* EligibleGate(Character* c,Building* b)
+{
+    if(!b||b->isDisabled()||b->getSpecialFunction()!=BF_GATE||!b->isGate()||b->getFaction()!=c->getFaction())return NULL;
+    DoorStuff* door=b->getDoor();
+    if(!door||!door->isSetupComplete||door->isBroken()||door->getDoorOpenAmount()>.05f||
+       (door->isLocked()&&!g_gateUnlock))return NULL;
+    return door;
+}
+bool GateConnects(Building* gate,DoorStuff* door,int source,int destination)
+{
+    if(source<0||destination<0||source==destination)return false;
+    // These are the two codes that DoorStuff registers in the engine's gate graph.
+    const unsigned leaf=door->getGateCode();
+    return leaf!=0xffffu&&AIFixedGate::ConnectsRegions(source,destination,leaf,gate->amInsideTownWalls());
+}
+float GateDistanceSq(const Ogre::Vector3& a,const Ogre::Vector3& b)
+{
+    const float x=a.x-b.x,z=a.z-b.z;
+    return x*x+z*z;
+}
+DoorStuff* FindGate(Character* c,const Ogre::Vector3& here,const Ogre::Vector3& destination,
+                    int source,int target,float radius,Building*& parent)
+{
+    if(!ou->zoneMgr)return NULL;
+    --g_gateQueryBudget;
+    lektor<RootObject*>& objects=GateObjects();
+    // The loaded building grid indexes Building::getSpecialFunction per cell.
+    // Query gates directly so dense bases do not flood the result with walls.
+    ou->zoneMgr->buildingGrid.getObjects(here,radius,1u<<BF_GATE,objects,128);
+    if(objects.size()>=128)return NULL;
+    DoorStuff* best=NULL;float bestMiss=0,bestDistance=0;bool bestRoute=false;
+    for(uint32_t i=0;i<objects.size();++i)
+    {
+        Building* b=static_cast<Building*>(objects[i]);
+        DoorStuff* d=EligibleGate(c,b);
+        if(!d)continue;
+        const bool route=GateConnects(b,d,source,target);
+        float miss=0;
+        if(!route&&!AIFixedGate::Crosses(GatePoint(here),GatePoint(destination),GatePoint(d->getDoorPosInside()),
+            GatePoint(d->getDoorPosOutside()),AIFixedGate::WorldUnits(8.0f),&miss))continue;
+        const float distance=GateDistanceSq(here,d->getDoorPosition());
+        if(!best||(route&&!bestRoute)||(route==bestRoute&&(miss<bestMiss||(miss==bestMiss&&distance<bestDistance))))
+        {best=d;parent=b;bestMiss=miss;bestDistance=distance;bestRoute=route;}
+    }
+    return best;
 }
 bool GateOne(GateState& state,DWORD now)
 {
     Character* c=LiveGateActor(state.actor);
     if(!c||InputSequence(c)!=state.serial||c->isDead()||c->isDown()||c->isUnconcious())return false;
     OrdersReceiver* orders=c->getOrdersReciever();if(!orders)return false;
-    if(!g_gatePassage||!g_gateHooksReady||g_gateConflict||AIFixedGate::Expired(now,state.created))
+    // A distant native move and opening approach can each exceed 30 seconds.
+    const bool expired=state.stage<2
+        ? AIFixedGate::Expired(now,state.sampledAt)||now-state.stageStartedAt>300000
+        : state.stage==2&&state.passedAt
+            ? now-state.passedAt>DWORD(g_gateCloseDelay*1000+30000)
+            : AIFixedGate::Expired(now,state.stageStartedAt);
+    if(!g_gatePassage||!g_gateHooksReady||g_gateConflict||expired)
     {
         if(state.stage==1&&OwnOpenOrder(orders,state))ResumeGateMove(c,state);
         return false;
     }
     if(state.stage==0)
     {
-        if(!AtMove(orders->getFirstOrder(),state.destination)||orders->orders.getSecondTask())return false;
+        Tasker* first=orders->getFirstOrder();
+        if(orders->orders.getSecondTask()||(first&&!AtMove(first,state.destination)))return false;
         const Ogre::Vector3 here=c->getPosition();
+        if(!first)
+        {
+            // The game can retire a blocked move before the scan. The input
+            // serial above still rejects Stop and replacement orders.
+            const float dx=here.x-state.destination.x,dz=here.z-state.destination.z;
+            if(dx*dx+dz*dz<1.0f)return false;
+        }
         const float moved=(here-state.sample).squaredLength();
+        if(!first&&moved>.25f)return false;
+        state.taskMissing=!first;
         if(moved>.25f){state.sample=here;state.sampledAt=now;return true;}
         if(!AIFixedGate::Ready(now,state.inputAt,state.sampledAt,moved)||now-state.checkedAt<1000)return true;
         if(!g_gateQueryBudget)return true;
-        --g_gateQueryBudget;
         state.checkedAt=now;
-        lektor<RootObject*>& objects=GateObjects();
-        ou->getObjectsWithinSphere(objects,here,float(g_gateRadius),BUILDING,128,NULL);
-        if(objects.size()>=128)return true;
-        DoorStuff* best=NULL;Building* bestParent=NULL;float bestDistance=0;
-        for(uint32_t i=0;i<objects.size();++i)
+        const float radius=AIFixedGate::WorldUnits(float(g_gateRadius));
+        const float nearRadius=AIFixedGate::WorldUnits(15.0f);
+        Building* bestParent=NULL;
+        DoorStuff* best=NULL;
+        bool townGate=false;
+        int source=-1,target=-1;
+        if(ou->navmesh&&!ou->navmesh->isGenerating())
         {
-            // The native query is explicitly BUILDING; DoorStuff also derives Building.
-            Building* b=static_cast<Building*>(objects[i]);
-            if(!b||b->getSpecialFunction()!=BF_GATE||!b->isGate()||b->getFaction()!=c->getFaction())continue;
-            DoorStuff* d=b->getDoor();
-            if(!d||!d->isSetupComplete||d->isBroken()||d->getDoorOpenAmount()>.05f||
-               (d->isLocked()&&!g_gateUnlock))continue;
-            if(!AIFixedGate::Crosses(GatePoint(here),GatePoint(state.destination),
-                GatePoint(d->getDoorPosInside()),GatePoint(d->getDoorPosOutside()),8))continue;
-            const float distance=(here-d->getDoorPosition()).squaredLength();
-            if(!best||distance<bestDistance){best=d;bestParent=b;bestDistance=distance;}
+            source=ou->navmesh->getGateCode(here);
+            target=ou->navmesh->getGateCode(state.destination);
         }
-        if(!best)return true;
+        TownBase* town=source>=0&&target>=0&&source!=target?c->getCurrentTownLocation():NULL;
+        if(town)
+        {
+            Building* candidate=town->getNearestGate(here);
+            DoorStuff* door=EligibleGate(c,candidate);
+            if(door&&GateDistanceSq(here,door->getDoorPosition())<=radius*radius&&GateConnects(candidate,door,source,target))
+            {best=door;bestParent=candidate;townGate=true;--g_gateQueryBudget;}
+        }
+        if(!best&&radius>nearRadius&&g_gateQueryBudget>1)
+        {
+            best=FindGate(c,here,state.destination,source,target,nearRadius,bestParent);
+            if(best&&source>=0&&target>=0&&source!=target&&!GateConnects(bestParent,best,source,target))
+            {
+                Building* fartherParent=NULL;
+                DoorStuff* farther=FindGate(c,here,state.destination,source,target,radius,fartherParent);
+                if(farther&&GateConnects(fartherParent,farther,source,target)){best=farther;bestParent=fartherParent;}
+            }
+        }
+        if(!best)best=FindGate(c,here,state.destination,source,target,radius,bestParent);
+        if(!best)return first!=NULL;
         state.gate=hand(bestParent);state.leaf=hand(best);state.wasLocked=best->isLocked();
         {IntentGuard guard;state.doorSerial=g_gateDoorChanges[state.leaf];}
         state.startSide=AIFixedGate::Side(GatePoint(here),GatePoint(best->getDoorPosInside()),GatePoint(best->getDoorPosOutside()));
+        state.targetRegion=GateConnects(bestParent,best,source,target)?target:-1;
+        state.sample=here;state.sampledAt=state.stageStartedAt=now;
         state.stage=1;
         OpenGateFor(c,best,state.wasLocked);
-        if(g_debug)DebugLog("AIFixed: native gate passage order issued");
+        if(g_debug)
+            DebugLog(townGate?"AIFixed: native gate passage order issued using town gate":
+                "AIFixed: native gate passage order issued using local gate query");
         return true;
     }
     DoorStuff* door=LiveGate(state);
     if(!door||door->getFaction()!=c->getFaction())return false;
-    {IntentGuard guard;GateDoorChanges::const_iterator changed=g_gateDoorChanges.find(state.leaf);
-     if(changed==g_gateDoorChanges.end()||changed->second!=state.doorSerial)return false;}
+    if(!GateDoorUnchanged(state))return false;
     if(state.stage==1)
     {
         if(door->isLocked())return false; // another owner changed the lock
         if(door->getDoorOpenAmount()>=.9f)
         {
-            if(!OwnOpenOrder(orders,state)&&!AtMove(orders->getFirstOrder(),state.destination))return false;
-            ResumeGateMove(c,state);state.stage=2;
+            Tasker* first=orders->getFirstOrder();
+            // A completed OPEN_DOOR can leave the fallback queue empty.
+            const bool completedFallback=state.taskMissing&&!first&&!orders->orders.getSecondTask();
+            if(!completedFallback&&!OwnOpenOrder(orders,state)&&!AtMove(first,state.destination))return false;
+            ResumeGateMove(c,state);state.stageStartedAt=now;state.stage=2;
+        }
+        else
+        {
+            const float progressSample=AIFixedGate::WorldUnits(1.0f);
+            const Ogre::Vector3 here=c->getPosition();
+            const Ogre::Vector3 gate=door->getDoorPosition();
+            if((here-state.sample).squaredLength()>=progressSample*progressSample&&
+               (here-gate).squaredLength()<(state.sample-gate).squaredLength()&&OwnOpenOrder(orders,state))
+            {
+                state.sample=here;state.sampledAt=now;
+            }
         }
         return true;
     }
     if(state.stage==2)
     {
         const int side=AIFixedGate::Side(GatePoint(c->getPosition()),GatePoint(door->getDoorPosInside()),GatePoint(door->getDoorPosOutside()));
-        if(!side||side==state.startSide)return true;
+        const bool crossed=state.targetRegion>=0 ? c->amInsideTownWalls()==state.targetRegion :
+            side&&side!=state.startSide;
+        if(!crossed){state.passedAt=0;return true;}
         if(!state.passedAt)state.passedAt=now;
         if(!g_gateClose)return false;
         if(now-state.passedAt<DWORD(g_gateCloseDelay*1000)||GateOccupied(door))return true;
         // Do not close while another tracked actor is still approaching this gate.
         for(GateMap::const_iterator it=g_gateStates.begin();it!=g_gateStates.end();++it)
-            if(!SameIdentity(it->first,state.actor)&&SameIdentity(it->second.gate,state.gate)&&it->second.stage<2)return true;
+            if(!SameIdentity(it->first,state.actor)&&SameIdentity(it->second.gate,state.gate)&&
+               (it->second.stage<2||(it->second.stage==2&&!it->second.passedAt)))return true;
         if(!OwnCloseGate(door))return false;
-        state.stage=3;return true;
+        if(g_debug)DebugLog("AIFixed: native gate close requested");
+        state.stageStartedAt=now;state.stage=3;return true;
     }
     if(door->getDoorOpenAmount()>.01f)return true;
     if(state.wasLocked&&g_gateRelock)OwnLockGate(door);
+    if(g_debug)DebugLog("AIFixed: native gate closed after passage");
     return false;
 }
 bool GateOneCpp(GateState& state,DWORD now)
@@ -251,9 +392,11 @@ void GateScan(DWORD now)
     for(size_t i=0;i<pending.size();++i)
     {
         const MoveIntent& move=pending[i];
-        if(g_gateStates.find(move.actor)==g_gateStates.end()&&g_gateStates.size()>=128)continue;
+        GateMap::iterator prior=g_gateStates.find(move.actor);
+        if(prior==g_gateStates.end()&&g_gateStates.size()>=128)continue;
+        if(prior!=g_gateStates.end())SafeRetireGateLock(prior->second);
         GateState state={};state.actor=move.actor;state.destination=move.destination;
-        state.created=state.inputAt=now;state.serial=move.serial;
+        state.stageStartedAt=state.inputAt=now;state.serial=move.serial;
         state.sample=move.sample;state.sampledAt=now;g_gateStates[move.actor]=state;
     }
     // Eight actors per 250ms, round robin; no per-frame or global world scan.
@@ -264,7 +407,11 @@ void GateScan(DWORD now)
         if(it==g_gateStates.end())it=g_gateStates.begin();
         if(it==g_gateStates.end())break;
         g_gateCursor=it->first;
-        if(!SafeGateOne(it->second,now))g_gateStates.erase(it);
+        if(!SafeGateOne(it->second,now))
+        {
+            SafeRetireGateLock(it->second);
+            g_gateStates.erase(it);
+        }
     }
     // Watched door keys exist only while an episode references them.
     IntentGuard guard;

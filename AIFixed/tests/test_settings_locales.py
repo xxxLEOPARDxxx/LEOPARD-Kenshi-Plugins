@@ -14,8 +14,11 @@ assert set(ini['AIFixed'])==set(key.lower() for key in calls)
 for key in ('AutoSleep','RepairHealth','GatePassage','GateOpenLocked','RecoverStuckNpc','Debug'):
     assert ini['AIFixed'][key]=='0',key
 assert ini['AIFixed']['OwnBedsOnly']=='1'
+gate_search = re.search(r'api->integer\(api,"AIFixed","GateSearchRadius",.*?,(\d+),(\d+),(\d+),0\);',mcm)
+assert gate_search and gate_search.groups()==('30','5','500')
+assert ini['AIFixed']['GateSearchRadius']=='30'
 messages={json.loads(m) for m in re.findall(r'Tr\(("(?:[^"\\]|\\.)*")\)',mcm)}
-checks=27
+checks=29
 for language in ('en_GB','ru_RU','zh_CN'):
     po=base/'locale'/language/'LC_MESSAGES/ai_fixed.po'
     subprocess.run([sys.executable,str(base.parent/'tools/po2mo.py'),str(po)],check=True)

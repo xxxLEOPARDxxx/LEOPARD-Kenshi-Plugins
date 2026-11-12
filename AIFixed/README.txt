@@ -45,7 +45,7 @@ English
 AutoSleep=0; SleepBelowHealth=90 (10..99); WakeAboveHealth=99 (trigger..100).
 RepairHealth=0; RepairBelowHealth=90 (10..99); BedSearchRadius=100 (10..500 m).
 OwnBedsOnly=1; GatePassage=0; GateOpenLocked=0; GateCloseAfterPassage=1.
-GateRestoreLock=1; GateSearchRadius=30 (5..100 m); GateCloseDelay=3 (1..30 s).
+GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
 
   * Один планировщик для сна живых частей, ремонта здоровья робочастей
     и прежнего ремонта износа. AutoSleep=0, RepairHealth=0 — по желанию;
@@ -78,18 +78,27 @@ GateRestoreLock=1; GateSearchRadius=30 (5..100 m); GateCloseDelay=3 (1..30 s).
     исходная точка пути. Нет телепортации или принудительного закрытия.
     GateOpenLocked=0 не трогает запертые ворота.
   * GateCloseAfterPassage=1, GateRestoreLock=1: обычное закрытие после прохода,
-    GateCloseDelay=3 с (1..30), если в радиусе 8 м нет людей. Исходный замок
-    восстанавливается только после полного закрытия. Ручные приказы, кнопки
-    ворот и изменение замка отменяют помощь. При отмене/таймауте ворота могут
-    остаться открытыми или отпертыми: намерение игрока имеет приоритет.
+    GateCloseDelay=3 с (1..30), когда проём на этом этаже свободен. Исходный
+    замок восстанавливается после закрытия или отмены ещё закрытых ворот.
+    Ручное изменение створок или замка имеет приоритет над автоматикой.
     Задержки и предел ожидания ворот идут по времени симуляции. Во время
     паузы автоматические открытие, возврат к движению, закрытие и запирание
     не выполняются, отложенные намерения сохраняются. Недоступные часы
     приостанавливают только нашу автоматику; штатный интерфейс работает.
-  * GateSearchRadius=30 м (5..100), до двух локальных запросов за 250 мс,
-    до восьми персонажей за проход. Игра игнорирует maxNumber запроса — это
-    НЕ жёсткий лимит его работы/памяти. Наш код отказывается от результата
-    с 128+ постройками уже после запроса. Нет покадрового обхода мира.
+  * GateSearchRadius=30 м (5..500). Если навмеш подтверждает переход через
+    штатные ворота города, поиск вокруг персонажа не нужен. Запасной поиск
+    использует категорию ворот и проверяет стороны навмеша или пересечение
+    исходного направления со створкой.
+    Подход продолжается до пяти минут симуляции, пока персонаж приближается.
+    После 30 секунд без продвижения помощь заканчивается. Исходный приказ
+    возобновляется, если персонаж ещё выполняет наш приказ открыть ворота.
+    До двух локальных запросов за 250 мс и до восьми персонажей за проход.
+    Игра игнорирует maxNumber. Результат с 128 и более воротами пропускается.
+  * RecoverStuckNpc=0. После четырёх игровых часов неподвижности здорового
+    NPC плагин ищет ближайший доступный навмеш. Если навмеш проходит внутри
+    природного камня, выход требует подтверждения коллизией и проверки места
+    посадки. Такие пробы ограничены одной в секунду на весь мир отдельно от
+    обычной проверки застрявших вне навмеша.
   * SleepFix.dll/GateFix.dll подавляют соответствующую автоматику AI Fixed
     для исключения конкурирующих приказов. Не используйте две реализации
     одной механики. Gate Push Guard исправляет другой случай: выталкивание
@@ -127,18 +136,27 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     then resume the original destination. No teleporting or forced-close fallback.
     GateOpenLocked=0 leaves locked gates untouched.
   * GateCloseAfterPassage=1 and GateRestoreLock=1 request normal closure after
-    GateCloseDelay=3 s (1..30), with no characters within 8 m. Original locking
-    returns only after full closure. Manual orders, direct door buttons and lock
-    changes cancel assistance. Cancellation/timeouts may leave a gate open or
-    unlocked; preserving player intent takes precedence over guaranteed closure.
+    GateCloseDelay=3 s (1..30), once the opening on the gate's floor is clear.
+    The original lock is restored after closure or cancellation of a gate that
+    is still shut. Manual gate and lock changes take precedence.
     Gate delays and episode expiry use active simulation time. Pausing suspends
     automatic opening, movement resume, closing and relocking while preserving
     pending intent. An unavailable clock suspends our automation while normal
     GUI updates continue. No native clock polling occurs without gate work.
-  * GateSearchRadius=30 m (5..100). At most two local queries per 250 ms and
-    eight actors processed per pass. Kenshi ignores query maxNumber, so this is
-    NOT a hard native work/allocation bound. We decline 128+ returned buildings
-    after native work. No per-frame world traversal or raw-pointer registry.
+  * GateSearchRadius=30 m (5..500). When the navmesh confirms a transition
+    through the registered town gate, no spatial query is needed. The fallback
+    queries only gate buildings and checks the navmesh regions or movement line.
+    A traveller
+    making progress has up to five simulation minutes to approach. After 30
+    seconds without progress, assistance ends and any door order still owned
+    by the plugin gives way to the original movement order.
+    Up to two local queries per 250 ms and eight actors per pass. Kenshi
+    ignores query maxNumber. Results containing 128 or more gates are skipped.
+  * RecoverStuckNpc=0. After four game hours without progress, a healthy NPC
+    can move to nearby walkable ground. When a valid navmesh face lies inside
+    natural rock, collision and landing clearance must confirm the escape.
+    These probes are limited to one per second globally, independently of
+    ordinary off-mesh recovery.
   * Original SleepFix.dll/GateFix.dll suppress the corresponding AI Fixed
     automation to avoid competing orders. Do not combine both implementations.
     Gate Push Guard handles pushing through closed gates, a different feature.

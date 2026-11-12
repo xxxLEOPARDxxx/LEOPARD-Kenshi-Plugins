@@ -36,6 +36,10 @@ int main()
             AIFixedGate::Point(-8914.5f,207.1f,28665),207.6f,14.0f),
             "gate platform is a lower walking surface");
         Check(!LandingAllowed(at, at, 200), "no zero-distance teleport");
+        Check(EntersSolid(36.0f, -.7f, 100.0f), "rock face points outward between probe start and NPC");
+        Check(!EntersSolid(101.0f, -.7f, 100.0f), "a face beyond the NPC does not enclose it");
+        Check(!EntersSolid(36.0f, .7f, 100.0f), "an exit face is not an entrance into a solid");
+        Check(!EntersSolid(0.0f, -.7f, 100.0f), "initial overlap is not an entrance into a solid");
         Check(LeavesSupportingWall(8.9f, -14.4f, -1.0f, true), "wall top can drop to confirmed exterior");
         Check(!LeavesSupportingWall(8.9f, -14.4f, -1.0f, false), "no cross-wall landing without exterior proof");
         Check(!LeavesSupportingWall(-8.9f, 14.4f, -1.0f, true), "never drop from wall top into enclosure");
@@ -119,6 +123,10 @@ int main()
     using namespace AIFixedGate;
     Point in(-2,0,0),out(2,0,0),from(-4,0,0),to(4,0,0);
     Check(Crosses(from,to,in,out,8),"gate corridor crossing selected");
+    Check(WorldUnits(50.0f)==500.0f,"gate search radius uses native units");
+    Check(Crosses(Point(-8857.8f,207.9f,28705.3f),Point(-9314.8f,163.0f,28867.9f),
+        Point(-8908.4f,207.6f,28704.4f),Point(-8880.9f,207.7f,28692.6f),WorldUnits(8.0f)),
+        "live base approach crosses the gate within the movement corridor");
     Check(!Crosses(from,Point(-8,0,0),in,out,8),"same side movement does not open gate");
     Check(!Crosses(Point(-4,0,20),Point(4,0,20),in,out,8),"unrelated nearby gate rejected");
     Check(!Crosses(Point(-4,20,0),to,in,out,8),"gate on different floor rejected");

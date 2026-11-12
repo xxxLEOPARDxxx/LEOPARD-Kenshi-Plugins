@@ -63,6 +63,7 @@
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/MedicalSystem.h>
 #include <kenshi/NavMesh.h>
+#include <kenshi/Town.h>
 #include <kenshi/ZoneManager.h>
 #include <kenshi/FactionRelations.h>
 #include <kenshi/RaceData.h>
@@ -74,6 +75,7 @@
 #include <kenshi/Building/WallBuilding.h>
 #include <kenshi/Building/UseableStuff.h>
 #include <kenshi/Building/DoorStuff.h>
+#include <kenshi/Building/GatewayBuilding.h>
 #include <kenshi/Town.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
@@ -170,7 +172,7 @@ namespace
         g_gateUnlock=GetPrivateProfileIntA(section,"GateOpenLocked",0,ini.c_str())!=0;
         g_gateClose=GetPrivateProfileIntA(section,"GateCloseAfterPassage",1,ini.c_str())!=0;
         g_gateRelock=GetPrivateProfileIntA(section,"GateRestoreLock",1,ini.c_str())!=0;
-        g_gateRadius=(std::max)(5,(std::min)(100,(int)GetPrivateProfileIntA(section,"GateSearchRadius",30,ini.c_str())));
+        g_gateRadius=(std::max)(5,(std::min)(500,(int)GetPrivateProfileIntA(section,"GateSearchRadius",30,ini.c_str())));
         g_gateCloseDelay=(std::max)(1,(std::min)(30,(int)GetPrivateProfileIntA(section,"GateCloseDelay",3,ini.c_str())));
         g_unstuck=GetPrivateProfileIntA(section,"RecoverStuckNpc",0,ini.c_str())!=0;
         g_debug =
@@ -1333,7 +1335,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api,"AIFixed","GateOpenLocked",Tr("Allow opening locked gates"),Tr("Allow passage to unlock your own gates. Disabled means locked gates remain untouched."),0,0);
     api->toggle(api,"AIFixed","GateCloseAfterPassage",Tr("Close after passage"),Tr("Request normal closing after passage only when the gate area is clear. Manual orders and lock changes cancel our assistance."),1,0);
     api->toggle(api,"AIFixed","GateRestoreLock",Tr("Restore original lock"),Tr("If we unlocked the gate, restore its lock only after it closes normally. Requires closing after passage."),1,0);
-    api->integer(api,"AIFixed","GateSearchRadius",Tr("Gate search radius (m)"),Tr("Local search distance around a stalled traveller; gates outside the movement corridor are ignored."),30,5,100,0);
+    api->integer(api,"AIFixed","GateSearchRadius",Tr("Gate search radius (m)"),Tr("Local search distance around a stalled traveller; gates outside the movement corridor are ignored."),30,5,500,0);
     api->integer(api,"AIFixed","GateCloseDelay",Tr("Gate close delay (s)"),Tr("Minimum delay after crossing before requesting closure. Nearby characters postpone it."),3,1,30,0);
     api->section(api,Tr("Stuck NPCs"));
     api->toggle(api,"AIFixed","RecoverStuckNpc",Tr("Free stuck NPCs"),
