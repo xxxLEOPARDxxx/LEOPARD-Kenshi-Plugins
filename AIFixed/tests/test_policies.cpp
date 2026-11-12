@@ -65,6 +65,9 @@ int main()
             Check(!staleGuard.SampleGuard(at, 40.0+i*.25, 40000+i*1000, false, true),
                 "a stale failed path retained during no-goal idle never renews failure evidence");
         Check(staleGuard.guardFailure==40.0, "no-goal samples preserve the original failure timestamp");
+        Check(!staleGuard.active,"an abandoned guard failure expires instead of keeping a reusable four-hour clock");
+        Check(!staleGuard.SampleGuard(at,45.0,45000,true,true) && staleGuard.since==45.0,
+            "a new real failure after an expired episode starts a fresh four-hour watch");
         const AIFixedGate::Point slope(-.8357f,.5356f,-.1212f);
         Check(GuardLeavesSlope(at,AIFixedGate::Point(88,82,297),slope), "a downhill landing leaves the observed platform slope");
         Check(!GuardLeavesSlope(at,AIFixedGate::Point(112,82,303),slope), "an uphill landing cannot move through a platform");

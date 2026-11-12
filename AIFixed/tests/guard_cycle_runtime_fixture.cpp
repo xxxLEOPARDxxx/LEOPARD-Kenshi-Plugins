@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <float.h>
+#include <limits>
 #include <GatePolicy.h>
 
 enum TaskType { NULL_TASK, IDLE, STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE, PATROL_TOWN, OTHER_TASK };
@@ -75,20 +76,37 @@ int main()
     Check(!ReadGuardCycle(&actor,&movement,NULL_TASK,false,attempt,failed),
         "untracked idle actor never starts a guard episode");
     navigation.state=HavokCharacter::GOAL_REACHED;
-    Check(!ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed),
-        "reached active post retires the old episode");
-    Check(!ReadGuardCycle(&actor,&movement,NULL_TASK,true,attempt,failed),
-        "reached state cannot be mistaken for an idle gap");
+    Check(ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed)==&support && !attempt && !failed,
+        "reached acknowledgement retains only the stationary clock, never relocation evidence");
+    Check(ReadGuardCycle(&actor,&movement,NULL_TASK,true,attempt,failed)==&support && !attempt && !failed,
+        "captured reached no-goal acknowledgement cannot refresh a failure");
+    Check(!ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,false,attempt,failed),
+        "final relocation revalidation rejects a reached active guard goal");
+    Check(!ReadGuardCycle(&actor,&movement,NULL_TASK,false,attempt,failed),
+        "final relocation revalidation rejects a no-goal acknowledgement");
     navigation.state=HavokCharacter::IDLE;
     navigation.path=HavokCharacter::COMPLETE;
-    Check(!ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed),
-        "completed active post cannot reuse old failure evidence");
+    Check(ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed)==&support &&
+        !attempt && !failed,"a completed path phase with a still distant native goal preserves but cannot refresh the episode");
+    navigation.path=HavokCharacter::NONE;
+    Check(ReadGuardCycle(&actor,&movement,PATROL_TOWN,true,attempt,failed)==&support && !attempt && !failed,
+        "a native no-path phase during the same blocked patrol preserves the stationary episode");
+    navigation.path=HavokCharacter::UPDATING;
+    Check(ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed)==&support && !attempt && !failed,
+        "an asynchronous refresh cannot restart four hours or manufacture a failure");
+    Check(!ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,false,attempt,failed),
+        "an untracked successful path phase cannot begin recovery");
     navigation.path=HavokCharacter::FAILED;
     navigation.goal=navigation.position;
-    Check(!ReadGuardCycle(&actor,&movement,PATROL_TOWN,true,attempt,failed),
-        "a destination already at the feet cannot continue a blocked patrol");
+    Check(ReadGuardCycle(&actor,&movement,PATROL_TOWN,true,attempt,failed)==&support && !attempt && !failed,
+        "at-feet reset can retain only the existing stationary clock");
+    Check(!ReadGuardCycle(&actor,&movement,PATROL_TOWN,false,attempt,failed),
+        "a destination already at the feet cannot admit relocation");
     Check(!ReadGuardCycle(&actor,&movement,OTHER_TASK,true,attempt,failed),
         "another task cancels the guard episode");
+    navigation.goal.m_quad.m128_f32[0]=std::numeric_limits<float>::quiet_NaN();
+    Check(!ReadGuardCycle(&actor,&movement,NULL_TASK,true,attempt,failed),
+        "invalid native goal data cannot retain guard history");
     printf("AIFixed extracted guard cycle: %s (%d checks)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
 }

@@ -1,5 +1,6 @@
 from pathlib import Path
 import os, subprocess
+import sys
 here=Path(__file__).resolve().parent
 out=here/'_generated';out.mkdir(exist_ok=True)
 vc=Path(r'C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC')
@@ -20,3 +21,4 @@ guard_exe=out/'guard_cycle_runtime.exe'
 subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/Od','/I'+str(here.parent),
     str(generated),'/Fe'+str(guard_exe),'/Fo'+str(out/'guard_cycle_runtime.obj')],env=env,cwd=out,check=True)
 subprocess.run([str(guard_exe)],check=True)
+subprocess.run([sys.executable,str(here/'test_guard_trace.py')],check=True)

@@ -106,6 +106,11 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     без пересечения стен и закрытых ворот. Для спуска нужны четыре часа
     без продвижения, подтверждённая коллизия склона и недавний отказ пути
     при активной задаче поста или городского патруля.
+    Краткие сбросы штатного пути, включая NONE/COMPLETE и подтверждение
+    GOAL_REACHED без реального перемещения, сохраняют только таймер наблюдения.
+    В этих состояниях перенос запрещён: нужна текущая активная попытка идти
+    к удалённой цели. Реальное прибытие сдвигает стационарную точку и сбрасывает
+    таймер; более часа без подтверждённого отказа завершает старое наблюдение.
   * SleepFix.dll/GateFix.dll подавляют соответствующую автоматику AI Fixed
     для исключения конкурирующих приказов. Не используйте две реализации
     одной механики. Gate Push Guard исправляет другой случай: выталкивание
@@ -171,6 +176,11 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     and closed-gate boundaries. Recovery requires four hours without progress,
     confirmation of the slope by collision and a recent path failure during
     an active guard-post or town-patrol task.
+    Transient native path resets, including NONE/COMPLETE and GOAL_REACHED
+    acknowledgements without physical movement, retain only the observation
+    clock. They never admit relocation: a current active remote guard attempt
+    is required. Real arrival changes the stationary anchor and resets its
+    clock; more than one hour without a confirmed failure expires the episode.
   * Original SleepFix.dll/GateFix.dll suppress the corresponding AI Fixed
     automation to avoid competing orders. Do not combine both implementations.
     Gate Push Guard handles pushing through closed gates, a different feature.

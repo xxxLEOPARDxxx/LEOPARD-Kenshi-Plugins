@@ -11,6 +11,7 @@ python tests/test_lifetime_debug.py
 python tests/test_gate_runtime.py
 python tests/test_settings_locales.py
 python tests/audit_rest_clock.py
+python tests/test_guard_trace.py
 ```
 
 The selector and gate/intent fixtures extract current production code. Native
@@ -24,6 +25,22 @@ native pause/speed/hour path and actual Steam/GOG SDK table bindings. Rest
 regressions cover continuing recovery beyond ten/twenty minutes, healing after
 new damage, long pause/resume, native clock rewind/invalid input and simulation
 time approach/stall bounds. The audit writes only ignored JSON; no process API.
+The guard trace fixture extracts production Inspect, CanTravel, ReadGuardCycle,
+SameIntent and uses the real Observation policy. Its read-only 2026-11-12 capture
+contains all nine distinct snapshots and their 316-observation histogram. The
+original collector retained first-seen snapshots and aggregate counts, not the
+full temporal order or game clock. The repeated order and >4-hour progression in
+the regression are therefore explicitly synthetic; all nine initial phases are
+tested. Native collision/navmesh/landing calls remain explicit boundary fakes.
+The tests preserve recent real failure evidence across native goal resets while
+rejecting relocation during reached/at-feet/no-goal phases, including a reached
+state arriving between the probe and final revalidation. Physical arrival,
+mobility, stale evidence, another support/task, native medical/combat/player
+exclusions and rejected landing geometry cannot reuse the old four-hour clock.
+`python tests/test_guard_trace.py --baseline-reset` runs the current replay
+against the pre-fix `3bc09133341a2a87a32bfaca800be086a2bfae3e` runtime and is
+expected to fail all nine cycle phases;
+it does not modify production source or inspect a live process.
 The gate fixture also extracts the real GUI dispatcher/clock wrapper/reset, with
 readiness and rest boundaries faked. It covers queued input and OPEN/close/relock
 across long pauses, invalid-clock recovery, active-time expiry, world replacement,

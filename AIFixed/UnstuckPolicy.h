@@ -40,6 +40,13 @@ namespace AIFixedUnstuck
 
         bool SampleGuard(const Point& position,double hours,unsigned now,bool startsAttempt,bool failed)
         {
+            // A native idle/path-pipeline gap may retain the stationary clock,
+            // but cannot preserve an abandoned guard episode indefinitely.
+            // Expire before accepting a new failure so a later unrelated
+            // attempt must earn its own full four-hour observation.
+            const double evidence=guardFailure>=since?guardFailure:since;
+            if (active && _finite(hours) && hours>=previous && hours-evidence>1.0)
+                active=false;
             if (!active && !startsAttempt) return false;
             const bool continued=active;
             const double started=since;

@@ -242,7 +242,7 @@ namespace Unstuck
         if (!guardTask && !(tracked && (task==NULL_TASK || task==IDLE))) return NULL;
         HavokCharacter* navigation=movement->havokCharacter;
         const HavokCharacter::CharacterState state=navigation->getState();
-        if (state!=HavokCharacter::IDLE) return NULL;
+        if (state!=HavokCharacter::IDLE && !(tracked && state==HavokCharacter::GOAL_REACHED)) return NULL;
         const HavokCharacter::PathState path=navigation->getPathState();
         if (!tracked && path!=HavokCharacter::WAITING && path!=HavokCharacter::FAILED &&
             path!=HavokCharacter::BROKEN && path!=HavokCharacter::INCOMPLETE) return NULL;
@@ -256,12 +256,20 @@ namespace Unstuck
         const float* dest=navigation->goal.m_quad.m128_f32;
         const float* here=navigation->position.m_quad.m128_f32;
         const AIFixedGate::Point delta(dest[0]-here[0],dest[1]-here[1],dest[2]-here[2]);
-        const bool away=AIFixedGate::Finite(delta) &&
-            AIFixedGate::DistanceSq(delta,AIFixedGate::Point())>=4.0f;
-        failed=guardTask && away &&
+        if (!AIFixedGate::Finite(delta)) return NULL;
+        const bool away=AIFixedGate::DistanceSq(delta,AIFixedGate::Point())>=4.0f;
+        failed=guardTask && state==HavokCharacter::IDLE && away &&
             (path==HavokCharacter::FAILED || path==HavokCharacter::BROKEN || path==HavokCharacter::INCOMPLETE);
-        attempt=guardTask && (failed || (away && path==HavokCharacter::WAITING));
-        if (guardTask && !attempt) return NULL;
+        attempt=guardTask && state==HavokCharacter::IDLE && (failed || (away && path==HavokCharacter::WAITING));
+        // NONE/COMPLETE/UPDATING describe the native path pipeline, not arrival
+        // at a guard post. A tracked guard can cycle through these phases at
+        // the same stuck position while its native goal remains far away.
+        // A cancelled request also briefly reports GOAL_REACHED or resets the
+        // native goal to the feet without any physical progress. These phases
+        // can retain an existing clock, but can never start/refresh evidence or
+        // admit a landing. SampleGuard still expires abandoned episodes and
+        // physical movement retires the old stationary anchor.
+        if (!tracked && !attempt) return NULL;
         return tracked || attempt ? support : NULL;
     }
 
@@ -651,7 +659,7 @@ namespace Unstuck
         const bool due=guard?entry.watch.SampleGuard(position,hours,activeMs,attempt,failed):
             entry.watch.Sample(position,hours,activeMs);
         if (!previouslyActive || entry.watch.since!=priorStart) entry.probeSite=0;
-        if (!due) return;
+        if (!due || (guard && !attempt)) return;
 
         Building* support=guard?guard:BlockedSupport(c,c->movement,task,here);
         // Keep the new valid-face collision probes from delaying the existing
@@ -674,7 +682,9 @@ namespace Unstuck
         goal=CurrentGoal(c);
         if (guard)
         {
-            Building* current=ReadGuardCycle(c,c->movement,GoalTask(goal),true,attempt,failed);
+            // Retained no-goal/reached/at-feet phases only keep observation.
+            // Actual relocation requires an active remote guard attempt now.
+            Building* current=ReadGuardCycle(c,c->movement,GoalTask(goal),false,attempt,failed);
             if (!current || !(Identity(current->handle)==subject)) return;
         }
         else
