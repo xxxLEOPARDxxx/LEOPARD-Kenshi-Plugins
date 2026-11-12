@@ -40,6 +40,16 @@ int main()
         Check(!EntersSolid(101.0f, -.7f, 100.0f), "a face beyond the NPC does not enclose it");
         Check(!EntersSolid(36.0f, .7f, 100.0f), "an exit face is not an entrance into a solid");
         Check(!EntersSolid(0.0f, -.7f, 100.0f), "initial overlap is not an entrance into a solid");
+        Check(OpposedRockFaces(0xbfu), "three axes enclose the live ore NPC despite missing the south ray");
+        Check(!OpposedRockFaces(0x1fu), "one complete axis does not establish rock enclosure");
+        Check(!OpposedRockFaces(0x0fu), "nearby faces on one side do not establish enclosure");
+        Check(LandingAllowed(at,AIFixedGate::Point(175,200,300),200,8.0f,8.0f),
+            "an enclosed actor can reach a clear spot beyond the normal recovery distance");
+        Check(!LandingAllowed(at,AIFixedGate::Point(181,200,300),200,8.0f,8.0f),
+            "even a proven ore exit respects the extended recovery limit");
+        Check(AboveGateDeck(281.3f,168.1f,207.6f), "live unsupported buyer is high above the lower gate platform");
+        Check(!AboveGateDeck(207.8f,168.1f,207.6f), "actor already on the gate platform is excluded");
+        Check(!AboveGateDeck(340.0f,168.1f,207.6f), "unsupported recovery cannot drop from arbitrarily high above terrain");
         Check(LeavesSupportingWall(8.9f, -14.4f, -1.0f, true), "wall top can drop to confirmed exterior");
         Check(!LeavesSupportingWall(8.9f, -14.4f, -1.0f, false), "no cross-wall landing without exterior proof");
         Check(!LeavesSupportingWall(-8.9f, 14.4f, -1.0f, true), "never drop from wall top into enclosure");

@@ -328,8 +328,48 @@ namespace Unstuck
             AIFixedGate::DistanceSq(Point(here),Point(navigation->getPosition()))<=25.0f;
     }
 
+    const float EscapeDirections[8][2]={{1,0},{.7071068f,.7071068f},{0,1},{-.7071068f,.7071068f},
+        {-1,0},{-.7071068f,-.7071068f},{0,-1},{.7071068f,-.7071068f}};
+
+    Ogre::Vector3 EscapeDirection(unsigned index)
+    { return Ogre::Vector3(EscapeDirections[index][0],0,EscapeDirections[index][1]); }
+
+    Building* FindElevatedGate(const Ogre::Vector3& here,float ground)
+    {
+        if (!AIFixedUnstuck::AboveGateDeck(here.y,ground,ground)) return NULL;
+        const unsigned gateMask=0x780200u | (1u<<13);
+        const Ogre::Vector3 up(0,1,0),body=here+8.0f*up;
+        physHit roof(false,true,here.y);
+        UtilityT::sphereTrace(roof,body+100.0f*up,-100.0f*up,.75f,gateMask,true);
+        if (roof.traceWasAborted() || !roof.hit || !(roof.position.y>body.y+1.5f)) return NULL;
+        Building* object=roof.hitObject.getBuilding();
+        Building* gate=object?object->isGate():NULL;
+        DoorStuff* door=gate && !gate->isDisabled()?gate->getDoor():NULL;
+        if (!door || !door->isSetupComplete) return NULL;
+        const Ogre::Vector3 deck=(door->getDoorPosInside()+door->getDoorPosOutside())*.5f;
+        const float dx=here.x-deck.x,dz=here.z-deck.z;
+        if (!AIFixedUnstuck::AboveGateDeck(here.y,ground,deck.y) || !(dx*dx+dz*dz<=3600.0f)) return NULL;
+
+        // A standing actor on a real upper walkway keeps its footing even
+        // when the movement controller has not assigned a standing handle.
+        physHit footing(false,true,here.y);
+        UtilityT::sphereTrace(footing,here+3.0f*up,-8.0f*up,.75f,~0u,true);
+        if (footing.traceWasAborted() || (footing.hit && footing.normal.y>.5f)) return NULL;
+        for (unsigned i=0;i<8;i+=2)
+        {
+            const Ogre::Vector3 direction=EscapeDirection(i);
+            physHit side(false,true,here.y);
+            UtilityT::trace(side,body,direction,gateMask);
+            if (side.traceWasAborted() || !side.hit || !_finite(side.distance) ||
+                side.distance<0.0f || side.distance>16.0f) continue;
+            Building* blocker=side.hitObject.getBuilding();
+            if (blocker && blocker->isGate()==gate) return gate;
+        }
+        return NULL;
+    }
+
     bool FindRockExit(const Ogre::Vector3& here,float clearance,unsigned site,Ogre::Vector3& seed,
-                      bool& enclosed)
+                      unsigned& siteCount)
     {
         // Natural collision (including placed ore veins) is group 14. Keep
         // these traces separate from building collision and ground geometry.
@@ -344,43 +384,66 @@ namespace Unstuck
         if (rock && (rock->isDisabled() || (!rock->isFoliage && rock->getSpecialFunction()!=BF_MINE_NATURAL)))
             return false;
 
-        static const float axes[4][2]={{1,0},{-1,0},{0,1},{0,-1}};
-        NxShape* shape=NULL;
-        float exits[4];
-        for (unsigned i=0;i<4;++i)
+        struct Face { NxShape* shape; float distance; } faces[8]={};
+        for (unsigned i=0;i<8;++i)
         {
-            const Ogre::Vector3 out(axes[i][0],0,axes[i][1]);
+            const Ogre::Vector3 out=EscapeDirection(i);
             physHit entry(false,true,here.y);
             UtilityT::trace(entry,body+out*span,-out,naturalMask);
-            if (entry.traceWasAborted() || !entry.hit || !entry.shape ||
-                (shape && entry.shape!=shape) || (rock && entry.hitObject.getBuilding()!=rock) ||
-                !AIFixedUnstuck::EntersSolid(entry.distance,entry.normal.dotProduct(-out),span)) return false;
-            shape=entry.shape;
-            exits[i]=span-entry.distance;
-
-            // An opening between two rock faces can resemble enclosure from
-            // the outside. An outward-facing ray within it must also be clear
-            // of that same shape before the exterior face.
-            physHit outward(false,true,here.y);
-            UtilityT::trace(outward,body,out,naturalMask);
-            if (outward.traceWasAborted() || (outward.hit && outward.shape==shape &&
-                outward.distance<=exits[i]+1.5f)) return false;
+            if (entry.traceWasAborted()) return false;
+            if (!entry.hit || !entry.shape || (rock && entry.hitObject.getBuilding()!=rock) ||
+                !AIFixedUnstuck::EntersSolid(entry.distance,entry.normal.dotProduct(-out),span)) continue;
+            faces[i].shape=entry.shape;
+            faces[i].distance=span-entry.distance;
         }
-        enclosed=true;
-        unsigned order[4]={0,1,2,3};
-        for (unsigned i=0;i<4;++i)
-            for (unsigned j=i+1;j<4;++j)
-                if (exits[order[j]]<exits[order[i]]) std::swap(order[i],order[j]);
-        const unsigned side=order[site%4];
-        const float distance=exits[side]+clearance+AIFixedGate::WorldUnits(site==4?1.3f:.5f);
-        if (distance>AIFixedGate::WorldUnits(6.0f)) return false;
-        seed=here+Ogre::Vector3(axes[side][0]*distance,0,axes[side][1]*distance);
+        // Seams and a ray starting inside a large rock can miss individual
+        // faces. Require two complete axes from the same physical shape.
+        unsigned mask=0;
+        for (unsigned i=0;i<4 && !mask;++i)
+        {
+            if (!faces[i].shape || faces[i].shape!=faces[i+4].shape) continue;
+            unsigned candidate=0;
+            for (unsigned j=0;j<8;++j)
+                if (faces[j].shape==faces[i].shape) candidate|=1u<<j;
+            if (AIFixedUnstuck::OpposedRockFaces(candidate)) mask=candidate;
+        }
+        if (!mask) return false;
+        if (!rock)
+        {
+            // Scenery can lack a building handle. Tie the overhead contact
+            // to the same shape in that case, since a sweep has no shape ID.
+            physHit top(false,true,here.y);
+            const Ogre::Vector3 down(0,-1,0);
+            UtilityT::trace(top,body-down*span,down,naturalMask);
+            unsigned first=0;
+            while (!(mask & (1u<<first))) ++first;
+            if (top.traceWasAborted() || !top.hit || top.shape!=faces[first].shape ||
+                !AIFixedUnstuck::EntersSolid(top.distance,top.normal.dotProduct(down),span)) return false;
+        }
+        std::pair<float,unsigned> exits[8];
+        unsigned count=0;
+        for (unsigned i=0;i<8;++i)
+        {
+            if (!(mask & (1u<<i))) continue;
+            // A recess can look enclosed from outside. Reject an inward
+            // face between the body and the corresponding exterior face.
+            physHit outward(false,true,here.y);
+            UtilityT::trace(outward,body,EscapeDirection(i),naturalMask);
+            if (outward.traceWasAborted() || (outward.hit && outward.shape==faces[i].shape &&
+                outward.distance<=faces[i].distance+1.5f)) return false;
+            exits[count++]=std::make_pair(faces[i].distance,i);
+        }
+        std::sort(exits,exits+count);
+        siteCount=count*2;
+        const std::pair<float,unsigned>& exit=exits[(site%siteCount)/2];
+        const float distance=exit.first+clearance+AIFixedGate::WorldUnits(site%2?2.5f:1.4f);
+        if (distance>AIFixedGate::WorldUnits(8.0f)) return false;
+        seed=here+EscapeDirection(exit.second)*distance;
         return true;
     }
 
-    bool StandingSpaceClear(const Ogre::Vector3& landing,float clearance)
+    bool StandingSpaceClear(const Ogre::Vector3& landing,float clearance,float height)
     {
-        const float height=AIFixedGate::WorldUnits(8.0f);
         const Ogre::Vector3 start=landing+Ogre::Vector3(0,height,0);
         const Ogre::Vector3 down(0,clearance+AIFixedGate::WorldUnits(.25f)-height,0);
         physHit solid(false,true,landing.y);
@@ -389,7 +452,7 @@ namespace Unstuck
     }
 
     bool FindLanding(GameWorld* world,Character* actor,Building* support,const Ogre::Vector3& here,
-                     unsigned probeSite,Ogre::Vector3& landing,bool& retryNearby)
+                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount)
     {
         NavMesh* nav=world->navmesh;
         ZoneMap* zone=world->zoneMgr?world->zoneMgr->getZoneMap(here):NULL;
@@ -399,16 +462,16 @@ namespace Unstuck
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
         if (!_finite(ground)) return false;
         if (here.y-ground<50.0f) support=NULL;
+        Building* inferredGate=!support && !movement->isStandingOnSomething()?FindElevatedGate(here,ground):NULL;
+        if (inferredGate) support=inferredGate;
         const float maximumDrop=support?14.0f:8.0f;
         if (here.y-ground<-15.0f || here.y-ground>maximumDrop*10.0f) return false;
         const float clearance=movement->getRadius();
         if (!_finite(clearance) || clearance<=0 || clearance>AIFixedGate::WorldUnits(2.0f)) return false;
         Ogre::Vector3 rockExit;
-        bool enclosed=false;
         const bool embedded=!support && !movement->isStandingOnSomething() &&
-            FindRockExit(here,clearance,probeSite,rockExit,enclosed);
-        retryNearby=enclosed || support;
-        if (enclosed && !embedded) return false;
+            FindRockExit(here,clearance,probeSite,rockExit,siteCount);
+        if (siteCount && !embedded) return false;
         if (!support)
         {
             if (!embedded)
@@ -420,7 +483,7 @@ namespace Unstuck
                 if (nav->getClosestPoint(here,3.0f,0.0f,false,nearPoint,key)!=0) return false;
             }
         }
-        retryNearby=true;
+        if (!embedded) { siteCount=5; probeSite%=siteCount; }
         // Start with the nearest surface around the NPC. If it fails, later
         // probes try a smaller area toward each side within the same 6 m limit.
         const float offset=30.0f;
@@ -449,10 +512,19 @@ namespace Unstuck
                     surface=platform;
             }
         }
-        const bool allowed=AIFixedUnstuck::LandingAllowed(Point(here),Point(landing),surface,maximumDrop);
-        if (!allowed || (embedded && !StandingSpaceClear(landing,clearance))) return false;
+        const bool allowed=AIFixedUnstuck::LandingAllowed(Point(here),Point(landing),surface,maximumDrop,embedded?8.0f:6.0f);
+        if (!allowed || (embedded && !StandingSpaceClear(landing,clearance,80.0f))) return false;
         const int destinationGate=nav->getGateCode(landing);
         if (destinationGate<0) return false;
+        if (inferredGate)
+        {
+            DoorStuff* door=inferredGate->getDoor();
+            if (!door || !door->isSetupComplete || destinationGate!=nav->getGateCode(here)) return false;
+            const AIFixedGate::Point in=Point(door->getDoorPosInside()),out=Point(door->getDoorPosOutside());
+            const int side=AIFixedGate::Side(Point(here),in,out);
+            if (!side || side!=AIFixedGate::Side(Point(landing),in,out) ||
+                !StandingSpaceClear(landing,clearance,30.0f)) return false;
+        }
         if (destinationGate>0)
         {
             // The upper gate deck can have a different face code from the
@@ -515,9 +587,9 @@ namespace Unstuck
         last=activeMs;
         Ogre::Vector3 landing;
         const unsigned probeSite=entry.probeSite;
-        bool retryNearby=false;
-        const bool found=FindLanding(world,c,support,here,probeSite,landing,retryNearby);
-        entry.probeSite=retryNearby?(entry.probeSite+1)%5:0;
+        unsigned siteCount=0;
+        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount);
+        entry.probeSite=siteCount?(probeSite+1)%siteCount:0;
         entry.watch.Probed(entry.probeSite==0);
         if (!found) return;
         if (currentGeneration!=InterlockedCompareExchange(&g_loadGeneration,0,0) ||

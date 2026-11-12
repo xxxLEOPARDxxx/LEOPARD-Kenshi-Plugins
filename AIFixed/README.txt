@@ -96,9 +96,11 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     Игра игнорирует maxNumber. Результат с 128 и более воротами пропускается.
   * RecoverStuckNpc=0. После четырёх игровых часов неподвижности здорового
     NPC плагин ищет ближайший доступный навмеш. Если навмеш проходит внутри
-    природного камня, выход требует подтверждения коллизией и проверки места
-    посадки. Такие пробы ограничены одной в секунду на весь мир отдельно от
-    обычной проверки застрявших вне навмеша.
+    природного камня, две пары встречных лучей подтверждают коллизию, а пробы
+    ищут свободное место до 8 м от NPC. У ворот после загрузки можно подтвердить
+    застревание по коллизии даже при потере опоры в данных движения. Выход
+    сохраняет сторону ворот и область навмеша. Пробы при наличии лица навмеша
+    ограничены одной в секунду отдельно от обычной проверки вне навмеша.
   * SleepFix.dll/GateFix.dll подавляют соответствующую автоматику AI Fixed
     для исключения конкурирующих приказов. Не используйте две реализации
     одной механики. Gate Push Guard исправляет другой случай: выталкивание
@@ -154,9 +156,11 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     ignores query maxNumber. Results containing 128 or more gates are skipped.
   * RecoverStuckNpc=0. After four game hours without progress, a healthy NPC
     can move to nearby walkable ground. When a valid navmesh face lies inside
-    natural rock, collision and landing clearance must confirm the escape.
-    These probes are limited to one per second globally, independently of
-    ordinary off-mesh recovery.
+    natural rock, two opposed pairs of rays confirm enclosure and the landing
+    search checks for clear ground within 8 m. Gate collision can confirm
+    elevated entrapment after a load loses the standing support handle. The
+    landing must stay on the same side and navmesh region. Valid-face probes
+    are limited to one per second independently of ordinary off-mesh recovery.
   * Original SleepFix.dll/GateFix.dll suppress the corresponding AI Fixed
     automation to avoid competing orders. Do not combine both implementations.
     Gate Push Guard handles pushing through closed gates, a different feature.
