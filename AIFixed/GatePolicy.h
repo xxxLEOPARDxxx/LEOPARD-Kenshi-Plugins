@@ -5,6 +5,8 @@
 // forced-close fallbacks. Adapted from Basusu (GPLv3); see UPSTREAM.md.
 namespace AIFixedGate
 {
+    // The stock speed display converts world units/s to mph with 0.22369362.
+    inline float WorldUnits(float meters){return meters*10.0f;}
     struct Point{float x,y,z;Point(float a=0,float b=0,float c=0):x(a),y(b),z(c){}};
     inline bool Finite(const Point& p){return _finite(p.x)&&_finite(p.y)&&_finite(p.z);}
     inline float DistanceSq(const Point& a,const Point& b){float x=a.x-b.x,y=a.y-b.y,z=a.z-b.z;return x*x+y*y+z*z;}

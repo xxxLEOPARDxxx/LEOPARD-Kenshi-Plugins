@@ -130,3 +130,11 @@ msgstr "Gate close delay (s)"
 
 msgid "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
 msgstr "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
+msgid "Free stuck NPCs"
+msgstr "Free stuck NPCs"
+
+msgid "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
+msgstr "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
+
+msgid "Stuck NPCs"
+msgstr "Stuck NPCs"

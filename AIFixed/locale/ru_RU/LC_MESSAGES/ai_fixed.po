@@ -130,3 +130,11 @@ msgstr "Задержка закрытия ворот (с)"
 
 msgid "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
 msgstr "Минимальная задержка после прохода перед запросом закрытия. Персонажи рядом откладывают закрытие."
+msgid "Free stuck NPCs"
+msgstr "Освобождать застрявших NPC"
+
+msgid "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
+msgstr "Если NPC застрял на четыре игровых часа, перенести его на проходимую поверхность рядом. Работает также при тупике на стенах и воротах. По умолчанию выключено."
+
+msgid "Stuck NPCs"
+msgstr "Застрявшие NPC"

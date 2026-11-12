@@ -130,3 +130,11 @@ msgstr "大门关闭延迟（秒）"
 
 msgid "Minimum delay after crossing before requesting closure. Nearby characters postpone it."
 msgstr "通过后请求关闭大门的最短等待时间。附近有角色时会推迟关闭。"
+msgid "Free stuck NPCs"
+msgstr "解救卡住的 NPC"
+
+msgid "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
+msgstr "如果 NPC 卡住并在四个游戏小时内没有移动，则将其移到附近可通行的位置。也适用于城墙和城门上的路径阻塞。默认关闭。"
+
+msgid "Stuck NPCs"
+msgstr "卡住的 NPC"

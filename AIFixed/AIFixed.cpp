@@ -46,11 +46,14 @@
 #include <exception>
 #include "RestPolicy.h"
 #include "GatePolicy.h"
+#include "UnstuckPolicy.h"
 
 #include <Debug.h>
 #include <core/Functions.h>
 
 #include <kenshi/Character.h>
+#include <kenshi/CharMovement.h>
+#include <kenshi/HavokCharacter.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Faction.h>
 #include <kenshi/Globals.h>
@@ -59,6 +62,8 @@
 #include <kenshi/SaveFileSystem.h>
 #include <kenshi/gui/ForgottenGUI.h>
 #include <kenshi/MedicalSystem.h>
+#include <kenshi/NavMesh.h>
+#include <kenshi/ZoneManager.h>
 #include <kenshi/FactionRelations.h>
 #include <kenshi/RaceData.h>
 #include <kenshi/AI/AI.h>
@@ -66,11 +71,13 @@
 #include <kenshi/AI/AITaskSystem.h>
 #include <kenshi/Tasker.h>
 #include <kenshi/Building/Building.h>
+#include <kenshi/Building/WallBuilding.h>
 #include <kenshi/Building/UseableStuff.h>
 #include <kenshi/Building/DoorStuff.h>
 #include <kenshi/Town.h>
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
+#include <kenshi/util/UtilityT.h>
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -90,6 +97,7 @@ namespace
     bool g_autoSleep=false,g_repairHealth=false,g_ownBedsOnly=true;
     int g_sleepBelow=90,g_healAbove=99,g_robotBelow=90,g_bedRadius=100;
     bool g_gatePassage=false,g_gateUnlock=false,g_gateClose=true,g_gateRelock=true;
+    bool g_unstuck=false;
     int g_gateRadius=30,g_gateCloseDelay=3;
     bool g_restConflict=false,g_gateConflict=false,g_newHooksReady=false,g_gateHooksReady=false;
     CRITICAL_SECTION g_intentLock;
@@ -164,6 +172,7 @@ namespace
         g_gateRelock=GetPrivateProfileIntA(section,"GateRestoreLock",1,ini.c_str())!=0;
         g_gateRadius=(std::max)(5,(std::min)(100,(int)GetPrivateProfileIntA(section,"GateSearchRadius",30,ini.c_str())));
         g_gateCloseDelay=(std::max)(1,(std::min)(30,(int)GetPrivateProfileIntA(section,"GateCloseDelay",3,ini.c_str())));
+        g_unstuck=GetPrivateProfileIntA(section,"RecoverStuckNpc",0,ini.c_str())!=0;
         g_debug =
             GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
         KLocLog::SetEnabled(g_debug);
@@ -914,8 +923,11 @@ namespace
     void (*g_origGuiUpdate)(ForgottenGUI*) = NULL;
     DWORD g_lastSelfRepairScan = 0;
 
+    #include "UnstuckRuntime.h"
+
     void InvalidateWorld()
     {
+        if (Unstuck::ready) Unstuck::Suspend();
         InterlockedExchange(&g_worldActiveAt, 0);
         InterlockedIncrement(&g_loadGeneration);
     }
@@ -985,6 +997,7 @@ namespace
         {
             InterlockedExchange(&g_worldReadyGeneration, generation);
             InterlockedExchange(&g_worldActiveAt, static_cast<LONG>(GetTickCount()));
+            if (Unstuck::ready) Unstuck::SafeUpdate(self,generation);
         }
     }
 
@@ -1322,6 +1335,9 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api,"AIFixed","GateRestoreLock",Tr("Restore original lock"),Tr("If we unlocked the gate, restore its lock only after it closes normally. Requires closing after passage."),1,0);
     api->integer(api,"AIFixed","GateSearchRadius",Tr("Gate search radius (m)"),Tr("Local search distance around a stalled traveller; gates outside the movement corridor are ignored."),30,5,100,0);
     api->integer(api,"AIFixed","GateCloseDelay",Tr("Gate close delay (s)"),Tr("Minimum delay after crossing before requesting closure. Nearby characters postpone it."),3,1,30,0);
+    api->section(api,Tr("Stuck NPCs"));
+    api->toggle(api,"AIFixed","RecoverStuckNpc",Tr("Free stuck NPCs"),
+        Tr("After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."),0,MCM_RESTART);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."), 0, MCM_RESTART);
 }
@@ -1357,6 +1373,7 @@ __declspec(dllexport) void startPlugin()
     g_lifecycleReady = worldHook && loadHook && newHook && resetHook && clearHook;
     if (!g_lifecycleReady)
         ErrorLog("AIFixed: lifecycle hooks incomplete, automatic self-repair disabled");
+    Unstuck::Install();
 
     g_restConflict=GetModuleHandleA("SleepFix.dll")!=NULL;
     g_gateConflict=GetModuleHandleA("GateFix.dll")!=NULL;

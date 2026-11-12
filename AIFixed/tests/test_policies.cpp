@@ -2,10 +2,53 @@
 #include <limits>
 #include "../RestPolicy.h"
 #include "../GatePolicy.h"
+#include "../UnstuckPolicy.h"
 int checks=0,failures=0;
 void Check(bool value,const char* name){++checks;if(!value){++failures;printf("FAIL: %s\n",name);}}
 int main()
 {
+    {
+        using namespace AIFixedUnstuck;
+        Observation watch;
+        const AIFixedGate::Point at(100,200,300);
+        Check(!watch.Sample(at, 10.0, 1000), "first observation starts tracking");
+        for (unsigned i=1; i<16; ++i)
+            Check(!watch.Sample(at, 10.0+i*.25, 1000+i*1000), "less than four game hours");
+        Check(watch.Sample(at, 14.0, 17000), "four continuous game hours");
+        watch.Probed(false);
+        Check(!watch.Sample(at, 14.04, 17400), "neighbor probes are spaced apart");
+        Check(watch.Sample(at, 14.06, 17600), "next neighbor is tried within minutes");
+        watch.Probed(true);
+        Check(!watch.Sample(at, 14.09, 17900), "exhausted sites back off before retrying");
+        Check(!watch.Sample(AIFixedGate::Point(107,200,300), 14.1, 18000), "progress restarts the timer");
+        Check(!watch.Sample(at, 18.1, 19000), "unobserved game time is discarded");
+        Check(!watch.Sample(at, 18.2, 34000), "unobserved real time is discarded");
+        Check(!watch.Sample(at, 1.0, 35000), "clock rewind starts new observation");
+        Check(LandingAllowed(at, AIFixedGate::Point(102,126,300), 126), "nearby terrain landing below a gate");
+        Check(LandingAllowed(at, AIFixedGate::Point(140,200,300), 200), "nearby sideways recovery from a rock");
+        Check(!LandingAllowed(at, AIFixedGate::Point(161,126,300), 126), "no wide horizontal jump");
+        Check(!LandingAllowed(at, AIFixedGate::Point(102,126,300), 112), "no placement on a building above terrain");
+        Check(!LandingAllowed(at, AIFixedGate::Point(100,110,300), 110), "no excessive drop");
+        Check(LandingAllowed(AIFixedGate::Point(-8180,252.9f,28086.4f),
+            AIFixedGate::Point(-8156.3f,127.3f,28077.2f),127.3f,14.0f),
+            "stranded iron hound can leave a tall defensive wall");
+        Check(LandingAllowed(AIFixedGate::Point(-8918,281.4f,28656.7f),
+            AIFixedGate::Point(-8914.5f,207.1f,28665),207.6f,14.0f),
+            "gate platform is a lower walking surface");
+        Check(!LandingAllowed(at, at, 200), "no zero-distance teleport");
+        Check(LeavesSupportingWall(8.9f, -14.4f, -1.0f, true), "wall top can drop to confirmed exterior");
+        Check(!LeavesSupportingWall(8.9f, -14.4f, -1.0f, false), "no cross-wall landing without exterior proof");
+        Check(!LeavesSupportingWall(-8.9f, 14.4f, -1.0f, true), "never drop from wall top into enclosure");
+        Check(!LeavesSupportingWall(22.0f, -14.4f, -1.0f, true), "preserve side away from wall center");
+        Check(LeavesSupportingWall(8.9f, 54.9f, -1.0f, false), "drop away on current side");
+        Check(PastSameWallEnd(-19.7f, -43.3f, 39.8f), "exit past adjacent wall end despite overlapping bounds");
+        Check(!PastSameWallEnd(-19.7f, 8.0f, 39.8f), "cannot move along wall end into its span");
+        Check(!PastSameWallEnd(-2.0f, -43.3f, 39.8f), "preserve clearance at a wall join");
+        Check(OverlapsStructure(at,AIFixedGate::Point(140,200,300),AIFixedGate::Point(120,200,300),
+            AIFixedGate::Point(3,10,30)), "wall blocks sideways recovery");
+        Check(!OverlapsStructure(at,AIFixedGate::Point(100,130,300),AIFixedGate::Point(120,200,300),
+            AIFixedGate::Point(3,10,30)), "landing on the same side can clear the wall");
+    }
     using namespace AIFixedRest;
     Health healthy;healthy.Part(false,false,false,1,0,100,0,100);
     Check(NutritionAllows(false,1),"native normal nutrition permits resting");

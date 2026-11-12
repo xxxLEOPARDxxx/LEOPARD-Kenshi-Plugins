@@ -139,6 +139,8 @@ void CheckNativeLoad(){
 void OrigLoad(SaveFileSystem*,const std::string&){++originals;CheckNativeLoad();}
 void OrigNew(SaveFileSystem*){++originals;CheckNativeLoad();}
 void (*g_origWorld)(GameWorld*,float)=OrigWorld;
+bool g_unstuck=false;
+namespace Unstuck { bool ready=false; void SafeUpdate(GameWorld*,long) {} void Suspend() {} }
 void (*g_origLoadGame)(SaveFileSystem*,const std::string&)=OrigLoad;
 void (*g_origNewGame)(SaveFileSystem*)=OrigNew;
 void OrigReset(GameWorld*){++originals;CheckNativeLoad();}
@@ -210,7 +212,7 @@ int main(){
  Check(notes==4 && originals==4,"debug on preserves diagnostics and originals");
  g_debug=false;notes=0;Medical_hook(&med,0);Check(notes==0,"live debug off stops already-installed medical diagnostics");
  MCM_Api api={0};api.version=6;api.beginMod=Begin;api.info=Info;api.section=Info;api.toggle=Toggle;api.integer=Integer;
- MCM_Describe(&api);Check(toggles==11 && (debugFlags & MCM_RESTART)!=0,"debug capture advertises required restart through actual API");
+ MCM_Describe(&api);Check(toggles==12 && (debugFlags & MCM_RESTART)!=0,"debug capture advertises required restart through actual API");
  calls=0;GuiUpdate_hook(&gui);Check(calls==0,"no world heartbeat prevents squad scan despite stale ou");
 
  SelfRepairState prior={0,0,2,true,&bed,0,0,0};g_selfRepairState[&c]=prior;
