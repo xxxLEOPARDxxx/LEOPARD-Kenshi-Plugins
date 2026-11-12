@@ -178,7 +178,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "3",
+    "version": "4",
     "changes": {
       "ru": [
         "Добавлены MCM и русский/английский/китайский интерфейс, отдельные переключатели категорий, дальность и настройки окраски.",
@@ -219,18 +219,34 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "4": {
+        "en": [
+          "Optional NPC names in relationship colours, with a separate Ctrl+N hotkey and adjustable horizontal and vertical offsets. In the maintainer's test scene, enabling names caused no noticeable FPS drop.",
+          "Optional relationship tint when hovering over a character, with adjustable tint intensity so clothing and equipment remain visible.",
+          "Fixed name colours when a highlight palette component exceeds the normal range."
+        ],
+        "ru": [
+          "Имена NPC окрашиваются по отношениям. Есть отдельное сочетание Ctrl+N и смещение по обеим осям. В тестовой сцене автора форка показ имён не вызвал заметной просадки FPS.",
+          "Можно включить окраску по отношениям при наведении курсора. Интенсивность регулируется, чтобы одежда и экипировка оставались видны.",
+          "Исправлены неверные цвета имён при выходе значения цвета за допустимый диапазон."
+        ]
       }
     },
     "player_changes": {
       "ru": [
         "Добавлены MCM и русский/английский/китайский интерфейс, отдельные переключатели категорий, дальность и настройки окраски.",
         "Снижена фоновая нагрузка подсветки, особенно в больших поселениях.",
-        "Добавлен отдельный цвет дипломатов, в том числе из других модов; исправлена подсветка персонажей без фракции."
+        "Добавлен отдельный цвет дипломатов, в том числе из других модов; исправлена подсветка персонажей без фракции.",
+        "Имена NPC окрашиваются по отношениям. Есть отдельное сочетание Ctrl+N и смещение по обеим осям. В тестовой сцене автора форка показ имён не вызвал заметной просадки FPS.",
+        "Можно включить окраску по отношениям при наведении курсора. Интенсивность регулируется, чтобы одежда и экипировка оставались видны."
       ],
       "en": [
         "Added MCM and Russian/English/Chinese text, separate category toggles, range and tint settings.",
         "Reduced background highlighting overhead, especially in large settlements.",
-        "Added a separate diplomat color, including modded envoys, and fixed highlighting for factionless characters."
+        "Added a separate diplomat color, including modded envoys, and fixed highlighting for factionless characters.",
+        "Optional NPC names in relationship colours, with a separate Ctrl+N hotkey and adjustable horizontal and vertical offsets. In the maintainer's test scene, enabling names caused no noticeable FPS drop.",
+        "Optional relationship tint when hovering over a character, with adjustable tint intensity so clothing and equipment remain visible."
       ]
     }
   },
@@ -667,7 +683,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "2",
+    "version": "3",
     "changes": {
       "ru": [
         "MCM заменяет прежнюю вкладку MODS: одно назначение клавиатуры или мыши с модификаторами, MMB по умолчанию; NONE отключает ввод. Для назначения мыши нужен MCM 10 или новее.",
@@ -702,6 +718,16 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "3": {
+        "en": [
+          "Workers can automatically unload rotated items into storage. Quick transfers and automatic unloading can merge compatible items into an existing stack in its current orientation.",
+          "Dragging onto a stack still requires matching orientations."
+        ],
+        "ru": [
+          "Работники автоматически разгружают перевёрнутые предметы на склад. При быстрой и автоматической передаче совместимые предметы объединяются с существующей стопкой в её ориентации.",
+          "При перетаскивании на стопку ориентации предметов должны совпадать."
+        ]
       }
     },
     "player_changes": {
@@ -709,13 +735,15 @@
         "MCM заменяет прежнюю вкладку MODS: одно назначение клавиатуры или мыши с модификаторами, MMB по умолчанию; NONE отключает ввод. Для назначения мыши нужен MCM 10 или новее.",
         "Первый активный прежний способ переносится автоматически; существующее новое сочетание и личные настройки сохраняются.",
         "Исправлены повторные повороты после фокуса инвентаря; редактируемые поля и окно настроек блокируют вращение.",
-        "Добавлены русский, английский и китайский; снижена нагрузка обновления значков инвентаря."
+        "Добавлены русский, английский и китайский; снижена нагрузка обновления значков инвентаря.",
+        "Работники автоматически разгружают перевёрнутые предметы на склад. При быстрой и автоматической передаче совместимые предметы объединяются с существующей стопкой в её ориентации."
       ],
       "en": [
         "MCM replaces the old MODS controls: one keyboard or mouse binding with modifiers, MMB by default; NONE disables input. Mouse assignment requires MCM 10 or newer.",
         "The first active legacy binding migrates automatically; an existing new binding and personal settings are preserved.",
         "Repeated rotation after inventory focus was fixed; editable fields and the Options window block rotation.",
-        "Added Russian, English and Chinese, with lower inventory-icon update overhead."
+        "Added Russian, English and Chinese, with lower inventory-icon update overhead.",
+        "Workers can automatically unload rotated items into storage. Quick transfers and automatic unloading can merge compatible items into an existing stack in its current orientation."
       ]
     }
   },
@@ -785,7 +813,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "6",
+    "version": "7",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -852,6 +880,20 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "7": {
+        "en": [
+          "Finishers start faster and approach the target before striking. Characters finish the assigned batch before returning to standing jobs.",
+          "Supported characters use a native strike animation and keep their equipped melee weapon in hand through the swing. A melee weapon in the second slot can be used if a crossbow is in the first.",
+          "Set the maximum finishing distance up to 20 and the number of selected executioners up to 50. Optionally put down a carried corpse before approaching. Carried targets are excluded by default.",
+          "Execution commands align with the game's visible context-menu rows."
+        ],
+        "ru": [
+          "Команда добивания выполняется быстрее. Персонаж подходит вплотную, добивает все назначенные цели и только потом возвращается к постоянным задачам.",
+          "Для подходящих персонажей используется штатная анимация удара. Оружие ближнего боя видно весь взмах. Если в первом слоте арбалет, можно достать оружие из второго.",
+          "Дистанция добивания настраивается до 20, число исполнителей до 50. Можно включить сброс переносимого тела перед подходом. Добивание целей, которых несут, по умолчанию выключено.",
+          "Команды добивания выровнены по строкам штатного контекстного меню."
+        ]
       }
     },
     "player_changes": {
@@ -859,13 +901,21 @@
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
         "Переведены кнопки действий; несколько исполнителей добивают отдельные ближайшие цели, новый приказ игрока отменяет действие.",
         "Исправлены мелькание задачи и звуки людей, животных и скелетов.",
-        "Действия встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом."
+        "Действия встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом.",
+        "Команда добивания выполняется быстрее. Персонаж подходит вплотную, добивает все назначенные цели и только потом возвращается к постоянным задачам.",
+        "Для подходящих персонажей используется штатная анимация удара. Оружие ближнего боя видно весь взмах. Если в первом слоте арбалет, можно достать оружие из второго.",
+        "Дистанция добивания настраивается до 20, число исполнителей до 50. Можно включить сброс переносимого тела перед подходом. Добивание целей, которых несут, по умолчанию выключено.",
+        "Команды добивания выровнены по строкам штатного контекстного меню."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
         "Action buttons are translated; multiple executioners take separate nearest targets, and a new player order cancels execution.",
         "Corrected task flicker and sounds for people, animals and skeletons.",
-        "Actions are integrated into the native context menu, retaining the separate panel as fallback."
+        "Actions are integrated into the native context menu, retaining the separate panel as fallback.",
+        "Finishers start faster and approach the target before striking. Characters finish the assigned batch before returning to standing jobs.",
+        "Supported characters use a native strike animation and keep their equipped melee weapon in hand through the swing. A melee weapon in the second slot can be used if a crossbow is in the first.",
+        "Set the maximum finishing distance up to 20 and the number of selected executioners up to 50. Optionally put down a carried corpse before approaching. Carried targets are excluded by default.",
+        "Execution commands align with the game's visible context-menu rows."
       ]
     }
   },
@@ -1272,7 +1322,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "7",
+    "version": "8",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -1353,6 +1403,14 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "8": {
+        "en": [
+          "Adjust the height of state text and icons above characters. The standalone bounty symbol keeps its own height setting."
+        ],
+        "ru": [
+          "Добавлена настройка высоты текста и значков состояния над персонажами. У отдельного значка награды сохраняется своя настройка высоты."
+        ]
       }
     },
     "player_changes": {
@@ -1363,7 +1421,8 @@
         "Цели с наградой используют цвет тира; окраска сосуществует с Character Highlight и не попадает в портреты.",
         "Клавиша задаётся одним сочетанием с модификаторами.",
         "[b]Необязательные значки.[/b] Настройки поясняют замену пользовательского значка штатным; недоступные файлы не вызывают ложных сообщений о текстурах.",
-        "[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему."
+        "[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему.",
+        "Добавлена настройка высоты текста и значков состояния над персонажами. У отдельного значка награды сохраняется своя настройка высоты."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
@@ -1372,7 +1431,8 @@
         "Bounty targets use tier colors; tint coexists with Character Highlight and is not baked into portraits.",
         "The show key is assigned as one binding with modifiers.",
         "[b]Optional icons.[/b] Settings explain when a custom icon falls back to the standard game icon; unavailable files no longer cause misleading texture messages.",
-        "[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour."
+        "[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour.",
+        "Adjust the height of state text and icons above characters. The standalone bounty symbol keeps its own height setting."
       ]
     }
   },
@@ -1635,7 +1695,7 @@
       "en": "Original source code is available in the linked repository.",
       "ru": "Исходный код оригинала доступен в указанном репозитории."
     },
-    "version": "1",
+    "version": "2",
     "changes": {
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
@@ -1683,6 +1743,18 @@
           "Steam/GOG в одном пакете. GOG работает, но широкое игровое тестирование ещё не завершено.",
           "Полезные функции KenshiQOL автора Steel объединены с KEO: переносимый вес, сбор продукции, пополнение прилавка и циклические маршруты.",
           "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах."
+        ]
+      },
+      "2": {
+        "en": [
+          "Set operator cargo limits by weight and occupied inventory and backpack cells in steps of 5%. A supported operator delivers when either limit is reached.",
+          "Right-click the backpack checkmark to set an individual cell limit or restore the global one. A green checkmark indicates an individual limit.",
+          "With MCM installed, KEO settings are available on its MCM page. The standalone tab is available without MCM."
+        ],
+        "ru": [
+          "Для операторов поддерживаемых станков можно настроить предел по весу и долю занятых ячеек инвентаря и рюкзака с шагом 5%. Доставка начинается по первому достигнутому пределу.",
+          "ПКМ по галочке рюкзака открывает личный лимит ячеек и позволяет вернуться к общему. Зелёная галочка показывает, что задан личный лимит.",
+          "При установленном MCM настройки доступны на странице KEO в MCM. Отдельная вкладка доступна без MCM."
         ]
       }
     }

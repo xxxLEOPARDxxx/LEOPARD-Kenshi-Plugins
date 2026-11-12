@@ -86,17 +86,15 @@
     ]
   },
   "SkillLevelUpInfo": {
-    "version": "3",
-    "published_version": "2",
+    "version": "4",
+    "published_version": "3",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Level-up messages use actual increases in the underlying skill. Temporary changes to effective skill, including penalties from overloaded animals, no longer trigger false notices.",
+      "Localised the Mass Combat skill name in Russian."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Уведомления появляются при реальном повышении навыка. Временные изменения характеристик, в том числе у перегруженных животных, больше не вызывают спам.",
+      "Название навыка «Массовый бой» переведено на русский."
     ]
   },
   "MultiXPMining": {
@@ -128,17 +126,15 @@
     ]
   },
   "KenshiRotate": {
-    "version": "2",
-    "published_version": "1",
+    "version": "3",
+    "published_version": "2",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Workers can automatically unload rotated items into storage. Quick transfers and automatic unloading can merge compatible items into an existing stack in its current orientation.",
+      "Dragging onto a stack still requires matching orientations."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Работники автоматически разгружают перевёрнутые предметы на склад. При быстрой и автоматической передаче совместимые предметы объединяются с существующей стопкой в её ориентации.",
+      "При перетаскивании на стопку ориентации предметов должны совпадать."
     ]
   },
   "KillCounter": {
@@ -360,17 +356,13 @@
     ]
   },
   "WantedMap": {
-    "version": "7",
-    "published_version": "6",
+    "version": "8",
+    "published_version": "7",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Recognises the full-width colon in Chinese wanted poster titles so they can be matched to map targets."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Объявления о розыске с полноширинным китайским двоеточием распознаются при поиске целей на карте."
     ]
   },
   "Container-Highlight": {
@@ -390,21 +382,13 @@
     ]
   },
   "Vital-Sense": {
-    "version": "7",
-    "published_version": "6",
+    "version": "8",
+    "published_version": "7",
     "en": [
-      "[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour.",
-      "[b]Optional icon compatibility.[/b] Optional custom textures are checked before loading, avoiding misleading missing-texture messages. Settings explain the standard-icon fallback.",
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Adjust the height of state text and icons above characters. The standalone bounty symbol keeps its own height setting."
     ],
     "ru": [
-      "[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему.",
-      "[b]Совместимость необязательных значков.[/b] Пользовательские текстуры проверяются до загрузки, без ложных сообщений об отсутствующих файлах. Подсказки настроек поясняют использование штатных значков.",
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Добавлена настройка высоты текста и значков состояния над персонажами. У отдельного значка награды сохраняется своя настройка высоты."
     ]
   },
   "Vital-Read": {
@@ -466,17 +450,19 @@
     ]
   },
   "Loot-Scoot-Execute": {
-    "version": "6",
-    "published_version": "5",
+    "version": "7",
+    "published_version": "6",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Finishers start faster and approach the target before striking. Characters finish the assigned batch before returning to standing jobs.",
+      "Supported characters use a native strike animation and keep their equipped melee weapon in hand through the swing. A melee weapon in the second slot can be used if a crossbow is in the first.",
+      "Set the maximum finishing distance up to 20 and the number of selected executioners up to 50. Optionally put down a carried corpse before approaching. Carried targets are excluded by default.",
+      "Execution commands align with the game's visible context-menu rows."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Команда добивания выполняется быстрее. Персонаж подходит вплотную, добивает все назначенные цели и только потом возвращается к постоянным задачам.",
+      "Для подходящих персонажей используется штатная анимация удара. Оружие ближнего боя видно весь взмах. Если в первом слоте арбалет, можно достать оружие из второго.",
+      "Дистанция добивания настраивается до 20, число исполнителей до 50. Можно включить сброс переносимого тела перед подходом. Добивание целей, которых несут, по умолчанию выключено.",
+      "Команды добивания выровнены по строкам штатного контекстного меню."
     ]
   },
   "Wall-B-Gone": {
@@ -534,35 +520,31 @@
     ]
   },
   "Character-Highlight": {
-    "version": "3",
-    "published_version": "2",
+    "version": "4",
+    "published_version": "3",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Optional NPC names in relationship colours, with a separate Ctrl+N hotkey and adjustable horizontal and vertical offsets. In the maintainer's test scene, enabling names caused no noticeable FPS drop.",
+      "Optional relationship tint when hovering over a character, with adjustable tint intensity so clothing and equipment remain visible.",
+      "Fixed name colours when a highlight palette component exceeds the normal range."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Имена NPC окрашиваются по отношениям. Есть отдельное сочетание Ctrl+N и смещение по обеим осям. В тестовой сцене автора форка показ имён не вызвал заметной просадки FPS.",
+      "Можно включить окраску по отношениям при наведении курсора. Интенсивность регулируется, чтобы одежда и экипировка оставались видны.",
+      "Исправлены неверные цвета имён при выходе значения цвета за допустимый диапазон."
     ]
   },
   "KEO": {
-    "version": "1",
-    "published_version": "0",
+    "version": "2",
+    "published_version": "1",
     "en": [
-      "First maintenance fork of KEO with optional MCM configuration, English/Russian/Simplified Chinese interface, and detailed logging off by default.",
-      "Steam and GOG are supported in one package. GOG works, with startup confirmed on an earlier candidate; broad testing of the current gameplay features is not complete.",
-      "Corrected route ownership for selected actors outside the formation limit, stale route-point application, and handling of native path readiness when cities reload.",
-      "Optional carried-body/container weight and three independently switched jobs adapted from Steel's KenshiQOL: Gather Output, Stock Shop Counter and cyclic waypoints. All are off by default.",
-      "Cyclic routes use ordinary job rows, retain distinct points and survive normal saving/loading. Counter stocking physically delivers items and does not create a sale or income."
+      "Set operator cargo limits by weight and occupied inventory and backpack cells in steps of 5%. A supported operator delivers when either limit is reached.",
+      "Right-click the backpack checkmark to set an individual cell limit or restore the global one. A green checkmark indicates an individual limit.",
+      "With MCM installed, KEO settings are available on its MCM page. The standalone tab is available without MCM."
     ],
     "ru": [
-      "Первый сопровождающий форк KEO: необязательная настройка через MCM, русский/английский/китайский интерфейс и подробный журнал, выключенный по умолчанию.",
-      "Steam и GOG поддерживаются одним пакетом. GOG работает: запуск более ранней сборки подтверждён, но широкая проверка нынешних игровых возможностей ещё не завершена.",
-      "Исправлены старое управление маршрутом у персонажей сверх лимита группы, применение устаревшей точки пути и обработка штатной готовности пути при повторной загрузке городов.",
-      "Необязательный вес переносимых тел/контейнеров и три отдельных задания из KenshiQOL автора Steel: сбор продукции, пополнение прилавка и циклический маршрут. По умолчанию выключены.",
-      "Циклический маршрут использует обычные строки задач, различает отдельные точки и сохраняется при обычном сохранении/загрузке. Пополнение прилавка физически переносит вещи и не создаёт сделку или доход."
+      "Для операторов поддерживаемых станков можно настроить предел по весу и долю занятых ячеек инвентаря и рюкзака с шагом 5%. Доставка начинается по первому достигнутому пределу.",
+      "ПКМ по галочке рюкзака открывает личный лимит ячеек и позволяет вернуться к общему. Зелёная галочка показывает, что задан личный лимит.",
+      "При установленном MCM настройки доступны на странице KEO в MCM. Отдельная вкладка доступна без MCM."
     ]
   }
 }

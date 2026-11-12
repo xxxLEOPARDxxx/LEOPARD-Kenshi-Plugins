@@ -20,7 +20,7 @@ import shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODS = r"D:\SteamLibrary\steamapps\common\Kenshi\mods"
 OURS = r"D:\DEV\Kenshi\ours"
-KEO_SOURCE = r"D:\DEV\Kenshi\forks\KEO"
+KEO_SOURCE = r"D:\DEV\Kenshi\forks\LEOPARD-Kenshi-Forks\KEO"
 # Mod Config Menu - ссылка в шапке описания всех остальных модов.
 MCM_STEAM_URL = "https://steamcommunity.com/sharedfiles/filedetails/?id=3813761584"
 MCM_NEXUS_URL = "https://www.nexusmods.com/kenshi/mods/2202"
@@ -100,7 +100,7 @@ ITEMS = [
          en="The 'Choose your beginning' window as a list of all starts: two "
             "layouts, sorting by name and difficulty, search, race filter, the "
             "game's advanced options inside with right-click reset."),
-    dict(mod="WantedMap", title="Wanted Map (QoL)", nexus=2203, version="7",
+    dict(mod="WantedMap", title="Wanted Map (QoL)", nexus=2203, version="8",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Select a character carrying 'Wanted' posters and the world map "
             "shows where the targets are: exact, approximate, at their home "
@@ -129,11 +129,11 @@ ITEMS = [
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Pauses the game after a save loads, on trade and on inventory - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Loot-Scoot-Execute", title="Loot Scoot Execute (MCM fork) (QoL)", nexus=2210, version="6",
+    dict(mod="Loot-Scoot-Execute", title="Loot Scoot Execute (MCM fork) (QoL)", nexus=2210, version="7",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Execute and Execute All for downed enemies in the context menu - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Vital-Sense", title="Vital Sense (MCM fork) (QoL)", nexus=2214, version="7",
+    dict(mod="Vital-Sense", title="Vital Sense (MCM fork) (QoL)", nexus=2214, version="8",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT for state and bounty markers over visible characters - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
@@ -194,7 +194,7 @@ ITEMS = [
             "Indicators."),
     # --- форк Character Highlight (BFrizzleFoShizzle, KenshiLib_Examples, GPLv3).
     dict(mod="Character-Highlight", title="Character Highlight (MCM fork) (QoL)", nexus=2233,
-         version="3", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
+         version="4", tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT to tint characters by how they stand to you - squad, enemies, allies, "
             "neutrals, diplomats. A heavily optimised fork of BFrizzleFoShizzle's mod with "
             "settings in Mod Config Menu."),
@@ -209,7 +209,7 @@ ITEMS = [
          en='Recruit bubbles, trader coins and gold squad-leader stars, with a shared show key and independent star size.'),
 ]
 
-ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': 2257, 'version': "3", 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Full XP Info displays: blue experience gains, gold level increases and recent-training bars, configured through MCM.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': 2258, 'version': "2", 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': 2261, 'version': "2", 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': 2259, 'version': "3", 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': 2260, 'version': "2", 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
+ITEMS.extend([{'mod': 'SkillLevelUpInfo', 'title': 'Skill Level Up Info (QoL)', 'nexus': 2257, 'version': "4", 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Full XP Info displays: blue experience gains, gold level increases and recent-training bars, configured through MCM.'}, {'mod': 'MultiXPMining', 'title': 'Multi XP Mining (QoL)', 'nexus': 2258, 'version': "2", 'tags': ['Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Extra Strength, Toughness and Dexterity training from actual mining work. Detects mining sources from all loaded mods.'}, {'mod': 'KillCounter', 'title': 'Kill Counter (MCM fork) (QoL)', 'nexus': 2261, 'version': "2", 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Kills, knockouts and severed-limb counters in the character stats window, with optional rows and in-game settings.'}, {'mod': 'Character Inspector', 'title': 'Character Inspector (MCM fork) (QoL)', 'nexus': 2259, 'version': "3", 'tags': ['GUI', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Inspect body-part armour coverage, protective layers and environmental resistance using the inventory STATS button.'}, {'mod': 'KenshiRotate', 'title': 'Rotate Items (MCM fork) (QoL)', 'nexus': 2260, 'version': "3", 'tags': ['GUI', 'Gameplay', 'RE_Kenshi'], 'lang': True, 'drop': [], 'en': 'Rotate inventory and backpack items repeatedly with one keyboard or mouse binding. Rotations remain saved.'}])
 
 ITEMS.append(dict(mod="StackSort",title="Stack Sort (MCM fork) (QoL)",nexus=2262,version="3",tags=["GUI","Gameplay","RE_Kenshi"],lang=True,drop=[],en="Pack inventories, consolidate compatible stacks and reserve free space, with Rotate Items support and MCM settings."))
 ITEMS.extend([
@@ -221,7 +221,7 @@ ITEMS.extend([
          en="Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors."),
 ])
 
-ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="1",
+ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="2",
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="A maintenance fork of Kenshi Engine Optimizations with MCM settings, translations and optional inventory jobs."))
 
