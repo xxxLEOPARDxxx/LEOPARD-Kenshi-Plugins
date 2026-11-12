@@ -5,6 +5,45 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Information below the map"
+msgstr "地图下方信息"
+
+msgid "Show zoom level"
+msgstr "显示缩放比例"
+
+msgid "100% is the default range (2000). Zooming in raises the percentage. The strip disappears when all its fields are off."
+msgstr "100%对应默认范围（2000）。放大时百分比增加。所有信息项关闭时，面板自动隐藏。"
+
+msgid "Show centre coordinates"
+msgstr "显示中心坐标"
+
+msgid "X and Z of the minimap centre, in metres. Follows the selected characters when that centring mode is enabled."
+msgstr "小地图中心的X、Z坐标，单位为米。启用以所选角色为中心时，坐标随角色移动。"
+
+msgid "Show camera direction"
+msgstr "显示镜头方向"
+
+msgid "Camera heading in degrees: 000 is north on the map, 090 east, 180 south and 270 west."
+msgstr "镜头朝向角度：000为地图北方，090为东方，180为南方，270为西方。"
+
+msgid "Show real-world clock"
+msgstr "显示现实时间"
+
+msgid "Local computer time, in 24-hour HH:MM format."
+msgstr "电脑本地时间，采用24小时制，格式为时:分。"
+
+msgid "Zoom:%s"
+msgstr "缩放:%s"
+
+msgid "Dir:%03d"
+msgstr "向:%03d"
+
+msgid "Dir:--"
+msgstr "向:--"
+
+msgid "Time:%s"
+msgstr "时:%s"
+
 msgid "1-10 (10% steps). Only the map: the markers stay opaque."
 msgstr "1-10（每级 10%）。只影响地图：标记始终不透明。"
 

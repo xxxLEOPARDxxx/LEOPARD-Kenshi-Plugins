@@ -5,6 +5,45 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Information below the map"
+msgstr "Информация под картой"
+
+msgid "Show zoom level"
+msgstr "Показывать масштаб"
+
+msgid "100% is the default range (2000). Zooming in raises the percentage. The strip disappears when all its fields are off."
+msgstr "100% - исходный обзор (2000). При приближении процент увеличивается. Если все поля выключены, панель скрыта."
+
+msgid "Show centre coordinates"
+msgstr "Показывать координаты центра"
+
+msgid "X and Z of the minimap centre, in metres. Follows the selected characters when that centring mode is enabled."
+msgstr "X и Z центра миникарты в метрах. Следует за выделенными персонажами, если включён такой режим центрирования."
+
+msgid "Show camera direction"
+msgstr "Показывать направление камеры"
+
+msgid "Camera heading in degrees: 000 is north on the map, 090 east, 180 south and 270 west."
+msgstr "Курс камеры в градусах: 000 - север карты, 090 - восток, 180 - юг, 270 - запад."
+
+msgid "Show real-world clock"
+msgstr "Показывать реальные часы"
+
+msgid "Local computer time, in 24-hour HH:MM format."
+msgstr "Местное время компьютера в 24-часовом формате ЧЧ:ММ."
+
+msgid "Zoom:%s"
+msgstr "Масштаб:%s"
+
+msgid "Dir:%03d"
+msgstr "Курс:%03d"
+
+msgid "Dir:--"
+msgstr "Курс:--"
+
+msgid "Time:%s"
+msgstr "Часы:%s"
+
 msgid "1-10 (10% steps). Only the map: the markers stay opaque."
 msgstr "1-10 (шаг 10%). Только карта: метки остаются непрозрачными."
 

@@ -5,6 +5,45 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Information below the map"
+msgstr "Information below the map"
+
+msgid "Show zoom level"
+msgstr "Show zoom level"
+
+msgid "100% is the default range (2000). Zooming in raises the percentage. The strip disappears when all its fields are off."
+msgstr "100% is the default range (2000). Zooming in raises the percentage. The strip disappears when all its fields are off."
+
+msgid "Show centre coordinates"
+msgstr "Show centre coordinates"
+
+msgid "X and Z of the minimap centre, in metres. Follows the selected characters when that centring mode is enabled."
+msgstr "X and Z of the minimap centre, in metres. Follows the selected characters when that centring mode is enabled."
+
+msgid "Show camera direction"
+msgstr "Show camera direction"
+
+msgid "Camera heading in degrees: 000 is north on the map, 090 east, 180 south and 270 west."
+msgstr "Camera heading in degrees: 000 is north on the map, 090 east, 180 south and 270 west."
+
+msgid "Show real-world clock"
+msgstr "Show real-world clock"
+
+msgid "Local computer time, in 24-hour HH:MM format."
+msgstr "Local computer time, in 24-hour HH:MM format."
+
+msgid "Zoom:%s"
+msgstr "Zoom:%s"
+
+msgid "Dir:%03d"
+msgstr "Dir:%03d"
+
+msgid "Dir:--"
+msgstr "Dir:--"
+
+msgid "Time:%s"
+msgstr "Time:%s"
+
 msgid "1-10 (10% steps). Only the map: the markers stay opaque."
 msgstr "1-10 (10% steps). Only the map: the markers stay opaque."
 

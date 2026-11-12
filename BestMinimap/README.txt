@@ -32,6 +32,9 @@ BEST MINIMAP (QoL)
   * Двойной щелчок по миникарте - камера переносится в эту точку, если игра пускает
     её так далеко от ваших персонажей (до линии предела камеры). Камера,
     следившая за персонажем, перестаёт за ним следить.
+  * Необязательную панель под картой: масштаб в процентах, координаты
+    центра X/Z в метрах, курс камеры и местное время компьютера. Каждое
+    поле включается отдельно в MCM; все выключены - панель скрыта.
   * Тонкую линию вокруг ваших персонажей: докуда можно отвести камеру.
     Предел плагин узнаёт сам - один раз отведите камеру до упора.
 
@@ -120,6 +123,25 @@ MCM settings or BestMinimap.ini control appearance, filters, alerts and colours.
 Camera arrow size, line width and manual range apply without a game restart.
 Detailed logging is the last setting and defaults to off.
 
+Optional information strip below the map: each field has a separate live MCM
+switch (InfoScale, InfoCoordinates, InfoHeading, InfoClock), all off by default.
+Zoom is the current zoom percentage, X/Z the map
+centre in metres, Dir the camera bearing from map north (000-359), and Time
+the local computer clock in 24-hour format. The default Range=2000 is 100%;
+zooming in increases the percentage (2000 / current Range * 100%). This stable
+reference does not depend on map size or shape. Turning every field off hides
+the strip; hiding the minimap also hides it. It follows the minimap while
+dragging/resizing. The minimum strip width is 100 pixels to fit vanilla borders.
+
+Информационная панель: InfoScale - масштаб в процентах, InfoCoordinates - X/Z центра,
+InfoHeading - курс камеры от севера карты (000-359), InfoClock - часы компьютера.
+Все поля по умолчанию выключены. Применяются без перезапуска. Исходный Range=2000
+соответствует 100%; при приближении процент растёт (2000 / текущий Range * 100%).
+База не зависит от размера и формы карты. Координаты переводятся в метры.
+Панель перемещается вместе с миникартой и скрывается вместе с ней. Если все поля
+выключены, панель исчезает. Минимальная ширина панели - 100 пикселей для рамки
+ванильного интерфейса.
+
 Prepared update 2 / Подготовленный выпуск 2
 EN: Added independent camera arrow size and adjustable, clearer boundary width.
 Auto range uses the verified game limit instead of a persisted maximum observed
@@ -148,6 +170,18 @@ arrow size is copied into draw commands. Dotted and solid circles are capped at
 Legacy CameraArrowSize=0 is migrated once to the actual previous pixel size,
 so the displayed value can be reduced. Russian in-game text uses ASCII hyphens;
 typographic dashes are unsupported by the game font.
+
+Information-strip implementation (2026-11-13, local change, not a release):
+one root-owned thin game panel and at most five reusable text rows; WidgetRef
+clears every reference on game-UI destruction. Text and background use the
+current interface skins, including their text colour. Root placement bounds
+include the strip, while map texture, world projection and click bounds keep
+their original dimensions. Numeric work is limited to four updates per second
+plus changes to settings/zoom; captions update only when their content changes.
+The clock is sampled at the next minute boundary, with no per-frame clock/INI
+polling or world traversal. Native world positions use ten units per metre.
+Runtime visual verification on vanilla/Dark UI and long-run FPS/memory checks
+remain required; native production policy tests do not replace those checks.
 
 
 Localization diagnostics / Журнал локализации (2026-11-01)

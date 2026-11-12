@@ -62,6 +62,7 @@
 #include <Debug.h>
 #include <core/Functions.h>
 #include "CameraRangePolicy.h"
+#include "MinimapInfoPolicy.h"
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -184,6 +185,8 @@ namespace
     float g_range = 2000.0f;            // метров от центра до края
     bool g_rotate = false;
     bool g_centerOnSelected = false;
+    unsigned g_infoFields = 0;          // optional strip below the map, live MCM settings
+    bool g_infoDirty = true;
     int g_opacity = 10;
     int g_fps = 20;
     int g_dot = 5;
@@ -333,6 +336,16 @@ namespace
         g_range = static_cast<float>(ReadInt(ini, "Range", 2000, static_cast<int>(kRangeMin), static_cast<int>(kRangeMax)));
         g_rotate = ReadBool(ini, "RotateWithCamera", false);
         g_centerOnSelected = ReadBool(ini, "CenterOnSelected", false);
+        g_infoFields = 0;
+        if (ReadBool(ini, "InfoScale", false))
+            g_infoFields |= BestMinimapInfo::Scale;
+        if (ReadBool(ini, "InfoCoordinates", false))
+            g_infoFields |= BestMinimapInfo::Coordinates;
+        if (ReadBool(ini, "InfoHeading", false))
+            g_infoFields |= BestMinimapInfo::Heading;
+        if (ReadBool(ini, "InfoClock", false))
+            g_infoFields |= BestMinimapInfo::Clock;
+        g_infoDirty = true;
         g_opacity = ReadInt(ini, "Opacity", 10, 1, 10);
         g_fps = ReadInt(ini, "UpdateFps", 20, 2, 60);
         g_dot = ReadInt(ini, "DotSize", 5, 2, 16);
@@ -1364,6 +1377,11 @@ namespace
     WidgetRef g_rootRef;            // панель: ловит мышь
     WidgetRef g_backRef;            // подложка-скин игры (Frame=game)
     WidgetRef g_imageRef;           // картинка с нашей текстурой
+    WidgetRef g_infoBackRef;        // owned by root; five bounded, reusable text rows
+    WidgetRef g_infoTextRefs[5];
+    std::string g_infoCaptions[5];
+    DWORD g_infoAt = 0, g_infoClockAt = 0, g_infoClockWait = 0;
+    char g_infoClock[6] = {};
     MyGUI::ITexture* g_tex = NULL;
     std::string g_texName;
     int g_texW = 0, g_texH = 0;     // размер текстуры (степень двойки от 256)
@@ -1527,6 +1545,7 @@ namespace
         g_range = Clamp(g_range * factor, kRangeMin, kRangeMax);
         WriteInt("Range", static_cast<int>(g_range + 0.5f));
         g_lastRender = 0;
+        g_infoDirty = true;
     }
 
     void Resize(int delta)
@@ -1548,13 +1567,14 @@ namespace
     bool EnsureWidgets()
     {
         const int w = ViewWidth(), h = ViewHeight(), pad = GamePad();
+        const BestMinimapInfo::Layout layout = BestMinimapInfo::Plan(g_infoFields, w, h, pad);
         MyGUI::Widget* root = g_rootRef.get();
         const bool created = root == NULL;
         if (root == NULL)
         {
-            ClampPosition(w + 2 * pad, h + 2 * pad);
+            ClampPosition(layout.width, layout.height);
             root = MyGUI::Gui::getInstance().createWidget<MyGUI::Widget>(
-                "PanelEmpty", MyGUI::IntCoord(g_left, g_top, w + 2 * pad, h + 2 * pad),
+                "PanelEmpty", MyGUI::IntCoord(g_left, g_top, layout.width, layout.height),
                 MyGUI::Align::Default, "Window", "BestMinimap_Root");
             g_rootRef.set(root);
             root->eventMouseButtonPressed += MyGUI::newDelegate(&OnPressed);
@@ -1565,6 +1585,13 @@ namespace
             root->setNeedMouseFocus(true);
             g_backRef.reset();
             g_imageRef.reset();
+            g_infoBackRef.reset();
+            for (int i = 0; i < 5; ++i)
+            {
+                g_infoTextRefs[i].reset();
+                g_infoCaptions[i].clear();
+            }
+            g_infoDirty = true;
             g_dirtyMask = true;
         }
 
@@ -1597,7 +1624,7 @@ namespace
             g_viewW = g_viewH = 0;
         }
 
-        if (root->getWidth() != w + 2 * pad || root->getHeight() != h + 2 * pad)
+        if (root->getWidth() != layout.width || root->getHeight() != layout.height)
         {
             // Размер меняется - держим тот край, к которому миникарта ближе:
             // стоит справа - растёт влево, снизу - вверх. Раньше всегда рос
@@ -1609,11 +1636,11 @@ namespace
                 const MyGUI::IntSize view = MyGUI::RenderManager::getInstance().getViewSize();
                 const int oldW = root->getWidth(), oldH = root->getHeight();
                 if (g_left + oldW / 2 > view.width / 2)
-                    g_left += oldW - (w + 2 * pad);
+                    g_left += oldW - layout.width;
                 if (g_top + oldH / 2 > view.height / 2)
-                    g_top += oldH - (h + 2 * pad);
+                    g_top += oldH - layout.height;
             }
-            ClampPosition(w + 2 * pad, h + 2 * pad);
+            ClampPosition(layout.width, layout.height);
             // Новое место - в ini: иначе перечитка настроек (MCM) вернула бы
             // старое.
             if (g_placed && (g_left != wasLeft || g_top != wasTop))
@@ -1621,9 +1648,10 @@ namespace
                 WriteInt("Left", g_left);
                 WriteInt("Top", g_top);
             }
-            root->setCoord(g_left, g_top, w + 2 * pad, h + 2 * pad);
+            root->setCoord(g_left, g_top, layout.width, layout.height);
             if (back != NULL)
                 back->setSize(w + 2 * pad, h + 2 * pad);
+            g_infoDirty = true;
         }
 
         if (!EnsureTexture(w, h))
@@ -2080,6 +2108,132 @@ namespace
         lastPx = px;
         lastFont = pick;
         return pick;
+    }
+
+    // Root owns the strip and its rows. WidgetRef clears on GUI teardown;
+    // hiding/re-enabling fields reuses at most one panel and five text boxes.
+    // No INI access, world scan or caption construction on intervening frames.
+    void InfoRow(MyGUI::Widget* back, int slot, int row, const char* text)
+    {
+        MyGUI::TextBox* box = g_infoTextRefs[slot].get()
+            ? g_infoTextRefs[slot].get()->castType<MyGUI::TextBox>(false) : NULL;
+        if (box == NULL)
+        {
+            box = back->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
+                MyGUI::IntCoord(4, 4 + row * 16, back->getWidth() - 8, 16), MyGUI::Align::Default, "");
+            box->setNeedMouseFocus(false);
+            box->setTextShadow(true);
+            const std::string font = FontFor(12);
+            if (!font.empty())
+                box->setFontName(font);
+            box->setFontHeight(12);
+            // Retain the text colour supplied by the current interface skin.
+            g_infoTextRefs[slot].set(box);
+            g_infoCaptions[slot].clear();
+        }
+        const MyGUI::IntCoord want(4, 4 + row * 16, back->getWidth() - 8, 16);
+        if (box->getCoord() != want)
+            box->setCoord(want);
+        if (g_infoCaptions[slot] != text)
+        {
+            g_infoCaptions[slot] = text;
+            box->setCaption(MyGUI::UString(g_infoCaptions[slot]));
+        }
+        if (!box->getVisible())
+            box->setVisible(true);
+    }
+
+    void UpdateInfo(const Ogre::Vector3& center, DWORD now)
+    {
+        MyGUI::Widget* const root = g_rootRef.get();
+        if (root == NULL)
+            return;
+        MyGUI::Widget* back = g_infoBackRef.get();
+        if (!g_infoFields)
+        {
+            if (back != NULL && back->getVisible())
+                back->setVisible(false);
+            return;
+        }
+        if (!BestMinimapInfo::Due(now, g_infoAt, g_infoDirty))
+            return;
+        g_infoAt = now;
+        g_infoDirty = false;
+        const BestMinimapInfo::Layout layout = BestMinimapInfo::Plan(g_infoFields, ViewWidth(), ViewHeight(), GamePad());
+        if (back == NULL)
+        {
+            // Thin skin has a 19px minimum height in vanilla and 14px in Dark UI.
+            back = root->createWidget<MyGUI::Widget>("Kenshi_FloatingPanelThinSkin",
+                MyGUI::IntCoord(0, layout.panelTop, layout.width, layout.panelHeight), MyGUI::Align::Default, "");
+            back->setNeedMouseFocus(false);
+            g_infoBackRef.set(back);
+        }
+        const MyGUI::IntCoord want(0, layout.panelTop, layout.width, layout.panelHeight);
+        if (back->getCoord() != want)
+            back->setCoord(want);
+        if (!back->getVisible())
+            back->setVisible(true);
+        const unsigned flags[5] = {
+            BestMinimapInfo::Scale, BestMinimapInfo::Coordinates, BestMinimapInfo::Coordinates,
+            BestMinimapInfo::Heading, BestMinimapInfo::Clock
+        };
+        for (int i = 0; i < 5; ++i)
+        {
+            if (!(g_infoFields & flags[i]))
+            {
+                MyGUI::Widget* const box = g_infoTextRefs[i].get();
+                if (box != NULL && box->getVisible())
+                    box->setVisible(false);
+            }
+        }
+        int row = 0;
+        char text[128];
+        if (g_infoFields & BestMinimapInfo::Scale)
+        {
+            char zoom[32];
+            BestMinimapInfo::ZoomText(zoom, sizeof(zoom), g_range);
+            sprintf_s(text, Tr("Zoom:%s"), zoom);
+            InfoRow(back, 0, row++, text);
+        }
+        if (g_infoFields & BestMinimapInfo::Coordinates)
+        {
+            sprintf_s(text, "X:%d", BestMinimapInfo::CoordinateMetres(center.x));
+            InfoRow(back, 1, row++, text);
+            sprintf_s(text, "Z:%d", BestMinimapInfo::CoordinateMetres(center.z));
+            InfoRow(back, 2, row++, text);
+        }
+        if (g_infoFields & BestMinimapInfo::Heading)
+        {
+            int bearing = -1;
+            if (CameraClass* const cam = ou->player->camera)
+            {
+                if (cam->camera != NULL)
+                {
+                    const Ogre::Vector3 dir = cam->camera->getDerivedDirection();
+                    const double dx = (g_map.au * dir.x + g_map.bu * dir.z) * Hi(1, g_src.w);
+                    const double dy = (g_map.av * dir.x + g_map.bv * dir.z) * Hi(1, g_src.h);
+                    bearing = BestMinimapInfo::Bearing(dx, dy);
+                }
+            }
+            if (bearing >= 0)
+                sprintf_s(text, Tr("Dir:%03d"), bearing);
+            else
+                sprintf_s(text, Tr("Dir:--"));
+            InfoRow(back, 3, row++, text);
+        }
+        if (g_infoFields & BestMinimapInfo::Clock)
+        {
+            if (!g_infoClock[0] || now - g_infoClockAt >= g_infoClockWait)
+            {
+                SYSTEMTIME time;
+                GetLocalTime(&time);
+                sprintf_s(g_infoClock, "%02u:%02u", static_cast<unsigned>(time.wHour), static_cast<unsigned>(time.wMinute));
+                g_infoClockAt = now;
+                g_infoClockWait = 60000 - static_cast<DWORD>(time.wSecond) * 1000 - time.wMilliseconds;
+            }
+            sprintf_s(text, Tr("Time:%s"), g_infoClock);
+            InfoRow(back, 4, row++, text);
+        }
     }
 
     void PlaceLabel(const std::string& text, float x, float y, unsigned colour, int fontPx = 0, bool rightOf = false)
@@ -3298,6 +3452,9 @@ namespace
             return false;
         const MyGUI::IntPoint m = MyGUI::InputManager::getInstance().getMousePosition();
         const MyGUI::IntPoint a = img->getAbsolutePosition();
+        // The optional strip belongs to the drag root, not the map projection.
+        if (!BestMinimapInfo::WithinMap(m.left - a.left, m.top - a.top, img->getWidth(), img->getHeight()))
+            return false;
         const View& v = g_lastView;
         const double dx = (m.left - a.left + 0.5 - v.cx) * v.scale;
         const double dy = (m.top - a.top + 0.5 - v.cy) * v.scale;
@@ -3579,6 +3736,8 @@ namespace
             Show(true);
         Reason("");
 
+        UpdateInfo(center, now);
+
         UploadJob();
         const DWORD period = 1000 / static_cast<DWORD>(g_fps);
         if (g_lastRender != 0 && now - g_lastRender < period)
@@ -3671,6 +3830,16 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->integer(api, kSec, "Opacity", Tr("Opacity"), Tr("1-10 (10% steps). Only the map: the markers stay opaque."), 10, 1, 10, 0);
     api->integer(api, kSec, "DotSize", Tr("Marker size, px"), NULL, 5, 2, 16, 0);
     api->toggle(api, kSec, "Locked", Tr("Lock position"), Tr("Off - drag the minimap with the left mouse button."), 0, 0);
+
+    api->section(api, Tr("Information below the map"));
+    api->toggle(api, kSec, "InfoScale", Tr("Show zoom level"),
+        Tr("100% is the default range (2000). Zooming in raises the percentage. The strip disappears when all its fields are off."), 0, 0);
+    api->toggle(api, kSec, "InfoCoordinates", Tr("Show centre coordinates"),
+        Tr("X and Z of the minimap centre, in metres. Follows the selected characters when that centring mode is enabled."), 0, 0);
+    api->toggle(api, kSec, "InfoHeading", Tr("Show camera direction"),
+        Tr("Camera heading in degrees: 000 is north on the map, 090 east, 180 south and 270 west."), 0, 0);
+    api->toggle(api, kSec, "InfoClock", Tr("Show real-world clock"),
+        Tr("Local computer time, in 24-hour HH:MM format."), 0, 0);
 
     api->section(api, Tr("Map"));
     api->integer(api, kSec, "Range", Tr("Range, m"), Tr("From the centre to the edge. The wheel over the minimap and the zoom keys change it too. The map picture of the game has about 70 m in a pixel, so below about 1500 m it gets blurry."), 2000, static_cast<int>(kRangeMin), static_cast<int>(kRangeMax), 0);
