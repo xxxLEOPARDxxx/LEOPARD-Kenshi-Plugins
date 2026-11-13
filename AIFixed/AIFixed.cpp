@@ -101,6 +101,7 @@ namespace
     int g_sleepBelow=90,g_healAbove=99,g_robotBelow=90,g_bedRadius=100;
     bool g_gatePassage=false,g_gateUnlock=false,g_gateClose=true,g_gateRelock=true;
     bool g_unstuck=false;
+    int g_unstuckDelayHours=1;
     int g_gateRadius=30,g_gateCloseDelay=3;
     bool g_restConflict=false,g_gateConflict=false,g_newHooksReady=false,g_gateHooksReady=false;
     CRITICAL_SECTION g_intentLock;
@@ -176,6 +177,7 @@ namespace
         g_gateRadius=(std::max)(5,(std::min)(500,(int)GetPrivateProfileIntA(section,"GateSearchRadius",30,ini.c_str())));
         g_gateCloseDelay=(std::max)(1,(std::min)(30,(int)GetPrivateProfileIntA(section,"GateCloseDelay",3,ini.c_str())));
         g_unstuck=GetPrivateProfileIntA(section,"RecoverStuckNpc",0,ini.c_str())!=0;
+        g_unstuckDelayHours=(std::max)(1,(std::min)(4,(int)GetPrivateProfileIntA(section,"UnstuckDelayHours",1,ini.c_str())));
         g_debug =
             GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
         KLocLog::SetEnabled(g_debug);
@@ -1340,7 +1342,9 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->integer(api,"AIFixed","GateCloseDelay",Tr("Gate close delay (s)"),Tr("Minimum delay after crossing before requesting closure. Nearby characters postpone it."),3,1,30,0);
     api->section(api,Tr("Stuck NPCs"));
     api->toggle(api,"AIFixed","RecoverStuckNpc",Tr("Free stuck NPCs"),
-        Tr("After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."),0,MCM_RESTART);
+        Tr("Move a stranded NPC to a nearby walkable surface after the selected delay without progress. Includes blocked routes on walls and gates. Off by default."),0,MCM_RESTART);
+    api->integer(api,"AIFixed","UnstuckDelayHours",Tr("Stuck recovery delay (game hours)"),
+        Tr("Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."),1,1,4,0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."), 0, MCM_RESTART);
 }

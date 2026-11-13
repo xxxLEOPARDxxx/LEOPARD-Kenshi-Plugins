@@ -11,19 +11,19 @@ int main()
         using namespace AIFixedUnstuck;
         Observation watch;
         const AIFixedGate::Point at(100,200,300);
-        Check(!watch.Sample(at, 10.0, 1000), "first observation starts tracking");
+        Check(!watch.Sample(at, 10.0, 1000,4.0), "first observation starts tracking");
         for (unsigned i=1; i<16; ++i)
-            Check(!watch.Sample(at, 10.0+i*.25, 1000+i*1000), "less than four game hours");
-        Check(watch.Sample(at, 14.0, 17000), "four continuous game hours");
+            Check(!watch.Sample(at, 10.0+i*.25, 1000+i*1000,4.0), "less than four game hours");
+        Check(watch.Sample(at, 14.0, 17000,4.0), "four continuous game hours");
         watch.Probed(false);
-        Check(!watch.Sample(at, 14.04, 17400), "neighbor probes are spaced apart");
-        Check(watch.Sample(at, 14.06, 17600), "next neighbor is tried within minutes");
+        Check(!watch.Sample(at, 14.04, 17400,4.0), "neighbor probes are spaced apart");
+        Check(watch.Sample(at, 14.06, 17600,4.0), "next neighbor is tried within minutes");
         watch.Probed(true);
-        Check(!watch.Sample(at, 14.09, 17900), "exhausted sites back off before retrying");
-        Check(!watch.Sample(AIFixedGate::Point(107,200,300), 14.1, 18000), "progress restarts the timer");
-        Check(!watch.Sample(at, 18.1, 19000), "unobserved game time is discarded");
-        Check(!watch.Sample(at, 18.2, 34000), "unobserved real time is discarded");
-        Check(!watch.Sample(at, 1.0, 35000), "clock rewind starts new observation");
+        Check(!watch.Sample(at, 14.09, 17900,4.0), "exhausted sites back off before retrying");
+        Check(!watch.Sample(AIFixedGate::Point(107,200,300), 14.1, 18000,4.0), "progress restarts the timer");
+        Check(!watch.Sample(at, 18.1, 19000,4.0), "unobserved game time is discarded");
+        Check(!watch.Sample(at, 18.2, 34000,4.0), "unobserved real time is discarded");
+        Check(!watch.Sample(at, 1.0, 35000,4.0), "clock rewind starts new observation");
         Check(LandingAllowed(at, AIFixedGate::Point(102,126,300), 126), "nearby terrain landing below a gate");
         Check(LandingAllowed(at, AIFixedGate::Point(140,200,300), 200), "nearby sideways recovery from a rock");
         Check(!LandingAllowed(at, AIFixedGate::Point(161,126,300), 126), "no wide horizontal jump");
@@ -52,22 +52,40 @@ int main()
         Check(!AboveGateDeck(340.0f,168.1f,207.6f), "unsupported recovery cannot drop from arbitrarily high above terrain");
         Observation guard;
         for (unsigned i=0; i<=16; ++i)
-            Check(!guard.SampleGuard(at, 30.0+i*.25, 1000+i*1000, false, false), "a guard at a valid post does not start recovery");
-        Check(!guard.SampleGuard(at, 35.0, 20000, true, false), "an outstanding path request starts observation but does not prove failure");
+            Check(!guard.SampleGuard(at, 30.0+i*.25, 1000+i*1000, false, false,4.0), "a guard at a valid post does not start recovery");
+        Check(!guard.SampleGuard(at, 35.0, 20000, true, false,4.0), "an outstanding path request starts observation but does not prove failure");
         for (unsigned i=1; i<16; ++i)
-            Check(!guard.SampleGuard(at, 35.0+i*.25, 20000+i*1000, i%4<=1, i%4==1), "post and no-goal cycles preserve but do not shorten the four-hour wait");
-        Check(guard.SampleGuard(at, 39.0, 36000, true, false), "fresh failure survives a resumed guard request after four stationary hours");
-        Check(!guard.SampleGuard(at, 39.5, 37000, false, false), "old failure cannot move a guard who has returned to a post");
-        Check(!guard.SampleGuard(AIFixedGate::Point(106,200,300), 39.75, 38000, false, true), "movement discards stale failed guard intent");
+            Check(!guard.SampleGuard(at, 35.0+i*.25, 20000+i*1000, i%4<=1, i%4==1,4.0), "post and no-goal cycles preserve but do not shorten the four-hour wait");
+        Check(guard.SampleGuard(at, 39.0, 36000, true, false,4.0), "fresh failure survives a resumed guard request after four stationary hours");
+        Check(!guard.SampleGuard(at, 39.5, 37000, false, false,4.0), "old failure cannot move a guard who has returned to a post");
+        Check(!guard.SampleGuard(AIFixedGate::Point(106,200,300), 39.75, 38000, false, true,4.0), "movement discards stale failed guard intent");
         Observation staleGuard;
-        Check(!staleGuard.SampleGuard(at, 40.0, 40000, true, true), "an active failed guard request starts its own four-hour watch");
+        Check(!staleGuard.SampleGuard(at, 40.0, 40000, true, true,4.0), "an active failed guard request starts its own four-hour watch");
         for (unsigned i=1; i<=20; ++i)
-            Check(!staleGuard.SampleGuard(at, 40.0+i*.25, 40000+i*1000, false, true),
+            Check(!staleGuard.SampleGuard(at, 40.0+i*.25, 40000+i*1000, false, true,4.0),
                 "a stale failed path retained during no-goal idle never renews failure evidence");
         Check(staleGuard.guardFailure==40.0, "no-goal samples preserve the original failure timestamp");
-        Check(!staleGuard.active,"an abandoned guard failure expires instead of keeping a reusable four-hour clock");
-        Check(!staleGuard.SampleGuard(at,45.0,45000,true,true) && staleGuard.since==45.0,
-            "a new real failure after an expired episode starts a fresh four-hour watch");
+        Check(staleGuard.active,"continuous physical observation survives expired movement evidence");
+        Check(staleGuard.SampleGuard(at,45.0,61000,true,true,4.0) && staleGuard.since==40.0,
+            "a genuinely new failure can use continuous four-hour physical history after a long witness gap");
+        const unsigned configuredWaits[]={1,2,4};
+        for(unsigned option=0;option<3;++option){
+            Observation configured;
+            const unsigned wait=configuredWaits[option];
+            for(unsigned step=0;step<wait*4;++step)
+                Check(!configured.Sample(at,100.0+step*.25,1000+step*1000,wait),"selected wait cannot mature early");
+            Check(configured.Sample(at,100.0+wait,1000+wait*4000,wait),"each1/2/4-hour policy matures at its selected boundary");
+        }
+        Observation defaultWait;
+        for(unsigned step=0;step<4;++step)Check(!defaultWait.Sample(at,110.0+step*.25,1000+step*1000),"default one-hour wait cannot mature early");
+        Check(defaultWait.Sample(at,111.0,5000),"policy default is one game hour");
+        defaultWait.Probed(true);
+        Check(!defaultWait.Sample(at,111.1,6000,4),"increasing wait postpones an already mature observation");
+        Check(!defaultWait.Sample(at,111.2,7000,1),"lowering wait cannot bypass an exhausted-probe cooldown");
+        Check(defaultWait.Sample(at,111.75,8000,1),"existing cooldown expires normally after live delay changes");
+        Observation invalidWait;
+        Check(!invalidWait.Sample(at,120,1000,0)&&!invalidWait.active,"invalid low wait fails closed");
+        Check(!invalidWait.Sample(at,120,1000,5)&&!invalidWait.active,"invalid high wait fails closed");
         const AIFixedGate::Point slope(-.8357f,.5356f,-.1212f);
         Check(GuardLeavesSlope(at,AIFixedGate::Point(88,82,297),slope), "a downhill landing leaves the observed platform slope");
         Check(!GuardLeavesSlope(at,AIFixedGate::Point(112,82,303),slope), "an uphill landing cannot move through a platform");

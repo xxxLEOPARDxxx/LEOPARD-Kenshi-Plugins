@@ -133,8 +133,16 @@ msgstr "Минимальная задержка после прохода пер
 msgid "Free stuck NPCs"
 msgstr "Освобождать застрявших NPC"
 
-msgid "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
-msgstr "Если NPC застрял на четыре игровых часа, перенести его на проходимую поверхность рядом. Работает также при тупике на стенах и воротах. По умолчанию выключено."
+msgid "Move a stranded NPC to a nearby walkable surface after the selected delay without progress. Includes blocked routes on walls and gates. Off by default."
+msgstr "После выбранного времени без продвижения перенести застрявшего NPC на проходимую поверхность рядом. Работает также при тупике на стенах и воротах. По умолчанию выключено."
 
 msgid "Stuck NPCs"
 msgstr "Застрявшие NPC"
+
+
+msgid "Stuck recovery delay (game hours)"
+msgstr "Ожидание освобождения (игр. ч)"
+
+
+msgid "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
+msgstr "Время без физического продвижения перед попыткой освобождения. 1-4 игровых часа; частота проверок не меняется. Изменение применяется сразу."

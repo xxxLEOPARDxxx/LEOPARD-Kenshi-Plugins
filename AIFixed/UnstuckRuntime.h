@@ -37,8 +37,8 @@ namespace Unstuck
         AIFixedGate::Point destination;
         AIFixedUnstuck::Observation watch;
         unsigned probeSite, reportedAt;
-        bool guard, failedObserved;
-        History():goal(NULL_TASK),probeSite(0),reportedAt(0),guard(false),failedObserved(false){}
+        bool guard;
+        History():goal(NULL_TASK),probeSite(0),reportedAt(0),guard(false){}
     };
 
     struct LandingTrace
@@ -270,8 +270,10 @@ namespace Unstuck
         // has ended; idle/at-post actors must never refresh this evidence.
         CharBody* body=c->getBody();
         const Tasker* action=body?body->getCurrentAction():NULL;
-        const bool movingTask=task!=NULL_TASK && task!=IDLE && action &&
-            action->taskData && action->key()==MOVE_ON_FREE_WILL;
+        // GOAP can clear its goal before the body receives the path failure.
+        // The still-current native movement action is the movement witness;
+        // the high-level goal is not an additional admission requirement.
+        const bool movingTask=action && action->taskData && action->key()==MOVE_ON_FREE_WILL;
         failed=movingTask && state==HavokCharacter::IDLE && away &&
             (path==HavokCharacter::FAILED || path==HavokCharacter::BROKEN || path==HavokCharacter::INCOMPLETE);
         attempt=movingTask && state==HavokCharacter::IDLE && (failed || (away && path==HavokCharacter::WAITING));
@@ -281,7 +283,7 @@ namespace Unstuck
         // A cancelled request also briefly reports GOAL_REACHED or resets the
         // native goal to the feet without any physical progress. These phases
         // can retain an existing clock, but can never start/refresh evidence or
-        // admit a landing. SampleGuard still expires abandoned episodes and
+        // admit a landing. SampleGuard still expires stale movement evidence;
         // physical movement retires the old stationary anchor. Goal changes
         // retain only the physical history tied to this exact support handle.
         if (!tracked && !attempt) return NULL;
@@ -542,7 +544,11 @@ namespace Unstuck
         trace.slope=slope;
         Building* inferredGate=!support && !movement->isStandingOnSomething()?FindElevatedGate(here,ground):NULL;
         if (inferredGate) support=inferredGate;
-        const float maximumDrop=support?14.0f:8.0f;
+        // The platform path above already confirmed a steep BF_FLUFF support.
+        // Saved upper-parapet actors are 15.9-17.5 m over authenticated terrain;
+        // the original guard was only 11-12 m above it. Keep the higher bound
+        // local to this confirmed platform case, never gates or natural rock.
+        const float maximumDrop=guard?18.0f:(support?14.0f:8.0f);
         if (here.y-ground<-15.0f || here.y-ground>maximumDrop*10.0f) return RejectLanding(trace,"terrain-height-limit");
         const float clearance=movement->getRadius();
         trace.clearance=clearance;
@@ -714,21 +720,15 @@ namespace Unstuck
             entry.subject=subject;
             entry.destination=destination;
             entry.guard=guard!=NULL;
-            entry.failedObserved=false;
         }
         const bool previouslyActive=entry.watch.active;
         const double priorStart=entry.watch.since;
-        // An unchanged FAILED result is one witness, not a fresh failure on
-        // every poll. Goal/action cancellation cannot clear the native latch;
-        // a non-failure native path phase must intervene.
-        const bool freshFailure=failed && !entry.failedObserved;
-        const HavokCharacter::PathState observedPath=c->movement->havokCharacter->getPathState();
-        const bool nativeFailed=observedPath==HavokCharacter::FAILED ||
-            observedPath==HavokCharacter::BROKEN || observedPath==HavokCharacter::INCOMPLETE;
-        if (!nativeFailed) entry.failedObserved=false;
-        else if (failed) entry.failedObserved=true;
-        const bool due=guard?entry.watch.SampleGuard(position,hours,activeMs,attempt,freshFailure):
-            entry.watch.Sample(position,hours,activeMs);
+        // Current native movement plus a current remote failed path is blocked
+        // intent even when GOAP recreates the action or the path state stays
+        // unchanged. A retained failure after movement ended is not evidence.
+        const bool freshFailure=failed;
+        const bool due=guard?entry.watch.SampleGuard(position,hours,activeMs,attempt,freshFailure,g_unstuckDelayHours):
+            entry.watch.Sample(position,hours,activeMs,g_unstuckDelayHours);
         if (!previouslyActive || entry.watch.since!=priorStart) entry.probeSite=0;
         if (!due || (guard && !attempt))
         {

@@ -82,6 +82,7 @@ History history[HistorySize];
 DWORD activeMs=0,lastRockProbeMs=0,lastProbeMs=0;
 LONG g_loadGeneration=0,g_loading=0;
 bool g_debug=false;
+int g_unstuckDelayHours=4; // Legacy captured replay explicitly exercises its old4h configuration.
 unsigned teleports=0,probes=0;
 bool allowLanding=true,reachedDuringProbe=false;
 double firstRelocationHours=0,firstRelocationAge=0,currentHours=0;
@@ -241,13 +242,64 @@ int main(){
     for(unsigned n=0;n<500;++n){
         Apply(actor,nav,captured[6]);currentHours=700+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
     }
-    Check(teleports==0&&probes==0,"one unchanged native FAILED sample cannot renew its own failure timestamp for four hours");
+    Check(teleports==1&&firstRelocationAge>=4.0,"four hours of continuously current native movement with a remote FAILED path is sustained blocked intent");
+    Reset(actor,movement,nav,platform);
+    for(unsigned n=0;n<500;++n){
+        Apply(actor,nav,captured[6]);actor.combat=n==10;
+        currentHours=735+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==1&&firstRelocationAge>=4.0&&firstRelocationHours>=739.1,"return from combat requires its own full four-hour physical observation before a current blocked move can recover");
+    // Actual latest log: native MOVE_ON_FREE_WILL remains while GOAP goal is
+    // NULL. That active movement witness must not depend on a high-level goal.
+    Reset(actor,movement,nav,platform);
+    for(unsigned n=0;n<500 && !teleports;++n){
+        Captured s=captured[6];s.task=NULL_TASK;s.action=MOVE_ON_FREE_WILL;
+        if(n%3==0)s.path=HavokCharacter::WAITING;
+        Apply(actor,nav,s);currentHours=740+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==1&&firstRelocationAge>=4.0,"real active native move failures remain valid during observed NULL-goal phases");
+    // Physical proof must outlive a lack of recent failure, but cannot relocate
+    // until a newly acknowledged current native failure appears.
+    Reset(actor,movement,nav,platform);
+    for(unsigned n=0;n<450;++n){
+        Captured s=captured[6];s.task=SHOPPING;
+        if(n>0){s.task=NULL_TASK;s.action=0;}
+        Apply(actor,nav,s);currentHours=745+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==0&&probes==0&&Entry(id).watch.active&&currentHours-Entry(id).watch.since>=4.0,
+        "stationary support history survives a long witness gap without permitting stale relocation");
+    Captured resumed=captured[6];resumed.task=NULL_TASK;
+    Apply(actor,nav,resumed);currentHours+=.01;activeMs+=1000;Inspect(&world,id,currentHours,0);
+    Check(teleports==1&&firstRelocationAge>=4.0,"a current native blocked move can use retained physical proof after goal cancellations");
     Reset(actor,movement,nav,platform);
     for(unsigned n=0;n<500;++n){
         Captured s=captured[6];s.task=n%2?NULL_TASK:SHOPPING;s.action=n%2?0:MOVE_ON_FREE_WILL;
         Apply(actor,nav,s);currentHours=750+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
     }
-    Check(teleports==0&&probes==0,"GOAP cancellations and action recreation cannot refresh an unchanged native FAILED result");
+    Check(teleports==1&&firstRelocationAge>=4.0,"recreated native MOVE with a current remote FAILED path is blocked intent despite GOAP cancellation");
+    const unsigned delays[]={1,2,4};
+    for(unsigned setting=0;setting<3;++setting){
+        Reset(actor,movement,nav,platform);g_unstuckDelayHours=delays[setting];
+        for(unsigned n=0;n<450 && !teleports;++n){
+            Apply(actor,nav,captured[6]);currentHours=900+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+        }
+        Check(teleports==1&&firstRelocationAge>=delays[setting]&&firstRelocationAge<delays[setting]+.02,
+            "actual runtime applies each configured1/2/4-hour physical wait");
+    }
+    Reset(actor,movement,nav,platform);g_unstuckDelayHours=4;
+    for(unsigned n=0;n<=200;++n){
+        Apply(actor,nav,captured[6]);currentHours=910+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==0,"four-hour live setting cannot act after only two hours");
+    g_unstuckDelayHours=1;activeMs+=1000;Inspect(&world,id,currentHours,0);
+    Check(teleports==1&&firstRelocationAge>=2.0,"lowering the live wait uses existing physical history without restarting it");
+    Reset(actor,movement,nav,platform);g_unstuckDelayHours=1;
+    for(unsigned n=0;n<450 && !teleports;++n){
+        if(n==50)g_unstuckDelayHours=4;
+        Apply(actor,nav,captured[6]);currentHours=920+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==1&&firstRelocationAge>=4.0,"raising the live wait postpones an existing observation to its new deadline");
+    g_unstuckDelayHours=4;
     Reset(actor,movement,nav,platform);Apply(actor,nav,captured[6]);
     g_debug=false;debugLines=0;activeMs=1000;Inspect(&world,id,800,0);
     Check(debugLines==0,"platform diagnostics stay silent with detailed logging disabled");

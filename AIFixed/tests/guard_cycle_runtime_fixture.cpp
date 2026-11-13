@@ -74,11 +74,13 @@ int main()
     Check(ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed)==&support &&
         attempt && failed,"captured active post failure supplies fresh evidence");
     Check(ReadGuardCycle(&actor,&movement,NULL_TASK,true,attempt,failed)==&support &&
-        !attempt && !failed,"captured no-goal gap retains history without renewing a stale failure");
+        attempt && failed,"a current native movement action can report failure after the GOAP goal was cancelled");
     Check(ReadGuardCycle(&actor,&movement,IDLE,true,attempt,failed)==&support &&
-        !attempt && !failed,"idle gap cannot renew retained failed navigation");
+        attempt && failed,"the actual native movement action is independent of the high-level idle goal");
+    actor.body.moving=false;
     Check(!ReadGuardCycle(&actor,&movement,NULL_TASK,false,attempt,failed),
-        "untracked idle actor never starts a guard episode");
+        "an untracked idle actor without a movement action never starts a physical episode");
+    actor.body.moving=true;
     navigation.state=HavokCharacter::GOAL_REACHED;
     Check(ReadGuardCycle(&actor,&movement,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE,true,attempt,failed)==&support && !attempt && !failed,
         "reached acknowledgement retains only the stationary clock, never relocation evidence");

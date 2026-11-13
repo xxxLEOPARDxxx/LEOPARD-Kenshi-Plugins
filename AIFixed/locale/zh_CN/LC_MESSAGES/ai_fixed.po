@@ -133,8 +133,16 @@ msgstr "通过后请求关闭大门的最短等待时间。附近有角色时会
 msgid "Free stuck NPCs"
 msgstr "解救卡住的 NPC"
 
-msgid "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
-msgstr "如果 NPC 卡住并在四个游戏小时内没有移动，则将其移到附近可通行的位置。也适用于城墙和城门上的路径阻塞。默认关闭。"
+msgid "Move a stranded NPC to a nearby walkable surface after the selected delay without progress. Includes blocked routes on walls and gates. Off by default."
+msgstr "在选定的时间内没有实际移动后，将受困的NPC移动到附近可行走的地面。也包括城墙和城门上的受阻路线。默认关闭。"
 
 msgid "Stuck NPCs"
 msgstr "卡住的 NPC"
+
+
+msgid "Stuck recovery delay (game hours)"
+msgstr "脱困等待时间（游戏小时）"
+
+
+msgid "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
+msgstr "尝试脱困前角色必须没有实际移动的时间。1-4个游戏小时；检查频率不变。修改立即生效。"

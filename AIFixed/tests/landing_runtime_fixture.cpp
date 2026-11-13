@@ -19,7 +19,7 @@ struct DoorStuff {
     Ogre::Vector3 getDoorPosInside(){return Ogre::Vector3();}
     Ogre::Vector3 getDoorPosOutside(){return Ogre::Vector3();}
 };
-struct Building {Building* isGate(){return NULL;}DoorStuff* getDoor(){return NULL;}};
+struct Building {bool gate;DoorStuff door;Building():gate(false){door.isSetupComplete=false;}Building* isGate(){return gate?this:NULL;}DoorStuff* getDoor(){return gate?&door:NULL;}};
 struct StandingHandle {Building* building;operator bool(){return building!=NULL;}};
 struct CharMovement {
     void* havokCharacter;
@@ -60,9 +60,9 @@ bool CrossesBarrier(GameWorld*,const Ogre::Vector3&,const Ogre::Vector3&,Buildin
 
 int checks=0,failures=0;
 void Check(bool value,const char* message){++checks;if(!value){++failures;printf("FAIL: %s\n",message);}}
-bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3& p,const char* reason){
+bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3& p,const char* reason,bool platformRecovery=true){
     LandingTrace trace;unsigned sites=0;Ogre::Vector3 landing=p;
-    const bool accepted=FindLanding(&w,&actor,&platform,p,0,landing,sites,true,trace);
+    const bool accepted=FindLanding(&w,&actor,&platform,p,0,landing,sites,platformRecovery,trace);
     Check(!strcmp(trace.reason,reason),reason);
     return accepted;
 }
@@ -74,14 +74,31 @@ int main(){
     Character actor={&movement};
     const Ogre::Vector3 original(18778,258.5387f,47723.859f);
     Check(Probe(world,actor,platform,original,"accepted"),"captured lower guard height has a permitted dry downhill landing when all native queries confirm it");
-    // Actual new saved actor heights; ground here is an EXPLICIT boundary fake.
-    // Saves do not provide terrain/support/navmesh data, so this is conditional.
-    const float elevated[]={299.07416f,305.96454f,315.03497f};
+    // Actual new actor coordinates and authenticated base terrain samples.
+    // Walkability, slope, town side and clearance are EXPLICIT native fakes.
+    const Ogre::Vector3 upper[]={Ogre::Vector3(18762.498f,299.07416f,47775.023f),
+        Ogre::Vector3(18749.109f,315.03497f,47782.895f),Ogre::Vector3(18754.861f,305.96454f,47777.359f)};
+    for(unsigned i=0;i<3;++i){
+        nav.candidate=Ogre::Vector3(upper[i].x-38.0f,139.96796f,upper[i].z-4.0f);
+        Check(Probe(world,actor,platform,upper[i],"accepted"),
+            "each saved upper actor can use a native-confirmed safe platform landing within18m");
+    }
+    nav.candidate=Ogre::Vector3(18740,140,47720);
+    Check(Probe(world,actor,platform,Ogre::Vector3(18778,320,47724),"accepted"),
+        "confirmed steep-platform18m boundary is admitted");
     const unsigned calls=nav.exteriorCalls;
-    for(unsigned i=0;i<3;++i)
-        Check(!Probe(world,actor,platform,Ogre::Vector3(18778,elevated[i],47724),"terrain-height-limit"),
-            "if terrain is140, a saved upper actor cannot be recovered through the14m drop limit");
-    Check(nav.exteriorCalls==calls,"height rejection precedes exterior navmesh search");
+    Check(!Probe(world,actor,platform,Ogre::Vector3(18778,320.02f,47724),"terrain-height-limit"),
+        "even a confirmed steep platform cannot exceed18m");
+    Check(nav.exteriorCalls==calls,"excessive height rejection precedes exterior navmesh search");
+    platform.gate=true;
+    Check(!Probe(world,actor,platform,Ogre::Vector3(18778,281,47724),"terrain-height-limit",false),
+        "gate recovery retains its14m limit");
+    Check(Probe(world,actor,platform,Ogre::Vector3(18778,280,47724),"accepted",false),
+        "gate14m boundary stays accepted");
+    platform.gate=false;
+    LandingTrace rockTrace;Ogre::Vector3 rockLanding;unsigned rockSites=0;
+    Check(!FindLanding(&world,&actor,NULL,Ogre::Vector3(18778,221,47724),0,rockLanding,rockSites,false,rockTrace)&&
+        !strcmp(rockTrace.reason,"terrain-height-limit"),"ordinary rock/off-mesh recovery retains its8m height limit");
     standingClear=false;Check(!Probe(world,actor,platform,original,"platform-landing-clearance"),"blocked landing cannot be accepted");standingClear=true;
     water=true;Check(!Probe(world,actor,platform,original,"landing-water"),"water cannot be accepted");water=false;
     nav.targetCode=4;Check(!Probe(world,actor,platform,original,"platform-gate-code"),"different town side cannot be accepted");nav.targetCode=0;

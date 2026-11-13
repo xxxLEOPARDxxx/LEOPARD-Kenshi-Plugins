@@ -15,9 +15,10 @@ namespace AIFixedUnstuck
 
         Observation():since(0),previous(0),nextProbe(0),guardFailure(0),sampledAt(0),active(false){}
 
-        bool Sample(const Point& position,double hours,unsigned now)
+        bool Sample(const Point& position,double hours,unsigned now,double delayHours=1.0)
         {
-            if (!_finite(hours) || !AIFixedGate::Finite(position))
+            if (!_finite(hours) || !AIFixedGate::Finite(position) || !_finite(delayHours) ||
+                delayHours<1.0 || delayHours>4.0)
             {
                 active=false;
                 return false;
@@ -29,28 +30,29 @@ namespace AIFixedUnstuck
             {
                 anchor=position;
                 since=hours;
-                nextProbe=hours+4.0;
+                nextProbe=hours;
                 guardFailure=hours-2.0;
                 active=true;
             }
             previous=hours;
             sampledAt=now;
-            return hours>=nextProbe;
+            // The live maturity delay and landing retry cooldown are separate:
+            // changing the setting preserves observed time and probe backoff.
+            return hours>=since+delayHours && hours>=nextProbe;
         }
 
-        bool SampleGuard(const Point& position,double hours,unsigned now,bool startsAttempt,bool failed)
+        bool SampleGuard(const Point& position,double hours,unsigned now,bool startsAttempt,bool failed,double delayHours=1.0)
         {
-            // A native idle/path-pipeline gap may retain the stationary clock,
-            // but cannot preserve an abandoned guard episode indefinitely.
-            // Expire before accepting a new failure so a later unrelated
-            // attempt must earn its own full four-hour observation.
-            const double evidence=guardFailure>=since?guardFailure:since;
-            if (active && _finite(hours) && hours>=previous && hours-evidence>1.0)
-                active=false;
+            // Physical observation and the lifetime of a movement witness are
+            // separate. Goal cancellations can outlast the one-hour failure
+            // window while the actor remains on the exact same obstruction.
+            // Keep that physical clock, but stale failure can never make it
+            // due. Movement, missing samples, support/identity or world changes
+            // still retire the physical history through Sample/the caller.
             if (!active && !startsAttempt) return false;
             const bool continued=active;
             const double started=since;
-            const bool due=Sample(position,hours,now);
+            const bool due=Sample(position,hours,now,delayHours);
             if (!active || ((!continued || since!=started) && !startsAttempt))
             {
                 active=false;

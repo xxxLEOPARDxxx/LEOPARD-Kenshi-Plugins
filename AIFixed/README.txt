@@ -94,7 +94,7 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     возобновляется, если персонаж ещё выполняет наш приказ открыть ворота.
     До двух локальных запросов за 250 мс и до восьми персонажей за проход.
     Игра игнорирует maxNumber. Результат с 128 и более воротами пропускается.
-  * RecoverStuckNpc=0. После четырёх игровых часов неподвижности здорового
+  * RecoverStuckNpc=0. После выбранного времени неподвижности здорового
     NPC плагин ищет ближайший доступный навмеш. Если навмеш проходит внутри
     природного камня, две пары встречных лучей подтверждают коллизию, а пробы
     ищут свободное место до 8 м от NPC. У ворот после загрузки можно подтвердить
@@ -103,20 +103,30 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     ограничены одной в секунду отдельно от обычной проверки вне навмеша.
     NPC, у которого срываются попытки пройти к цели, может спуститься с
     крутого склона платформы на свободную сушу в той же загруженной зоне,
-    без пересечения стен и закрытых ворот. Для спуска нужны четыре часа
+    без пересечения стен и закрытых ворот. Для спуска нужны выбранное время
     без продвижения, подтверждённая коллизия склона и недавний отказ пути
     при текущем штатном действии движения. Смена цели на кровать, покупки,
     патруль или другую задачу не обнуляет физическое наблюдение на той же
-    опоре. Отсутствующая задача и простой не создают доказательство отказа.
+    опоре. Пустая цель ИИ не отменяет ещё активное штатное действие движения;
+    без такого действия новое доказательство отказа не создаётся.
     Краткие сбросы штатного пути, включая NONE/COMPLETE и подтверждение
     GOAL_REACHED без реального перемещения, сохраняют только таймер наблюдения.
     В этих состояниях перенос запрещён: нужна текущая активная попытка идти
     к удалённой цели. Реальное прибытие сдвигает стационарную точку и сбрасывает
-    таймер; более часа без подтверждённого отказа завершает старое наблюдение.
-    Один неизменный отказ пути не обновляет сам себя при каждом опросе.
-    Пределы спуска с платформы остаются 6 м по горизонтали и 5-14 м вниз.
+    таймер. Отказ старше часа не разрешает перенос: нужен подтверждённый
+    отказ текущего движения. Физическое наблюдение на той же опоре сохраняется
+    отдельно от срока действия этого свидетельства.
+    Сохранённый отказ после завершения движения не обновляет свидетельство.
+    Текущее штатное движение к удалённой цели с текущим отказом пути считается
+    действующей заблокированной попыткой, даже если ИИ пересоздаёт действие.
+    Для подтверждённого крутого склона платформы пределы составляют 6 м по
+    горизонтали и 5-18 м вниз. У ворот сохраняется предел 14 м, у камней - 8 м.
     Подробный журнал показывает опору, положение, возраст наблюдения, текущие
     цель/действие/путь и конкретный отказ места выхода. Он выключен по умолчанию.
+  * UnstuckDelayHours=1 (1..4 игровых часа). Время без физического
+    продвижения до попытки освобождения. Меняется сразу, без перезапуска,
+    и не меняет частоту проверок. Уже наблюдавшееся время сохраняется;
+    повторные пробы продолжают соблюдать свой предел частоты.
   * SleepFix.dll/GateFix.dll подавляют соответствующую автоматику AI Fixed
     для исключения конкурирующих приказов. Не используйте две реализации
     одной механики. Gate Push Guard исправляет другой случай: выталкивание
@@ -170,7 +180,7 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     by the plugin gives way to the original movement order.
     Up to two local queries per 250 ms and eight actors per pass. Kenshi
     ignores query maxNumber. Results containing 128 or more gates are skipped.
-  * RecoverStuckNpc=0. After four game hours without progress, a healthy NPC
+  * RecoverStuckNpc=0. After the selected delay without progress, a healthy NPC
     can move to nearby walkable ground. When a valid navmesh face lies inside
     natural rock, two opposed pairs of rays confirm enclosure and the landing
     search checks for clear ground within 8 m. Gate collision can confirm
@@ -179,20 +189,29 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     are limited to one per second independently of ordinary off-mesh recovery.
     NPCs repeatedly failing to reach their destinations can leave a steep platform
     slope for clear, dry ground in the same loaded zone while preserving wall
-    and closed-gate boundaries. Recovery requires four hours without progress,
+    and closed-gate boundaries. Recovery requires the selected time without progress,
     confirmation of the slope by collision and a recent path failure during
     a current native movement action. Switching to bed, shopping, patrol or
-    another goal retains physical observation on the same support. Missing
-    goals and idle tasks cannot supply failure evidence.
+    another goal retains physical observation on the same support. A missing
+    GOAP goal does not cancel a still-current native movement action. Without
+    that action, a native failed path cannot supply new failure evidence.
     Transient native path resets, including NONE/COMPLETE and GOAL_REACHED
     acknowledgements without physical movement, retain only the observation
     clock. They never admit relocation: a current active remote movement attempt
     is required. Real arrival changes the stationary anchor and resets its
-    clock; more than one hour without a confirmed failure expires the episode.
-    One unchanged failed path cannot refresh itself on every poll. Platform
-    limits remain 6 m horizontally and a 5-14 m descent. Detailed log records
+    clock. A failure older than one hour cannot admit relocation: a confirmed
+    current movement failure is required. Physical observation
+    on the same support is retained separately from witness freshness.
+    A retained failed path after movement ended cannot refresh evidence. A
+    current native move with a current remote failed path is blocked intent,
+    including when GOAP recreates that move action. Platform limits are 6 m horizontally and a 5-18 m descent only for a confirmed steep
+    platform. Gates retain their 14 m limit; natural rock retains 8 m. Detailed log records
     support, position, observation age, goal/action/path and the exact rejected
     landing check. It is disabled by default.
+  * UnstuckDelayHours=1 (1..4 game hours). Time without physical progress
+    before recovery is attempted. Applies immediately without restart and
+    does not change the checking rate. Existing observation time is retained;
+    retry probes keep their separate cooldown.
   * Original SleepFix.dll/GateFix.dll suppress the corresponding AI Fixed
     automation to avoid competing orders. Do not combine both implementations.
     Gate Push Guard handles pushing through closed gates, a different feature.

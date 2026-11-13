@@ -13,6 +13,7 @@ python tests/test_settings_locales.py
 python tests/audit_rest_clock.py
 python tests/test_guard_trace.py
 python tests/test_landing_runtime.py
+python tests/test_delay_settings.py
 ```
 
 The selector and gate/intent fixtures extract current production code. Native
@@ -33,21 +34,37 @@ original collector retained first-seen snapshots and aggregate counts, not the
 full temporal order or game clock. The repeated order and >4-hour progression in
 the regression are therefore explicitly synthetic; all nine initial phases are
 tested. Native collision/navmesh/landing calls remain explicit boundary fakes.
+Physical observation and one-hour failure freshness are separate: a long
+no-action/no-goal gap can retain a continually sampled same-support position,
+but cannot relocate without a current active movement attempt and a recent
+confirmed failure.
 The tests preserve recent real failure evidence across native goal resets while
-rejecting relocation during reached/at-feet/no-goal phases, including a reached
+rejecting relocation during reached/at-feet/no-action phases, including a reached
 state arriving between the probe and final revalidation. Physical arrival,
-mobility, stale evidence, another support, native medical/combat/player
-exclusions and rejected landing geometry cannot reuse the old four-hour clock.
+mobility, another support and native medical/combat/player exclusions retire
+the old physical watch. Stale movement evidence and rejected landing geometry
+block relocation without deleting a continuously sampled same-support watch.
 The 2026-11-13 followup additionally covers four separate synthetic mixed-goal
 actors. Bed/shopping/other goals retain a physical episode only on the same
 support; current MOVE_ON_FREE_WILL and distant blocked native navigation are
-required to start an attempt. An unchanged native FAILED result, including
-GOAP cancellation/action recreation, cannot refresh its own timestamp.
+required to start an attempt. The actual native movement action remains
+valid after the high-level GOAP goal is cleared, as observed in the latest log.
+A current native MOVE with a current remote FAILED/BROKEN/INCOMPLETE path is
+current blocked intent even when GOAP recreates the action or its state remains
+unchanged for four hours. A retained native failure without that movement
+action cannot refresh evidence or admit recovery. WAITING requires a failure
+within the preceding game hour; inactive observations only retain physical
+history. Combat/medical exclusions still require a new physical window.
 The landing-flow fixture extracts actual FindLanding and checks geometry and
 rejection diagnostics with explicit native query fakes. If terrain were 140,
-the saved upper actor heights 299-315 exceed the existing 14 m descent limit;
-the saves do not contain terrain/support/navmesh queries, so this is a
-conditional check, not a measured landing result. The lower captured guard
+the saved upper actor heights 299-315 exceed the former 14 m platform limit.
+`inspect_platform_terrain.py` independently authenticates fullmap.tif and
+samples base-terrain triangles at their exact saved coordinates: the actual
+base-ground descents are 15.91, 17.51 and 16.60 m. Confirmed steep-platform
+recovery now permits at most 18 m; the actual landing-flow fixture covers
+those coordinates, the 18 m boundary, over-limit rejection and unchanged
+gate/rock limits. Base terrain is not native walkability or collision proof;
+all original dry/same-zone/clearance/barrier checks remain mandatory. The lower captured guard
 height is accepted only when every fake physical query confirms a safe exit.
 The runtime replay's fake landing now also respects the production distance
 and minimum descent limits; actual native landing queries remain faked.
@@ -104,3 +121,16 @@ The pre-fix source failed four behavioral checks: disabled diagnostics still ran
 medical diagnostics survived live disabling, no-world scans ran, and a reused
 character address inherited attempts. These tests do not establish gameplay or
 FPS results, and do not replace a game test of repair-bed selection and orders.
+
+Latest actual Lagoon failure analysis and candidate receipt:
+[verification-platform-followup-20261113.md](verification-platform-followup-20261113.md).
+
+The live UnstuckDelayHours control defaults to 1 and accepts integers 1..4.
+Actual MCM descriptor tests verify its range/default and lack of restart flag.
+The runtime and policy fixtures cover 1/2/4-hour waits, live raising/lowering,
+retained physical history and independent retry backoff. Legacy captured
+replays explicitly select 4 hours. test_delay_settings.py compiles the actual
+LoadSettings and its globals against a temporary absolute INI; it checks
+missing-key fallback, clamping and preservation of existing personal values.
+The native INI path/default preparation boundary is explicitly faked; the
+installed INI is never opened or modified by that fixture.

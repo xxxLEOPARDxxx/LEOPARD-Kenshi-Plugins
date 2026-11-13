@@ -1,5 +1,9 @@
 # Platform recovery followup, 13 November 2026
 
+Historical candidate receipt: the owner subsequently tested this 9DF2 DLL and
+reported that no Lagoon NPC escaped. Current changes and the corrected
+recovery contract are in verification-platform-followup-20261113.md.
+
 Status at handoff: reviewed local diagnostic candidate, not installed or
 published. Release number unchanged. The game remained closed throughout.
 

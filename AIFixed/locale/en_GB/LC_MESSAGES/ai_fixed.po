@@ -133,8 +133,16 @@ msgstr "Minimum delay after crossing before requesting closure. Nearby character
 msgid "Free stuck NPCs"
 msgstr "Free stuck NPCs"
 
-msgid "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
-msgstr "After four game hours without progress, move a stranded NPC to a nearby walkable surface. Includes blocked routes on walls and gates. Off by default."
+msgid "Move a stranded NPC to a nearby walkable surface after the selected delay without progress. Includes blocked routes on walls and gates. Off by default."
+msgstr "Move a stranded NPC to a nearby walkable surface after the selected delay without progress. Includes blocked routes on walls and gates. Off by default."
 
 msgid "Stuck NPCs"
 msgstr "Stuck NPCs"
+
+
+msgid "Stuck recovery delay (game hours)"
+msgstr "Stuck recovery delay (game hours)"
+
+
+msgid "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
+msgstr "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
