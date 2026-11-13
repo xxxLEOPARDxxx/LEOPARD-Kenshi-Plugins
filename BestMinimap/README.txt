@@ -1,4 +1,4 @@
-﻿BEST MINIMAP (QoL)
+BEST MINIMAP (QoL)
 
 Миникарта в углу экрана. Требуется RE_Kenshi.
 
@@ -180,7 +180,7 @@ Legacy CameraArrowSize=0 is migrated once to the actual previous pixel size,
 so the displayed value can be reduced. Russian in-game text uses ASCII hyphens;
 typographic dashes are unsupported by the game font.
 
-Information-strip implementation (2026-11-13, local change, not a release):
+Information-strip implementation (release 4):
 one root-owned thin game panel and at most four reusable inline fields; WidgetRef
 clears every reference on game-UI destruction. Text and background use the
 current interface skins, including their text colour. Root placement bounds
@@ -195,8 +195,8 @@ Numeric work is limited to four updates per second
 plus changes to settings/zoom; captions update only when their content changes.
 The clock is sampled at the next minute boundary, with no per-frame clock/INI
 polling or world traversal. Native world positions use ten units per metre.
-Runtime visual verification on vanilla/Dark UI and long-run FPS/memory checks
-remain required; native production policy tests do not replace those checks.
+The owner accepted the in-game panel layout. Separate long-run FPS/memory
+measurements were not performed; native policy tests do not replace them.
 
 
 Localization diagnostics / Журнал локализации (2026-11-01)
@@ -216,3 +216,17 @@ English
 - Необязательная диагностика языка. Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.
 - Ошибки остаются видимыми. Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.
 - Чистый пакет обновления. Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются.
+
+## Release 4 / Выпуск 4
+
+English
+
+- Added an optional compact strip below the minimap: zoom, X/Z coordinates, camera direction and PC time.
+- Each field has its own MCM switch. All fields are off by default; the strip is absent when none is enabled.
+- Text is centred with padding and wraps on a narrow minimap. Clicking the strip does not issue character orders.
+
+Русский
+
+- Добавлена необязательная компактная панель под миникартой: масштаб, координаты X/Z, направление камеры и время ПК.
+- Каждое поле включается отдельно в MCM. Все поля по умолчанию выключены; когда они отключены, панели нет.
+- Текст центрируется с отступами и переносится на узкой миникарте. Щелчки по панели не отдают приказы персонажам.

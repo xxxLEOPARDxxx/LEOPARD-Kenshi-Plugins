@@ -1,0 +1,91 @@
+{
+  "date_msk": "2026-11-13",
+  "status": "prepared-not-published",
+  "runtime_code_changed_during_packaging": false,
+  "packages": {
+    "AIFixed": {
+      "version": "3",
+      "previous_published_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\AIFixed-3.zip",
+      "sha256": "7a2af228f670ce777c2ee2bee4a57a63a88d7a85fcc48eba7812a7f849e92c7c",
+      "dll_sha256": "40A0DC209A49B00C0F31D903352C34E1B8D40C1257ACEC47FB10B5AA934500EB",
+      "bytes": 140712,
+      "files": 10,
+      "crc": "pass",
+      "content_parity": "pass",
+      "accepted_runtime_hash": "pass",
+      "source_locales": "pass",
+      "clean_composition": "pass"
+    },
+    "BestMinimap": {
+      "version": "4",
+      "previous_published_version": "3",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\BestMinimap-4.zip",
+      "sha256": "6898702e6498a901521dc691fb80375ff0b2665bd3ed51d99383bcbbf4b1972e",
+      "dll_sha256": "991BC1B4BEF1EE138F7FD7C84700649073FD72B3871322A480F274B527249097",
+      "bytes": 165775,
+      "files": 8,
+      "crc": "pass",
+      "content_parity": "pass",
+      "accepted_runtime_hash": "pass",
+      "source_locales": "pass",
+      "clean_composition": "pass"
+    },
+    "BetterLooting": {
+      "version": "6",
+      "previous_published_version": "5",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\BetterLooting-6.zip",
+      "sha256": "7b51ab13b28b51d00d56e1d58b9ffa59d80d6c8b0006ea65816c5fa22bc50709",
+      "dll_sha256": "ADFCCCB937A85B96CF0D49C06DB0E0E6FA2A52949805E6EF328DD77150542820",
+      "bytes": 121887,
+      "files": 8,
+      "crc": "pass",
+      "content_parity": "pass",
+      "accepted_runtime_hash": "pass",
+      "source_locales": "pass",
+      "clean_composition": "pass"
+    },
+    "Loot-Scoot-Execute": {
+      "version": "8",
+      "previous_published_version": "7",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Loot-Scoot-Execute-8.zip",
+      "sha256": "3191063a2c35b229ffeea11559f97a89da7cd4af98fa80d1f5673f8040f3a283",
+      "dll_sha256": "2AD27011E490C1052253210DEFE67B3643590B997CD555A57B1F2D8F058B1206",
+      "bytes": 160965,
+      "files": 14,
+      "crc": "pass",
+      "content_parity": "pass",
+      "accepted_runtime_hash": "pass",
+      "source_locales": "pass",
+      "clean_composition": "pass"
+    },
+    "KillCounter": {
+      "version": "3",
+      "previous_published_version": "2",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KillCounter-3.zip",
+      "sha256": "3bd21ef0838f97ffa93e9a441d0872e5a9afd454452b5bb528d4f7f2349c5e88",
+      "dll_sha256": "07CA6223BD2E5B29941069FC59B24DE838F7130BA89E48AC1613E21375C066F6",
+      "bytes": 69680,
+      "files": 9,
+      "crc": "pass",
+      "content_parity": "pass",
+      "accepted_runtime_hash": "pass",
+      "source_locales": "pass",
+      "clean_composition": "pass"
+    },
+    "Vital-Sense": {
+      "version": "9",
+      "previous_published_version": "8",
+      "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\Vital-Sense-9.zip",
+      "sha256": "e1d7a457a6dc5f011fda2b32e19ad44aeca9a50a8abdf1fa9638132b968c9572",
+      "dll_sha256": "AC15C06B4D86DA059CFCB7BA488E51038A5DB78A582305FE3DBCB36CDCE6810D",
+      "bytes": 202699,
+      "files": 19,
+      "crc": "pass",
+      "content_parity": "pass",
+      "accepted_runtime_hash": "pass",
+      "source_locales": "pass",
+      "clean_composition": "pass"
+    }
+  }
+}

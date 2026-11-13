@@ -1,18 +1,4 @@
-﻿AI Fixed — модульный сборник / modular AI fixes
-
-Local validation candidate (13 November 2026) / Локальная проверочная сборка
-Восстановление NPC на опорах Ровной Лагуны: округлая опора допускается
-только после подтверждения маленького изолированного участка навмеша
-либо проверки самой небольшой выпуклой опоры по её физической форме.
-Если навмеш немного ниже земли, точка посадки сверяется с реальной
-коллизией грунта. Проверки препятствий, воды, стороны ворот и свободного
-места сохранены. 13.11.2026 владелец подтвердил выход обоих проблемных NPC;
-журнал зафиксировал Трутня и стражника после 1.00 и 1.11 игровых часа.
-Flat Lagoon recovery checks native local confinement or a physically confirmed
-small convex support cap, and a terrain landing when simplified navmesh lies slightly below
-the ground. Barrier, water, gate-side and body-space checks remain. Recovery
-of both reported NPCs was confirmed by the owner and recorded in the game log
-on 13 November 2026, after 1.00 and 1.11 game hours respectively.
+AI Fixed — модульный сборник / modular AI fixes
 
 Собственные исправления LEOPARD и адаптированные модули других авторов;
 сборник может расширяться независимо от отдельных модулей.
@@ -368,3 +354,19 @@ Basusu (адаптированные GateFix/SleepFix / adapted modules). Founda
 Localization diagnostics / Журнал локализации (2026-11-01)
 Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
 Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.
+
+## Release 3 / Выпуск 3
+
+English
+
+- Added optional recovery for NPCs stranded in rocks, ore deposits, walls, gates and small supports. Characters immobilised by injuries or missing legs are not treated as stuck.
+- The wait without progress is adjustable from 1 to 4 game hours, default 1 hour. A nearby safe landing is checked before moving the NPC; recovery is off by default.
+- Corrected passage through own gates and movement after opening them. Closing after passage accounts for characters in the opening; the search radius is adjustable up to 500 m.
+- Original SleepFix and GateFix are not required: their adapted functions are already included in AI Fixed.
+
+Русский
+
+- Добавлено необязательное освобождение NPC, застрявших в скалах, рудных жилах, стенах, воротах и небольших опорах. Обездвиженные ранениями и персонажи без ног не считаются застрявшими.
+- Ожидание без продвижения настраивается от 1 до 4 игровых часов, по умолчанию 1 час. Перед перемещением проверяется безопасное место рядом; функция по умолчанию выключена.
+- Исправлены проход собственных ворот и продолжение движения после открытия. Закрытие после прохода учитывает персонажей в проёме; радиус поиска настраивается до 500 м.
+- Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed.

@@ -101,15 +101,19 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "5",
+    "version": "6",
     "changes": {
       "ru": [
         "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
-        "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже."
+        "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже.",
+        "Исправлены вылеты при повторном сборе по Insert после разгрузки, закрытия или смены окон инвентаря и замены рюкзака.",
+        "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике."
       ],
       "en": [
         "MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.",
-        "Required items, protected player storage and nearest-first ground pickup. Details and settings are below."
+        "Required items, protected player storage and nearest-first ground pickup. Details and settings are below.",
+        "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
+        "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
       ]
     },
     "history": {
@@ -156,16 +160,30 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "6": {
+        "ru": [
+          "Исправлены вылеты при повторном сборе по Insert после разгрузки, закрытия или смены окон инвентаря и замены рюкзака.",
+          "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике."
+        ],
+        "en": [
+          "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
+          "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
+        ]
       }
     },
     "player_changes": {
       "ru": [
         "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
-        "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже."
+        "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже.",
+        "Исправлены вылеты при повторном сборе по Insert после разгрузки, закрытия или смены окон инвентаря и замены рюкзака.",
+        "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике."
       ],
       "en": [
         "MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.",
-        "Required items, protected player storage and nearest-first ground pickup. Details and settings are below."
+        "Required items, protected player storage and nearest-first ground pickup. Details and settings are below.",
+        "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
+        "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
       ]
     }
   },
@@ -756,17 +774,21 @@
       "ru": "Исходники поставлялись с установленным оригиналом; публичный репозиторий и разрешение автора на распространение изменённой версии не подтверждены. Явной лицензии локально не было.",
       "en": "Source code shipped with the installed original; a public repository and author permission to redistribute a modified version have not been verified. No explicit license was present locally."
     },
-    "version": "2",
+    "version": "3",
     "changes": {
       "ru": [
         "В MCM добавлены общее включение учёта и независимый показ каждой строки; скрытие строки не останавливает её учёт, отключение сохраняет накопленное.",
         "Подписи и настройки переведены на русский, английский и китайский; прежние исправления сообщества и совместимость со StatColours сохранены.",
-        "Числа обновляются только при изменении; очищаются записи удалённых персонажей и просроченных скрытных оглушений, не накапливаются пустые записи статистики."
+        "Числа обновляются только при изменении; очищаются записи удалённых персонажей и просроченных скрытных оглушений, не накапливаются пустые записи статистики.",
+        "Добавлен учёт добиваний из обновлённого Loot-Scoot-Execute: убийство засчитывается фактическому исполнителю, в том числе после чужого оглушения.",
+        "Повторное начисление одного убийства исключено; авторство первоначального оглушения сохраняется. Loot-Scoot-Execute необязателен для обычной работы счётчика."
       ],
       "en": [
         "MCM adds a tracking enable switch and independent row visibility; hiding a row does not stop counting, and disabling retains totals.",
         "Labels and settings support Russian, English and Chinese, retaining community fixes and StatColours compatibility.",
-        "Numbers refresh only when changed; destroyed-character and expired stealth-attempt records are removed, and empty statistics records do not accumulate."
+        "Numbers refresh only when changed; destroyed-character and expired stealth-attempt records are removed, and empty statistics records do not accumulate.",
+        "Added finisher credit from the updated Loot-Scoot-Execute: the actual executor receives the kill, including after another character knocked the victim out.",
+        "The same kill is not counted twice, and the original knockout credit is preserved. Loot-Scoot-Execute remains optional for ordinary counter operation."
       ]
     },
     "history": {
@@ -789,18 +811,32 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "3": {
+        "ru": [
+          "Добавлен учёт добиваний из обновлённого Loot-Scoot-Execute: убийство засчитывается фактическому исполнителю, в том числе после чужого оглушения.",
+          "Повторное начисление одного убийства исключено; авторство первоначального оглушения сохраняется. Loot-Scoot-Execute необязателен для обычной работы счётчика."
+        ],
+        "en": [
+          "Added finisher credit from the updated Loot-Scoot-Execute: the actual executor receives the kill, including after another character knocked the victim out.",
+          "The same kill is not counted twice, and the original knockout credit is preserved. Loot-Scoot-Execute remains optional for ordinary counter operation."
+        ]
       }
     },
     "player_changes": {
       "ru": [
         "В MCM добавлены общее включение учёта и независимый показ каждой строки; скрытие строки не останавливает её учёт, отключение сохраняет накопленное.",
         "Подписи и настройки переведены на русский, английский и китайский; прежние исправления сообщества и совместимость со StatColours сохранены.",
-        "Убраны лишние обновления счётчиков, снижающие производительность интерфейса."
+        "Убраны лишние обновления счётчиков, снижающие производительность интерфейса.",
+        "Добавлен учёт добиваний из обновлённого Loot-Scoot-Execute: убийство засчитывается фактическому исполнителю, в том числе после чужого оглушения.",
+        "Повторное начисление одного убийства исключено; авторство первоначального оглушения сохраняется. Loot-Scoot-Execute необязателен для обычной работы счётчика."
       ],
       "en": [
         "MCM adds a tracking enable switch and independent row visibility; hiding a row does not stop counting, and disabling retains totals.",
         "Labels and settings support Russian, English and Chinese, retaining community fixes and StatColours compatibility.",
-        "Reduced unnecessary counter updates to improve interface performance."
+        "Reduced unnecessary counter updates to improve interface performance.",
+        "Added finisher credit from the updated Loot-Scoot-Execute: the actual executor receives the kill, including after another character knocked the victim out.",
+        "The same kill is not counted twice, and the original knockout credit is preserved. Loot-Scoot-Execute remains optional for ordinary counter operation."
       ]
     }
   },
@@ -813,19 +849,29 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "7",
+    "version": "8",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
         "Переведены кнопки действий; несколько исполнителей добивают отдельные ближайшие цели, новый приказ игрока отменяет действие.",
         "Исправлены мелькание задачи и звуки людей, животных и скелетов.",
-        "Действия встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом."
+        "Действия встроены в штатное контекстное меню; отдельная панель остаётся запасным вариантом.",
+        "Shift + «Добить» добавляет постоянную работу по целям, которых этот исполнитель лично оглушил в бою или скрытности. Shift + «Добить всех» добавляет работу по лежащим врагам.",
+        "Постоянные работы выполняются после боя, учитывают приоритет работ и уступают прямым приказам. Разрешение не-врагов действует на собственные подтверждённые оглушения; работа по врагам остаётся только для врагов.",
+        "Восстановлено добивание поверженных животных. Радиус поиска теперь соответствует метрам; дистанция самого удара настраивается отдельно.",
+        "При разрешённом убийстве нейтрала или союзника окно нарушения закона длится не менее 20 секунд. Свидетелей и их реакцию определяет игра.",
+        "Обновлённый Kill Counter засчитывает добивание исполнителю без двойного начисления. Kill Counter необязателен; подсказки уточнены на трёх языках."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
         "Action buttons are translated; multiple executioners take separate nearest targets, and a new player order cancels execution.",
         "Corrected task flicker and sounds for people, animals and skeletons.",
-        "Actions are integrated into the native context menu, retaining the separate panel as fallback."
+        "Actions are integrated into the native context menu, retaining the separate panel as fallback.",
+        "Shift + Execute adds a persistent job for targets personally knocked out by that executor in combat or stealth. Shift + Execute All adds a job for downed enemies.",
+        "Persistent jobs run after combat, respect job priority and yield to direct orders. Non-hostile permission applies to verified own knockouts; the enemy job remains hostile-only.",
+        "Restored finishers on downed animals. Search radius now uses metres; strike distance is configured separately.",
+        "For permitted neutral or allied murders, the crime window lasts at least 20 seconds. Witnesses and their reactions are handled by the game.",
+        "The updated Kill Counter credits finishers to their executor without double counting. Kill Counter is optional; tooltips were clarified in all three languages."
       ]
     },
     "history": {
@@ -894,6 +940,22 @@
           "Дистанция добивания настраивается до 20, число исполнителей до 50. Можно включить сброс переносимого тела перед подходом. Добивание целей, которых несут, по умолчанию выключено.",
           "Команды добивания выровнены по строкам штатного контекстного меню."
         ]
+      },
+      "8": {
+        "ru": [
+          "Shift + «Добить» добавляет постоянную работу по целям, которых этот исполнитель лично оглушил в бою или скрытности. Shift + «Добить всех» добавляет работу по лежащим врагам.",
+          "Постоянные работы выполняются после боя, учитывают приоритет работ и уступают прямым приказам. Разрешение не-врагов действует на собственные подтверждённые оглушения; работа по врагам остаётся только для врагов.",
+          "Восстановлено добивание поверженных животных. Радиус поиска теперь соответствует метрам; дистанция самого удара настраивается отдельно.",
+          "При разрешённом убийстве нейтрала или союзника окно нарушения закона длится не менее 20 секунд. Свидетелей и их реакцию определяет игра.",
+          "Обновлённый Kill Counter засчитывает добивание исполнителю без двойного начисления. Kill Counter необязателен; подсказки уточнены на трёх языках."
+        ],
+        "en": [
+          "Shift + Execute adds a persistent job for targets personally knocked out by that executor in combat or stealth. Shift + Execute All adds a job for downed enemies.",
+          "Persistent jobs run after combat, respect job priority and yield to direct orders. Non-hostile permission applies to verified own knockouts; the enemy job remains hostile-only.",
+          "Restored finishers on downed animals. Search radius now uses metres; strike distance is configured separately.",
+          "For permitted neutral or allied murders, the crime window lasts at least 20 seconds. Witnesses and their reactions are handled by the game.",
+          "The updated Kill Counter credits finishers to their executor without double counting. Kill Counter is optional; tooltips were clarified in all three languages."
+        ]
       }
     },
     "player_changes": {
@@ -905,7 +967,12 @@
         "Команда добивания выполняется быстрее. Персонаж подходит вплотную, добивает все назначенные цели и только потом возвращается к постоянным задачам.",
         "Для подходящих персонажей используется штатная анимация удара. Оружие ближнего боя видно весь взмах. Если в первом слоте арбалет, можно достать оружие из второго.",
         "Дистанция добивания настраивается до 20, число исполнителей до 50. Можно включить сброс переносимого тела перед подходом. Добивание целей, которых несут, по умолчанию выключено.",
-        "Команды добивания выровнены по строкам штатного контекстного меню."
+        "Команды добивания выровнены по строкам штатного контекстного меню.",
+        "Shift + «Добить» добавляет постоянную работу по целям, которых этот исполнитель лично оглушил в бою или скрытности. Shift + «Добить всех» добавляет работу по лежащим врагам.",
+        "Постоянные работы выполняются после боя, учитывают приоритет работ и уступают прямым приказам. Разрешение не-врагов действует на собственные подтверждённые оглушения; работа по врагам остаётся только для врагов.",
+        "Восстановлено добивание поверженных животных. Радиус поиска теперь соответствует метрам; дистанция самого удара настраивается отдельно.",
+        "При разрешённом убийстве нейтрала или союзника окно нарушения закона длится не менее 20 секунд. Свидетелей и их реакцию определяет игра.",
+        "Обновлённый Kill Counter засчитывает добивание исполнителю без двойного начисления. Kill Counter необязателен; подсказки уточнены на трёх языках."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
@@ -915,7 +982,12 @@
         "Finishers start faster and approach the target before striking. Characters finish the assigned batch before returning to standing jobs.",
         "Supported characters use a native strike animation and keep their equipped melee weapon in hand through the swing. A melee weapon in the second slot can be used if a crossbow is in the first.",
         "Set the maximum finishing distance up to 20 and the number of selected executioners up to 50. Optionally put down a carried corpse before approaching. Carried targets are excluded by default.",
-        "Execution commands align with the game's visible context-menu rows."
+        "Execution commands align with the game's visible context-menu rows.",
+        "Shift + Execute adds a persistent job for targets personally knocked out by that executor in combat or stealth. Shift + Execute All adds a job for downed enemies.",
+        "Persistent jobs run after combat, respect job priority and yield to direct orders. Non-hostile permission applies to verified own knockouts; the enemy job remains hostile-only.",
+        "Restored finishers on downed animals. Search radius now uses metres; strike distance is configured separately.",
+        "For permitted neutral or allied murders, the crime window lasts at least 20 seconds. Witnesses and their reactions are handled by the game.",
+        "The updated Kill Counter credits finishers to their executor without double counting. Kill Counter is optional; tooltips were clarified in all three languages."
       ]
     }
   },
@@ -1322,21 +1394,25 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "8",
+    "version": "9",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
         "Значки не просвечивают сквозь окна; исправлена очистка материалов, нейтралы получили отдельный цвет.",
         "Лимит 8–256 значков: приоритет у видимых ближайших к центру камеры целей.",
         "Цели с наградой используют цвет тира; окраска сосуществует с Character Highlight и не попадает в портреты.",
-        "Клавиша задаётся одним сочетанием с модификаторами."
+        "Клавиша задаётся одним сочетанием с модификаторами.",
+        "Текст состояния больше не обрезается рядом со знаком награды: иконка, символ и подпись получают достаточно места.",
+        "Учитываются длина подписи, размер шрифта и ширина всего маркера при размещении у края экрана."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
         "Markers no longer show through windows; material cleanup was corrected and neutrals have a separate color.",
         "An 8–256 marker budget prioritizes visible targets nearest the camera center.",
         "Bounty targets use tier colors; tint coexists with Character Highlight and is not baked into portraits.",
-        "The show key is assigned as one binding with modifiers."
+        "The show key is assigned as one binding with modifiers.",
+        "State captions are no longer clipped beside the bounty symbol: the icon, symbol and caption each have enough room.",
+        "Caption length, font size and the combined marker width are respected when placing markers near screen edges."
       ]
     },
     "history": {
@@ -1411,6 +1487,16 @@
         "ru": [
           "Добавлена настройка высоты текста и значков состояния над персонажами. У отдельного значка награды сохраняется своя настройка высоты."
         ]
+      },
+      "9": {
+        "ru": [
+          "Текст состояния больше не обрезается рядом со знаком награды: иконка, символ и подпись получают достаточно места.",
+          "Учитываются длина подписи, размер шрифта и ширина всего маркера при размещении у края экрана."
+        ],
+        "en": [
+          "State captions are no longer clipped beside the bounty symbol: the icon, symbol and caption each have enough room.",
+          "Caption length, font size and the combined marker width are respected when placing markers near screen edges."
+        ]
       }
     },
     "player_changes": {
@@ -1422,7 +1508,9 @@
         "Клавиша задаётся одним сочетанием с модификаторами.",
         "[b]Необязательные значки.[/b] Настройки поясняют замену пользовательского значка штатным; недоступные файлы не вызывают ложных сообщений о текстурах.",
         "[b]Читаемые значки потери сознания.[/b] Цветной игровой значок оглушения сохраняет исходные цвета и больше не становится почти чёрным рядом с зелёной подписью отряда. Пользовательские картинки и нейтральные маски значков работают по-прежнему.",
-        "Добавлена настройка высоты текста и значков состояния над персонажами. У отдельного значка награды сохраняется своя настройка высоты."
+        "Добавлена настройка высоты текста и значков состояния над персонажами. У отдельного значка награды сохраняется своя настройка высоты.",
+        "Текст состояния больше не обрезается рядом со знаком награды: иконка, символ и подпись получают достаточно места.",
+        "Учитываются длина подписи, размер шрифта и ширина всего маркера при размещении у края экрана."
       ],
       "en": [
         "Settings moved from Mod Hub to MCM, with Russian and Chinese translations.",
@@ -1432,7 +1520,9 @@
         "The show key is assigned as one binding with modifiers.",
         "[b]Optional icons.[/b] Settings explain when a custom icon falls back to the standard game icon; unavailable files no longer cause misleading texture messages.",
         "[b]Readable unconscious icons.[/b] The game's coloured Knockout glyph keeps its original colours instead of turning almost black beside green squad labels. Custom pictures and neutral icon masks retain their existing behaviour.",
-        "Adjust the height of state text and icons above characters. The standalone bounty symbol keeps its own height setting."
+        "Adjust the height of state text and icons above characters. The standalone bounty symbol keeps its own height setting.",
+        "State captions are no longer clipped beside the bounty symbol: the icon, symbol and caption each have enough room.",
+        "Caption length, font size and the combined marker width are respected when placing markers near screen edges."
       ]
     }
   },
