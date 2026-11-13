@@ -36,9 +36,17 @@ namespace Unstuck
         TaskType goal;
         AIFixedGate::Point destination;
         AIFixedUnstuck::Observation watch;
-        unsigned probeSite;
-        bool guard;
-        History():goal(NULL_TASK),probeSite(0),guard(false){}
+        unsigned probeSite, reportedAt;
+        bool guard, failedObserved;
+        History():goal(NULL_TASK),probeSite(0),reportedAt(0),guard(false),failedObserved(false){}
+    };
+
+    struct LandingTrace
+    {
+        const char* reason;
+        float ground, clearance;
+        AIFixedGate::Point slope;
+        LandingTrace():reason("not-probed"),ground(0),clearance(0),slope(0,0,0){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -238,11 +246,9 @@ namespace Unstuck
     Building* ReadGuardCycle(Character* c,CharMovement* movement,TaskType task,bool tracked,
                             bool& attempt,bool& failed)
     {
-        const bool guardTask=task==STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE || task==PATROL_TOWN;
-        if (!guardTask && !(tracked && (task==NULL_TASK || task==IDLE))) return NULL;
         HavokCharacter* navigation=movement->havokCharacter;
         const HavokCharacter::CharacterState state=navigation->getState();
-        if (state!=HavokCharacter::IDLE && !(tracked && state==HavokCharacter::GOAL_REACHED)) return NULL;
+        if (!tracked && state!=HavokCharacter::IDLE) return NULL;
         const HavokCharacter::PathState path=navigation->getPathState();
         if (!tracked && path!=HavokCharacter::WAITING && path!=HavokCharacter::FAILED &&
             path!=HavokCharacter::BROKEN && path!=HavokCharacter::INCOMPLETE) return NULL;
@@ -258,17 +264,26 @@ namespace Unstuck
         const AIFixedGate::Point delta(dest[0]-here[0],dest[1]-here[1],dest[2]-here[2]);
         if (!AIFixedGate::Finite(delta)) return NULL;
         const bool away=AIFixedGate::DistanceSq(delta,AIFixedGate::Point())>=4.0f;
-        failed=guardTask && state==HavokCharacter::IDLE && away &&
+        // Goals describe why an NPC travels, not whether it is travelling.
+        // Shopping, bed and modded goals all use the same native move action.
+        // A retained native failure alone is insufficient after that action
+        // has ended; idle/at-post actors must never refresh this evidence.
+        CharBody* body=c->getBody();
+        const Tasker* action=body?body->getCurrentAction():NULL;
+        const bool movingTask=task!=NULL_TASK && task!=IDLE && action &&
+            action->taskData && action->key()==MOVE_ON_FREE_WILL;
+        failed=movingTask && state==HavokCharacter::IDLE && away &&
             (path==HavokCharacter::FAILED || path==HavokCharacter::BROKEN || path==HavokCharacter::INCOMPLETE);
-        attempt=guardTask && state==HavokCharacter::IDLE && (failed || (away && path==HavokCharacter::WAITING));
+        attempt=movingTask && state==HavokCharacter::IDLE && (failed || (away && path==HavokCharacter::WAITING));
         // NONE/COMPLETE/UPDATING describe the native path pipeline, not arrival
-        // at a guard post. A tracked guard can cycle through these phases at
+        // at a guard post. A tracked actor can cycle through these phases at
         // the same stuck position while its native goal remains far away.
         // A cancelled request also briefly reports GOAL_REACHED or resets the
         // native goal to the feet without any physical progress. These phases
         // can retain an existing clock, but can never start/refresh evidence or
         // admit a landing. SampleGuard still expires abandoned episodes and
-        // physical movement retires the old stationary anchor.
+        // physical movement retires the old stationary anchor. Goal changes
+        // retain only the physical history tied to this exact support handle.
         if (!tracked && !attempt) return NULL;
         return tracked || attempt ? support : NULL;
     }
@@ -507,38 +522,44 @@ namespace Unstuck
         return AIFixedUnstuck::IsSteepGuardSlope(normal);
     }
 
+    bool RejectLanding(LandingTrace& trace,const char* reason)
+    { trace.reason=reason;return false; }
+
     bool FindLanding(GameWorld* world,Character* actor,Building* support,const Ogre::Vector3& here,
-                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard)
+                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard,LandingTrace& trace)
     {
         NavMesh* nav=world->navmesh;
         ZoneMap* zone=world->zoneMgr?world->zoneMgr->getZoneMap(here):NULL;
         if (!nav || !zone || !zone->isLoadedMT() || zone->isBeingLoadedMT() ||
-            !nav->isLoaded(zone) || nav->isGenerating()) return false;
+            !nav->isLoaded(zone) || nav->isGenerating()) return RejectLanding(trace,"zone-not-ready");
         CharMovement* movement=actor->movement;
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
-        if (!_finite(ground)) return false;
+        trace.ground=ground;
+        if (!_finite(ground)) return RejectLanding(trace,"invalid-ground");
         if (here.y-ground<50.0f) support=NULL;
         AIFixedGate::Point slope;
-        if (guard && (!support || !ReadPlatformSlope(support,here,slope))) return false;
+        if (guard && (!support || !ReadPlatformSlope(support,here,slope))) return RejectLanding(trace,"support-not-steep");
+        trace.slope=slope;
         Building* inferredGate=!support && !movement->isStandingOnSomething()?FindElevatedGate(here,ground):NULL;
         if (inferredGate) support=inferredGate;
         const float maximumDrop=support?14.0f:8.0f;
-        if (here.y-ground<-15.0f || here.y-ground>maximumDrop*10.0f) return false;
+        if (here.y-ground<-15.0f || here.y-ground>maximumDrop*10.0f) return RejectLanding(trace,"terrain-height-limit");
         const float clearance=movement->getRadius();
-        if (!_finite(clearance) || clearance<=0 || clearance>AIFixedGate::WorldUnits(2.0f)) return false;
+        trace.clearance=clearance;
+        if (!_finite(clearance) || clearance<=0 || clearance>AIFixedGate::WorldUnits(2.0f)) return RejectLanding(trace,"invalid-radius");
         Ogre::Vector3 rockExit;
         const bool embedded=!support && !movement->isStandingOnSomething() &&
             FindRockExit(here,clearance,probeSite,rockExit,siteCount);
-        if (siteCount && !embedded) return false;
+        if (siteCount && !embedded) return RejectLanding(trace,"rock-exit-unconfirmed");
         if (!support)
         {
             if (!embedded)
             {
-                if (NativePositionAgrees(movement->havokCharacter,here)) return false;
+                if (NativePositionAgrees(movement->havokCharacter,here)) return RejectLanding(trace,"native-position-valid");
                 // Only an explicit miss qualifies. -1 denotes an unavailable query.
                 Ogre::Vector3 nearPoint;
                 unsigned key=~0u;
-                if (nav->getClosestPoint(here,3.0f,0.0f,false,nearPoint,key)!=0) return false;
+                if (nav->getClosestPoint(here,3.0f,0.0f,false,nearPoint,key)!=0) return RejectLanding(trace,"near-face-not-explicit-miss");
             }
         }
         if (!embedded) { siteCount=5; probeSite%=siteCount; }
@@ -553,18 +574,19 @@ namespace Unstuck
             below.x+=55.0f*slope.x;
             below.z+=55.0f*slope.z;
         }
-        if (world->zoneMgr->getZoneMap(below)!=zone) return false;
+        if (world->zoneMgr->getZoneMap(below)!=zone) return RejectLanding(trace,"seed-zone");
         below.y=UtilityT::getTerrainHeight(below.x,below.z);
-        if (!_finite(below.y)) return false;
+        if (!_finite(below.y)) return RejectLanding(trace,"seed-ground");
         const float search=embedded?AIFixedGate::WorldUnits(1.0f):(probeSite==0&&!guard?60.0f:30.0f);
-        if (nav->getClosestExteriorPoint(below,search,clearance,landing)!=1 ||
-            !AIFixedGate::Finite(Point(landing)) ||
-            world->zoneMgr->getZoneMap(landing)!=zone || UtilityT::getPositionInWater(landing.x,landing.z))
-            return false;
+        if (nav->getClosestExteriorPoint(below,search,clearance,landing)!=1)
+            return RejectLanding(trace,"no-exterior-point");
+        if (!AIFixedGate::Finite(Point(landing))) return RejectLanding(trace,"invalid-landing");
+        if (world->zoneMgr->getZoneMap(landing)!=zone) return RejectLanding(trace,"landing-zone");
+        if (UtilityT::getPositionInWater(landing.x,landing.z)) return RejectLanding(trace,"landing-water");
         float surface=UtilityT::getTerrainHeight(landing.x,landing.z);
         if (support)
         {
-            if (here.y-landing.y<50.0f) return false;
+            if (here.y-landing.y<50.0f) return RejectLanding(trace,"platform-drop-too-small");
             DoorStuff* door=support->isGate()?support->getDoor():NULL;
             if (door && door->isSetupComplete)
             {
@@ -576,20 +598,21 @@ namespace Unstuck
             }
         }
         const bool allowed=AIFixedUnstuck::LandingAllowed(Point(here),Point(landing),surface,maximumDrop,embedded?8.0f:6.0f);
-        if (!allowed || (embedded && !StandingSpaceClear(landing,clearance,80.0f))) return false;
+        if (!allowed) return RejectLanding(trace,"landing-distance-height-surface");
+        if (embedded && !StandingSpaceClear(landing,clearance,80.0f)) return RejectLanding(trace,"rock-landing-clearance");
         const int destinationGate=nav->getGateCode(landing);
-        if (destinationGate<0) return false;
-        if (guard && (destinationGate!=nav->getGateCode(here) ||
-            !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope) ||
-            !StandingSpaceClear(landing,clearance,here.y-landing.y+clearance))) return false;
+        if (destinationGate<0) return RejectLanding(trace,"invalid-gate-code");
+        if (guard && destinationGate!=nav->getGateCode(here)) return RejectLanding(trace,"platform-gate-code");
+        if (guard && !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope)) return RejectLanding(trace,"platform-uphill");
+        if (guard && !StandingSpaceClear(landing,clearance,here.y-landing.y+clearance)) return RejectLanding(trace,"platform-landing-clearance");
         if (inferredGate)
         {
             DoorStuff* door=inferredGate->getDoor();
-            if (!door || !door->isSetupComplete || destinationGate!=nav->getGateCode(here)) return false;
+            if (!door || !door->isSetupComplete || destinationGate!=nav->getGateCode(here)) return RejectLanding(trace,"inferred-gate-code");
             const AIFixedGate::Point in=Point(door->getDoorPosInside()),out=Point(door->getDoorPosOutside());
             const int side=AIFixedGate::Side(Point(here),in,out);
             if (!side || side!=AIFixedGate::Side(Point(landing),in,out) ||
-                !StandingSpaceClear(landing,clearance,30.0f)) return false;
+                !StandingSpaceClear(landing,clearance,30.0f)) return RejectLanding(trace,"inferred-gate-side-clearance");
         }
         if (destinationGate>0)
         {
@@ -598,10 +621,46 @@ namespace Unstuck
             // verify the same-gate recovery.
             const int sourceGate=support && support->isGate()
                 ? actor->amInsideTownWalls() : nav->getGateCode(here);
-            if (destinationGate!=sourceGate) return false;
+            if (destinationGate!=sourceGate) return RejectLanding(trace,"town-gate-code");
         }
-        return !CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0) && zone->isLoadedMT() &&
-            !zone->isBeingLoadedMT() && nav->isLoaded(zone);
+        if (CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0)) return RejectLanding(trace,"barrier");
+        if (!zone->isLoadedMT() || zone->isBeingLoadedMT() || !nav->isLoaded(zone)) return RejectLanding(trace,"zone-changed");
+        trace.reason="accepted";
+        return true;
+    }
+
+    void TracePlatform(History& entry,Character* c,double hours,const char* reason,
+                       bool attempt,bool failed,bool fresh,const LandingTrace* trace=NULL,
+                       const Ogre::Vector3* landing=NULL)
+    {
+        if (!g_debug) return;
+        static unsigned lastReport=0;
+        if (!trace && ((entry.reportedAt && activeMs-entry.reportedAt<15000) || activeMs-lastReport<200)) return;
+        CharMovement* movement=c->movement;
+        Building* support=movement->isStandingOnSomething().getBuilding();
+        if (!support || support->getSpecialFunction()!=BF_FLUFF) return;
+        entry.reportedAt=lastReport=activeMs;
+        CharBody* body=c->getBody();
+        const Tasker* action=body?body->getCurrentAction():NULL;
+        const HavokCharacter* nav=movement->havokCharacter;
+        const float* a=nav->position.m_quad.m128_f32,*b=nav->goal.m_quad.m128_f32;
+        const Ogre::Vector3 here=c->getPosition(),target=landing?*landing:here;
+        const Identity object(support->handle);
+        char line[768];
+        _snprintf_s(line,_TRUNCATE,
+            "platform NPC %u/%u/%u:%u/%u support %u/%u/%u:%u/%u p=(%.2f,%.2f,%.2f) "
+            "anchor=(%.2f,%.2f,%.2f) age=%.3f failureAge=%.3f active=%u goal=%d action=%d "
+            "native=%d/%d native_delta=(%.2f,%.2f,%.2f) attempt=%u failed=%u fresh=%u reason=%s "
+            "site=%u ground=%.2f radius=%.2f slopeY=%.3f landing=(%.2f,%.2f,%.2f)",
+            entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
+            object.type,object.container,object.containerSerial,object.index,object.serial,
+            here.x,here.y,here.z,entry.watch.anchor.x,entry.watch.anchor.y,entry.watch.anchor.z,
+            entry.watch.active?hours-entry.watch.since:0.0,hours-entry.watch.guardFailure,entry.watch.active?1:0,
+            static_cast<int>(GoalTask(CurrentGoal(c))),action&&action->taskData?static_cast<int>(action->key()):-1,
+            static_cast<int>(movement->havokCharacter->getState()),static_cast<int>(movement->havokCharacter->getPathState()),
+            b[0]-a[0],b[1]-a[1],b[2]-a[2],attempt?1:0,failed?1:0,fresh?1:0,reason,entry.probeSite,
+            trace?trace->ground:0.0f,trace?trace->clearance:0.0f,trace?trace->slope.y:0.0f,target.x,target.y,target.z);
+        DebugLog(line);
     }
 
     void Inspect(GameWorld* world,const Identity& actor,double hours,LONG currentGeneration)
@@ -627,6 +686,7 @@ namespace Unstuck
             if (entry.actor==actor) entry.watch.active=false;
             return;
         }
+        if (!(entry.actor==actor)) { entry=History();entry.actor=actor; }
         const TaskMatch* goal=CurrentGoal(c);
         task=GoalTask(goal);
         bool attempt=false,failed=false;
@@ -641,6 +701,7 @@ namespace Unstuck
             !CanTravel(c,c->movement,task))
         {
             if (entry.actor==actor) entry.watch.active=false;
+            TracePlatform(entry,c,hours,"actor-or-intent-ineligible",attempt,failed,false);
             return;
         }
         const Ogre::Vector3 here=c->getPosition();
@@ -653,13 +714,27 @@ namespace Unstuck
             entry.subject=subject;
             entry.destination=destination;
             entry.guard=guard!=NULL;
+            entry.failedObserved=false;
         }
         const bool previouslyActive=entry.watch.active;
         const double priorStart=entry.watch.since;
-        const bool due=guard?entry.watch.SampleGuard(position,hours,activeMs,attempt,failed):
+        // An unchanged FAILED result is one witness, not a fresh failure on
+        // every poll. Goal/action cancellation cannot clear the native latch;
+        // a non-failure native path phase must intervene.
+        const bool freshFailure=failed && !entry.failedObserved;
+        const HavokCharacter::PathState observedPath=c->movement->havokCharacter->getPathState();
+        const bool nativeFailed=observedPath==HavokCharacter::FAILED ||
+            observedPath==HavokCharacter::BROKEN || observedPath==HavokCharacter::INCOMPLETE;
+        if (!nativeFailed) entry.failedObserved=false;
+        else if (failed) entry.failedObserved=true;
+        const bool due=guard?entry.watch.SampleGuard(position,hours,activeMs,attempt,freshFailure):
             entry.watch.Sample(position,hours,activeMs);
         if (!previouslyActive || entry.watch.since!=priorStart) entry.probeSite=0;
-        if (!due || (guard && !attempt)) return;
+        if (!due || (guard && !attempt))
+        {
+            TracePlatform(entry,c,hours,entry.watch.active?"observing":"evidence-expired",attempt,failed,freshFailure);
+            return;
+        }
 
         Building* support=guard?guard:BlockedSupport(c,c->movement,task,here);
         // Keep the new valid-face collision probes from delaying the existing
@@ -668,10 +743,12 @@ namespace Unstuck
         DWORD& last=validFace?lastRockProbeMs:lastProbeMs;
         if (activeMs-last<(validFace?1000u:500u)) return;
         last=activeMs;
-        Ogre::Vector3 landing;
+        Ogre::Vector3 landing=here;
+        LandingTrace trace;
         const unsigned probeSite=entry.probeSite;
         unsigned siteCount=0;
-        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount,guard!=NULL);
+        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount,guard!=NULL,trace);
+        TracePlatform(entry,c,hours,trace.reason,attempt,failed,freshFailure,&trace,&landing);
         entry.probeSite=siteCount?(probeSite+1)%siteCount:0;
         entry.watch.Probed(entry.probeSite==0);
         if (!found) return;
@@ -683,7 +760,7 @@ namespace Unstuck
         if (guard)
         {
             // Retained no-goal/reached/at-feet phases only keep observation.
-            // Actual relocation requires an active remote guard attempt now.
+            // Actual relocation requires an active remote native move now.
             Building* current=ReadGuardCycle(c,c->movement,GoalTask(goal),false,attempt,failed);
             if (!current || !(Identity(current->handle)==subject)) return;
         }

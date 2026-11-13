@@ -101,16 +101,22 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     застревание по коллизии даже при потере опоры в данных движения. Выход
     сохраняет сторону ворот и область навмеша. Пробы при наличии лица навмеша
     ограничены одной в секунду отдельно от обычной проверки вне навмеша.
-    Стражник, у которого срываются попытки пройти к посту, может спуститься с
+    NPC, у которого срываются попытки пройти к цели, может спуститься с
     крутого склона платформы на свободную сушу в той же загруженной зоне,
     без пересечения стен и закрытых ворот. Для спуска нужны четыре часа
     без продвижения, подтверждённая коллизия склона и недавний отказ пути
-    при активной задаче поста или городского патруля.
+    при текущем штатном действии движения. Смена цели на кровать, покупки,
+    патруль или другую задачу не обнуляет физическое наблюдение на той же
+    опоре. Отсутствующая задача и простой не создают доказательство отказа.
     Краткие сбросы штатного пути, включая NONE/COMPLETE и подтверждение
     GOAL_REACHED без реального перемещения, сохраняют только таймер наблюдения.
     В этих состояниях перенос запрещён: нужна текущая активная попытка идти
     к удалённой цели. Реальное прибытие сдвигает стационарную точку и сбрасывает
     таймер; более часа без подтверждённого отказа завершает старое наблюдение.
+    Один неизменный отказ пути не обновляет сам себя при каждом опросе.
+    Пределы спуска с платформы остаются 6 м по горизонтали и 5-14 м вниз.
+    Подробный журнал показывает опору, положение, возраст наблюдения, текущие
+    цель/действие/путь и конкретный отказ места выхода. Он выключен по умолчанию.
   * SleepFix.dll/GateFix.dll подавляют соответствующую автоматику AI Fixed
     для исключения конкурирующих приказов. Не используйте две реализации
     одной механики. Gate Push Guard исправляет другой случай: выталкивание
@@ -171,16 +177,22 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     elevated entrapment after a load loses the standing support handle. The
     landing must stay on the same side and navmesh region. Valid-face probes
     are limited to one per second independently of ordinary off-mesh recovery.
-    Guards repeatedly failing to reach their posts can leave a steep platform
+    NPCs repeatedly failing to reach their destinations can leave a steep platform
     slope for clear, dry ground in the same loaded zone while preserving wall
     and closed-gate boundaries. Recovery requires four hours without progress,
     confirmation of the slope by collision and a recent path failure during
-    an active guard-post or town-patrol task.
+    a current native movement action. Switching to bed, shopping, patrol or
+    another goal retains physical observation on the same support. Missing
+    goals and idle tasks cannot supply failure evidence.
     Transient native path resets, including NONE/COMPLETE and GOAL_REACHED
     acknowledgements without physical movement, retain only the observation
-    clock. They never admit relocation: a current active remote guard attempt
+    clock. They never admit relocation: a current active remote movement attempt
     is required. Real arrival changes the stationary anchor and resets its
     clock; more than one hour without a confirmed failure expires the episode.
+    One unchanged failed path cannot refresh itself on every poll. Platform
+    limits remain 6 m horizontally and a 5-14 m descent. Detailed log records
+    support, position, observation age, goal/action/path and the exact rejected
+    landing check. It is disabled by default.
   * Original SleepFix.dll/GateFix.dll suppress the corresponding AI Fixed
     automation to avoid competing orders. Do not combine both implementations.
     Gate Push Guard handles pushing through closed gates, a different feature.

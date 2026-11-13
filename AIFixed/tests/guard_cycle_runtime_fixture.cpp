@@ -3,7 +3,7 @@
 #include <limits>
 #include <GatePolicy.h>
 
-enum TaskType { NULL_TASK, IDLE, STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE, PATROL_TOWN, OTHER_TASK };
+enum TaskType { NULL_TASK, IDLE, STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE, PATROL_TOWN, OTHER_TASK, MOVE_ON_FREE_WILL };
 enum { BF_FLUFF, BF_BED };
 struct Vector { struct { float m128_f32[4]; } m_quad; };
 struct Building
@@ -42,8 +42,12 @@ struct CharMovement
     StandingHandle standing;
     StandingHandle isStandingOnSomething() { return standing; }
 };
+struct Tasker {bool taskData;TaskType key()const{return MOVE_ON_FREE_WILL;}};
+struct CharBody {Tasker action;bool moving;CharBody():moving(true){action.taskData=true;}Tasker* getCurrentAction(){return moving?&action:NULL;}};
 struct Character
 {
+    CharBody body;
+    CharBody* getBody(){return &body;}
     bool animal;
     Character():animal(false) {}
     bool isAnimal() { return animal; }
@@ -102,8 +106,16 @@ int main()
         "at-feet reset can retain only the existing stationary clock");
     Check(!ReadGuardCycle(&actor,&movement,PATROL_TOWN,false,attempt,failed),
         "a destination already at the feet cannot admit relocation");
-    Check(!ReadGuardCycle(&actor,&movement,OTHER_TASK,true,attempt,failed),
-        "another task cancels the guard episode");
+    Check(ReadGuardCycle(&actor,&movement,OTHER_TASK,true,attempt,failed)==&support,
+        "another task retains physical history on the same platform");
+    navigation.goal.m_quad.m128_f32[0]=57.0f;
+    Check(ReadGuardCycle(&actor,&movement,OTHER_TASK,false,attempt,failed)==&support && attempt && failed,
+        "a native move action under an arbitrary goal can begin physical observation");
+    actor.body.moving=false;
+    Check(ReadGuardCycle(&actor,&movement,OTHER_TASK,true,attempt,failed)==&support && !attempt && !failed,
+        "a stale native failure after movement ended cannot refresh evidence");
+    Check(!ReadGuardCycle(&actor,&movement,OTHER_TASK,false,attempt,failed),
+        "a stale native failure without current movement cannot start observation");
     navigation.goal.m_quad.m128_f32[0]=std::numeric_limits<float>::quiet_NaN();
     Check(!ReadGuardCycle(&actor,&movement,NULL_TASK,true,attempt,failed),
         "invalid native goal data cannot retain guard history");

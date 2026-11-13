@@ -12,6 +12,7 @@ python tests/test_gate_runtime.py
 python tests/test_settings_locales.py
 python tests/audit_rest_clock.py
 python tests/test_guard_trace.py
+python tests/test_landing_runtime.py
 ```
 
 The selector and gate/intent fixtures extract current production code. Native
@@ -35,8 +36,28 @@ tested. Native collision/navmesh/landing calls remain explicit boundary fakes.
 The tests preserve recent real failure evidence across native goal resets while
 rejecting relocation during reached/at-feet/no-goal phases, including a reached
 state arriving between the probe and final revalidation. Physical arrival,
-mobility, stale evidence, another support/task, native medical/combat/player
+mobility, stale evidence, another support, native medical/combat/player
 exclusions and rejected landing geometry cannot reuse the old four-hour clock.
+The 2026-11-13 followup additionally covers four separate synthetic mixed-goal
+actors. Bed/shopping/other goals retain a physical episode only on the same
+support; current MOVE_ON_FREE_WILL and distant blocked native navigation are
+required to start an attempt. An unchanged native FAILED result, including
+GOAP cancellation/action recreation, cannot refresh its own timestamp.
+The landing-flow fixture extracts actual FindLanding and checks geometry and
+rejection diagnostics with explicit native query fakes. If terrain were 140,
+the saved upper actor heights 299-315 exceed the existing 14 m descent limit;
+the saves do not contain terrain/support/navmesh queries, so this is a
+conditional check, not a measured landing result. The lower captured guard
+height is accepted only when every fake physical query confirms a safe exit.
+The runtime replay's fake landing now also respects the production distance
+and minimum descent limits; actual native landing queries remain faked.
+`inspect_saved_platform.py <save...>` reads v15 platoon instances/state records
+without opening a process or modifying saves. It requires the local read-only
+modread Reader and writes only ignored `_generated/saved_platform_actors.json`.
+Platform diagnostics are gated by Detailed log, limited to one observation
+per actor per 15 seconds and five ordinary lines/second globally. Probe-result
+lines use the existing probe budget (at most two/second), with no extra native
+collision or spatial queries. No CPU/FPS/memory claim follows from these tests.
 `python tests/test_guard_trace.py --baseline-reset` runs the current replay
 against the pre-fix `3bc09133341a2a87a32bfaca800be086a2bfae3e` runtime and is
 expected to fail all nine cycle phases;

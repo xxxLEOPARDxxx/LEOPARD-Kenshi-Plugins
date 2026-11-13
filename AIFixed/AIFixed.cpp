@@ -53,6 +53,7 @@
 
 #include <kenshi/Character.h>
 #include <kenshi/CharMovement.h>
+#include <kenshi/CharBody.h>
 #include <kenshi/HavokCharacter.h>
 #include <kenshi/Enums.h>
 #include <kenshi/Faction.h>

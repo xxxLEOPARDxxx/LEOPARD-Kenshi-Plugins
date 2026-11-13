@@ -6,7 +6,7 @@
 #include <UnstuckPolicy.h>
 
 enum itemType { BUILDING=0,CHARACTER=1,EMPTY_HANDLE=11 };
-enum TaskType { NULL_TASK=0,IDLE=1,PATROL_TOWN=156,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE=157,OTHER_TASK=999 };
+enum TaskType { NULL_TASK=0,MOVE_ON_FREE_WILL=1,IDLE=14,USE_BED=99,SHOPPING=119,PATROL_TOWN=156,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE=157,OTHER_TASK=999 };
 enum { BF_FLUFF=18,BF_BED=19,MOVE_NORMAL=0,MOVE_DIRECTION=2,IN_NOTHING=0 };
 namespace WaterState {enum { THIGH_DEEP_WATER=2 };}
 namespace RobotLimbs {enum Limb { LEFT_LEG,RIGHT_LEG };}
@@ -54,7 +54,11 @@ struct TaskMatch {
     TaskData* taskData;hand subject;
     TaskMatch():taskData(NULL){}TaskType key()const{return taskData?taskData->type:NULL_TASK;}
 };
+struct Tasker {TaskData* taskData; TaskType key()const{return taskData?taskData->type:NULL_TASK;}};
+struct CharBody {Tasker* currentAction;CharBody():currentAction(NULL){}Tasker* getCurrentAction(){return currentAction;}};
 struct Character {
+    CharBody body;TaskData actionData;Tasker action;
+    CharBody* getBody(){return &body;}
     hand handle;CharMovement* movement;Ogre::Vector3 position;TaskData data;TaskMatch currentGoal;
     bool player,dead,down,unconscious,ragdoll,crippled,carried,isCarryingSomething,isUsingTurret,isChained,combat;
     int inSomething;bool inWhat;int water;bool animal;MedicalSystem medical;
@@ -100,20 +104,27 @@ bool ReadIntent(Character*,CharMovement*,const TaskMatch*,TaskType,Identity&,AIF
 
 Building* BlockedSupport(Character*,CharMovement*,TaskType,const Ogre::Vector3&){return NULL;}
 bool NativePositionAgrees(HavokCharacter*,const Ogre::Vector3&){return true;}
-bool FindLanding(GameWorld*,Character* c,Building*,const Ogre::Vector3& here,unsigned,Ogre::Vector3& landing,unsigned& sites,bool guard){
+bool FindLanding(GameWorld*,Character* c,Building*,const Ogre::Vector3& here,unsigned,Ogre::Vector3& landing,unsigned& sites,bool guard,LandingTrace& trace){
     ++probes;sites=1;
     if(reachedDuringProbe){c->movement->havokCharacter->state=HavokCharacter::GOAL_REACHED;c->movement->havokCharacter->goal=c->movement->havokCharacter->position;}
     // Native terrain/collision/navmesh/barrier queries remain explicit fakes.
     // Their real guard branch and all geometry limits are unchanged by this fix.
-    landing=Ogre::Vector3(here.x-12.0f,here.y-40.0f,here.z-2.0f);
-    return guard && allowLanding && AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),capturedSlope);
+    landing=Ogre::Vector3(here.x-12.0f,here.y-100.0f,here.z-2.0f);
+    return guard && allowLanding && AIFixedUnstuck::LandingAllowed(Point(here),Point(landing),landing.y,14.0f) &&
+        here.y-landing.y>=50.0f && AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),capturedSlope);
 }
-void DebugLog(const char*){}
+bool FindLanding(GameWorld* w,Character* c,Building* b,const Ogre::Vector3& p,unsigned site,Ogre::Vector3& landing,unsigned& sites,bool guard){
+    LandingTrace trace;return FindLanding(w,c,b,p,site,landing,sites,guard,trace);
+}
+unsigned debugLines=0;
+void DebugLog(const char*){++debugLines;}
+
+// @TRACE@
 
 // @INSPECT@
 
 struct Captured {
-    TaskType task;int state,path;float position[3],navPosition[3],navGoal[3];unsigned count;
+    TaskType task;int action,state,path;float position[3],navPosition[3],navGoal[3];unsigned count;
 };
 // @CAPTURED@
 
@@ -128,6 +139,7 @@ void Reset(Character& c,CharMovement& m,HavokCharacter& nav,Building& b){
 void Apply(Character& c,HavokCharacter& nav,const Captured& s){
     c.position=Ogre::Vector3(s.position[0],s.position[1],s.position[2]);
     c.data.type=s.task;c.currentGoal.taskData=s.task==NULL_TASK?NULL:&c.data;
+    c.actionData.type=static_cast<TaskType>(s.action);c.action.taskData=&c.actionData;c.body.currentAction=s.action?&c.action:NULL;
     nav.state=static_cast<HavokCharacter::CharacterState>(s.state);nav.path=static_cast<HavokCharacter::PathState>(s.path);
     for(unsigned i=0;i<3;++i){nav.position.m_quad.m128_f32[i]=s.navPosition[i]*.1f;nav.goal.m_quad.m128_f32[i]=s.navGoal[i]*.1f;}
 }
@@ -200,10 +212,50 @@ int main(){
     Check(teleports==0&&probes==0&&!Entry(id).watch.active,"a legitimate untracked guard post at its goal never begins recovery");
     Reset(actor,movement,nav,platform);Apply(actor,nav,captured[6]);currentHours=300;activeMs=1000;Inspect(&world,id,currentHours,0);
     actor.data.type=OTHER_TASK;actor.currentGoal.taskData=&actor.data;Inspect(&world,id,currentHours+.001,0);
-    Check(!Entry(id).watch.active,"an unrelated real goal still retires the blocked guard episode");
+    Check(Entry(id).watch.active,"goal replacement alone must preserve physical obstruction history on the same support");
     Reset(actor,movement,nav,platform);Apply(actor,nav,captured[6]);currentHours=400;activeMs=1000;Inspect(&world,id,currentHours,0);
     platform.handle.serial++;currentHours+=.1;activeMs+=1000;Inspect(&world,id,currentHours,0);
     Check(Entry(id).watch.since==currentHours,"a different supporting platform starts its own complete observation window");
+    // User followup: four physically stationary NPCs cycle arbitrary goals.
+    // Goal order/time below is synthetic, not a reconstructed live trace.
+    const TaskType mixedGoals[]={USE_BED,SHOPPING,PATROL_TOWN,OTHER_TASK,NULL_TASK};
+    for(unsigned actorIndex=0;actorIndex<4;++actorIndex){
+        Reset(actor,movement,nav,platform);actor.handle.index+=actorIndex;
+        const Identity mixedId(actor.handle);
+        for(unsigned n=0;n<500 && !teleports;++n){
+            Captured s=captured[6];s.task=mixedGoals[(n+actorIndex)%5];
+            if(n%3==1){s.task=NULL_TASK;s.action=0;s.state=HavokCharacter::GOAL_REACHED;s.path=HavokCharacter::COMPLETE;}
+            if(n%3==2)s.path=HavokCharacter::WAITING;
+            Apply(actor,nav,s);currentHours=500+n*.01;activeMs=1000+n*100;
+            Inspect(&world,mixedId,currentHours,0);
+        }
+        Check(teleports==1&&firstRelocationAge>=4.0,"each mixed-goal actor earns its own full physical four-hour watch");
+    }
+    Reset(actor,movement,nav,platform);
+    for(unsigned n=0;n<500;++n){
+        Captured s=captured[6];s.task=SHOPPING;s.action=0;
+        Apply(actor,nav,s);currentHours=600+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(!Entry(id).watch.active&&teleports==0&&probes==0,"a leftover native failure without current movement action is not fresh movement evidence");
+    Reset(actor,movement,nav,platform);
+    for(unsigned n=0;n<500;++n){
+        Apply(actor,nav,captured[6]);currentHours=700+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==0&&probes==0,"one unchanged native FAILED sample cannot renew its own failure timestamp for four hours");
+    Reset(actor,movement,nav,platform);
+    for(unsigned n=0;n<500;++n){
+        Captured s=captured[6];s.task=n%2?NULL_TASK:SHOPPING;s.action=n%2?0:MOVE_ON_FREE_WILL;
+        Apply(actor,nav,s);currentHours=750+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==0&&probes==0,"GOAP cancellations and action recreation cannot refresh an unchanged native FAILED result");
+    Reset(actor,movement,nav,platform);Apply(actor,nav,captured[6]);
+    g_debug=false;debugLines=0;activeMs=1000;Inspect(&world,id,800,0);
+    Check(debugLines==0,"platform diagnostics stay silent with detailed logging disabled");
+    g_debug=true;activeMs=2000;Inspect(&world,id,800.1,0);
+    Check(debugLines==1,"detailed logging records a support-bound observation");
+    activeMs=3000;Inspect(&world,id,800.2,0);
+    Check(debugLines==1,"repeated observations of one actor are rate limited");
+    g_debug=false;
     printf("AIFixed extracted guard trace: %s (%d checks; 316 captured observations, synthetic repeated order/time)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
 }

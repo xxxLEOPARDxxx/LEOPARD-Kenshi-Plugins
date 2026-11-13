@@ -1,0 +1,275 @@
+{
+  "evidence_note": "Actual v15 saved platoon instance positions and five-field handles. Both latest saves fully parsed with byte-consumption assertions. Identical endpoints do not prove continuous four-game-hour immobility. Goals, actions, physical support, terrain and landing queries are not present in these saved records. Four newer actors are candidates inferred from proximity and elevated positions; the screenshot identities were not independently confirmed.",
+  "observations": [
+    {
+      "save": "autosave0",
+      "saved_at_msk": "2026-11-13T01:54:39.118782+03:00",
+      "name": "Трутень",
+      "identity": [
+        1,
+        61,
+        2046386688,
+        3,
+        2518066432
+      ],
+      "position": [
+        18781.48046875,
+        260.7485046386719,
+        47723.09375
+      ],
+      "source_platoon": "Западный Улей_3.platoon",
+      "source_sha256": "c166acd1386351b30a524c7385d0d3534961487c6db679653d05035a151035f8",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave0",
+      "saved_at_msk": "2026-11-13T01:54:39.118782+03:00",
+      "name": "Стражница",
+      "identity": [
+        1,
+        24,
+        19042968,
+        8,
+        3292846592
+      ],
+      "position": [
+        18762.498046875,
+        299.07415771484375,
+        47775.0234375
+      ],
+      "source_platoon": "Техохотники_11.platoon",
+      "source_sha256": "607bd8863f5eba226e4adaddffdb7decaa815c10f2ac1d519350efe0f82cd1c5",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave0",
+      "saved_at_msk": "2026-11-13T01:54:39.118782+03:00",
+      "name": "Стражник",
+      "identity": [
+        1,
+        24,
+        19042968,
+        6,
+        3422119168
+      ],
+      "position": [
+        18749.109375,
+        315.03497314453125,
+        47782.89453125
+      ],
+      "source_platoon": "Техохотники_11.platoon",
+      "source_sha256": "607bd8863f5eba226e4adaddffdb7decaa815c10f2ac1d519350efe0f82cd1c5",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave0",
+      "saved_at_msk": "2026-11-13T01:54:39.118782+03:00",
+      "name": "Патч",
+      "identity": [
+        1,
+        29,
+        1448486272,
+        16,
+        2482788096
+      ],
+      "position": [
+        18754.861328125,
+        305.96453857421875,
+        47777.359375
+      ],
+      "source_platoon": "Техохотники_16.platoon",
+      "source_sha256": "4b405c78d7e892bd085c5338c77cc1a3f9b477439e0c3ac5b21b33beea522fe4",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave0",
+      "saved_at_msk": "2026-11-13T01:54:39.118782+03:00",
+      "name": "Техохотник ветеран",
+      "identity": [
+        1,
+        15,
+        98510744,
+        6,
+        3684570368
+      ],
+      "position": [
+        18772.154296875,
+        250.47865295410156,
+        47736.890625
+      ],
+      "source_platoon": "Техохотники_3.platoon",
+      "source_sha256": "dec08099c4328483315439b8787e3e3d04f61f880f6cbaef97de9f0046c63152",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave2",
+      "saved_at_msk": "2026-11-13T01:44:37.943215+03:00",
+      "name": "Трутень",
+      "identity": [
+        1,
+        61,
+        2046386688,
+        3,
+        2518066432
+      ],
+      "position": [
+        18781.48046875,
+        260.7485046386719,
+        47723.09375
+      ],
+      "source_platoon": "Западный Улей_3.platoon",
+      "source_sha256": "e4f6c2455642da5542d7b974a49dc10339f6bc98740f3514eda97d02272e9bb9",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave2",
+      "saved_at_msk": "2026-11-13T01:44:37.943215+03:00",
+      "name": "Стражница",
+      "identity": [
+        1,
+        24,
+        19042968,
+        8,
+        3292846592
+      ],
+      "position": [
+        18762.498046875,
+        299.07415771484375,
+        47775.0234375
+      ],
+      "source_platoon": "Техохотники_11.platoon",
+      "source_sha256": "03111a20b008aacca66a7ecf392e1e5b732c5e9f30171f436a8fa67c315a10ee",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave2",
+      "saved_at_msk": "2026-11-13T01:44:37.943215+03:00",
+      "name": "Стражник",
+      "identity": [
+        1,
+        24,
+        19042968,
+        6,
+        3422119168
+      ],
+      "position": [
+        18749.109375,
+        315.03497314453125,
+        47782.89453125
+      ],
+      "source_platoon": "Техохотники_11.platoon",
+      "source_sha256": "03111a20b008aacca66a7ecf392e1e5b732c5e9f30171f436a8fa67c315a10ee",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave2",
+      "saved_at_msk": "2026-11-13T01:44:37.943215+03:00",
+      "name": "Патч",
+      "identity": [
+        1,
+        29,
+        1448486272,
+        16,
+        2482788096
+      ],
+      "position": [
+        18754.861328125,
+        305.96453857421875,
+        47777.359375
+      ],
+      "source_platoon": "Техохотники_16.platoon",
+      "source_sha256": "3eff582f6d6070a58937339091253ad3583a388f79fa2e7299781245597a533d",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    },
+    {
+      "save": "autosave2",
+      "saved_at_msk": "2026-11-13T01:44:37.943215+03:00",
+      "name": "Техохотник ветеран",
+      "identity": [
+        1,
+        15,
+        98510744,
+        6,
+        3684570368
+      ],
+      "position": [
+        18772.154296875,
+        250.47865295410156,
+        47736.890625
+      ],
+      "source_platoon": "Техохотники_3.platoon",
+      "source_sha256": "1a8ec7b2fa6ba90b5054d5b7b94b734b52193120d814c123b0cc6cf10cecb9de",
+      "medical_flags": {
+        "coma": 0,
+        "dead": 0,
+        "unconcious": 0,
+        "incapacitated": 0
+      },
+      "in_something": 0,
+      "carrying": 0
+    }
+  ]
+}
