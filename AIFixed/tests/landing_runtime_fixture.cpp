@@ -46,7 +46,8 @@ struct NavMesh {
 struct GameWorld {NavMesh* navmesh;ZoneManager* zoneMgr;};
 float ground=140;
 bool slopeConfirmed=true,standingClear=true,barrier=false,water=false;
-bool pocketConfirmed=false;
+bool pocketConfirmed=false,physicalCapConfirmed=false;
+int pocketResult=0,physicalCapCalls=0;
 bool nativeAgrees=true;
 bool floorHit=true,floorAborted=false,floorBuilding=false;
 float floorY=140,floorNormalY=1,floorDistance=5;
@@ -67,8 +68,9 @@ struct UtilityT {
     static void trace(physHit& hit,const Ogre::Vector3& start,const Ogre::Vector3&,unsigned){hit.position.x=start.x;hit.position.z=start.z;}
 };
 AIFixedGate::Point Point(const Ogre::Vector3& p){return AIFixedGate::Point(p.x,p.y,p.z);}
-bool ReadPlatformSlope(Building*,const Ogre::Vector3&,AIFixedGate::Point& out){out=normal;return slopeConfirmed;}
-bool ReadPlatformPocket(NavMesh*,CharMovement*,const AIFixedGate::Point&,int& result){result=pocketConfirmed?1:0;return pocketConfirmed;}
+bool ReadPlatformSlope(Building*,const Ogre::Vector3&,AIFixedGate::Point& out,unsigned& group){out=normal;group=7;return slopeConfirmed;}
+bool ReadPlatformPocket(NavMesh*,CharMovement*,const AIFixedGate::Point&,int& result){result=pocketConfirmed?1:pocketResult;return pocketConfirmed;}
+bool ReadPhysicalPlatformCap(Building*,const Ogre::Vector3&,const AIFixedGate::Point&,unsigned){++physicalCapCalls;return physicalCapConfirmed;}
 Building* FindElevatedGate(const Ogre::Vector3&,float){return NULL;}
 bool FindRockExit(const Ogre::Vector3&,float,unsigned,Ogre::Vector3&,unsigned&){return false;}
 bool NativePositionAgrees(void*,const Ogre::Vector3&){return nativeAgrees;}
@@ -159,7 +161,18 @@ int main(){
     nav.sourceKey=0x02000306;Check(!Probe(world,actor,platform,Ogre::Vector3(18780.78f,260.48f,47723.61f),"support-not-steep"),
         "nearby physical query must match the current native face");nav.sourceKey=0x02000307;
     pocketConfirmed=false;Check(!Probe(world,actor,platform,Ogre::Vector3(18780.78f,260.48f,47723.61f),"support-not-steep"),
-        "connected rounded footing cannot use cap recovery");
+        "rounded footing without either native island or physical convex-cap proof rejects");
+    physicalCapConfirmed=true;
+    const Ogre::Vector3 drone(18780.21f,259.86f,47722.70f);
+    normal=AIFixedGate::Point(-.514f,.819f,-.253f);
+    Check(Probe(world,actor,platform,drone,"accepted"),"recorded Drone pocket0 may use independently proven small physical cap");
+    pocketResult=-1;const int previousPhysicalCalls=physicalCapCalls;
+    Check(!Probe(world,actor,platform,drone,"support-not-steep")&&physicalCapCalls==previousPhysicalCalls,"busy or faulted nav query cannot fall back to physical cap");pocketResult=0;
+    nativeAgrees=false;Check(!Probe(world,actor,platform,drone,"support-not-steep"),"physical cap cannot bypass native position agreement");nativeAgrees=true;
+    water=true;Check(!Probe(world,actor,platform,drone,"landing-water"),"physical cap cannot bypass dry landing");water=false;
+    barrier=true;Check(!Probe(world,actor,platform,drone,"barrier"),"physical cap cannot bypass barrier checks");barrier=false;
+    standingClear=false;Check(!Probe(world,actor,platform,drone,"platform-landing-clearance"),"physical cap cannot bypass standing clearance");standingClear=true;
+    Check(!Probe(world,actor,platform,Ogre::Vector3(drone.x,280.1f,drone.z),"terrain-height-limit"),"physical cap retains14m drop limit");
     printf("AIFixed extracted landing flow: %s (%d checks; native queries faked explicitly)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
 }

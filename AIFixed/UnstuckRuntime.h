@@ -46,8 +46,8 @@ namespace Unstuck
         const char* reason;
         float ground, clearance, surface, landingGround;
         AIFixedGate::Point slope;
-        int sourceFace, pocket;
-        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),sourceFace(-2),pocket(-2){}
+        int sourceFace, pocket,physicalCap;
+        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),sourceFace(-2),pocket(-2),physicalCap(0){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -515,15 +515,88 @@ namespace Unstuck
         return !solid.traceWasAborted() && !solid.hit;
     }
 
-    bool ReadPlatformSlope(Building* support,const Ogre::Vector3& here,AIFixedGate::Point& normal)
+    bool ReadPlatformSlope(Building* support,const Ogre::Vector3& here,AIFixedGate::Point& normal,unsigned& group)
     {
         physHit footing(false,true,here.y);
         UtilityT::sphereTrace(footing,here+Ogre::Vector3(0,6,0),Ogre::Vector3(0,-12,0),.75f,~0u,true);
         if (footing.traceWasAborted() || !footing.hit || footing.getBuilding()!=support ||
             !AIFixedGate::Finite(Point(footing.position)) || std::fabs(footing.position.y-here.y)>5.0f)
             return false;
-        normal=Point(footing.normal);
+        normal=Point(footing.normal);group=footing.group();
         return AIFixedUnstuck::IsSteepGuardSlope(normal);
+    }
+
+    struct CapFooting
+    {
+        AIFixedGate::Point position,normal;
+        NxShape* shape;
+        CapFooting():shape(NULL){}
+    };
+
+    bool ReadCapFooting(Building* support,const Ogre::Vector3& here,float x,float z,
+                        NxShape* shape,unsigned group,CapFooting& out)
+    {
+        // Rays retain the actual NxShape; sphere sweeps do not populate it.
+        physHit hit(false,true,here.y);
+        if (group>=32) return false;
+        UtilityT::trace(hit,Ogre::Vector3(x,here.y+10.0f,z),Ogre::Vector3(0,-1,0),1u<<group);
+        if (hit.traceWasAborted() || !hit.hit || !hit.shape || (shape && hit.shape!=shape) ||
+            hit.getBuilding()!=support || !AIFixedGate::Finite(Point(hit.position)) ||
+            !AIFixedGate::Finite(Point(hit.normal)) || !_finite(hit.distance) ||
+            hit.distance<0 || hit.distance>40.0f ||
+            std::fabs(hit.position.x-x)>1.0f || std::fabs(hit.position.z-z)>1.0f ||
+            hit.position.y>here.y+8.0f || hit.position.y<here.y-30.0f) return false;
+        const float length=hit.normal.x*hit.normal.x+hit.normal.y*hit.normal.y+hit.normal.z*hit.normal.z;
+        if (length<.95f || length>1.05f) return false;
+        out.position=Point(hit.position);out.normal=Point(hit.normal);out.shape=hit.shape;
+        return true;
+    }
+
+    bool ReadPhysicalPlatformCap(Building* support,const Ogre::Vector3& here,const AIFixedGate::Point& normal,unsigned group)
+    {
+        // Small convex cap proof is independent of a coarse nav polygon's
+        // edge length. At most seven rays, only inside the mature probe slot.
+        if (!support || group>=32 || !AIFixedUnstuck::IsRoundedGuardFooting(normal)) return false;
+        CapFooting source,uphill;
+        if (!ReadCapFooting(support,here,here.x,here.z,NULL,group,source) ||
+            !AIFixedUnstuck::IsRoundedGuardFooting(source.normal)) return false;
+        const float agreement=normal.x*source.normal.x+normal.y*source.normal.y+normal.z*source.normal.z;
+        const float horizontal=std::sqrt(source.normal.x*source.normal.x+source.normal.z*source.normal.z);
+        if (agreement<.98f || horizontal<.2f) return false;
+        if (!ReadCapFooting(support,here,here.x-8.0f*source.normal.x/horizontal,
+            here.z-8.0f*source.normal.z/horizontal,source.shape,group,uphill) || uphill.normal.y<.95f) return false;
+        const AIFixedGate::Point dp(uphill.position.x-source.position.x,uphill.position.y-source.position.y,
+            uphill.position.z-source.position.z),dn(uphill.normal.x-source.normal.x,
+            uphill.normal.y-source.normal.y,uphill.normal.z-source.normal.z);
+        const float change=dn.x*dn.x+dn.y*dn.y+dn.z*dn.z;
+        if (change<.02f) return false;
+        const float radius=(dp.x*dn.x+dp.y*dn.y+dp.z*dn.z)/change;
+        if (!_finite(radius) || radius<10.0f || radius>30.0f) return false;
+        const AIFixedGate::Point error(dp.x-radius*dn.x,dp.y-radius*dn.y,dp.z-radius*dn.z);
+        if (AIFixedGate::DistanceSq(error,AIFixedGate::Point())>1.0f) return false;
+        const AIFixedGate::Point center(source.position.x-radius*source.normal.x,
+            source.position.y-radius*source.normal.y,source.position.z-radius*source.normal.z);
+        static const float directions[5][2]={{0,0},{1,0},{-1,0},{0,1},{0,-1}};
+        float top=0;
+        for (unsigned i=0;i<5;++i)
+        {
+            CapFooting edge;
+            if (!ReadCapFooting(support,here,center.x+.85f*radius*directions[i][0],
+                center.z+.85f*radius*directions[i][1],source.shape,group,edge)) return false;
+            if (!i)
+            {
+                if (edge.normal.y<.97f || std::fabs(edge.position.y-center.y-radius)>1.0f) return false;
+                top=edge.position.y;
+            }
+            else
+            {
+                const float outward=edge.normal.x*directions[i][0]+edge.normal.z*directions[i][1];
+                const float sideways=edge.normal.x*directions[i][1]-edge.normal.z*directions[i][0];
+                if (edge.normal.y<.25f || edge.normal.y>.68f || outward<.70f ||
+                    std::fabs(sideways)>.15f || top-edge.position.y<5.0f || top-edge.position.y>25.0f) return false;
+            }
+        }
+        return true;
     }
 
     int QueryPlatformPocket(NavMesh* nav,HavokCharacter* navigation)
@@ -605,10 +678,11 @@ namespace Unstuck
         if (here.y-ground<50.0f) support=NULL;
         AIFixedGate::Point slope;
         bool steep=false,pocket=false;
+        unsigned footingGroup=32;
         if (guard)
         {
             if (!support) return RejectLanding(trace,"platform-support-missing");
-            steep=ReadPlatformSlope(support,here,slope);
+            steep=ReadPlatformSlope(support,here,slope,footingGroup);
             trace.slope=slope;
             if (!steep)
             {
@@ -624,9 +698,17 @@ namespace Unstuck
                     if (trace.sourceFace!=1 || !AIFixedGate::Finite(Point(nearPoint)) ||
                         AIFixedGate::DistanceSq(Point(here),Point(nearPoint))>25.0f ||
                         key!=movement->havokCharacter->currentFace ||
-                        !NativePositionAgrees(movement->havokCharacter,here) ||
-                        !ReadPlatformPocket(nav,movement,slope,trace.pocket))
+                        !NativePositionAgrees(movement->havokCharacter,here))
                         return RejectLanding(trace,"support-not-steep");
+                    if (!ReadPlatformPocket(nav,movement,slope,trace.pocket))
+                    {
+                        // False can mean a long simplified polygon, not a
+                        // connected walking surface. Prove the actual small
+                        // convex cap instead; unavailable/faulted nav rejects.
+                        if (trace.pocket!=0 || !ReadPhysicalPlatformCap(support,here,slope,footingGroup))
+                            return RejectLanding(trace,"support-not-steep");
+                        trace.physicalCap=1;
+                    }
                     pocket=true;
                 }
             }
@@ -754,7 +836,7 @@ namespace Unstuck
             "anchor=(%.2f,%.2f,%.2f) age=%.3f failureAge=%.3f active=%u goal=%d action=%d "
             "native=%d/%d native_delta=(%.2f,%.2f,%.2f) attempt=%u failed=%u fresh=%u reason=%s "
             "site=%u ground=%.2f radius=%.2f slopeY=%.3f slopeXZ=(%.3f,%.3f) sourceFace=%d "
-            "pocket=%d navY=%.2f landingGround=%.2f landing=(%.2f,%.2f,%.2f)",
+            "pocket=%d cap=%d navY=%.2f landingGround=%.2f landing=(%.2f,%.2f,%.2f)",
             entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
             object.type,object.container,object.containerSerial,object.index,object.serial,
             here.x,here.y,here.z,entry.watch.anchor.x,entry.watch.anchor.y,entry.watch.anchor.z,
@@ -764,7 +846,8 @@ namespace Unstuck
             b[0]-a[0],b[1]-a[1],b[2]-a[2],attempt?1:0,failed?1:0,fresh?1:0,reason,entry.probeSite,
             trace?trace->ground:0.0f,trace?trace->clearance:0.0f,
             trace?trace->slope.y:0.0f,trace?trace->slope.x:0.0f,trace?trace->slope.z:0.0f,
-            trace?trace->sourceFace:-2,trace?trace->pocket:-2,trace?trace->surface:0.0f,trace?trace->landingGround:0.0f,
+            trace?trace->sourceFace:-2,trace?trace->pocket:-2,trace?trace->physicalCap:0,
+            trace?trace->surface:0.0f,trace?trace->landingGround:0.0f,
             target.x,target.y,target.z);
         DebugLog(line);
     }

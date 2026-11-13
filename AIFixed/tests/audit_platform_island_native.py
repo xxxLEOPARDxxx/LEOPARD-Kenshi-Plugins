@@ -97,9 +97,26 @@ assert any(i.op_str == 'dword ptr [rsp + 0x20], xmm6' for i in native_caller)
 assert struct.unpack('<f', steam_pe.get_data(0x167ead4, 4))[0] == 10.0
 table_gog = (GAME/'RE_Kenshi/RVAs/GOG_1.0.65.br').read_bytes()
 assert struct.unpack_from('<I', table_gog, 5006*4)[0] == 0x3a4960
+ray_proof=[]
+for symbol,slot,steam_rva,expect_shape in [('UtilityT::trace',7164,0x9b5bc0,True),('UtilityT::sphereTrace',7168,0x9b6060,False)]:
+    reference=None
+    for profile in profiles[:2]:
+        pe_image=pefile.PE(profile['executable'],fast_load=True)
+        rva=steam_rva if profile['name']=='Steam' else struct.unpack_from('<I',table_gog,slot*4)[0]
+        body=[]
+        for instruction in md.disasm(pe_image.get_data(rva,0x400),rva):
+            body.append(instruction)
+            if instruction.mnemonic=='ret':break
+        assert body[-1].mnemonic=='ret'
+        normalized=normalize(body,rva)
+        if reference is None:reference=normalized
+        assert reference==normalized,(symbol,profile['name'])
+        shape_store=any(i.mnemonic=='mov' and i.op_str.startswith('qword ptr [rbx + 0x28],') for i in body)
+        assert shape_store==expect_shape,(symbol,profile['name'])
+        ray_proof.append(dict(name=symbol,profile=profile['name'],slot=slot,rva=hex(rva),populates_shape=shape_store,body=rows(body)))
 out = Path(__file__).resolve().parent/'_generated'
 out.mkdir(exist_ok=True)
-report = dict(profiles=profiles, wrapper_instruction_count=72,
+report = dict(profiles=profiles, wrapper_instruction_count=72,ray_shape_proof=ray_proof,
     official_export_slot=5006,
     conclusions=dict(units='Havok meters: exact native HK position/radius, not world coordinates',
         fresh_face_lookup=True, no_face_result=False, only_exhausted_flood_result=True,
@@ -110,4 +127,4 @@ report = dict(profiles=profiles, wrapper_instruction_count=72,
     steam_windows=dict(path_exists_try_shared=rows(path_lock), edge_visitor=rows(visitor),
         flood_status=rows(flood_status), flood_budget=rows(flood_budget), native_caller=rows(native_caller)))
 (out/'platform-island-native.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
-print('AIFixed platform island native: PASS; matching 72-instruction wrapper + 485-instruction resolvePoint on Steam/supported GOG/vanilla comparison; units, finite budgets, try-shared lock contract')
+print('AIFixed platform island native: PASS; matching 72-instruction wrapper + 485-instruction resolvePoint on Steam/supported GOG/vanilla comparison; units, finite budgets, try-shared lock; Steam/GOG ray retains NxShape, sphere does not')

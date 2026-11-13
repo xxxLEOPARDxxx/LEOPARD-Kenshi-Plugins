@@ -2,12 +2,13 @@
 
 Local validation candidate (13 November 2026) / Локальная проверочная сборка
 Восстановление NPC на опорах Ровной Лагуны: округлая опора допускается
-только после штатного подтверждения маленького изолированного участка
-навмеша. Если навмеш немного ниже земли, точка посадки сверяется с реальной
+только после подтверждения маленького изолированного участка навмеша
+либо проверки самой небольшой выпуклой опоры по её физической форме.
+Если навмеш немного ниже земли, точка посадки сверяется с реальной
 коллизией грунта. Проверки препятствий, воды, стороны ворот и свободного
 места сохранены. Проверка именно этих NPC в игре ещё не пройдена.
-Flat Lagoon recovery now checks native local confinement on rounded supports
-and a physical terrain landing when simplified navmesh lies slightly below
+Flat Lagoon recovery checks native local confinement or a physically confirmed
+small convex support cap, and a terrain landing when simplified navmesh lies slightly below
 the ground. Barrier, water, gate-side and body-space checks remain. Recovery
 of the reported NPCs is still pending an actual gameplay test.
 
