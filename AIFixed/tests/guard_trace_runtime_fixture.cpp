@@ -6,7 +6,7 @@
 #include <UnstuckPolicy.h>
 
 enum itemType { BUILDING=0,CHARACTER=1,EMPTY_HANDLE=11 };
-enum TaskType { NULL_TASK=0,MOVE_ON_FREE_WILL=1,IDLE=14,USE_BED=99,SHOPPING=119,PATROL_TOWN=156,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE=157,OTHER_TASK=999 };
+enum TaskType { NULL_TASK=0,MOVE_ON_FREE_WILL=1,IDLE=14,USE_BED=99,SHOPPING=119,PATROL_TOWN=36,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE=157,OTHER_TASK=999 };
 enum { BF_FLUFF=18,BF_BED=19,MOVE_NORMAL=0,MOVE_DIRECTION=2,IN_NOTHING=0 };
 namespace WaterState {enum { THIGH_DEEP_WATER=2 };}
 namespace RobotLimbs {enum Limb { LEFT_LEG,RIGHT_LEG };}
@@ -277,6 +277,16 @@ int main(){
         Apply(actor,nav,s);currentHours=750+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
     }
     Check(teleports==1&&firstRelocationAge>=4.0,"recreated native MOVE with a current remote FAILED path is blocked intent despite GOAP cancellation");
+    // Actual DE461 run: the original guard uses the native town-patrol
+    // action36 directly; generic MOVE action1 is not its current body action.
+    Reset(actor,movement,nav,platform);g_unstuckDelayHours=1;
+    for(unsigned n=0;n<150 && !teleports;++n){
+        Captured patrol=captured[6];patrol.task=PATROL_TOWN;patrol.action=PATROL_TOWN;
+        patrol.position[0]=18773.75f;patrol.position[1]=254.3874f;patrol.position[2]=47727.3984f;
+        Apply(actor,nav,patrol);currentHours=880+n*.01;activeMs=1000+n*100;Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==1&&firstRelocationAge>=1.0,"observed native town-patrol action uses proven platform recovery rather than the8m rock branch");
+    g_unstuckDelayHours=4;
     const unsigned delays[]={1,2,4};
     for(unsigned setting=0;setting<3;++setting){
         Reset(actor,movement,nav,platform);g_unstuckDelayHours=delays[setting];

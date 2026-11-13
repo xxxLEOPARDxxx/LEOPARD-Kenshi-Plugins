@@ -104,7 +104,8 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     NPC, у которого срываются попытки пройти к цели, может спуститься с
     крутого склона платформы на свободную сушу в той же загруженной зоне,
     без пересечения стен и закрытых ворот. Для спуска нужны выбранное время
-    без продвижения, подтверждённая коллизия склона и недавний отказ пути
+    без продвижения, подтверждённый склон либо явное отсутствие проходимого
+    лица навмеша под NPC и недавний отказ пути
     при текущем штатном действии движения. Смена цели на кровать, покупки,
     патруль или другую задачу не обнуляет физическое наблюдение на той же
     опоре. Пустая цель ИИ не отменяет ещё активное штатное действие движения;
@@ -120,7 +121,8 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     Текущее штатное движение к удалённой цели с текущим отказом пути считается
     действующей заблокированной попыткой, даже если ИИ пересоздаёт действие.
     Для подтверждённого крутого склона платформы пределы составляют 6 м по
-    горизонтали и 5-18 м вниз. У ворот сохраняется предел 14 м, у камней - 8 м.
+    горизонтали и 5-18 м вниз. При отсутствии лица без подтверждённого склона
+    предел спуска - 14 м. У ворот сохраняется предел 14 м, у камней - 8 м.
     Подробный журнал показывает опору, положение, возраст наблюдения, текущие
     цель/действие/путь и конкретный отказ места выхода. Он выключен по умолчанию.
   * UnstuckDelayHours=1 (1..4 игровых часа). Время без физического
@@ -190,7 +192,8 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     NPCs repeatedly failing to reach their destinations can leave a steep platform
     slope for clear, dry ground in the same loaded zone while preserving wall
     and closed-gate boundaries. Recovery requires the selected time without progress,
-    confirmation of the slope by collision and a recent path failure during
+    a collision-confirmed slope or an explicit native walkable-face miss at
+    the NPC, plus a recent path failure during
     a current native movement action. Switching to bed, shopping, patrol or
     another goal retains physical observation on the same support. A missing
     GOAP goal does not cancel a still-current native movement action. Without
@@ -205,7 +208,8 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     A retained failed path after movement ended cannot refresh evidence. A
     current native move with a current remote failed path is blocked intent,
     including when GOAP recreates that move action. Platform limits are 6 m horizontally and a 5-18 m descent only for a confirmed steep
-    platform. Gates retain their 14 m limit; natural rock retains 8 m. Detailed log records
+    platform. An explicit face miss without steep-slope proof retains 14 m.
+    Gates retain their 14 m limit; natural rock retains 8 m. Detailed log records
     support, position, observation age, goal/action/path and the exact rejected
     landing check. It is disabled by default.
   * UnstuckDelayHours=1 (1..4 game hours). Time without physical progress

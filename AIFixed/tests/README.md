@@ -134,3 +134,14 @@ LoadSettings and its globals against a temporary absolute INI; it checks
 missing-key fallback, clamping and preservation of existing personal values.
 The native INI path/default preparation boundary is explicitly faked; the
 installed INI is never opened or modified by that fixture.
+
+The DE461 game run identified a native PATROL_TOWN body action (actual enum 36)
+on the original stationary guard. It now enters the platform branch directly
+instead of ordinary 8 m rock recovery. The runtime regression uses that actual
+action and saved position. A non-steep platform can alternatively qualify
+only on an explicit native closest-walkable-face miss (0); a success (1) or
+unavailable result (-1) rejects it. This branch retains 14 m maximum descent
+and all current movement, landing-clearance and barrier checks. The slope
+normal is retained before rejection and sourceFace is logged (-2=not queried).
+These query results for the actual Drone remain unmeasured; the tests provide
+explicit native boundary fakes rather than claiming the actor was freed.

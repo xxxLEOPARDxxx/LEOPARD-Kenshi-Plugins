@@ -46,7 +46,8 @@ namespace Unstuck
         const char* reason;
         float ground, clearance;
         AIFixedGate::Point slope;
-        LandingTrace():reason("not-probed"),ground(0),clearance(0),slope(0,0,0){}
+        int sourceFace;
+        LandingTrace():reason("not-probed"),ground(0),clearance(0),slope(0,0,0),sourceFace(-2){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -273,7 +274,8 @@ namespace Unstuck
         // GOAP can clear its goal before the body receives the path failure.
         // The still-current native movement action is the movement witness;
         // the high-level goal is not an additional admission requirement.
-        const bool movingTask=action && action->taskData && action->key()==MOVE_ON_FREE_WILL;
+        const bool movingTask=action && action->taskData &&
+            (action->key()==MOVE_ON_FREE_WILL || action->key()==PATROL_TOWN);
         failed=movingTask && state==HavokCharacter::IDLE && away &&
             (path==HavokCharacter::FAILED || path==HavokCharacter::BROKEN || path==HavokCharacter::INCOMPLETE);
         attempt=movingTask && state==HavokCharacter::IDLE && (failed || (away && path==HavokCharacter::WAITING));
@@ -540,15 +542,30 @@ namespace Unstuck
         if (!_finite(ground)) return RejectLanding(trace,"invalid-ground");
         if (here.y-ground<50.0f) support=NULL;
         AIFixedGate::Point slope;
-        if (guard && (!support || !ReadPlatformSlope(support,here,slope))) return RejectLanding(trace,"support-not-steep");
-        trace.slope=slope;
+        bool steep=false;
+        if (guard)
+        {
+            if (!support) return RejectLanding(trace,"platform-support-missing");
+            steep=ReadPlatformSlope(support,here,slope);
+            trace.slope=slope;
+            if (!steep)
+            {
+                // A native cached face may outlive the walkable surface that
+                // supported it. Only an explicit current walkable-face miss
+                // can replace slope proof; unknown query results fail closed.
+                Ogre::Vector3 nearPoint;
+                unsigned key=~0u;
+                trace.sourceFace=nav->getClosestPoint(here,3.0f,0.0f,false,nearPoint,key);
+                if (trace.sourceFace!=0) return RejectLanding(trace,
+                    trace.sourceFace<0?"support-face-unavailable":"support-not-steep");
+            }
+        }
         Building* inferredGate=!support && !movement->isStandingOnSomething()?FindElevatedGate(here,ground):NULL;
         if (inferredGate) support=inferredGate;
-        // The platform path above already confirmed a steep BF_FLUFF support.
-        // Saved upper-parapet actors are 15.9-17.5 m over authenticated terrain;
-        // the original guard was only 11-12 m above it. Keep the higher bound
-        // local to this confirmed platform case, never gates or natural rock.
-        const float maximumDrop=guard?18.0f:(support?14.0f:8.0f);
+        // Only confirmed steep BF_FLUFF support receives the higher bound.
+        // An explicit native face miss can prove other stranded footing, but
+        // retains the normal14m support limit; gates and rock are unchanged.
+        const float maximumDrop=guard && steep?18.0f:(support?14.0f:8.0f);
         if (here.y-ground<-15.0f || here.y-ground>maximumDrop*10.0f) return RejectLanding(trace,"terrain-height-limit");
         const float clearance=movement->getRadius();
         trace.clearance=clearance;
@@ -575,7 +592,7 @@ namespace Unstuck
         static const float shifts[5][2]={{0,0},{offset,0},{-offset,0},{0,offset},{0,-offset}};
         Ogre::Vector3 below=embedded?rockExit:
             Ogre::Vector3(here.x+shifts[probeSite][0],ground,here.z+shifts[probeSite][1]);
-        if (guard && probeSite==0)
+        if (guard && steep && probeSite==0)
         {
             below.x+=55.0f*slope.x;
             below.z+=55.0f*slope.z;
@@ -609,7 +626,7 @@ namespace Unstuck
         const int destinationGate=nav->getGateCode(landing);
         if (destinationGate<0) return RejectLanding(trace,"invalid-gate-code");
         if (guard && destinationGate!=nav->getGateCode(here)) return RejectLanding(trace,"platform-gate-code");
-        if (guard && !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope)) return RejectLanding(trace,"platform-uphill");
+        if (guard && steep && !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope)) return RejectLanding(trace,"platform-uphill");
         if (guard && !StandingSpaceClear(landing,clearance,here.y-landing.y+clearance)) return RejectLanding(trace,"platform-landing-clearance");
         if (inferredGate)
         {
@@ -657,7 +674,7 @@ namespace Unstuck
             "platform NPC %u/%u/%u:%u/%u support %u/%u/%u:%u/%u p=(%.2f,%.2f,%.2f) "
             "anchor=(%.2f,%.2f,%.2f) age=%.3f failureAge=%.3f active=%u goal=%d action=%d "
             "native=%d/%d native_delta=(%.2f,%.2f,%.2f) attempt=%u failed=%u fresh=%u reason=%s "
-            "site=%u ground=%.2f radius=%.2f slopeY=%.3f landing=(%.2f,%.2f,%.2f)",
+            "site=%u ground=%.2f radius=%.2f slopeY=%.3f sourceFace=%d landing=(%.2f,%.2f,%.2f)",
             entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
             object.type,object.container,object.containerSerial,object.index,object.serial,
             here.x,here.y,here.z,entry.watch.anchor.x,entry.watch.anchor.y,entry.watch.anchor.z,
@@ -665,7 +682,8 @@ namespace Unstuck
             static_cast<int>(GoalTask(CurrentGoal(c))),action&&action->taskData?static_cast<int>(action->key()):-1,
             static_cast<int>(movement->havokCharacter->getState()),static_cast<int>(movement->havokCharacter->getPathState()),
             b[0]-a[0],b[1]-a[1],b[2]-a[2],attempt?1:0,failed?1:0,fresh?1:0,reason,entry.probeSite,
-            trace?trace->ground:0.0f,trace?trace->clearance:0.0f,trace?trace->slope.y:0.0f,target.x,target.y,target.z);
+            trace?trace->ground:0.0f,trace?trace->clearance:0.0f,trace?trace->slope.y:0.0f,
+            trace?trace->sourceFace:-2,target.x,target.y,target.z);
         DebugLog(line);
     }
 

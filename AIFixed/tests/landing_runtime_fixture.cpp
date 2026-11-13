@@ -34,9 +34,9 @@ struct ZoneManager {ZoneMap* getZoneMap(const Ogre::Vector3&){return &zone;}};
 struct NavMesh {
     Ogre::Vector3 candidate;
     unsigned exteriorCalls;
-    int sourceCode,targetCode,exteriorResult;
+    int sourceCode,targetCode,exteriorResult,sourceFaceResult;
     bool isLoaded(ZoneMap*){return true;}bool isGenerating(){return false;}
-    int getClosestPoint(const Ogre::Vector3&,float,float,bool,Ogre::Vector3&,unsigned&){return 0;}
+    int getClosestPoint(const Ogre::Vector3&,float,float,bool,Ogre::Vector3&,unsigned&){return sourceFaceResult;}
     int getClosestExteriorPoint(const Ogre::Vector3&,float,float,Ogre::Vector3& out){++exteriorCalls;out=candidate;return exteriorResult;}
     int getGateCode(const Ogre::Vector3& p){return p.y>200?sourceCode:targetCode;}
 };
@@ -67,7 +67,7 @@ bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3&
     return accepted;
 }
 int main(){
-    NavMesh nav;nav.exteriorCalls=0;nav.sourceCode=nav.targetCode=0;nav.exteriorResult=1;
+    NavMesh nav;nav.sourceFaceResult=1;nav.exteriorCalls=0;nav.sourceCode=nav.targetCode=0;nav.exteriorResult=1;
     nav.candidate=Ogre::Vector3(18740,140,47720);
     ZoneManager manager;GameWorld world={&nav,&manager};Building platform;
     CharMovement movement;movement.havokCharacter=NULL;movement.standing.building=&platform;
@@ -106,6 +106,12 @@ int main(){
     nav.candidate.x=18810;Check(!Probe(world,actor,platform,original,"platform-uphill"),"wrong slope side cannot be accepted");nav.candidate.x=18740;
     nav.candidate.x=18700;Check(!Probe(world,actor,platform,original,"landing-distance-height-surface"),"a farther point cannot exceed6m");nav.candidate.x=18740;
     slopeConfirmed=false;Check(!Probe(world,actor,platform,original,"support-not-steep"),"ordinary posts cannot enter platform recovery");
+    normal=AIFixedGate::Point(0,1,0);nav.sourceFaceResult=0;
+    Check(Probe(world,actor,platform,original,"accepted"),"an explicit native walkable-face miss can prove a stranded non-steep platform position");
+    standingClear=false;Check(!Probe(world,actor,platform,original,"platform-landing-clearance"),"native face miss cannot bypass landing clearance");standingClear=true;
+    Check(!Probe(world,actor,platform,upper[1],"terrain-height-limit"),"non-steep explicit-miss recovery cannot use the18m steep-platform limit");
+    nav.sourceFaceResult=-1;Check(!Probe(world,actor,platform,original,"support-face-unavailable"),"an unavailable native face query is never a miss");
+    nav.sourceFaceResult=1;Check(!Probe(world,actor,platform,original,"support-not-steep"),"an ordinary valid walking face cannot use missing-face recovery");
     printf("AIFixed extracted landing flow: %s (%d checks; native queries faked explicitly)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
 }
