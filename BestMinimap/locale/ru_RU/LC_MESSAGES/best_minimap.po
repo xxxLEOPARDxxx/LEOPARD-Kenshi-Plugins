@@ -41,8 +41,8 @@ msgstr "Курс:%03d"
 msgid "Dir:--"
 msgstr "Курс:--"
 
-msgid "Time:%s"
-msgstr "Часы:%s"
+msgid "PC time:%s"
+msgstr "Время ПК:%s"
 
 msgid "1-10 (10% steps). Only the map: the markers stay opaque."
 msgstr "1-10 (шаг 10%). Только карта: метки остаются непрозрачными."

@@ -41,8 +41,8 @@ msgstr "向:%03d"
 msgid "Dir:--"
 msgstr "向:--"
 
-msgid "Time:%s"
-msgstr "时:%s"
+msgid "PC time:%s"
+msgstr "电脑时间:%s"
 
 msgid "1-10 (10% steps). Only the map: the markers stay opaque."
 msgstr "1-10（每级 10%）。只影响地图：标记始终不透明。"

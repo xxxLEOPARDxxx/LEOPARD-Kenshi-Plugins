@@ -31,9 +31,13 @@ namespace BestMinimapInfo
         FlowLayout layout = {};
         if (count <= 0)
             return layout;
-        const int available = panelWidth > 16 ? panelWidth - 16 : 1;
-        int left = 8;
-        int top = 5;
+        // Vanilla thin-panel corners occupy 9px at the top and 10px at
+        // the bottom; Dark UI uses 7px. Twelve pixels leave a clear text gap
+        // beyond both skins, including the measured text/shadow rectangle.
+        const int margin = 12;
+        const int available = panelWidth > 2 * margin ? panelWidth - 2 * margin : 1;
+        int left = margin;
+        int top = margin;
         int rowHeight = 0;
         layout.rows = 1;
         for (int field = 0; field < count && field < 4; ++field)
@@ -41,11 +45,11 @@ namespace BestMinimapInfo
             int width = widths[field] > 0 ? widths[field] : 1;
             if (width > available)
                 width = available;
-            const int height = heights[field] > 0 ? heights[field] : 18;
-            if (left > 8 && left + width > panelWidth - 8)
+            const int height = heights[field] > 0 ? heights[field] : 22;
+            if (left > margin && left + width > panelWidth - margin)
             {
-                left = 8;
-                top += rowHeight + 3;
+                left = margin;
+                top += rowHeight + 4;
                 rowHeight = 0;
                 ++layout.rows;
             }
@@ -58,7 +62,21 @@ namespace BestMinimapInfo
             if (height > rowHeight)
                 rowHeight = height;
         }
-        layout.height = top + rowHeight + 5;
+        layout.height = top + rowHeight + margin;
+        // Centre each measured row as one group. Inter-field spacing stays
+        // fixed, with no columns or stretched blank gaps between fields.
+        const int used = count < 4 ? count : 4;
+        for (int first = 0; first < used; )
+        {
+            int end = first;
+            while (end + 1 < used && layout.fields[end + 1].top == layout.fields[first].top)
+                ++end;
+            const int rowWidth = layout.fields[end].left + layout.fields[end].width - margin;
+            const int shift = (panelWidth - rowWidth) / 2 - margin;
+            for (int field = first; field <= end; ++field)
+                layout.fields[field].left += shift;
+            first = end + 1;
+        }
         return layout;
     }
 

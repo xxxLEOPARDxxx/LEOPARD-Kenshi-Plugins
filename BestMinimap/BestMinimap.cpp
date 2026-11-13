@@ -2127,10 +2127,10 @@ namespace
                 MyGUI::IntCoord(0, 0, 4096, 128), MyGUI::Align::Default, "");
             box->setNeedMouseFocus(false);
             box->setTextShadow(true);
-            const std::string font = FontFor(18);
+            const std::string font = FontFor(22);
             if (!font.empty())
                 box->setFontName(font);
-            box->setFontHeight(18);
+            box->setFontHeight(22);
             box->setTextAlign(MyGUI::Align::Left | MyGUI::Align::Top);
             // Keep the text colour supplied by the interface skin. Account for
             // its text-region borders, plus two pixels for the shadow.
@@ -2269,7 +2269,7 @@ namespace
                 g_infoClockAt = now;
                 g_infoClockWait = 60000 - static_cast<DWORD>(time.wSecond) * 1000 - time.wMilliseconds;
             }
-            sprintf_s(text, Tr("Time:%s"), g_infoClock);
+            sprintf_s(text, Tr("PC time:%s"), g_infoClock);
             InfoRow(back, 1, text);
         }
         if (g_infoFields & BestMinimapInfo::Coordinates)

@@ -41,8 +41,8 @@ msgstr "Dir:%03d"
 msgid "Dir:--"
 msgstr "Dir:--"
 
-msgid "Time:%s"
-msgstr "Time:%s"
+msgid "PC time:%s"
+msgstr "PC time:%s"
 
 msgid "1-10 (10% steps). Only the map: the markers stay opaque."
 msgstr "1-10 (10% steps). Only the map: the markers stay opaque."

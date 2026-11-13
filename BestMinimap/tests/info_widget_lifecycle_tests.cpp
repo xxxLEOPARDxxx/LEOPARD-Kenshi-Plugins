@@ -13,7 +13,7 @@ int clockReads=0;
 void GetLocalTime(SYSTEMTIME* t){++clockReads;t->wHour=23;t->wMinute=59;t->wSecond=58;t->wMilliseconds=0;}
 namespace Ogre { struct Vector3 { double x,y,z; Vector3(double a=0,double b=0,double c=0):x(a),y(b),z(c){} }; }
 int liveWidgets=0,createdWidgets=0,captionChanges=0,cameraReads=0;
-int skinHorizontal=4,skinVertical=2,nativeLineHeight=20,language=0;
+int skinHorizontal=4,skinVertical=2,nativeLineHeight=24,language=0;
 namespace MyGUI {
 struct IntCoord {
     int left,top,width,height;
@@ -61,7 +61,7 @@ public:
     void setTextAlign(int){}
     const std::string& getFontName()const{return font;} int getFontHeight()const{return fontHeight;}
     IntCoord getTextRegion(){return IntCoord(skinHorizontal/2,skinVertical/2,getWidth()-skinHorizontal,getHeight()-skinVertical);}
-    IntSize getTextSize(){int width=0;for(size_t i=0;i<caption.size();++i)width+=caption[i]>=0x4e00?18:(caption[i]>=128?10:9);return IntSize(width,nativeLineHeight);}
+    IntSize getTextSize(){int width=0;for(size_t i=0;i<caption.size();++i)width+=caption[i]>=0x4e00?18:(caption[i]>=128?10:9);return IntSize((width*fontHeight+17)/18,nativeLineHeight);}
     void setCaption(const UString& text){caption=text;++captionChanges;}
 
 };
@@ -79,12 +79,12 @@ template<class T> T Hi(T a,T b){return a>b?a:b;}
 const char* Tr(const char* text){
     if(language==1){
         if(!std::strcmp(text,"Zoom:%s"))return "\xd0\x9c\xd0\xb0\xd1\x81\xd1\x88\xd1\x82\xd0\xb0\xd0\xb1:%s";
-        if(!std::strcmp(text,"Time:%s"))return "\xd0\xa7\xd0\xb0\xd1\x81\xd1\x8b:%s";
+        if(!std::strcmp(text,"PC time:%s"))return "\xd0\x92\xd1\x80\xd0\xb5\xd0\xbc\xd1\x8f\x20\xd0\x9f\xd0\x9a:%s";
         if(!std::strcmp(text,"Dir:%03d"))return "\xd0\x9a\xd1\x83\xd1\x80\xd1\x81:%03d";
     }
     if(language==2){
         if(!std::strcmp(text,"Zoom:%s"))return "\xe7\xbc\xa9\xe6\x94\xbe:%s";
-        if(!std::strcmp(text,"Time:%s"))return "\xe6\x97\xb6:%s";
+        if(!std::strcmp(text,"PC time:%s"))return "\xe7\x94\xb5\xe8\x84\x91\xe6\x97\xb6\xe9\x97\xb4:%s";
         if(!std::strcmp(text,"Dir:%03d"))return "\xe5\x90\x91:%03d";
     }
     return text;
@@ -104,16 +104,16 @@ int main(){int failures=0,checks=0;
     UpdateInfo(Ogre::Vector3(),1000);C(root->children.empty());C(clockReads==0);
     g_infoFields=15;UpdateInfo(Ogre::Vector3(150,0,-150),1001);
     C(createdWidgets==6 && liveWidgets==6);C(root->children.size()==1);
-    C(g_infoBackRef.get()->mouseFocus);C(requestedFont==18);
-    C(g_infoBackRef.get()->getCoord().top==83);C(g_infoHeight<=60);
-    C(g_infoCaptions[0]=="Zoom:100%");C(g_infoCaptions[1]=="Time:23:59");
+    C(g_infoBackRef.get()->mouseFocus);C(requestedFont==22);
+    C(g_infoBackRef.get()->getCoord().top==83);C(g_infoHeight<=88);
+    C(g_infoCaptions[0]=="Zoom:100%");C(g_infoCaptions[1]=="PC time:23:59");
     C(g_infoCaptions[2]=="X:15 Z:-15");C(g_infoCaptions[3]=="Dir:090");
     C(clockReads==1 && cameraReads==1);
     int captions=captionChanges;
     UpdateInfo(Ogre::Vector3(200,0,-150),1100);C(captionChanges==captions && cameraReads==1 && clockReads==1);
     UpdateInfo(Ogre::Vector3(200,0,-150),1251);C(captionChanges==captions+1 && cameraReads==2 && clockReads==1);
     g_infoFields=BestMinimapInfo::Clock;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),1260);
-    C(g_infoHeight==34);C(g_infoTextRefs[1].get()->getCoord().top==5);
+    C(g_infoHeight==52);C(g_infoTextRefs[1].get()->getCoord().top==12);
     for(int i=0;i<4;++i)C(g_infoTextRefs[i].get()->getVisible()==(i==1));
     C(createdWidgets==6 && clockReads==1);
     g_infoFields=0;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),1261);
@@ -121,7 +121,7 @@ int main(){int failures=0,checks=0;
     for(int w=80;w<=420;w+=20){viewWidth=w;g_infoFields=15;g_infoDirty=true;UpdateInfo(Ogre::Vector3(99999999,0,-99999999),1300+w);
         C(createdWidgets==6);MyGUI::Widget* back=g_infoBackRef.get();C(back->getVisible());
         for(int i=0;i<4;++i){MyGUI::TextBox* box=g_infoTextRefs[i].get()->castType<MyGUI::TextBox>();
-            const MyGUI::IntCoord r=box->getCoord();C(box->getVisible());C(r.left>=8 && r.left+r.width<=back->getWidth()-8);
+            const MyGUI::IntCoord r=box->getCoord();C(box->getVisible());C(r.left>=12 && r.left+r.width<=back->getWidth()-12);
             C(box->getTextSize().width<=box->getTextRegion().width);C(box->getTextSize().height<=box->getTextRegion().height);
         }
     }
@@ -132,7 +132,7 @@ int main(){int failures=0,checks=0;
     InfoRow(g_infoBackRef.get(),0,"\xd0\x9c\xd0\xb0\xd1\x81\xd1\x88\xd1\x82\xd0\xb0\xd0\xb1:100%");
     FitInfoField(0,BestMinimapInfo::FieldRect());
     MyGUI::TextBox* box=g_infoTextRefs[0].get()->castType<MyGUI::TextBox>();C(box->caption.size()==0);
-    BestMinimapInfo::FieldRect clipped={8,5,64,24};FitInfoField(0,clipped);
+    BestMinimapInfo::FieldRect clipped={12,12,64,32};FitInfoField(0,clipped);
     C(box->caption.size()>=3);C(box->caption[box->caption.size()-1]=='.');C(box->getTextSize().width<=box->getTextRegion().width);
     delete root;C(g_rootRef.get()==NULL && g_infoBackRef.get()==NULL);C(liveWidgets==0);
     for(int i=0;i<4;++i)C(g_infoTextRefs[i].get()==NULL);
@@ -142,24 +142,33 @@ int main(){int failures=0,checks=0;
     // models, and the user's 80/100/420-pixel sizes. Renderer QA stays in-game.
     const unsigned flags[4]={1,8,2,4};const int widths[3]={80,100,420};
     for(language=0;language<3;++language)for(int skin=0;skin<2;++skin){
-        skinHorizontal=skin?8:0;skinVertical=skin?4:0;nativeLineHeight=skin?24:18;
+        skinHorizontal=skin?8:0;skinVertical=skin?4:0;nativeLineHeight=skin?28:24;
         root=new MyGUI::Widget;g_rootRef.set(root);
         for(int wi=0;wi<3;++wi)for(unsigned mask=1;mask<=15;++mask){
             viewWidth=widths[wi];g_infoFields=mask;g_infoDirty=true;g_range=30;
             UpdateInfo(Ogre::Vector3(-999999999,0,999999999),4000);
             MyGUI::Widget* back=g_infoBackRef.get();C(liveWidgets<=6);C(back->getVisible());
-            if(viewWidth==420)C(g_infoHeight<=2*(nativeLineHeight+skinVertical+2)+13);
+            if(viewWidth==420)C(g_infoHeight<=2*(nativeLineHeight+skinVertical+2)+28);
             int previous=-1;
+            int rowFirst=-1,rowLast=-1;
             for(int i=0;i<4;++i){MyGUI::Widget* w=g_infoTextRefs[i].get();
                 if(!(mask&flags[i])){C(w==NULL || !w->getVisible());continue;}
                 MyGUI::TextBox* box=w->castType<MyGUI::TextBox>();const MyGUI::IntCoord r=box->getCoord();
-                C(box->getVisible());C(r.left>=8 && r.left+r.width<=back->getWidth()-8);
-                C(r.top>=5 && r.top+r.height<=g_infoHeight-5);
+                C(box->getVisible());C(r.left>=12 && r.left+r.width<=back->getWidth()-12);
+                C(r.top>=12 && r.top+r.height<=g_infoHeight-12);
                 C(box->getTextSize().width<=box->getTextRegion().width);C(box->getTextSize().height<=box->getTextRegion().height);
                 if(previous>=0){const MyGUI::IntCoord p=g_infoTextRefs[previous].get()->getCoord();
                     if(p.top==r.top)C(p.left+p.width+12==r.left);
-                }previous=i;
+                }
+                if(rowFirst<0)rowFirst=i;
+                if(rowLast>=0 && g_infoTextRefs[rowLast].get()->getCoord().top!=r.top){
+                    const MyGUI::IntCoord f=g_infoTextRefs[rowFirst].get()->getCoord();
+                    const MyGUI::IntCoord l=g_infoTextRefs[rowLast].get()->getCoord();
+                    C(std::abs(f.left-(back->getWidth()-l.left-l.width))<=1);rowFirst=i;
+                }
+                rowLast=i;previous=i;
             }
+            if(rowFirst>=0){const MyGUI::IntCoord f=g_infoTextRefs[rowFirst].get()->getCoord();const MyGUI::IntCoord l=g_infoTextRefs[rowLast].get()->getCoord();C(std::abs(f.left-(back->getWidth()-l.left-l.width))<=1);}
         }
         delete root;C(liveWidgets==0);
     }
