@@ -1,0 +1,198 @@
+{
+  "date": "2026-11-13",
+  "status": "installed_locally_not_published",
+  "upstream_records_before": 1905,
+  "upstream_records_current": 1910,
+  "added_records": 5,
+  "changed_records": 38,
+  "removed_records": 0,
+  "translation": {
+    "english_records": 1910,
+    "overlay_records": 1105,
+    "translated_names": 641,
+    "translated_fields": 1331,
+    "previous_fields_preserved": 1326,
+    "new_fields": 5,
+    "revised_fields": 0,
+    "stale_anchors": 0,
+    "missing_player_strings": 0,
+    "gameplay_overrides": 0,
+    "intentional_internal_labels": [
+      {
+        "id": "GENERATION_TEMPLATE_CHARACTER",
+        "name": "GENERATION_TEMPLATE_CHARACTER"
+      },
+      {
+        "id": "1532951-__world reactions.mod",
+        "name": "Okran's Fist (override) half destroyed"
+      },
+      {
+        "id": "1532952-__world reactions.mod",
+        "name": "Okran's Fist (override) half destroyed"
+      },
+      {
+        "id": "1533314-__world reactions Shek.mod",
+        "name": "Admag (override) Seto"
+      },
+      {
+        "id": "1533587-__world reactions Slavers.mod",
+        "name": "Heft (override) malnourished"
+      },
+      {
+        "id": "1533590-__world reactions Slavers.mod",
+        "name": "Heft (override) malnourished 2"
+      },
+      {
+        "id": "1533591-__world reactions Slavers.mod",
+        "name": "Heft (override) malnourished 3"
+      },
+      {
+        "id": "5131575-A_BossPlus.mod",
+        "name": "FISTS- robo tinfist"
+      },
+      {
+        "id": "5131624-A_BossPlus.mod",
+        "name": "1testc"
+      },
+      {
+        "id": "5131658-A_BossPlus.mod",
+        "name": "1testa"
+      },
+      {
+        "id": "5131716-A_BossPlus.mod",
+        "name": "_spider type small bugbd"
+      },
+      {
+        "id": "5131825-A_BossPlus.mod",
+        "name": "1testb"
+      },
+      {
+        "id": "5131884-A_BossPlus.mod",
+        "name": "_gorillo king"
+      },
+      {
+        "id": "5131936-A_BossPlus.mod",
+        "name": "_dog type weapon dogmeat"
+      },
+      {
+        "id": "5132177-A_BossPlus.mod",
+        "name": "_robot spider type KC"
+      }
+    ],
+    "english_sha256": "07db2fe2fdd6cf9688e2abb3d245764769cc07967a80e42eef0be9632fc1e866",
+    "overlay_sha256": "adc8cd8364c4623f90181dc912ec5716da073ac28a5c04a18c185e81b8a226c0"
+  },
+  "nce": {
+    "baseline": "D:\\DEV\\Kenshi\\build\\lok-update-20261113\\NCE-candidate-formula.mod",
+    "baseline_sha256": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002",
+    "installed_sha256": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002",
+    "candidate": "D:\\DEV\\Kenshi\\build\\lok-update-20261113\\NCE-candidate.mod",
+    "candidate_sha256": "8e5da69cbaaea9219d2056d69af5f63de88b1d1e0b1159c7384fae6db5395a02",
+    "records_total": 1539,
+    "byte_identical_records": 1537,
+    "name_only_changes": [
+      {
+        "id": "1534050-Newwworld.mod",
+        "before": "Leather Hive Vest",
+        "after": "Кожаный жилет Улья"
+      },
+      {
+        "id": "1534061-Newwworld Plus.mod",
+        "before": "Blackened Chain Hive Shirt",
+        "after": "Чернённая колчуга улья"
+      }
+    ],
+    "numeric_fields_all_records_unchanged": true,
+    "all_fields_except_name_unchanged": true,
+    "armour_formula_match_count": 90,
+    "header_unchanged": true,
+    "game_files_modified": false
+  },
+  "companions": {
+    "patches": {
+      "Legendary of Kenshi All Anim patch": {
+        "records": 15,
+        "overridden_upstream_ids": 15,
+        "changed_upstream_ids": []
+      },
+      "Legendary of Kenshi All Robots Module Patch": {
+        "records": 2,
+        "overridden_upstream_ids": 2,
+        "changed_upstream_ids": []
+      }
+    },
+    "upstream_dll_imports": {},
+    "removed_mesh_references": []
+  },
+  "installation": {
+    "status": "installed_locally",
+    "time_msk": "2026-11-13T16:33:11.311413+03:00",
+    "backup": "D:\\DEV\\Kenshi\\backup\\LoK-before-update-20261113-163311",
+    "changed_files": [
+      {
+        "path": "mods\\Legendary of Kenshi\\Legendary of Kenshi.mod",
+        "before_sha256": "c17b0b37ecdf7c6a65b7e52b7a0773a3bbe44e9108fa28282c0aacec58d8ab14",
+        "after_sha256": "07db2fe2fdd6cf9688e2abb3d245764769cc07967a80e42eef0be9632fc1e866"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi\\_Legendary of Kenshi.info",
+        "before_sha256": "ada3f5f614a3e01e80e1bc8d933fe72a47e65f3705386fe4bcbaa046866c90ec",
+        "after_sha256": "85dae686a808dfe24cd9e1d99eebbd025abb4e43e368a69850859c56d2a29b4f"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi\\items\\weapons\\Purging_Crossblade.mesh",
+        "before_sha256": null,
+        "after_sha256": "ea76403943c76f8b981ef89ef9c462a5c5a4727d0fb907a9a5b60710e3586954"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi\\items\\weapons\\Purging_Crossblade_bare.mesh",
+        "before_sha256": null,
+        "after_sha256": "0c03ca4100b09b430b9e53a625f58d9eb6df1d4c99c43f81cbb43d21d57bd66a"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi\\items\\weapons\\Sevenwinds_Tachi.mesh",
+        "before_sha256": null,
+        "after_sha256": "a5bc6bef432f73da09b8eebd1c22c5d988738035966b99ae9c2c4d0fb3d0d282"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi\\items\\weapons\\Sevenwinds_Tachi_bare.mesh",
+        "before_sha256": null,
+        "after_sha256": "d1196cba7f28e7a43f5fe5b9465081f69e8358517432be1a90f65ffc6d9d5bf5"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi\\lok_npcs.dll",
+        "before_sha256": "397ffa4bfa91dce81ae91416eed3a3d5e93a3e18e7ebbe483652b1f11aaf7976",
+        "after_sha256": "5d76a0fea6c83b6a4b7711d86fb1e70db221c9343d7f63b5e83949bdbe9b25bd"
+      },
+      {
+        "path": "mods\\Legendary of Kenshi RU\\Legendary of Kenshi RU.mod",
+        "before_sha256": "22a23238bf77347df3b3bdb8a246f4089e555c10677aed8155ed5dc9ed6661cb",
+        "after_sha256": "adc8cd8364c4623f90181dc912ec5716da073ac28a5c04a18c185e81b8a226c0"
+      },
+      {
+        "path": "mods\\THE_NCE_Patch\\THE_NCE_Patch.mod",
+        "before_sha256": "e8b210980c3edb3a5c7a1a8f2fe46e975259f9de37f880484ad3cd63d1b07002",
+        "after_sha256": "8e5da69cbaaea9219d2056d69af5f63de88b1d1e0b1159c7384fae6db5395a02"
+      }
+    ],
+    "protected_files": {
+      "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\data\\mods.cfg": "74bc4c5541676005d47b99c5d22aa64d0835e1e0291deca8648ff3ddcbe405c7",
+      "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.dll": "3392e6489a329352eaa08fd40d55a08a6d2ac53e47400d077853bb41ed1564f1",
+      "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\KEO\\KEO.ini": "c04421fa52840f6e55c086f51708f712e55f6676f6cd0bc43ad6aae65b925e4e",
+      "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Legendary of Kenshi All Anim patch\\Legendary of Kenshi All Anim patch.mod": "ad753449345d1ead740025d8433ad2977a5bc279cbcf4a36a1a5532152841f2e",
+      "D:\\SteamLibrary\\steamapps\\common\\Kenshi\\mods\\Legendary of Kenshi All Robots Module Patch\\Legendary of Kenshi All Robots Module Patch.mod": "ff0a4ce786390e78087ebeabe885d277dab997cd4849da5807df3cf6213c75b3"
+    },
+    "all_downloaded_files_verified": 243,
+    "local_extra_files_preserved": [
+      "Legendary of Kenshi.mod.premapnames",
+      "character/meshes/robot/lok_slaughter unit.mesh"
+    ],
+    "game_process_count_before_install": 0,
+    "publication": false
+  },
+  "archive": "D:\\DEV\\Kenshi\\export\\Legendary of Kenshi RU - 2026-11-13.zip",
+  "archive_sha256": "3d18d517c6f09bca80c97ad03cde3f92b5f5794c4dbe6d21676d4b76a352d27c",
+  "archive_crc": "pass",
+  "author_update_screenshot": "13 November 2026 15:13; owner supplied screenshot",
+  "author_requires_import": true
+}

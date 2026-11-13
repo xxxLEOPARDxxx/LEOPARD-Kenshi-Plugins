@@ -1,4 +1,4 @@
-# Legendary of Kenshi RU — обновление 31.10.2026
+# Legendary of Kenshi RU - обновление 13.11.2026
 
 Отдельный русский перевод Legendary of Kenshi / Legendary of Kenshi — World of Unique
 автора Johnson. Спасибо автору за оригинальный мод и его развитие.
@@ -10,6 +10,47 @@
 содержит только русские имена и текстовые поля с английскими `_original_*`
 привязками. Баланс, отряды, модели, характеристики и поведение в перевод не входят.
 Это обычный мод FCS, не плагин MCM.
+
+## Обновление 13.11.2026
+
+Установлен оригинал с 1910 записями (раньше 1905): 5 добавлено,
+38 существующих записей изменено, удалений нет. По журналу автора:
+
+- Исправлено отсутствие кованых доспехов улья и некоторых других доспехов
+  в меню изготовления после изучения чертежей.
+- Добавлен «Очищающий крест» (Purging Cross), другой внешний вариант
+  «Очищающего тесака».
+- Добавлены «Тати семи ветров» (Sevenwinds Tachi), оружие класса катан,
+  и соответствующий чертёж.
+- Скорректированы шансы появления части оружия у торговцев.
+
+Сравнение данных также показывает изменения экипировки нескольких NPC,
+характеристик Ринобота и отдельных параметров оружия. Переведены все пять
+новых текстовых полей; все прежние 1326 переводов сохранены. Отдельный
+русификатор содержит 1105 правок и 1331 переведённое поле. Устаревших
+английских привязок и изменений игрового баланса в нём нет.
+
+NCE прогнан повторно: все 90 записей брони по характеристикам неизменны,
+формула компенсации подтверждена для каждой. Исправлены два старых
+английских названия в NCE, перекрывавших русский перевод; числовые поля
+всех 1539 записей и остальные 1537 записей целиком сохранены. NCE остаётся
+отдельным локальным патчем и в архив перевода не входит.
+
+Патчи All Anim и All Robots Module не требуют изменений: затрагиваемые ими
+15 и 2 записи оригинала не менялись. Порядок модов сохранён. Для применения
+обновления автор оригинала указывает импорт сохранения из главного меню.
+
+English: updated for the November 13 upstream (1910 records, 5 added and
+38 changed). All five new text fields are translated; the previous 1326
+translations are preserved. The armour recipe correction and two new weapons
+are supplied by the original author. The existing NCE formula still matches
+all 90 armour records; only two pre-existing English NCE names were corrected.
+All numerical NCE fields and both companion patches remain unchanged. The
+author instructs players to import their save for the update to take effect.
+
+Evidence: `verification-20261113.json`, `installation-20261113.json`,
+`lok_ru_update_20261113.json`. The original update and translation are installed
+locally; this is not a Nexus/Steam publication.
 
 ## Проверка обновления 05.11.2026
 
