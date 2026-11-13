@@ -25,7 +25,8 @@
         "scope": "GateFix/SleepFix adaptations",
         "source_url": "https://github.com/Basusu0/Basusu-kenshi-plugins"
       }
-    ]
+    ],
+    "published_version": "3"
   },
   {
     "package": "AssignedWorkers",
@@ -59,7 +60,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "4"
   },
   {
     "package": "BuildModeGizmo",
@@ -350,7 +352,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "6"
   },
   {
     "package": "Character-Highlight",
@@ -503,7 +506,8 @@
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "3"
   },
   {
     "package": "Loot-Scoot-Execute",
@@ -520,7 +524,8 @@
         "method": "bridge"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "8"
   },
   {
     "package": "Map-markers",
@@ -623,7 +628,8 @@
         "method": "bridge"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "9"
   },
   {
     "package": "Wall-B-Gone",

@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-12",
+  "date": "2026-11-13",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -19,7 +19,7 @@
     "BetterLooting": {
       "nexus": 2218,
       "workshop_id": 3816121198,
-      "version": "5"
+      "version": "6"
     },
     "UITweaks": {
       "nexus": 2192,
@@ -34,7 +34,7 @@
     "AIFixed": {
       "nexus": 2256,
       "workshop_id": 3829845490,
-      "version": "2"
+      "version": "3"
     },
     "SkillLevelUpInfo": {
       "nexus": 2257,
@@ -59,7 +59,7 @@
     "KillCounter": {
       "nexus": 2261,
       "workshop_id": 3829848599,
-      "version": "2"
+      "version": "3"
     },
     "Auto-Pause-on-Load": {
       "nexus": 2206,
@@ -99,7 +99,7 @@
     "Loot-Scoot-Execute": {
       "nexus": 2210,
       "workshop_id": 3813852124,
-      "version": "7"
+      "version": "8"
     },
     "Map-markers": {
       "nexus": 2211,
@@ -130,7 +130,7 @@
     "Vital-Sense": {
       "nexus": 2214,
       "workshop_id": 3813852288,
-      "version": "8"
+      "version": "9"
     },
     "Wall-B-Gone": {
       "nexus": 2215,
@@ -145,7 +145,7 @@
     "BestMinimap": {
       "nexus": 2242,
       "workshop_id": 3824087152,
-      "version": "3"
+      "version": "4"
     },
     "TauntExpansion": {
       "nexus": 2265,
