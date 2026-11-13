@@ -103,9 +103,15 @@ namespace AIFixedUnstuck
         return AIFixedGate::Finite(normal) && normal.y>=.2f && normal.y<=.60f;
     }
 
-    inline bool GuardLeavesSlope(const Point& from,const Point& to,const Point& normal)
+    inline bool IsRoundedGuardFooting(const Point& normal)
     {
-        return AIFixedGate::Finite(from) && AIFixedGate::Finite(to) && IsSteepGuardSlope(normal) &&
+        return AIFixedGate::Finite(normal) && normal.y>.60f && normal.y<.95f;
+    }
+
+    inline bool GuardLeavesSlope(const Point& from,const Point& to,const Point& normal,bool pocket=false)
+    {
+        return AIFixedGate::Finite(from) && AIFixedGate::Finite(to) &&
+            (IsSteepGuardSlope(normal) || (pocket && IsRoundedGuardFooting(normal))) &&
             (to.x-from.x)*normal.x+(to.z-from.z)*normal.z>=WorldUnits(.2f);
     }
 

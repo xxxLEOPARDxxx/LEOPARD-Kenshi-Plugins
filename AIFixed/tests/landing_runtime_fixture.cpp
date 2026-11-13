@@ -21,8 +21,9 @@ struct DoorStuff {
 };
 struct Building {bool gate;DoorStuff door;Building():gate(false){door.isSetupComplete=false;}Building* isGate(){return gate?this:NULL;}DoorStuff* getDoor(){return gate?&door:NULL;}};
 struct StandingHandle {Building* building;operator bool(){return building!=NULL;}};
+struct HavokCharacter {unsigned currentFace;};
 struct CharMovement {
-    void* havokCharacter;
+    HavokCharacter* havokCharacter;
     StandingHandle standing;
     float getRadius(){return 2.0f;}
     StandingHandle isStandingOnSomething(){return standing;}
@@ -34,25 +35,43 @@ struct ZoneManager {ZoneMap* getZoneMap(const Ogre::Vector3&){return &zone;}};
 struct NavMesh {
     Ogre::Vector3 candidate;
     unsigned exteriorCalls;
-    int sourceCode,targetCode,exteriorResult,sourceFaceResult;
+    int sourceCode,targetCode,exteriorResult,sourceFaceResult,requeryResult;
+    unsigned sourceKey;
+    float requeryShift;
     bool isLoaded(ZoneMap*){return true;}bool isGenerating(){return false;}
-    int getClosestPoint(const Ogre::Vector3&,float,float,bool,Ogre::Vector3&,unsigned&){return sourceFaceResult;}
-    int getClosestExteriorPoint(const Ogre::Vector3&,float,float,Ogre::Vector3& out){++exteriorCalls;out=candidate;return exteriorResult;}
+    int getClosestPoint(const Ogre::Vector3& p,float,float,bool,Ogre::Vector3& out,unsigned& key){out=p;key=sourceKey;return sourceFaceResult;}
+    int getClosestExteriorPoint(const Ogre::Vector3&,float radius,float,Ogre::Vector3& out){++exteriorCalls;out=candidate;if(radius==10){out.x+=requeryShift;return requeryResult;}return exteriorResult;}
     int getGateCode(const Ogre::Vector3& p){return p.y>200?sourceCode:targetCode;}
 };
 struct GameWorld {NavMesh* navmesh;ZoneManager* zoneMgr;};
 float ground=140;
 bool slopeConfirmed=true,standingClear=true,barrier=false,water=false;
+bool pocketConfirmed=false;
+bool nativeAgrees=true;
+bool floorHit=true,floorAborted=false,floorBuilding=false;
+float floorY=140,floorNormalY=1,floorDistance=5;
+unsigned floorGroup=2;
 AIFixedGate::Point normal(-.8357168f,.5356244f,-.1211773f);
+struct physHit {
+    bool hit;
+    Ogre::Vector3 position,normal;
+    float distance;
+    physHit(bool,bool,float):hit(floorHit),position(0,floorY,0),normal(0,floorNormalY,0),distance(floorDistance){}
+    bool traceWasAborted(){return floorAborted;}
+    unsigned group(){return floorGroup;}
+    Building* getBuilding(){static Building b;return floorBuilding?&b:NULL;}
+};
 struct UtilityT {
     static float getTerrainHeight(float,float){return ground;}
     static bool getPositionInWater(float,float){return water;}
+    static void trace(physHit& hit,const Ogre::Vector3& start,const Ogre::Vector3&,unsigned){hit.position.x=start.x;hit.position.z=start.z;}
 };
 AIFixedGate::Point Point(const Ogre::Vector3& p){return AIFixedGate::Point(p.x,p.y,p.z);}
 bool ReadPlatformSlope(Building*,const Ogre::Vector3&,AIFixedGate::Point& out){out=normal;return slopeConfirmed;}
+bool ReadPlatformPocket(NavMesh*,CharMovement*,const AIFixedGate::Point&,int& result){result=pocketConfirmed?1:0;return pocketConfirmed;}
 Building* FindElevatedGate(const Ogre::Vector3&,float){return NULL;}
 bool FindRockExit(const Ogre::Vector3&,float,unsigned,Ogre::Vector3&,unsigned&){return false;}
-bool NativePositionAgrees(void*,const Ogre::Vector3&){return true;}
+bool NativePositionAgrees(void*,const Ogre::Vector3&){return nativeAgrees;}
 bool StandingSpaceClear(const Ogre::Vector3&,float,float){return standingClear;}
 bool CrossesBarrier(GameWorld*,const Ogre::Vector3&,const Ogre::Vector3&,Building*,bool){return barrier;}
 // @TRACE_STRUCT@
@@ -67,10 +86,11 @@ bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3&
     return accepted;
 }
 int main(){
-    NavMesh nav;nav.sourceFaceResult=1;nav.exteriorCalls=0;nav.sourceCode=nav.targetCode=0;nav.exteriorResult=1;
+    NavMesh nav;nav.sourceKey=0x02000307;nav.sourceFaceResult=1;nav.exteriorCalls=0;nav.sourceCode=nav.targetCode=0;nav.exteriorResult=nav.requeryResult=1;nav.requeryShift=0;
     nav.candidate=Ogre::Vector3(18740,140,47720);
     ZoneManager manager;GameWorld world={&nav,&manager};Building platform;
-    CharMovement movement;movement.havokCharacter=NULL;movement.standing.building=&platform;
+    HavokCharacter navigation={0x02000307};
+    CharMovement movement;movement.havokCharacter=&navigation;movement.standing.building=&platform;
     Character actor={&movement};
     const Ogre::Vector3 original(18778,258.5387f,47723.859f);
     Check(Probe(world,actor,platform,original,"accepted"),"captured lower guard height has a permitted dry downhill landing when all native queries confirm it");
@@ -112,6 +132,34 @@ int main(){
     Check(!Probe(world,actor,platform,upper[1],"terrain-height-limit"),"non-steep explicit-miss recovery cannot use the18m steep-platform limit");
     nav.sourceFaceResult=-1;Check(!Probe(world,actor,platform,original,"support-face-unavailable"),"an unavailable native face query is never a miss");
     nav.sourceFaceResult=1;Check(!Probe(world,actor,platform,original,"support-not-steep"),"an ordinary valid walking face cannot use missing-face recovery");
+    // Recorded13.11 candidate: simplified exterior navmesh is0.55m under
+    // the independently sampled physical terrain at the same X/Z.
+    slopeConfirmed=true;normal=AIFixedGate::Point(-.80f,.589f,-.08f);
+    nav.candidate=Ogre::Vector3(18729.38f,134.50f,47725.18f);
+    Check(Probe(world,actor,platform,Ogre::Vector3(18773.75f,254.39f,47727.40f),"accepted"),
+        "recorded lower guard can land on physically confirmed terrain above simplified navmesh");
+    const Ogre::Vector3 guard(18773.75f,254.39f,47727.40f);
+    floorHit=false;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"missing collision floor rejects correction");floorHit=true;
+    floorAborted=true;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"unavailable collision floor rejects correction");floorAborted=false;
+    floorBuilding=true;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"building roof is not terrain");floorBuilding=false;
+    floorGroup=14;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"natural scenery is not the terrain collision group");floorGroup=2;
+    floorNormalY=.5f;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"steep landing cannot be corrected");floorNormalY=1;
+    floorDistance=11;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"unbounded native ray must hit within explicit1m band");floorDistance=5;
+    floorY=136;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"floor must agree with independently queried terrain");floorY=140;
+    nav.candidate.y=129;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"no correction beyond1m");nav.candidate.y=134.5f;
+    nav.requeryResult=-1;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"unavailable exterior requery fails closed");nav.requeryResult=0;
+    Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"missing exterior requery fails closed");nav.requeryResult=1;
+    nav.requeryShift=2;Check(!Probe(world,actor,platform,guard,"platform-ground-unconfirmed"),"different nearby face cannot authorize original landing");nav.requeryShift=0;
+    slopeConfirmed=false;normal=AIFixedGate::Point(-.49f,.84638f,-.20f);pocketConfirmed=true;
+    nav.candidate=Ogre::Vector3(18743.75f,140,47723.61f);
+    Check(Probe(world,actor,platform,Ogre::Vector3(18780.78f,260.48f,47723.61f),"accepted"),
+        "captured rounded strut cap requires independent native local-pocket proof");
+    nativeAgrees=false;Check(!Probe(world,actor,platform,Ogre::Vector3(18780.78f,260.48f,47723.61f),"support-not-steep"),
+        "stale native position cannot authorize recovery of different physical footing");nativeAgrees=true;
+    nav.sourceKey=0x02000306;Check(!Probe(world,actor,platform,Ogre::Vector3(18780.78f,260.48f,47723.61f),"support-not-steep"),
+        "nearby physical query must match the current native face");nav.sourceKey=0x02000307;
+    pocketConfirmed=false;Check(!Probe(world,actor,platform,Ogre::Vector3(18780.78f,260.48f,47723.61f),"support-not-steep"),
+        "connected rounded footing cannot use cap recovery");
     printf("AIFixed extracted landing flow: %s (%d checks; native queries faked explicitly)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
 }

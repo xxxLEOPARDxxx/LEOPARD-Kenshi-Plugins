@@ -1,0 +1,31 @@
+{
+  "provenance": "Read-only verified PID 23856; 54 samples per actor over 1.325 seconds before process exit / partial-read error 299. This is a short physical snapshot, not the long immobility timer.",
+  "native_island_result": "Not measured; no native calls or process writes were performed.",
+  "support_sid": "56728-Newwworld.mod",
+  "support_identity": [0, 2724, 11111, 7, 1688598656],
+  "support_position": [18264.6484375, 115.97044372558594, 48441.2265625],
+  "support_orientation_wxyz": [-0.8773344159126282, 0.0, 0.47987982630729675, 0.0],
+  "collision_source": "data/newland/Assets/Buildings/Lagoon-Rig_Platform_COL.xml",
+  "collision_sha256": "6e14806eac157d5657343e4d7a48e4c8354252c32296b68d38274d584bc14cad",
+  "collision_shape": "Lagoon-Rig_Platform_COL013",
+  "sphere_sweep_radius_world_units": 0.75,
+  "drone": {
+    "identity": [1, 61, 2046386688, 3, 2518066432],
+    "position": [18780.77734375, 260.48114013671875, 47723.609375],
+    "native_position_hk": [1878.0777587890625, 26.38565444946289, 4772.36083984375],
+    "cached_native_face": "0x02000307",
+    "all_positions_identical": true,
+    "native_action_histogram": {"IDLE_FAILED_MOVE1": 38, "IDLE_GOAL_REACHED_MOVE1": 16},
+    "observed_current_source_face_query": 1,
+    "observed_footing_normal_y": 0.846,
+    "expected_capsule_endpoint": [18791.570265588, 242.678533958, 47728.289075247],
+    "expected_analytic_normal_y": 0.846378140465
+  },
+  "original_guard": {
+    "identity": [1, 15, 98510744, 6, 3684570368],
+    "position": [18773.75, 254.38739013671875, 47727.3984375],
+    "cached_native_face": "0x02000306",
+    "all_positions_identical": true,
+    "native_action_histogram": {"IDLE_GOAL_REACHED_NO_ACTION": 52, "IDLE_GOAL_REACHED_MOVE1": 2}
+  }
+}

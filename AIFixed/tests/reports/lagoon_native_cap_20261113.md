@@ -1,0 +1,15 @@
+# Lagoon rounded footing evidence - 2026-11-13
+
+The Drone `1/61/2046386688:3/2518066432` is physically on the rounded upper end of capsule `Lagoon-Rig_Platform_COL013`, part of support SID `56728-Newwworld.mod`. Transforming the authenticated collision XML with the current support position and Ogre **wxyz** orientation gives endpoint `(18791.570265588,242.678533958,47728.289075247)`. At the captured Drone position, the radius-0.75 sphere sweep normal is `Y=0.846378140`, matching the game's logged `.846`. This is a curved strut cap, not evidence that all non-steep platform surfaces are invalid.
+
+The verified read-only snapshot contains 54 identical positions over 1.325 seconds, with current MOVE action 1 and native FAILED in 38 samples, GOAL_REACHED in 16. Process exit interrupted collection (error 299). The long immobility evidence comes from the runtime log/timer, not this short capture. Cached face `0x02000307` and a successful native nearest-face lookup show that face presence alone cannot distinguish this cap. No native island result was collected; the process was never written to or called into.
+
+`audit_lagoon_cap_geometry.py` checks the recorded source hash and reproduces the endpoint/normal. Its frozen inputs are `fixtures/lagoon_cap_20261113.json`.
+
+`audit_platform_island_native.py` authenticates Steam, supported RE GOG and an independent vanilla GOG comparison. The island wrappers (72 instructions) and full resolvePoint bodies (485 instructions) match after relocation normalization. Official export slot 5006 resolves Steam `3A4D40` and supported RE GOG `3A4960`; vanilla comparison has the equivalent body at `3A4820` and must not reuse the supported GOG table blindly.
+
+The native query accepts Havok meters and doubles the supplied Havok character radius. Native caller `HavokCharacter::resolveProblems` passes position/radius directly and threshold 10.0. The wrapper resolves a fresh point; lookup failure returns false. Edge endpoints reaching the supplied threshold stop traversal with nonzero status, which returns false; only successful flood exhaustion returns true. Resolve fallback limits candidates to 500; flood defaults allocate bounded search buffers `0x20000` and `0x90200` bytes. A spatial threshold is not a hard timing guarantee.
+
+Neither wrapper nor resolvePoint acquires a nav lock. Native public `pathExists` protects readers using a nonblocking try-shared lock on `NavMesh::changeMutex` at `+0x200`; its CAS/state flags match the bundled Boost 1.60 implementation. Use the same scoped try-shared lock, reject if busy, and release before other independently locking nav calls. Keep this query inside the existing mature recovery probe budget. The offline audit writes disassembly/provenance to `_generated/platform-island-native.json`.
+
+The new geometric admission still requires a **live true island query**, mature current failed movement, exact BF_FLUFF support, bounded rounded normal, current matching face, and all final landing checks. This report does not establish a safe landing or successful in-game recovery.

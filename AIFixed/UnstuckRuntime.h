@@ -44,10 +44,10 @@ namespace Unstuck
     struct LandingTrace
     {
         const char* reason;
-        float ground, clearance;
+        float ground, clearance, surface, landingGround;
         AIFixedGate::Point slope;
-        int sourceFace;
-        LandingTrace():reason("not-probed"),ground(0),clearance(0),slope(0,0,0),sourceFace(-2){}
+        int sourceFace, pocket;
+        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),sourceFace(-2),pocket(-2){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -526,8 +526,70 @@ namespace Unstuck
         return AIFixedUnstuck::IsSteepGuardSlope(normal);
     }
 
+    int QueryPlatformPocket(NavMesh* nav,HavokCharacter* navigation)
+    {
+        // Catch native faults inside the caller's RAII lock scope, so the
+        // native nav reader lock is still released before recovery suspends.
+        __try
+        {
+            return nav->isCharacterStuck(navigation->position,navigation->currentFace,navigation->radius,3.0f)?1:0;
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) { Fault();return -1; }
+    }
+
+    bool ReadPlatformPocket(NavMesh* nav,CharMovement* movement,const AIFixedGate::Point& normal,int& result)
+    {
+        // A rounded end of a tilted support can have a small walkable cap.
+        // Keep ordinary flat posts and connected ramps out of this fallback.
+        result=-2;
+        if (!AIFixedUnstuck::IsRoundedGuardFooting(normal)) return false;
+        HavokCharacter* navigation=movement->havokCharacter;
+        if (!navigation || navigation->currentFace==~0u || !_finite(navigation->radius) ||
+            navigation->radius<=0 || navigation->radius>2.0f) return false;
+        const float* p=navigation->position.m_quad.m128_f32;
+        if (!_finite(p[0]) || !_finite(p[1]) || !_finite(p[2])) return false;
+        // Same non-blocking reader lock as native pathExists; the native
+        // island query itself does not lock. No engine calls inside this lock
+        // other than the audited local query (Steam/GOG native slot5006).
+        boost::shared_lock<boost::shared_mutex> lock(nav->changeMutex,boost::try_to_lock);
+        result=-1;
+        if (!lock.owns_lock()) return false;
+        result=QueryPlatformPocket(nav,navigation);
+        return result==1;
+    }
+
     bool RejectLanding(LandingTrace& trace,const char* reason)
     { trace.reason=reason;return false; }
+
+    bool CorrectPlatformGround(NavMesh* nav,const Ogre::Vector3& source,float terrain,
+                               float clearance,Ogre::Vector3& landing)
+    {
+        // Exterior navmesh simplifies the terrain. Its closest face can be
+        // slightly below the real collision floor; teleport preserves Y.
+        // Correct only a small downward discrepancy, with an independently
+        // hit terrain floor AND the same nearby exterior face after correction.
+        const float gap=terrain-source.y;
+        if (!_finite(gap) || gap<=AIFixedGate::WorldUnits(.3f) ||
+            gap>AIFixedGate::WorldUnits(1.0f)) return false;
+        const Ogre::Vector3 start(source.x,terrain+AIFixedGate::WorldUnits(.5f),source.z);
+        physHit floor(false,true,terrain);
+        UtilityT::trace(floor,start,Ogre::Vector3(0,-1,0),1u<<2);
+        if (floor.traceWasAborted() || !floor.hit || floor.group()!=2 || floor.getBuilding() ||
+            !AIFixedGate::Finite(Point(floor.position)) || !AIFixedGate::Finite(Point(floor.normal)) ||
+            floor.normal.y<.65f || !_finite(floor.distance) || floor.distance<0 ||
+            floor.distance>AIFixedGate::WorldUnits(1.0f) ||
+            std::fabs(floor.position.x-source.x)>AIFixedGate::WorldUnits(.1f) ||
+            std::fabs(floor.position.z-source.z)>AIFixedGate::WorldUnits(.1f) ||
+            std::fabs(floor.position.y-terrain)>AIFixedGate::WorldUnits(.2f)) return false;
+        const Ogre::Vector3 physical(source.x,floor.position.y,source.z);
+        Ogre::Vector3 confirmed;
+        if (nav->getClosestExteriorPoint(physical,AIFixedGate::WorldUnits(1.0f),clearance,confirmed)!=1 ||
+            !AIFixedGate::Finite(Point(confirmed)) ||
+            AIFixedGate::DistanceSq(Point(source),Point(confirmed))>AIFixedGate::WorldUnits(.1f)*AIFixedGate::WorldUnits(.1f))
+            return false;
+        landing=physical;
+        return true;
+    }
 
     bool FindLanding(GameWorld* world,Character* actor,Building* support,const Ogre::Vector3& here,
                      unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard,LandingTrace& trace)
@@ -542,7 +604,7 @@ namespace Unstuck
         if (!_finite(ground)) return RejectLanding(trace,"invalid-ground");
         if (here.y-ground<50.0f) support=NULL;
         AIFixedGate::Point slope;
-        bool steep=false;
+        bool steep=false,pocket=false;
         if (guard)
         {
             if (!support) return RejectLanding(trace,"platform-support-missing");
@@ -556,8 +618,17 @@ namespace Unstuck
                 Ogre::Vector3 nearPoint;
                 unsigned key=~0u;
                 trace.sourceFace=nav->getClosestPoint(here,3.0f,0.0f,false,nearPoint,key);
-                if (trace.sourceFace!=0) return RejectLanding(trace,
-                    trace.sourceFace<0?"support-face-unavailable":"support-not-steep");
+                if (trace.sourceFace<0) return RejectLanding(trace,"support-face-unavailable");
+                if (trace.sourceFace!=0)
+                {
+                    if (trace.sourceFace!=1 || !AIFixedGate::Finite(Point(nearPoint)) ||
+                        AIFixedGate::DistanceSq(Point(here),Point(nearPoint))>25.0f ||
+                        key!=movement->havokCharacter->currentFace ||
+                        !NativePositionAgrees(movement->havokCharacter,here) ||
+                        !ReadPlatformPocket(nav,movement,slope,trace.pocket))
+                        return RejectLanding(trace,"support-not-steep");
+                    pocket=true;
+                }
             }
         }
         Building* inferredGate=!support && !movement->isStandingOnSomething()?FindElevatedGate(here,ground):NULL;
@@ -592,7 +663,7 @@ namespace Unstuck
         static const float shifts[5][2]={{0,0},{offset,0},{-offset,0},{0,offset},{0,-offset}};
         Ogre::Vector3 below=embedded?rockExit:
             Ogre::Vector3(here.x+shifts[probeSite][0],ground,here.z+shifts[probeSite][1]);
-        if (guard && steep && probeSite==0)
+        if (guard && (steep || pocket) && probeSite==0)
         {
             below.x+=55.0f*slope.x;
             below.z+=55.0f*slope.z;
@@ -607,6 +678,14 @@ namespace Unstuck
         if (world->zoneMgr->getZoneMap(landing)!=zone) return RejectLanding(trace,"landing-zone");
         if (UtilityT::getPositionInWater(landing.x,landing.z)) return RejectLanding(trace,"landing-water");
         float surface=UtilityT::getTerrainHeight(landing.x,landing.z);
+        trace.landingGround=surface;
+        trace.surface=landing.y;
+        if (guard && _finite(surface) && surface-landing.y>AIFixedGate::WorldUnits(.3f))
+        {
+            const Ogre::Vector3 source=landing;
+            if (!CorrectPlatformGround(nav,source,surface,clearance,landing))
+                return RejectLanding(trace,"platform-ground-unconfirmed");
+        }
         if (support)
         {
             if (here.y-landing.y<50.0f) return RejectLanding(trace,"platform-drop-too-small");
@@ -626,7 +705,7 @@ namespace Unstuck
         const int destinationGate=nav->getGateCode(landing);
         if (destinationGate<0) return RejectLanding(trace,"invalid-gate-code");
         if (guard && destinationGate!=nav->getGateCode(here)) return RejectLanding(trace,"platform-gate-code");
-        if (guard && steep && !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope)) return RejectLanding(trace,"platform-uphill");
+        if (guard && (steep || pocket) && !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope,pocket)) return RejectLanding(trace,"platform-uphill");
         if (guard && !StandingSpaceClear(landing,clearance,here.y-landing.y+clearance)) return RejectLanding(trace,"platform-landing-clearance");
         if (inferredGate)
         {
@@ -674,7 +753,8 @@ namespace Unstuck
             "platform NPC %u/%u/%u:%u/%u support %u/%u/%u:%u/%u p=(%.2f,%.2f,%.2f) "
             "anchor=(%.2f,%.2f,%.2f) age=%.3f failureAge=%.3f active=%u goal=%d action=%d "
             "native=%d/%d native_delta=(%.2f,%.2f,%.2f) attempt=%u failed=%u fresh=%u reason=%s "
-            "site=%u ground=%.2f radius=%.2f slopeY=%.3f sourceFace=%d landing=(%.2f,%.2f,%.2f)",
+            "site=%u ground=%.2f radius=%.2f slopeY=%.3f slopeXZ=(%.3f,%.3f) sourceFace=%d "
+            "pocket=%d navY=%.2f landingGround=%.2f landing=(%.2f,%.2f,%.2f)",
             entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
             object.type,object.container,object.containerSerial,object.index,object.serial,
             here.x,here.y,here.z,entry.watch.anchor.x,entry.watch.anchor.y,entry.watch.anchor.z,
@@ -682,8 +762,10 @@ namespace Unstuck
             static_cast<int>(GoalTask(CurrentGoal(c))),action&&action->taskData?static_cast<int>(action->key()):-1,
             static_cast<int>(movement->havokCharacter->getState()),static_cast<int>(movement->havokCharacter->getPathState()),
             b[0]-a[0],b[1]-a[1],b[2]-a[2],attempt?1:0,failed?1:0,fresh?1:0,reason,entry.probeSite,
-            trace?trace->ground:0.0f,trace?trace->clearance:0.0f,trace?trace->slope.y:0.0f,
-            trace?trace->sourceFace:-2,target.x,target.y,target.z);
+            trace?trace->ground:0.0f,trace?trace->clearance:0.0f,
+            trace?trace->slope.y:0.0f,trace?trace->slope.x:0.0f,trace?trace->slope.z:0.0f,
+            trace?trace->sourceFace:-2,trace?trace->pocket:-2,trace?trace->surface:0.0f,trace?trace->landingGround:0.0f,
+            target.x,target.y,target.z);
         DebugLog(line);
     }
 
