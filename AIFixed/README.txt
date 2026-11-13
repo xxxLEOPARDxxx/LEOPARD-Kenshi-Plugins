@@ -6,11 +6,13 @@ Local validation candidate (13 November 2026) / Локальная провер�
 либо проверки самой небольшой выпуклой опоры по её физической форме.
 Если навмеш немного ниже земли, точка посадки сверяется с реальной
 коллизией грунта. Проверки препятствий, воды, стороны ворот и свободного
-места сохранены. Проверка именно этих NPC в игре ещё не пройдена.
+места сохранены. 13.11.2026 владелец подтвердил выход обоих проблемных NPC;
+журнал зафиксировал Трутня и стражника после 1.00 и 1.11 игровых часа.
 Flat Lagoon recovery checks native local confinement or a physically confirmed
 small convex support cap, and a terrain landing when simplified navmesh lies slightly below
 the ground. Barrier, water, gate-side and body-space checks remain. Recovery
-of the reported NPCs is still pending an actual gameplay test.
+of both reported NPCs was confirmed by the owner and recorded in the game log
+on 13 November 2026, after 1.00 and 1.11 game hours respectively.
 
 Собственные исправления LEOPARD и адаптированные модули других авторов;
 сборник может расширяться независимо от отдельных модулей.
