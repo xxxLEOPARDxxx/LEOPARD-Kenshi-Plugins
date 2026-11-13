@@ -1377,9 +1377,13 @@ namespace
     WidgetRef g_rootRef;            // панель: ловит мышь
     WidgetRef g_backRef;            // подложка-скин игры (Frame=game)
     WidgetRef g_imageRef;           // картинка с нашей текстурой
-    WidgetRef g_infoBackRef;        // owned by root; five bounded, reusable text rows
-    WidgetRef g_infoTextRefs[5];
-    std::string g_infoCaptions[5];
+    WidgetRef g_infoBackRef;        // owned by root; four reusable inline fields
+    WidgetRef g_infoTextRefs[4];
+    std::string g_infoCaptions[4];
+    MyGUI::IntSize g_infoSizes[4], g_infoInsets[4];
+    int g_infoLimits[4] = {};
+    int g_infoHeight = 0;
+    bool g_infoFontReported = false;
     DWORD g_infoAt = 0, g_infoClockAt = 0, g_infoClockWait = 0;
     char g_infoClock[6] = {};
     MyGUI::ITexture* g_tex = NULL;
@@ -1567,7 +1571,7 @@ namespace
     bool EnsureWidgets()
     {
         const int w = ViewWidth(), h = ViewHeight(), pad = GamePad();
-        const BestMinimapInfo::Layout layout = BestMinimapInfo::Plan(g_infoFields, w, h, pad);
+        const BestMinimapInfo::Layout layout = BestMinimapInfo::Plan(g_infoFields ? g_infoHeight : 0, w, h, pad);
         MyGUI::Widget* root = g_rootRef.get();
         const bool created = root == NULL;
         if (root == NULL)
@@ -1586,12 +1590,13 @@ namespace
             g_backRef.reset();
             g_imageRef.reset();
             g_infoBackRef.reset();
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 g_infoTextRefs[i].reset();
                 g_infoCaptions[i].clear();
             }
             g_infoDirty = true;
+            g_infoFontReported = false;
             g_dirtyMask = true;
         }
 
@@ -2110,37 +2115,99 @@ namespace
         return pick;
     }
 
-    // Root owns the strip and its rows. WidgetRef clears on GUI teardown;
-    // hiding/re-enabling fields reuses at most one panel and five text boxes.
-    // No INI access, world scan or caption construction on intervening frames.
-    void InfoRow(MyGUI::Widget* back, int slot, int row, const char* text)
+    // Root owns one panel and four reusable fields. Native metrics are cached
+    // until a caption changes; all layout work is bounded by these four fields.
+    void InfoRow(MyGUI::Widget* back, int slot, const char* text)
     {
         MyGUI::TextBox* box = g_infoTextRefs[slot].get()
             ? g_infoTextRefs[slot].get()->castType<MyGUI::TextBox>(false) : NULL;
         if (box == NULL)
         {
             box = back->createWidget<MyGUI::TextBox>("Kenshi_TextboxStandardText",
-                MyGUI::IntCoord(4, 4 + row * 16, back->getWidth() - 8, 16), MyGUI::Align::Default, "");
+                MyGUI::IntCoord(0, 0, 4096, 128), MyGUI::Align::Default, "");
             box->setNeedMouseFocus(false);
             box->setTextShadow(true);
-            const std::string font = FontFor(12);
+            const std::string font = FontFor(18);
             if (!font.empty())
                 box->setFontName(font);
-            box->setFontHeight(12);
-            // Retain the text colour supplied by the current interface skin.
+            box->setFontHeight(18);
+            box->setTextAlign(MyGUI::Align::Left | MyGUI::Align::Top);
+            // Keep the text colour supplied by the interface skin. Account for
+            // its text-region borders, plus two pixels for the shadow.
+            const MyGUI::IntCoord region = box->getTextRegion();
+            g_infoInsets[slot] = MyGUI::IntSize(Hi(0, 4096 - region.width) + 2,
+                                               Hi(0, 128 - region.height) + 2);
             g_infoTextRefs[slot].set(box);
             g_infoCaptions[slot].clear();
         }
-        const MyGUI::IntCoord want(4, 4 + row * 16, back->getWidth() - 8, 16);
-        if (box->getCoord() != want)
-            box->setCoord(want);
         if (g_infoCaptions[slot] != text)
         {
             g_infoCaptions[slot] = text;
             box->setCaption(MyGUI::UString(g_infoCaptions[slot]));
+            const MyGUI::IntSize measured = box->getTextSize();
+            g_infoSizes[slot] = MyGUI::IntSize(measured.width + g_infoInsets[slot].width,
+                                              measured.height + g_infoInsets[slot].height);
+            g_infoLimits[slot] = -1;
         }
         if (!box->getVisible())
             box->setVisible(true);
+        if (g_debug && !g_infoFontReported)
+        {
+            char note[256];
+            sprintf_s(note, "BestMinimap info: font=%s height=%d, native text=%dx%d, skin inset=%dx%d",
+                box->getFontName().c_str(), box->getFontHeight(),
+                g_infoSizes[slot].width, g_infoSizes[slot].height,
+                g_infoInsets[slot].width, g_infoInsets[slot].height);
+            DebugLog(note);
+            g_infoFontReported = true;
+        }
+    }
+
+    void FitInfoField(int slot, const BestMinimapInfo::FieldRect& rect)
+    {
+        MyGUI::TextBox* const box = g_infoTextRefs[slot].get()->castType<MyGUI::TextBox>(false);
+        const MyGUI::IntCoord want(rect.left, rect.top, rect.width, rect.height);
+        if (box->getCoord() != want)
+            box->setCoord(want);
+        if (g_infoLimits[slot] == rect.width)
+            return;
+        const int previousLimit = g_infoLimits[slot];
+        g_infoLimits[slot] = rect.width;
+        if (g_infoSizes[slot].width <= rect.width)
+        {
+            // A formerly clipped field can now use its full caption again.
+            if (previousLimit != -1)
+                box->setCaption(MyGUI::UString(g_infoCaptions[slot]));
+            return;
+        }
+        const int limit = Hi(0, rect.width - g_infoInsets[slot].width);
+        // UString indexes UTF-32 code points, so a Cyrillic/Chinese character
+        // is never cut in the middle of its UTF-8 encoding. Native glyph widths
+        // decide the longest prefix; use ASCII dots supported by game fonts.
+        const MyGUI::UString full(g_infoCaptions[slot]);
+        MyGUI::UString fitted("...");
+        box->setCaption(fitted);
+        if (box->getTextSize().width > limit)
+        {
+            box->setCaption(MyGUI::UString(""));
+            return;
+        }
+        size_t low = 0, high = full.size();
+        while (low < high)
+        {
+            const size_t mid = (low + high + 1) / 2;
+            MyGUI::UString candidate = full.substr(0, mid);
+            candidate.append("...");
+            box->setCaption(candidate);
+            if (box->getTextSize().width <= limit)
+            {
+                low = mid;
+                fitted = candidate;
+            }
+            else
+                high = mid - 1;
+        }
+        box->setCaption(fitted);
     }
 
     void UpdateInfo(const Ogre::Vector3& center, DWORD now)
@@ -2151,6 +2218,7 @@ namespace
         MyGUI::Widget* back = g_infoBackRef.get();
         if (!g_infoFields)
         {
+            g_infoHeight = 0;
             if (back != NULL && back->getVisible())
                 back->setVisible(false);
             return;
@@ -2159,25 +2227,22 @@ namespace
             return;
         g_infoAt = now;
         g_infoDirty = false;
-        const BestMinimapInfo::Layout layout = BestMinimapInfo::Plan(g_infoFields, ViewWidth(), ViewHeight(), GamePad());
+        const BestMinimapInfo::Layout base = BestMinimapInfo::Plan(1, ViewWidth(), ViewHeight(), GamePad());
         if (back == NULL)
         {
-            // Thin skin has a 19px minimum height in vanilla and 14px in Dark UI.
             back = root->createWidget<MyGUI::Widget>("Kenshi_FloatingPanelThinSkin",
-                MyGUI::IntCoord(0, layout.panelTop, layout.width, layout.panelHeight), MyGUI::Align::Default, "");
-            back->setNeedMouseFocus(false);
+                MyGUI::IntCoord(0, base.panelTop, base.width, 32), MyGUI::Align::Default, "");
+            // Consume panel clicks; they do not reach the map/root or world.
+            back->setNeedMouseFocus(true);
             g_infoBackRef.set(back);
         }
-        const MyGUI::IntCoord want(0, layout.panelTop, layout.width, layout.panelHeight);
-        if (back->getCoord() != want)
-            back->setCoord(want);
         if (!back->getVisible())
             back->setVisible(true);
-        const unsigned flags[5] = {
-            BestMinimapInfo::Scale, BestMinimapInfo::Coordinates, BestMinimapInfo::Coordinates,
-            BestMinimapInfo::Heading, BestMinimapInfo::Clock
+        const unsigned flags[4] = {
+            BestMinimapInfo::Scale, BestMinimapInfo::Clock,
+            BestMinimapInfo::Coordinates, BestMinimapInfo::Heading
         };
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 4; ++i)
         {
             if (!(g_infoFields & flags[i]))
             {
@@ -2186,21 +2251,31 @@ namespace
                     box->setVisible(false);
             }
         }
-        int row = 0;
         char text[128];
         if (g_infoFields & BestMinimapInfo::Scale)
         {
             char zoom[32];
             BestMinimapInfo::ZoomText(zoom, sizeof(zoom), g_range);
             sprintf_s(text, Tr("Zoom:%s"), zoom);
-            InfoRow(back, 0, row++, text);
+            InfoRow(back, 0, text);
+        }
+        if (g_infoFields & BestMinimapInfo::Clock)
+        {
+            if (!g_infoClock[0] || now - g_infoClockAt >= g_infoClockWait)
+            {
+                SYSTEMTIME time;
+                GetLocalTime(&time);
+                sprintf_s(g_infoClock, "%02u:%02u", static_cast<unsigned>(time.wHour), static_cast<unsigned>(time.wMinute));
+                g_infoClockAt = now;
+                g_infoClockWait = 60000 - static_cast<DWORD>(time.wSecond) * 1000 - time.wMilliseconds;
+            }
+            sprintf_s(text, Tr("Time:%s"), g_infoClock);
+            InfoRow(back, 1, text);
         }
         if (g_infoFields & BestMinimapInfo::Coordinates)
         {
-            sprintf_s(text, "X:%d", BestMinimapInfo::CoordinateMetres(center.x));
-            InfoRow(back, 1, row++, text);
-            sprintf_s(text, "Z:%d", BestMinimapInfo::CoordinateMetres(center.z));
-            InfoRow(back, 2, row++, text);
+            sprintf_s(text, "X:%d Z:%d", BestMinimapInfo::CoordinateMetres(center.x), BestMinimapInfo::CoordinateMetres(center.z));
+            InfoRow(back, 2, text);
         }
         if (g_infoFields & BestMinimapInfo::Heading)
         {
@@ -2219,21 +2294,23 @@ namespace
                 sprintf_s(text, Tr("Dir:%03d"), bearing);
             else
                 sprintf_s(text, Tr("Dir:--"));
-            InfoRow(back, 3, row++, text);
+            InfoRow(back, 3, text);
         }
-        if (g_infoFields & BestMinimapInfo::Clock)
-        {
-            if (!g_infoClock[0] || now - g_infoClockAt >= g_infoClockWait)
+        int widths[4], heights[4], slots[4], count = 0;
+        for (int i = 0; i < 4; ++i)
+            if (g_infoFields & flags[i])
             {
-                SYSTEMTIME time;
-                GetLocalTime(&time);
-                sprintf_s(g_infoClock, "%02u:%02u", static_cast<unsigned>(time.wHour), static_cast<unsigned>(time.wMinute));
-                g_infoClockAt = now;
-                g_infoClockWait = 60000 - static_cast<DWORD>(time.wSecond) * 1000 - time.wMilliseconds;
+                slots[count] = i;
+                widths[count] = g_infoSizes[i].width;
+                heights[count++] = g_infoSizes[i].height;
             }
-            sprintf_s(text, Tr("Time:%s"), g_infoClock);
-            InfoRow(back, 4, row++, text);
-        }
+        const BestMinimapInfo::FlowLayout flow = BestMinimapInfo::Flow(widths, heights, count, base.width);
+        g_infoHeight = flow.height;
+        const MyGUI::IntCoord want(0, base.panelTop, base.width, g_infoHeight);
+        if (back->getCoord() != want)
+            back->setCoord(want);
+        for (int i = 0; i < count; ++i)
+            FitInfoField(slots[i], flow.fields[i]);
     }
 
     void PlaceLabel(const std::string& text, float x, float y, unsigned colour, int fontPx = 0, bool rightOf = false)
@@ -3736,7 +3813,12 @@ namespace
             Show(true);
         Reason("");
 
+        const int previousInfoHeight = g_infoHeight;
         UpdateInfo(center, now);
+        // Apply measured height before drawing this frame, including the first
+        // frame after GUI recreation. Preserve the existing corner anchoring.
+        if (previousInfoHeight != g_infoHeight && !EnsureWidgets())
+            return Hide("could not resize the minimap info panel");
 
         UploadJob();
         const DWORD period = 1000 / static_cast<DWORD>(g_fps);

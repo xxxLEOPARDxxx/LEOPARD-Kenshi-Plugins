@@ -16,17 +16,12 @@ int main()
 } while (0)
     using namespace BestMinimapInfo;
 
-    C(Height(0, 16) == 0);
-    C(Height(Scale, 16) == 24);
-    C(Height(Coordinates, 16) == 40);
-    C(Height(Scale | Coordinates | Heading | Clock, 16) == 88);
-
     Layout layout = Plan(0, 80, 80, 0);
     C(layout.width == 80 && layout.height == 80 && layout.panelHeight == 0);
-    layout = Plan(Scale, 80, 80, 0);
-    C(layout.width == 100 && layout.height == 107 && layout.panelTop == 83 && layout.panelHeight == 24);
-    layout = Plan(Scale | Coordinates | Heading | Clock, 320, 200, 8);
-    C(layout.width == 336 && layout.height == 307 && layout.panelTop == 219 && layout.panelHeight == 88);
+    layout = Plan(30, 80, 80, 0);
+    C(layout.width == 100 && layout.height == 113 && layout.panelTop == 83 && layout.panelHeight == 30);
+    layout = Plan(53, 320, 200, 8);
+    C(layout.width == 336 && layout.height == 272 && layout.panelTop == 219 && layout.panelHeight == 53);
 
     C(ZoomPercent(2000) == 100);
     C(ZoomPercent(1000) == 200);

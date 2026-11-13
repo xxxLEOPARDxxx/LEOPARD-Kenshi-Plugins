@@ -14,18 +14,52 @@ namespace BestMinimapInfo
         Clock = 8
     };
 
-    inline int Height(unsigned fields, int rowHeight)
+    struct FieldRect
     {
-        int rows = 0;
-        if (fields & Scale)
-            ++rows;
-        if (fields & Coordinates)
-            rows += 2;
-        if (fields & Heading)
-            ++rows;
-        if (fields & Clock)
-            ++rows;
-        return rows ? rows * rowHeight + 8 : 0;
+        int left, top, width, height;
+    };
+
+    struct FlowLayout
+    {
+        FieldRect fields[4];
+        int rows, height;
+    };
+
+    // The caller supplies native TextBox measurements, not guessed glyph widths.
+    inline FlowLayout Flow(const int* widths, const int* heights, int count, int panelWidth)
+    {
+        FlowLayout layout = {};
+        if (count <= 0)
+            return layout;
+        const int available = panelWidth > 16 ? panelWidth - 16 : 1;
+        int left = 8;
+        int top = 5;
+        int rowHeight = 0;
+        layout.rows = 1;
+        for (int field = 0; field < count && field < 4; ++field)
+        {
+            int width = widths[field] > 0 ? widths[field] : 1;
+            if (width > available)
+                width = available;
+            const int height = heights[field] > 0 ? heights[field] : 18;
+            if (left > 8 && left + width > panelWidth - 8)
+            {
+                left = 8;
+                top += rowHeight + 3;
+                rowHeight = 0;
+                ++layout.rows;
+            }
+            FieldRect& rect = layout.fields[field];
+            rect.left = left;
+            rect.top = top;
+            rect.width = width;
+            rect.height = height;
+            left += width + 12;
+            if (height > rowHeight)
+                rowHeight = height;
+        }
+        layout.height = top + rowHeight + 5;
+        return layout;
     }
 
     struct Layout
@@ -36,9 +70,9 @@ namespace BestMinimapInfo
         int panelHeight;
     };
 
-    inline Layout Plan(unsigned fields, int width, int height, int pad)
+    inline Layout Plan(int panelHeight, int width, int height, int pad)
     {
-        Layout layout = { width + 2 * pad, height + 2 * pad, 0, Height(fields, 16) };
+        Layout layout = { width + 2 * pad, height + 2 * pad, 0, panelHeight };
         if (layout.panelHeight)
         {
             // The fixed corners of the vanilla thin panel need 98 pixels.

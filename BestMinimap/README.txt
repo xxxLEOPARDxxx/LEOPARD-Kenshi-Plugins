@@ -1,4 +1,4 @@
-BEST MINIMAP (QoL)
+﻿BEST MINIMAP (QoL)
 
 Миникарта в углу экрана. Требуется RE_Kenshi.
 
@@ -132,6 +132,10 @@ zooming in increases the percentage (2000 / current Range * 100%). This stable
 reference does not depend on map size or shape. Turning every field off hides
 the strip; hiding the minimap also hides it. It follows the minimap while
 dragging/resizing. The minimum strip width is 100 pixels to fit vanilla borders.
+The four fields share compact lines in this order: zoom, clock, combined X/Z,
+heading. A readable 18-pixel font and measured text size determine wrapping;
+very narrow panels shorten an individual field with dots. Panel clicks do not
+send characters or move the camera.
 
 Информационная панель: InfoScale - масштаб в процентах, InfoCoordinates - X/Z центра,
 InfoHeading - курс камеры от севера карты (000-359), InfoClock - часы компьютера.
@@ -140,7 +144,10 @@ InfoHeading - курс камеры от севера карты (000-359), Info
 База не зависит от размера и формы карты. Координаты переводятся в метры.
 Панель перемещается вместе с миникартой и скрывается вместе с ней. Если все поля
 выключены, панель исчезает. Минимальная ширина панели - 100 пикселей для рамки
-ванильного интерфейса.
+ванильного интерфейса. Поля идут компактно: масштаб, часы, X/Z одной строкой,
+курс камеры. Шрифт 18 пикселей; перенос зависит от реального размера текста.
+На узкой панели длинное поле сокращается с точками. Щелчки по панели не
+отправляют персонажей и не переносят камеру.
 
 Prepared update 2 / Подготовленный выпуск 2
 EN: Added independent camera arrow size and adjustable, clearer boundary width.
@@ -172,11 +179,15 @@ so the displayed value can be reduced. Russian in-game text uses ASCII hyphens;
 typographic dashes are unsupported by the game font.
 
 Information-strip implementation (2026-11-13, local change, not a release):
-one root-owned thin game panel and at most five reusable text rows; WidgetRef
+one root-owned thin game panel and at most four reusable inline fields; WidgetRef
 clears every reference on game-UI destruction. Text and background use the
 current interface skins, including their text colour. Root placement bounds
 include the strip, while map texture, world projection and click bounds keep
-their original dimensions. Numeric work is limited to four updates per second
+their original dimensions. TextBox::getTextSize and the skin's text-region insets
+provide native field width and line height at FontFor(18); no estimated glyph
+widths or empty grid columns. Narrow fields are shortened by UTF-32 code point
+with a natively measured ASCII-dot suffix. Panel mouse focus consumes clicks.
+Numeric work is limited to four updates per second
 plus changes to settings/zoom; captions update only when their content changes.
 The clock is sampled at the next minute boundary, with no per-frame clock/INI
 polling or world traversal. Native world positions use ten units per metre.
