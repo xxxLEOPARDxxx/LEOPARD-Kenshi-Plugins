@@ -191,12 +191,20 @@ widths or empty grid columns. Narrow fields are shortened by UTF-32 code point
 with a natively measured ASCII-dot suffix. Row groups are centred; 12px margins
 clear the 9/10px vanilla and 7/7px Dark UI top/bottom corners. Panel mouse focus
 consumes clicks.
-Local correction (2026-11-16): the strip frame touches the minimap frame,
-including the transparent edge rows in vanilla and Dark UI skins. The text's
-centred rows, 12px padding and measured wrapping are unchanged.
-Локальная правка (16.11.2026): рамка информационной панели примыкает к миникарте
-без зазора, с учётом прозрачных краёв ванильного скина и Dark UI. Центрирование,
-отступы текста 12 пикселей и перенос по реальной ширине сохранены.
+Local correction (2026-11-16): rectangular maps using the game frame now share
+  one continuous native background and outer border with the information strip.
+  The strip starts at the image's bottom edge; it has no second framed skin.
+  The previous two-skin overlap still left a visible seam in the owner's game.
+  Circle/bare maps retain their standalone strip. Centred text rows, 12px text
+  padding and measured wrapping remain unchanged. Live frame/shape changes
+  rebuild only the strip's bounded widget subtree; no additional polling.
+Локальная правка (16.11.2026): у прямоугольной карты с игровой рамкой теперь
+  общий непрерывный фон и внешний контур с информационной строкой. Строка
+  начинается сразу под изображением, отдельной рамки у неё больше нет.
+  Прежнее наложение двух скинов оставляло видимый просвет в игре владельца.
+  Для круга и карты без игровой рамки отдельная панель сохранена. Центрирование,
+  отступы текста 12 пикселей и перенос по реальной ширине сохранены. Смена
+  рамки/формы пересоздаёт только панель с четырьмя полями, без нового опроса.
 Numeric work is limited to four updates per second
 plus changes to settings/zoom; captions update only when their content changes.
 The clock is sampled at the next minute boundary, with no per-frame clock/INI

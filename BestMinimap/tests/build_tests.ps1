@@ -7,6 +7,10 @@ $env:PATH="$vc/bin/amd64;"+$env:PATH
 $out='D:/DEV/Kenshi/build/BestMinimapTests'
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 $source=[IO.File]::ReadAllText("$PSScriptRoot/../BestMinimap.cpp")
+$begin=$source.IndexOf('    bool EnsureWidgets()')
+$end=$source.IndexOf('    void HideTooltip();', $begin)
+if($begin -lt 0 -or $end -lt $begin){throw 'Production widget placement boundary missing'}
+[IO.File]::WriteAllText("$out/map_widgets_under_test.h",$source.Substring($begin,$end-$begin))
 $begin=$source.IndexOf('    void DrawCameraRange(')
 $end=$source.IndexOf('    // Последний нарисованный вид:', $begin)
 if($begin -lt 0 -or $end -lt $begin){throw 'Production renderer boundary missing'}

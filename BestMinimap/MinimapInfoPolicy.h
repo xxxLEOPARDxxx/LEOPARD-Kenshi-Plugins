@@ -96,10 +96,10 @@ namespace BestMinimapInfo
             // The fixed corners of the vanilla thin panel need 98 pixels.
             if (layout.width < 100)
                 layout.width = 100;
-            // Both thin skins have a transparent first row; Dark UI's map
-            // frame also has a transparent last row. Overlap those margins
-            // so the visible borders touch, keeping the text padding intact.
-            layout.panelTop = layout.height - (pad > 0 ? 2 : 1);
+            // A game frame encloses both the map and its unskinned footer.
+            // Start the footer at the image bottom, inside that shared frame.
+            // Bare/circular maps retain their standalone thin footer skin.
+            layout.panelTop = pad > 0 ? height + pad : height - 1;
             layout.height = layout.panelTop + layout.panelHeight;
         }
         return layout;

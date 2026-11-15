@@ -32,6 +32,8 @@ public:
 };
 struct IntSize {int width,height;IntSize(int w=0,int h=0):width(w),height(h){}};
 struct Align { enum Value { Default=0, Left=1, Top=2 }; };
+struct Event { template<class T> void operator+=(T){} };
+template<class T> int newDelegate(T){return 0;}
 class Widget;
 struct IUnlinkWidget { virtual void _unlinkWidget(Widget*)=0; };
 class WidgetManager {
@@ -44,16 +46,32 @@ public:
 class Widget {
     IntCoord coord; bool visible;
 public:
+    std::string skin; Widget* parent; int depth;
+    Event eventMouseButtonPressed,eventMouseDrag,eventMouseButtonReleased,eventMouseWheel,eventMouseButtonDoubleClick;
     std::vector<Widget*> children;
-    Widget():visible(true){++liveWidgets;++createdWidgets;}
-    virtual ~Widget(){while(!children.empty()){delete children.back();children.pop_back();}WidgetManager::getInstancePtr()->unlink(this);--liveWidgets;}
-    template<class T> T* createWidget(const char*,const IntCoord& c,Align::Value,const char*){T* w=new T;w->setCoord(c);children.push_back(w);return w;}
+    Widget():visible(true),parent(NULL),depth(0){++liveWidgets;++createdWidgets;}
+    virtual ~Widget(){while(!children.empty())delete children.back();if(parent){for(size_t i=0;i<parent->children.size();++i)if(parent->children[i]==this){parent->children.erase(parent->children.begin()+i);break;}}WidgetManager::getInstancePtr()->unlink(this);--liveWidgets;}
+    template<class T> T* createWidget(const char* name,const IntCoord& c,Align::Value,const char*){T* w=new T;w->skin=name;w->parent=this;w->setCoord(c);children.push_back(w);return w;}
     template<class T> T* castType(bool=false){return dynamic_cast<T*>(this);}
     void setCoord(const IntCoord& c){coord=c;} const IntCoord& getCoord()const{return coord;}
+    void setCoord(int l,int t,int w,int h){coord=IntCoord(l,t,w,h);}
+    void setSize(int w,int h){coord.width=w;coord.height=h;}
+    void setPosition(int l,int t){coord.left=l;coord.top=t;}
+    void setDepth(int v){depth=v;}
     int getWidth()const{return coord.width;} int getHeight()const{return coord.height;}
     bool mouseFocus; void setNeedMouseFocus(bool v){mouseFocus=v;}
     bool getVisible()const{return visible;} void setVisible(bool v){visible=v;}
 };
+class ImageBox:public Widget {
+public:
+    std::string texture;
+    const std::string& _getTextureName(){return texture;}
+    void setImageInfo(const std::string& t,const IntCoord&,const IntSize&){texture=t;}
+    void setImageIndex(int){}
+};
+class RenderManager {public:static RenderManager& getInstance(){static RenderManager r;return r;}IntSize getViewSize(){return IntSize(2560,1440);}};
+class Gui {public:static Gui& getInstance(){static Gui g;return g;}void destroyWidget(Widget* w){delete w;}
+template<class T>T* createWidget(const char* name,const IntCoord& c,Align::Value,const char*,const char*){T* w=new T;w->skin=name;w->setCoord(c);return w;}};
 class TextBox:public Widget {
 public:
     UString caption;int fontHeight;std::string font;
@@ -67,14 +85,14 @@ public:
 };
 }
 #include "info_widget_ref_under_test.h"
-WidgetRef g_rootRef,g_infoBackRef,g_infoTextRefs[4];
+WidgetRef g_rootRef,g_infoBackRef,g_infoTextRefs[4],g_backRef,g_imageRef;
 std::string g_infoCaptions[4];
-MyGUI::IntSize g_infoSizes[4],g_infoInsets[4];int g_infoLimits[4]={},g_infoHeight=0;bool g_infoFontReported=false,g_debug=false;
+MyGUI::IntSize g_infoSizes[4],g_infoInsets[4];int g_infoLimits[4]={},g_infoHeight=0;bool g_infoFontReported=false,g_debug=false,g_infoJoinedFrame=false;
 void DebugLog(const std::string&){}
 DWORD g_infoAt=0,g_infoClockAt=0,g_infoClockWait=0;
 char g_infoClock[6]={};
 unsigned g_infoFields=0;bool g_infoDirty=true;double g_range=2000;
-int viewWidth=420; int ViewWidth(){return viewWidth;} int ViewHeight(){return 80;} int GamePad(){return 0;}
+int viewWidth=420,viewHeight=80,gamePad=0; int ViewWidth(){return viewWidth;} int ViewHeight(){return viewHeight;} int GamePad(){return gamePad;}
 template<class T> T Hi(T a,T b){return a>b?a:b;}
 const char* Tr(const char* text){
     if(language==1){
@@ -97,6 +115,11 @@ struct World { Player* player; };
 Camera camera; CameraClass cameraClass={&camera}; Player player={&cameraClass};World world={&player};World* ou=&world;
 struct Affine { double au,bu,av,bv; }g_map={1,0,0,1};
 struct Source { int w,h; }g_src={100,100};
+int g_left=0,g_top=0,g_viewW=0,g_viewH=0;bool g_placed=false,g_dirtyMask=false;
+std::string g_texName="fixture";
+void ClampPosition(int,int){}void WriteInt(const char*,int){}bool EnsureTexture(int,int){return true;}
+void OnPressed(){}void OnDragged(){}void OnReleased(){}void OnWheel(){}void OnDoubleClick(){}
+#include "map_widgets_under_test.h"
 #include "info_widget_runtime_under_test.h"
 int main(){int failures=0,checks=0;
 #define C(x) do {++checks;if(!(x)){++failures;std::printf("FAIL line %d: %s\n",__LINE__,#x);}}while(0)
@@ -172,6 +195,46 @@ int main(){int failures=0,checks=0;
         }
         delete root;C(liveWidgets==0);
     }
+    // The same live root can switch game frame <-> bare/circular map. Do not
+    // retain the previous skin or stale child references across the switch.
+    root=new MyGUI::Widget;g_rootRef.set(root);g_infoFields=15;
+    for(int pass=0;pass<6;++pass){
+        gamePad=pass%2?0:8;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),6000+pass);
+        MyGUI::Widget* back=g_infoBackRef.get();
+        C(back->skin==(gamePad?"PanelEmpty":"Kenshi_FloatingPanelThinSkin"));
+        C(root->children.size()==1 && liveWidgets==6);
+        C(back->mouseFocus && back->getCoord().top==(gamePad?88:79));
+        for(int i=0;i<4;++i)C(g_infoTextRefs[i].get()->parent==back);
+        int created=createdWidgets;UpdateInfo(Ogre::Vector3(),6000+pass);
+        C(createdWidgets==created);
+    }
+    g_infoFields=0;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),7000);C(!g_infoBackRef.get()->getVisible());
+    delete root;C(liveWidgets==0);gamePad=0;
+    // Exercise actual EnsureWidgets, not just the geometry policy. A single
+    // backdrop covers the image/footer seam, including hidden round trips.
+    viewWidth=viewHeight=420;gamePad=8;g_infoFields=9;g_infoDirty=true;
+    C(EnsureWidgets());UpdateInfo(Ogre::Vector3(),8000);C(EnsureWidgets());
+    C(g_backRef.get()->getCoord().height==g_rootRef.get()->getHeight());
+    C(g_backRef.get()->depth>g_infoBackRef.get()->depth);
+    C(g_infoBackRef.get()->skin=="PanelEmpty");
+    C(g_imageRef.get()->getCoord().top+g_imageRef.get()->getHeight()==g_infoBackRef.get()->getCoord().top);
+    // Same image dimensions, changed padding: texture need not be replaced.
+    gamePad=0;g_infoDirty=true;C(EnsureWidgets());UpdateInfo(Ogre::Vector3(),8001);C(EnsureWidgets());
+    C(g_backRef.get()==NULL);C(g_imageRef.get()->getCoord().left==0 && g_imageRef.get()->getCoord().top==0);
+    C(g_infoBackRef.get()->skin=="Kenshi_FloatingPanelThinSkin");
+    // Backdrop gets recreated after a retained hidden footer. Its explicit
+    // lower draw priority must keep it behind the footer when shown again.
+    gamePad=8;g_infoDirty=true;C(EnsureWidgets());UpdateInfo(Ogre::Vector3(),8002);C(EnsureWidgets());
+    g_infoFields=0;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),8003);C(EnsureWidgets());
+    gamePad=0;C(EnsureWidgets());gamePad=8;C(EnsureWidgets());
+    g_infoFields=9;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),8004);C(EnsureWidgets());
+    C(g_backRef.get()->depth>g_infoBackRef.get()->depth);
+    C(g_backRef.get()->getHeight()==g_rootRef.get()->getHeight());
+    C(g_infoBackRef.get()->getVisible());C(g_imageRef.get()->getCoord().top==8);
+    // All info off restores an image-only native frame.
+    g_infoFields=0;g_infoDirty=true;UpdateInfo(Ogre::Vector3(),8005);C(EnsureWidgets());
+    C(g_backRef.get()->getHeight()==436);C(!g_infoBackRef.get()->getVisible());
+    delete g_rootRef.get();C(liveWidgets==0);C(g_backRef.get()==NULL && g_imageRef.get()==NULL);
     std::printf("%d actual info widget/WidgetRef lifecycle checks, %d failures\n",checks,failures);
     return failures?1:0;
 }

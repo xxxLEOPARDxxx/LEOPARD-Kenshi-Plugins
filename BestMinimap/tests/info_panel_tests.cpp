@@ -21,7 +21,11 @@ int main()
     layout = Plan(30, 80, 80, 0);
     C(layout.width == 100 && layout.height == 109 && layout.panelTop == 79 && layout.panelHeight == 30);
     layout = Plan(53, 320, 200, 8);
-    C(layout.width == 336 && layout.height == 267 && layout.panelTop == 214 && layout.panelHeight == 53);
+    C(layout.width == 336 && layout.height == 261 && layout.panelTop == 208 && layout.panelHeight == 53);
+    // A shared game frame encloses the image and footer as one surface.
+    layout = Plan(52, 420, 420, 8);
+    C(layout.panelTop == 428 && layout.height == 480);
+    C(layout.panelTop == 420 + 8 && layout.height - layout.panelTop == 52);
 
     C(ZoomPercent(2000) == 100);
     C(ZoomPercent(1000) == 200);

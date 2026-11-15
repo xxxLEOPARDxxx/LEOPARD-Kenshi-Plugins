@@ -1383,6 +1383,7 @@ namespace
     MyGUI::IntSize g_infoSizes[4], g_infoInsets[4];
     int g_infoLimits[4] = {};
     int g_infoHeight = 0;
+    bool g_infoJoinedFrame = false;
     bool g_infoFontReported = false;
     DWORD g_infoAt = 0, g_infoClockAt = 0, g_infoClockWait = 0;
     char g_infoClock[6] = {};
@@ -1605,8 +1606,11 @@ namespace
         if (pad > 0 && back == NULL)
         {
             back = root->createWidget<MyGUI::Widget>("Kenshi_FloatingPanelSkin",
-                MyGUI::IntCoord(0, 0, w + 2 * pad, h + 2 * pad), MyGUI::Align::Default, "");
+                MyGUI::IntCoord(0, 0, layout.width, layout.height), MyGUI::Align::Default, "");
             back->setNeedMouseFocus(false);
+            // Higher MyGUI depth draws below the default-depth siblings,
+            // including a footer retained while all information was hidden.
+            back->setDepth(1);
             g_backRef.set(back);
             // Подложка должна быть под картинкой: картинку пересоздаём сверху.
             if (MyGUI::Widget* const old = g_imageRef.get())
@@ -1655,16 +1659,18 @@ namespace
             }
             root->setCoord(g_left, g_top, layout.width, layout.height);
             if (back != NULL)
-                back->setSize(w + 2 * pad, h + 2 * pad);
+                back->setSize(layout.width, layout.height);
             g_infoDirty = true;
         }
 
         if (!EnsureTexture(w, h))
             return false;
         MyGUI::ImageBox* const box = image->castType<MyGUI::ImageBox>();
+        const MyGUI::IntCoord imageCoord(pad, pad, w, h);
+        if (box->getCoord() != imageCoord)
+            box->setCoord(imageCoord);
         if (g_viewW != w || g_viewH != h || box->_getTextureName() != g_texName)
         {
-            box->setCoord(pad, pad, w, h);
             // Текстура, часть её и «плитка» - одним вызовом. По отдельности
             // нельзя: размер плитки ImageBox запоминает при первой установке
             // и сам не меняет, и после смены размера миникарты показывался
@@ -2223,6 +2229,15 @@ namespace
                 back->setVisible(false);
             return;
         }
+        const bool joinedFrame = GamePad() > 0;
+        if (back != NULL && g_infoJoinedFrame != joinedFrame)
+        {
+            // Frame/shape can change without recreating the root. Rebuild only
+            // this bounded subtree; WidgetRef unlinks its four cached fields.
+            MyGUI::Gui::getInstance().destroyWidget(back);
+            back = NULL;
+            g_infoDirty = true;
+        }
         if (!BestMinimapInfo::Due(now, g_infoAt, g_infoDirty))
             return;
         g_infoAt = now;
@@ -2230,11 +2245,12 @@ namespace
         const BestMinimapInfo::Layout base = BestMinimapInfo::Plan(1, ViewWidth(), ViewHeight(), GamePad());
         if (back == NULL)
         {
-            back = root->createWidget<MyGUI::Widget>("Kenshi_FloatingPanelThinSkin",
+            back = root->createWidget<MyGUI::Widget>(joinedFrame ? "PanelEmpty" : "Kenshi_FloatingPanelThinSkin",
                 MyGUI::IntCoord(0, base.panelTop, base.width, 32), MyGUI::Align::Default, "");
             // Consume panel clicks; they do not reach the map/root or world.
             back->setNeedMouseFocus(true);
             g_infoBackRef.set(back);
+            g_infoJoinedFrame = joinedFrame;
         }
         if (!back->getVisible())
             back->setVisible(true);
