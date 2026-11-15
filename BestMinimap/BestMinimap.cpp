@@ -1380,7 +1380,9 @@ namespace
     WidgetRef g_infoBackRef;        // owned by root; four reusable inline fields
     WidgetRef g_infoTextRefs[4];
     std::string g_infoCaptions[4];
-    MyGUI::IntSize g_infoSizes[4], g_infoInsets[4];
+    MyGUI::IntSize g_infoSizes[4];
+    MyGUI::IntCoord g_infoRegions[4];
+    BestMinimapInfo::TextMetrics g_infoMetrics[4];
     int g_infoLimits[4] = {};
     int g_infoHeight = 0;
     bool g_infoJoinedFrame = false;
@@ -2121,8 +2123,64 @@ namespace
         return pick;
     }
 
-    // Root owns one panel and four reusable fields. Native metrics are cached
-    // until a caption changes; all layout work is bounded by these four fields.
+    // Native getTextSize measures advance and nominal line height (+1 shadow).
+    // SimpleText draws scaled bearing/ink quads, which can exceed that line.
+    // Guard a centred native line against every overhang; flow centres its ink.
+    BestMinimapInfo::TextMetrics MeasureInfoText(MyGUI::TextBox* box,
+        const MyGUI::IntCoord& border, const MyGUI::UString& caption)
+    {
+        const MyGUI::IntSize measured = box->getTextSize();
+        BestMinimapInfo::TextMetrics result = {
+            { border.left, border.top, measured.width, measured.height },
+            measured.width + border.width, measured.height + border.height
+        };
+        MyGUI::IFont* const font = MyGUI::FontManager::getInstance().getByName(box->getFontName());
+        if (font == NULL || caption.empty())
+            return result;
+        const int defaultHeight = font->getDefaultHeight();
+        if (defaultHeight <= 0)
+            return result;
+        const float scale = static_cast<float>(box->getFontHeight()) / defaultHeight;
+        float pen = 0, left = 1e9f, top = 1e9f, right = -1e9f, bottom = -1e9f;
+        bool visible = false;
+        for (size_t i = 0; i < caption.size(); ++i)
+        {
+            const MyGUI::GlyphInfo* const glyph = font->getGlyphInfo(caption[i]);
+            if (glyph == NULL)
+                return result;
+            if (glyph->width > 0 && glyph->height > 0)
+            {
+                const float x = pen + glyph->bearingX * scale;
+                const float y = glyph->bearingY * scale;
+                if (x < left) left = x;
+                if (y < top) top = y;
+                if (x + glyph->width * scale > right) right = x + glyph->width * scale;
+                if (y + glyph->height * scale > bottom) bottom = y + glyph->height * scale;
+                visible = true;
+            }
+            pen += glyph->bearingX * scale + glyph->advance * scale;
+        }
+        if (!visible)
+            return result;
+        const int inkLeft = static_cast<int>(std::floor(left));
+        const int inkTop = static_cast<int>(std::floor(top));
+        const int inkRight = static_cast<int>(std::ceil(right + 1));
+        const int inkBottom = static_cast<int>(std::ceil(bottom + 1));
+        const int lineWidth = Hi(0, measured.width - 1);
+        const int lineHeight = box->getFontHeight();
+        const int guardX = Hi(0, Hi(-inkLeft, inkRight - lineWidth));
+        const int guardY = Hi(0, Hi(-inkTop, inkBottom - lineHeight));
+        result.ink.left = border.left + guardX + inkLeft;
+        result.ink.top = border.top + guardY + inkTop;
+        result.ink.width = inkRight - inkLeft;
+        result.ink.height = inkBottom - inkTop;
+        result.width = lineWidth + 2 * guardX + border.width;
+        result.height = lineHeight + 2 * guardY + border.height;
+        return result;
+    }
+
+    // Four reusable root-owned fields. Font metrics change only with captions
+    // or fitted width, never on unchanged updates or every rendered frame.
     void InfoRow(MyGUI::Widget* back, int slot, const char* text)
     {
         MyGUI::TextBox* box = g_infoTextRefs[slot].get()
@@ -2137,22 +2195,21 @@ namespace
             if (!font.empty())
                 box->setFontName(font);
             box->setFontHeight(22);
-            box->setTextAlign(MyGUI::Align::Left | MyGUI::Align::Top);
-            // Keep the text colour supplied by the interface skin. Account for
-            // its text-region borders, plus two pixels for the shadow.
+            box->setTextAlign(MyGUI::Align::HCenter | MyGUI::Align::VCenter);
+            // Preserve colour and the actual (possibly asymmetric) skin region.
             const MyGUI::IntCoord region = box->getTextRegion();
-            g_infoInsets[slot] = MyGUI::IntSize(Hi(0, 4096 - region.width) + 2,
-                                               Hi(0, 128 - region.height) + 2);
+            g_infoRegions[slot] = MyGUI::IntCoord(region.left, region.top,
+                Hi(0, 4096 - region.width), Hi(0, 128 - region.height));
             g_infoTextRefs[slot].set(box);
             g_infoCaptions[slot].clear();
         }
         if (g_infoCaptions[slot] != text)
         {
             g_infoCaptions[slot] = text;
-            box->setCaption(MyGUI::UString(g_infoCaptions[slot]));
-            const MyGUI::IntSize measured = box->getTextSize();
-            g_infoSizes[slot] = MyGUI::IntSize(measured.width + g_infoInsets[slot].width,
-                                              measured.height + g_infoInsets[slot].height);
+            const MyGUI::UString caption(g_infoCaptions[slot]);
+            box->setCaption(caption);
+            g_infoMetrics[slot] = MeasureInfoText(box, g_infoRegions[slot], caption);
+            g_infoSizes[slot] = MyGUI::IntSize(g_infoMetrics[slot].ink.width, g_infoMetrics[slot].ink.height);
             g_infoLimits[slot] = -1;
         }
         if (!box->getVisible())
@@ -2160,10 +2217,10 @@ namespace
         if (g_debug && !g_infoFontReported)
         {
             char note[256];
-            sprintf_s(note, "BestMinimap info: font=%s height=%d, native text=%dx%d, skin inset=%dx%d",
+            sprintf_s(note, "BestMinimap info: font=%s height=%d, glyph+shadow=%dx%d, skin border=%dx%d",
                 box->getFontName().c_str(), box->getFontHeight(),
                 g_infoSizes[slot].width, g_infoSizes[slot].height,
-                g_infoInsets[slot].width, g_infoInsets[slot].height);
+                g_infoRegions[slot].width, g_infoRegions[slot].height);
             DebugLog(note);
             g_infoFontReported = true;
         }
@@ -2172,48 +2229,57 @@ namespace
     void FitInfoField(int slot, const BestMinimapInfo::FieldRect& rect)
     {
         MyGUI::TextBox* const box = g_infoTextRefs[slot].get()->castType<MyGUI::TextBox>(false);
-        const MyGUI::IntCoord want(rect.left, rect.top, rect.width, rect.height);
-        if (box->getCoord() != want)
-            box->setCoord(want);
-        if (g_infoLimits[slot] == rect.width)
-            return;
-        const int previousLimit = g_infoLimits[slot];
-        g_infoLimits[slot] = rect.width;
-        if (g_infoSizes[slot].width <= rect.width)
+        if (g_infoLimits[slot] != rect.width)
         {
-            // A formerly clipped field can now use its full caption again.
-            if (previousLimit != -1)
-                box->setCaption(MyGUI::UString(g_infoCaptions[slot]));
-            return;
-        }
-        const int limit = Hi(0, rect.width - g_infoInsets[slot].width);
-        // UString indexes UTF-32 code points, so a Cyrillic/Chinese character
-        // is never cut in the middle of its UTF-8 encoding. Native glyph widths
-        // decide the longest prefix; use ASCII dots supported by game fonts.
-        const MyGUI::UString full(g_infoCaptions[slot]);
-        MyGUI::UString fitted("...");
-        box->setCaption(fitted);
-        if (box->getTextSize().width > limit)
-        {
-            box->setCaption(MyGUI::UString(""));
-            return;
-        }
-        size_t low = 0, high = full.size();
-        while (low < high)
-        {
-            const size_t mid = (low + high + 1) / 2;
-            MyGUI::UString candidate = full.substr(0, mid);
-            candidate.append("...");
-            box->setCaption(candidate);
-            if (box->getTextSize().width <= limit)
+            const int previousLimit = g_infoLimits[slot];
+            g_infoLimits[slot] = rect.width;
+            if (g_infoSizes[slot].width <= rect.width)
             {
-                low = mid;
-                fitted = candidate;
+                if (previousLimit != -1)
+                {
+                    const MyGUI::UString full(g_infoCaptions[slot]);
+                    box->setCaption(full);
+                    g_infoMetrics[slot] = MeasureInfoText(box, g_infoRegions[slot], full);
+                }
             }
             else
-                high = mid - 1;
+            {
+                // UTF-32 prefixes never split Cyrillic/Chinese UTF-8 sequences.
+                const MyGUI::UString full(g_infoCaptions[slot]);
+                MyGUI::UString fitted("...");
+                box->setCaption(fitted);
+                BestMinimapInfo::TextMetrics metrics = MeasureInfoText(box, g_infoRegions[slot], fitted);
+                if (metrics.ink.width > rect.width)
+                    fitted = MyGUI::UString("");
+                else
+                {
+                    size_t low = 0, high = full.size();
+                    while (low < high)
+                    {
+                        const size_t mid = (low + high + 1) / 2;
+                        MyGUI::UString candidate = full.substr(0, mid);
+                        candidate.append("...");
+                        box->setCaption(candidate);
+                        metrics = MeasureInfoText(box, g_infoRegions[slot], candidate);
+                        if (metrics.ink.width <= rect.width)
+                        {
+                            low = mid;
+                            fitted = candidate;
+                        }
+                        else
+                            high = mid - 1;
+                    }
+                }
+                box->setCaption(fitted);
+                g_infoMetrics[slot] = MeasureInfoText(box, g_infoRegions[slot], fitted);
+            }
         }
-        box->setCaption(fitted);
+        const BestMinimapInfo::TextMetrics& metrics = g_infoMetrics[slot];
+        const MyGUI::IntCoord want(rect.left + (rect.width - metrics.ink.width) / 2 - metrics.ink.left,
+            rect.top + (rect.height - metrics.ink.height) / 2 - metrics.ink.top,
+            metrics.width, metrics.height);
+        if (box->getCoord() != want)
+            box->setCoord(want);
     }
 
     void UpdateInfo(const Ogre::Vector3& center, DWORD now)

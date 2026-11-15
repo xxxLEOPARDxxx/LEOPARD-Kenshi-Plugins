@@ -185,9 +185,12 @@ one root-owned thin game panel and at most four reusable inline fields; WidgetRe
 clears every reference on game-UI destruction. Text and background use the
 current interface skins, including their text colour. Root placement bounds
 include the strip, while map texture, world projection and click bounds keep
-their original dimensions. TextBox::getTextSize and the skin's text-region insets
-provide native field width and line height at FontFor(22); no estimated glyph
-widths or empty grid columns. Narrow fields are shortened by UTF-32 code point
+their original dimensions. TextBox::getTextSize supplies the nominal advance and line height at FontFor(22).
+GlyphInfo supplies the actual scaled glyph bounds, including bearings and the
+one-pixel shadow. Row layout centres these visible bounds, while each TextBox
+retains enough space for the full native line and any glyph overhang. Actual
+text-region origins and borders are respected even when asymmetric; no guessed
+glyph widths or empty grid columns. Narrow fields are shortened by UTF-32 code point
 with a natively measured ASCII-dot suffix. Row groups are centred; 12px margins
 clear the 9/10px vanilla and 7/7px Dark UI top/bottom corners. Panel mouse focus
 consumes clicks.
@@ -209,8 +212,20 @@ Numeric work is limited to four updates per second
 plus changes to settings/zoom; captions update only when their content changes.
 The clock is sampled at the next minute boundary, with no per-frame clock/INI
 polling or world traversal. Native world positions use ten units per metre.
-The owner accepted the in-game panel layout. Separate long-run FPS/memory
-measurements were not performed; native policy tests do not replace them.
+Local text correction (2026-11-16, release 4 local candidate): the strip now
+  centres visible letters and their shadow in both directions instead of the
+  nominal font line rectangle. Full glyph bearings/descenders are kept inside
+  the native text clipping region. The owner's 02:05 screenshot showed the
+  previous text sitting low; it did not accept the latest text placement.
+Локальная правка текста (16.11.2026, локальный кандидат выпуска 4): строка
+  центрирует видимые буквы вместе с тенью по горизонтали и вертикали, а не
+  номинальный прямоугольник шрифта. Нижние выносные элементы и смещения
+  глифов помещаются в область текста без обрезания. На скриншоте владельца
+  02:05 прежний текст расположен низко; новая раскладка в игре не проверена.
+The current text correction has offline geometry/lifecycle coverage; its game
+appearance remains unverified. No game run or capture was requested for this
+change. Separate long-run FPS/memory measurements were not performed; native
+policy tests do not replace them.
 
 
 Localization diagnostics / Журнал локализации (2026-11-01)

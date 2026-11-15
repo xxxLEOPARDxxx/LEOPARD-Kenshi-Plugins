@@ -19,6 +19,14 @@ namespace BestMinimapInfo
         int left, top, width, height;
     };
 
+    // Visible glyph+shadow bounds inside a larger, unclipped TextBox. The
+    // renderer aligns its nominal line; flow layout aligns this visible area.
+    struct TextMetrics
+    {
+        FieldRect ink;
+        int width, height;
+    };
+
     struct FlowLayout
     {
         FieldRect fields[4];

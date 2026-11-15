@@ -23,7 +23,7 @@ $begin=$source.IndexOf('        const int oldArrowSize =')
 $end=$source.IndexOf('        g_cameraLineWidth =', $begin)
 if($begin -lt 0 -or $end -lt $begin){throw 'Production arrow settings boundary missing'}
 [IO.File]::WriteAllText("$out/camera_arrow_settings_under_test.h",$source.Substring($begin,$end-$begin))
-$begin=$source.IndexOf('    void InfoRow(')
+$begin=$source.IndexOf('    BestMinimapInfo::TextMetrics MeasureInfoText(')
 $end=$source.IndexOf('    void PlaceLabel(', $begin)
 if($begin -lt 0 -or $end -lt $begin){throw 'Production info widget boundary missing'}
 [IO.File]::WriteAllText("$out/info_widget_runtime_under_test.h",$source.Substring($begin,$end-$begin))
