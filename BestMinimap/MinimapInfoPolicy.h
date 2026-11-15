@@ -96,7 +96,10 @@ namespace BestMinimapInfo
             // The fixed corners of the vanilla thin panel need 98 pixels.
             if (layout.width < 100)
                 layout.width = 100;
-            layout.panelTop = layout.height + 3;
+            // Both thin skins have a transparent first row; Dark UI's map
+            // frame also has a transparent last row. Overlap those margins
+            // so the visible borders touch, keeping the text padding intact.
+            layout.panelTop = layout.height - (pad > 0 ? 2 : 1);
             layout.height = layout.panelTop + layout.panelHeight;
         }
         return layout;

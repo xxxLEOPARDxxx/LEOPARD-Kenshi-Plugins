@@ -191,6 +191,12 @@ widths or empty grid columns. Narrow fields are shortened by UTF-32 code point
 with a natively measured ASCII-dot suffix. Row groups are centred; 12px margins
 clear the 9/10px vanilla and 7/7px Dark UI top/bottom corners. Panel mouse focus
 consumes clicks.
+Local correction (2026-11-16): the strip frame touches the minimap frame,
+including the transparent edge rows in vanilla and Dark UI skins. The text's
+centred rows, 12px padding and measured wrapping are unchanged.
+Локальная правка (16.11.2026): рамка информационной панели примыкает к миникарте
+без зазора, с учётом прозрачных краёв ванильного скина и Dark UI. Центрирование,
+отступы текста 12 пикселей и перенос по реальной ширине сохранены.
 Numeric work is limited to four updates per second
 plus changes to settings/zoom; captions update only when their content changes.
 The clock is sampled at the next minute boundary, with no per-frame clock/INI

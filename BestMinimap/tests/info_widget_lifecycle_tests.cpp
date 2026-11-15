@@ -105,7 +105,7 @@ int main(){int failures=0,checks=0;
     g_infoFields=15;UpdateInfo(Ogre::Vector3(150,0,-150),1001);
     C(createdWidgets==6 && liveWidgets==6);C(root->children.size()==1);
     C(g_infoBackRef.get()->mouseFocus);C(requestedFont==22);
-    C(g_infoBackRef.get()->getCoord().top==83);C(g_infoHeight<=88);
+    C(g_infoBackRef.get()->getCoord().top==79);C(g_infoHeight<=88);
     C(g_infoCaptions[0]=="Zoom:100%");C(g_infoCaptions[1]=="PC time:23:59");
     C(g_infoCaptions[2]=="X:15 Z:-15");C(g_infoCaptions[3]=="Dir:090");
     C(clockReads==1 && cameraReads==1);

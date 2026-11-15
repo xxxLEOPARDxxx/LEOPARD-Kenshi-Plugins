@@ -19,9 +19,9 @@ int main()
     Layout layout = Plan(0, 80, 80, 0);
     C(layout.width == 80 && layout.height == 80 && layout.panelHeight == 0);
     layout = Plan(30, 80, 80, 0);
-    C(layout.width == 100 && layout.height == 113 && layout.panelTop == 83 && layout.panelHeight == 30);
+    C(layout.width == 100 && layout.height == 109 && layout.panelTop == 79 && layout.panelHeight == 30);
     layout = Plan(53, 320, 200, 8);
-    C(layout.width == 336 && layout.height == 272 && layout.panelTop == 219 && layout.panelHeight == 53);
+    C(layout.width == 336 && layout.height == 267 && layout.panelTop == 214 && layout.panelHeight == 53);
 
     C(ZoomPercent(2000) == 100);
     C(ZoomPercent(1000) == 200);
