@@ -2692,8 +2692,8 @@ namespace
 
     // Метки большой карты по поселению (по ссылке игры, а если её не
     // вышло получить - по подписи метки).
-    std::map<TownBase*, MapScreen::MapMarkerTown*> g_markerByTown;
-    std::map<std::string, MapScreen::MapMarkerTown*> g_markerByName;
+    std::map<TownBase*, MyGUI::ImageBox*> g_markerByTown;
+    std::map<std::string, MyGUI::ImageBox*> g_markerByName;
 
     // Метки (и значки) большая карта строит при первом открытии. Не
     // открывали - просим её построить их сами, один раз на карту:
@@ -2705,6 +2705,48 @@ namespace
     MapScreen* g_markersBuiltFor = NULL;
     size_t g_markersIndexed = 0;        // сколько меток было при последнем разборе
     DWORD g_markersIndexedAt = 0;
+    MapScreen* g_markersIndexedFor = NULL;
+
+    // GUI-thread only. Native marker records may be replaced independently of
+    // their widgets, so caches keep only images and observe their destruction.
+    // Like WidgetRef, this single unlinker lives until process shutdown.
+    class TownMarkerLifetime : public MyGUI::IUnlinkWidget
+    {
+        std::set<MyGUI::Widget*> m_images;
+        bool m_registered;
+    public:
+        TownMarkerLifetime() : m_registered(false) {}
+        void clear()
+        {
+            g_markerByTown.clear();
+            g_markerByName.clear();
+            m_images.clear();
+            g_markersIndexed = 0;
+            g_markersIndexedAt = 0;
+            g_markersIndexedFor = NULL;
+        }
+        bool begin()
+        {
+            clear();
+            if (!m_registered)
+            {
+                MyGUI::WidgetManager* const manager = MyGUI::WidgetManager::getInstancePtr();
+                if (manager == NULL)
+                    return false;
+                manager->registerUnlinker(this);
+                m_registered = true;
+            }
+            return true;
+        }
+        void observe(MyGUI::ImageBox* image) { m_images.insert(image); }
+        virtual void _unlinkWidget(MyGUI::Widget* widget)
+        {
+            if (m_images.find(widget) != m_images.end())
+                clear();
+        }
+    };
+    TownMarkerLifetime g_townMarkerLifetime;
+
 
     // Разбор меток карты - когда их число сменилось, и не чаще раза в 10 с
     // без этого: раньше - каждую секунду, с копией подписи каждой метки.
@@ -2712,9 +2754,7 @@ namespace
     {
         if (map == NULL || !g_townGameIcons)
         {
-            g_markerByTown.clear();
-            g_markerByName.clear();
-            g_markersIndexed = 0;
+            g_townMarkerLifetime.clear();
             return;
         }
         if (map->mapMarkersTowns.empty() && g_markersBuiltFor != map)
@@ -2726,13 +2766,14 @@ namespace
                       static_cast<unsigned>(map->mapMarkersTowns.size()));
             DebugLog(note);
         }
-        if (map->mapMarkersTowns.size() == g_markersIndexed && now - g_markersIndexedAt < 10000 &&
+        if (map == g_markersIndexedFor && map->mapMarkersTowns.size() == g_markersIndexed && now - g_markersIndexedAt < 10000 &&
             g_markersIndexedAt != 0)
             return;
+        if (!g_townMarkerLifetime.begin())
+            return; // Never cache widgets without destruction notifications.
+        g_markersIndexedFor = map;
         g_markersIndexed = map->mapMarkersTowns.size();
         g_markersIndexedAt = now;
-        g_markerByTown.clear();
-        g_markerByName.clear();
         typedef ogre_unordered_map<hand, MapScreen::MapMarkerTown*>::type Towns;
         const Towns& towns = map->mapMarkersTowns;
         for (Towns::const_iterator it = towns.begin(); it != towns.end(); ++it)
@@ -2740,13 +2781,16 @@ namespace
             MapScreen::MapMarkerTown* const m = it->second;
             if (m == NULL || m->image == NULL)
                 continue;
+            // Track before either map insertion: allocation failure cannot
+            // leave an admitted image without a destruction notification.
+            g_townMarkerLifetime.observe(m->image);
             TownBase* t = it->first.getTown();
             if (t == NULL)
                 t = m->handle.getTown();
             if (t != NULL)
-                g_markerByTown[t] = m;
+                g_markerByTown[t] = m->image;
             if (m->label != NULL)
-                g_markerByName[m->label->getCaption().asUTF8()] = m;
+                g_markerByName[m->label->getCaption().asUTF8()] = m->image;
         }
     }
 
@@ -2795,17 +2839,17 @@ namespace
         if (g_townGameIcons && !st.iconTried && !g_markerByTown.empty())
         {
             st.iconTried = true;
-            std::map<TownBase*, MapScreen::MapMarkerTown*>::const_iterator m = g_markerByTown.find(t);
-            MapScreen::MapMarkerTown* marker = m != g_markerByTown.end() ? m->second : NULL;
+            std::map<TownBase*, MyGUI::ImageBox*>::const_iterator m = g_markerByTown.find(t);
+            MyGUI::ImageBox* marker = m != g_markerByTown.end() ? m->second : NULL;
             if (marker == NULL)
             {
-                std::map<std::string, MapScreen::MapMarkerTown*>::const_iterator n = g_markerByName.find(info.name);
+                std::map<std::string, MyGUI::ImageBox*>::const_iterator n = g_markerByName.find(info.name);
                 marker = n != g_markerByName.end() ? n->second : NULL;
             }
             std::string texture;
             MyGUI::IntCoord coord;
             int texW = 0, texH = 0;
-            if (marker != NULL && IconOf(marker->image, texture, coord, texW, texH))
+            if (marker != NULL && IconOf(marker, texture, coord, texW, texH))
                 st.icon = IconFor(texture, coord, texW, texH, MyGUI::Colour::White, g_townIconSize);
         }
         info.icon = g_townGameIcons ? st.icon : NULL;
@@ -3949,11 +3993,8 @@ namespace
             g_alertNames.clear();
             g_towns.clear();
             g_townStatic.clear();
-            g_markerByTown.clear();
-            g_markerByName.clear();
+            g_townMarkerLifetime.clear();
             g_markersBuiltFor = NULL;
-            g_markersIndexed = 0;
-            g_markersIndexedAt = 0;
             g_townsAt = 0;
             g_mapPinsFile.clear();
         }

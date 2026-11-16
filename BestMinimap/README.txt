@@ -1,4 +1,4 @@
-BEST MINIMAP (QoL)
+﻿BEST MINIMAP (QoL)
 
 Миникарта в углу экрана. Требуется RE_Kenshi.
 
@@ -259,3 +259,17 @@ English
 - Добавлена необязательная компактная панель под миникартой: масштаб, координаты X/Z, направление камеры и время ПК.
 - Каждое поле включается отдельно в MCM. Все поля по умолчанию выключены; когда они отключены, панели нет.
 - Текст центрируется с отступами и переносится на узкой миникарте. Щелчки по панели не отдают приказы персонажам.
+
+
+LOCAL STABILITY FIX AFTER VERSION 4 / ЛОКАЛЬНОЕ ИСПРАВЛЕНИЕ ПОСЛЕ ВЕРСИИ 4
+
+- Town icon lookup no longer retains native marker records between updates.
+  Cached icon widgets are forgotten when MyGUI destroys them; rebuilding the
+  big map with an unchanged marker count cannot reuse these deleted widgets.
+- Поиск значков поселений больше не хранит объекты меток игры между обновлениями.
+  При удалении значков MyGUI ссылки сбрасываются. Перестроение большой карты с
+  прежним количеством меток больше не позволяет использовать удалённые виджеты.
+- Offline regression and UI checks passed. No controlled gameplay verification
+  of the reported crash, performance measurement or new release was performed.
+- Проверки логики и интерфейса вне игры пройдены. Повторного игрового прогона
+  этого краша и замеров производительности не было; новый выпуск не публиковался.
