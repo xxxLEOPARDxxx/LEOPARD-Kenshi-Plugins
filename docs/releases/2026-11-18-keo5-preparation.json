@@ -1,0 +1,40 @@
+{
+  "mod": "KEO",
+  "version": "5",
+  "status": "prepared, not installed, not published",
+  "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KEO-5.zip",
+  "archive_sha256": "14fd3c4caf19bbc5d35964fe6841f0bd5928086240f887ccfbcda71a242be05f",
+  "archive_bytes": 969560,
+  "files": [
+    "KEO/KEO.defaults.ini",
+    "KEO/KEO.dll",
+    "KEO/KEO.mod",
+    "KEO/LICENSE",
+    "KEO/README.md",
+    "KEO/RE_Kenshi.json",
+    "KEO/locale/en_GB/LC_MESSAGES/keo.mo",
+    "KEO/locale/ru_RU/LC_MESSAGES/keo.mo",
+    "KEO/locale/zh_CN/LC_MESSAGES/keo.mo"
+  ],
+  "dll_sha256": "94a9593f34bfaafcebbb8e337a3d932076766ef7b9f93828d4e860e0b9e261c0",
+  "code_commit": "0d4decc",
+  "change_date_msk": "2026-11-18",
+  "packaging_date_msk": "2026-11-18",
+  "changes": {
+    "en": [
+      "Fixed custom-job initialization when KenshiLua scripts, including Animal Husbandry, already use the shared context menu. This could disable Waypoint route, Gather output and Stock shop counter.",
+      "Existing job rows and personal settings are preserved. No save import or relocation between Workshop and local mods is required."
+    ],
+    "ru": [
+      "Исправлена инициализация работ KEO, когда скрипты KenshiLua, в том числе Animal Husbandry, уже используют общее контекстное меню. Из-за этого могли отключаться маршрут по точкам, сбор продукции и пополнение прилавка.",
+      "Назначенные работы и личные настройки сохраняются. Импорт сохранения и перенос модов между Workshop и локальной папкой mods не требуются."
+    ]
+  },
+  "description_bytes": {
+    "en": 5565,
+    "ru": 7864
+  },
+  "verification": "CRC and exact9-file payload;3 unchanged157-key MO locales; bilingual descriptions/history; protected installation/settings/publication ledger and other archives unchanged; DEV/PROD builds and183 SDK imports; independent code review;148 admission checks Od/O2;206 factory and321 runtime controls Od/O2",
+  "limits": "Conflict reproduced offline from source-proven hook timing; no new player diagnostic runs or gameplay test; GOG uses frozen contract snapshot.",
+  "publication": "Await owner Nexus publication; Steam not submitted; no personal published-changelog entry."
+}

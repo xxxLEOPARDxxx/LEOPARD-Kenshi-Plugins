@@ -526,21 +526,15 @@
     ]
   },
   "KEO": {
-    "version": "4",
-    "published_version": "3",
+    "version": "5",
+    "published_version": "4",
     "en": [
-      "Added optional automatic Ctrl+Shift+F11-style building repair and full exterior/interior navmesh generation once per visited zone after each save load.",
-      "Uses the existing KEO background generation, waits for idle loading, physics and navigation, excludes speculative preloads and spaces requests.",
-      "The live setting is named Pathing repairs itself, following the KenshiQOL feature description, and is off by default.",
-      "Added English, Russian and Simplified Chinese help and optional detailed operation timings. Personal settings are preserved.",
-      "Corrected the package loader manifest so it no longer requests a compatibility DLL absent from the package."
+      "Fixed custom-job initialization when KenshiLua scripts, including Animal Husbandry, already use the shared context menu. This could disable Waypoint route, Gather output and Stock shop counter.",
+      "Existing job rows and personal settings are preserved. No save import or relocation between Workshop and local mods is required."
     ],
     "ru": [
-      "Добавлены необязательный автоматический ремонт построек по Ctrl+Shift+F11 и полная генерация внешней/внутренней навсетки один раз для каждой посещённой зоны после загрузки сохранения.",
-      "Используются фоновые потоки KEO; при занятой загрузке мира, физике или навигации новая заявка ждёт. Фоновые предзагрузки исключены, между заявками есть пауза.",
-      "Настройка «Автовосстановление путей» (Pathing repairs itself, название из описания KenshiQOL) переключается без перезапуска и по умолчанию выключена.",
-      "Добавлены подсказки на русском, английском и китайском и необязательные подробные замеры отдельных операций. Личные настройки сохраняются.",
-      "Исправлен манифест загрузки: убрана ссылка на DLL совместимости, отсутствующую в пакете."
+      "Исправлена инициализация работ KEO, когда скрипты KenshiLua, в том числе Animal Husbandry, уже используют общее контекстное меню. Из-за этого могли отключаться маршрут по точкам, сбор продукции и пополнение прилавка.",
+      "Назначенные работы и личные настройки сохраняются. Импорт сохранения и перенос модов между Workshop и локальной папкой mods не требуются."
     ]
   }
 }

@@ -1785,7 +1785,7 @@
       "en": "Original source code is available in the linked repository.",
       "ru": "Исходный код оригинала доступен в указанном репозитории."
     },
-    "version": "4",
+    "version": "5",
     "changes": {
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
@@ -1889,6 +1889,16 @@
           "Настройка «Автовосстановление путей» (Pathing repairs itself, название из описания KenshiQOL) переключается без перезапуска и по умолчанию выключена.",
           "Добавлены подсказки на русском, английском и китайском и необязательные подробные замеры отдельных операций. Личные настройки сохраняются.",
           "Исправлен манифест загрузки: убрана ссылка на DLL совместимости, отсутствующую в пакете."
+        ]
+      },
+      "5": {
+        "en": [
+          "Fixed custom-job initialization when KenshiLua scripts, including Animal Husbandry, already use the shared context menu. This could disable Waypoint route, Gather output and Stock shop counter.",
+          "Existing job rows and personal settings are preserved. No save import or relocation between Workshop and local mods is required."
+        ],
+        "ru": [
+          "Исправлена инициализация работ KEO, когда скрипты KenshiLua, в том числе Animal Husbandry, уже используют общее контекстное меню. Из-за этого могли отключаться маршрут по точкам, сбор продукции и пополнение прилавка.",
+          "Назначенные работы и личные настройки сохраняются. Импорт сохранения и перенос модов между Workshop и локальной папкой mods не требуются."
         ]
       }
     }
