@@ -1,0 +1,27 @@
+{
+  "status": "prepared, installed locally, not published",
+  "mod": "KEO",
+  "version": "4",
+  "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KEO-4.zip",
+  "archive_sha256": "11c0249c080979afa49667f086ba16e2f1b8d945d0f5946bb998d17707dea358",
+  "archive_bytes": 969139,
+  "files": [
+    "KEO/KEO.dll",
+    "KEO/KEO.mod",
+    "KEO/LICENSE",
+    "KEO/README.md",
+    "KEO/RE_Kenshi.json",
+    "KEO/locale/en_GB/LC_MESSAGES/keo.mo",
+    "KEO/locale/ru_RU/LC_MESSAGES/keo.mo",
+    "KEO/locale/zh_CN/LC_MESSAGES/keo.mo",
+    "KEO/KEO.defaults.ini"
+  ],
+  "dll_sha256": "137bd0a9398f1eadfea261d84ea58ba1deeac3f1fde6f63abe28259fe94375d0",
+  "kenshilib_imports": 183,
+  "description_bytes": {
+    "en": 5469,
+    "ru": 7828
+  },
+  "game_performance": "not measured; UI check stopped by user; scheduling-only fake-boundary benchmark is separate",
+  "published_registry_version": "3"
+}

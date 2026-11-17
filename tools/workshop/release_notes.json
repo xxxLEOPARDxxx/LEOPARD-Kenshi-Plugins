@@ -526,25 +526,21 @@
     ]
   },
   "KEO": {
-    "version": "3",
-    "published_version": "2",
+    "version": "4",
+    "published_version": "3",
     "en": [
-      "Added optional resource preparation in RAM, startup warmup and advance preparation of nearby terrain. Reusing warmed resources reduces loading interruptions when revisiting areas.",
-      "Added bounded retention of loaded model geometry and textures in video memory, with configurable limits.",
-      "Accelerated startup before the main menu and startup resource preparation.",
-      "Reduced CPU work when loading saves and preparing NPC skeletons, models, body shapes, equipment and bone data.",
-      "Warmup text shows current progress and disappears when preparation finishes; it reappears for new queued work.",
-      "Reduced redundant resource bookkeeping and corrected resource lifetime, cancellation and compatibility fallback handling.",
-      "Updated Rotate Items compatibility for counter stocking. Unavailable stocking no longer disables production collection or waypoint routes."
+      "Added optional automatic Ctrl+Shift+F11-style building repair and full exterior/interior navmesh generation once per visited zone after each save load.",
+      "Uses the existing KEO background generation, waits for idle loading, physics and navigation, excludes speculative preloads and spaces requests.",
+      "The live setting is named Pathing repairs itself, following the KenshiQOL feature description, and is off by default.",
+      "Added English, Russian and Simplified Chinese help and optional detailed operation timings. Personal settings are preserved.",
+      "Corrected the package loader manifest so it no longer requests a compatibility DLL absent from the package."
     ],
     "ru": [
-      "Добавлены необязательная подготовка ресурсов в ОЗУ, стартовый прогрев и предварительная подготовка соседнего рельефа. Повторное использование прогретых ресурсов уменьшает задержки при возвращении в уже посещённые области.",
-      "Добавлено удержание загруженной геометрии моделей и текстур в видеопамяти с настраиваемыми пределами.",
-      "Ускорены запуск до главного меню и стартовая подготовка ресурсов.",
-      "Уменьшена работа CPU при загрузке сейвов и подготовке скелетов, моделей, форм тела, снаряжения и данных костей NPC.",
-      "Текст прогрева показывает текущий прогресс и исчезает после подготовки; при новых запросах появляется снова.",
-      "Убрана лишняя обработка ресурсов, исправлены их освобождение, отмена загрузки и переход к штатной обработке при несовместимости.",
-      "Обновлена совместимость пополнения прилавка с Rotate Items. Недоступность пополнения больше не отключает сбор продукции и маршруты по точкам."
+      "Добавлены необязательный автоматический ремонт построек по Ctrl+Shift+F11 и полная генерация внешней/внутренней навсетки один раз для каждой посещённой зоны после загрузки сохранения.",
+      "Используются фоновые потоки KEO; при занятой загрузке мира, физике или навигации новая заявка ждёт. Фоновые предзагрузки исключены, между заявками есть пауза.",
+      "Настройка «Автовосстановление путей» (Pathing repairs itself, название из описания KenshiQOL) переключается без перезапуска и по умолчанию выключена.",
+      "Добавлены подсказки на русском, английском и китайском и необязательные подробные замеры отдельных операций. Личные настройки сохраняются.",
+      "Исправлен манифест загрузки: убрана ссылка на DLL совместимости, отсутствующую в пакете."
     ]
   }
 }
