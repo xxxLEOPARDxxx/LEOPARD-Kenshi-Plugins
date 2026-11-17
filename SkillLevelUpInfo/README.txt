@@ -65,9 +65,10 @@ here if a second XP display is unwanted. A UI overhaul replacing the character
 panel needs visual verification. XP_Overhaul should load before SkillLevelUpInfo.
 This plugin observes resulting base skill gains without changing XP formulas.
 
-All original skill enums are covered: 34 distinct supported base fields on
-Steam 1.0.65, including hidden MassCombat. HiveMedic/Vet alias Medic; the unused
-Survival dummy is excluded. Equipment, injury and age modifiers are excluded.
+33 distinct supported base skill fields are tracked on Steam 1.0.65.
+The unused Mass combat skill is excluded from notifications and recent-training
+bars. HiveMedic/Vet alias Medic; the Survival dummy is excluded.
+Equipment, injury and age modifiers are excluded.
 Both polling and the XP hook read the same raw skill field. A native stat
 reference index filters unrelated increaseStat events before formatting or
 allocating. Worker hooks update only scalar accumulators. Native Character,
@@ -136,9 +137,10 @@ SelectedOnly ограничивает надписи; исходные знач�
 визуальной проверки. XP_Overhaul должен грузиться раньше SkillLevelUpInfo.
 Расчёт опыта не подменяется, наблюдаются полученные базовые значения.
 
-Полный набор оригинальных навыков: 34 различных базовых поля Steam 1.0.65,
-включая скрытый MassCombat. HiveMedic/Vet используют поле медицины, пустышка
-Survival исключается. Экипировка, ранения и возраст не влияют на расчёт опыта.
+Отслеживаются 33 различных базовых поля навыков Steam 1.0.65.
+Неиспользуемый навык Mass combat исключён из уведомлений и полос недавних
+тренировок. HiveMedic/Vet используют поле медицины, пустышка Survival исключается.
+Экипировка, ранения и возраст не влияют на расчёт опыта.
 Опрос и перехват прибавок читают одно базовое поле навыка. Индекс полей
 своих героев отсекает чужие increaseStat до текста и выделения памяти.
 Рабочие потоки меняют только накопители. Character/MyGUI/Ogre используются
@@ -325,3 +327,10 @@ English
 
 - Level-up messages use actual increases in the underlying skill. Temporary changes to effective skill, including penalties from overloaded animals, no longer trigger false notices.
 - Localised the Mass Combat skill name in Russian.
+
+Local correction / Локальная правка (2026-11-17; no new release / без нового выпуска)
+
+- Exclude the unused Mass combat skill from XP/level notifications and
+  recent-training bars; other skills and native XP calculations are unchanged.
+- Неиспользуемый Mass combat исключён из сообщений об опыте/уровнях и полос
+  недавних тренировок; остальные навыки и расчёт опыта игры не изменены.

@@ -250,6 +250,9 @@ namespace
                 Snapshot& state=g_seen[h];state.live=true;
                 for(size_t j=0;j<kCount;++j)
                 {
+                    // Unused by the game: exclude it from notifications and recent-training bars.
+                    // Retain its table slot to keep the diagnostic Snapshot layout stable.
+                    if(kStats[j]==STAT_MASSCOMBAT)continue;
                     float* ref=&stats->getStatRef(kStats[j]);
                     const ULONG_PTR address=reinterpret_cast<ULONG_PTR>(ref);
                     const ULONG_PTR base=reinterpret_cast<ULONG_PTR>(stats);
