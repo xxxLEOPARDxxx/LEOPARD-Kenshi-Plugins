@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-17",
+  "date": "2026-11-18",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -220,11 +220,11 @@
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "4",
-      "archive_sha256": "11c0249c080979afa49667f086ba16e2f1b8d945d0f5946bb998d17707dea358",
-      "dll_sha256": "137bd0a9398f1eadfea261d84ea58ba1deeac3f1fde6f63abe28259fe94375d0",
-      "published_msk": "2026-11-17T21:25:36.049374+03:00",
-      "bilingual_change_note_sha256": "c266b2b0c12957cd20bd0c496b05c28f304c226a135e2d54ec7fb2326de0b1ea"
+      "version": "5",
+      "archive_sha256": "5461d23d4d4cca8bc7ae30d7a65aac4bca5bec03117c3a0f3d98d3126e4ec9a1",
+      "dll_sha256": "94a9593f34bfaafcebbb8e337a3d932076766ef7b9f93828d4e860e0b9e261c0",
+      "published_msk": "2026-11-18T00:40:25.451642+03:00",
+      "bilingual_change_note_sha256": "176260f7841e114c60df712a8016ddde1e63efe88c240f29a0538b0b2f4411a3"
     }
   }
 }
