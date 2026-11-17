@@ -3,8 +3,8 @@
   "version": "5",
   "status": "prepared, not installed, not published",
   "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KEO-5.zip",
-  "archive_sha256": "14fd3c4caf19bbc5d35964fe6841f0bd5928086240f887ccfbcda71a242be05f",
-  "archive_bytes": 969560,
+  "archive_sha256": "5461d23d4d4cca8bc7ae30d7a65aac4bca5bec03117c3a0f3d98d3126e4ec9a1",
+  "archive_bytes": 969559,
   "files": [
     "KEO/KEO.defaults.ini",
     "KEO/KEO.dll",

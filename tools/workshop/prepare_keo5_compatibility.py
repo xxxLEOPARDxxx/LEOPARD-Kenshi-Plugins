@@ -64,7 +64,7 @@ if heading in text:
 if '## Release 5 / Выпуск 5' not in text:
  text+='\n## Release 5 / Выпуск 5\n\n'
  for lang,title in [('en','English'),('ru','Русский')]:text+='### '+title+'\n\n'+''.join('- '+line+'\n' for line in note[lang])+'\n'
-readme.write_text(text,encoding='utf-8')
+readme.write_text(text.rstrip()+'\n',encoding='utf-8')
 
 candidate=STAGE/'inputs/KEO';candidate.mkdir(parents=True,exist_ok=True)
 binary=ROOT/'build/KEO_step4_prod/KEO.dll'
