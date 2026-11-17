@@ -35,8 +35,6 @@
   * Необязательную панель под картой: масштаб в процентах, координаты
     центра X/Z в метрах, курс камеры и местное время компьютера. Каждое
     поле включается отдельно в MCM; все выключены - панель скрыта.
-  * Тонкую линию вокруг ваших персонажей: докуда можно отвести камеру.
-    Предел плагин узнаёт сам - один раз отведите камеру до упора.
 
 Цвета точек по умолчанию - «auto»: тот же цвет, которым игра отмечает
 персонажа на большой карте. Каждой категории можно задать свой.
@@ -151,7 +149,7 @@ InfoHeading - курс камеры от севера карты (000-359), Info
 На узкой панели длинное поле сокращается с точками. Щелчки по панели не
 отправляют персонажей и не переносят камеру.
 
-Prepared update 2 / Подготовленный выпуск 2
+Update 2 / Выпуск 2
 EN: Added independent camera arrow size and adjustable, clearer boundary width.
 Auto range uses the verified game limit instead of a persisted maximum observed
 distance. Range checks include the complete player-character list used by the
@@ -180,8 +178,9 @@ Legacy CameraArrowSize=0 is migrated once to the actual previous pixel size,
 so the displayed value can be reduced. Russian in-game text uses ASCII hyphens;
 typographic dashes are unsupported by the game font.
 
-Information-strip implementation (release 4):
-one root-owned thin game panel and at most four reusable inline fields; WidgetRef
+Information-strip implementation (release 5):
+one root-owned strip with at most four reusable inline fields; the rectangular
+game-framed map shares its outer background/frame with that strip; WidgetRef
 clears every reference on game-UI destruction. Text and background use the
 current interface skins, including their text colour. Root placement bounds
 include the strip, while map texture, world projection and click bounds keep
@@ -212,12 +211,12 @@ Numeric work is limited to four updates per second
 plus changes to settings/zoom; captions update only when their content changes.
 The clock is sampled at the next minute boundary, with no per-frame clock/INI
 polling or world traversal. Native world positions use ten units per metre.
-Local text correction (2026-11-16, release 4 local candidate): the strip now
+Local text correction (2026-11-16, release 5): the strip now
   centres visible letters and their shadow in both directions instead of the
   nominal font line rectangle. Full glyph bearings/descenders are kept inside
   the native text clipping region. The owner's 02:05 screenshot showed the
   previous text sitting low; it did not accept the latest text placement.
-Локальная правка текста (16.11.2026, локальный кандидат выпуска 4): строка
+Локальная правка текста (16.11.2026, выпуск 5): строка
   центрирует видимые буквы вместе с тенью по горизонтали и вертикали, а не
   номинальный прямоугольник шрифта. Нижние выносные элементы и смещения
   глифов помещаются в область текста без обрезания. На скриншоте владельца
@@ -273,3 +272,18 @@ LOCAL STABILITY FIX AFTER VERSION 4 / ЛОКАЛЬНОЕ ИСПРАВЛЕНИЕ 
   of the reported crash, performance measurement or new release was performed.
 - Проверки логики и интерфейса вне игры пройдены. Повторного игрового прогона
   этого краша и замеров производительности не было; новый выпуск не публиковался.
+
+
+## Release 5 / Выпуск 5
+
+English
+
+- Joined the rectangular minimap and information strip in one game-style frame, removing the gap between them.
+- Centred the visible text and its shadow horizontally and vertically, with room for descenders and skin-specific margins.
+- Fixed stale town-icon references when the game replaces or destroys map widgets, including during long trips. The rendering worker is preserved.
+
+Русский
+
+- Прямоугольная миникарта и информационная строка объединены общей игровой рамкой без зазора.
+- Видимый текст вместе с тенью центрируется по горизонтали и вертикали; нижние элементы букв и отступы скина помещаются целиком.
+- Исправлены устаревшие ссылки на значки городов при замене или удалении виджетов карты, в том числе на дальних переходах. Рабочий поток отрисовки сохранён.

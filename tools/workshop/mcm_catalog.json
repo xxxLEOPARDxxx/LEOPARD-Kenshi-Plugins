@@ -56,7 +56,7 @@
     "source_export": [
       {
         "path": "D:\\DEV\\Kenshi\\ours\\BestMinimap\\BestMinimap.cpp",
-        "line": 3619,
+        "line": 4007,
         "method": "direct"
       }
     ],
@@ -263,11 +263,12 @@
     "source_export": [
       {
         "path": "D:\\DEV\\Kenshi\\ours\\SkillLevelUpInfo\\SkillLevelUpInfo.cpp",
-        "line": 461,
+        "line": 596,
         "method": "direct"
       }
     ],
-    "dll_export_verified": true
+    "dll_export_verified": true,
+    "published_version": "4"
   },
   {
     "package": "StatColours",
@@ -748,10 +749,10 @@
     "group": "other_fork",
     "status": "canonical_supported",
     "author": "Jakematt2004 (jacobericson)",
-    "source": "D:/DEV/Kenshi/forks/KEO",
+    "source": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KEO",
     "source_export": [
       {
-        "path": "D:\\DEV\\Kenshi\\forks\\KEO\\src\\gui\\mcm_bridge.cpp",
+        "path": "D:\\DEV\\Kenshi\\forks\\LEOPARD-Kenshi-Forks\\KEO\\src\\gui\\mcm_bridge.cpp",
         "line": 128,
         "method": "direct"
       }
@@ -760,8 +761,8 @@
     "public": true,
     "release_authorized": true,
     "nexus_url": "https://www.nexusmods.com/kenshi/mods/2271",
-    "nexus_published_version": "1",
-    "published_version": "1",
+    "nexus_published_version": "2",
+    "published_version": "2",
     "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834042449"
   }
 ]

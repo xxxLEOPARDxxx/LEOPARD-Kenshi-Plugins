@@ -1785,21 +1785,23 @@
       "en": "Original source code is available in the linked repository.",
       "ru": "Исходный код оригинала доступен в указанном репозитории."
     },
-    "version": "2",
+    "version": "3",
     "changes": {
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
         "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
         "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
         "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
-        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling."
+        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling.",
+        "Optional RAM/VRAM resource preparation and faster startup, save and NPC loading."
       ],
       "ru": [
         "Необязательная страница MCM; без неё остаётся исходная вкладка KEO.",
         "Русский, английский и китайский интерфейс, английский для остальных языков и подробный журнал, выключенный по умолчанию.",
         "Steam/GOG в одном пакете. GOG работает, но широкое игровое тестирование ещё не завершено.",
         "Полезные функции KenshiQOL автора Steel объединены с KEO: переносимый вес, сбор продукции, пополнение прилавка и циклические маршруты.",
-        "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах."
+        "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах.",
+        "Необязательная подготовка ресурсов в ОЗУ/VRAM и ускорение запуска, загрузки сейвов и NPC."
       ]
     },
     "player_changes": {
@@ -1808,14 +1810,16 @@
         "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
         "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
         "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
-        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling."
+        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling.",
+        "Optional RAM/VRAM resource preparation and faster startup, save and NPC loading."
       ],
       "ru": [
         "Необязательная страница MCM; без неё остаётся исходная вкладка KEO.",
         "Русский, английский и китайский интерфейс, английский для остальных языков и подробный журнал, выключенный по умолчанию.",
         "Steam/GOG в одном пакете. GOG работает, но широкое игровое тестирование ещё не завершено.",
         "Полезные функции KenshiQOL автора Steel объединены с KEO: переносимый вес, сбор продукции, пополнение прилавка и циклические маршруты.",
-        "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах."
+        "Правки старого управления маршрутом, проверки актуальности точек и обработки готовности пути в городах.",
+        "Необязательная подготовка ресурсов в ОЗУ/VRAM и ускорение запуска, загрузки сейвов и NPC."
       ]
     },
     "history": {
@@ -1845,6 +1849,26 @@
           "Для операторов поддерживаемых станков можно настроить предел по весу и долю занятых ячеек инвентаря и рюкзака с шагом 5%. Доставка начинается по первому достигнутому пределу.",
           "ПКМ по галочке рюкзака открывает личный лимит ячеек и позволяет вернуться к общему. Зелёная галочка показывает, что задан личный лимит.",
           "При установленном MCM настройки доступны на странице KEO в MCM. Отдельная вкладка доступна без MCM."
+        ]
+      },
+      "3": {
+        "en": [
+          "Added optional resource preparation in RAM, startup warmup and advance preparation of nearby terrain. Reusing warmed resources reduces loading interruptions when revisiting areas.",
+          "Added bounded retention of loaded model geometry and textures in video memory, with configurable limits.",
+          "Accelerated startup before the main menu and startup resource preparation.",
+          "Reduced CPU work when loading saves and preparing NPC skeletons, models, body shapes, equipment and bone data.",
+          "Warmup text shows current progress and disappears when preparation finishes; it reappears for new queued work.",
+          "Reduced redundant resource bookkeeping and corrected resource lifetime, cancellation and compatibility fallback handling.",
+          "Updated Rotate Items compatibility for counter stocking. Unavailable stocking no longer disables production collection or waypoint routes."
+        ],
+        "ru": [
+          "Добавлены необязательная подготовка ресурсов в ОЗУ, стартовый прогрев и предварительная подготовка соседнего рельефа. Повторное использование прогретых ресурсов уменьшает задержки при возвращении в уже посещённые области.",
+          "Добавлено удержание загруженной геометрии моделей и текстур в видеопамяти с настраиваемыми пределами.",
+          "Ускорены запуск до главного меню и стартовая подготовка ресурсов.",
+          "Уменьшена работа CPU при загрузке сейвов и подготовке скелетов, моделей, форм тела, снаряжения и данных костей NPC.",
+          "Текст прогрева показывает текущий прогресс и исчезает после подготовки; при новых запросах появляется снова.",
+          "Убрана лишняя обработка ресурсов, исправлены их освобождение, отмена загрузки и переход к штатной обработке при несовместимости.",
+          "Обновлена совместимость пополнения прилавка с Rotate Items. Недоступность пополнения больше не отключает сбор продукции и маршруты по точкам."
         ]
       }
     }

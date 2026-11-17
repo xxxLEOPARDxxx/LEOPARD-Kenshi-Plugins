@@ -328,9 +328,13 @@ English
 - Level-up messages use actual increases in the underlying skill. Temporary changes to effective skill, including penalties from overloaded animals, no longer trigger false notices.
 - Localised the Mass Combat skill name in Russian.
 
-Local correction / Локальная правка (2026-11-17; no new release / без нового выпуска)
 
-- Exclude the unused Mass combat skill from XP/level notifications and
-  recent-training bars; other skills and native XP calculations are unchanged.
-- Неиспользуемый Mass combat исключён из сообщений об опыте/уровнях и полос
-  недавних тренировок; остальные навыки и расчёт опыта игры не изменены.
+## Release 5 / Выпуск 5
+
+English
+
+- Excluded the unused Mass combat skill from XP and level-up notifications and recent-training bars. Other skills and the game's XP calculation are unchanged.
+
+Русский
+
+- Неиспользуемый навык «Массовый бой» исключён из сообщений об опыте, повышении уровня и полос недавних тренировок. Остальные навыки и расчёт опыта игры не изменены.
