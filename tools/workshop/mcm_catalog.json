@@ -61,7 +61,7 @@
       }
     ],
     "dll_export_verified": true,
-    "published_version": "4"
+    "published_version": "5"
   },
   {
     "package": "BuildModeGizmo",
@@ -268,7 +268,7 @@
       }
     ],
     "dll_export_verified": true,
-    "published_version": "4"
+    "published_version": "5"
   },
   {
     "package": "StatColours",
@@ -761,8 +761,8 @@
     "public": true,
     "release_authorized": true,
     "nexus_url": "https://www.nexusmods.com/kenshi/mods/2271",
-    "nexus_published_version": "2",
-    "published_version": "2",
+    "nexus_published_version": "3",
+    "published_version": "3",
     "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834042449"
   }
 ]

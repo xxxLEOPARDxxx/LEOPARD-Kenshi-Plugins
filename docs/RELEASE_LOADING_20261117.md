@@ -1,14 +1,16 @@
 # Prepared loading/UI update - 17 November2026
 
-Status: prepared locally; not published. User confirmed faster save loads and
+Status: Nexus publication confirmed by the owner; all three Steam updates
+were published and verified on17 November2026. Receipt:
+`docs/releases/2026-11-17-loading-publication.json`. User confirmed faster save loads and
 warmed area transitions with the already installed KEO build. This is feedback,
 not an overall timing multiplier from a native microbenchmark. No new game run,
 capture/profile, live gameplay log or process-memory collection was performed.
 Preparation adds no new gameplay code; it packages earlier installed changes.
 
 Published registry records KEO2, SkillLevelUpInfo4 and BestMinimap4 on13 November.
-Prepared versions are3/5/5. Prior working2/4 labels were stale. The registry and
-ALL_CHANGELOG_MODS.txt remain unchanged until actual publication is confirmed.
+Prepared versions are3/5/5. Prior working2/4 labels were stale. The registry now records3/5/5; ALL_CHANGELOG_MODS.txt contains exactly one
+confirmed Russian entry per release.
 
 ## KEO3
 
@@ -55,5 +57,7 @@ verified repeat idempotence and that only the selected3 versions differ from
 HEAD. Final normal preparation and real pack/input-boundary tests pass.
 
 ZIPs and bilingual Nexus descriptions are under D:/DEV/Kenshi/workshop/nexus.
-User uploads Nexus first and supplies links; corresponding Steam publication
-follows that confirmation. No publication command was executed in this phase.
+The owner confirmed the Nexus updates, then the existing Steam IPC uploader
+published each existing item with one bilingual change note and a separate
+Russian translation submission without another change note. Both descriptions
+were queried back through Steam and matched the prepared text.

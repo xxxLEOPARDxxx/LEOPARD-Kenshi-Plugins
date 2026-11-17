@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-13",
+  "date": "2026-11-17",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -39,7 +39,11 @@
     "SkillLevelUpInfo": {
       "nexus": 2257,
       "workshop_id": 3829848328,
-      "version": "4"
+      "version": "5",
+      "archive_sha256": "6ede2c3194e1e5cdbd2b7cb6fbc50452fb3073ee8902e3814e52f50e18e32537",
+      "dll_sha256": "33ad71b5de7c534a9dd8d493ded562c1e3650853bb59f547e514bdd537fc7a33",
+      "published_msk": "2026-11-17T18:15:59.584956+03:00",
+      "bilingual_change_note_sha256": "95034a348a2c78afbd52ca63bd7e2a810b0f82359d84b200ea2584b17c3e2419"
     },
     "MultiXPMining": {
       "nexus": 2258,
@@ -145,7 +149,11 @@
     "BestMinimap": {
       "nexus": 2242,
       "workshop_id": 3824087152,
-      "version": "4"
+      "version": "5",
+      "archive_sha256": "3d14fba6de5757cd013db33fe414e19721df3d3b1e800dbdc5d85a4e8ac96cb3",
+      "dll_sha256": "28cf78e5edbbba23fc8fe69fd59265c22b6b55d35761188cebb2422214a91e9a",
+      "published_msk": "2026-11-17T18:16:07.139868+03:00",
+      "bilingual_change_note_sha256": "940571cae8272b2ddfe00fff342ed5ae264bf84d843f9a299c4b476e80116004"
     },
     "TauntExpansion": {
       "nexus": 2265,
@@ -212,7 +220,11 @@
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "2"
+      "version": "3",
+      "archive_sha256": "7c5167d9ea07c4bf08b5c915fe649b95afab09a7d6b7b192457a82ecf6149cf3",
+      "dll_sha256": "5a869adcbf04e15f8c4952108f8268fc764540fc11735501b72a56c5c208b574",
+      "published_msk": "2026-11-17T18:15:52.331397+03:00",
+      "bilingual_change_note_sha256": "0df703d4d435059bef85d5bd4dea7b05de70f63c332404cdfddf98c708601372"
     }
   }
 }
