@@ -220,11 +220,11 @@
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "3",
-      "archive_sha256": "7c5167d9ea07c4bf08b5c915fe649b95afab09a7d6b7b192457a82ecf6149cf3",
-      "dll_sha256": "5a869adcbf04e15f8c4952108f8268fc764540fc11735501b72a56c5c208b574",
-      "published_msk": "2026-11-17T18:15:52.331397+03:00",
-      "bilingual_change_note_sha256": "0df703d4d435059bef85d5bd4dea7b05de70f63c332404cdfddf98c708601372"
+      "version": "4",
+      "archive_sha256": "11c0249c080979afa49667f086ba16e2f1b8d945d0f5946bb998d17707dea358",
+      "dll_sha256": "137bd0a9398f1eadfea261d84ea58ba1deeac3f1fde6f63abe28259fe94375d0",
+      "published_msk": "2026-11-17T21:25:36.049374+03:00",
+      "bilingual_change_note_sha256": "c266b2b0c12957cd20bd0c496b05c28f304c226a135e2d54ec7fb2326de0b1ea"
     }
   }
 }
