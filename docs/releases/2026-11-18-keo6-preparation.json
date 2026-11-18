@@ -1,0 +1,33 @@
+{
+  "mod": "KEO",
+  "version": "6",
+  "code_commit": "0dbe9c7",
+  "archive": "D:\\DEV\\Kenshi\\workshop\\nexus\\KEO-6.zip",
+  "archive_sha256": "f137db3e3d52d616a600648b560e32c8ae5832ab7d4d5dcae273b06fb3fa083b",
+  "dll_sha256": "d0f442610ce92d362178ff924d006bc1672e10b62211e244653fbdddb986a033",
+  "files": [
+    "KEO.defaults.ini",
+    "KEO.dll",
+    "KEO.mod",
+    "LICENSE",
+    "README.md",
+    "RE_Kenshi.json",
+    "locale/en_GB/LC_MESSAGES/keo.mo",
+    "locale/ru_RU/LC_MESSAGES/keo.mo",
+    "locale/zh_CN/LC_MESSAGES/keo.mo"
+  ],
+  "changes": {
+    "version": "6",
+    "published_version": "5",
+    "en": [
+      "Fixed a second compatibility issue that could prevent KEO jobs from registering when another plugin had already connected to the game’s job creation system. This could leave Shift + right-click unable to add Waypoint route.",
+      "If registration still fails, the standard log now identifies which stage failed."
+    ],
+    "ru": [
+      "Исправлена ещё одна причина, по которой работы KEO могли не регистрироваться, если другой плагин уже подключился к системе создания заданий игры. Из-за этого Shift + ПКМ мог не добавлять работу «Маршрут по точкам».",
+      "Если регистрация всё же не удаётся, в обычном журнале теперь указан этап сбоя."
+    ]
+  },
+  "nexus_status": "prepared_for_owner",
+  "verification": "CRC, exact Steam/Nexus parity, three MO catalogs"
+}

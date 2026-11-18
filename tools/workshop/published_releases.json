@@ -220,11 +220,13 @@
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "5",
-      "archive_sha256": "5461d23d4d4cca8bc7ae30d7a65aac4bca5bec03117c3a0f3d98d3126e4ec9a1",
-      "dll_sha256": "94a9593f34bfaafcebbb8e337a3d932076766ef7b9f93828d4e860e0b9e261c0",
-      "published_msk": "2026-11-18T00:40:25.451642+03:00",
-      "bilingual_change_note_sha256": "176260f7841e114c60df712a8016ddde1e63efe88c240f29a0538b0b2f4411a3"
+      "version": "6",
+      "archive_sha256": "f137db3e3d52d616a600648b560e32c8ae5832ab7d4d5dcae273b06fb3fa083b",
+      "dll_sha256": "d0f442610ce92d362178ff924d006bc1672e10b62211e244653fbdddb986a033",
+      "published_msk": "2026-11-18T11:33:36.973900+03:00",
+      "bilingual_change_note_sha256": "6bd41bbaf44397cf3c39cc4fee1943e8af01cadfe64df796ec965eea88eed466",
+      "steam_version": "6",
+      "nexus_version": "6"
     }
   }
 }
