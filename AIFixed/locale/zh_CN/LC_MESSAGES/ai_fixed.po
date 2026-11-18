@@ -146,3 +146,15 @@ msgstr "脱困等待时间（游戏小时）"
 
 msgid "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
 msgstr "尝试脱困前角色必须没有实际移动的时间。1-4个游戏小时；检查频率不变。修改立即生效。"
+
+msgid "Engineers"
+msgstr "工程师"
+
+msgid "Coordinate player engineers"
+msgstr "协调玩家工程师"
+
+msgid "Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."
+msgstr "共享建筑材料预留记录，一次搬运适量材料，并优先完工较早新放置的生产设备。在恢复较低优先级工作前，将确认来自建筑任务的剩余材料送回仓库。手动命令、战斗和较高优先级工作优先。默认关闭。"
+
+msgid "Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."
+msgstr "在 RE_Kenshi_log.txt 中记录维修床、通过城门、NPC 脱困及工程师协调的详细信息。"

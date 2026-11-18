@@ -5,13 +5,13 @@ base=Path(__file__).resolve().parents[1]
 source=(base/'AIFixed.cpp').read_text(encoding='utf-8-sig')
 mcm=source[source.index('extern "C" __declspec(dllexport) void MCM_Describe'):source.index('__declspec(dllexport) void startPlugin')]
 calls=re.findall(r'api->(?:toggle|integer)\(api,\s*"AIFixed",\s*"([^"]+)".*?\);',mcm,re.S)
-assert len(calls)==20 and len(set(calls))==20,calls
+assert len(calls)==21 and len(set(calls))==21,calls
 assert calls[-1]=='Debug'
 for match in re.finditer(r'api->(?:toggle|integer)\(api,\s*"AIFixed",\s*"([^"]+)".*?\);',mcm,re.S):
-    assert ('MCM_RESTART' in match.group(0))==(match.group(1) in ('Enabled','RecoverStuckNpc','Debug'))
+    assert ('MCM_RESTART' in match.group(0))==(match.group(1) in ('Enabled','RecoverStuckNpc','CoordinateEngineers','Debug'))
 ini=configparser.ConfigParser();ini.read(base/'AIFixed.ini',encoding='utf-8-sig')
 assert set(ini['AIFixed'])==set(key.lower() for key in calls)
-for key in ('AutoSleep','RepairHealth','GatePassage','GateOpenLocked','RecoverStuckNpc','Debug'):
+for key in ('AutoSleep','RepairHealth','GatePassage','GateOpenLocked','RecoverStuckNpc','CoordinateEngineers','Debug'):
     assert ini['AIFixed'][key]=='0',key
 assert ini['AIFixed']['OwnBedsOnly']=='1'
 assert ini['AIFixed']['UnstuckDelayHours']=='1'

@@ -103,6 +103,11 @@ void ErrorLog(const char*){}
 int g_bedRadius=100,g_healAbove=99;
 int g_selfRepairWear=50;
 volatile LONG g_loadGeneration=0,g_worldActiveAt=0,g_worldReadyGeneration=-1,g_loading=0;
+LONG priorityInvalidatedAt=-1,materialsInvalidatedAt=-1,surplusInvalidatedAt=-1;
+namespace PriorityNative {void Invalidate(){priorityInvalidatedAt=g_loadGeneration;}}
+namespace EngineerMaterialsRuntime {void Invalidate(){materialsInvalidatedAt=g_loadGeneration;}}
+namespace EngineerSurplusRuntime {void Invalidate(){surplusInvalidatedAt=g_loadGeneration;}}
+void EngineerMaintenance(){}
 LONG g_seenGeneration=0;
 DWORD g_lastSelfRepairScan=0, tick=10000;
 DWORD TestTick(){return tick;}
@@ -215,7 +220,7 @@ int main(){
  Check(notes==4 && originals==4,"debug on preserves diagnostics and originals");
  g_debug=false;notes=0;Medical_hook(&med,0);Check(notes==0,"live debug off stops already-installed medical diagnostics");
  MCM_Api api={0};api.version=6;api.beginMod=Begin;api.info=Info;api.section=Info;api.toggle=Toggle;api.integer=Integer;
- MCM_Describe(&api);Check(unstuckDelayDefault==1&&unstuckDelayMinimum==1&&unstuckDelayMaximum==4&&unstuckDelayFlags==0,"actual MCM descriptor exposes a live1..4-hour integer wait defaulting to1");Check(toggles==12 && (debugFlags & MCM_RESTART)!=0,"debug capture advertises required restart through actual API");
+ MCM_Describe(&api);Check(unstuckDelayDefault==1&&unstuckDelayMinimum==1&&unstuckDelayMaximum==4&&unstuckDelayFlags==0,"actual MCM descriptor exposes a live1..4-hour integer wait defaulting to1");Check(toggles==13 && (debugFlags & MCM_RESTART)!=0,"debug capture advertises required restart through actual API");
  calls=0;GuiUpdate_hook(&gui);Check(calls==0,"no world heartbeat prevents squad scan despite stale ou");
 
  SelfRepairState prior={0,0,2,true,&bed,0,0,0};g_selfRepairState[&c]=prior;
@@ -341,6 +346,9 @@ int main(){
  SelfRepairState approachTimeout={1,1,1,true,c.inWhat,0,0,0};approachTimeout.inputSerial=inputSerial;
  Check(SelfRepairOne(&c,approachTimeout,60002)&&!approachTimeout.sent&&ownOrders.lastTask==GET_OUT_OF_BED,"failed approach still retires after sixty simulation seconds");
  Check(nativeLessCalls==0 && nativeEqualCalls==0,"AIFixed identity does not depend on native hand comparison semantics");
+ LONG beforeEngineerReset=g_loadGeneration;InvalidateWorld();
+ Check(priorityInvalidatedAt==beforeEngineerReset&&materialsInvalidatedAt==beforeEngineerReset+1&&surplusInvalidatedAt==beforeEngineerReset+1,
+       "world invalidation poisons selector before epoch change and resets reservations after it");
  printf("AIFixed lifetime/debug regressions: %s (%d checks, %d failure(s))\n",failures ? "FAILED":"PASSED",checks,failures);
  return failures ? 1:0;
 }

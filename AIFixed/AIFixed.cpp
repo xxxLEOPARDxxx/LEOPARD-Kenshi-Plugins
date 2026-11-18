@@ -62,6 +62,7 @@
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/SaveFileSystem.h>
 #include <kenshi/gui/ForgottenGUI.h>
+#include <kenshi/gui/LevelEditor.h>
 #include <kenshi/MedicalSystem.h>
 #include <kenshi/NavMesh.h>
 #include <kenshi/Town.h>
@@ -81,6 +82,9 @@
 #include <kenshi/util/hand.h>
 #include <kenshi/util/lektor.h>
 #include <kenshi/util/UtilityT.h>
+#include "EngineerMaterialsRuntime.h"
+#include "EngineerPriorityNative.h"
+#include "EngineerSurplusRuntime.h"
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
@@ -101,6 +105,9 @@ namespace
     int g_sleepBelow=90,g_healAbove=99,g_robotBelow=90,g_bedRadius=100;
     bool g_gatePassage=false,g_gateUnlock=false,g_gateClose=true,g_gateRelock=true;
     bool g_unstuck=false;
+    // Hook installation requires restart. Atomic admission also responds to
+    // disabling through MCM without sharing ordinary booleans with AI workers.
+    volatile LONG g_engineers=0,g_engineerDebug=0,g_engineerReady=0,g_engineerGlobalEnabled=1;
     int g_unstuckDelayHours=1;
     int g_gateRadius=30,g_gateCloseDelay=3;
     bool g_restConflict=false,g_gateConflict=false,g_newHooksReady=false,g_gateHooksReady=false;
@@ -142,6 +149,15 @@ namespace
         return IniDefaults::Prepare(IniFileName());
     }
 
+    void EngineerSettingsChanged()
+    {
+        // Metadata only. An owned haul remains marked as ours until its native
+        // task dies; disabling must never expose the game's whole-stack helper.
+        PriorityNative::Invalidate();
+        EngineerMaterialsRuntime::Invalidate();
+        EngineerSurplusRuntime::Invalidate();
+    }
+
 
     void LoadSettings()
     {
@@ -153,6 +169,7 @@ namespace
 
         g_enabled =
             GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
+        const bool engineerMasterChanged=InterlockedExchange(&g_engineerGlobalEnabled,g_enabled?1:0)!=(g_enabled?1:0);
         g_skeletonBeds =
             GetPrivateProfileIntA(section, "SkeletonRepairBeds", 1, ini.c_str()) != 0;
         g_selfRepair =
@@ -178,9 +195,12 @@ namespace
         g_gateCloseDelay=(std::max)(1,(std::min)(30,(int)GetPrivateProfileIntA(section,"GateCloseDelay",3,ini.c_str())));
         g_unstuck=GetPrivateProfileIntA(section,"RecoverStuckNpc",0,ini.c_str())!=0;
         g_unstuckDelayHours=(std::max)(1,(std::min)(4,(int)GetPrivateProfileIntA(section,"UnstuckDelayHours",1,ini.c_str())));
+        const LONG engineers=GetPrivateProfileIntA(section,"CoordinateEngineers",0,ini.c_str())!=0?1:0;
+        if(InterlockedExchange(&g_engineers,engineers)!=engineers||engineerMasterChanged)EngineerSettingsChanged();
         g_debug =
             GetPrivateProfileIntA(section, "Debug", 0, ini.c_str()) != 0;
         KLocLog::SetEnabled(g_debug);
+        InterlockedExchange(&g_engineerDebug,g_debug?1:0);
     }
 
 
@@ -244,7 +264,8 @@ namespace
     {
         __try
         {
-            if(t_ownOrder||!g_newHooksReady||(!g_selfRepair&&!g_autoSleep&&!g_repairHealth&&!g_gatePassage)||
+            if(t_ownOrder||!g_newHooksReady||(!g_selfRepair&&!g_autoSleep&&!g_repairHealth&&!g_gatePassage&&
+               !InterlockedCompareExchange(&g_engineers,0,0))||
                !orders||!orders->me||!orders->me->isPlayerCharacter()||
                InterlockedCompareExchange(&g_loading,0,0)!=0)return false;
             *out=orders->me->handle;return true;
@@ -260,12 +281,14 @@ namespace
         g_intents[who]=g_intentSerial;
     }
     void (*g_origOrdersAdd)(OrdersReceiver*,TaskType,const hand&,const Ogre::Vector3&,bool,bool)=NULL;
+    void EngineerCancelInput(const hand& who);
     void OrdersAdd_hook(OrdersReceiver* self,TaskType task,const hand& subject,const Ogre::Vector3& position,bool clearOld,bool shift)
     {
         hand who;const bool capture=InputIdentity(self,&who);
         const LONG generation=InterlockedCompareExchange(&g_loadGeneration,0,0);
         g_origOrdersAdd(self,task,subject,position,clearOld,shift);
-        if(capture&&generation==InterlockedCompareExchange(&g_loadGeneration,0,0))RecordInput(who);
+        if(capture&&generation==InterlockedCompareExchange(&g_loadGeneration,0,0))
+        {RecordInput(who);EngineerCancelInput(who);}
     }
     void (*g_origOrdersClear)(OrdersReceiver*)=NULL;
     void OrdersClear_hook(OrdersReceiver* self)
@@ -273,7 +296,8 @@ namespace
         hand who;const bool capture=InputIdentity(self,&who);
         const LONG generation=InterlockedCompareExchange(&g_loadGeneration,0,0);
         g_origOrdersClear(self);
-        if(capture&&generation==InterlockedCompareExchange(&g_loadGeneration,0,0))RecordInput(who);
+        if(capture&&generation==InterlockedCompareExchange(&g_loadGeneration,0,0))
+        {RecordInput(who);EngineerCancelInput(who);}
     }
     void OwnRestOrder(OrdersReceiver* orders,TaskType task,const hand& target,const Ogre::Vector3& position)
     {
@@ -932,9 +956,12 @@ namespace
 
     void InvalidateWorld()
     {
+        PriorityNative::Invalidate();
         if (Unstuck::ready) Unstuck::Suspend();
         InterlockedExchange(&g_worldActiveAt, 0);
         InterlockedIncrement(&g_loadGeneration);
+        EngineerMaterialsRuntime::Invalidate();
+        EngineerSurplusRuntime::Invalidate();
     }
 
     bool WorldActive(DWORD now)
@@ -944,6 +971,55 @@ namespace
                last != 0 && now - last <= 300 &&
                InterlockedCompareExchange(&g_worldReadyGeneration, 0, 0) ==
                InterlockedCompareExchange(&g_loadGeneration, 0, 0);
+    }
+
+    #include "EngineerHostRuntime.h"
+
+    void EngineerCancelInput(const hand& who)
+    {
+        if(!InterlockedCompareExchange(&g_engineerReady,0,0))return;
+        // Called after RecordInput has released the intent lock. There are no
+        // native orders, native dereferences or foreign task cancellations here.
+        EngineerMaterialsRuntime::Cancel(who);
+        EngineerSurplusRuntime::Cancel(who);
+    }
+    bool EngineerAddHook(void* target,void* detour,void** original)
+    {return KenshiLib::SUCCESS==KenshiLib::AddHook(target,detour,original);}
+    void EngineerReport(const char* message){ErrorLog(message);}
+    void InstallEngineers()
+    {
+        if(!InterlockedCompareExchange(&g_engineers,0,0))return;
+        if(!g_lifecycleReady||!g_newHooksReady)
+        {ErrorLog("AIFixed: engineer coordination disabled: lifecycle/input hooks incomplete");return;}
+        EngineerMaterialsRuntime::Init(&EngineerAdmitted,&EngineerDebug,&EngineerEpoch);
+        EngineerSurplusRuntime::Init(&EngineerAdmitted,&EngineerDebug,&EngineerEpoch,&EngineerAllowed);
+        EngineerMaterialsRuntime::SetSelectedCallback(&EngineerSurplusRuntime::Selected);
+        PriorityNative::Config config={};
+        config.current=&EngineerCurrent;config.allowActor=&EngineerAllowActor;
+        config.snapshot=&EngineerSnapshot;config.resolve=&EngineerResolve;
+        config.addHook=&EngineerAddHook;config.report=&EngineerReport;
+        // Global admission is published only after the complete set succeeds.
+        // Partially installed wrappers retain their native fallback behavior.
+        const bool priority=PriorityNative::Configure(config)&&PriorityNative::Install();
+        if(!priority){ErrorLog("AIFixed: engineer coordination inactive: construction target adapter unavailable");return;}
+        const bool materials=EngineerMaterialsRuntime::Install();
+        if(!materials){ErrorLog("AIFixed: engineer coordination inactive: construction material adapter unavailable");return;}
+        const bool surplus=EngineerSurplusRuntime::Install();
+        const bool complete=priority&&materials&&surplus;
+        InterlockedExchange(&g_engineerReady,complete?1:0);
+        if(!complete)ErrorLog("AIFixed: engineer coordination remains inactive: required adapters incomplete");
+        else if(EngineerDebug())DebugLog("AIFixed: player engineer coordination installed; native job election retained");
+    }
+    void EngineerMaintenance()
+    {
+        if(!InterlockedCompareExchange(&g_engineerReady,0,0))return;
+        static DWORD last=0;const DWORD now=GetTickCount();
+        if(now-last<250)return;last=now;
+        PriorityNative::Maintenance(8);
+        EngineerMaterialsRuntime::Maintenance();
+        // Finish a detached-item rollback even if MCM disabled new engineer
+        // assistance. This grants inventory recovery only, never an AI order.
+        EngineerSurplusRuntime::Maintenance(WorldActive(now)&&ou&&ou->player);
     }
 
     void ResetSessionState()
@@ -1003,6 +1079,7 @@ namespace
             InterlockedExchange(&g_worldReadyGeneration, generation);
             InterlockedExchange(&g_worldActiveAt, static_cast<LONG>(GetTickCount()));
             if (Unstuck::ready) Unstuck::SafeUpdate(self,generation);
+            EngineerMaintenance();
         }
     }
 
@@ -1345,8 +1422,11 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
         Tr("Move a stranded NPC to a nearby walkable surface after the selected delay without progress. Includes blocked routes on walls and gates. Off by default."),0,MCM_RESTART);
     api->integer(api,"AIFixed","UnstuckDelayHours",Tr("Stuck recovery delay (game hours)"),
         Tr("Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."),1,1,4,0);
+    api->section(api,Tr("Engineers"));
+    api->toggle(api,"AIFixed","CoordinateEngineers",Tr("Coordinate player engineers"),
+        Tr("Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."),0,MCM_RESTART);
     api->section(api, Tr("Diagnostics"));
-    api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details in RE_Kenshi_log.txt: for whom a repair bed was looked for and which one was chosen."), 0, MCM_RESTART);
+    api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."), 0, MCM_RESTART);
 }
 
 
@@ -1404,6 +1484,7 @@ __declspec(dllexport) void startPlugin()
     g_gateHooksReady=moveHook&&lockHook&&unlockHook&&lockButtonHook&&openButtonHook;
     if(!g_newHooksReady)ErrorLog("AIFixed: intent hooks incomplete; automatic rest/gates suspended");
     if(!g_gateHooksReady)ErrorLog("AIFixed: gate intent hooks incomplete; gate assistance suspended");
+    InstallEngineers();
 
     // Хук стоит всегда, выключатель правки читается на ходу.
     if (KenshiLib::SUCCESS !=

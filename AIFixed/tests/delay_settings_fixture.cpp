@@ -10,6 +10,8 @@ char fixturePath[MAX_PATH]={};
 const char* fixtureIni=fixturePath;
 std::string IniPath(){return fixtureIni;}
 namespace KLocLog {void SetEnabled(bool){}}
+unsigned engineerSettingChanges=0;
+void EngineerSettingsChanged(){++engineerSettingChanges;}
 // @LOAD@
 int checks=0,failures=0;
 void Check(bool condition,const char* message){++checks;if(!condition){++failures;printf("FAIL: %s\n",message);}}
@@ -30,6 +32,12 @@ int main(){
         Check(g_unstuckDelayHours==expected[i],"actual INI loader clamps1..4 and applies each live integer value");
         Check(Bytes()==before,"live delay load preserves all existing user keys and values");
     }
+    WritePrivateProfileStringA("AIFixed","CoordinateEngineers","1",fixtureIni);
+    std::string beforeEngineers=Bytes();LoadSettings();
+    Check(g_engineers==1&&engineerSettingChanges==1,"engineer enable publishes atomic admission and invalidates old metadata once");
+    Check(Bytes()==beforeEngineers,"new engineer loader preserves personal INI bytes");
+    WritePrivateProfileStringA("AIFixed","Enabled","0",fixtureIni);LoadSettings();
+    Check(!g_engineerGlobalEnabled&&engineerSettingChanges==2,"master disable suspends worker admission and invalidates metadata");
     DeleteFileA(fixtureIni);
     printf("AIFixed extracted delay settings: %s (%d checks)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;

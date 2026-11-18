@@ -1,0 +1,69 @@
+"""Offline native ABI proof; does not open a game process or launch Kenshi."""
+from pathlib import Path
+import hashlib, json, re, struct, sys
+sys.path.insert(0,'D:/DEV/Kenshi/tools/_native_python')
+import pefile
+here=Path(__file__).resolve().parent
+exe=Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/Kenshi_x64.exe')
+data=exe.read_bytes();pe=pefile.PE(data=data,fast_load=True)
+assert hashlib.md5(data).hexdigest()=='df4a5a7ef8a29deb24b70e7b7f4a222a'
+proof=json.loads((here/'engineer_material_native_contracts.json').read_text())
+runtime=(here.parent/'EngineerMaterialsRuntime.h').read_text()
+assert pe.FILE_HEADER.TimeDateStamp==proof['timestamp']
+assert pe.OPTIONAL_HEADER.SizeOfImage==proof['imageSize']
+for row in proof['windows']:
+    off=pe.get_offset_from_rva(row['rva']);body=data[off:off+row['size']]
+    assert body.hex()==row['bytes'],row['name']
+    value=14695981039346656037
+    for b in body:value=((value^b)*1099511628211)&0xffffffffffffffff
+    assert value==int(row['fnv'],16),row['name']
+    assert re.search(r'\{0x%X,%d,0x%016Xui64\}'%(row['rva'],row['size'],value),runtime)
+base=pe.OPTIONAL_HEADER.ImageBase
+for table,index,thunk,target in [(0x16BD7E0,2,0x43E3C,0x33CCB0),(0x16BD7E0,5,0x3E52C,0x341160),
+                              (0x16BDE38,2,0x4C41A,0x34F2E0),(0x16BDEF8,2,0x29AF0,0x348810)]:
+    assert struct.unpack_from('<Q',data,pe.get_offset_from_rva(table)+8*index)[0]==base+thunk
+    at=pe.get_offset_from_rva(thunk);assert data[at]==0xe9
+    assert thunk+5+struct.unpack_from('<i',data,at+1)[0]==target
+# Verify the actual two-level factory branch for task247, not a stale SDK index.
+index=data[pe.get_offset_from_rva(0x3303C8)+247-1]
+assert struct.unpack_from('<I',data,pe.get_offset_from_rva(0x330218)+index*4)[0]==0x32F906
+assert data[pe.get_offset_from_rva(0x341160):pe.get_offset_from_rva(0x341176)].hex()==\
+    '4883ec1848c70424feffffffb8020000004883c418c3'
+# Source removal is tied to the actual private action's exact call site;
+# acquisition is observed at native Inventory::tryAddItem for both vanilla and
+# KEO's direct backpack route, independently of Character::giveItem hook order.
+assert '0x33CF1C' in runtime
+assert '0x74B1E0' in runtime
+assert 'AddHook(intptr_t(image+0x74B1E0)' not in runtime
+assert 'AddHook(intptr_t(image+0x3BA11)' in runtime
+for table in (0x170BF88,0x17367C8):
+    assert struct.unpack_from('<Q',data,pe.get_offset_from_rva(table)+0x18)[0]==base+0x3BA11
+assert data[pe.get_offset_from_rva(0x3BA11):pe.get_offset_from_rva(0x3BA11)+5].hex()=='e9caf77000'
+body=next(x for x in proof['windows'] if x['name']=='body')
+tail=14695981039346656037
+for b in bytes.fromhex(body['bytes'])[5:]:tail=((tail^b)*1099511628211)&0xffffffffffffffff
+assert tail==int(proof['sharedBodyTail'],16)
+assert ('0x%016Xui64'%tail) in runtime
+dest=next(x for x in proof['windows'] if x['name']=='destination')
+tail=14695981039346656037
+for b in bytes.fromhex(dest['bytes'])[5:]:tail=((tail^b)*1099511628211)&0xffffffffffffffff
+assert tail==int(proof['sharedDestinationTail'],16)
+assert ('0x%016Xui64'%tail) in runtime
+assert struct.unpack_from('<Q',data,pe.get_offset_from_rva(0x1740910)+0x20)[0]==base+0x5305D
+carry=next(x for x in proof['windows'] if x['name']=='carryWeight');tail=14695981039346656037
+for b in bytes.fromhex(carry['bytes'])[5:]:tail=((tail^b)*1099511628211)&0xffffffffffffffff
+assert tail==int(proof['sharedCarryTail'],16)
+assert ('0x%016Xui64'%tail) in runtime
+for at,target in [(0x883916,0x2132E9C),(0x883922,0x2132E98)]:
+    off=pe.get_offset_from_rva(at);assert at+8+struct.unpack_from('<i',data,off+4)[0]==target
+table=Path('D:/SteamLibrary/steamapps/common/Kenshi/RE_Kenshi/RVAs/Steam_1.0.65.br').read_bytes()
+assert struct.unpack_from('<I',table,7623*4)[0]==0x2132D70
+assert struct.unpack_from('<I',data,pe.get_offset_from_rva(0x883E8C)+4)[0]==0x883CB9
+assert '_MaxCarryWeight' not in runtime
+for table,slot,thunk,target in proof['stopVirtuals']:
+    assert '{0x%X,%d,0x%X,0x%X}'%(table,slot,thunk,target) in runtime
+    assert struct.unpack_from('<Q',data,pe.get_offset_from_rva(table)+slot*8)[0]==base+thunk
+    off=pe.get_offset_from_rva(thunk);assert data[off]==0xe9
+    assert thunk+5+struct.unpack_from('<i',data,off+1)[0]==target
+assert 'MoveBowRange' in runtime and not any(row[0]==0x16BCE40 for row in proof['stopVirtuals'])
+print('engineer materials native contracts: %d windows, 38 RTTI virtuals, task247 factory, 3 shared entry tails, virtual thunk vs stock body, native carry/Move end-action PASS'%len(proof['windows']))

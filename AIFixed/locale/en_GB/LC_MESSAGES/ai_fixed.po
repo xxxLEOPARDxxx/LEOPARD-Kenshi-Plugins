@@ -146,3 +146,15 @@ msgstr "Stuck recovery delay (game hours)"
 
 msgid "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
 msgstr "Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."
+
+msgid "Engineers"
+msgstr "Engineers"
+
+msgid "Coordinate player engineers"
+msgstr "Coordinate player engineers"
+
+msgid "Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."
+msgstr "Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."
+
+msgid "Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."
+msgstr "Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."

@@ -41,6 +41,72 @@ English
 
 ПОДРОБНЫЙ СПРАВОЧНИК ВОЗМОЖНОСТЕЙ / DETAILED FEATURE REFERENCE
 
+ENGINEERS / ИНЖЕНЕРЫ - local development candidate, 2026-11-18
+Not a published release / Не опубликованный выпуск.
+
+CoordinateEngineers=0. MCM > Engineers; restarting installs the adapters.
+Coordinates automatic player Engineer jobs. Native election retains direct
+orders, combat, urgent work and higher job priorities. NPC AI packages, modded
+tasks and permanent job lists are not rewritten. Direct build orders stay native.
+
+Committed engineers share source and destination-material reservations, including
+cargo already carried. Ground items already in an inventory are no longer valid
+sources to chase. Native theft, access, capacity and actual item transfer remain.
+Storage batches use outstanding demand, stock and the native carrying-weight
+calculation, up to 32 units. Invalid/unknown weight or no free weight retains the
+native batch of two. Existing whole-ground-stack pickup is not manually split.
+
+Newly placed productive machines are preferred in observed placement order
+among native-admitted candidates; walls keep parallel construction. Native
+production/crafting/research/farm classes cover modded buildings without names.
+Chronology is transient: earlier/reloaded/unavailable blueprints have no proven
+placement age and retain native selection. No custom chronological save fields.
+
+Only proven construction cargo may be returned, at the original Engineer job
+rank ahead of lower jobs. Preexisting stock, still-needed project material and
+different personal variants are protected. Native movement/one-unit transfer
+preserve rollback. Missing/full/unreachable/unsupported storage retains cargo.
+Acquisition credits reset on load: unknown earlier-session leftovers are retained.
+
+No extra game-object worker or world scan. Native callback threads use bounded
+identity/quantity metadata with short locks; native calls stay outside locks.
+Known-row maintenance and storage searches are budgeted. Steam 1.0.65 native
+contracts are checked; unsupported builds/layouts use native behavior. Offline
+tests/build/review do not establish measured FPS or gameplay acceptance.
+
+CoordinateEngineers=0. MCM > Инженеры; для установки нужен перезапуск.
+Согласовывает автоматическую работу инженеров игрока. Ручные приказы, бой,
+срочные и более важные работы сохраняют штатный приоритет. Пакеты ИИ NPC,
+модовые задания и список работ не переписываются. Прямой приказ строить штатный.
+
+Назначенные инженеры учитывают резервы источников и потребности строек,
+включая уже переносимые материалы. Предмет в чужом инвентаре не считается
+наземным источником для преследования. Проверки кражи, доступа, вместимости
+и передачи остаются штатными. Партия со склада ограничена недостачей, запасом
+и нативным расчётом веса, максимум 32 единицы. Неизвестный/некорректный вес
+или отсутствие свободного веса сохраняют штатную партию из двух предметов.
+Подбор целой наземной стопки вручную не разделяется.
+
+Новые производственные машины завершаются с учётом порядка их размещения
+среди доступных штатному ИИ кандидатов; стены строятся параллельно. Используются
+нативные классы производства, крафта, исследований и ферм, а не названия модов.
+Порядок временный: достоверный возраст прежних, загруженных и недоступных
+чертежей неизвестен, и выбор для них остаётся штатным. Порядок в сейв не пишется.
+
+На склад возвращается только подтверждённый остаток наших материалов,
+с исходным рангом инженерной работы перед менее важными задачами. Прежний
+запас, нужные проекту материалы и отличающиеся личные экземпляры защищены.
+Штатные движение и поштучная передача сохраняют возврат при отказе приёмника.
+Нет подходящего свободного доступного склада - груз остаётся у инженера.
+Учёт полученного сбрасывается при загрузке: неизвестные старые остатки остаются.
+
+Новых потоков с игровыми объектами и обхода мира нет. Используются штатные
+вызовы игры и ограниченные таблицы с короткими блокировками; нативные вызовы
+выполняются снаружи. Обслуживание известных записей и поиск складов имеют
+бюджеты. Проверяются контракты Steam 1.0.65; неподдерживаемая сборка или структура
+сохраняет штатное поведение. Автономные тесты, сборка и ревью не доказывают
+измеренный FPS или игровой результат.
+
 Новые настройки / New settings (live / сразу):
 AutoSleep=0; SleepBelowHealth=90 (10..99); WakeAboveHealth=99 (trigger..100).
 RepairHealth=0; RepairBelowHealth=90 (10..99); BedSearchRadius=100 (10..500 m).

@@ -114,6 +114,9 @@ bool t_ownOrder=false,g_newHooksReady=true,g_gateHooksReady=true,g_gatePassage=t
 bool g_selfRepair=false,g_autoSleep=false,g_repairHealth=false;
 int g_gateRadius=30,g_gateCloseDelay=3;
 volatile LONG g_loading=0,g_loadGeneration=0;
+volatile LONG g_engineers=0;
+unsigned engineerCancels=0;
+void EngineerCancelInput(const hand&){++engineerCancels;}
 DWORD tick=1000;DWORD TestTick(){return tick;}
 #define GetTickCount TestTick
 unsigned errors=0,moveOriginals=0;
@@ -376,6 +379,14 @@ int main()
  Check(leaf.closes==0&&leaf.locks==0,"old gate watch cannot mutate a replacement world");
  Reset(c,gate,leaf,world,player);GuiUpdate_hook(&gui);Pump(world,250,.25);
  Check(world.clockReads==0&&world.queries==0,"idle enabled gate module performs no native clock poll or spatial query");
+ Reset(c,gate,leaf,world,player);g_gatePassage=false;g_engineers=1;
+ unsigned engineerBefore=engineerCancels;unsigned inputBefore=InputSequence(&c);
+ OrdersAdd_hook(&c.orders,MOVE_CUS_ORDERED,hand(),Ogre::Vector3(30),true,false);
+ Check(InputSequence(&c)!=inputBefore,"engineer-only mode still records explicit player input");
+ Check(engineerCancels>engineerBefore,"explicit input releases engineer claims without issuing another order");
+ engineerBefore=engineerCancels;OrdersClear_hook(&c.orders);
+ Check(engineerCancels==engineerBefore+1,"Stop releases engineer claims even with rest and gate features disabled");
+ g_engineers=0;
  printf("AIFixed extracted gate/intent runtime: %s (%d checks)\n",failures?"FAIL":"PASS",checks);
  return failures?1:0;
 }
