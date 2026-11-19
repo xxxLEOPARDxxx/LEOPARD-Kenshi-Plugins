@@ -93,7 +93,8 @@ struct Building
     struct ConstructionState
     {
         struct BuildMaterial{GameData* mat;};
-        lektor<BuildMaterial*> mats;std::map<GameData*,int> needs;
+        lektor<BuildMaterial*> mats;std::map<GameData*,int> needs;bool isComplete;
+        ConstructionState():isComplete(false){}
         int needsMat(GameData* m){Boundary();return needs[m];}
     } state;
     hand handle;StorageBuilding* storage;
@@ -197,9 +198,16 @@ static float Destination(AI* ai,const hand&,hand& out,bool)
 static void Selected(AITaskSytem* s,Tasker* t,float,taskPriority){Boundary();s->goal.taskData=t->taskData;s->goal.subject=t->subject;s->goal.subtarget=t->currentSubTarget;}
 static void Callback(AITaskSytem*,Tasker*){Boundary();++callbacks;}
 static int Quantity(Tasker*,Character*,GameData*,StorageBuilding*){Boundary();return 2;}
+static Building* completeOnTake=NULL;
 static Item* Take(Inventory* inv,GameData* d)
 {
     Boundary();++takes;if(inv->counts[d]<=0)return NULL;--inv->counts[d];
+    if(completeOnTake)
+    {
+        completeOnTake->state.isComplete=true;
+        EngineerMaterialsRuntime::CompleteProject(EngineerMaterialsRuntime::Of(completeOnTake->handle),epoch);
+        completeOnTake=NULL;
+    }
     static Item one(500,d,1);one.data=d;one.quantity=1;return &one;
 }
 static bool Give(Character* c,Item* item,bool,bool)
@@ -520,6 +528,49 @@ int main()
     body.action=&collectMats;EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
     CHECK(ai.resultsCache.resourceSourceCache.count(&mats)==0);
     CHECK(ai.resultsCache.resourceSourceCache.count(&iron)==1);
+    // The native goal and move for the completed project can still be live
+    // when another engineer starts the next machine from the same store.
+    ++epoch;Invalidate();material=&mats;storage=&store;store.inv.counts[&mats]=4;
+    actor.inv.counts.clear();second.inv.counts.clear();
+    Building finishedSite(998),nextSite(999);
+    finishedSite.state.mats.stuff=nextSite.state.mats.stuff=needs;
+    finishedSite.state.mats.count=nextSite.state.mats.count=1;
+    finishedSite.state.needs[&mats]=nextSite.state.needs[&mats]=4;
+    Tasker nextBuilder=builder,storeCollection=collectMats;
+    builder.currentSubTarget=finishedSite.handle;nextBuilder.currentSubTarget=nextSite.handle;
+    storeCollection.subject=move.subject=store.handle;
+    body.action=&move;system.actions.list.clear();system.actions.list.push_back(&storeCollection);
+    EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    CHECK(EngineerMaterialsRuntime::Find(&ai2,nextSite.handle,out,true)==0&&out.isNull());
+    Request staleFetch,unrelatedFetch;
+    CHECK(RequestFor(&second,&finishedSite,store.handle,&mats,staleFetch));
+    CHECK(RequestFor(&second,&nextSite,store.handle,&mats,unrelatedFetch));
+    finishedSite.state.isComplete=true;
+    CompleteProject(Of(finishedSite.handle),epoch);
+    const unsigned completion=ProjectRevision(Of(finishedSite.handle));
+    CompleteProject(Of(finishedSite.handle),epoch);
+    CHECK(ProjectRevision(Of(finishedSite.handle))==completion);
+    CHECK(Commit(staleFetch)==0); // this worker had no claim at completion
+    CHECK(Commit(unrelatedFetch)==4);
+    Cancel(second.handle);
+    CHECK(system.goal.subtarget.index==finishedSite.handle.index&&body.action==&move);
+    CHECK(EngineerMaterialsRuntime::Find(&ai2,nextSite.handle,out,true)==1&&out.index==store.handle.index);
+    body2.action=&storeCollection;system2.actions.list.clear();
+    EngineerMaterialsRuntime::Selected(&system2,&nextBuilder,1,NORMAL);
+    completeOnTake=&nextSite;
+    EngineerMaterialsRuntime::Collect(&storeCollection,&body2);
+    CHECK(!completeOnTake&&store.inv.counts[&mats]==3&&second.inv.counts[&mats]==1);
+    CHECK(ListOwned(rows,128)==1&&rows[0].project==Of(nextSite.handle)&&rows[0].owned==1);
+    const unsigned finishEnd=endedActions;
+    EngineerMaterialsRuntime::Body(&body,.1f);
+    CHECK(body.action==NULL&&endedActions==finishEnd+1&&store.inv.counts[&mats]==3);
+    Building unclaimedSite(1000);
+    unclaimedSite.state.mats.stuff=needs;unclaimedSite.state.mats.count=1;
+    unclaimedSite.state.needs[&mats]=3;
+    CHECK(RequestFor(&actor,&unclaimedSite,store.handle,&mats,staleFetch));
+    unclaimedSite.state.isComplete=true;
+    CompleteProject(Of(unclaimedSite.handle),epoch,true); // registry observed genuine completion with no claims
+    CHECK(Commit(staleFetch)==0);
     CheckWindows();
     CHECK(nativeCalls>100);std::printf("engineer materials runtime: %u checks, %u native boundaries PASS\n",checks,nativeCalls);
     return 0;

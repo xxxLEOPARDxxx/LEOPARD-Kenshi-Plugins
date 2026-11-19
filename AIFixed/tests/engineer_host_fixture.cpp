@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <cstdio>
+#include "EngineerMaterialsPolicy.h"
 #include "EngineerPriorityPolicy.h"
 enum BuildingFunction { BF_ANY,BF_MINE,BF_RESOURCE_STORAGE,BF_RESEARCH,BF_REFINERY,BF_GENERATOR,BF_BED,BF_TRAINING,BF_CAGE,BF_SHOP,BF_CRAFTING,BF_CORPSE_DISPOSAL,BF_TURRET,BF_GENERAL_STORAGE,BF_ITEM_FURNACE,BF_LIGHT,BF_TABLE,BF_CHAIR,BF_FLUFF,BF_SHELL_WITH_INTERIOR,BF_WALL,BF_GATE,BF_DOOR,BF_BATTERY,BF_THRONE,BF_SKELETON_BED,BF_RAIN_COLLECTOR,BF_MINE_NATURAL,BF_STEERING,BF_ENGINE,BF_LIQUID_TANK };
 enum itemType { BUILDING=0 };
@@ -42,7 +43,15 @@ DWORD hostTick=1000;
 DWORD HostTick(){return hostTick;}
 #define GetTickCount HostTick
 namespace PriorityNative {void Maintenance(unsigned){}}
-namespace EngineerMaterialsRuntime {void Maintenance(){}}
+namespace EngineerMaterialsRuntime
+{
+    AIFixedEngineer::Identity completed;
+    unsigned completionGeneration=0;
+    bool knownNewCompletion=false;
+    void Maintenance(){}
+    void CompleteProject(const AIFixedEngineer::Identity& key,unsigned e,bool newCompletion)
+    {completed=key;completionGeneration=e;knownNewCompletion=newCompletion;}
+}
 unsigned pendingMaintenanceCalls=0;bool pendingWorldSafe=false;
 namespace EngineerSurplusRuntime {void Maintenance(bool safe){++pendingMaintenanceCalls;pendingWorldSafe=safe;}}
 // @PRODUCTION@
@@ -72,6 +81,13 @@ int main(){
  Building b;resolved=&b;AIFixedEngineerPriority::Candidate candidate={};
  Check(EngineerSnapshot(&b,&candidate)&&candidate.productive&&!candidate.wall,"production uses native function category");
  Check(EngineerResolve(candidate.key)==&b,"fresh resolution validates complete serial identity");
+ EngineerCompletedProject(candidate.key,generation);
+ const AIFixedEngineer::Identity& completed=EngineerMaterialsRuntime::completed;
+ Check(completed.type==candidate.key.type&&completed.index==candidate.key.index&&
+       completed.serial==candidate.key.serial&&completed.container==candidate.key.container&&
+       completed.containerSerial==candidate.key.containerSerial&&
+       EngineerMaterialsRuntime::completionGeneration==generation&&EngineerMaterialsRuntime::knownNewCompletion,
+       "completion forwards full identity and world generation");
  AIFixedEngineerPriority::Key wrong=candidate.key;++wrong.containerSerial;
  Check(!EngineerResolve(wrong),"reused container cannot resolve old target");
  b.function=BF_WALL;b.wall=true;Check(EngineerSnapshot(&b,&candidate)&&candidate.wall&&!candidate.productive,"walls stay observable but native parallelism retained");

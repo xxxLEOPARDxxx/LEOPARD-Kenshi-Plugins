@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 #include <float.h>
 #include <GatePolicy.h>
 #include <UnstuckPolicy.h>
@@ -10,7 +11,9 @@ struct Vector3 {
     Vector3(float a=0,float b=0,float c=0):x(a),y(b),z(c){}
     Vector3 operator+(const Vector3& b)const{return Vector3(x+b.x,y+b.y,z+b.z);}
     Vector3 operator-(const Vector3& b)const{return Vector3(x-b.x,y-b.y,z-b.z);}
+    Vector3 operator-()const{return Vector3(-x,-y,-z);}
     Vector3 operator*(float n)const{return Vector3(x*n,y*n,z*n);}
+    float dotProduct(const Vector3& b)const{return x*b.x+y*b.y+z*b.z;}
     float squaredLength()const{return x*x+y*y+z*z;}
 };
 }
@@ -19,8 +22,24 @@ struct DoorStuff {
     Ogre::Vector3 getDoorPosInside(){return Ogre::Vector3();}
     Ogre::Vector3 getDoorPosOutside(){return Ogre::Vector3();}
 };
-struct Building {bool gate;DoorStuff door;Building():gate(false){door.isSetupComplete=false;}Building* isGate(){return gate?this:NULL;}DoorStuff* getDoor(){return gate?&door:NULL;}};
-struct StandingHandle {Building* building;operator bool(){return building!=NULL;}};
+struct Building {
+    bool gate,wall,disabled;int outsideGate;
+    DoorStuff door;
+    struct ConstructionState {bool isComplete;} state;
+    struct Orientation {Ogre::Vector3 xAxis(){return Ogre::Vector3(-1,0,0);}};
+    Building():gate(false),wall(false),disabled(false),outsideGate(0){door.isSetupComplete=false;state.isComplete=true;}
+    Building* isGate(){return gate?this:NULL;}
+    Building* isAWall(){return wall?this:NULL;}
+    DoorStuff* getDoor(){return gate?&door:NULL;}
+    bool isDisabled(){return disabled;}
+    ConstructionState* getBuildState(){return &state;}
+    Ogre::Vector3 getPosition(){return Ogre::Vector3(-9200,140,27300);}
+    Ogre::Vector3 getWallEndPosition(){return Ogre::Vector3(-9200,140,27400);}
+    Orientation getOrientation(){return Orientation();}
+    int getOutsideGateCode(){return outsideGate;}
+};
+typedef Building WallBuilding;
+struct StandingHandle {Building* building;operator bool(){return building!=NULL;}Building* getBuilding(){return building;}};
 struct HavokCharacter {unsigned currentFace;};
 struct CharMovement {
     HavokCharacter* havokCharacter;
@@ -50,6 +69,10 @@ bool pocketConfirmed=false,physicalCapConfirmed=false;
 int pocketResult=0,physicalCapCalls=0;
 bool nativeAgrees=true;
 bool floorHit=true,floorAborted=false,floorBuilding=false;
+Building* colliderWall=NULL;
+int wallShape=1,otherShape=2;
+bool entryBlocked=false,wrongShape=false,wallHollow=false;
+float wallTop=230.0f;
 float floorY=140,floorNormalY=1,floorDistance=5;
 unsigned floorGroup=2;
 AIFixedGate::Point normal(-.8357168f,.5356244f,-.1211773f);
@@ -57,15 +80,32 @@ struct physHit {
     bool hit;
     Ogre::Vector3 position,normal;
     float distance;
-    physHit(bool,bool,float):hit(floorHit),position(0,floorY,0),normal(0,floorNormalY,0),distance(floorDistance){}
+    Building* building;
+    int* shape;
+    physHit(bool,bool,float):hit(floorHit),position(0,floorY,0),normal(0,floorNormalY,0),distance(floorDistance),building(NULL),shape(NULL){}
     bool traceWasAborted(){return floorAborted;}
     unsigned group(){return floorGroup;}
-    Building* getBuilding(){static Building b;return floorBuilding?&b:NULL;}
+    Building* getBuilding(){static Building b;return building?building:(floorBuilding?&b:NULL);}
 };
 struct UtilityT {
     static float getTerrainHeight(float,float){return ground;}
     static bool getPositionInWater(float,float){return water;}
-    static void trace(physHit& hit,const Ogre::Vector3& start,const Ogre::Vector3&,unsigned){hit.position.x=start.x;hit.position.z=start.z;}
+    static void trace(physHit& hit,const Ogre::Vector3& start,const Ogre::Vector3& direction,unsigned){
+        hit.position.x=start.x;hit.position.z=start.z;
+        if (!colliderWall) return;
+        hit.hit=false;
+        hit.building=colliderWall;
+        hit.shape=&wallShape;
+        if (direction.y<0.0f && start.y>=wallTop){
+            hit.hit=true;hit.position.y=wallTop;hit.normal=Ogre::Vector3(0,1,0);
+        } else if (!direction.y && !entryBlocked && (start.x<-9212.0f || start.x>-9188.0f)){
+            const float edge=direction.x>0.0f?-9212.0f:-9188.0f;
+            hit.hit=true;hit.distance=std::fabs(start.x-edge);hit.normal=-direction;
+            if (wrongShape && direction.x<0.0f) hit.shape=&otherShape;
+        } else if (!direction.y && wallHollow){
+            hit.hit=true;hit.distance=2.0f;hit.normal=-direction;
+        }
+    }
 };
 AIFixedGate::Point Point(const Ogre::Vector3& p){return AIFixedGate::Point(p.x,p.y,p.z);}
 bool ReadPlatformSlope(Building*,const Ogre::Vector3&,AIFixedGate::Point& out,unsigned& group){out=normal;group=7;return slopeConfirmed;}
@@ -75,15 +115,21 @@ Building* FindElevatedGate(const Ogre::Vector3&,float){return NULL;}
 bool FindRockExit(const Ogre::Vector3&,float,unsigned,Ogre::Vector3&,unsigned&){return false;}
 bool NativePositionAgrees(void*,const Ogre::Vector3&){return nativeAgrees;}
 bool StandingSpaceClear(const Ogre::Vector3&,float,float){return standingClear;}
-bool CrossesBarrier(GameWorld*,const Ogre::Vector3&,const Ogre::Vector3&,Building*,bool){return barrier;}
+// @WALL_SIDE@
+bool CrossesBarrier(GameWorld*,const Ogre::Vector3& from,const Ogre::Vector3& to,Building* support,bool exterior,bool verified){
+    return barrier || (support && support->wall && !WallAllowsLanding(support,from,to,true,exterior,verified));
+}
+// @WALL_INTENT@
 // @TRACE_STRUCT@
+// @WALL_ESCAPE@
 // @PRODUCTION@
 
 int checks=0,failures=0;
 void Check(bool value,const char* message){++checks;if(!value){++failures;printf("FAIL: %s\n",message);}}
-bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3& p,const char* reason,bool platformRecovery=true){
+bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3& p,const char* reason,bool platformRecovery=true,
+           WallIntent intent=NoWallIntent){
     LandingTrace trace;unsigned sites=0;Ogre::Vector3 landing=p;
-    const bool accepted=FindLanding(&w,&actor,&platform,p,0,landing,sites,platformRecovery,trace);
+    const bool accepted=FindLanding(&w,&actor,&platform,p,0,landing,sites,platformRecovery,trace,intent);
     Check(!strcmp(trace.reason,reason),reason);
     return accepted;
 }
@@ -118,6 +164,58 @@ int main(){
     Check(Probe(world,actor,platform,Ogre::Vector3(18778,280,47724),"accepted",false),
         "gate14m boundary stays accepted");
     platform.gate=false;
+    Building embeddedWall;embeddedWall.wall=true;
+    movement.standing.building=&embeddedWall;
+    colliderWall=&embeddedWall;
+    nav.candidate=Ogre::Vector3(-9240,140,27344.7f);
+    const Ogre::Vector3 embedded(-9204.69f,140,27344.7f);
+    Check(Probe(world,actor,embeddedWall,embedded,"accepted",false),
+        "physical enclosure in a wall can be escaped at ground level despite a cached native face");
+    movement.standing.building=NULL;
+    Check(Probe(world,actor,embeddedWall,embedded,"accepted",false,EmbeddedWallOnly),
+        "matching solid enclosure can provide its own wall when the movement handle is absent");
+    nav.candidate.x=-9165;
+    Check(!Probe(world,actor,embeddedWall,embedded,"wall-landing-clearance",false,EmbeddedWallOnly),
+        "solid enclosure may only be escaped toward the original side");
+    nav.candidate.x=-9240;
+    wrongShape=true;
+    Check(!Probe(world,actor,embeddedWall,embedded,"wall-support-unconfirmed",false,EmbeddedWallOnly),
+        "overhead and both side hits must come from the same collider");
+    wrongShape=false;wallHollow=true;
+    Check(!Probe(world,actor,embeddedWall,embedded,"wall-support-unconfirmed",false,EmbeddedWallOnly),
+        "a tunnel under the same wall collider is not solid enclosure");
+    wallHollow=false;standingClear=false;
+    Check(!Probe(world,actor,embeddedWall,embedded,"wall-landing-clearance",false,EmbeddedWallOnly),
+        "a blocked landing cannot be used to escape an embedded wall");
+    standingClear=true;barrier=true;
+    Check(!Probe(world,actor,embeddedWall,embedded,"barrier",false,EmbeddedWallOnly),
+        "an additional barrier blocks the wall exit");
+    barrier=false;
+    const Ogre::Vector3 crest(-9200,wallTop,27292.5f);
+    nav.candidate=Ogre::Vector3(-9235,140,27292.5f);
+    nav.sourceFaceResult=1;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,RetreatWallOnly),
+        "a fresh walkable crest face keeps the retreating actor on a real walkway");
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,RetreatWall),
+        "ordinary movement fallback cannot override rejected retreat on a real supported wall walkway");
+    nav.sourceFaceResult=0;
+    Check(Probe(world,actor,embeddedWall,crest,"accepted",false,RetreatWallOnly),
+        "an unsupported retreating animal at a small wall endpoint join can use the proven exterior");
+    nav.targetCode=27;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-gate-code",false,RetreatWallOnly),
+        "the elevation fallback cannot enter a walled town");
+    nav.targetCode=0;
+    Check(!Probe(world,actor,embeddedWall,Ogre::Vector3(-9190,wallTop,27292.5f),
+        "wall-support-unconfirmed",false,RetreatWallOnly),
+        "the crest fallback cannot switch an actor already positioned on the interior side");
+    nav.candidate.x=-9165;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-landing-clearance",false,RetreatWallOnly),
+        "even an exterior code cannot override the measured wall side");
+    nav.candidate.x=-9235;
+    colliderWall=NULL;
+    nav.sourceFaceResult=1;
+    movement.standing.building=&platform;
+    nav.candidate=Ogre::Vector3(18740,140,47720);
     LandingTrace rockTrace;Ogre::Vector3 rockLanding;unsigned rockSites=0;
     Check(!FindLanding(&world,&actor,NULL,Ogre::Vector3(18778,221,47724),0,rockLanding,rockSites,false,rockTrace)&&
         !strcmp(rockTrace.reason,"terrain-height-limit"),"ordinary rock/off-mesh recovery retains its8m height limit");

@@ -30,6 +30,8 @@ namespace Unstuck
         Sample():used(false){}
     };
 
+    enum WallIntent { NoWallIntent, EmbeddedWallOnly, RetreatWall, RetreatWallOnly };
+
     struct History
     {
         Identity actor, subject;
@@ -38,7 +40,8 @@ namespace Unstuck
         AIFixedUnstuck::Observation watch;
         unsigned probeSite, reportedAt;
         bool guard;
-        History():goal(NULL_TASK),probeSite(0),reportedAt(0),guard(false){}
+        WallIntent wallIntent;
+        History():goal(NULL_TASK),probeSite(0),reportedAt(0),guard(false),wallIntent(NoWallIntent){}
     };
 
     struct LandingTrace
@@ -154,6 +157,14 @@ namespace Unstuck
         return support && support->isAWall();
     }
 
+    bool RetreatTask(TaskType task)
+    {
+        return task==RETREAT_HOMETOWN || task==RUN_AWAY_HOMETOWN ||
+            task==RUN_AWAY || task==RUN_AWAY_FORCED;
+    }
+
+    bool AnimalRetreat(Character* c,TaskType task) { return RetreatTask(task) && c->isAnimal(); }
+
     bool CanTravel(Character* c,CharMovement* movement,TaskType task)
     {
         if (!movement || !movement->havokCharacter ||
@@ -165,7 +176,8 @@ namespace Unstuck
             c->isChained || c->isInCombatMode(true,true) ||
             c->getWaterLevel()>=WaterState::THIGH_DEEP_WATER) return false;
         if (movement->movementMode!=MOVE_NORMAL &&
-            (movement->movementMode!=MOVE_DIRECTION || !IsWallFollower(c,movement,task))) return false;
+            (movement->movementMode!=MOVE_DIRECTION ||
+                (!AnimalRetreat(c,task) && !IsWallFollower(c,movement,task)))) return false;
         MedicalSystem* med=c->getMedical();
         if (!med || med->isCrippled()) return false;
         for (int i=RobotLimbs::LEFT_LEG;i<=RobotLimbs::RIGHT_LEG;++i)
@@ -244,6 +256,58 @@ namespace Unstuck
             AIFixedGate::DistanceSq(Point(here),destination)>=400.0f;
     }
 
+    bool ReadRecoveryIntent(Character* c,CharMovement* movement,const TaskMatch* goal,TaskType task,
+                            Identity& subject,AIFixedGate::Point& destination,WallIntent& wall)
+    {
+        wall=NoWallIntent;
+        const bool ordinary=ReadIntent(c,movement,goal,task,subject,destination);
+        HavokCharacter* navigation=movement->havokCharacter;
+        if (AnimalRetreat(c,task))
+        {
+            bool retreat=false;
+            if (movement->movementMode==MOVE_DIRECTION && navigation->getState()==HavokCharacter::MANUAL)
+            {
+                const AIFixedGate::Point direction=Point(movement->desiredMotion);
+                retreat=AIFixedGate::Finite(direction) &&
+                    direction.x*direction.x+direction.z*direction.z>.01f;
+            }
+            else if (movement->movementMode==MOVE_NORMAL && PathBlocked(navigation,false))
+            {
+                const float* target=navigation->goal.m_quad.m128_f32;
+                const float* source=navigation->position.m_quad.m128_f32;
+                const AIFixedGate::Point delta(target[0]-source[0],target[1]-source[1],target[2]-source[2]);
+                CharBody* body=c->getBody();
+                const Tasker* action=body?body->getCurrentAction():NULL;
+                retreat=action && action->taskData &&
+                    (action->key()==MOVE_ON_FREE_WILL || RetreatTask(action->key())) &&
+                    AIFixedGate::Finite(delta) && delta.y<=-5.0f;
+            }
+            if (retreat)
+            {
+                subject=Identity(goal->subject);
+                destination=AIFixedGate::Point();
+                wall=ordinary && movement->movementMode==MOVE_NORMAL?RetreatWall:RetreatWallOnly;
+                return true;
+            }
+            if (movement->movementMode==MOVE_DIRECTION) return false;
+        }
+        if (ordinary) return true;
+        if (navigation->getState()!=HavokCharacter::IDLE) return false;
+        Building* standing=movement->isStandingOnSomething().getBuilding();
+        if (task==NULL_TASK || task==IDLE)
+        {
+            if (!standing || !standing->isAWall()) return false;
+        }
+        else if (!TravelGoal(task) || !PathBlocked(navigation,false) ||
+                 (standing && !standing->isAWall())) return false;
+        // In this lane only proof of enclosure within a physical wall can
+        // lead to recovery. An idle actor on an ordinary walkway stays put.
+        subject=Identity(standing?standing->handle:hand());
+        destination=AIFixedGate::Point();
+        wall=EmbeddedWallOnly;
+        return true;
+    }
+
     Building* ReadGuardCycle(Character* c,CharMovement* movement,TaskType task,bool tracked,
                             bool& attempt,bool& failed)
     {
@@ -299,7 +363,8 @@ namespace Unstuck
     }
 
     bool WallAllowsLanding(WallBuilding* wall,const Ogre::Vector3& origin,
-                           const Ogre::Vector3& landing,bool supporting,bool confirmedExterior)
+                           const Ogre::Vector3& landing,bool supporting,bool confirmedExterior,
+                           bool verifiedCrest=false)
     {
         if (!wall) return false;
         const Ogre::Vector3 a=wall->getPosition(),b=wall->getWallEndPosition();
@@ -316,7 +381,8 @@ namespace Unstuck
             return AIFixedUnstuck::PastSameWallEnd(along,targetAlong,length);
         }
         if (!confirmedExterior) return false;
-        if (!_finite(along) || along<0.0f || along>length) return false;
+        const float join=verifiedCrest?AIFixedGate::WorldUnits(1.0f):0.0f;
+        if (!_finite(along) || along<-join || along>length+join) return false;
         // The game uses local +X for a wall's exterior waypoint. The
         // gate codes also have to confirm that the landing is outside.
         const Ogre::Vector3 direction=wall->getOrientation().xAxis();
@@ -336,7 +402,7 @@ namespace Unstuck
     }
 
     bool CrossesBarrier(GameWorld* world,const Ogre::Vector3& origin,const Ogre::Vector3& landing,
-                        Building* support,bool exterior)
+                        Building* support,bool exterior,bool verifiedCrest=false)
     {
         // Spatial searches can omit long walls whose origins are far away.
         // Validate the actual structure supporting the NPC independently.
@@ -346,7 +412,7 @@ namespace Unstuck
             {
                 if (!GateAllowsLanding(support,origin,landing)) return true;
             }
-            else if (!WallAllowsLanding(support->isAWall(),origin,landing,true,exterior)) return true;
+            else if (!WallAllowsLanding(support->isAWall(),origin,landing,true,exterior,verifiedCrest)) return true;
         }
         lektor<RootObject*>& objects=GateObjects();
         world->getObjectsWithinSphere(objects,landing,AIFixedGate::WorldUnits(18.0f),BUILDING,128,NULL);
@@ -390,6 +456,83 @@ namespace Unstuck
     {
         return navigation->isOnNavmesh() &&
             AIFixedGate::DistanceSq(Point(here),Point(navigation->getPosition()))<=25.0f;
+    }
+
+    struct WallEscape
+    {
+        WallBuilding* wall;
+        Ogre::Vector3 outward;
+        float edge;
+        WallEscape():wall(NULL),outward(0,0,0),edge(0){}
+    };
+
+    bool ReadWallEscape(CharMovement* movement,NavMesh* nav,const Ogre::Vector3& here,
+                        float ground,bool elevated,WallEscape& exit)
+    {
+        const float above=here.y-ground;
+        if (elevated ? (above<50.0f || above>140.0f) : (above<-15.0f || above>=50.0f)) return false;
+        Building* standing=movement->isStandingOnSomething().getBuilding();
+        if (standing && !standing->isAWall()) return false;
+        const Ogre::Vector3 down(0,-1,0), body=here+Ogre::Vector3(0,8,0);
+        const Ogre::Vector3 start=elevated?here-down*5.0f:body-down*140.0f;
+        physHit roof(false,true,here.y);
+        UtilityT::trace(roof,start,down,~0u);
+        if (roof.traceWasAborted() || !roof.hit || !AIFixedGate::Finite(Point(roof.position))) return false;
+        if (elevated ? (std::fabs(roof.position.y-here.y)>5.0f || !(roof.normal.y>.5f)) :
+            (roof.position.y<=body.y+1.5f || roof.position.y>start.y)) return false;
+        Building* object=roof.getBuilding();
+        WallBuilding* wall=object?object->isAWall():NULL;
+        if (!wall || (standing && standing!=wall) || wall->isDisabled()) return false;
+        const Building::ConstructionState* state=wall->getBuildState();
+        if (!state || !state->isComplete) return false;
+        const Ogre::Vector3 a=wall->getPosition(), b=wall->getWallEndPosition();
+        const float x=b.x-a.x,z=b.z-a.z,length=std::sqrt(x*x+z*z);
+        if (!_finite(length) || length<1.0f) return false;
+        const Ogre::Vector3 normal(-z/length,0,x/length);
+        const float along=((here.x-a.x)*x+(here.z-a.z)*z)/length;
+        const float side=(here-a).dotProduct(normal);
+        const float join=AIFixedGate::WorldUnits(1.0f);
+        if (!_finite(along) || !_finite(side) || along<-join || along>length+join) return false;
+        if (elevated)
+        {
+            Ogre::Vector3 point;
+            unsigned key=~0u;
+            // A real walkway is allowed to remain occupied, even with a
+            // failed retreat path or a manual movement command.
+            if (nav->getClosestPoint(here,3.0f,0.0f,false,point,key)!=0 ||
+                wall->getOutsideGateCode()!=0) return false;
+            const float outside=wall->getOrientation().xAxis().dotProduct(normal);
+            if (!_finite(outside) || std::fabs(outside)<.5f || std::fabs(side)>20.0f) return false;
+            const float sign=outside>0.0f?1.0f:-1.0f;
+            if (sign*side<-AIFixedGate::WorldUnits(.1f)) return false;
+            exit.outward=normal*sign;
+        }
+        else
+        {
+            // Two opposing entry faces and the overhead hit must belong to
+            // one collider. An outward-facing surface seen from the NPC's
+            // position disproves solid enclosure (e.g. under a walkway).
+            if (!roof.shape || std::fabs(side)<1.0f) return false;
+            const float span=60.0f;
+            exit.outward=normal*(side>0.0f?1.0f:-1.0f);
+            for (unsigned i=0;i<2;++i)
+            {
+                const Ogre::Vector3 direction=i?-exit.outward:exit.outward;
+                physHit in(false,true,here.y);
+                UtilityT::trace(in,body+direction*span,-direction,~0u);
+                if (in.traceWasAborted() || !in.hit || in.shape!=roof.shape ||
+                    !AIFixedUnstuck::EntersSolid(in.distance,in.normal.dotProduct(-direction),span)) return false;
+                const float distance=span-in.distance;
+                physHit out(false,true,here.y);
+                UtilityT::trace(out,body,direction,~0u);
+                if (out.traceWasAborted() || (out.hit && out.shape==roof.shape &&
+                    (!_finite(out.distance) || (out.distance<=distance+1.5f &&
+                     !(out.normal.dotProduct(direction)>.1f))))) return false;
+                if (!i) exit.edge=distance;
+            }
+        }
+        exit.wall=wall;
+        return true;
     }
 
     const float EscapeDirections[8][2]={{1,0},{.7071068f,.7071068f},{0,1},{-.7071068f,.7071068f},
@@ -665,7 +808,8 @@ namespace Unstuck
     }
 
     bool FindLanding(GameWorld* world,Character* actor,Building* support,const Ogre::Vector3& here,
-                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard,LandingTrace& trace)
+                     unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard,LandingTrace& trace,
+                     WallIntent wallIntent=NoWallIntent)
     {
         NavMesh* nav=world->navmesh;
         ZoneMap* zone=world->zoneMgr?world->zoneMgr->getZoneMap(here):NULL;
@@ -675,7 +819,15 @@ namespace Unstuck
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
         trace.ground=ground;
         if (!_finite(ground)) return RejectLanding(trace,"invalid-ground");
+        const bool elevatedWall=wallIntent==RetreatWall || wallIntent==RetreatWallOnly;
+        WallEscape wallExit;
+        if (!guard && (elevatedWall || here.y-ground<50.0f))
+            ReadWallEscape(movement,nav,here,ground,elevatedWall,wallExit);
+        if (!wallExit.wall && (wallIntent==EmbeddedWallOnly || wallIntent==RetreatWallOnly ||
+            (elevatedWall && support && support->isAWall())))
+            return RejectLanding(trace,"wall-support-unconfirmed");
         if (here.y-ground<50.0f) support=NULL;
+        if (wallExit.wall) support=wallExit.wall;
         AIFixedGate::Point slope;
         bool steep=false,pocket=false;
         unsigned footingGroup=32;
@@ -718,7 +870,8 @@ namespace Unstuck
         // Only confirmed steep BF_FLUFF support receives the higher bound.
         // An explicit native face miss can prove other stranded footing, but
         // retains the normal14m support limit; gates and rock are unchanged.
-        const float maximumDrop=guard && steep?18.0f:(support?14.0f:8.0f);
+        const float maximumDrop=guard && steep?18.0f:
+            (support && (!wallExit.wall || elevatedWall)?14.0f:8.0f);
         if (here.y-ground<-15.0f || here.y-ground>maximumDrop*10.0f) return RejectLanding(trace,"terrain-height-limit");
         const float clearance=movement->getRadius();
         trace.clearance=clearance;
@@ -738,13 +891,20 @@ namespace Unstuck
                 if (nav->getClosestPoint(here,3.0f,0.0f,false,nearPoint,key)!=0) return RejectLanding(trace,"near-face-not-explicit-miss");
             }
         }
-        if (!embedded) { siteCount=5; probeSite%=siteCount; }
+        if (!embedded) { siteCount=wallExit.wall?3:5; probeSite%=siteCount; }
         // Start with the nearest surface around the NPC. If it fails, later
         // probes try a smaller area toward each side within the same 6 m limit.
         const float offset=30.0f;
         static const float shifts[5][2]={{0,0},{offset,0},{-offset,0},{0,offset},{0,-offset}};
         Ogre::Vector3 below=embedded?rockExit:
             Ogre::Vector3(here.x+shifts[probeSite][0],ground,here.z+shifts[probeSite][1]);
+        if (wallExit.wall)
+        {
+            const float step=elevatedWall?30.0f+10.0f*probeSite:
+                wallExit.edge+clearance+8.0f+6.0f*probeSite;
+            if (step>60.0f) return RejectLanding(trace,"wall-exit-too-far");
+            below=here+wallExit.outward*step;
+        }
         if (guard && (steep || pocket) && probeSite==0)
         {
             below.x+=55.0f*slope.x;
@@ -753,7 +913,8 @@ namespace Unstuck
         if (world->zoneMgr->getZoneMap(below)!=zone) return RejectLanding(trace,"seed-zone");
         below.y=UtilityT::getTerrainHeight(below.x,below.z);
         if (!_finite(below.y)) return RejectLanding(trace,"seed-ground");
-        const float search=embedded?AIFixedGate::WorldUnits(1.0f):(probeSite==0&&!guard?60.0f:30.0f);
+        const float search=embedded || wallExit.wall?AIFixedGate::WorldUnits(1.0f):
+            (probeSite==0&&!guard?60.0f:30.0f);
         if (nav->getClosestExteriorPoint(below,search,clearance,landing)!=1)
             return RejectLanding(trace,"no-exterior-point");
         if (!AIFixedGate::Finite(Point(landing))) return RejectLanding(trace,"invalid-landing");
@@ -768,7 +929,7 @@ namespace Unstuck
             if (!CorrectPlatformGround(nav,source,surface,clearance,landing))
                 return RejectLanding(trace,"platform-ground-unconfirmed");
         }
-        if (support)
+        if (support && (!wallExit.wall || elevatedWall))
         {
             if (here.y-landing.y<50.0f) return RejectLanding(trace,"platform-drop-too-small");
             DoorStuff* door=support->isGate()?support->getDoor():NULL;
@@ -786,6 +947,15 @@ namespace Unstuck
         if (embedded && !StandingSpaceClear(landing,clearance,80.0f)) return RejectLanding(trace,"rock-landing-clearance");
         const int destinationGate=nav->getGateCode(landing);
         if (destinationGate<0) return RejectLanding(trace,"invalid-gate-code");
+        if (wallExit.wall)
+        {
+            const int sourceGate=nav->getGateCode(here);
+            const int expectedGate=elevatedWall?0:(sourceGate>=0?sourceGate:actor->amInsideTownWalls());
+            if (destinationGate!=expectedGate) return RejectLanding(trace,"wall-gate-code");
+            if ((landing-here).dotProduct(wallExit.outward)<wallExit.edge+clearance+1.5f ||
+                !StandingSpaceClear(landing,clearance,(std::max)(80.0f,here.y-landing.y+clearance)))
+                return RejectLanding(trace,"wall-landing-clearance");
+        }
         if (guard && destinationGate!=nav->getGateCode(here)) return RejectLanding(trace,"platform-gate-code");
         if (guard && (steep || pocket) && !AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),slope,pocket)) return RejectLanding(trace,"platform-uphill");
         if (guard && !StandingSpaceClear(landing,clearance,here.y-landing.y+clearance)) return RejectLanding(trace,"platform-landing-clearance");
@@ -798,7 +968,7 @@ namespace Unstuck
             if (!side || side!=AIFixedGate::Side(Point(landing),in,out) ||
                 !StandingSpaceClear(landing,clearance,30.0f)) return RejectLanding(trace,"inferred-gate-side-clearance");
         }
-        if (destinationGate>0)
+        if (destinationGate>0 && !wallExit.wall)
         {
             // The upper gate deck can have a different face code from the
             // gate below. Native standing support and the door side both
@@ -807,7 +977,8 @@ namespace Unstuck
                 ? actor->amInsideTownWalls() : nav->getGateCode(here);
             if (destinationGate!=sourceGate) return RejectLanding(trace,"town-gate-code");
         }
-        if (CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0)) return RejectLanding(trace,"barrier");
+        if (CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0,
+                           wallExit.wall && elevatedWall)) return RejectLanding(trace,"barrier");
         if (!zone->isLoadedMT() || zone->isBeingLoadedMT() || !nav->isLoaded(zone)) return RejectLanding(trace,"zone-changed");
         trace.reason="accepted";
         return true;
@@ -878,6 +1049,7 @@ namespace Unstuck
         if (!(entry.actor==actor)) { entry=History();entry.actor=actor; }
         const TaskMatch* goal=CurrentGoal(c);
         task=GoalTask(goal);
+        WallIntent wallIntent=NoWallIntent;
         bool attempt=false,failed=false;
         Building* guard=ReadGuardCycle(c,c->movement,task,entry.actor==actor && entry.guard &&
             entry.watch.active,attempt,failed);
@@ -886,7 +1058,7 @@ namespace Unstuck
             task=STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE;
             subject=Identity(guard->handle);
         }
-        if ((!guard && !ReadIntent(c,c->movement,goal,task,subject,destination)) ||
+        if ((!guard && !ReadRecoveryIntent(c,c->movement,goal,task,subject,destination,wallIntent)) ||
             !CanTravel(c,c->movement,task))
         {
             if (entry.actor==actor) entry.watch.active=false;
@@ -895,7 +1067,8 @@ namespace Unstuck
         }
         const Ogre::Vector3 here=c->getPosition();
         const AIFixedGate::Point position=Point(here);
-        if (!(entry.actor==actor) || entry.guard!=(guard!=NULL) || !SameIntent(entry,task,subject,destination))
+        if (!(entry.actor==actor) || entry.guard!=(guard!=NULL) || entry.wallIntent!=wallIntent ||
+            !SameIntent(entry,task,subject,destination))
         {
             entry.watch.active=false;
             entry.actor=actor;
@@ -903,6 +1076,7 @@ namespace Unstuck
             entry.subject=subject;
             entry.destination=destination;
             entry.guard=guard!=NULL;
+            entry.wallIntent=wallIntent;
         }
         const bool previouslyActive=entry.watch.active;
         const double priorStart=entry.watch.since;
@@ -930,7 +1104,7 @@ namespace Unstuck
         LandingTrace trace;
         const unsigned probeSite=entry.probeSite;
         unsigned siteCount=0;
-        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount,guard!=NULL,trace);
+        const bool found=FindLanding(world,c,support,here,probeSite,landing,siteCount,guard!=NULL,trace,wallIntent);
         TracePlatform(entry,c,hours,trace.reason,attempt,failed,freshFailure,&trace,&landing);
         entry.probeSite=siteCount?(probeSite+1)%siteCount:0;
         entry.watch.Probed(entry.probeSite==0);
@@ -950,7 +1124,8 @@ namespace Unstuck
         else
         {
             task=GoalTask(goal);
-            if (!ReadIntent(c,c->movement,goal,task,subject,destination) ||
+            if (!ReadRecoveryIntent(c,c->movement,goal,task,subject,destination,wallIntent) ||
+                wallIntent!=entry.wallIntent ||
                 !SameIntent(entry,task,subject,destination)) return;
         }
         if (!CanTravel(c,c->movement,task)) return;

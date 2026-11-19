@@ -56,6 +56,9 @@ Storage batches use outstanding demand, stock and the native carrying-weight
 calculation, up to 32 units. Invalid/unknown weight or no free weight retains the
 native batch of two. Existing whole-ground-stack pickup is not manually split.
 Machine collections reserve materials the machine actually offers as output.
+Completing a project releases its unused source reservations, so the next
+project can use the same stock. Already collected construction cargo can
+still be delivered where needed or returned to storage.
 
 Among locally reachable productive machines, engineers prefer one they already
 started while it can be built or its remaining materials are on the way.
@@ -90,6 +93,9 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 или отсутствие свободного веса сохраняют штатную партию из двух предметов.
 Подбор целой наземной стопки вручную не разделяется.
 У станков резервируются только материалы, которые они отдают на выходе.
+Готовая постройка освобождает остаток резервов источников, поэтому их запасы
+доступны следующей стройке. Уже полученные материалы можно использовать по
+потребности или вернуть на склад.
 
 Среди доступных машин инженеры предпочитают уже начатую, пока её можно
 строить или оставшиеся материалы несут. Свободные инженеры могут строить
@@ -129,12 +135,16 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     приостанавливается, затем может продолжиться после исчезновения штрафа
     при неизменном намерении и оставшихся попытках. Это не гарантия питания
     при любой модификации ИИ, отсутствии еды или заблокированном пути.
-  * BedSearchRadius=100 м (10..500), только то же поселение; реальная функция
-    кровати, мебель, доступность места, собственность и этаж. OwnBedsOnly=1;
+  * BedSearchRadius=100 м (10..500), только то же поселение. Модовые ремкровати
+    распознаются по игровой функции, обычные кровати также проверяются как мебель.
+    Учитываются доступность места, собственность и этаж. OwnBedsOnly=1;
     при 0 допускаются союзные, но не нейтральные или вражеские кровати.
     Разные этажи одного здания и перепад высоты более 10 м исключаются.
     Ремкровать должна реально чинить с питанием. Название мебели не является
     признаком кровати; модовые флаги и анимации требуют игровой проверки.
+    Если автоматический спасатель уложил скелета в обычную кровать, скелет
+    может перейти на свободную ремкровать после восстановления подвижности.
+    Переход учитывает включённые пороги ремонта и сохраняет ручные приказы.
   * Ручное движение, Stop, другая цель и очередь приказов отменяют владение;
     данный эпизод не повторяется до устранения причины отдыха. Заменяется
     только наш единственный точный приказ; постоянные работы не удаляются.
@@ -174,6 +184,10 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     застревание по коллизии даже при потере опоры в данных движения. Выход
     сохраняет сторону ворот и область навмеша. Пробы при наличии лица навмеша
     ограничены одной в секунду отдельно от обычной проверки вне навмеша.
+    Если вьючный зверь застрял наверху стены при отступлении, спуск возможен
+    после проверки опоры и отсутствия проходимой поверхности под ним. Выход
+    из толщи стены требует подтверждения коллизии той же секции. Точка выхода
+    должна быть свободной, на суше и на исходной стороне преграды.
     NPC, у которого срываются попытки пройти к цели, может спуститься с
     крутого склона платформы на свободную сушу в той же загруженной зоне,
     без пересечения стен и закрытых ворот. Для спуска нужны выбранное время
@@ -220,11 +234,15 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     The native hunger movement penalty gives food priority: our rest pauses,
     and can resume after that penalty clears if intent and attempt budget permit.
     This does not guarantee feeding with arbitrary AI mods, no food or blocked paths.
-  * BedSearchRadius=100 m (10..500) bounds same-settlement choices. Real bed
-    function, furniture, usable/free slot, ownership and floor are required.
+  * BedSearchRadius=100 m (10..500) bounds same-settlement choices. Repair beds
+    are identified by their native function, including modded beds. Ordinary
+    beds are also checked as furniture. Slot, ownership and floor are checked.
     OwnBedsOnly=1; disabling permits allies, never neutral/enemy owners.
     Different floors in one building or >10 m vertical separation are rejected.
     Repair beds must actually repair with power. Custom flags need game checks.
+    After automatic rescue to an ordinary bed, a skeleton that recovers mobility
+    can switch to a free repair bed within the enabled repair thresholds.
+    Manual orders take precedence.
   * Manual travel, Stop, another target or queued orders cancel our ownership
     and suppress that injury episode until its trigger clears. Only our sole
     exact order can be replaced; permanent jobs remain. Approach: 60 simulation s, at most
@@ -262,6 +280,10 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     elevated entrapment after a load loses the standing support handle. The
     landing must stay on the same side and navmesh region. Valid-face probes
     are limited to one per second independently of ordinary off-mesh recovery.
+    A retreating pack animal trapped on a wall can descend once terrain and
+    collision checks confirm that its footing is on the wall outside the
+    walkable surface. A character trapped inside a wall needs collision proof
+    from the same segment, with a clear, dry landing on the original side.
     NPCs repeatedly failing to reach their destinations can leave a steep platform
     slope for clear, dry ground in the same loaded zone while preserving wall
     and closed-gate boundaries. Recovery requires the selected time without progress,

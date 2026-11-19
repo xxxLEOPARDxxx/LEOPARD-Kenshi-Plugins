@@ -38,6 +38,8 @@ namespace EngineerMaterialsRuntime
     static bool (*productiveProject)(Building*)=NULL;
     static CRITICAL_SECTION mutex;
     static volatile LONG initialized=0,ready=0;
+    enum { CompletionStripes=64 };
+    static volatile LONG completionRevision[CompletionStripes]={};
     static unsigned generation=0;
     static AIFixedEngineer::Coordinator coordinator;
     struct DeniedMove
@@ -69,6 +71,14 @@ namespace EngineerMaterialsRuntime
     }
     inline bool Matches(GameData* data,const Material& material)
     {Material x;return MaterialOf(data,x)&&x==material;}
+    static volatile LONG* CompletionStripe(const Identity& h)
+    {
+        const unsigned hash=(h.index*0x9e3779b9u)^(h.container*0x85ebca6bu)^
+            h.serial^(h.containerSerial*31u)^h.type;
+        return &completionRevision[(hash^(hash>>16))&(CompletionStripes-1)];
+    }
+    static unsigned ProjectRevision(const Identity& h)
+    {return static_cast<unsigned>(InterlockedCompareExchange(CompletionStripe(h),0,0));}
     static unsigned Epoch(){return readEpoch?static_cast<unsigned>(readEpoch()):0;}
     static void ClearDenied()
     {for(unsigned i=0;i<AIFixedEngineer::Coordinator::Capacity;++i)denied[i].used=false;InterlockedExchange(&deniedCount,0);}
@@ -99,6 +109,13 @@ namespace EngineerMaterialsRuntime
     {if(InterlockedCompareExchange(&initialized,0,0)){const unsigned e=Epoch();const Identity id=Of(actor);Guard lock;if(Sync(e)){coordinator.Cancel(id);ClearDenied(id);}}}
     static void CancelAt(const Identity& actor,unsigned e)
     {Guard lock;if(Sync(e)){coordinator.Cancel(actor);ClearDenied(actor);}}
+    inline void CompleteProject(const Identity& project,unsigned e,bool newlyObserved=false)
+    {
+        Guard lock;
+        if(!Sync(e)||!project.Valid())return;
+        const bool retired=coordinator.CompleteProject(project,e);
+        if(retired||newlyObserved)InterlockedIncrement(CompletionStripe(project));
+    }
     inline unsigned ListOwned(OwnedSurplus* out,unsigned capacity)
     {
         if(!out||!capacity||!InterlockedCompareExchange(&initialized,0,0))return 0;
@@ -244,10 +261,14 @@ namespace EngineerMaterialsRuntime
     {
         const unsigned e=Epoch();if(expectedEpoch!=~0u&&expectedEpoch!=e)return false;
         if(!actor||!project||!material||!MaterialOf(material,r.material))return false;
-        Building::ConstructionState* state=project->getBuildState();if(!state)return false;
+        r.project=Of(project->handle);
+        // Only actual acquisition requests need a fence. Bulk native
+        // previews do not need an atomic revision read for every source.
+        if(weigh)r.completionRevision=ProjectRevision(r.project);
+        Building::ConstructionState* state=project->getBuildState();if(!state||state->isComplete)return false;
         r.need=state->needsMat(material);if(r.need<=0)return false;
         r.carried=InventoryCount(actor,material);if(r.carried<0)return false;
-        r.actor=Of(actor->handle);r.project=Of(project->handle);r.source=Of(source);
+        r.actor=Of(actor->handle);r.source=Of(source);
         r.epoch=e;r.now=GetTickCount();r.ground=false;r.capacity=32;
         if(source.type==BUILDING)
         {
@@ -276,12 +297,16 @@ namespace EngineerMaterialsRuntime
     }
     static int Preview(const Request& r)
     {Guard lock;return Sync(r.epoch)?coordinator.Preview(r):0;}
+    static bool RequestCurrent(const Request& r)
+    {return Sync(r.epoch)&&r.completionRevision==ProjectRevision(r.project);}
     static int Commit(const Request& r)
-    {Guard lock;return Sync(r.epoch)?coordinator.Commit(r):0;}
+    {Guard lock;return RequestCurrent(r)?coordinator.Commit(r):0;}
     static int Grant(const Request& r)
-    {Guard lock;return Sync(r.epoch)?coordinator.Grant(r):0;}
+    {Guard lock;return RequestCurrent(r)?coordinator.Grant(r):0;}
     static bool Has(const Request& r)
     {Guard lock;return Sync(r.epoch)&&coordinator.Has(r);}
+    static bool HasReceipt(const Request& r)
+    {Guard lock;return Sync(r.epoch)&&coordinator.HasReceipt(r);}
     static bool CanTrack(const Request& r)
     {Guard lock;return Sync(r.epoch)&&coordinator.CanTrack(r);}
     static int Cargo(const Request& r,bool& capacity)
@@ -294,7 +319,7 @@ namespace EngineerMaterialsRuntime
     {
         if(e!=Epoch())return false;
         Building::ConstructionState* state=project->getBuildState();
-        if(!state||state->mats.size()>16||e!=Epoch())return false;
+        if(!state||state->isComplete||state->mats.size()>16||e!=Epoch())return false;
         const Identity who=Of(actor->handle),where=Of(project->handle);
         if(!who.Valid()||!where.Valid())return false;
         const unsigned now=GetTickCount();
@@ -516,6 +541,7 @@ namespace EngineerMaterialsRuntime
         CargoResult result;Building::ConstructionState* state=project->getBuildState();
         if(!state||state->mats.size()>16)return result;
         const Identity who=Of(actor->handle),where=Of(project->handle);
+        if(state->isComplete){CompleteProject(where,e);return result;}
         for(unsigned i=0;i<state->mats.size()&&e==Epoch();++i)
         {
             Building::ConstructionState::BuildMaterial* needed=state->mats[i];if(!needed)continue;
@@ -598,7 +624,11 @@ namespace EngineerMaterialsRuntime
         if(!SourceWatch(Of(actor->handle),Of(project->handle),Of(pending->subject),GetTickCount(),e,previous))return;
         Building::ConstructionState* state=project->getBuildState();GameData* material=NULL;
         if(state&&state->mats.size()>16)return; // Unsupported modded shape retains native ownership.
-        if(!state){DenyMove(system,project,pending,e);StopDeniedMove(body,actor,project,e);return;}
+        if(!state||state->isComplete)
+        {
+            if(state)CompleteProject(previous.project,e);
+            DenyMove(system,project,pending,e);StopDeniedMove(body,actor,project,e);return;
+        }
         for(unsigned i=0;i<state->mats.size();++i)
         {Building::ConstructionState::BuildMaterial* m=state->mats[i];if(m&&Matches(m->mat,previous.material)){material=m->mat;break;}}
         Request current;
@@ -701,7 +731,7 @@ namespace EngineerMaterialsRuntime
         // the captured full identity before reading the pickup receipt.
         Item* item=Handle(r.source).getItem();GameData* data=item?item->getGameData():NULL;
         if(e!=Epoch()||!item||Of(item->handle)!=r.source||item->isInInventory||
-            !item->getInventoryWeAreIn().isNull()||!Matches(data,r.material)||item->quantity!=r.available)
+            !item->getInventoryWeAreIn().isNull()||!Matches(data,r.material)||item->quantity!=r.available||!Has(r))
         {if(e==Epoch()){Cancel(actor->handle);Replan(body);}return;}
         Transfer scope(task,body,project,e);scope.request=r;scope.material=data;
         scope.hasRequest=true;scope.receipt=r.source;scope.receiptUnits=r.available;
@@ -742,7 +772,7 @@ namespace EngineerMaterialsRuntime
             Inventory* main=actor->getInventory();ContainerItem* bag=actor->hasABackpackOn();
             Inventory* backpack=bag?bag->getInventory():NULL;
             witness=(inventory==main||inventory==backpack)&&Matches(material,scope->request.material)&&
-                units>0&&units<=scope->receiptUnits&&Has(scope->request);
+                units>0&&units<=scope->receiptUnits&&HasReceipt(scope->request);
             if(witness){before=InventoryCount(actor,material);witness=before==scope->receiptBefore;}
         }
         // Includes KEO's direct worn-backpack tryAddItem route. Hook order at

@@ -120,6 +120,7 @@ namespace
     volatile LONG g_loadGeneration = 0;
     volatile LONG g_worldActiveAt = 0, g_worldReadyGeneration = -1;
     volatile LONG g_loading = 0;
+    volatile LONG g_rescuePolicyGeneration = 0;
     LONG g_seenGeneration = -1;
     bool g_lifecycleReady = false, g_sessionActive = false;
 
@@ -166,6 +167,7 @@ namespace
             return;
 
         const char* const section = "AIFixed";
+        const bool rescueWasEnabled=g_skeletonBeds&&(g_selfRepair||g_repairHealth);
 
         g_enabled =
             GetPrivateProfileIntA(section, "Enabled", 1, ini.c_str()) != 0;
@@ -182,6 +184,8 @@ namespace
             g_selfRepairWear = 100;
         g_autoSleep=GetPrivateProfileIntA(section,"AutoSleep",0,ini.c_str())!=0;
         g_repairHealth=GetPrivateProfileIntA(section,"RepairHealth",0,ini.c_str())!=0;
+        if(rescueWasEnabled!=(g_skeletonBeds&&(g_selfRepair||g_repairHealth)))
+            InterlockedIncrement(&g_rescuePolicyGeneration);
         g_ownBedsOnly=GetPrivateProfileIntA(section,"OwnBedsOnly",1,ini.c_str())!=0;
         g_sleepBelow=(std::max)(10,(std::min)(99,(int)GetPrivateProfileIntA(section,"SleepBelowHealth",90,ini.c_str())));
         g_healAbove=(std::max)(g_sleepBelow,(std::min)(100,(int)GetPrivateProfileIntA(section,"WakeAboveHealth",99,ini.c_str())));
@@ -306,6 +310,13 @@ namespace
         __finally{t_ownOrder=old;}
     }
 
+    void ClearOwnRestOrder(OrdersReceiver* orders)
+    {
+        const bool old=t_ownOrder;t_ownOrder=true;
+        __try{orders->clearOrders();}
+        __finally{t_ownOrder=old;}
+    }
+
     #include "GateRuntime.h"
 
     bool IsRobot(Character* c)
@@ -365,8 +376,11 @@ namespace
     {
         if(!bed||!context.owner)return false;
         candidate.properFunction=bed->getSpecialFunction()==(care==AIFixedRest::Repair?BF_SKELETON_BED:BF_BED);
-        candidate.furniture=bed->isFurniture();
-        if(!candidate.properFunction||!candidate.furniture)return false;
+        if(!candidate.properFunction)return false;
+        // A repair bed is identified by BF_SKELETON_BED. The native furniture
+        // predicate describes placement/layout and can exclude valid mod beds.
+        candidate.furniture=care==AIFixedRest::Repair||bed->isFurniture();
+        if(!candidate.furniture)return false;
         Faction* owner=bed->getFaction();candidate.own=owner==context.owner;
         candidate.allied=!g_ownBedsOnly&&owner&&owner!=context.owner&&owner->relations&&owner->relations->isAlly(context.owner);
         candidate.sameTown=bed->getTown()==context.town;
@@ -623,7 +637,7 @@ namespace
     // (правка 1б), потом наш приказ снимается - и он встаёт к своим делам.
     //
     // Не трогаем: тех, кто в бою, без сознания, лежит, несёт кого-то или
-    // кого несут, уже в кровати или тюрьме. Игрок отменил приказ -
+    // кого несут, в тюрьме или в чужом эпизоде сна. Игрок отменил приказ -
     // повторяем не чаще раза в 20 с и не больше 3 раз, пока износ не
     // опустится ниже порога.
     //
@@ -651,6 +665,8 @@ namespace
         DWORD progressAt;
         bool failed;
         bool foodPaused;
+        hand transferFrom;  // Ordinary bed used by native automatic rescue.
+        DWORD fallbackCheckedAt;
     };
 
     enum { NOTED_NONE, NOTED_NO_BED, NOTED_SENT, NOTED_HEADING, NOTED_NOT_GOING };
@@ -677,6 +693,55 @@ namespace
     // A recycled address must not inherit another character's attempts/order.
     typedef std::map<hand, SelfRepairState, HandIdentityLess> RepairStateMap;
     RepairStateMap g_selfRepairState;
+
+    struct RescueFallback
+    {
+        hand bed;
+        unsigned inputSerial;
+        LONG generation;
+        LONG policyGeneration;
+        DWORD observed;
+        bool arrived;
+    };
+    typedef std::map<hand, RescueFallback, HandIdentityLess> RescueFallbackMap;
+    RescueFallbackMap g_rescueFallbacks;
+    const DWORD RESCUE_FALLBACK_OBSERVATION_MS = 30000;
+
+    void RecordRescueFallback(Character* patient, const hand& bed, LONG generation, LONG policyGeneration)
+    {
+        const unsigned serial=InputSequence(patient);
+        if(serial==~0u)return;
+        const hand who(patient);
+        RescueFallback fallback={bed,serial,generation,policyGeneration,GetTickCount(),false};
+        IntentGuard guard;
+        if(g_rescueFallbacks.size()<256||g_rescueFallbacks.find(who)!=g_rescueFallbacks.end())
+            g_rescueFallbacks[who]=fallback;
+    }
+
+    bool FromRescueFallback(Character* c, unsigned inputSerial)
+    {
+        const hand who(c);
+        const hand current=c->inSomething==IN_BED?c->inWhat:hand();
+        const DWORD now=GetTickCount();
+        IntentGuard guard;
+        RescueFallbackMap::iterator it=g_rescueFallbacks.find(who);
+        if(it==g_rescueFallbacks.end())return false;
+        RescueFallback& fallback=it->second;
+        if(fallback.generation!=g_seenGeneration||inputSerial!=fallback.inputSerial||
+           fallback.policyGeneration!=InterlockedCompareExchange(&g_rescuePolicyGeneration,0,0))
+        {
+            g_rescueFallbacks.erase(it);
+            return false;
+        }
+        if(SameIdentity(current,fallback.bed))
+        {
+            fallback.arrived=true;fallback.observed=now;
+            return true;
+        }
+        if(fallback.arrived||now-fallback.observed>RESCUE_FALLBACK_OBSERVATION_MS)
+            g_rescueFallbacks.erase(it);
+        return false;
+    }
 
 
     float WorstWear(MedicalSystem* med, bool robotRace)
@@ -725,6 +790,7 @@ namespace
             return NULL;
         lektor<Building*>& machines = Machines();
         ai->getAllLocalMachines(machines, (1u << BF_SKELETON_BED)|(1u << BF_BED));
+        if(machines.size()>4096)return NULL;
         for (uint32_t i = 0; i < machines.size(); ++i)
             if (machines[i] != NULL && SameIdentity(hand(machines[i]), stored))
                 return machines[i];
@@ -750,17 +816,39 @@ namespace
         if(!health.valid)return false;
         const AIFixedRest::Care needed=RestNeeded(health);
         const AIFixedRest::Care care=state.care?static_cast<AIFixedRest::Care>(state.care):AIFixedRest::Repair;
-        if(state.ordered&&InputSequence(c)!=state.inputSerial){state.interrupted=true;state.sent=false;}
+        const unsigned inputSerial=InputSequence(c);
+        if(state.ordered&&inputSerial!=state.inputSerial){state.interrupted=true;state.sent=false;}
         if(state.interrupted)return needed!=AIFixedRest::None;
         const bool owned=state.sent&&OwnRestOrderMatches(c,orders,state);
         if(state.sent&&!owned){state.interrupted=true;state.sent=false;return needed!=AIFixedRest::None;}
         const bool foodPriority=!AIFixedRest::NutritionAllows(robotRace,robotRace?1.0f:med->getHungerSpeedModifier());
-        if(c->inSomething==IN_BED)
+        const bool inBed=c->inSomething==IN_BED;
+        const bool fromRescue=g_skeletonBeds&&!owned&&(g_selfRepair||g_repairHealth)&&
+                              FromRescueFallback(c,inputSerial);
+        const bool moveFromRescue=fromRescue&&needed==AIFixedRest::Repair;
+        const hand rescueBed=moveFromRescue?c->inWhat:hand();
+        if(inBed&&!moveFromRescue)
         {
             if(!owned)return needed!=AIFixedRest::None;
-            if(!SameIdentity(c->inWhat,state.bed))return false;
+            if(!SameIdentity(c->inWhat,state.bed))
+            {
+                if(SameIdentity(state.transferFrom,hand())||!SameIdentity(c->inWhat,state.transferFrom))return false;
+                if(g_skeletonBeds&&(g_selfRepair||g_repairHealth)&&!g_restConflict&&!foodPriority&&
+                   !c->isDown()&&!c->isUnconcious()&&!c->isDead()&&!c->isInCombatMode(true,true)&&
+                   now-state.lastOrder<60000)
+                {
+                    AI* const ai=c->getAI();
+                    const RestBedContext context(c);AIFixedRest::Bed candidate;
+                    if(ai&&RestBedAllowed(LiveRepairBed(ai,state.bed),context,care,candidate))return true;
+                }
+                if(OwnRestOrderMatches(c,orders,state))ClearOwnRestOrder(orders);
+                state.sent=false;state.interrupted=true;
+                return needed!=AIFixedRest::None;
+            }
+            state.transferFrom=hand();
             Building* bed=c->inWhat.getBuilding();
-            const bool working=bed&&(care!=AIFixedRest::Repair||RepairRate(bed)>0);
+            const bool working=bed&&(care!=AIFixedRest::Repair||
+                                    (bed->getSpecialFunction()==BF_SKELETON_BED&&RepairRate(bed)>0));
             const bool active=care==AIFixedRest::Sleep?g_autoSleep:(g_selfRepair||g_repairHealth);
             const float progress=care==AIFixedRest::Sleep?health.fleshRatio*100:-health.robotMissing-health.wear;
             // New damage lowers the comparison baseline; subsequent healing is
@@ -795,9 +883,9 @@ namespace
             if(owned){OwnRestOrder(orders,GET_OUT_OF_BED,c->handle,c->getPosition());state.sent=false;state.bed=hand();state.lastOrder=now;}
             return needed!=AIFixedRest::None;
         }
-        if(c->inSomething!=IN_NOTHING||c->isDead()||c->isUnconcious()||c->isDown()||
+        if((!moveFromRescue&&c->inSomething!=IN_NOTHING)||c->isDead()||c->isUnconcious()||c->isDown()||
            c->isCarryingSomething||c->isBeingCarried()||c->isInCombatMode(true,true))return state.ordered!=0;
-        if(g_restConflict||!g_newHooksReady||InputSequence(c)==~0u)return false;
+        if(g_restConflict||!g_newHooksReady||inputSerial==~0u)return false;
         if(orders->hasPlayerOrders()&&!owned)return needed!=AIFixedRest::None;
         if(needed==AIFixedRest::None&&!state.sent)return false;
         AI* ai=c->getAI();if(!ai)return false;
@@ -815,6 +903,11 @@ namespace
         }
         if(needed==AIFixedRest::None)return false;
         if(state.tries>=SELF_REPAIR_TRIES||(state.lastOrder&&now-state.lastOrder<SELF_REPAIR_RETRY_MS))return true;
+        if(moveFromRescue)
+        {
+            if(state.fallbackCheckedAt&&now-state.fallbackCheckedAt<SELF_REPAIR_RETRY_MS)return true;
+            state.fallbackCheckedAt=now;
+        }
         Building* bed=NULL;bool lookupFailed=false;
         {
             // Catch native lookup faults inside this allocation-owning scope.
@@ -824,8 +917,17 @@ namespace
         }
         if(lookupFailed){state.interrupted=true;return true;}
         if(!bed)return true;
-        state.inputSerial=InputSequence(c);
+        if(InputSequence(c)!=inputSerial||orders->hasPlayerOrders())return true;
+        if(moveFromRescue&&(c->inSomething!=IN_BED||!SameIdentity(c->inWhat,rescueBed)||
+                           !FromRescueFallback(c,inputSerial)))return true;
+        state.inputSerial=inputSerial;
+        state.transferFrom=rescueBed;
         OwnRestOrder(orders,USE_BED_ORDER,bed->handle,bed->getPosition());
+        if(moveFromRescue)
+        {
+            const hand who(c);IntentGuard guard;
+            g_rescueFallbacks.erase(who);
+        }
         state.bed=hand(bed);state.sent=true;state.care=needed;state.ordered=state.lastOrder=now;++state.tries;
         state.progressAt=now;state.progress=needed==AIFixedRest::Sleep?health.fleshRatio*100:-health.robotMissing-health.wear;
         g_reserved[state.bed]=hand(c);NoteSelfRepair(c,"assigned a nearby eligible bed");return true;
@@ -939,6 +1041,9 @@ namespace
         // Remove identities no longer in the player's live list. Keep sequence
         // numbers for current actors even when they have no rest episode.
         IntentGuard guard;
+        const DWORD observed=GetTickCount();
+        for(RescueFallbackMap::iterator it=g_rescueFallbacks.begin();it!=g_rescueFallbacks.end();)
+            if(observed-it->second.observed>RESCUE_FALLBACK_OBSERVATION_MS)g_rescueFallbacks.erase(it++);else ++it;
         for(IntentMap::iterator it=g_intents.begin();it!=g_intents.end();)
         {
             bool live=false;
@@ -1003,6 +1108,7 @@ namespace
         config.snapshot=&EngineerSnapshot;config.resolve=&EngineerResolve;
         config.addHook=&EngineerAddHook;config.report=&EngineerReport;
         config.materialsEnRoute=&EngineerMaterialsRuntime::MaterialsEnRoute;
+        config.constructionCompleted=&EngineerCompletedProject;
         // Construction requires both target selection and shared materials.
         // Surplus return is optional and owns a separate native safety gate.
         const bool priority=PriorityNative::Configure(config)&&PriorityNative::Install();
@@ -1037,7 +1143,7 @@ namespace
         g_restClock.Reset();
         g_gateClock.Reset();
         g_gateStates.clear();g_gateCursor=hand();g_lastGateScan=0;
-        {IntentGuard guard;g_intents.clear();g_moveIntents.clear();g_gateDoorChanges.clear();g_intentOverflow=false;}
+        {IntentGuard guard;g_intents.clear();g_moveIntents.clear();g_gateDoorChanges.clear();g_rescueFallbacks.clear();g_intentOverflow=false;}
         EnterCriticalSection(&g_noteLock);
         g_notedSearch.clear();
         g_notedBed.clear();
@@ -1241,9 +1347,45 @@ namespace
         }
     }
 
+    void CaptureRescueFallback(Character* carrier)
+    {
+        const LONG policyGeneration=InterlockedCompareExchange(&g_rescuePolicyGeneration,0,0);
+        if(!carrier||!g_newHooksReady||!g_lifecycleReady||!g_skeletonBeds||
+           (!g_selfRepair&&!g_repairHealth)||InterlockedCompareExchange(&g_loading,0,0)!=0||
+           !carrier->isPlayerCharacter())return;
+        const LONG generation=InterlockedCompareExchange(&g_loadGeneration,0,0);
+        Character* const patient=CarriedRobot(carrier);
+        if(!patient||patient==carrier||!patient->isPlayerCharacter())return;
+        OrdersReceiver* const rescue=carrier->getOrdersReciever();
+        OrdersReceiver* const orders=patient->getOrdersReciever();
+        if(!rescue||!orders||rescue->getCurrentGoal().key()!=PUT_SOMEONE_IN_BED||
+           rescue->hasPlayerOrders()||orders->hasPlayerOrders())return;
+        AI* const ai=carrier->getAI();
+        Tasker* const action=ai&&ai->taskSystemAI?ai->taskSystemAI->actions.getFirstTask():NULL;
+        if(!action||action->key()!=PUT_SOMEONE_IN_BED)return;
+        Building* const bed=action->subject.getBuilding();
+        if(!bed||bed->getSpecialFunction()!=BF_BED)return;
+        // Native rescue uses this remove-only drop immediately before laying
+        // the patient down. The rest scan confirms the exact live bed handle.
+        try{RecordRescueFallback(patient,bed->handle,generation,policyGeneration);}
+        catch(...){ErrorLog("AIFixed: could not record automatic rescue bed");}
+    }
+
+    void SafeCaptureRescueFallback(Character* carrier)
+    {
+        __try{CaptureRescueFallback(carrier);}
+        __except(NativeFaultFilter(GetExceptionCode()))
+        {
+            static LONG told=0;
+            if(InterlockedExchange(&told,1)==0)
+                ErrorLog("AIFixed: invalid automatic rescue bed observation");
+        }
+    }
+
     void Drop_hook(Character* self, bool ragdoll, bool removeOnly)
     {
         if (g_debug) SafeNoteDrop(self, ragdoll, removeOnly, _ReturnAddress());
+        if(removeOnly&&!ragdoll)SafeCaptureRescueFallback(self);
         g_origDrop(self, ragdoll, removeOnly);
     }
 
@@ -1518,12 +1660,15 @@ __declspec(dllexport) void startPlugin()
         ErrorLog("AIFixed: could not hook the interface update, no self-repair");
     }
 
-    // Диагностика - только при подробном журнале на старте.
+    if((g_debug||(g_lifecycleReady&&g_newHooksReady))&&
+       KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::dropCarriedObject),
+                                             Drop_hook,&g_origDrop))
+        ErrorLog("AIFixed: could not observe automatic rescue bed placements");
+
+    // Остальная диагностика - только при подробном журнале на старте.
     if (g_debug)
     {
-        if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::dropCarriedObject),
-                                                     Drop_hook, &g_origDrop) ||
-            KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::setBedMode),
+        if (KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::setBedMode),
                                                      SetBedMode_hook, &g_origSetBedMode) ||
             KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(&AITaskSytem::taskImpossible),
                                                      TaskImpossible_hook, &g_origTaskImpossible) ||

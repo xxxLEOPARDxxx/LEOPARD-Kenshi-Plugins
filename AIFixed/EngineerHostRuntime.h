@@ -92,3 +92,10 @@ Building* EngineerResolve(const AIFixedEngineerPriority::Key& key)
     }
     __except(EngineerNativeFaultFilter(GetExceptionCode())){return NULL;}
 }
+void EngineerCompletedProject(const AIFixedEngineerPriority::Key& key,unsigned generation)
+{
+    AIFixedEngineer::Identity project;
+    project.type=key.type;project.container=key.container;project.containerSerial=key.containerSerial;
+    project.index=key.index;project.serial=key.serial;
+    EngineerMaterialsRuntime::CompleteProject(project,generation,true);
+}

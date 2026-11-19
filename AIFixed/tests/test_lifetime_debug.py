@@ -34,7 +34,8 @@ helpers = '\n'.join(function(name, optional=True) for name in (
     'InvalidateWorld', 'WorldActive', 'ResetSessionState', 'SelfRepairSessionReady',
     'World_hook', 'LoadGame_hook', 'NewGame_hook', 'ResetGame_hook', 'ClearWorld_hook'))
 wrappers = '\n'.join(function(name) for name in (
-    'OwnRestOrder', 'OwnRestOrderMatches','LiveRepairBed', 'SelfRepairOne', 'ReadRestClock','ReadGateClock','SelfRepairScan', 'GateUpdate','GuiUpdate_hook', 'Drop_hook', 'SetBedMode_hook',
+    'OwnRestOrder', 'ClearOwnRestOrder', 'OwnRestOrderMatches','LiveRepairBed', 'SelfRepairOne', 'ReadRestClock','ReadGateClock','SelfRepairScan', 'GateUpdate','GuiUpdate_hook',
+    'CaptureRescueFallback', 'SafeCaptureRescueFallback', 'Drop_hook', 'SetBedMode_hook',
     'TaskImpossible_hook', 'Medical_hook', 'MCM_Describe'))
 if '--baseline-repair' in sys.argv:
     current=source
@@ -43,7 +44,7 @@ if '--baseline-repair' in sys.argv:
     source=current
     wrappers=wrappers.replace(function('SelfRepairOne'),old)
 fixture = (here / 'lifetime_debug_fixture.cpp').read_text(encoding='utf-8')
-fixture = fixture.replace('// @STATE@', identity + '\n' + state)
+fixture = fixture.replace('// @IDENTITY@', identity).replace('// @STATE@', state)
 fixture = fixture.replace('// @PRODUCTION@', helpers + '\n' + wrappers)
 fixture = fixture.replace('// @LIFECYCLE@', '#define HAS_LIFECYCLE 1' if function('InvalidateWorld', True) else '')
 out = here / '_generated'

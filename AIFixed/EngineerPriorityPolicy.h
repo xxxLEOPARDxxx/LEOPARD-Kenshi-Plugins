@@ -47,8 +47,12 @@ namespace AIFixedEngineerPriority
         }
         bool Started(const Key& key)const
         {const Entry* e=Find(key);return e&&e->started;}
-        void Forget(const Key& key)
-        {Entry* e=Find(key);if(e){if(e->started)--startedCount_;e->state=2;--count_;}}
+        bool Forget(const Key& key)
+        {
+            Entry* e=Find(key);if(!e)return false;
+            if(e->started)--startedCount_;
+            e->state=2;--count_;return true;
+        }
         unsigned Collect(Key* keys,unsigned limit,unsigned& cursor)const
         {
             if(!count_||!keys||!limit)return 0;

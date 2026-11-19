@@ -12,6 +12,7 @@ def function(name,optional=False):
     while depth:
         depth+=(source[end]=='{')-(source[end]=='}');end+=1
     return source[match.start():end]
+production+=source[source.index('    struct RescueFallback'):source.index('    const DWORD RESCUE_FALLBACK_OBSERVATION_MS')]
 production+='\n'+'\n'.join(function(name,True) for name in ('ReadGateClock','ResetSessionState','GateUpdate','GuiUpdate_hook'))
 fixture=(here/'gate_runtime_fixture.cpp').read_text(encoding='utf-8').replace('// @PRODUCTION@',production)
 out=here/'_generated';out.mkdir(exist_ok=True)

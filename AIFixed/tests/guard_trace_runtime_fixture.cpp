@@ -6,7 +6,14 @@
 #include <UnstuckPolicy.h>
 
 enum itemType { BUILDING=0,CHARACTER=1,EMPTY_HANDLE=11 };
-enum TaskType { NULL_TASK=0,MOVE_ON_FREE_WILL=1,IDLE=14,USE_BED=99,SHOPPING=119,PATROL_TOWN=36,STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE=157,OTHER_TASK=999 };
+enum TaskType {
+    NULL_TASK=0,MOVE_ON_FREE_WILL=1,IDLE=14,PATROL=22,RUN_AWAY=35,PATROL_TOWN=36,
+    USE_BED=99,SHOPPING=119,RUN_AWAY_HOMETOWN=127,RETREAT_HOMETOWN=128,FOLLOW_SQUADLEADER=141,
+    STAND_AT_GUARD_NODE_HOMETOWN_OUTSIDE=157,MOVE_CUS_ORDERED=201,GET_NEAR_TO=202,
+    WANDERING_TRADER=203,TRAVEL_TO_TARGET_TOWN=204,TRAVEL_TO_TARGET_TOWN_FAST=205,
+    FOLLOW_PLAYER_ORDER=206,STAY_CLOSE_TO_TARGET=207,STAY_CLOSE_TO_TARGET_ANIMAL=208,
+    RUN_AWAY_FORCED=270,OTHER_TASK=999
+};
 enum { BF_FLUFF=18,BF_BED=19,MOVE_NORMAL=0,MOVE_DIRECTION=2,IN_NOTHING=0 };
 namespace WaterState {enum { THIGH_DEEP_WATER=2 };}
 namespace RobotLimbs {enum Limb { LEFT_LEG,RIGHT_LEG };}
@@ -23,12 +30,13 @@ struct hand {
 struct Building {
     hand handle;
     int function;
-    bool disabled;
+    bool disabled,wall;
     struct {bool isComplete;} _buildState;
-    Building():handle(7,1688598656u,BUILDING,2724,11111),function(BF_FLUFF),disabled(false){_buildState.isComplete=true;}
+    Building():handle(7,1688598656u,BUILDING,2724,11111),function(BF_FLUFF),disabled(false),wall(false){_buildState.isComplete=true;}
     int getSpecialFunction(){return function;}bool isDisabled(){return disabled;}
+    bool isAWall(){return wall;}bool isGate(){return false;}
 };
-struct StandingHandle {Building* object;Building* getBuilding(){return object;}};
+struct StandingHandle {Building* object;Building* getBuilding(){return object;}operator bool(){return object!=NULL;}};
 struct HVector {struct {float m128_f32[4];} m_quad;};
 struct HavokCharacter {
     enum CharacterState {IDLE,GOAL_REACHED,FOLLOWING_PATH,MANUAL};
@@ -40,10 +48,12 @@ struct HavokCharacter {
 };
 struct CharMovement {
     HavokCharacter* havokCharacter;StandingHandle support;
-    bool animationOverride,tracking,indoors;int movementMode;
-    CharMovement():havokCharacter(NULL),animationOverride(false),tracking(false),indoors(false),movementMode(MOVE_NORMAL){support.object=NULL;}
+    Ogre::Vector3 desiredMotion,destination;
+    bool animationOverride,tracking,indoors,reached;int movementMode;
+    CharMovement():havokCharacter(NULL),animationOverride(false),tracking(false),indoors(false),reached(false),movementMode(MOVE_NORMAL){support.object=NULL;}
     bool isTrackingAnimationMode(){return tracking;}bool isIndoors(){return indoors;}
     StandingHandle isStandingOnSomething(){return support;}
+    bool isDestinationReached(){return reached;}Ogre::Vector3 getDestination(){return destination;}
 };
 struct MedicalSystem {
     bool crippled;LimbState legs[2];MedicalSystem():crippled(false){legs[0]=legs[1]=LIMB_OK;}
@@ -67,6 +77,7 @@ struct Character {
     bool isUnconcious(){return unconscious;}bool isRagdoll(){return ragdoll;}bool isCrippled(){return crippled;}
     bool isBeingCarried(){return carried;}bool isInCombatMode(bool,bool){return combat;}int getWaterLevel(){return water;}
     bool isAnimal(){return animal;}MedicalSystem* getMedical(){return &medical;}Ogre::Vector3 getPosition(){return position;}
+    Character* getSquadLeader(){return this;}
     bool isPhysicalMode;void teleport(const Ogre::Vector3& p);
 };
 Character* hand::getCharacter()const {
@@ -85,6 +96,7 @@ bool g_debug=false;
 int g_unstuckDelayHours=4; // Legacy captured replay explicitly exercises its old4h configuration.
 unsigned teleports=0,probes=0;
 bool allowLanding=true,reachedDuringProbe=false;
+bool retreatCancelledDuringProbe=false;
 double firstRelocationHours=0,firstRelocationAge=0,currentHours=0;
 const AIFixedGate::Point capturedSlope(-.8357168157f,.5356243592f,-.1211773484f);
 History& Entry(const Identity& id){
@@ -93,24 +105,27 @@ History& Entry(const Identity& id){
     return history[start];
 }
 void Character::teleport(const Ogre::Vector3& p){position=p;++teleports;if(!firstRelocationHours){firstRelocationHours=currentHours;firstRelocationAge=currentHours-Entry(Identity(handle)).watch.since;}}
-bool IsWallFollower(Character*,CharMovement*,TaskType){return false;}
-AIFixedGate::Point Point(const Ogre::Vector3& v){return AIFixedGate::Point(v.x,v.y,v.z);}
-bool MovingDestination(TaskType task){return task==PATROL_TOWN;}
+// @TRAVEL@
+
 const TaskMatch* CurrentGoal(Character* c){return &c->currentGoal;}
 TaskType GoalTask(const TaskMatch* g){return g && g->taskData?g->key():NULL_TASK;}
-bool ReadIntent(Character*,CharMovement*,const TaskMatch*,TaskType,Identity&,AIFixedGate::Point&){return false;}
 
-// @CAN_TRAVEL@
+// @INTENT@
 // @GUARD_CYCLE@
 
 Building* BlockedSupport(Character*,CharMovement*,TaskType,const Ogre::Vector3&){return NULL;}
 bool NativePositionAgrees(HavokCharacter*,const Ogre::Vector3&){return true;}
-bool FindLanding(GameWorld*,Character* c,Building*,const Ogre::Vector3& here,unsigned,Ogre::Vector3& landing,unsigned& sites,bool guard,LandingTrace& trace){
+bool FindLanding(GameWorld*,Character* c,Building*,const Ogre::Vector3& here,unsigned,Ogre::Vector3& landing,unsigned& sites,
+                 bool guard,LandingTrace& trace,WallIntent wall=NoWallIntent){
     ++probes;sites=1;
     if(reachedDuringProbe){c->movement->havokCharacter->state=HavokCharacter::GOAL_REACHED;c->movement->havokCharacter->goal=c->movement->havokCharacter->position;}
+    if(retreatCancelledDuringProbe)c->movement->desiredMotion=Ogre::Vector3();
     // Native terrain/collision/navmesh/barrier queries remain explicit fakes.
     // Their real guard branch and all geometry limits are unchanged by this fix.
     landing=Ogre::Vector3(here.x-12.0f,here.y-100.0f,here.z-2.0f);
+#ifdef TEST_WALL_INTENT
+    if (wall!=NoWallIntent) return allowLanding;
+#endif
     return guard && allowLanding && AIFixedUnstuck::LandingAllowed(Point(here),Point(landing),landing.y,14.0f) &&
         here.y-landing.y>=50.0f && AIFixedUnstuck::GuardLeavesSlope(Point(here),Point(landing),capturedSlope);
 }
@@ -135,7 +150,8 @@ void Reset(Character& c,CharMovement& m,HavokCharacter& nav,Building& b){
     for(unsigned i=0;i<HistorySize;++i)history[i]=History();
     c=Character();m=CharMovement();nav=HavokCharacter();b=Building();
     c.movement=&m;c.isPhysicalMode=true;m.havokCharacter=&nav;m.support.object=&b;actorObject=&c;
-    activeMs=lastProbeMs=lastRockProbeMs=0;teleports=probes=0;firstRelocationHours=firstRelocationAge=0;allowLanding=true;reachedDuringProbe=false;
+    activeMs=lastProbeMs=lastRockProbeMs=0;teleports=probes=0;firstRelocationHours=firstRelocationAge=0;allowLanding=true;
+    reachedDuringProbe=false;retreatCancelledDuringProbe=false;
 }
 void Apply(Character& c,HavokCharacter& nav,const Captured& s){
     c.position=Ogre::Vector3(s.position[0],s.position[1],s.position[2]);
@@ -318,6 +334,51 @@ int main(){
     activeMs=3000;Inspect(&world,id,800.2,0);
     Check(debugLines==1,"repeated observations of one actor are rate limited");
     g_debug=false;
+#ifdef TEST_WALL_INTENT
+    for(unsigned kind=0;kind<5;++kind){
+        Reset(actor,movement,nav,platform);g_unstuckDelayHours=1;
+        platform.function=BF_BED;platform.wall=true;
+        actor.position=Ogre::Vector3(-9297.7f,380.8f,27216.99f);
+        actor.animal=kind!=2;
+        actor.combat=kind==3;
+        actor.data.type=RETREAT_HOMETOWN;actor.currentGoal.taskData=&actor.data;
+        movement.movementMode=MOVE_DIRECTION;
+        movement.desiredMotion=Ogre::Vector3(kind==1?0.0f:1.0f,0,0);
+        nav.state=HavokCharacter::MANUAL;
+        retreatCancelledDuringProbe=kind==4;
+        for(unsigned n=0;n<115 && !teleports;++n){
+            currentHours=950+n*.01;activeMs=1000+n*100;
+            Inspect(&world,id,currentHours,0);
+        }
+        if(kind==0) Check(teleports==1&&firstRelocationAge>=1.0,
+            "actual Retreat admits an actively steering animal after the configured stationary period");
+        if(kind==1) Check(teleports==0&&probes==0,"an empty direction is not an active retreat attempt");
+        if(kind==2) Check(teleports==0&&probes==0,"ordinary humanoid direct steering cannot use the animal retreat fallback");
+        if(kind==3) Check(teleports==0&&probes==0,"retreat fallback retains the native combat exclusion");
+        if(kind==4) Check(teleports==0&&probes==1,"direct retreat cancellation during the probe blocks relocation");
+    }
+    Reset(actor,movement,nav,platform);platform.function=BF_BED;platform.wall=true;actor.animal=true;
+    actor.data.type=RETREAT_HOMETOWN;actor.currentGoal.taskData=&actor.data;
+    movement.reached=true;nav.state=HavokCharacter::IDLE;nav.path=HavokCharacter::FAILED;
+    nav.goal.m_quad.m128_f32[1]=-9.0f;
+    // A current failed remote native goal supports a retreat even after the game
+    // movement destination has reset. A stale failure without an action does not.
+    Identity subject;AIFixedGate::Point destination;WallIntent wall;
+    Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
+        wall==EmbeddedWallOnly,"stale retreat paths cannot establish upper wall intent");
+    actor.actionData.type=MOVE_ON_FREE_WILL;actor.action.taskData=&actor.actionData;actor.body.currentAction=&actor.action;
+    Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
+        wall==RetreatWallOnly,"current movement plus failed remote descent admits the retreat wall-only lane");
+    nav.goal=nav.position;
+    Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
+        wall==EmbeddedWallOnly,"a native goal at the actor's feet cannot establish upper wall intent");
+    actor.animal=false;actor.data.type=IDLE;actor.body.currentAction=NULL;
+    Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,IDLE,subject,destination,wall)&&
+        wall==EmbeddedWallOnly,"idle on reported wall can request only a proven solid enclosure exit");
+    platform.wall=false;
+    Check(!ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,IDLE,subject,destination,wall),
+        "idle on other native support is outside the wall-only lane");
+#endif
     printf("AIFixed extracted guard trace: %s (%d checks; 316 captured observations, synthetic repeated order/time)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
 }

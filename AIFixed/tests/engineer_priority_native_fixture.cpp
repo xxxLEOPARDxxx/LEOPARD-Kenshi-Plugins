@@ -22,7 +22,9 @@ static Building* candidates[8];static unsigned candidateCount=0;static Building*
 static Building* noSource=NULL;
 static bool inTransit=false,wrongMaterialCaller=false,wrongCache=false,expireDuringWait=false;
 static unsigned materialCalls=0,coverageChecks=0;
+static unsigned completionCalls=0,completionEpoch=0;static Key completedKey={};
 static void CheckUnlocked(){if(PriorityNative::metadataLock.RecursionCount&&reinterpret_cast<size_t>(PriorityNative::metadataLock.OwningThread)==GetCurrentThreadId())InterlockedIncrement(&lockedCallbacks);}
+static void Completed(const Key& key,unsigned e){CheckUnlocked();++completionCalls;completedKey=key;completionEpoch=e;}
 static bool Current(unsigned*g){CheckUnlocked();if(throwCurrent)RaiseException(0xE0421041,0,0,0);*g=epoch;return active;}
 static bool Allowed(AI*){CheckUnlocked();return allow;}
 static bool MaterialsEnRoute(AI*,Building* project)
@@ -72,7 +74,7 @@ static DWORD WINAPI WorkerFind(void*p){unsigned* result=static_cast<unsigned*>(p
 static DWORD WINAPI WorkerPlace(void*p){for(unsigned i=0;i<200;++i)Place(static_cast<Building*>(p));return 0;}
 int main(int argc,char**argv){
  Check(argc==2,"mapped image supplied");if(argc!=2)return 1;FILE*f=0;fopen_s(&f,argv[1],"rb");Check(f!=0,"mapped fixture opens");if(!f)return 1;fseek(f,0,SEEK_END);size_t size=ftell(f);rewind(f);image=(unsigned char*)std::malloc(size);Check(image&&fread(image,1,size,f)==size,"mapped fixture read");fclose(f);const unsigned thunks[5]={0x4CF5F,0x20D56,0x1E1DC,0x8918,0x5305D};for(unsigned i=0;i<5;++i)reinterpret_cast<size_t*>(image+0x1740910)[i]=reinterpret_cast<size_t>(image+thunks[i]);
- PriorityNative::Config cfg={};cfg.current=Current;cfg.allowActor=Allowed;cfg.snapshot=Snapshot;cfg.resolve=Resolve;cfg.addHook=AddHook;cfg.report=Report;cfg.diskIdentity=TestDisk;cfg.materialsEnRoute=MaterialsEnRoute;
+ PriorityNative::Config cfg={};cfg.current=Current;cfg.allowActor=Allowed;cfg.snapshot=Snapshot;cfg.resolve=Resolve;cfg.addHook=AddHook;cfg.report=Report;cfg.diskIdentity=TestDisk;cfg.materialsEnRoute=MaterialsEnRoute;cfg.constructionCompleted=Completed;
  Check(PriorityNative::Configure(cfg,image,size),"callbacks configured");Check(PriorityNative::Install(),"exact Steam image installs native observers");if(!PriorityNative::Ready()){std::printf("%u checks, %u failures\n",checks,failures);return 1;}
 
  Check(hookCalls==6&&reports==0,"exact six hooks, no startup error");
@@ -108,6 +110,12 @@ int main(int argc,char**argv){
  PriorityNative::Started(&a,epoch);
  const unsigned materialsBefore=materialCalls;
  Check(Find(ai)==0&&materialCalls==materialsBefore+1,"waiting for a working machine does not divert to the next machine");
+ // Native drops the first machine from discovery at completion. The same
+ // engineer must be able to take the second before registry maintenance.
+ a.complete=true;candidateCount=1;
+ const unsigned beforeHandoff=coverageChecks;
+ Check(Find(ai)==2&&coverageChecks==beforeHandoff,"next machine remains selectable while completed focus and incoming claims are still recorded");
+ a.complete=false;candidateCount=2;
  nativeResult=&wall;Check(Find(ai)==3,"the same wait does not suppress native wall work");nativeResult=&b;
  candidates[2]=&wall;candidateCount=3;
  Check(Find(ai)==3,"positive wall remains available even when native first ranks the later machine");
@@ -119,11 +127,17 @@ int main(int argc,char**argv){
  inTransit=false;Check(Find(ai)==2,"a genuinely unsupplied machine yields to useful work");
  noSource=NULL;nativeResult=&legacy;candidates[0]=&legacy;
  Check(Find(ai)==100,"established focus also orders legacy blueprints once elected");
- a.complete=true;Check(Find(ai)==4,"finished machine cannot retain focus");a.complete=false;
+ a.complete=true;
+ Check(Find(ai)==4,"finished machine cannot retain focus");
+ Candidate completed={};Snapshot(&a,&completed);
+ Check(completionCalls==1&&Equal(completedKey,completed.key)&&completionEpoch==epoch,
+     "already observed completed candidate releases exactly its own claims");
+ Check(Find(ai)==4&&completionCalls==1,"repeated native observations do not reissue completion");
+ a.complete=false;
  nativeResult=&b;candidates[0]=&b;
  PriorityNative::Invalidate();Place(&a);Place(&b);
  nativeResult=&wall;Check(Find(ai)==3,"native wall selection preserved");nativeResult=&b;
- b.complete=true;Check(Find(ai)==2,"native repair selection preserved");b.complete=false;
+ b.complete=true;Check(Find(ai)==2,"native repair selection preserved");b.complete=false;Place(&b);
  candidates[0]=&legacy;Check(Find(ai)==2,"unknown legacy positive candidate forces native fallback");candidates[0]=&b;
  allow=false;Check(Find(ai)==2,"coordinator actor/order/priority refusal preserves native");allow=true;
  active=false;Check(Find(ai)==2,"inactive world preserves native");active=true;
@@ -156,10 +170,14 @@ int main(int argc,char**argv){
  PriorityNative::Invalidate();Place(&a);Place(&b);a.paused=true;
  for(unsigned pass=0;pass<32;++pass){unsigned beforeResolve=resolveCalls;PriorityNative::Maintenance(999);Check(resolveCalls-beforeResolve<=8,"maintenance bounds native handle queries even with excessive requested budget");}
  a.paused=false;Check(Find(ai)==100,"paused construction retains placement ordinal");
+ const unsigned beforeMaintenanceCompletion=completionCalls;
  a.complete=true;for(unsigned pass=0;pass<32;++pass)PriorityNative::Maintenance(8);a.complete=false;
+ Check(completionCalls==beforeMaintenanceCompletion+1&&Equal(completedKey,completed.key)&&completionEpoch==epoch,
+     "bounded maintenance reports completion even after native discovery drops the site");
  Check(Find(ai)==2,"completed metadata is retired without retaining stale priority");
  PriorityNative::Invalidate();Place(&a);Place(&b);a.dismantled=true;for(unsigned pass=0;pass<32;++pass)PriorityNative::Maintenance();a.dismantled=false;
  Check(Find(ai)==2,"dismantled metadata is retired");
+ Check(completionCalls==beforeMaintenanceCompletion+1,"dismantling does not report construction completion");
  PriorityNative::Invalidate();Place(&a);Place(&b);failedResolve=true;for(unsigned pass=0;pass<32;++pass)PriorityNative::Maintenance();failedResolve=false;
  Check(Find(ai)==2,"unavailable handle becomes unknown native fallback rather than invented restored chronology");
  unsigned beforeResolve=resolveCalls;PriorityNative::Maintenance(0);Check(resolveCalls==beforeResolve,"zero maintenance budget performs no handle query");

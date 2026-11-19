@@ -22,8 +22,9 @@
 // `current` admits the game's own callback thread (including native AI workers).
 // `snapshot` must use full identity and final native class/shared build state,
 // and reject non-player/disabled/invalid objects. `allowActor` owns scheduler,
-// explicit-order and player-priority gating. Every callback must be read-only,
-// bounded and nonthrowing. No ordinal survives Invalidate/load or DLL restart.
+// explicit-order and player-priority gating. Query callbacks must be read-only,
+// bounded and nonthrowing. The optional completion callback only releases
+// plugin claims for a known full key. No ordinal survives Invalidate or load.
 namespace PriorityNative
 {
     using AIFixedEngineerPriority::Key;
@@ -40,6 +41,7 @@ namespace PriorityNative
         void (*report)(const char*);
         bool (*diskIdentity)(); // Optional offline host override; production defaults to SHA256 of main EXE.
         bool (*materialsEnRoute)(AI*,Building*);
+        void (*constructionCompleted)(const Key&,unsigned);
     };
     struct Pin {unsigned rva,size;unsigned __int64 hash;};
     static const Pin pins[] = {
@@ -192,11 +194,20 @@ namespace PriorityNative
         if(frame->scoreMap&&frame->scoreMap!=self){frame->round.bad=true;return result;}
         frame->scoreMap=self;Candidate candidate={};
         if(!Snapshot(*key,&candidate)){frame->round.bad=true;return result;}
+        bool completed=false;
         EnterCriticalSection(&metadataLock);
         if(registryGeneration!=frame->finder->generation||registryInvalidation!=frame->finder->invalidation||
            Invalid()!=frame->finder->invalidation)frame->round.bad=true;
-        else registry.Observe(frame->round,candidate);
-        LeaveCriticalSection(&metadataLock);return result;
+        else
+        {
+            if(candidate.productive&&candidate.complete&&config.constructionCompleted)
+                completed=registry.Forget(candidate.key);
+            registry.Observe(frame->round,candidate);
+        }
+        LeaveCriticalSection(&metadataLock);
+        if(completed&&SameEpoch(frame->finder->generation,frame->finder->invalidation))
+            config.constructionCompleted(candidate.key,frame->finder->generation);
+        return result;
     }
     static __declspec(noinline) float* ScoreSlotHook(void* self,Building* const* key)
     {const void* caller=_ReturnAddress();return ScoreSlotAt(self,key,caller);}
@@ -335,12 +346,15 @@ namespace PriorityNative
         {
             if(!SameEpoch(generation,local))return;
             Building* b=Resolve(keys[i]);Candidate state={};
-            const bool retire=!b||(Snapshot(b,&state)&&AIFixedEngineerPriority::Equal(state.key,keys[i])&&
-                (state.complete||state.dismantled));
+            const bool known=b&&Snapshot(b,&state)&&AIFixedEngineerPriority::Equal(state.key,keys[i]);
+            const bool retire=!b||(known&&(state.complete||state.dismantled));
             if(!retire||!SameEpoch(generation,local))continue;
+            bool removed=false;
             EnterCriticalSection(&metadataLock);
-            if(registryGeneration==generation&&registryInvalidation==local&&Invalid()==local)registry.Forget(keys[i]);
+            if(registryGeneration==generation&&registryInvalidation==local&&Invalid()==local)removed=registry.Forget(keys[i]);
             LeaveCriticalSection(&metadataLock);
+            if(removed&&known&&state.complete&&config.constructionCompleted&&SameEpoch(generation,local))
+                config.constructionCompleted(keys[i],generation);
         }
     }
     static bool Configure(const Config& c,const unsigned char* module=0,size_t bytes=0)

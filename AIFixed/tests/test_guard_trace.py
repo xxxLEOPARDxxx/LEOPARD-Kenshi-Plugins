@@ -35,8 +35,12 @@ for s in capture['snapshots']:
     rows.append('    {'+','.join(['static_cast<TaskType>('+str(s['goal'] or 0)+')',str(s['action'] or 0),str(s['state']),str(s['path']),vector(s['pos']),vector(s['nav_pos']),vector(s['nav_goal']),str(s['count'])])+'}')
 fixture=(here/'guard_trace_runtime_fixture.cpp').read_text(encoding='utf-8')
 sections={
-    '// @STRUCTS@':part('    struct Identity','    // The movement hook')+('' if 'struct LandingTrace' in runtime else '\nstruct LandingTrace {};\n'),
-    '// @CAN_TRAVEL@':part('    bool CanTravel(','    AIFixedGate::Point Point('),
+    '// @STRUCTS@':part('    struct Identity','    // The movement hook')+
+        ('' if 'struct LandingTrace' in runtime else '\nstruct LandingTrace {};\n')+
+        ('' if 'enum WallIntent' in runtime else '\nenum WallIntent { NoWallIntent };\n'),
+    '// @TRAVEL@':part('    bool FollowGoal(','    const TaskMatch* CurrentGoal('),
+    '// @INTENT@':part('    bool ReadIntent(','    Building* ReadGuardCycle(')+
+        ('\n#define TEST_WALL_INTENT\n' if 'bool ReadRecoveryIntent' in runtime else ''),
     '// @GUARD_CYCLE@':part('    Building* ReadGuardCycle(','    bool WallAllowsLanding('),
     '// @TRACE@':part('    void TracePlatform(','    void Inspect(') if '    void TracePlatform(' in runtime else '',
     '// @INSPECT@':part('    void Inspect(','    void Update('),

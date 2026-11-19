@@ -33,8 +33,8 @@ namespace AIFixedEngineer
     struct Request
     {
         Identity actor,project,source;Material material;
-        int need,carried,available,capacity;unsigned now,epoch;bool ground;
-        Request():need(0),carried(0),available(0),capacity(32),now(0),epoch(0),ground(false){}
+        int need,carried,available,capacity;unsigned now,epoch,completionRevision;bool ground;
+        Request():need(0),carried(0),available(0),capacity(32),now(0),epoch(0),completionRevision(0),ground(false){}
     };
     struct Owned
     {
@@ -46,8 +46,8 @@ namespace AIFixedEngineer
     {
         struct Claim
         {
-            Request request;int quantity,sourceUnits;unsigned started,observed,checked;bool used;
-            Claim():quantity(0),sourceUnits(0),started(0),observed(0),checked(0),used(false){}
+            Request request;int quantity,sourceUnits;unsigned started,observed,checked;bool used,completed;
+            Claim():quantity(0),sourceUnits(0),started(0),observed(0),checked(0),used(false),completed(false){}
         };
         Claim claims[128];Owned owned[128];unsigned epoch,serial;
         static int Min(int a,int b){return a<b?a:b;}
@@ -62,6 +62,13 @@ namespace AIFixedEngineer
         int Find(const Identity& actor,const Material* material=NULL)const
         {for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&claims[i].request.actor==actor&&
             (!material||claims[i].request.material==*material))return int(i);return -1;}
+        int LiveSlot(const Request& r)const
+        {
+            if(r.epoch!=epoch)return -1;
+            const int i=Find(r.actor,&r.material);
+            return i>=0&&Live(claims[i],r.now)&&claims[i].request.project==r.project&&
+                claims[i].request.source==r.source?i:-1;
+        }
         int FindOwned(const Identity& actor,const Material& material)const
         {for(unsigned i=0;i<Capacity;++i)if(owned[i].token&&owned[i].actor==actor&&owned[i].material==material)return int(i);return -1;}
         unsigned Token(){if(++serial==0)++serial;return serial;}
@@ -82,7 +89,7 @@ namespace AIFixedEngineer
             for(unsigned i=0;i<Capacity;++i)
             {
                 const Claim& c=claims[i];
-                if(!Live(c,r.now)||c.request.actor==r.actor||!(c.request.material==r.material))continue;
+                if(!Live(c,r.now)||c.completed||c.request.actor==r.actor||!(c.request.material==r.material))continue;
                 if(c.request.project==r.project)need=Sub(need,c.quantity);
                 if(c.request.source==r.source)
                 {
@@ -96,10 +103,11 @@ namespace AIFixedEngineer
         {
             if(!Valid(r))return 0;
             Expire(r.now,r.epoch);int slot=Find(r.actor,&r.material);
+            if(slot>=0&&claims[slot].completed&&claims[slot].request.project==r.project)return 0;
             if(requireExisting)
             {
                 bool committed=false;
-                for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&claims[i].request.actor==r.actor&&claims[i].request.project==r.project)
+                for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&!claims[i].completed&&claims[i].request.actor==r.actor&&claims[i].request.project==r.project)
                 {committed=true;break;}
                 if(!committed)return 0;
             }
@@ -141,7 +149,7 @@ namespace AIFixedEngineer
             claims[slot].request=r;claims[slot].quantity=Min(r.need,r.carried+quantity);
             claims[slot].sourceUnits=r.ground?r.available:quantity;
             claims[slot].started=started;claims[slot].observed=r.now;claims[slot].checked=r.now-250;
-            claims[slot].used=true;EmptyPlaceholders();return quantity;
+            claims[slot].used=true;claims[slot].completed=false;EmptyPlaceholders();return quantity;
         }
     public:
         enum{Capacity=128,Batch=32,LeaseMs=120000};
@@ -153,7 +161,7 @@ namespace AIFixedEngineer
             for(unsigned i=0;i<Capacity;++i)
             {
                 const Claim& c=claims[i];
-                if(Live(c,now)&&c.request.actor!=actor&&c.request.project==project&&c.request.material==material)
+                if(Live(c,now)&&!c.completed&&c.request.actor!=actor&&c.request.project==project&&c.request.material==material)
                     need=Sub(need,carriedOnly?Min(c.quantity,c.request.carried):c.quantity);
             }
             return need;
@@ -173,7 +181,9 @@ namespace AIFixedEngineer
             if(r.epoch!=epoch||!r.actor.Valid()||!r.project.Valid()||!r.material.Valid()||r.need<=0||r.need>1000000||
                 r.carried<=0||r.carried>1000000)return 0;
             Expire(r.now,r.epoch);int slot=Find(r.actor,&r.material);
-            if(slot>=0&&claims[slot].sourceUnits>0)return claims[slot].request.project==r.project?claims[slot].quantity:0;
+            if(slot>=0&&claims[slot].completed&&claims[slot].request.project==r.project)return 0;
+            if(slot>=0&&!claims[slot].completed&&claims[slot].sourceUnits>0)
+                return claims[slot].request.project==r.project?claims[slot].quantity:0;
             // Real cargo can reach the site even if someone else promised
             // to fetch the same units. Other carried pledges still count.
             const int quantity=Min(r.carried,Demand(r.actor,r.project,r.material,r.need,r.now,r.epoch,true));
@@ -182,7 +192,7 @@ namespace AIFixedEngineer
             if(slot<0)return 0;
             claims[slot].request=r;claims[slot].request.source=r.actor;
             claims[slot].quantity=quantity;claims[slot].sourceUnits=0;claims[slot].started=r.now;
-            claims[slot].observed=r.now;claims[slot].checked=r.now;claims[slot].used=true;
+            claims[slot].observed=r.now;claims[slot].checked=r.now;claims[slot].used=true;claims[slot].completed=false;
             return quantity; // Existing cargo creates no ownership credit or ownership placeholder.
         }
         int Commit(const Request& r){return Store(r,false);}
@@ -191,6 +201,17 @@ namespace AIFixedEngineer
         {epoch=e;Token();for(unsigned i=0;i<Capacity;++i){claims[i]=Claim();owned[i]=Owned();}}
         void Cancel(const Identity& actor)
         {bool found=false;for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&claims[i].request.actor==actor){claims[i]=Claim();found=true;}if(found)EmptyPlaceholders();}
+        bool CompleteProject(const Identity& project,unsigned e)
+        {
+            if(e!=epoch||!project.Valid())return false;
+            // A completed site cannot hold stock or shortage anywhere. Keep
+            // the move witness and any native transfer receipt already in flight.
+            bool changed=false;
+            for(unsigned i=0;i<Capacity;++i)
+                if(claims[i].used&&!claims[i].completed&&claims[i].request.project==project)
+                {claims[i].completed=true;changed=true;}
+            return changed;
+        }
         void Expire(unsigned now,unsigned e)
         {
             if(e!=epoch)return; // Only explicit world invalidation advances generation.
@@ -233,14 +254,13 @@ namespace AIFixedEngineer
         }
         bool Has(const Request& r)const
         {
-            if(r.epoch!=epoch)return false;
-            int i=Find(r.actor,&r.material);return i>=0&&Live(claims[i],r.now)&&claims[i].request.project==r.project&&
-                claims[i].request.source==r.source&&claims[i].request.material==r.material;
+            const int i=LiveSlot(r);return i>=0&&!claims[i].completed;
         }
+        bool HasReceipt(const Request& r)const{return LiveSlot(r)>=0;}
         void Acquired(const Request& r,int moved,int before,int after)
         {
-            int c=Find(r.actor,&r.material),o=FindOwned(r.actor,r.material);
-            if(c<0||o<0||!Has(r)||moved<=0||before<0||after<before||after-before!=moved)return;
+            const int c=LiveSlot(r),o=FindOwned(r.actor,r.material);
+            if(c<0||o<0||moved<=0||before<0||after<before||after-before!=moved)return;
             Owned& ledger=owned[o];
             if(ledger.expectedTotal!=before)
             {ledger.owned=0;ledger.baseline=before;ledger.token=Token();}
@@ -252,7 +272,7 @@ namespace AIFixedEngineer
         }
         void Finish(const Request& r,int total)
         {
-            int c=Find(r.actor,&r.material);if(c<0||!Has(r))return;
+            const int c=LiveSlot(r);if(c<0)return;
             claims[c].request.carried=Positive(total);
             claims[c].sourceUnits=0;claims[c].quantity=Min(r.need,claims[c].request.carried);
             if(!claims[c].quantity)claims[c]=Claim();EmptyPlaceholders();

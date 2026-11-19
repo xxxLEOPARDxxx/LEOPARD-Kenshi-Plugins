@@ -64,6 +64,7 @@ int main()
  ReservedSet reserved;reserved.insert(hand(&bed));Check(!FindRestBed(&ai,&c,&reserved,AIFixedRest::Sleep),"another owned episode cannot choose the same bed");
  bed.function=BF_SKELETON_BED;bed.power=0;Check(!FindRepairBed(&ai,&c,NULL),"unpowered repair bed rejected");bed.power=1;
  Check(FindRepairBed(&ai,&c,NULL)==&bed,"powered real repair bed accepted");
+ bed.furniture=false;Check(FindRepairBed(&ai,&c,NULL)==&bed,"native repair-bed function is enough even without a furniture layout");bed.furniture=true;
  Check(!FindRestBed(&ai,&c,NULL,AIFixedRest::Sleep),"robotic bed not mistaken for biological sleep bed");
  bed.function=BF_BED;Building nearAlly;nearAlly.owner=&ally;nearAlly.town=&town;nearAlly.useable=&useable;nearAlly.position.x=1;ai.beds.push_back(&nearAlly);
  Check(FindRestBed(&ai,&c,NULL,AIFixedRest::Sleep)==&bed,"own bed has priority over nearer allied bed");

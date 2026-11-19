@@ -74,6 +74,25 @@ int main()
     a.carried=5;a.need=10;CHECK(c.Grant(a)==0); // other project cargo already covers demand
     c.Reset(3);a=Req();a.need=10;a.carried=3;CHECK(c.Commit(a)==7);
     b=Req(2);b.project=Id(21);b.available=8;CHECK(c.Commit(b)==1); // source shared across projects
+    // After the first site finishes, its incoming lease must stop blocking
+    // the next site at the same source, before the old actor's goal changes.
+    c.Reset(3);a=Req();a.need=6;a.available=7;CHECK(c.Commit(a)==6);
+    c.Acquired(a,2,0,2);
+    Request otherSite=Req(3);otherSite.project=Id(22);otherSite.need=1;otherSite.available=5;
+    CHECK(c.Commit(otherSite)==1);
+    b=Req(2);b.project=Id(21);b.available=5;
+    CHECK(c.Preview(b)==0);
+    Identity recycledSite=a.project;++recycledSite.serial;
+    c.CompleteProject(recycledSite,3);c.CompleteProject(a.project,2);
+    CHECK(c.Preview(b)==0);
+    c.CompleteProject(a.project,3);
+    CHECK(c.Preview(b)==4); // the unrelated site's single reservation remains
+    CHECK(c.Demand(b.actor,a.project,a.material,6,100,3)==6);
+    CHECK(c.SourceWatch(a.actor,a.project,a.source,100,3,observed)&&!c.Has(a));
+    CHECK(c.ListOwned(mixed,8)==1&&mixed[0].project==a.project&&mixed[0].owned==2);
+    c.Acquired(a,1,2,3); // Complete can race with the receipt of a native take.
+    CHECK(c.ListOwned(mixed,8)==1&&mixed[0].owned==3);
+    b.available=4;CHECK(c.Commit(b)==3);
     c.Reset(3);a=Req();a.ground=true;a.available=1000;a.need=3;CHECK(c.Commit(a)==3);
     b=Req(2);b.ground=true;CHECK(c.Commit(b)==0); // whole ground stack is exclusive
     b.source.serial++;CHECK(c.Commit(b)==32); // serial-bearing source identity

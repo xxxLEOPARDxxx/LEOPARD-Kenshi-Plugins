@@ -62,6 +62,7 @@ mutations={
     'blocks_productive_site':('return !productiveProject||!productiveProject(project);', 'return true;'),
     'reject_shared_entry':('if(hash==w.fnv)return true;','if(hash==w.fnv)return true;return false;'),
     'no_lock_epoch_fence':('if(epoch!=Epoch())return false;','if(false)return false;'),
+    'no_completion_fence':('Sync(r.epoch)&&r.completionRevision==ProjectRevision(r.project)','Sync(r.epoch)'),
     'reads_machine_inputs':(
         'for(unsigned i=0;i<outputs.offered.size()&&e==Epoch();++i)\n'
         '        {\n'

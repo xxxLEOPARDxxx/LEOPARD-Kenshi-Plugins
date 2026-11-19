@@ -24,7 +24,7 @@ struct Position {
 };
 namespace Ogre{typedef Position Vector3;}
 typedef int TaskType;
-enum { IN_NOTHING, IN_BED, USE_BED_ORDER=258, USE_BED=259, GET_OUT_OF_BED=260 };
+enum { IN_NOTHING, IN_BED, PUT_SOMEONE_IN_BED=106, USE_BED_ORDER=258, USE_BED=259, GET_OUT_OF_BED=260 };
 int nativeLessCalls=0,nativeEqualCalls=0;
 struct hand {
     int type; unsigned container,containerSerial,index,serial;void* object;
@@ -32,6 +32,7 @@ struct hand {
     hand(Character* c);
     hand(Building* b);
     Building* getBuilding()const{return static_cast<Building*>(object);}
+    Character* getCharacter()const{return static_cast<Character*>(object);}
     bool operator<(const hand& h) const {
         ++nativeLessCalls;return index < h.index; // Deliberately does not promise serial ordering.
     }
@@ -40,28 +41,31 @@ struct hand {
 };
 struct Character {
  unsigned serial,containerSerial;int inSomething;bool isCarryingSomething,robot;
- MedicalSystem* medical;OrdersReceiver* orders;AI* ai;hand handle,inWhat;
+ MedicalSystem* medical;OrdersReceiver* orders;AI* ai;hand handle,inWhat,carried;
  Character(unsigned s=1):serial(s),containerSerial(1),inSomething(IN_NOTHING),isCarryingSomething(false),robot(true),medical(NULL),orders(NULL),ai(NULL){handle=hand(this);}
  MedicalSystem* getMedical(){return medical;}OrdersReceiver* getOrdersReciever(){return orders;}AI* getAI(){return ai;}
  bool isDead(){return false;}bool isUnconcious(){return false;}bool isDown(){return false;}
  bool isBeingCarried(){return false;}bool isInCombatMode(bool,bool){return false;}
+ bool isPlayerCharacter(){return true;}hand getCarryingObject(){return carried;}
  Position getPosition(){return Position();}TownBase* getCurrentTownLocation(){return NULL;}
  void* getFaction(){return NULL;}
 };
 struct Building {
- unsigned serial,containerSerial;std::string displayName;hand handle;bool valid;
- Building(unsigned s=1):serial(s),containerSerial(1),displayName("bed"),valid(true){handle=hand(this);}
+ unsigned serial,containerSerial;std::string displayName;hand handle;bool valid;int function;
+ Building(unsigned s=1):serial(s),containerSerial(1),displayName("bed"),valid(true),function(25){handle=hand(this);}
  Position getPosition(){return Position();}
- int getSpecialFunction(){return 25;}UseableStuff* getUseableStuff();
+ int getSpecialFunction(){return function;}UseableStuff* getUseableStuff();
  TownBase* getTown(){return NULL;}void* getFaction(){return NULL;}
 };
 hand::hand(Character* c):type(1),container(7),containerSerial(c ? c->containerSerial:0),index((unsigned)(uintptr_t)c),serial(c ? c->serial : 0),object(c){}
 hand::hand(Building* b):type(2),container(7),containerSerial(b ? b->containerSerial:0),index((unsigned)(uintptr_t)b),serial(b ? b->serial : 0),object(b){}
 template<class T> struct lektor : std::vector<T> {};
+struct Tasker;
+struct AITaskSytem {struct Actions{Tasker* first;Tasker* getFirstTask(){return first;}}actions;};
 lektor<Building*> liveBeds;
 lektor<Building*>& Machines(){liveBeds.clear();return liveBeds;}
 struct AI {
- Building* candidate;
+ Building* candidate;AITaskSytem* taskSystemAI;
  void getAllLocalMachines(lektor<Building*>& out,unsigned){if(candidate)out.push_back(candidate);}
 };
 enum { BF_BED=6,BF_SKELETON_BED=25 };
@@ -78,7 +82,6 @@ struct ForgottenGUI {};
 struct UseableStuff:Building { bool isFreeSlot(const hand&){return true;} };
 UseableStuff uGlobal;
 UseableStuff* Building::getUseableStuff(){return &uGlobal;}
-struct AITaskSytem {};
 struct MedicalSystem { bool repaired;float hungerSpeed,repairWear;MedicalSystem():repaired(false),hungerSpeed(1),repairWear(60){}float getHungerSpeedModifier(){return hungerSpeed;} };
 struct TaskGoal { int task;int key()const{return task;} };
 struct Tasker {int task;hand subject;int key(){return task;}};
@@ -89,20 +92,23 @@ struct OrdersReceiver {
  TaskGoal getCurrentGoal(){TaskGoal g={goal};return g;}
  Tasker* getFirstOrder(){return present?&first:NULL;}bool hasPlayerOrders(){return present;}
  void addOrder(int task,const hand& target,const Position&,bool clear,bool shift){if(failAdd)RaiseException(EXCEPTION_ACCESS_VIOLATION,0,0,NULL);++count;lastTask=goal=task;first.task=task;first.subject=target;cleared=clear;shifted=shift;}
+ void clearOrders(){present=false;cleared=true;}
 };
 struct TownBase {std::string displayName;};
 struct SaveFileSystem {};
 
 GameWorld* ou=NULL;
-bool g_debug=false,g_selfRepair=true,g_lifecycleReady=true,g_sessionActive=false;
+bool g_debug=false,g_skeletonBeds=true,g_selfRepair=true,g_lifecycleReady=true,g_sessionActive=false;
 bool g_autoSleep=false,g_repairHealth=false,g_ownBedsOnly=true,g_restConflict=false,g_newHooksReady=true,t_ownOrder=false;
 bool g_gateConflict=false,g_gatePassage=false;
 AIFixedRest::SimulationClock g_restClock,g_gateClock;
 int NativeFaultFilter(unsigned code){return code==0xe06d7363?EXCEPTION_CONTINUE_SEARCH:EXCEPTION_EXECUTE_HANDLER;}
 void ErrorLog(const char*){}
+void ErrorLog(const std::string&){}
 int g_bedRadius=100,g_healAbove=99;
 int g_selfRepairWear=50;
 volatile LONG g_loadGeneration=0,g_worldActiveAt=0,g_worldReadyGeneration=-1,g_loading=0;
+volatile LONG g_rescuePolicyGeneration=0;
 LONG priorityInvalidatedAt=-1,materialsInvalidatedAt=-1,surplusInvalidatedAt=-1;
 namespace PriorityNative {void Invalidate(){priorityInvalidatedAt=g_loadGeneration;}}
 namespace EngineerMaterialsRuntime {void Invalidate(){materialsInvalidatedAt=g_loadGeneration;}}
@@ -165,7 +171,7 @@ void Integer(MCM_Api*,const char*,const char* key,const char*,const char*,int va
  if(std::string(key)=="UnstuckDelayHours"){unstuckDelayDefault=value;unstuckDelayMinimum=minimum;unstuckDelayMaximum=maximum;unstuckDelayFlags=flags;}
 }
 
-// @STATE@
+// @IDENTITY@
 struct IntentGuard{};
 typedef std::map<hand,unsigned,HandIdentityLess> IntentMap;
 IntentMap g_intents;std::vector<int> g_moveIntents;bool g_intentOverflow=false;
@@ -173,7 +179,9 @@ std::map<int,int> g_gateStates,g_gateDoorChanges;hand g_gateCursor;DWORD g_lastG
 void GateScan(DWORD){}
 unsigned inputSerial=0;
 unsigned InputSequence(Character*){return inputSerial;}
+// @STATE@
 bool IsRobot(Character* c){return c->robot;}
+Character* CarriedRobot(Character* c){return c->isCarryingSomething?c->carried.getCharacter():NULL;}
 bool HasRoboticParts(MedicalSystem*,bool){return true;}
 bool RoboticPartsRepaired(MedicalSystem* med,bool){return med->repaired;}
 float WorstWear(MedicalSystem* med,bool){return med->repaired?0:60;}
@@ -183,7 +191,11 @@ AIFixedRest::Care RestNeeded(const AIFixedRest::Health& h){return AIFixedRest::N
 void NoteSelfRepair(Character*,const std::string&){}
 Building* FindRepairBed(AI* ai,Character*,const ReservedSet*){return ai->candidate;}
 Building* FindRestBed(AI* ai,Character*,const ReservedSet*,AIFixedRest::Care){return ai->candidate;}
-Building* SafeFindRestBed(AI* ai,Character*,const ReservedSet*,AIFixedRest::Care,bool* =NULL){return ai->candidate;}
+Building* movedDuringBedLookup=NULL;
+Building* SafeFindRestBed(AI* ai,Character* c,const ReservedSet*,AIFixedRest::Care,bool* =NULL){
+ if(movedDuringBedLookup)c->inWhat=movedDuringBedLookup->handle;
+ return ai->candidate;
+}
 struct RestBedContext{explicit RestBedContext(Character*){}};
 bool RestBedAllowed(Building* bed,const RestBedContext&,AIFixedRest::Care,AIFixedRest::Bed&){return bed&&bed->valid;}
 bool SelfRepairOne(Character*,SelfRepairState&,DWORD);
@@ -345,6 +357,57 @@ int main(){
  c.inSomething=IN_NOTHING;ownOrders.count=0;ownOrders.first.task=USE_BED_ORDER;ownOrders.first.subject=c.inWhat;
  SelfRepairState approachTimeout={1,1,1,true,c.inWhat,0,0,0};approachTimeout.inputSerial=inputSerial;
  Check(SelfRepairOne(&c,approachTimeout,60002)&&!approachTimeout.sent&&ownOrders.lastTask==GET_OUT_OF_BED,"failed approach still retires after sixty simulation seconds");
+ Building ordinary;ordinary.function=BF_BED;
+ bed.handle=hand(&bed);c.handle=hand(&c);
+ Character rescuer;AI rescueAI={};AITaskSytem rescueTasks={};Tasker rescueAction={};
+ OrdersReceiver rescueOrders;rescueOrders.present=false;rescueOrders.goal=PUT_SOMEONE_IN_BED;
+ rescueAction.task=PUT_SOMEONE_IN_BED;rescueAction.subject=ordinary.handle;
+ rescueTasks.actions.first=&rescueAction;rescueAI.taskSystemAI=&rescueTasks;
+ rescuer.orders=&rescueOrders;rescuer.ai=&rescueAI;rescuer.carried=c.handle;rescuer.isCarryingSomething=true;
+ ownOrders.present=false;ownOrders.count=0;c.inSomething=IN_NOTHING;c.inWhat=hand();
+ g_loading=0;c.robot=true;med.repaired=false;med.repairWear=60;ai.candidate=&bed;
+ c.inSomething=IN_BED;c.inWhat=ordinary.handle;
+ SelfRepairState rescued={};
+ Check(SelfRepairOne(&c,rescued,68000)&&!rescued.sent&&ownOrders.count==0,
+       "ordinary bed without rescue provenance never receives a transfer");
+ rescueOrders.present=true;
+ Drop_hook(&rescuer,false,true);
+ rescueOrders.present=false;
+ Check(SelfRepairOne(&c,rescued,68001)&&!rescued.sent&&ownOrders.count==0,
+       "a carrier following a manual order never authorizes a transfer");
+ Drop_hook(&rescuer,false,true);
+ ++inputSerial;
+ Check(SelfRepairOne(&c,rescued,68002)&&!rescued.sent&&ownOrders.count==0,
+       "manual input after rescue discards even an exact fallback bed");
+ Drop_hook(&rescuer,false,true);
+ InterlockedIncrement(&g_rescuePolicyGeneration);
+ Check(SelfRepairOne(&c,rescued,68003)&&!rescued.sent&&ownOrders.count==0,
+       "a rescue-setting transition invalidates old automatic bed provenance");
+ c.inSomething=IN_NOTHING;c.inWhat=hand();
+ Drop_hook(&rescuer,false,true);
+ c.inSomething=IN_BED;c.inWhat=ordinary.handle;
+ ai.candidate=NULL;
+ Check(SelfRepairOne(&c,rescued,70000)&&!rescued.sent&&ownOrders.count==0,
+       "with no eligible repair bed the rescued patient stays in the ordinary bed");
+ ai.candidate=&bed;
+ Check(SelfRepairOne(&c,rescued,75000)&&!rescued.sent&&ownOrders.count==0,
+       "unavailable rescue replacement is rechecked at the rest retry cadence");
+ Check(SelfRepairOne(&c,rescued,90000)&&rescued.sent&&ownOrders.count==1&&
+       ownOrders.lastTask==USE_BED_ORDER&&SameIdentity(ownOrders.first.subject,bed.handle),
+       "native rescue fallback can transfer recovered skeleton directly to eligible repair bed");
+ ownOrders.present=true;
+ Check(SelfRepairOne(&c,rescued,90001)&&rescued.sent&&ownOrders.count==1&&ownOrders.present,
+       "the original bed may still be occupied while the transfer order starts");
+ ai.candidate=NULL;
+ Check(SelfRepairOne(&c,rescued,90002)&&!rescued.sent&&!ownOrders.present&&ownOrders.count==1,
+       "losing the replacement while still in the fallback retires only the plugin order");
+ Building otherBed;otherBed.function=BF_BED;
+ Drop_hook(&rescuer,false,true);
+ ai.candidate=&bed;movedDuringBedLookup=&otherBed;
+ SelfRepairState concurrentMove={};
+ Check(SelfRepairOne(&c,concurrentMove,90003)&&!concurrentMove.sent&&ownOrders.count==1,
+       "a native bed change during replacement lookup cancels the transfer");
+ movedDuringBedLookup=NULL;
  Check(nativeLessCalls==0 && nativeEqualCalls==0,"AIFixed identity does not depend on native hand comparison semantics");
  LONG beforeEngineerReset=g_loadGeneration;InvalidateWorld();
  Check(priorityInvalidatedAt==beforeEngineerReset&&materialsInvalidatedAt==beforeEngineerReset+1&&surplusInvalidatedAt==beforeEngineerReset+1,

@@ -38,6 +38,11 @@ int main(){
     Check(Bytes()==beforeEngineers,"new engineer loader preserves personal INI bytes");
     WritePrivateProfileStringA("AIFixed","Enabled","0",fixtureIni);LoadSettings();
     Check(!g_engineerGlobalEnabled&&engineerSettingChanges==2,"master disable suspends worker admission and invalidates metadata");
+    const LONG beforeRescue=g_rescuePolicyGeneration;
+    WritePrivateProfileStringA("AIFixed","SelfRepair","0",fixtureIni);LoadSettings();
+    Check(g_rescuePolicyGeneration==beforeRescue+1,"disabling automatic repair invalidates rescue provenance");
+    WritePrivateProfileStringA("AIFixed","RepairHealth","1",fixtureIni);LoadSettings();
+    Check(g_rescuePolicyGeneration==beforeRescue+2,"enabling another repair trigger starts a fresh rescue policy");
     DeleteFileA(fixtureIni);
     printf("AIFixed extracted delay settings: %s (%d checks)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;
