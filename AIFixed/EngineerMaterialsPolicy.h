@@ -146,14 +146,15 @@ namespace AIFixedEngineer
     public:
         enum{Capacity=128,Batch=32,LeaseMs=120000};
         Coordinator():epoch(0),serial(0){}
-        int Demand(const Identity& actor,const Identity& project,const Material& material,int need,unsigned now,unsigned e)const
+        int Demand(const Identity& actor,const Identity& project,const Material& material,int need,unsigned now,unsigned e,
+                   bool carriedOnly=false)const
         {
             if(e!=epoch||need<0||need>1000000)return 0;
             for(unsigned i=0;i<Capacity;++i)
             {
                 const Claim& c=claims[i];
                 if(Live(c,now)&&c.request.actor!=actor&&c.request.project==project&&c.request.material==material)
-                    need=Sub(need,c.quantity);
+                    need=Sub(need,carriedOnly?Min(c.quantity,c.request.carried):c.quantity);
             }
             return need;
         }
@@ -173,7 +174,9 @@ namespace AIFixedEngineer
                 r.carried<=0||r.carried>1000000)return 0;
             Expire(r.now,r.epoch);int slot=Find(r.actor,&r.material);
             if(slot>=0&&claims[slot].sourceUnits>0)return claims[slot].request.project==r.project?claims[slot].quantity:0;
-            const int quantity=Min(r.carried,Demand(r.actor,r.project,r.material,r.need,r.now,r.epoch));
+            // Real cargo can reach the site even if someone else promised
+            // to fetch the same units. Other carried pledges still count.
+            const int quantity=Min(r.carried,Demand(r.actor,r.project,r.material,r.need,r.now,r.epoch,true));
             if(!quantity)return 0;
             if(slot<0)for(unsigned i=0;i<Capacity;++i)if(!claims[i].used){slot=int(i);break;}
             if(slot<0)return 0;
@@ -212,6 +215,22 @@ namespace AIFixedEngineer
             }
             return false;
         }
+        int RevalidateSource(const Request& watched,const Request& current)
+        {
+            const int useful=Calculate(current);
+            if(!useful)return 0;
+            const int slot=Find(current.actor,&current.material);
+            if(slot<0)return useful;
+            Claim& c=claims[slot];
+            if(!Live(c,current.now)||!c.sourceUnits||c.checked!=watched.now||
+                c.request.project!=current.project||c.request.source!=current.source)return useful;
+            // Stock can shrink on a useful trip. Release only the lost
+            // units without growing the pledge or renewing its lifetime.
+            c.sourceUnits=Min(c.sourceUnits,current.ground?current.available:useful);
+            c.request.carried=current.carried;
+            c.quantity=Min(c.quantity,current.carried+Min(c.sourceUnits,useful));
+            return useful;
+        }
         bool Has(const Request& r)const
         {
             if(r.epoch!=epoch)return false;
@@ -228,12 +247,14 @@ namespace AIFixedEngineer
             if(moved>1000000-ledger.owned){ledger=Owned();claims[c]=Claim();return;}
             ledger.owned+=moved;ledger.expectedTotal=after;ledger.project=r.project;
             claims[c].sourceUnits=Sub(claims[c].sourceUnits,moved);
+            claims[c].request.carried=after;
             claims[c].quantity=Min(r.need,after+claims[c].sourceUnits);
         }
         void Finish(const Request& r,int total)
         {
             int c=Find(r.actor,&r.material);if(c<0||!Has(r))return;
-            claims[c].sourceUnits=0;claims[c].quantity=Min(r.need,Positive(total));
+            claims[c].request.carried=Positive(total);
+            claims[c].sourceUnits=0;claims[c].quantity=Min(r.need,claims[c].request.carried);
             if(!claims[c].quantity)claims[c]=Claim();EmptyPlaceholders();
         }
         // An observed native delivery may spend only proven owned units. Other
@@ -248,7 +269,11 @@ namespace AIFixedEngineer
                 else{x.owned=Sub(x.owned,before-after);x.expectedTotal=after;if(!x.owned)x=Owned();}
             }
             int c=Find(actor,&material);if(c>=0)
-            {claims[c].quantity=Min(claims[c].quantity,Positive(after));if(!after)claims[c]=Claim();}
+            {
+                claims[c].request.carried=Positive(after);
+                claims[c].quantity=Min(claims[c].quantity,claims[c].request.carried);
+                if(!after)claims[c]=Claim();
+            }
             EmptyPlaceholders();
         }
         unsigned ListOwned(Owned* out,unsigned capacity)const

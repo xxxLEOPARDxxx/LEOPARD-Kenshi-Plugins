@@ -986,6 +986,11 @@ namespace
     bool EngineerAddHook(void* target,void* detour,void** original)
     {return KenshiLib::SUCCESS==KenshiLib::AddHook(target,detour,original);}
     void EngineerReport(const char* message){ErrorLog(message);}
+    bool EngineerProductiveProject(Building* project)
+    {
+        AIFixedEngineerPriority::Candidate state={};
+        return EngineerSnapshot(project,&state)&&AIFixedEngineerPriority::Construction(state);
+    }
     void InstallEngineers()
     {
         if(!InterlockedCompareExchange(&g_engineers,0,0))return;
@@ -997,10 +1002,12 @@ namespace
         config.current=&EngineerCurrent;config.allowActor=&EngineerAllowActor;
         config.snapshot=&EngineerSnapshot;config.resolve=&EngineerResolve;
         config.addHook=&EngineerAddHook;config.report=&EngineerReport;
+        config.materialsEnRoute=&EngineerMaterialsRuntime::MaterialsEnRoute;
         // Construction requires both target selection and shared materials.
         // Surplus return is optional and owns a separate native safety gate.
         const bool priority=PriorityNative::Configure(config)&&PriorityNative::Install();
         if(!priority){ErrorLog("AIFixed: engineer coordination inactive: construction target adapter unavailable");return;}
+        EngineerMaterialsRuntime::SetProjectPriority(&PriorityNative::Started,&EngineerProductiveProject);
         const bool materials=EngineerMaterialsRuntime::Install();
         if(!materials){ErrorLog("AIFixed: engineer coordination inactive: construction material adapter unavailable");return;}
         const bool surplus=EngineerSurplusRuntime::Install();

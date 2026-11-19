@@ -34,6 +34,8 @@ namespace EngineerMaterialsRuntime
     // under our table lock; it must never call game code, allocate or log.
     static LONG (*readEpoch)()=NULL;
     static void (*selectedCallback)(AITaskSytem*,Tasker*)=NULL;
+    static void (*projectStarted)(Building*,unsigned)=NULL;
+    static bool (*productiveProject)(Building*)=NULL;
     static CRITICAL_SECTION mutex;
     static volatile LONG initialized=0,ready=0;
     static unsigned generation=0;
@@ -113,6 +115,8 @@ namespace EngineerMaterialsRuntime
     {if(InterlockedCompareExchange(&initialized,0,0)){Guard lock;coordinator.ForgetOwned(row);}}
     inline void SetSelectedCallback(void (*callback)(AITaskSytem*,Tasker*))
     {selectedCallback=callback;}
+    inline void SetProjectPriority(void (*started)(Building*,unsigned),bool (*productive)(Building*))
+    {projectStarted=started;productiveProject=productive;}
     inline void Init(Predicate allow,Predicate debug,LONG (*epoch)())
     {
         // Plugin initialization happens once, before hooks become reachable.
@@ -219,21 +223,46 @@ namespace EngineerMaterialsRuntime
         }
         return AIFixedEngineer::StorageCapacity(capacity,carried,unit);
     }
-    static bool RequestFor(Character* actor,Building* project,const hand& source,GameData* material,Request& r,unsigned expectedEpoch=~0u,bool weigh=true)
+    static bool ExactSingleOutput(StorageBuilding* storage)
+    {
+        const uintptr_t* table=*reinterpret_cast<const uintptr_t* const*>(storage);
+        static const unsigned char thunk[]={0xe9,0xe6,0x18,0x25,0x00};
+        static const unsigned char offerSingle[]={
+            0x48,0x89,0x5c,0x24,0x08,0x57,0x48,0x83,0xec,0x20,0x48,0x8b,0x01,0x48,0x8b,0xda,
+            0x48,0x8b,0xf9,0xff,0x90,0x80,0x05,0x00,0x00,0x84,0xc0,0x75,0x2f,0x48,0x8b,0x07,
+            0x48,0x8b,0xcf,0xff,0x90,0x50,0x05,0x00,0x00,0x8b,0x53,0x0c,0x48,0x8b,0xf8,0x39,
+            0x53,0x08,0x72,0x0a,0x03,0xd2,0x48,0x8b,0xcb,0xe8,0xca,0xf1,0xd7,0xff,0x8b,0x53,
+            0x08,0x48,0x8b,0x4b,0x10,0x48,0x89,0x3c,0xd1,0xff,0x43,0x08,0x48,0x8b,0x5c,0x24,
+            0x30,0x48,0x83,0xc4,0x20,0x5f,0xc3
+        };
+        return table[0x548/sizeof(uintptr_t)]==image+0x481D5&&
+            !std::memcmp(reinterpret_cast<const void*>(image+0x481D5),thunk,sizeof(thunk))&&
+            !std::memcmp(reinterpret_cast<const void*>(image+0x299AC0),offerSingle,sizeof(offerSingle));
+    }
+    static bool RequestFor(Character* actor,Building* project,const hand& source,GameData* material,Request& r,
+                           unsigned expectedEpoch=~0u,bool weigh=true,bool verifyOutput=false)
     {
         const unsigned e=Epoch();if(expectedEpoch!=~0u&&expectedEpoch!=e)return false;
         if(!actor||!project||!material||!MaterialOf(material,r.material))return false;
         Building::ConstructionState* state=project->getBuildState();if(!state)return false;
-        r.need=state->needsMat(material);r.carried=InventoryCount(actor,material);
-        if(r.need<=0||r.carried<0)return false;
+        r.need=state->needsMat(material);if(r.need<=0)return false;
+        r.carried=InventoryCount(actor,material);if(r.carried<0)return false;
         r.actor=Of(actor->handle);r.project=Of(project->handle);r.source=Of(source);
         r.epoch=e;r.now=GetTickCount();r.ground=false;r.capacity=32;
         if(source.type==BUILDING)
         {
             Building* building=source.getBuilding();if(!building)return false;
             StorageBuilding* storage=building->getFunctionStuff();if(!storage)return false;
-            Inventory* inventory=storage->getInventory();if(!inventory)return false;
+            // Task247 takes items from the subject building's inventory.
+            Inventory* inventory=building->getInventory();if(!inventory)return false;
             r.available=inventory->countItems(material);
+            if(verifyOutput&&r.available>0&&ExactSingleOutput(storage))
+            {
+                if(storage->isProductionEmpty()||storage->getProductionItemData()!=material)return false;
+                const int units=storage->getCurrentProductionQuantity();
+                if(units<=0)return false;
+                if(units<r.available)r.available=units;
+            }
             if(weigh)r.capacity=StorageBudget(actor,inventory,material);
         }
         else
@@ -259,8 +288,37 @@ namespace EngineerMaterialsRuntime
     {Guard lock;if(!Sync(r.epoch))return 0;capacity=coordinator.CanCargo(r);return capacity?coordinator.Cargo(r):0;}
     static bool SourceWatch(const Identity& actor,const Identity& project,const Identity& source,unsigned now,unsigned e,Request& out)
     {Guard lock;return Sync(e)&&coordinator.SourceWatch(actor,project,source,now,e,out);}
-    static int Demand(const Identity& actor,const Identity& project,const Material& material,int need,unsigned now,unsigned e)
-    {Guard lock;return Sync(e)?coordinator.Demand(actor,project,material,need,now,e):0;}
+    static int RevalidateSource(const Request& previous,const Request& current)
+    {Guard lock;return Sync(current.epoch)?coordinator.RevalidateSource(previous,current):0;}
+    static bool ProjectNeedsCovered(Character* actor,Building* project,unsigned e)
+    {
+        if(e!=Epoch())return false;
+        Building::ConstructionState* state=project->getBuildState();
+        if(!state||state->mats.size()>16||e!=Epoch())return false;
+        const Identity who=Of(actor->handle),where=Of(project->handle);
+        if(!who.Valid()||!where.Valid())return false;
+        const unsigned now=GetTickCount();
+        bool hasNeed=false;
+        for(unsigned i=0;i<state->mats.size();++i)
+        {
+            Building::ConstructionState::BuildMaterial* m=state->mats[i];
+            Material material;
+            if(!m||!MaterialOf(m->mat,material))return false;
+            const int units=state->needsMat(m->mat);
+            if(units>1000000)return false;
+            if(units<=0)continue;
+            hasNeed=true;
+            Guard lock;
+            if(!Sync(e)||coordinator.Demand(who,where,material,units,now,e)>0)return false;
+        }
+        return hasNeed&&e==Epoch();
+    }
+    static bool MaterialsEnRoute(AI* ai,Building* project)
+    {
+        const unsigned e=Epoch();
+        Character* actor=ai?ai->me:NULL;
+        return project&&Eligible(actor)&&ProjectNeedsCovered(actor,project,e);
+    }
     struct Query
     {
         AI* ai;Building* project;GameData* material;Query* previous;unsigned epoch;bool unmanaged;
@@ -320,20 +378,10 @@ namespace EngineerMaterialsRuntime
         Character* actor=destinationQuery->ai->me;
         if(!actor||*reinterpret_cast<Character**>(static_cast<unsigned char*>(finder)+0x20)!=actor)return impossible;
         Building* project=target.getBuilding();if(!project)return impossible;
-        Building::ConstructionState* state=project->getBuildState();
-        if(!state||state->mats.size()==0||state->mats.size()>16)return impossible;
-        const Identity who=Of(actor->handle),where=Of(project->handle);const unsigned now=GetTickCount(),e=destinationQuery->epoch;
-        bool hasNeed=false;
-        for(unsigned i=0;i<state->mats.size();++i)
-        {
-            Building::ConstructionState::BuildMaterial* m=state->mats[i];Material material;
-            if(!m||!MaterialOf(m->mat,material))return impossible;
-            const int need=state->needsMat(m->mat);
-            if(need>0){hasNeed=true;if(Demand(who,where,material,need,now,e)>0)return impossible;}
-        }
-        // This return affects only the current native finder candidate. It
-        // never writes native pathFailures or changes a real path result.
-        return hasNeed;
+        // The productive-building selector handles waiting after native site
+        // checks. Keep its candidate visible even when all materials are booked.
+        if(!ProjectNeedsCovered(actor,project,destinationQuery->epoch))return impossible;
+        return !productiveProject||!productiveProject(project);
     }
 
     static float Find(AI* ai,const hand& in,hand& out,bool asking)
@@ -362,17 +410,17 @@ namespace EngineerMaterialsRuntime
         }
         out.count=kept;
     }
+    typedef std::map<GameData*,hand,std::less<GameData*>,std::allocator<std::pair<GameData* const,hand> > > ResourceSources;
     static float Source(AI::AIResultsCacher* self,hand& out,GameData* material,StorageBuilding* skip)
     {
         Material key;
         if(!self||!query||query->ai!=self->ai||query->epoch!=Epoch()||!Eligible(self->ai->me)||!MaterialOf(material,key))return originalSource(self,out,material,skip);
         Query scope(self->ai,query->project,material,query->epoch);
-        std::map<GameData*,hand,std::less<GameData*>,std::allocator<std::pair<GameData* const,hand> > >::iterator it=
-            self->resourceSourceCache.find(material);
+        ResourceSources::iterator it=self->resourceSourceCache.find(material);
         if(it!=self->resourceSourceCache.end())
         {
             Request cached;
-            if(!RequestFor(self->ai->me,scope.project,it->second,material,cached,scope.epoch,false)||Preview(cached)<=0)
+            if(!RequestFor(self->ai->me,scope.project,it->second,material,cached,scope.epoch,false,true)||Preview(cached)<=0)
                 self->resourceSourceCache.erase(it); // Exactly this actor/material; one native requery below.
         }
         const float score=originalSource(self,out,material,skip);
@@ -397,23 +445,63 @@ namespace EngineerMaterialsRuntime
         }
         return NULL;
     }
-    static bool Plan(Character* actor,Building* project,Tasker* collection,Request& r,unsigned e)
+    struct MachineOutputs
+    {
+        lektor<GameData*> offered;
+        ~MachineOutputs()
+        {
+            // The SDK lektor does not release its storage. Pair the native
+            // allocation with the same game delete[] used by task247.
+            if(offered.stuff)reinterpret_cast<void (*)(void*)>(image+0xED562E)(offered.stuff);
+        }
+    };
+    static void ClearUnofferedSource(Character* actor,Building* project,const hand& source,
+                                    const lektor<GameData*>& offered,unsigned e)
+    {
+        AI* ai=actor->getAI();
+        if(e!=Epoch()||!ai||ai->me!=actor)return;
+        Building::ConstructionState* state=project->getBuildState();
+        if(e!=Epoch()||!state||state->mats.size()>16)return;
+        ResourceSources& cache=ai->resultsCache.resourceSourceCache;
+        for(unsigned i=0;i<state->mats.size();++i)
+        {
+            Building::ConstructionState::BuildMaterial* item=state->mats[i];if(!item)continue;
+            ResourceSources::iterator hit=cache.find(item->mat);
+            if(hit==cache.end()||Of(hit->second)!=Of(source))continue;
+            unsigned j=0;while(j<offered.size()&&offered[j]!=item->mat)++j;
+            if(j==offered.size())cache.erase(hit);
+        }
+    }
+    static bool Plan(Character* actor,Building* project,Tasker* collection,Request& r,unsigned e,bool* unmanaged=NULL)
     {
         if(!actor||!project||!collection||!collection->taskData||
             collection->taskData->key!=COLLECT_OUTPUT_RESOURCE_BUILD_MATS)return false;
-        const hand& source=collection->subject;
+        const hand source=collection->subject;
         if(ExactClass(collection,true))
         {
             Item* item=source.getItem();return item&&RequestFor(actor,project,source,item->getGameData(),r,e);
         }
         if(!ExactClass(collection,false))return false;
-        Building::ConstructionState* state=project->getBuildState();
-        if(!state||state->mats.size()>16)return false;
-        for(unsigned i=0;i<state->mats.size();++i)
+        Building* building=source.getBuilding();
+        StorageBuilding* storage=building?building->getFunctionStuff():NULL;
+        if(!storage||e!=Epoch())return false;
+        Inventory* inventory=storage->getInventory();if(!inventory)return false;
+        const lektor<Item*>& stock=inventory->getAllItems();
+        const unsigned offerLimit=128;
+        if(stock.size()>offerLimit||stock.size()>stock.maxSize||(stock.size()&&!stock.stuff))
+        {if(unmanaged)*unmanaged=true;return false;}
+        // A machine's inventory also contains inputs. The native collection
+        // action can pick only from the materials the source offers to it.
+        MachineOutputs outputs;
+        storage->getItemsWeWantRidOf(outputs.offered,false);
+        if(outputs.offered.size()>offerLimit||outputs.offered.size()>outputs.offered.maxSize||
+            (outputs.offered.size()&&!outputs.offered.stuff))
+        {if(unmanaged)*unmanaged=true;return false;}
+        for(unsigned i=0;i<outputs.offered.size()&&e==Epoch();++i)
         {
-            Building::ConstructionState::BuildMaterial* needed=state->mats[i];
-            if(needed&&RequestFor(actor,project,source,needed->mat,r,e)&&Preview(r)>0)return true;
+            if(RequestFor(actor,project,source,outputs.offered[i],r,e,true,true)&&Preview(r)>0)return true;
         }
+        if(e==Epoch())ClearUnofferedSource(actor,project,source,outputs.offered,e);
         return false;
     }
     static void Replan(CharBody* body)
@@ -514,7 +602,7 @@ namespace EngineerMaterialsRuntime
         for(unsigned i=0;i<state->mats.size();++i)
         {Building::ConstructionState::BuildMaterial* m=state->mats[i];if(m&&Matches(m->mat,previous.material)){material=m->mat;break;}}
         Request current;
-        if(e==Epoch()&&(!material||!RequestFor(actor,project,pending->subject,material,current,e,false)||Preview(current)<=0))
+        if(e==Epoch()&&(!material||!RequestFor(actor,project,pending->subject,material,current,e,false,true)||RevalidateSource(previous,current)<=0))
         {
             DenyMove(system,project,pending,e);StopDeniedMove(body,actor,project,e);
         }
@@ -531,14 +619,22 @@ namespace EngineerMaterialsRuntime
             if(project&&SupportedProject(project))
             {
                 const CargoResult cargo=CommitCargo(actor,project,e);Tasker* collection=PendingCollection(system);
+                bool advances=!collection&&(!cargo.present||cargo.pledged||cargo.full);
                 if(collection&&NativePending(collection))
                 {
-                    const bool planned=Plan(actor,project,collection,r,e);
-                    if((planned||r.actor.Valid())&&r.available>0&&r.need>0&&!CanTrack(r)){/* Explicit native fallback on table exhaustion. */}
-                    else if(!planned||!Commit(r))DenyMove(system,project,collection,e);
+                    bool unmanaged=false;
+                    const bool planned=Plan(actor,project,collection,r,e,&unmanaged);
+                    if(unmanaged||((planned||r.actor.Valid())&&r.available>0&&r.need>0&&!CanTrack(r)))
+                    {/* Unsupported source shape or exhausted claim table: keep native ownership. */}
+                    else
+                    {
+                        advances=planned&&Commit(r)>0;
+                        if(!advances)DenyMove(system,project,collection,e);
+                    }
                 }
                 else if(!collection&&cargo.present&&!cargo.pledged&&!cargo.full)
                     DenyMove(system,project,PendingDelivery(system,Of(project->handle)),e);
+                if(advances&&e==Epoch()&&projectStarted)projectStarted(project,e);
             }
         }
         if(e==Epoch()&&selectedCallback)selectedCallback(system,task);
@@ -549,8 +645,11 @@ namespace EngineerMaterialsRuntime
             transfer->body->getCharacter()!=actor||!ExactClass(task,false)||!Eligible(actor))
             return originalQuantity(task,actor,material,source);
         Building* project=SelectedProject(actor);
-        if(!project||project!=transfer->project||!source||Of(source->handle)!=Of(task->subject))return 0;
-        Request r;if(!RequestFor(actor,project,task->subject,material,r,transfer->epoch))return 0;
+        if(!project||project!=transfer->project||!source)return 0;
+        const hand target=task->subject;
+        Building* building=target.getBuilding();
+        if(!building||building->getFunctionStuff()!=source)return 0;
+        Request r;if(!RequestFor(actor,project,target,material,r,transfer->epoch,true,true))return 0;
         // Native selected action is now executing. Its material may differ
         // from the conservative pre-trip proposal: atomically replace our
         // own claim; never subtract or displace another engineer's claim.
@@ -571,8 +670,16 @@ namespace EngineerMaterialsRuntime
         Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(actor);
         if(e!=Epoch()||!project||!ExactClass(task,false)||body->getCurrentAction()!=task||!SupportedProject(project))
         {originalCollect(task,body);return;}
-        Request r;
-        if(!Plan(actor,project,task,r,e)){if(e==Epoch()){Cancel(actor->handle);Replan(body);}return;}
+        Request r;bool unmanaged=false;
+        if(!Plan(actor,project,task,r,e,&unmanaged))
+        {
+            if(e==Epoch())
+            {
+                CancelAt(Of(actor->handle),e);
+                if(unmanaged)originalCollect(task,body);else Replan(body);
+            }
+            return;
+        }
         if(!CanTrack(r)){CancelAt(r.actor,e);originalCollect(task,body);return;}
         if(!Commit(r)){if(e==Epoch()){CancelAt(r.actor,e);Replan(body);}return;}
         Transfer scope(task,body,project,e);originalCollect(task,body);
@@ -612,8 +719,7 @@ namespace EngineerMaterialsRuntime
             // native removal, otherwise that fallback bypasses reservations.
             if(scope->epoch!=Epoch()||!scope->hasRequest||!Matches(material,scope->request.material)||!Has(scope->request))return NULL;
             Building* source=Handle(scope->request.source).getBuilding();
-            StorageBuilding* storage=source?source->getFunctionStuff():NULL;
-            if(!storage||storage->getInventory()!=inventory)return NULL;
+            if(!source||source->getInventory()!=inventory||scope->epoch!=Epoch())return NULL;
             before=InventoryCount(scope->body->getCharacter(),material);stock=inventory->countItems(material);witnessed=true;
         }
         Item* item=originalTake(inventory,material);
@@ -737,6 +843,7 @@ namespace EngineerMaterialsRuntime
         {0x354750,102,0x628356FE75A24369ui64}, // moveEndAction
         {0x332970,188,0xCC1DA0BFC99C0AB7ui64}, // doorMoveEndAction
         {0x50BE00,8,0x1BFEDCA503B6727Bui64}, // taskImpossible
+        {0xED562E,6,0x85D4B9433D44322Cui64}, // native delete[] for temporary offer lists
     };
     static const unsigned NativeTimeStamp=0x65D604D7;
     static const unsigned NativeImageSize=0x232C000;

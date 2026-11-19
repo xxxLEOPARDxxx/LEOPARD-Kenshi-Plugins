@@ -18,7 +18,7 @@ for prefix,rva in [('?findSomethingToBuild@AI@@',0x998190),('?createBuilding@Roo
  assert [v for n,v in resolved.items() if n.startswith(prefix)]==[rva],(prefix,[(n,hex(v)) for n,v in resolved.items() if n.startswith(prefix)])
 source=(here.parent/'EngineerPriorityNative.h').read_text(encoding='utf-8-sig')
 pins=[(int(a,16),int(b,16),int(c,16)) for a,b,c in re.findall(r'\{0x([0-9A-Fa-f]+),0x([0-9A-Fa-f]+),0x([0-9A-Fa-f]+)ULL\}',source)]
-assert len(pins)==7
+assert len(pins)==8
 for rva,length,expected in pins:
  h=14695981039346656037
  for byte in pe.get_data(rva,length):h=((h^byte)*1099511628211)&((1<<64)-1)
@@ -29,6 +29,11 @@ def decoded(rva,length):return [(i.address,i.mnemonic,i.op_str) for i in md.disa
 assert decoded(0x9A6050,16)==[(0x9A6050,'mov','qword ptr [rbp + 0x118], rsi'),(0x9A6057,'comiss','xmm6, xmm7'),(0x9A605A,'jbe','0x9a6109')]
 assert decoded(0x9A60E2,17)==[(0x9A60E2,'lea','rdx, [rbp + 0x118]'),(0x9A60E9,'lea','rcx, [rsp + 0x48]'),(0x9A60EE,'call','0x26b5c')]
 assert decoded(0x9A60F3,4)==[(0x9A60F3,'movss','dword ptr [rax], xmm6')]
+assert decoded(0x9A5FDB,24)[-1]==(0x9A5FEE,'call','0x452e6')
+assert decoded(0x452E6,5)==[(0x452E6,'jmp','0x60e740')]
+assert decoded(0x107E9,5)==[(0x107E9,'jmp','0x5a1fd0')]
+assert decoded(0x60E835,25)[-1]==(0x60E84B,'call','qword ptr [r15]')
+assert 'const void* caller=_ReturnAddress();return MaterialsAt' in source
 assert pe.get_data(0x26B5C,1)==b'\xe9' and 0x26B5C+5+struct.unpack('<i',pe.get_data(0x26B5D,4))[0]==0x8D9600
 assert decoded(0x8D961B,3)==[(0x8D961B,'mov','r8, qword ptr [rdx]')]
 assert decoded(0x8D9647,4)==[(0x8D9647,'lea','rax, [rbx + 0x20]')]
@@ -39,4 +44,4 @@ assert 'const void* caller=_ReturnAddress();return ScoreSlotAt' in source
 assert 'const void* caller=_ReturnAddress();return FactoryAt' in source
 assert '__declspec(noinline) float* ScoreSlotHook' in source
 assert '__declspec(noinline) Building* FactoryHook' in source
-print('PASS actual SHA256, 3 FF25/export mappings, 6 relocation-free complete bodies + 1 public entry ABI pin, positive branch/helper ABI, placement caller ABI, return-address bridge declarations')
+print('PASS actual SHA256, 3 FF25/export mappings, 8 native code windows, positive branch, source cache and placement caller ABI')

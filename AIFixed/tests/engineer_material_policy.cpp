@@ -53,6 +53,18 @@ int main()
     CHECK(c.SourceWatch(witness.actor,witness.project,witness.source,120400,3,observed));
     c.Expire(240401,3);CHECK(!c.SourceWatch(witness.actor,witness.project,witness.source,240401,3,observed));
     c.Reset(3);
+    Request shipment=Req();shipment.need=10;shipment.available=10;
+    CHECK(c.Commit(shipment)==10);
+    CHECK(c.SourceWatch(shipment.actor,shipment.project,shipment.source,350,3,observed));
+    shipment.available=3;shipment.now=350;
+    CHECK(c.RevalidateSource(observed,shipment)==3);
+    CHECK(c.Demand(Id(2),shipment.project,shipment.material,10,350,3)==7);
+    CHECK(c.SourceWatch(shipment.actor,shipment.project,shipment.source,600,3,observed));
+    shipment.available=10;shipment.now=600;
+    CHECK(c.RevalidateSource(observed,shipment)==10);
+    CHECK(c.Demand(Id(2),shipment.project,shipment.material,10,600,3)==7);
+    CHECK(c.Demand(Id(2),shipment.project,shipment.material,10,120101,3)==10);
+    c.Reset(3);
     CHECK(c.Preview(a)==32);CHECK(c.Preview(a)==32);
     CHECK(c.Commit(a)==32);Request b=Req(2);CHECK(c.Commit(b)==32);
     b=Req(3);CHECK(c.Commit(b)==32);b=Req(4);CHECK(c.Commit(b)==4);

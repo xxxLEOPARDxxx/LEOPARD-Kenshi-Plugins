@@ -39,6 +39,30 @@ assert 'AddHook(intptr_t(image+0x3BA11)' in runtime
 for table in (0x170BF88,0x17367C8):
     assert struct.unpack_from('<Q',data,pe.get_offset_from_rva(table)+0x18)[0]==base+0x3BA11
 assert data[pe.get_offset_from_rva(0x3BA11):pe.get_offset_from_rva(0x3BA11)+5].hex()=='e9caf77000'
+# The native task releases its temporary advertised-material lektor through
+# the same game CRT array delete that releases the plugin's observation list.
+delete_thunk=0xED562E
+delete_import=delete_thunk+6+struct.unpack_from('<i',data,pe.get_offset_from_rva(delete_thunk)+2)[0]
+pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']])
+assert any(d.dll.lower()==b'mfc100u.dll' and e.ordinal==266
+           and e.address==base+delete_import for d in pe.DIRECTORY_ENTRY_IMPORT for e in d.imports)
+delete_at=0x33CFBF
+assert pe.get_data(delete_at,1)==b'\xe8'
+assert delete_at+5+struct.unpack_from('<i',data,pe.get_offset_from_rva(delete_at)+1)[0]==delete_thunk
+assert pe.get_data(0x33CF04,13).hex()=='498b0424498bccff9060010000' # root building getInventory
+# The allocation-free shortcut recognizes only the original single-output
+# method. Multi-output crafting has a different dispatch target.
+for thunk,target in [(0x481D5,0x299AC0),(0x16D9C,0x2B5410)]:
+    code=pe.get_data(thunk,5)
+    assert code[0]==0xe9 and thunk+5+struct.unpack_from('<i',code,1)[0]==target
+assert pe.get_data(0x299AD3,6).hex()=='ff9080050000' # isProductionEmpty, slot +0x580
+assert pe.get_data(0x299AE3,6).hex()=='ff9050050000' # getProductionItemData, slot +0x550
+for name,rva in [('thunk',0x481D5),('offerSingle',0x299AC0)]:
+    match=re.search(r'unsigned char '+name+r'\[\]=\{([^}]+)\};',runtime)
+    expected=bytes(int(value,16) for value in re.findall(r'0x[0-9a-f]+',match[1]))
+    assert pe.get_data(rva,len(expected))==expected
+assert pe.get_data(0x296f4f,4).hex()=='488b4918'     # native quantity uses output section
+assert pe.get_data(0x745d27,6).hex()=='03812c010000' # section count adds item unit quantities
 body=next(x for x in proof['windows'] if x['name']=='body')
 tail=14695981039346656037
 for b in bytes.fromhex(body['bytes'])[5:]:tail=((tail^b)*1099511628211)&0xffffffffffffffff

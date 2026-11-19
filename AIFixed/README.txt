@@ -41,7 +41,7 @@ English
 
 ПОДРОБНЫЙ СПРАВОЧНИК ВОЗМОЖНОСТЕЙ / DETAILED FEATURE REFERENCE
 
-ENGINEERS / ИНЖЕНЕРЫ - local development candidate, 2026-11-18
+ENGINEERS / ИНЖЕНЕРЫ - local development candidate, 2026-11-20
 Not a published release / Не опубликованный выпуск.
 
 CoordinateEngineers=0. MCM > Engineers; restarting installs the adapters.
@@ -55,18 +55,21 @@ sources to chase. Native theft, access, capacity and actual item transfer remain
 Storage batches use outstanding demand, stock and the native carrying-weight
 calculation, up to 32 units. Invalid/unknown weight or no free weight retains the
 native batch of two. Existing whole-ground-stack pickup is not manually split.
+Machine collections reserve materials the machine actually offers as output.
 
-Newly placed productive machines are preferred in observed placement order
-among native-admitted candidates; walls keep parallel construction. Native
-production/crafting/research/farm classes cover modded buildings without names.
-Chronology is transient: earlier/reloaded/unavailable blueprints have no proven
-placement age and retain native selection. No custom chronological save fields.
+Among locally reachable productive machines, engineers prefer one they already
+started while it can be built or its remaining materials are on the way.
+Engineers who have nothing to deliver can take other jobs or work on walls.
+An unavailable or unsupplied machine can yield to another project. New machines
+use the observed placement order. Older blueprints start with native selection
+and keep the same preference once an engineer starts work. Order resets on load.
 
 Only proven construction cargo may be returned, at the original Engineer job
 rank ahead of lower jobs. Preexisting stock, still-needed project material and
 different personal variants are protected. Native movement/one-unit transfer
 preserve rollback. Missing/full/unreachable/unsupported storage retains cargo.
 Acquisition credits reset on load: unknown earlier-session leftovers are retained.
+Surplus return supports the verified KEP 0.17.3 furnace and LSE planner hooks.
 
 No extra game-object worker or world scan. Native callback threads use bounded
 identity/quantity metadata with short locks; native calls stay outside locks.
@@ -86,12 +89,15 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 и нативным расчётом веса, максимум 32 единицы. Неизвестный/некорректный вес
 или отсутствие свободного веса сохраняют штатную партию из двух предметов.
 Подбор целой наземной стопки вручную не разделяется.
+У станков резервируются только материалы, которые они отдают на выходе.
 
-Новые производственные машины завершаются с учётом порядка их размещения
-среди доступных штатному ИИ кандидатов; стены строятся параллельно. Используются
-нативные классы производства, крафта, исследований и ферм, а не названия модов.
-Порядок временный: достоверный возраст прежних, загруженных и недоступных
-чертежей неизвестен, и выбор для них остаётся штатным. Порядок в сейв не пишется.
+Среди доступных машин инженеры предпочитают уже начатую, пока её можно
+строить или оставшиеся материалы несут. Свободные инженеры могут строить
+стены и выполнять другие работы. Если машина недоступна или для неё
+действительно нет материалов, очередь может перейти к следующей. Новые
+машины учитывают порядок размещения. Для старых чертежей первую цель выбирает
+игра, а после начала работ инженеры держат её в приоритете. При загрузке
+порядок сбрасывается.
 
 На склад возвращается только подтверждённый остаток наших материалов,
 с исходным рангом инженерной работы перед менее важными задачами. Прежний
@@ -99,6 +105,7 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 Штатные движение и поштучная передача сохраняют возврат при отказе приёмника.
 Нет подходящего свободного доступного склада - груз остаётся у инженера.
 Учёт полученного сбрасывается при загрузке: неизвестные старые остатки остаются.
+Возврат работает с проверенными обработчиками печей KEP 0.17.3 и планировщика LSE.
 
 Новых потоков с игровыми объектами и обхода мира нет. Используются штатные
 вызовы игры и ограниченные таблицы с короткими блокировками; нативные вызовы

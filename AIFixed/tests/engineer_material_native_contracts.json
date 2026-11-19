@@ -183,6 +183,13 @@
       "size": 8,
       "fnv": "0x1bfedca503b6727b",
       "bytes": "c6816d02000001c3"
+    },
+    {
+      "name": "temporaryOfferListDelete",
+      "rva": 15554094,
+      "size": 6,
+      "fnv": "0x85d4b9433d44322c",
+      "bytes": "ff25243f3701"
     }
   ],
   "sharedBodyTail": "0x4a4146b1228bc6f3",

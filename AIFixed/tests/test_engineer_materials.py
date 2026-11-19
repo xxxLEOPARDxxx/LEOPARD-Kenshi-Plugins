@@ -18,10 +18,14 @@ for opt in ('Od','O2'):
     production=runtime[start:end]+'\n}\n'
     a=runtime.index('    static bool WindowMatches(');b=runtime.index('    static bool NativeAdmission()',a)
     production+='namespace EngineerMaterialsRuntime { struct NativeWindow{unsigned rva,size;unsigned __int64 fnv;};\n'+runtime[a:b]+'}\n'
-    # Only the hardware return-address boundary is injected; scope, epoch,
+    # Replace native allocation/caller and lock boundaries. Scope, epoch,
     # eligibility, cache, reservation and transfer code are the actual header.
     production=production.replace('_ReturnAddress()','FixtureReturnAddress()')
     production=production.replace('EnterCriticalSection(&mutex)','FixtureEnter(&mutex)')
+    production=production.replace('reinterpret_cast<void (*)(void*)>(image+0xED562E)', 'FreeOfferList')
+    a=production.index('        const uintptr_t* table=*reinterpret_cast<const uintptr_t* const*>(storage);')
+    b=production.index('\n    }',a)
+    production=production[:a]+'        return storage->producer;'+production[b:]
     cpp=out/'engineer_material_runtime.cpp'
     window_tests=[]
     proof=json.loads((here/'engineer_material_native_contracts.json').read_text())
@@ -49,15 +53,23 @@ for opt in ('Od','O2'):
 
 mutations={
     'stale_source_cache':('self->resourceSourceCache.erase(it);','(void)0;'),
-    'no_commit':('else if(!planned||!Commit(r))DenyMove(system,project,collection,e);',
-                 'else if(!planned)DenyMove(system,project,collection,e);'),
+    'no_commit':('advances=planned&&Commit(r)>0;', 'advances=planned;'),
     'tiny_batch':('int quantity=Grant(r);','int quantity=2;'),
     'unreserved_fallback':('if(scope->epoch!=Epoch()||!scope->hasRequest||!Matches(material,scope->request.material)||!Has(scope->request))return NULL;',
                           'if(!scope->hasRequest)return originalTake(inventory,material);'),
     'unowned_credit':('coordinator.Acquired(scope->request,moved,before,after);','(void)0;'),
-    'no_destination_claim':('return hasNeed;','return impossible;'),
+    'no_destination_claim':('return !productiveProject||!productiveProject(project);', 'return impossible;'),
+    'blocks_productive_site':('return !productiveProject||!productiveProject(project);', 'return true;'),
     'reject_shared_entry':('if(hash==w.fnv)return true;','if(hash==w.fnv)return true;return false;'),
     'no_lock_epoch_fence':('if(epoch!=Epoch())return false;','if(false)return false;'),
+    'reads_machine_inputs':(
+        'for(unsigned i=0;i<outputs.offered.size()&&e==Epoch();++i)\n'
+        '        {\n'
+        '            if(RequestFor(actor,project,source,outputs.offered[i],r,e,true,true)&&Preview(r)>0)return true;\n'
+        '        }',
+        'Building::ConstructionState* state=project->getBuildState();\n'
+        '        for(unsigned i=0;i<state->mats.size();++i)\n'
+        '            if(RequestFor(actor,project,source,state->mats[i]->mat,r,e)&&Preview(r)>0)return true;'),
 }
 for name,(old,new) in mutations.items():
     assert fixture.count(old)==1,(name,fixture.count(old))

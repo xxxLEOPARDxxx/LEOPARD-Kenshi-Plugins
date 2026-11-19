@@ -8,6 +8,7 @@
 #include "EngineerPriorityPolicy.h"
 #ifndef AIFIXED_ENGINEER_PRIORITY_EXTERNAL_TYPES
 #include <kenshi/AI/AI.h>
+#include <kenshi/AI/AITaskSystem.h>
 #include <kenshi/Building/Building.h>
 #include <kenshi/RootObjectFactory.h>
 #endif
@@ -38,6 +39,7 @@ namespace PriorityNative
         bool (*addHook)(void*,void*,void**);
         void (*report)(const char*);
         bool (*diskIdentity)(); // Optional offline host override; production defaults to SHA256 of main EXE.
+        bool (*materialsEnRoute)(AI*,Building*);
     };
     struct Pin {unsigned rva,size;unsigned __int64 hash;};
     static const Pin pins[] = {
@@ -48,7 +50,8 @@ namespace PriorityNative
         {0x8D9600,0x98,0x2cc3e82f012a04abULL},
         {0x9FA9B0,0x13E,0xce05f4fced53610bULL},
         {0x57C1E0,0x20,0x3ff5030ff1d41cf3ULL},
-        {0x4D6810,0xADE,0x9d76c1b61e7a8909ULL}
+        {0x4D6810,0xADE,0x9d76c1b61e7a8909ULL},
+        {0x60E740,0x1A5,0x8012647b3df1b88dULL}
     };
     static unsigned __int64 HashBytes(const unsigned char* p,size_t n)
     {unsigned __int64 h=14695981039346656037ULL;for(size_t i=0;i<n;++i){h^=p[i];h*=1099511628211ULL;}return h;}
@@ -84,6 +87,10 @@ namespace PriorityNative
                 int delta=0;std::memcpy(&delta,base+thunks[j]+1,4);
                 if(static_cast<size_t>(thunks[j]+5+delta)!=destinations[j])return false;
             }
+            const unsigned char finderRelay[]={0xe9,0x55,0x94,0x5c,0x00};
+            const unsigned char materialsRelay[]={0xe9,0xe2,0x17,0x59,0x00};
+            if(std::memcmp(base+0x452E6,finderRelay,sizeof(finderRelay))||
+               std::memcmp(base+0x107E9,materialsRelay,sizeof(materialsRelay)))return false;
             return true;
         }
         __except(EXCEPTION_EXECUTE_HANDLER){return false;}
@@ -92,6 +99,8 @@ namespace PriorityNative
     typedef Building* (*SelectorFn)(void*);
     typedef void (*BuilderFn)(void*);
     typedef float* (*ScoreSlotFn)(void*,Building* const*);
+    // Win64 passes the 16-byte AI member pointer by address in RDX.
+    typedef float (*MaterialsFn)(void*,const void*,const TaskMatch&,hand&);
     typedef Building* (*FactoryFn)(RootObjectFactory*,GameData*,Ogre::Vector3,TownBase*,Faction*,Ogre::Quaternion,
         FactoryCallbackInterface*,Layout*,Building*,GameSaveState*,Building*,bool,bool,bool,int,bool);
     static Config config={};static const unsigned char* image=0;static size_t imageSize=0;
@@ -100,8 +109,9 @@ namespace PriorityNative
     static unsigned maintenanceCursor=0;static unsigned registryGeneration=0;static LONG registryInvalidation=-1;
     static FinderFn originalFinder=0;static SelectorFn originalSelector=0;
     static ScoreSlotFn originalScoreSlot=0;static FactoryFn originalFactory=0;static BuilderFn originalBuilder=0;
+    static MaterialsFn originalMaterials=0;
     struct FinderFrame {AI* ai;unsigned generation;LONG invalidation;bool bad;};
-    struct SelectorFrame {FinderFrame* finder;void* selector;void* scoreMap;Round round;};
+    struct SelectorFrame {FinderFrame* finder;void* selector;void* scoreMap;Round round;unsigned failedSourceChecks;};
     static __declspec(thread) FinderFrame* finderFrame=0;
     static __declspec(thread) SelectorFrame* selectorFrame=0;
     static __declspec(thread) unsigned inCallback=0,placementDepth=0,factoryDepth=0;
@@ -134,6 +144,22 @@ namespace PriorityNative
         // Caller holds metadataLock. No callbacks or native functions here.
         if(registryGeneration!=generation||registryInvalidation!=local)
         {registry.Reset(generation);maintenanceCursor=0;registryGeneration=generation;registryInvalidation=local;}
+    }
+    static void Started(Building* project,unsigned expectedGeneration)
+    {
+        unsigned generation=0;const LONG local=Invalid();Candidate candidate={};
+        if(!Current(&generation)||generation!=expectedGeneration||!Snapshot(project,&candidate)||!AIFixedEngineerPriority::Construction(candidate)||
+           !SameEpoch(generation,local))return;
+        EnterCriticalSection(&metadataLock);
+        if(Invalid()==local){Synchronise(generation,local);registry.Start(candidate.key);}
+        LeaveCriticalSection(&metadataLock);
+    }
+    static bool EnRoute(AI* ai,Building* project)
+    {
+        ++inCallback;bool covered=false;
+        __try {__try {covered=config.materialsEnRoute(ai,project);} __except(EXCEPTION_EXECUTE_HANDLER){covered=false;}}
+        __finally {--inCallback;}
+        return covered;
     }
     static bool FinderIdentity(void* finder,AI* ai)
     {
@@ -174,6 +200,35 @@ namespace PriorityNative
     }
     static __declspec(noinline) float* ScoreSlotHook(void* self,Building* const* key)
     {const void* caller=_ReturnAddress();return ScoreSlotAt(self,key,caller);}
+    static float MaterialsAt(void* cache,const void* token,const TaskMatch& request,hand& out,const void* caller)
+    {
+        const float score=originalMaterials(cache,token,request,out);
+        SelectorFrame* frame=selectorFrame;
+        if(!frame||caller!=image+0x9A5FF3||!(score<=0.0f)||inCallback||frame->round.bad||!frame->round.trackWaiting)return score;
+        FinderFrame* parent=frame->finder;
+        if(parent->bad||cache!=reinterpret_cast<unsigned char*>(parent->ai)+0x208||
+           !SameEpoch(parent->generation,parent->invalidation))return score;
+        if(++frame->failedSourceChecks>Registry::MaxObserved){frame->round.bad=true;return score;}
+        // This call site follows native range, fortification and build checks.
+        // An earlier machine with only in-flight materials can have a native
+        // score of zero. The original cache contents and result stay intact.
+        Building* project=NULL;
+        __try {project=request.subject.getBuilding();} __except(EXCEPTION_EXECUTE_HANDLER){return score;}
+        Candidate candidate={};
+        if(!Snapshot(project,&candidate)||!AIFixedEngineerPriority::Construction(candidate))return score;
+        EnterCriticalSection(&metadataLock);
+        const bool started=registryInvalidation==parent->invalidation&&registryGeneration==parent->generation&&
+            Invalid()==parent->invalidation&&registry.Started(candidate.key);
+        LeaveCriticalSection(&metadataLock);
+        if(!started||!EnRoute(parent->ai,project)||!SameEpoch(parent->generation,parent->invalidation))return score;
+        EnterCriticalSection(&metadataLock);
+        if(registryInvalidation==parent->invalidation&&registryGeneration==parent->generation&&Invalid()==parent->invalidation)
+            registry.Observe(frame->round,candidate,true);
+        LeaveCriticalSection(&metadataLock);
+        return score;
+    }
+    static __declspec(noinline) float MaterialsHook(void* cache,const void* token,const TaskMatch& request,hand& out)
+    {const void* caller=_ReturnAddress();return MaterialsAt(cache,token,request,out,caller);}
     static Building* SelectorHook(void* self)
     {
         SelectorFrame* previous=selectorFrame;FinderFrame* parent=finderFrame;
@@ -194,6 +249,19 @@ namespace PriorityNative
         Building* chosen=Resolve(replacement);Candidate live={};
         if(!Snapshot(chosen,&live)||!AIFixedEngineerPriority::Equal(live.key,replacement)||
            !AIFixedEngineerPriority::Construction(live)||!SameEpoch(parent->generation,parent->invalidation))return native;
+        if(frame.round.waiting)
+        {
+            if(!EnRoute(parent->ai,chosen)||!SameEpoch(parent->generation,parent->invalidation))return native;
+            if(!frame.round.hasAlternative)return NULL;
+            // Preserve another positive wall/repair candidate from this
+            // native round when the next machine has to wait.
+            Building* other=Resolve(frame.round.alternative);Candidate alternative={};
+            if(!SameEpoch(parent->generation,parent->invalidation))return native;
+            const bool valid=Snapshot(other,&alternative)&&AIFixedEngineerPriority::Equal(alternative.key,frame.round.alternative)&&
+                AIFixedEngineerPriority::OtherConstruction(alternative);
+            if(!SameEpoch(parent->generation,parent->invalidation))return native;
+            return valid?other:NULL;
+        }
         return chosen;
     }
     static float FinderHook(AI* ai,const hand& in,hand& out,bool justAsking)
@@ -277,7 +345,7 @@ namespace PriorityNative
     }
     static bool Configure(const Config& c,const unsigned char* module=0,size_t bytes=0)
     {
-        if(configured||attempted||!c.current||!c.allowActor||!c.snapshot||!c.resolve||!c.addHook||!c.report)return false;
+        if(configured||attempted||!c.current||!c.allowActor||!c.snapshot||!c.resolve||!c.addHook||!c.report||!c.materialsEnRoute)return false;
         if(!module){module=reinterpret_cast<const unsigned char*>(GetModuleHandleW(0));bytes=0x232C000;}
         config=c;image=module;imageSize=bytes;InitializeCriticalSection(&metadataLock);configured=true;return true;
     }
@@ -319,7 +387,8 @@ namespace PriorityNative
         if(ok)ok=config.addHook(const_cast<unsigned char*>(image)+0x8D9600,reinterpret_cast<void*>(&ScoreSlotHook),reinterpret_cast<void**>(&originalScoreSlot));
         if(ok)ok=config.addHook(const_cast<unsigned char*>(image)+0x57C1E0,reinterpret_cast<void*>(&FactoryHook),reinterpret_cast<void**>(&originalFactory));
         if(ok)ok=config.addHook(const_cast<unsigned char*>(image)+0x4D6810,reinterpret_cast<void*>(&BuilderHook),reinterpret_cast<void**>(&originalBuilder));
-        ok=ok&&originalFinder&&originalSelector&&originalScoreSlot&&originalFactory&&originalBuilder;
+        if(ok)ok=config.addHook(const_cast<unsigned char*>(image)+0x60E740,reinterpret_cast<void*>(&MaterialsHook),reinterpret_cast<void**>(&originalMaterials));
+        ok=ok&&originalFinder&&originalSelector&&originalScoreSlot&&originalFactory&&originalBuilder&&originalMaterials;
         if(ok)InterlockedExchange(&ready,1);
         else config.report("Engineer priority: native observer installation failed; keeping native targets.");
         return ok;

@@ -13,10 +13,12 @@ static unsigned checks=0,nativeCalls=0;static uintptr_t returnAddress=0;
 static LONG epoch=3;static bool flipEpochOnCount=false,flipEpochUnderLock=false;
 static LONG epochCalls=0,admitCalls=0;
 static unsigned vanishItem=0,vanishOnRead=0,itemReads=0,lockCalls=0;
+static unsigned liveOfferLists=0;
 #define CHECK(x) do{++checks;if(!(x)){std::fprintf(stderr,"CHECK line %d: %s\n",__LINE__,#x);std::exit(1);}}while(0)
 static void Boundary();static void* FixtureReturnAddress(){return reinterpret_cast<void*>(returnAddress);}
 static void FixtureEnter(CRITICAL_SECTION* lock){++lockCalls;EnterCriticalSection(lock);}
 enum itemType{BUILDING=0,CHARACTER=1,ITEM=4,NULL_ITEM=11};
+enum BuildingClassType{BCTYPE_STORAGE,BCTYPE_PRODUCTION};
 enum TaskType{BUILD=2,PICKUP=3,ADD_MATERIALS_TO_BUILDING=71,JOB_BUILDER=125,COLLECT_OUTPUT_RESOURCE_BUILD_MATS=247};
 enum taskPriority{NORMAL};
 enum StatsEnumerated{STAT_STRENGTH=1};
@@ -80,6 +82,7 @@ struct Character
     bool isDead(){Boundary();return dead;}
     bool isInCombatMode(bool,bool){Boundary();return combat;}
     OrdersReceiver* getOrdersReciever();
+    AI* getAI(){Boundary();return ai;}
     Inventory* getInventory(){Boundary();return &inv;}
     ContainerItem* hasABackpackOn(){Boundary();return bag;}
     CharStats* getStats(){Boundary();return &stats;}
@@ -97,13 +100,30 @@ struct Building
     Building(unsigned id):handle(id,1,BUILDING,1,1),storage(NULL){buildings[id]=this;}
     ConstructionState* getBuildState(){Boundary();return &state;}
     StorageBuilding* getFunctionStuff(){Boundary();return storage;}
+    virtual Inventory* getInventory(){Boundary();return NULL;}
 };
 struct StorageBuilding:Building
 {
-    Inventory inv;
-    StorageBuilding(unsigned n):Building(n){storage=this;}
+    Inventory inv;GameData* output;bool producer;int outputUnits;
+    StorageBuilding(unsigned n):Building(n),output(NULL),producer(false),outputUnits(0){storage=this;}
     Inventory* getInventory(){Boundary();return &inv;}
+    BuildingClassType getBuildingClass(){Boundary();return producer?BCTYPE_PRODUCTION:BCTYPE_STORAGE;}
+    GameData* getProductionItemData(){Boundary();return output;}
+    int getCurrentProductionQuantity(){Boundary();return outputUnits;}
+    bool isProductionEmpty(){Boundary();return outputUnits<=0;}
+    void getItemsWeWantRidOf(lektor<GameData*>& out,bool loot)
+    {
+        Boundary();CHECK(!loot);
+        out.maxSize=static_cast<unsigned>(inv.counts.size());
+        if(!out.maxSize)return;
+        out.stuff=new GameData*[out.maxSize];
+        ++liveOfferLists;
+        for(std::map<GameData*,int>::const_iterator i=inv.counts.begin();i!=inv.counts.end();++i)
+            if(i->second>0&&(!output||i->first==output))out.stuff[out.count++]=i->first;
+    }
 };
+static void FreeOfferList(void* list)
+{Boundary();CHECK(liveOfferLists>0);--liveOfferLists;delete[] static_cast<GameData**>(list);}
 struct Item
 {
     hand handle,owner;GameData* data;bool isInInventory;int quantity;float weight;
@@ -127,7 +147,7 @@ struct AI
     {
         AI* ai;
         std::map<GameData*,hand,std::less<GameData*>,std::allocator<std::pair<GameData* const,hand> > > resourceSourceCache;
-    } cache;
+    } resultsCache;
     Character* me;AITaskSytem* taskSystemAI;
 };
 struct AITaskSytem:OrdersReceiver
@@ -162,10 +182,12 @@ static float Source(AI::AIResultsCacher* c,hand& out,GameData* d,StorageBuilding
     if(machines.size()){out=machines[0]->handle;c->resourceSourceCache[d]=out;return 1;}
     out.setNull();return 0;
 }
-static float Find(AI* ai,const hand&,hand& out,bool){Boundary();++findCalls;return EngineerMaterialsRuntime::Source(&ai->cache,out,material,NULL);}
+static float Find(AI* ai,const hand&,hand& out,bool){Boundary();++findCalls;return EngineerMaterialsRuntime::Source(&ai->resultsCache,out,material,NULL);}
 struct Finder{uintptr_t vptr,pad[3];Character* actor;};
-static bool DestinationPath(void*,const hand&){Boundary();return false;}
+static bool nativePathImpossible=false;
+static bool DestinationPath(void*,const hand&){Boundary();return nativePathImpossible;}
 static Building* desiredProject=NULL;
+static bool IsProductive(Building* project){Boundary();return project==desiredProject;}
 static float Destination(AI* ai,const hand&,hand& out,bool)
 {
     Boundary();Finder finder;finder.vptr=EngineerMaterialsRuntime::image+0x1740910;finder.actor=ai->me;
@@ -214,7 +236,7 @@ static void Pickup(Tasker* t,CharBody* b)
 static void Deliver(Tasker*,CharBody* b){Boundary();--b->actor->inv.counts[material];}
 static void Body(CharBody* b,float){Boundary();if(b&&EngineerMaterialsRuntime::MoveClass(b->action))++moveAttempts;}
 static void Connect(Character& c,AI& ai,AITaskSytem& s,CharBody& b)
-{c.ai=&ai;c.system=&s;ai.me=&c;ai.taskSystemAI=&s;ai.cache.ai=&ai;s.character=&c;s.body=&b;b.actor=&c;b.ai=&ai;b.vptr=EngineerMaterialsRuntime::image+0x16F7938;}
+{c.ai=&ai;c.system=&s;ai.me=&c;ai.taskSystemAI=&s;ai.resultsCache.ai=&ai;s.character=&c;s.body=&b;b.actor=&c;b.ai=&ai;b.vptr=EngineerMaterialsRuntime::image+0x16F7938;}
 struct Race{AIFixedEngineer::Request request;volatile LONG* total;};
 static DWORD WINAPI RaceCommit(void* p)
 {Race* r=static_cast<Race*>(p);InterlockedExchangeAdd(r->total,EngineerMaterialsRuntime::Commit(r->request));return 0;}
@@ -244,14 +266,20 @@ int main()
     collection.taskData=&collectData;collection.subject=store.handle;collection.vptr=image+0x16BD7E0;
     delivery.taskData=&deliverData;delivery.subject=project.handle;move.taskData=&moveData;move.vptr=image+0x16BCD88;body.action=&move;system.actions.list.push_back(&collection);
     Item first(30,&mats,1),alternate(31,&mats,1);groundA=&first;groundB=&alternate;first.isInInventory=true;
-    ai.cache.resourceSourceCache[&mats]=first.handle;ai.cache.resourceSourceCache[&iron]=store.handle;
+    ai.resultsCache.resourceSourceCache[&mats]=first.handle;ai.resultsCache.resourceSourceCache[&iron]=store.handle;
     hand out;CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1);CHECK(out.index==alternate.handle.index);
-    CHECK(sourceCalls==1&&findCalls==1&&ai.cache.resourceSourceCache.count(&iron)==1);
+    CHECK(sourceCalls==1&&findCalls==1&&ai.resultsCache.resourceSourceCache.count(&iron)==1);
     Request preview;CHECK(RequestFor(&actor,&project,alternate.handle,&mats,preview));CHECK(Preview(preview)==1); // queries reserve nothing
-    groundA=NULL;groundB=NULL;ai.cache.resourceSourceCache.erase(&mats);
+    groundA=NULL;groundB=NULL;ai.resultsCache.resourceSourceCache.erase(&mats);
     EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);CHECK(callbacks==1);
     Request competing;CHECK(RequestFor(&second,&project,store.handle,&mats,competing));CHECK(Preview(competing)==0);
     second.inv.counts[&mats]=5;CHECK(EngineerMaterialsRuntime::Destination(&ai2,hand(),out,true)==0&&out.isNull());
+    SetProjectPriority(NULL,IsProductive);
+    CHECK(EngineerMaterialsRuntime::Destination(&ai2,hand(),out,true)==1&&Of(out)==Of(project.handle));
+    nativePathImpossible=true;
+    CHECK(EngineerMaterialsRuntime::Destination(&ai2,hand(),out,true)==0&&out.isNull());
+    nativePathImpossible=false;SetProjectPriority(NULL,NULL);
+    CHECK(EngineerMaterialsRuntime::Destination(&ai2,hand(),out,true)==0&&out.isNull());
     Finder unrelated;unrelated.vptr=image+1;unrelated.actor=&second;
     {DestinationQuery scope(&ai2);CHECK(!EngineerMaterialsRuntime::DestinationPath(&unrelated,project.handle));}
     CHECK(EngineerMaterialsRuntime::Quantity(&collection,&actor,&mats,&store)==2); // outside admitted runAction stays native
@@ -384,14 +412,15 @@ int main()
     winSys.actions.list.clear();winSys.actions.list.push_back(&cargoDelivery);winBody.action=&moves[0];moves[0].subject=cargoProject.handle;
     EngineerMaterialsRuntime::Selected(&winSys,&cargoGoal,1,NORMAL);
     Material mi,ms,mm;MaterialOf(&mats,mm);MaterialOf(&iron,mi);MaterialOf(&steel,ms);
-    const unsigned when=GetTickCount();CHECK(Demand(Of(lose1.handle),Of(cargoProject.handle),mm,10,when,epoch)==7);
-    CHECK(Demand(Of(lose1.handle),Of(cargoProject.handle),mi,8,when,epoch)==3);
-    CHECK(Demand(Of(lose1.handle),Of(cargoProject.handle),ms,4,when,epoch)==0);CHECK(ListOwned(rows,128)==0);
-    collections[0].subject=store.handle;collections[0].vptr=image+0x16BD7E0;store.inv.counts[&mats]=100;
+    const unsigned when=GetTickCount();CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),mm,10,when,epoch)==7);
+    CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),mi,8,when,epoch)==3);
+    CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),ms,4,when,epoch)==0);CHECK(ListOwned(rows,128)==0);
+    collections[0].subject=store.handle;collections[0].vptr=image+0x16BD7E0;
+    store.inv.counts[&mats]=100;store.inv.counts[&iron]=0;
     winSys.actions.list.push_front(&collections[0]);EngineerMaterialsRuntime::Selected(&winSys,&cargoGoal,1,NORMAL);
-    CHECK(Demand(Of(lose1.handle),Of(cargoProject.handle),mm,10,when,epoch)==0);
-    CHECK(Demand(Of(lose1.handle),Of(cargoProject.handle),mi,8,when,epoch)==3);
-    CHECK(Demand(Of(lose1.handle),Of(cargoProject.handle),ms,4,when,epoch)==0);
+    CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),mm,10,when,epoch)==0);
+    CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),mi,8,when,epoch)==3);
+    CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),ms,4,when,epoch)==0);
     // Capacity exhaustion preserves ordinary movement and ordinary native2
     // collection; it neither bricks the job nor evicts another actor's lease.
     ++epoch;Invalidate();
@@ -405,6 +434,92 @@ int main()
     CHECK(deniedCount==0);const unsigned capacityMoves=moveAttempts;EngineerMaterialsRuntime::Body(&winBody,.1f);CHECK(moveAttempts==capacityMoves+1);
     winBody.action=&collections[0];const int cargoBefore=win.inv.counts[&mats];EngineerMaterialsRuntime::Collect(&collections[0],&winBody);
     CHECK(win.inv.counts[&mats]==cargoBefore+2);
+    // Each machine contains the other recipe material as an input. Both
+    // engineers must collect their source's output instead of pledging inputs.
+    ++epoch;Invalidate();
+    Building mixedSite(998);
+    mixedSite.state.mats.stuff=mixedNeeds;mixedSite.state.mats.count=mixedSite.state.mats.maxSize=2;
+    mixedSite.state.needs[&mats]=6;mixedSite.state.needs[&iron]=6;
+    StorageBuilding ironOutput(992),matsOutput(993);
+    ironOutput.output=&iron;matsOutput.output=&mats;
+    ironOutput.inv.counts[&iron]=ironOutput.inv.counts[&mats]=6;
+    matsOutput.inv.counts[&iron]=matsOutput.inv.counts[&mats]=6;
+    Item ironStack(994,&iron,6);
+    Item* machineStocks[]={&sourceStack,&ironStack};
+    ironOutput.inv.all.stuff=matsOutput.inv.all.stuff=machineStocks;
+    ironOutput.inv.all.count=ironOutput.inv.all.maxSize=2;
+    matsOutput.inv.all.count=matsOutput.inv.all.maxSize=2;
+    actor.inv.counts.clear();second.inv.counts.clear();
+    builder.currentSubTarget=mixedSite.handle;
+    Tasker collectIron=collection,collectMats=collection;
+    collectIron.subject=ironOutput.handle;collectMats.subject=matsOutput.handle;
+    collectIron.vptr=collectMats.vptr=image+0x16BD7E0;
+    body.action=&collectIron;body2.action=&collectMats;
+    EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    EngineerMaterialsRuntime::Selected(&system2,&builder,1,NORMAL);
+    material=&iron;storage=&ironOutput;EngineerMaterialsRuntime::Collect(&collectIron,&body);
+    CHECK(actor.inv.counts[&iron]==6&&ironOutput.inv.counts[&mats]==6);
+    material=&mats;storage=&matsOutput;EngineerMaterialsRuntime::Collect(&collectMats,&body2);
+    CHECK(second.inv.counts[&mats]==6&&matsOutput.inv.counts[&iron]==6);
+    CHECK(liveOfferLists==0);
+    // Large modded machine inventories stay on the native collection path.
+    ++epoch;Invalidate();second.inv.counts.clear();matsOutput.inv.counts[&mats]=6;
+    Item* oversized[129];for(unsigned i=0;i<129;++i)oversized[i]=&sourceStack;
+    matsOutput.inv.all.stuff=oversized;matsOutput.inv.all.count=matsOutput.inv.all.maxSize=129;
+    EngineerMaterialsRuntime::Selected(&system2,&builder,1,NORMAL);
+    EngineerMaterialsRuntime::Collect(&collectMats,&body2);
+    CHECK(second.inv.counts[&mats]==2&&matsOutput.inv.counts[&mats]==4);
+    CHECK(deniedCount==0&&liveOfferLists==0);
+    // Haulers can consume stock while the engineer approaches. As long as a
+    // few units remain the trip is still useful, and other sources can serve
+    // the part that is no longer covered.
+    ++epoch;Invalidate();actor.inv.counts.clear();second.inv.counts.clear();
+    matsOutput.inv.all.stuff=machineStocks;
+    matsOutput.inv.all.count=matsOutput.inv.all.maxSize=2;
+    matsOutput.inv.counts[&mats]=6;store.inv.counts[&mats]=6;
+    move.subject=matsOutput.handle;body.action=&move;
+    system.actions.list.clear();system.actions.list.push_back(&collectMats);
+    EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    Request unpledged;
+    CHECK(RequestFor(&second,&mixedSite,store.handle,&mats,unpledged));
+    CHECK(Preview(unpledged)==0);
+    matsOutput.inv.counts[&mats]=2;
+    EngineerMaterialsRuntime::Body(&body,.1f);
+    CHECK(body.action==&move&&Preview(unpledged)==4);
+    // A delivery that can already reach the site supersedes an incoming
+    // promise. Collection still fetches the uncovered part when it arrives.
+    ++epoch;Invalidate();matsOutput.inv.counts[&mats]=6;
+    EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    second.inv.counts[&mats]=4;
+    Tasker readyDelivery=delivery,deliveryWalk=move;
+    readyDelivery.vptr=image+0x16BDEF8;
+    readyDelivery.subject=deliveryWalk.subject=mixedSite.handle;
+    body2.action=&deliveryWalk;
+    system2.actions.list.clear();system2.actions.list.push_back(&readyDelivery);
+    EngineerMaterialsRuntime::Selected(&system2,&builder,1,NORMAL);
+    EngineerMaterialsRuntime::Body(&body2,.1f);
+    CHECK(body2.action==&deliveryWalk);
+    body.action=&collectMats;EngineerMaterialsRuntime::Collect(&collectMats,&body);
+    CHECK(actor.inv.counts[&mats]==2&&matsOutput.inv.counts[&mats]==4);
+    // A producer's physical inventory can still contain the same material
+    // elsewhere after the amount in the output section drops.
+    ++epoch;Invalidate();actor.inv.counts.clear();second.inv.counts.clear();
+    matsOutput.producer=true;matsOutput.outputUnits=6;matsOutput.inv.counts[&mats]=6;
+    body.action=&move;EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    CHECK(RequestFor(&second,&mixedSite,store.handle,&mats,unpledged));
+    CHECK(Preview(unpledged)==0);
+    matsOutput.outputUnits=2;
+    EngineerMaterialsRuntime::Body(&body,.1f);
+    CHECK(body.action==&move&&Preview(unpledged)==4);
+    // The multi-output provider no longer advertises the required material.
+    // Its old cached row should be discarded while an unrelated row stays.
+    ++epoch;Invalidate();matsOutput.producer=false;matsOutput.output=&iron;
+    mixedSite.state.needs[&iron]=0;
+    ai.resultsCache.resourceSourceCache[&mats]=matsOutput.handle;
+    ai.resultsCache.resourceSourceCache[&iron]=store.handle;
+    body.action=&collectMats;EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    CHECK(ai.resultsCache.resourceSourceCache.count(&mats)==0);
+    CHECK(ai.resultsCache.resourceSourceCache.count(&iron)==1);
     CheckWindows();
     CHECK(nativeCalls>100);std::printf("engineer materials runtime: %u checks, %u native boundaries PASS\n",checks,nativeCalls);
     return 0;

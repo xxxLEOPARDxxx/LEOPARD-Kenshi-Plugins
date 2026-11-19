@@ -37,6 +37,17 @@ int main(){
  r.Observe(q,wrong);Check(!r.Select(q,1,recycled,out),"container serial participates in full identity");
  r.Reset(2);r.Begin(q,2);r.Observe(q,C(100));r.Observe(q,C(2));
  Check(!r.Select(q,2,C(2),out),"load resets transient ordering instead of fabricating save persistence");
+ r.Start(K(100));r.Start(K(100));r.Start(K(2));
+ r.Begin(q,2);r.Observe(q,C(2));r.Observe(q,C(6));r.Observe(q,C(100),true);
+ Check(r.Select(q,2,C(2),out)&&Equal(out,K(100))&&q.waiting,"working machine with fully booked deliveries holds against another machine");
+ Check(!r.Select(q,2,C(8,true,true),out),"waiting machine cannot block wall work");
+ r.Begin(q,2);r.Observe(q,C(2));r.Observe(q,C(100),true);r.Observe(q,C(100));
+ Check(r.Select(q,2,C(2),out)&&!q.waiting,"a viable delivery outranks waiting for the same machine");
+ r.Begin(q,2);r.Observe(q,C(2));
+ Check(!r.Select(q,2,C(2),out),"unreachable, unsupplied or finished earlier focus is absent from native selection");
+ r.Begin(q,2);r.Observe(q,C(100));r.Observe(q,C(6));
+ Check(r.Select(q,2,C(6),out)&&Equal(out,K(100)),"selected existing blueprint holds priority without inventing placement order");
+ r.Forget(K(100));Check(!r.Select(q,2,C(6),out),"retired focus cannot suppress new construction");
  r.Reset(3);for(unsigned i=1;i<=Registry::MaxEntries;++i)Check(r.Record(K(i)),"metadata capacity can hold admitted placements");
  Check(!r.Record(K(Registry::MaxEntries+1)),"full metadata refuses another placement without eviction");
  r.Forget(K(20));Check(r.Record(K(Registry::MaxEntries+1)),"deleted metadata slot can be reused");
