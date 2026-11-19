@@ -993,22 +993,21 @@ namespace
         {ErrorLog("AIFixed: engineer coordination disabled: lifecycle/input hooks incomplete");return;}
         EngineerMaterialsRuntime::Init(&EngineerAdmitted,&EngineerDebug,&EngineerEpoch);
         EngineerSurplusRuntime::Init(&EngineerAdmitted,&EngineerDebug,&EngineerEpoch,&EngineerAllowed);
-        EngineerMaterialsRuntime::SetSelectedCallback(&EngineerSurplusRuntime::Selected);
         PriorityNative::Config config={};
         config.current=&EngineerCurrent;config.allowActor=&EngineerAllowActor;
         config.snapshot=&EngineerSnapshot;config.resolve=&EngineerResolve;
         config.addHook=&EngineerAddHook;config.report=&EngineerReport;
-        // Global admission is published only after the complete set succeeds.
-        // Partially installed wrappers retain their native fallback behavior.
+        // Construction requires both target selection and shared materials.
+        // Surplus return is optional and owns a separate native safety gate.
         const bool priority=PriorityNative::Configure(config)&&PriorityNative::Install();
         if(!priority){ErrorLog("AIFixed: engineer coordination inactive: construction target adapter unavailable");return;}
         const bool materials=EngineerMaterialsRuntime::Install();
         if(!materials){ErrorLog("AIFixed: engineer coordination inactive: construction material adapter unavailable");return;}
         const bool surplus=EngineerSurplusRuntime::Install();
-        const bool complete=priority&&materials&&surplus;
-        InterlockedExchange(&g_engineerReady,complete?1:0);
-        if(!complete)ErrorLog("AIFixed: engineer coordination remains inactive: required adapters incomplete");
-        else if(EngineerDebug())DebugLog("AIFixed: player engineer coordination installed; native job election retained");
+        if(surplus)EngineerMaterialsRuntime::SetSelectedCallback(&EngineerSurplusRuntime::Selected);
+        InterlockedExchange(&g_engineerReady,1);
+        if(!surplus)ErrorLog("AIFixed: engineer coordination enabled; automatic surplus return unavailable");
+        else if(EngineerDebug())DebugLog("AIFixed: player engineer coordination and surplus return installed");
     }
     void EngineerMaintenance()
     {

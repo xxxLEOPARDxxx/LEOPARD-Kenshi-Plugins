@@ -484,8 +484,35 @@ namespace EngineerSurplusRuntime
     bool Bytes(unsigned rva,const char* bytes,unsigned n){return !std::memcmp(image+rva,bytes,n);}
     bool SharedEntry(unsigned rva,const char* bytes,unsigned n)
     {return Bytes(rva,bytes,n)||(image[rva]==0xe9&&n>5&&!std::memcmp(image+rva+5,bytes+5,n-5));}
+    bool MatchesCode(const unsigned char* code,unsigned count,unsigned long long expected)
+    {
+        unsigned long long hash=14695981039346656037ULL;
+        for(unsigned i=0;i<count;++i)hash=(hash^code[i])*1099511628211ULL;
+        return hash==expected;
+    }
     bool Contract(unsigned rva,unsigned n,unsigned long long expected)
-    {unsigned long long h=14695981039346656037ULL;for(unsigned i=0;i<n;++i)h=(h^image[rva+i])*1099511628211ULL;return h==expected;}
+    {return MatchesCode(image+rva,n,expected);}
+    bool PlannerEntry()
+    {
+        if(Contract(0x50f380,0x6af,0x37b09f9ef0175dbbULL))return true;
+        const unsigned char* entry=image+0x50f380;
+        if(entry[0]!=0xe9||!Contract(0x50f385,0x6aa,0xf27e769eb7fb5a5dULL))return false;
+        // LSE's audited runGOAP wrapper forwards ordinary builder and fill
+        // tasks unchanged. Resolve its existing MinHook relay, never bypass it.
+        // NativeAdmission is called under SEH, including these startup reads.
+        const unsigned char* lse=reinterpret_cast<const unsigned char*>(GetModuleHandleW(L"Loot-Scoot-Execute.dll"));
+        if(!lse)return false;
+        LONG jump=0;
+        std::memcpy(&jump,entry+1,sizeof(jump));
+        const unsigned char* relay=reinterpret_cast<const unsigned char*>(
+            static_cast<ULONG_PTR>(reinterpret_cast<LONG_PTR>(entry)+5+jump));
+        const unsigned char relayHead[]={0xff,0x25,0,0,0,0};
+        if(std::memcmp(relay,relayHead,sizeof(relayHead))!=0)return false;
+        ULONG_PTR target=0;
+        std::memcpy(&target,relay+sizeof(relayHead),sizeof(target));
+        return target==reinterpret_cast<ULONG_PTR>(lse+0x15c10)&&
+            MatchesCode(lse+0x15c10,0xfa,0x953671ec41749d05ULL);
+    }
     bool NativeAdmission()
     {
         // Startup admission authenticates code while the host live-world gate
@@ -497,7 +524,6 @@ namespace EngineerSurplusRuntime
         if(dos->e_magic!=IMAGE_DOS_SIGNATURE||pe->Signature!=IMAGE_NT_SIGNATURE||pe->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64||
            pe->FileHeader.TimeDateStamp!=0x65d604d7||pe->OptionalHeader.SizeOfImage!=0x232c000)return false;
         if(!SharedEntry(0x60f2f0,"\x48\x89\x5c\x24\x08\x48\x89\x74\x24\x10\x57\x48\x83\xec\x60\x48\x8b\x41\x70\x48\x8b\xd9\x4c\x8d\x41\x58\x0f\x29\x74\x24\x50\x48",32))return false;
-        if(!Bytes(0x50f380,"\x48\x8b\xc4\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8d\xa8\x08\xff\xff\xff\x48\x81\xec\xc0\x01\x00\x00\x48\xc7\x45\x90",32))return false;
         if(!Bytes(0x340eb0,"\x48\x8b\xc4\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x83\xec\x50\x48\xc7\x44\x24\x30\xfe\xff\xff\xff\x48\x89\x58\x08\x48\x89\x68",32))return false;
         if(!Bytes(0x33ee80,"\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x48\x8d\x05\xd7\xdd\x37\x01\x48\x8b\xf9\x48\x83\xc1\x08\x48\x89\x41\xf8\x8b\xda\xff\x15",32))return false;
         if(!SharedEntry(0x32eb90,"\x40\x55\x56\x57\x41\x54\x41\x55\x48\x8d\x6c\x24\xe9\x48\x81\xec\x90\x00\x00\x00\x48\xc7\x45\xd7\xfe\xff\xff\xff\x48\x89\x9c\x24\xd0\x00\x00\x00\x48\x8b\x05\xfd\x77\xde\x01\x48\x33\xc4\x48\x89\x45\x07\x41\x8b\xf1\x49\x8b\xf8\x8b\xda\x89\x55\xcf\x4c\x8b\x65\x6f\x48\x8b\x01\xff\x50\x08\x84\xc0\x75\x07\x33\xc0\xe9\x11\x16\x00\x00\x8d\x43\xff\x45\x33\xed\x3d\x21\x01\x00\x00\x0f\x87\x73\x15\x00\x00\x48\x98\x48\x8d\x15\x04\x14\xcd\xff\x0f\xb6\x84\x02\xc8\x03\x33\x00\x8b\x8c\x82\x18\x02\x33\x00\x48\x03\xca\xff\xe1",128))return false;
@@ -513,7 +539,7 @@ namespace EngineerSurplusRuntime
         if(!Contract(0x340eb0,0x224,0xc6771c66ba2a0f5dULL))return false;
         if(!Contract(0x749e10,0x1da,0xaf57a2800f22161fULL))return false;
         if(!Contract(0x74bd70,0x4e9,0xa9f01c9c7210604aULL))return false;
-        if(!Contract(0x50f380,0x6af,0x37b09f9ef0175dbbULL))return false;
+        if(!PlannerEntry())return false;
         if(!Contract(0x50fbc0,0x2bc,0xdc6ed95659b1ae50ULL))return false;
         if(!Contract(0x50c850,0x124,0x57bbe974df7b4420ULL))return false;
         if(!Contract(0x32eb90,0x1663,0x325bb951c9771e3fULL)&&!(image[0x32eb90]==0xe9&&Contract(0x32eb95,0x165e,0x9ff28a9340a2516aULL)))return false;
