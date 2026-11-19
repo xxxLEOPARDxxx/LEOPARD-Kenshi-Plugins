@@ -30,7 +30,16 @@ for opt in ('Od','O2'):
         change='bytes[0]^=0x80' if raw[0]==0xE9 else 'bytes[0]=0xE9'
         window_tests.append('{ using namespace EngineerMaterialsRuntime; unsigned char bytes[]={%s}; NativeWindow w={0x%X,%d,0x%016Xui64}; CHECK(WindowMatches(w,bytes)); %s; CHECK(WindowMatches(w,bytes)==%s); bytes[%d]^=1; CHECK(!WindowMatches(w,bytes)); }'%(
             ','.join('0x%02X'%x for x in raw),row['rva'],size,int(row['fnv'],16),
-            change,'true' if row['rva'] in (0x5C6290,0x998190,0x5C7F40) else 'false',size-1))
+            change,'true' if row['rva'] in (0x5C6290,0x998190,0x5C7F40,0x996EB0) else 'false',size-1))
+        if row['name']=='groundSafety':
+            window_tests.append(
+                '{ using namespace EngineerMaterialsRuntime; unsigned char bytes[]={%s}; '
+                'const NativeWindow w={0x%X,%d,0x%016Xui64}; '
+                'bytes[0]=0xE9;bytes[1]=0x24;bytes[2]=0x65;bytes[3]=0x12;bytes[4]=0xFF;'
+                'CHECK(WindowMatches(w,bytes));'
+                'for(unsigned i=5;i<w.size;++i){bytes[i]^=1;CHECK(!WindowMatches(w,bytes));bytes[i]^=1;}'
+                'bytes[0]=0xCC;CHECK(!WindowMatches(w,bytes)); }' %
+                (','.join('0x%02X'%x for x in raw),row['rva'],size,int(row['fnv'],16)))
     fixture=(here/'engineer_material_runtime_fixture.cpp').read_text().replace('// @PRODUCTION@',production).replace('// @WINDOWTESTS@','\n'.join(window_tests))
     cpp.write_text(fixture)
     exe=out/('engineer_material_runtime_'+opt+'.exe')

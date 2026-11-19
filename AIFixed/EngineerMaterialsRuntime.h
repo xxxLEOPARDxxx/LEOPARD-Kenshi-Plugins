@@ -746,19 +746,25 @@ namespace EngineerMaterialsRuntime
         unsigned __int64 hash=14695981039346656037ui64;
         for(unsigned i=0;i<w.size;++i){hash^=data[i];hash*=1099511628211ui64;}
         if(hash==w.fnv)return true;
-        // KEO's optional frame audit also hooks CharBody::update. KenshiLib
-        // uses m417z MinHook multihook: adding our hook chains its original
-        // through the existing E9. Only this shared entry permits that form;
-        // all27 untouched tail bytes and all private action bodies stay exact.
-        // The exported destination finder also permits our earlier priority
-        // wrapper's identical shared-entry shape.
-        const bool shared32=(w.rva==0x5C6290||w.rva==0x998190)&&w.size==32;
-        const bool sharedCarry=w.rva==0x5C7F40&&w.size==44;
-        if((!shared32&&!sharedCarry)||data[0]!=0xE9)return false;
+        // Only known shared entries accept a five-byte KenshiLib jump.
+        // In particular, KEP's fix_stealing_check already hooks GroundSafe.
+        // Our wrapper calls that chain first and preserves a refusal.
+        if(data[0]!=0xE9)return false;
+        unsigned __int64 expected=0;
+        if(w.size==32)
+        {
+            switch(w.rva)
+            {
+            case 0x5C6290:expected=0x4A4146B1228BC6F3ui64;break; // KEO frame audit
+            case 0x998190:expected=0x071AA82295E69462ui64;break; // our priority wrapper
+            case 0x996EB0:expected=0x0E666EF51CE4D95Cui64;break; // KEP stealing check
+            default:return false;
+            }
+        }
+        else if(w.rva==0x5C7F40&&w.size==44)expected=0xDB02F90F01634456ui64;
+        else return false;
         hash=14695981039346656037ui64;
         for(unsigned i=5;i<w.size;++i){hash^=data[i];hash*=1099511628211ui64;}
-        const unsigned __int64 expected=sharedCarry?0xDB02F90F01634456ui64:
-            (w.rva==0x5C6290?0x4A4146B1228BC6F3ui64:0x071AA82295E69462ui64);
         return hash==expected;
     }
 
@@ -778,7 +784,14 @@ namespace EngineerMaterialsRuntime
         {
             const NativeWindow& w=windows[n];if(w.rva>NativeImageSize||w.size>NativeImageSize-w.rva)return false;
             const unsigned char* data=reinterpret_cast<const unsigned char*>(image+w.rva);
-            if(!WindowMatches(w,data))return false;
+            if(!WindowMatches(w,data))
+            {
+                char message[128];
+                sprintf_s(message,"AIFixed: engineer materials code at RVA 0x%X differs (first opcode 0x%02X)",
+                    w.rva,static_cast<unsigned>(data[0]));
+                ErrorLog(message);
+                return false;
+            }
         }
         // Factory selection and virtual slot identities are as important as
         // function heads: both action247 branches must be stock native classes.
