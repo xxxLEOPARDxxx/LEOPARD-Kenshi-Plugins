@@ -222,15 +222,6 @@ namespace EngineerMaterialsRuntime
         OrdersReceiver* orders=actor->getOrdersReciever();
         return orders&&orders->isJobsEnabled()&&!orders->hasPlayerOrders();
     }
-    static Building* SelectedProject(Character* actor)
-    {
-        if(!Eligible(actor))return NULL;OrdersReceiver* orders=actor->getOrdersReciever();
-        const TaskMatch& goal=orders->getCurrentGoal();
-        if(goal.key()!=JOB_BUILDER)return NULL;
-        // JOB_BUILDER is a native subtasking goal. The selected clone stores
-        // its construction destination in subtarget; no guessed fallback.
-        return goal.subtarget.getBuilding();
-    }
     static bool ExactClass(Tasker* task,bool ground)
     {
         if(!task||!image||!task->taskData||task->taskData->key!=COLLECT_OUTPUT_RESOURCE_BUILD_MATS)return false;
@@ -639,6 +630,42 @@ namespace EngineerMaterialsRuntime
     {
         return ExactClass(pending,true)||ExactClass(pending,false);
     }
+    static bool ConstructionWork(Tasker* action)
+    {
+        if(!action||!action->taskData)return false;
+        const uintptr_t table=*reinterpret_cast<const uintptr_t*>(action);
+        return (table==image+0x16BDE78&&action->taskData->key==BUILD)||
+            (table==image+0x16BDEF8&&action->taskData->key==ADD_MATERIALS_TO_BUILDING);
+    }
+    inline Building* SelectedProject(CharBody* body,Character* actor)
+    {
+        AITaskSytem* system=body&&body->ai?body->ai->taskSystemAI:NULL;
+        if(!system||system->body!=body||system->character!=actor||!Eligible(actor)||
+            actor->getOrdersReciever()->getCurrentGoal().key()!=JOB_BUILDER)return NULL;
+        // The goal's subtarget can still name an earlier site. Native BUILD
+        // and ADD execute against their own subject in the committed plan.
+        Tasker* active=body->getCurrentAction();
+        const hand* target=NULL;
+        if(ConstructionWork(active))target=&active->subject;
+        else if(MoveClass(active)||NativePending(active))
+        {
+            const size_t count=system->actions.list.size();
+            if(count>8)return NULL;
+            for(size_t i=0;i<count;++i)
+            {
+                Tasker* step=system->actions.list[i];
+                if(ConstructionWork(step))
+                {
+                    if(target&&Of(*target)!=Of(step->subject))return NULL;
+                    target=&step->subject;
+                }
+                else if(!MoveClass(step)&&!NativePending(step))break;
+            }
+        }
+        if(!target||target->type!=BUILDING)return NULL;
+        Building* project=target->getBuilding();
+        return project&&Of(project->handle)==Of(*target)?project:NULL;
+    }
     static bool DeliveryNext(AITaskSytem* system,const Identity& project)
     {
         if(!system||system->actions.list.size()>8)return false;
@@ -694,7 +721,7 @@ namespace EngineerMaterialsRuntime
             action->key()!=mark.key||Of(action->subject)!=mark.subject||action->startTime!=mark.start||
             action->endTime!=mark.end||action->priority!=mark.priority||action->weight!=mark.weight||
             action->location.x!=mark.x||action->location.y!=mark.y||action->location.z!=mark.z)return;
-        if(e!=Epoch()||body->getCurrentAction()!=action||SelectedProject(actor)!=project)return;
+        if(e!=Epoch()||body->getCurrentAction()!=action||SelectedProject(body,actor)!=project)return;
         if(DeliveryMove(system,mark.project,action,mark.moveClass))return;
         // Defer native destruction until the owning body phase. Native
         // endAction calls the admitted Move end/stop and deletes only this
@@ -743,7 +770,7 @@ namespace EngineerMaterialsRuntime
         if(system&&system->character)
         {
             Character* actor=system->character;const hand who=actor->handle;
-            CancelAt(Of(who),e);Building* project=SelectedProject(actor);Request r;
+            CancelAt(Of(who),e);Building* project=SelectedProject(system->body,actor);Request r;
             if(project&&SupportedProject(project))
             {
                 // A reservation limits how much more to collect. The
@@ -774,7 +801,7 @@ namespace EngineerMaterialsRuntime
         if(!transfer||transfer->epoch!=Epoch()||transfer->action!=task||transfer->body->getCurrentAction()!=task||
             transfer->body->getCharacter()!=actor||!ExactClass(task,false)||!Eligible(actor))
             return originalQuantity(task,actor,material,source);
-        Building* project=SelectedProject(actor);
+        Building* project=SelectedProject(transfer->body,actor);
         if(!project||project!=transfer->project||!source)return 0;
         const hand target=task->subject;
         Building* building=target.getBuilding();
@@ -797,7 +824,7 @@ namespace EngineerMaterialsRuntime
     static void Collect(Tasker* task,CharBody* body)
     {
         const unsigned e=Epoch();
-        Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(actor);
+        Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(body,actor);
         if(e!=Epoch()||!project||!ExactClass(task,false)||body->getCurrentAction()!=task||!SupportedProject(project))
         {originalCollect(task,body);return;}
         Request r;bool unmanaged=false;
@@ -818,7 +845,7 @@ namespace EngineerMaterialsRuntime
     static void Pickup(Tasker* task,CharBody* body)
     {
         const unsigned e=Epoch();
-        Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(actor);
+        Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(body,actor);
         if(e!=Epoch()||!project||!ExactClass(task,true)||body->getCurrentAction()!=task||!SupportedProject(project))
         {originalPickup(task,body);return;}
         Request r;
@@ -902,7 +929,7 @@ namespace EngineerMaterialsRuntime
     static void Deliver(Tasker* task,CharBody* body)
     {
         const unsigned e=Epoch();
-        Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(actor);
+        Character* actor=body?body->getCharacter():NULL;Building* project=SelectedProject(body,actor);
         if(e!=Epoch()||!project||!task||task->key()!=ADD_MATERIALS_TO_BUILDING||body->getCurrentAction()!=task||
             Of(project->handle)!=Of(task->subject)){originalDeliver(task,body);return;}
         struct Before{Material material;GameData* data;int count;};Before snapshots[16];unsigned size=0;
@@ -931,7 +958,7 @@ namespace EngineerMaterialsRuntime
         {
             const unsigned now=GetTickCount();
             if(e!=Epoch()){originalBody(body,time);return;}
-            Building* project=SelectedProject(actor);
+            Building* project=SelectedProject(body,actor);
             if(!project)CancelAt(Of(actor->handle),e);
             else{StopDeniedMove(body,actor,project,e);ValidateSourceMove(body,actor,project,e);}
             {Guard lock;if(Sync(e)&&unsigned(now-expiredAt)>=1000){coordinator.Expire(now,e);ExpireDenied(now);expiredAt=now;}}
@@ -1065,6 +1092,7 @@ namespace EngineerMaterialsRuntime
             {0x16BD028,2,0xE3BD,0x333130},{0x16BD028,3,0x27D2C,0x332970},{0x16BD028,4,0x3687C,0x3320F0},
             {0x16BD0A8,0,0x2C0B6,0x33AC50},{0x16BD0A8,1,0x3CC0E,0x332820},
             {0x16BD0A8,2,0x20E73,0x3328D0},{0x16BD0A8,3,0x27D2C,0x332970},{0x16BD0A8,4,0x3687C,0x3320F0},
+            {0x16BDE78,2,0x3642B,0x34A3E0},
             {0x16F7938,12,0x1127A,0x5C5CE0},
         };
         for(unsigned i=0;i<sizeof(stopVirtuals)/sizeof(stopVirtuals[0]);++i)

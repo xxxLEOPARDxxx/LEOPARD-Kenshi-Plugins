@@ -296,7 +296,9 @@ int main()
     TaskData builderData={JOB_BUILDER},collectData={COLLECT_OUTPUT_RESOURCE_BUILD_MATS},moveData={TaskType(80)},deliverData={ADD_MATERIALS_TO_BUILDING};
     Tasker builder,collection,move,delivery;builder.taskData=&builderData;builder.currentSubTarget=project.handle;
     collection.taskData=&collectData;collection.subject=store.handle;collection.vptr=image+0x16BD7E0;
-    delivery.taskData=&deliverData;delivery.subject=project.handle;move.taskData=&moveData;move.vptr=image+0x16BCD88;body.action=&move;system.actions.list.push_back(&collection);
+    delivery.taskData=&deliverData;delivery.vptr=image+0x16BDEF8;delivery.subject=project.handle;
+    move.taskData=&moveData;move.vptr=image+0x16BCD88;body.action=&move;
+    system.actions.list.push_back(&collection);system.actions.list.push_back(&delivery);
     Item first(30,&mats,1),alternate(31,&mats,1);groundA=&first;groundB=&alternate;first.isInInventory=true;
     ai.resultsCache.resourceSourceCache[&mats]=first.handle;ai.resultsCache.resourceSourceCache[&iron]=store.handle;
     hand out;CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1);CHECK(out.index==alternate.handle.index);
@@ -456,7 +458,7 @@ int main()
     {
         moves[i].vptr=image+0x16BCD88;moves[i].taskData=&moveData;moves[i].subject=lone.handle;
         collections[i].vptr=image+0x16BDE38;collections[i].taskData=&collectData;collections[i].subject=lone.handle;
-        bodies[i]->action=&moves[i];systems[i]->actions.list.push_back(&collections[i]);
+        bodies[i]->action=&moves[i];systems[i]->actions.list.push_back(&collections[i]);systems[i]->actions.list.push_back(&delivery);
         EngineerMaterialsRuntime::Selected(systems[i],&builder,1,NORMAL);
     }
     CHECK(deniedCount==2&&loseSys1.replans==0&&loseSys2.replans==0); // no destruction inside native runGoals
@@ -507,7 +509,9 @@ int main()
     cargoProject.state.mats.stuff=mixedNeeds;cargoProject.state.mats.count=cargoProject.state.mats.maxSize=3;
     cargoProject.state.needs[&mats]=10;cargoProject.state.needs[&iron]=8;cargoProject.state.needs[&steel]=4;
     win.inv.counts[&mats]=3;win.inv.counts[&iron]=5;win.inv.counts[&steel]=4;
-    Tasker cargoGoal,cargoDelivery;cargoGoal.taskData=&builderData;cargoGoal.currentSubTarget=cargoProject.handle;
+    // The original goal can still name the previous machine when native GOAP
+    // has already committed the delivery for the next one.
+    Tasker cargoGoal,cargoDelivery;cargoGoal.taskData=&builderData;cargoGoal.currentSubTarget=project.handle;
     cargoDelivery.taskData=&deliverData;cargoDelivery.vptr=image+0x16BDEF8;cargoDelivery.subject=cargoProject.handle;
     winSys.actions.list.clear();winSys.actions.list.push_back(&cargoDelivery);winBody.action=&moves[0];moves[0].subject=cargoProject.handle;
     EngineerMaterialsRuntime::Selected(&winSys,&cargoGoal,1,NORMAL);
@@ -515,6 +519,13 @@ int main()
     const unsigned when=GetTickCount();CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),mm,10,when,epoch)==7);
     CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),mi,8,when,epoch)==3);
     CHECK(coordinator.Demand(Of(lose1.handle),Of(cargoProject.handle),ms,4,when,epoch)==0);CHECK(ListOwned(rows,128)==0);
+    CHECK(coordinator.Demand(Of(lose1.handle),Of(project.handle),mm,10,when,epoch)==10);
+    Tasker build=cargoDelivery;TaskData buildData={BUILD};build.taskData=&buildData;build.vptr=image+0x16BDE78;
+    winBody.action=&build;CHECK(SelectedProject(&winBody,&win)==&cargoProject);
+    winBody.action=&cargoDelivery;CHECK(SelectedProject(&winBody,&win)==&cargoProject);
+    build.subject=project.handle;winBody.action=&moves[0];
+    winSys.actions.list.push_back(&build);CHECK(!SelectedProject(&winBody,&win));winSys.actions.list.pop_back();
+    winSys.actions.list.push_front(&cargoGoal);CHECK(!SelectedProject(&winBody,&win));winSys.actions.list.pop_front();
     collections[0].subject=store.handle;collections[0].vptr=image+0x16BD7E0;
     store.inv.counts[&mats]=100;store.inv.counts[&iron]=0;
     winSys.actions.list.push_front(&collections[0]);EngineerMaterialsRuntime::Selected(&winSys,&cargoGoal,1,NORMAL);
@@ -554,6 +565,9 @@ int main()
     Tasker collectIron=collection,collectMats=collection;
     collectIron.subject=ironOutput.handle;collectMats.subject=matsOutput.handle;
     collectIron.vptr=collectMats.vptr=image+0x16BD7E0;
+    Tasker mixedDelivery=delivery;mixedDelivery.subject=mixedSite.handle;
+    system.actions.list.clear();system.actions.list.push_back(&mixedDelivery);
+    system2.actions.list.push_back(&mixedDelivery);
     body.action=&collectIron;body2.action=&collectMats;
     EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
     EngineerMaterialsRuntime::Selected(&system2,&builder,1,NORMAL);
@@ -578,7 +592,7 @@ int main()
     matsOutput.inv.all.count=matsOutput.inv.all.maxSize=2;
     matsOutput.inv.counts[&mats]=6;store.inv.counts[&mats]=6;
     move.subject=matsOutput.handle;body.action=&move;
-    system.actions.list.clear();system.actions.list.push_back(&collectMats);
+    system.actions.list.clear();system.actions.list.push_back(&collectMats);system.actions.list.push_back(&mixedDelivery);
     EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
     Request unpledged;
     CHECK(RequestFor(&second,&mixedSite,store.handle,&mats,unpledged));
@@ -620,7 +634,7 @@ int main()
     CHECK(body2.action==&doorWalk&&DeliveryNext(&system2,Of(mixedSite.handle)));
     system2.actions.list.pop_front();
     CHECK(!DeliveryNext(&system2,Of(mixedSite.handle)));
-    system.actions.list.clear();system.actions.list.push_back(&collectMats);
+    system.actions.list.clear();system.actions.list.push_back(&collectMats);system.actions.list.push_back(&mixedDelivery);
     // A producer's physical inventory can still contain the same material
     // elsewhere after the amount in the output section drops.
     ++epoch;Invalidate();actor.inv.counts.clear();second.inv.counts.clear();
@@ -648,10 +662,11 @@ int main()
     finishedSite.state.mats.stuff=nextSite.state.mats.stuff=needs;
     finishedSite.state.mats.count=nextSite.state.mats.count=1;
     finishedSite.state.needs[&mats]=nextSite.state.needs[&mats]=4;
-    Tasker nextBuilder=builder,storeCollection=collectMats;
+    Tasker nextBuilder=builder,storeCollection=collectMats,finishedDelivery=delivery,nextDelivery=delivery;
     builder.currentSubTarget=finishedSite.handle;nextBuilder.currentSubTarget=nextSite.handle;
+    finishedDelivery.subject=finishedSite.handle;nextDelivery.subject=nextSite.handle;
     storeCollection.subject=move.subject=store.handle;
-    body.action=&move;system.actions.list.clear();system.actions.list.push_back(&storeCollection);
+    body.action=&move;system.actions.list.clear();system.actions.list.push_back(&storeCollection);system.actions.list.push_back(&finishedDelivery);
     EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
     CHECK(EngineerMaterialsRuntime::Find(&ai2,nextSite.handle,out,true)==0&&out.isNull());
     Request staleFetch,unrelatedFetch;
@@ -667,7 +682,7 @@ int main()
     Cancel(second.handle);
     CHECK(system.goal.subtarget.index==finishedSite.handle.index&&body.action==&move);
     CHECK(EngineerMaterialsRuntime::Find(&ai2,nextSite.handle,out,true)==1&&out.index==store.handle.index);
-    body2.action=&storeCollection;system2.actions.list.clear();
+    body2.action=&storeCollection;system2.actions.list.clear();system2.actions.list.push_back(&nextDelivery);
     EngineerMaterialsRuntime::Selected(&system2,&nextBuilder,1,NORMAL);
     completeOnTake=&nextSite;
     EngineerMaterialsRuntime::Collect(&storeCollection,&body2);
