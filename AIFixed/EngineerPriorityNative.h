@@ -42,6 +42,7 @@ namespace PriorityNative
         bool (*diskIdentity)(); // Optional offline host override; production defaults to SHA256 of main EXE.
         bool (*assignedProject)(AI*,Key*);
         void (*constructionCompleted)(const Key&,unsigned);
+        bool (*hasSuppliedAssembler)(AI*,Building*,unsigned);
     };
     struct Pin {unsigned rva,size;unsigned __int64 hash;};
     static const Pin pins[] = {
@@ -132,6 +133,19 @@ namespace PriorityNative
         __finally {--inCallback;}
         return ok;
     }
+    static bool SnapshotFor(FinderFrame* frame,Building* b,Candidate* c)
+    {
+        if(!Snapshot(b,c))return false;
+        if(!c->assembling&&AIFixedEngineerPriority::Construction(*c)&&config.hasSuppliedAssembler&&
+           (!frame->assigned||!AIFixedEngineerPriority::Equal(frame->assignment,c->key)))
+        {
+            ++inCallback;
+            __try {__try {c->assembling=config.hasSuppliedAssembler(frame->ai,b,frame->generation);}
+                   __except(EXCEPTION_EXECUTE_HANDLER){c->assembling=false;}}
+            __finally {--inCallback;}
+        }
+        return true;
+    }
     static bool Allowed(AI* ai)
     {++inCallback;bool ok=false;__try{__try{ok=config.allowActor(ai);}__except(EXCEPTION_EXECUTE_HANDLER){ok=false;}}__finally{--inCallback;}return ok;}
     static Building* Resolve(const Key& key)
@@ -191,7 +205,7 @@ namespace PriorityNative
         {frame->round.bad=true;return result;}
         if(frame->scoreMap&&frame->scoreMap!=self){frame->round.bad=true;return result;}
         frame->scoreMap=self;Candidate candidate={};
-        if(!Snapshot(*key,&candidate)){frame->round.bad=true;return result;}
+        if(!SnapshotFor(frame->finder,*key,&candidate)){frame->round.bad=true;return result;}
         bool completed=false;
         EnterCriticalSection(&metadataLock);
         if(registryGeneration!=frame->finder->generation||registryInvalidation!=frame->finder->invalidation||
@@ -219,7 +233,7 @@ namespace PriorityNative
         selectorFrame=&frame;Building* native=0;
         __try{native=originalSelector(self);}__finally{selectorFrame=previous;}
         if(frame.round.bad||parent->bad||!SameEpoch(parent->generation,parent->invalidation))return native;
-        Candidate nativeInfo={};if(!Snapshot(native,&nativeInfo))return native;
+        Candidate nativeInfo={};if(!SnapshotFor(parent,native,&nativeInfo))return native;
         Key replacement={};bool replace=false;
         EnterCriticalSection(&metadataLock);
         if(registryInvalidation==parent->invalidation&&Invalid()==parent->invalidation)
@@ -228,7 +242,7 @@ namespace PriorityNative
         if(!replace)return native;
         Building* chosen=Resolve(replacement);Candidate live={};
         using namespace AIFixedEngineerPriority;
-        if(!Snapshot(chosen,&live)||!Equal(live.key,replacement)||!SameEpoch(parent->generation,parent->invalidation))return native;
+        if(!SnapshotFor(parent,chosen,&live)||!Equal(live.key,replacement)||!SameEpoch(parent->generation,parent->invalidation))return native;
         const bool assigned=frame.round.assignmentSeen&&Equal(frame.round.assignment,replacement);
         const bool useful=Construction(live)&&(!live.assembling||assigned);
         const bool alternate=frame.round.hasAlternative&&Equal(frame.round.alternative,replacement)&&OtherConstruction(live);

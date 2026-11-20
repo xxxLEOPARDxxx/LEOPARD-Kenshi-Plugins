@@ -56,6 +56,7 @@ namespace EngineerMaterialsRuntime
     unsigned completionGeneration=0;
     bool knownNewCompletion=false;
     void Maintenance(){}
+    bool ProjectNeedsCovered(Character*,Building*,unsigned){return false;}
     void CompleteProject(const AIFixedEngineer::Identity& key,unsigned e,bool newCompletion)
     {completed=key;completionGeneration=e;knownNewCompletion=newCompletion;}
 }

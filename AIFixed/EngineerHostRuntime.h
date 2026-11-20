@@ -108,6 +108,12 @@ Building* EngineerResolve(const AIFixedEngineerPriority::Key& key)
     }
     __except(EngineerNativeFaultFilter(GetExceptionCode())){return NULL;}
 }
+bool EngineerHasSuppliedAssembler(AI* ai,Building* b,unsigned generation)
+{
+    Building::ConstructionState* state=b->getBuildState();
+    return state&&state->buildersThisFrame>0&&
+        EngineerMaterialsRuntime::ProjectNeedsCovered(ai->me,b,generation);
+}
 void EngineerCompletedProject(const AIFixedEngineerPriority::Key& key,unsigned generation)
 {
     AIFixedEngineer::Identity project;

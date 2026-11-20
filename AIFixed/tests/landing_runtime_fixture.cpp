@@ -30,11 +30,12 @@ struct Building:RootObject {
     bool gate,wall,disabled;int outsideGate;
     DoorStuff door;
     struct ConstructionState {bool isComplete;} state;
-    struct Orientation {Ogre::Vector3 xAxis(){return Ogre::Vector3(-1,0,0);}};
+    struct Orientation {Ogre::Vector3 lateral;Ogre::Vector3 xAxis(){return lateral;}};
     Ogre::Aabb bounds;
-    Ogre::Vector3 wallPosition;
+    Ogre::Vector3 wallPosition,wallAxis,wallExterior;
     float wallLength;
-    Building():gate(false),wall(false),disabled(false),outsideGate(0),wallPosition(-9200,140,27300),wallLength(100){
+    Building():gate(false),wall(false),disabled(false),outsideGate(0),wallPosition(-9200,140,27300),
+        wallAxis(0,0,1),wallExterior(-1,0,0),wallLength(100){
         door.isSetupComplete=false;door.broken=true;state.isComplete=true;
     }
     Building* isGate(){return gate?this:NULL;}
@@ -43,8 +44,8 @@ struct Building:RootObject {
     bool isDisabled(){return disabled;}
     ConstructionState* getBuildState(){return &state;}
     Ogre::Vector3 getPosition(){return wallPosition;}
-    Ogre::Vector3 getWallEndPosition(){return wallPosition+Ogre::Vector3(0,0,wallLength);}
-    Orientation getOrientation(){return Orientation();}
+    Ogre::Vector3 getWallEndPosition(){return wallPosition+wallAxis*wallLength;}
+    Orientation getOrientation(){Orientation result={wallExterior};return result;}
     int getOutsideGateCode(){return outsideGate;}
     const Ogre::Aabb& getAABB(){return bounds;}
 };
@@ -54,20 +55,31 @@ struct HavokCharacter {unsigned currentFace;};
 struct CharMovement {
     HavokCharacter* havokCharacter;
     StandingHandle standing;
-    float getRadius(){return 2.0f;}
+    float radius;
+    float getRadius(){return radius;}
     StandingHandle isStandingOnSomething(){return standing;}
 };
 struct Character {CharMovement* movement;int amInsideTownWalls(){return 0;}};
-struct ZoneMap {bool isLoadedMT(){return true;}bool isBeingLoadedMT(){return false;}};
-ZoneMap zone;
-struct ZoneManager {ZoneMap* getZoneMap(const Ogre::Vector3&){return &zone;}};
+struct ZoneMap {
+    ZoneMap *neighbour;
+    bool loaded,loading,mesh;
+    ZoneMap():neighbour(NULL),loaded(true),loading(false),mesh(true){}
+    bool isLoadedMT(){return loaded;}bool isBeingLoadedMT(){return loading;}
+    bool isANeighbour(ZoneMap* other){return other==neighbour;}
+};
+struct ZoneManager {
+    ZoneMap zone,west;
+    bool seam;
+    ZoneManager():seam(false){zone.neighbour=&west;west.neighbour=&zone;}
+    ZoneMap* getZoneMap(const Ogre::Vector3& p){return seam && p.x<-9216.0f?&west:&zone;}
+};
 struct NavMesh {
     Ogre::Vector3 candidate;
     unsigned exteriorCalls;
     int sourceCode,targetCode,exteriorResult,sourceFaceResult,requeryResult,alternateCode;
     unsigned sourceKey;
     float requeryShift,gateSplitX;
-    bool isLoaded(ZoneMap*){return true;}bool isGenerating(){return false;}
+    bool isLoaded(ZoneMap* tile){return tile->mesh;}bool isGenerating(){return false;}
     int getClosestPoint(const Ogre::Vector3& p,float,float,bool,Ogre::Vector3& out,unsigned& key){out=p;key=sourceKey;return sourceFaceResult;}
     int getClosestExteriorPoint(const Ogre::Vector3&,float radius,float,Ogre::Vector3& out){++exteriorCalls;out=candidate;if(radius==10){out.x+=requeryShift;return requeryResult;}return exteriorResult;}
     int getGateCode(const Ogre::Vector3& p){
@@ -84,8 +96,10 @@ struct GameWorld {
 lektor<RootObject*>& GateObjects(){static lektor<RootObject*> result;return result;}
 float ground=140;
 bool slopeConfirmed=true,standingClear=true,barrier=false,water=false;
+ZoneMap *unloadAfterBarriers=NULL;
 void GameWorld::getObjectsWithinSphere(lektor<RootObject*>& out,const Ogre::Vector3&,float,int,unsigned,void*){
     out.object=nearby;out.count=barrier?128u:nearby?1u:0u;
+    if (unloadAfterBarriers) unloadAfterBarriers->loaded=false;
 }
 bool pocketConfirmed=false,physicalCapConfirmed=false;
 int pocketResult=0,physicalCapCalls=0;
@@ -95,6 +109,8 @@ Building* colliderWall=NULL;
 int wallShape=1,otherShape=2;
 bool entryBlocked=false,wrongShape=false,wallHollow=false;
 float wallTop=230.0f;
+Ogre::Vector3 colliderOrigin(-9200,0,0),colliderNormal(1,0,0);
+float nearFace=-12.0f,farFace=12.0f;
 float floorY=140,floorNormalY=1,floorDistance=5;
 unsigned floorGroup=2;
 AIFixedGate::Point normal(-.8357168f,.5356244f,-.1211773f);
@@ -120,12 +136,16 @@ struct UtilityT {
         hit.shape=&wallShape;
         if (direction.y<0.0f && start.y>=wallTop){
             hit.hit=true;hit.position.y=wallTop;hit.normal=Ogre::Vector3(0,1,0);
-        } else if (!direction.y && !entryBlocked && (start.x<-9212.0f || start.x>-9188.0f)){
-            const float edge=direction.x>0.0f?-9212.0f:-9188.0f;
-            hit.hit=true;hit.distance=std::fabs(start.x-edge);hit.normal=-direction;
-            if (wrongShape && direction.x<0.0f) hit.shape=&otherShape;
-        } else if (!direction.y && wallHollow){
-            hit.hit=true;hit.distance=2.0f;hit.normal=-direction;
+        } else if (!direction.y){
+            const float from=(start-colliderOrigin).dotProduct(colliderNormal);
+            const float ray=direction.dotProduct(colliderNormal);
+            if (!entryBlocked && ((ray>0.0f && from<nearFace) || (ray<0.0f && from>farFace))) {
+                const float edge=ray>0.0f?nearFace:farFace;
+                hit.hit=true;hit.distance=(edge-from)/ray;hit.normal=-direction;
+                if (wrongShape && ray<0.0f) hit.shape=&otherShape;
+            } else if (wallHollow) {
+                hit.hit=true;hit.distance=2.0f;hit.normal=-direction;
+            }
         }
     }
 };
@@ -146,9 +166,9 @@ bool StandingSpaceClear(const Ogre::Vector3&,float,float){return standingClear;}
 int checks=0,failures=0;
 void Check(bool value,const char* message){++checks;if(!value){++failures;printf("FAIL: %s\n",message);}}
 bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3& p,const char* reason,bool platformRecovery=true,
-           WallIntent intent=NoWallIntent){
+           WallIntent intent=NoWallIntent,unsigned site=0){
     LandingTrace trace;unsigned sites=0;Ogre::Vector3 landing=p;
-    const bool accepted=FindLanding(&w,&actor,&platform,p,0,landing,sites,platformRecovery,trace,intent);
+    const bool accepted=FindLanding(&w,&actor,&platform,p,site,landing,sites,platformRecovery,trace,intent);
     Check(!strcmp(trace.reason,reason),reason);
     return accepted;
 }
@@ -157,7 +177,7 @@ int main(){
     nav.candidate=Ogre::Vector3(18740,140,47720);
     ZoneManager manager;GameWorld world={&nav,&manager,NULL};Building platform;
     HavokCharacter navigation={0x02000307};
-    CharMovement movement;movement.havokCharacter=&navigation;movement.standing.building=&platform;
+    CharMovement movement;movement.havokCharacter=&navigation;movement.standing.building=&platform;movement.radius=2.0f;
     Character actor={&movement};
     const Ogre::Vector3 original(18778,258.5387f,47723.859f);
     Check(Probe(world,actor,platform,original,"accepted"),"captured lower guard height has a permitted dry downhill landing when all native queries confirm it");
@@ -272,6 +292,49 @@ int main(){
     Check(!Probe(world,actor,embeddedWall,crest,"wall-landing-clearance",false,CrestWallOnly),
         "even an exterior code cannot override the measured wall side");
     nav.candidate.x=-9235;
+    // Captured patrol actor/candidate, saved wall direction and adjacent
+    // zone boundary. The native gate codes and load results are explicit fakes.
+    const Ogre::Vector3 patrol(-9204.73f,271.80f,27344.70f);
+    Building recordedWall;recordedWall.wall=true;
+    recordedWall.wallPosition=Ogre::Vector3(-9203.34f,297.6f,27291.58f);
+    recordedWall.wallAxis=Ogre::Vector3(.74378f,0,.66843f);
+    recordedWall.wallExterior=Ogre::Vector3(.66843f,0,-.74378f);
+    recordedWall.wallLength=39.95f;
+    ground=271.97f;wallTop=374.28f;movement.radius=4.0f;
+    colliderWall=&recordedWall;colliderOrigin=patrol;colliderNormal=-recordedWall.wallExterior;
+    nearFace=-44.92f;farFace=4.47f;
+    nav.candidate=Ogre::Vector3(-9214.47f,272.46f,27354.27f);
+    manager.seam=true;nav.gateSplitX=-9210.0f;nav.sourceCode=27;
+    Check(Probe(world,actor,recordedWall,patrol,"accepted",false),
+        "the logged patrol exit uses the grounded seed side when the embedded source has the opposite gate code");
+    nav.gateSplitX=-9215.0f;
+    Check(!Probe(world,actor,recordedWall,patrol,"wall-gate-code",false),
+        "nearest-nav snapping cannot cross the measured ground seed's gate code");
+    nav.gateSplitX=0;
+    nav.candidate=Ogre::Vector3(-9219.75f,272.46f,27361.41f);
+    Check(!Probe(world,actor,recordedWall,patrol,"landing-zone",false),
+        "the first seed cannot snap into a different tile");
+    Check(Probe(world,actor,recordedWall,patrol,"accepted",false,NoWallIntent,1),
+        "later seeds and landings can use the loaded immediate neighbouring tile at the recorded seam");
+    manager.west.mesh=false;
+    Check(!Probe(world,actor,recordedWall,patrol,"seed-zone",false,NoWallIntent,1),
+        "a neighbouring zone without a loaded mesh is unavailable");
+    manager.west.mesh=true;manager.west.loading=true;
+    Check(!Probe(world,actor,recordedWall,patrol,"seed-zone",false,NoWallIntent,1),
+        "a neighbouring zone still loading is unavailable");
+    manager.west.loading=false;manager.zone.neighbour=NULL;
+    Check(!Probe(world,actor,recordedWall,patrol,"seed-zone",false,NoWallIntent,1),
+        "an unrelated loaded zone cannot admit a wall landing");
+    manager.zone.neighbour=&manager.west;unloadAfterBarriers=&manager.west;
+    Check(!Probe(world,actor,recordedWall,patrol,"zone-changed",false,NoWallIntent,1),
+        "the neighbouring tile is checked again after the barrier query");
+    unloadAfterBarriers=NULL;manager.west.loaded=true;
+    colliderWall=NULL;nativeAgrees=false;
+    LandingTrace ordinaryProbe;Ogre::Vector3 ordinaryLanding;unsigned ordinarySites=0;
+    Check(!FindLanding(&world,&actor,NULL,patrol,2,ordinaryLanding,ordinarySites,false,ordinaryProbe)&&
+        !strcmp(ordinaryProbe.reason,"seed-zone"),"unconfirmed terrain recovery cannot cross a tile seam");
+    nativeAgrees=true;manager.seam=false;
+    ground=140;movement.radius=2.0f;nav.sourceCode=nav.targetCode=0;
     colliderWall=NULL;
     nav.sourceFaceResult=1;
     movement.standing.building=&platform;

@@ -41,6 +41,28 @@ int main()
     {Request x=Req();char name[32];sprintf_s(name,"cargo_%u",i);x.material=Mat(name);x.carried=1;CHECK(c.Cargo(x)==1);}
     Request extra=Req();extra.material=Mat("extra_cargo");extra.carried=1;CHECK(c.Cargo(extra)==0);
     c.Cancel(extra.actor);CHECK(c.Cargo(extra)==1);c.Reset(3);
+    // A plan without an active collection frees its source and keeps only
+    // the items the first engineer actually carries.
+    Request abandoned=Req();abandoned.need=7;abandoned.available=4;abandoned.carried=3;
+    CHECK(c.Commit(abandoned)==4);
+    Request replacement=Req(2);replacement.need=7;replacement.available=4;replacement.now=5101;
+    CHECK(c.Preview(replacement)==4);
+    CHECK(c.Demand(replacement.actor,abandoned.project,abandoned.material,7,5101,3)==4);
+    Request resumed;
+    CHECK(c.SourceWatch(abandoned.actor,abandoned.project,abandoned.source,5101,3,resumed));
+    CHECK(c.Preview(replacement)==4); // an old Move cannot reclaim the stock by waking up
+    CHECK(c.Commit(replacement)==4);
+    c.Reset(3);
+    abandoned.now=100;CHECK(c.Commit(abandoned)==4);
+    CHECK(c.SourceWatch(abandoned.actor,abandoned.project,abandoned.source,4100,3,resumed));
+    CHECK(c.Preview(replacement)==0); // a native trip still in progress retains its claim
+    c.Reset(3);
+    CHECK(c.Commit(abandoned,true)==4); // native transfer owns stock across the travel deadline
+    c.Expire(replacement.now,3);
+    CHECK(c.Preview(replacement)==0);
+    c.Finish(abandoned,3);
+    CHECK(c.Preview(replacement)==4);
+    c.Reset(3);
     // A selected owner's source witness survives a long native walk without
     // renewing its resource/demand lease. Unobserved witnesses expire fully.
     Request witness=Req();witness.ground=true;witness.available=1;witness.need=1;

@@ -46,8 +46,8 @@ namespace AIFixedEngineer
     {
         struct Claim
         {
-            Request request;int quantity,sourceUnits;unsigned started,observed,checked;bool used,completed;
-            Claim():quantity(0),sourceUnits(0),started(0),observed(0),checked(0),used(false),completed(false){}
+            Request request;int quantity,sourceUnits;unsigned started,observed,checked;bool used,completed,acquiring;
+            Claim():quantity(0),sourceUnits(0),started(0),observed(0),checked(0),used(false),completed(false),acquiring(false){}
         };
         Claim claims[128];Owned owned[128];unsigned epoch,serial;
         static int Min(int a,int b){return a<b?a:b;}
@@ -58,7 +58,11 @@ namespace AIFixedEngineer
             r.need>0&&r.need<=1000000&&r.carried>=0&&r.carried<=1000000&&r.available>0&&r.available<=1000000&&
             r.capacity>=1&&r.capacity<=32;}
         bool Live(const Claim& c,unsigned now)const
-        {return c.used&&c.request.epoch==epoch&&unsigned(now-c.started)<LeaseMs;}
+        {return c.used&&c.request.epoch==epoch&&static_cast<int>(now-c.started)<LeaseMs;}
+        static bool SourceLive(const Claim& c,unsigned now)
+        {return c.sourceUnits>0&&(c.acquiring||static_cast<int>(now-c.observed)<SourceLeaseMs);}
+        static int Claimed(const Claim& c,unsigned now)
+        {return SourceLive(c,now)?c.quantity:Min(c.quantity,c.request.carried);}
         int Find(const Identity& actor,const Material* material=NULL)const
         {for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&claims[i].request.actor==actor&&
             (!material||claims[i].request.material==*material))return int(i);return -1;}
@@ -90,8 +94,8 @@ namespace AIFixedEngineer
             {
                 const Claim& c=claims[i];
                 if(!Live(c,r.now)||c.completed||c.request.actor==r.actor||!(c.request.material==r.material))continue;
-                if(c.request.project==r.project)need=Sub(need,c.quantity);
-                if(c.request.source==r.source)
+                if(c.request.project==r.project)need=Sub(need,Claimed(c,r.now));
+                if(c.request.source==r.source&&SourceLive(c,r.now))
                 {
                     if(r.ground&&c.sourceUnits)return 0;
                     stock=Sub(stock,c.sourceUnits);
@@ -99,7 +103,7 @@ namespace AIFixedEngineer
             }
             return Min(Batch,Min(r.capacity,Min(need,stock)));
         }
-        int Store(const Request& r,bool requireExisting)
+        int Store(const Request& r,bool requireExisting,bool acquiring)
         {
             if(!Valid(r))return 0;
             Expire(r.now,r.epoch);int slot=Find(r.actor,&r.material);
@@ -149,10 +153,11 @@ namespace AIFixedEngineer
             claims[slot].request=r;claims[slot].quantity=Min(r.need,r.carried+quantity);
             claims[slot].sourceUnits=r.ground?r.available:quantity;
             claims[slot].started=started;claims[slot].observed=r.now;claims[slot].checked=r.now-250;
-            claims[slot].used=true;claims[slot].completed=false;EmptyPlaceholders();return quantity;
+            claims[slot].used=true;claims[slot].completed=false;claims[slot].acquiring=acquiring;
+            EmptyPlaceholders();return quantity;
         }
     public:
-        enum{Capacity=128,Batch=32,LeaseMs=120000};
+        enum{Capacity=128,Batch=32,LeaseMs=120000,SourceLeaseMs=5000};
         Coordinator():epoch(0),serial(0){}
         int Demand(const Identity& actor,const Identity& project,const Material& material,int need,unsigned now,unsigned e,
                    bool carriedOnly=false)const
@@ -162,7 +167,7 @@ namespace AIFixedEngineer
             {
                 const Claim& c=claims[i];
                 if(Live(c,now)&&!c.completed&&c.request.actor!=actor&&c.request.project==project&&c.request.material==material)
-                    need=Sub(need,carriedOnly?Min(c.quantity,c.request.carried):c.quantity);
+                    need=Sub(need,carriedOnly?Min(c.quantity,c.request.carried):Claimed(c,now));
             }
             return need;
         }
@@ -182,7 +187,7 @@ namespace AIFixedEngineer
                 r.carried<=0||r.carried>1000000)return 0;
             Expire(r.now,r.epoch);int slot=Find(r.actor,&r.material);
             if(slot>=0&&claims[slot].completed&&claims[slot].request.project==r.project)return 0;
-            if(slot>=0&&!claims[slot].completed&&claims[slot].sourceUnits>0)
+            if(slot>=0&&!claims[slot].completed&&SourceLive(claims[slot],r.now))
                 return claims[slot].request.project==r.project?claims[slot].quantity:0;
             // Real cargo can reach the site even if someone else promised
             // to fetch the same units. Other carried pledges still count.
@@ -192,11 +197,12 @@ namespace AIFixedEngineer
             if(slot<0)return 0;
             claims[slot].request=r;claims[slot].request.source=r.actor;
             claims[slot].quantity=quantity;claims[slot].sourceUnits=0;claims[slot].started=r.now;
-            claims[slot].observed=r.now;claims[slot].checked=r.now;claims[slot].used=true;claims[slot].completed=false;
+            claims[slot].observed=r.now;claims[slot].checked=r.now;claims[slot].used=true;
+            claims[slot].completed=false;claims[slot].acquiring=false;
             return quantity; // Existing cargo creates no ownership credit or ownership placeholder.
         }
-        int Commit(const Request& r){return Store(r,false);}
-        int Grant(const Request& r){return Store(r,true);}
+        int Commit(const Request& r,bool acquiring=false){return Store(r,false,acquiring);}
+        int Grant(const Request& r){return Store(r,true,true);}
         void Reset(unsigned e)
         {epoch=e;Token();for(unsigned i=0;i<Capacity;++i){claims[i]=Claim();owned[i]=Owned();}}
         void Cancel(const Identity& actor)
@@ -215,12 +221,17 @@ namespace AIFixedEngineer
         void Expire(unsigned now,unsigned e)
         {
             if(e!=epoch)return; // Only explicit world invalidation advances generation.
-            for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&!Live(claims[i],now))
+            for(unsigned i=0;i<Capacity;++i)if(claims[i].used)
             {
                 Claim& c=claims[i];
-                if(c.request.source!=c.request.actor&&unsigned(now-c.observed)<LeaseMs)
-                {c.quantity=0;c.sourceUnits=0;} // Live body witness, expired resource/demand lease.
-                else c=Claim();
+                if(!Live(c,now))
+                {
+                    if(c.request.source!=c.request.actor&&static_cast<int>(now-c.observed)<LeaseMs)
+                    {c.quantity=0;c.sourceUnits=0;} // Live body witness, expired resource/demand lease.
+                    else c=Claim();
+                }
+                else if(c.sourceUnits&&!SourceLive(c,now))
+                {c.sourceUnits=0;c.quantity=Min(c.quantity,c.request.carried);}
             }
             EmptyPlaceholders();
         }
@@ -231,7 +242,13 @@ namespace AIFixedEngineer
             {
                 Claim& c=claims[i];
                 if(!c.used||c.request.actor!=actor||c.request.project!=project||c.request.source!=source||source==actor)continue;
-                c.observed=now;if(unsigned(now-c.checked)<250)return false;
+                // A forgotten collection plan cannot retain stock. A late
+                // native Move may still proceed if useful, but reacquires at
+                // the actual collection boundary.
+                if(c.sourceUnits&&!SourceLive(c,now))
+                {c.sourceUnits=0;c.quantity=Min(c.quantity,c.request.carried);}
+                if(static_cast<int>(now-c.observed)>0)c.observed=now;
+                if(static_cast<int>(now-c.checked)<250)return false;
                 c.checked=now;out=c.request;out.now=now;return true;
             }
             return false;
@@ -274,7 +291,7 @@ namespace AIFixedEngineer
         {
             const int c=LiveSlot(r);if(c<0)return;
             claims[c].request.carried=Positive(total);
-            claims[c].sourceUnits=0;claims[c].quantity=Min(r.need,claims[c].request.carried);
+            claims[c].sourceUnits=0;claims[c].acquiring=false;claims[c].quantity=Min(r.need,claims[c].request.carried);
             if(!claims[c].quantity)claims[c]=Claim();EmptyPlaceholders();
         }
         // An observed native delivery may spend only proven owned units. Other

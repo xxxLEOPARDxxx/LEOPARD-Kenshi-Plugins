@@ -16,6 +16,7 @@ mutants=[
  ('townclaim_compat',True,'{0x57C1E0,0x20,0x3ff5030ff1d41cf3ULL}','{0x57C1E0,0x2570,0x778f1cf72006b4c1ULL}'),
  ('recycled_identity',True,'!Equal(live.key,replacement)||',''),
  ('ignore_assembly',False,'if(c.assembling&&!assigned)return;',''),
+ ('ignore_reserved_delivery',True,'&&config.hasSuppliedAssembler&&','&&false&&config.hasSuppliedAssembler&&'),
  ('drop_assignment',False,'if(q.assignmentSeen){out=q.assignment;return !Equal(out,native.key);}',''),
  ('ignore_wall_when_full',False,'if(q.hasAlternative){out=q.alternative;return true;}',''),
  ('stale_election',True,'||generation!=expectedGeneration||','||'),

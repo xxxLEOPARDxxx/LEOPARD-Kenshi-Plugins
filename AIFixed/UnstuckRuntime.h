@@ -49,9 +49,10 @@ namespace Unstuck
         const char* reason;
         float ground, clearance, surface, landingGround;
         AIFixedGate::Point slope;
-        int sourceFace, pocket,physicalCap;
+        int sourceFace, pocket,physicalCap, expectedGate, landingGate;
         bool wallHit;
-        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),sourceFace(-2),pocket(-2),physicalCap(0),wallHit(false){}
+        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),
+            sourceFace(-2),pocket(-2),physicalCap(0),expectedGate(-2),landingGate(-2),wallHit(false){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -306,7 +307,7 @@ namespace Unstuck
             {
                 if (idle)
                 {
-                    subject=Identity(standing?standing->handle:hand());
+                    subject=standing?Identity(standing->handle):Identity();
                     destination=AIFixedGate::Point();
                 }
                 wall=ordinary?CrestWall:CrestWallOnly;
@@ -324,7 +325,7 @@ namespace Unstuck
                  (standing && !standing->isAWall())) return false;
         // In this lane only proof of enclosure within a physical wall can
         // lead to recovery. An idle actor on an ordinary walkway stays put.
-        subject=Identity(standing?standing->handle:hand());
+        subject=standing?Identity(standing->handle):Identity();
         destination=AIFixedGate::Point();
         wall=EmbeddedWallOnly;
         return true;
@@ -852,14 +853,18 @@ namespace Unstuck
         return true;
     }
 
+    bool LandingZoneReady(NavMesh* nav,ZoneMap* zone)
+    {
+        return zone && zone->isLoadedMT() && !zone->isBeingLoadedMT() && nav->isLoaded(zone);
+    }
+
     bool FindLanding(GameWorld* world,Character* actor,Building* support,const Ogre::Vector3& here,
                      unsigned probeSite,Ogre::Vector3& landing,unsigned& siteCount,bool guard,LandingTrace& trace,
                      WallIntent wallIntent=NoWallIntent)
     {
         NavMesh* nav=world->navmesh;
         ZoneMap* zone=world->zoneMgr?world->zoneMgr->getZoneMap(here):NULL;
-        if (!nav || !zone || !zone->isLoadedMT() || zone->isBeingLoadedMT() ||
-            !nav->isLoaded(zone) || nav->isGenerating()) return RejectLanding(trace,"zone-not-ready");
+        if (!nav || !LandingZoneReady(nav,zone) || nav->isGenerating()) return RejectLanding(trace,"zone-not-ready");
         CharMovement* movement=actor->movement;
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
         trace.ground=ground;
@@ -955,7 +960,12 @@ namespace Unstuck
             below.x+=55.0f*slope.x;
             below.z+=55.0f*slope.z;
         }
-        if (world->zoneMgr->getZoneMap(below)!=zone) return RejectLanding(trace,"seed-zone");
+        ZoneMap* seedZone=world->zoneMgr->getZoneMap(below);
+        // A wall can straddle a map tile edge. Only a proven enclosure can
+        // search the next loaded tile, along the same measured exit direction.
+        if (seedZone!=zone && (!wallExit.wall || elevatedWall || !seedZone ||
+            !zone->isANeighbour(seedZone) || !LandingZoneReady(nav,seedZone)))
+            return RejectLanding(trace,"seed-zone");
         below.y=UtilityT::getTerrainHeight(below.x,below.z);
         if (!_finite(below.y)) return RejectLanding(trace,"seed-ground");
         const float search=embedded || wallExit.wall?AIFixedGate::WorldUnits(1.0f):
@@ -963,7 +973,9 @@ namespace Unstuck
         if (nav->getClosestExteriorPoint(below,search,clearance,landing)!=1)
             return RejectLanding(trace,"no-exterior-point");
         if (!AIFixedGate::Finite(Point(landing))) return RejectLanding(trace,"invalid-landing");
-        if (world->zoneMgr->getZoneMap(landing)!=zone) return RejectLanding(trace,"landing-zone");
+        ZoneMap* landingZone=world->zoneMgr->getZoneMap(landing);
+        if (landingZone!=zone && (landingZone!=seedZone || !LandingZoneReady(nav,landingZone)))
+            return RejectLanding(trace,"landing-zone");
         if (UtilityT::getPositionInWater(landing.x,landing.z)) return RejectLanding(trace,"landing-water");
         float surface=UtilityT::getTerrainHeight(landing.x,landing.z);
         trace.landingGround=surface;
@@ -991,16 +1003,15 @@ namespace Unstuck
         if (!allowed) return RejectLanding(trace,"landing-distance-height-surface");
         if (embedded && !StandingSpaceClear(landing,clearance,80.0f)) return RejectLanding(trace,"rock-landing-clearance");
         const int destinationGate=nav->getGateCode(landing);
+        trace.landingGate=destinationGate;
         if (destinationGate<0) return RejectLanding(trace,"invalid-gate-code");
         if (wallExit.wall)
         {
-            // There may be no fresh face at crest height. In that case the
-            // measured lateral side fixes the ground seed before the navmesh
-            // can move the requested landing to a nearby polygon.
-            const int sourceGate=nav->getGateCode(elevatedWall?below:here);
-            const int expectedGate=elevatedWall?(wallExit.exterior?0:sourceGate):
-                (sourceGate>=0?sourceGate:actor->amInsideTownWalls());
-            if (destinationGate!=expectedGate) return RejectLanding(trace,"wall-gate-code");
+            // The point inside solid collision can resolve to an opposing
+            // face. The closest landing must retain the physically measured
+            // outside-the-collider seed's code on the actor's side.
+            trace.expectedGate=elevatedWall && wallExit.exterior?0:nav->getGateCode(below);
+            if (destinationGate!=trace.expectedGate) return RejectLanding(trace,"wall-gate-code");
             if ((landing-here).dotProduct(wallExit.outward)<wallExit.edge+clearance+1.5f ||
                 !StandingSpaceClear(landing,clearance,(std::max)(80.0f,here.y-landing.y+clearance)))
                 return RejectLanding(trace,"wall-landing-clearance");
@@ -1028,7 +1039,9 @@ namespace Unstuck
         }
         if (CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0,
                            wallExit.wall && elevatedWall,wallExit.wall!=NULL)) return RejectLanding(trace,"barrier");
-        if (!zone->isLoadedMT() || zone->isBeingLoadedMT() || !nav->isLoaded(zone)) return RejectLanding(trace,"zone-changed");
+        if (!LandingZoneReady(nav,zone) ||
+            (seedZone!=zone && (!LandingZoneReady(nav,seedZone) || nav->isGenerating())))
+            return RejectLanding(trace,"zone-changed");
         trace.reason="accepted";
         return true;
     }
@@ -1050,14 +1063,14 @@ namespace Unstuck
         const HavokCharacter* nav=movement->havokCharacter;
         const float* a=nav->position.m_quad.m128_f32,*b=nav->goal.m_quad.m128_f32;
         const Ogre::Vector3 here=c->getPosition(),target=landing?*landing:here;
-        const Identity object(support?support->handle:hand());
+        const Identity object=support?Identity(support->handle):Identity();
         char line[768];
         _snprintf_s(line,_TRUNCATE,
             "%s NPC %u/%u/%u:%u/%u support %u/%u/%u:%u/%u p=(%.2f,%.2f,%.2f) "
             "anchor=(%.2f,%.2f,%.2f) age=%.3f failureAge=%.3f active=%u goal=%d action=%d "
             "native=%d/%d native_delta=(%.2f,%.2f,%.2f) attempt=%u failed=%u fresh=%u reason=%s "
             "site=%u ground=%.2f radius=%.2f slopeY=%.3f slopeXZ=(%.3f,%.3f) sourceFace=%d "
-            "pocket=%d cap=%d navY=%.2f landingGround=%.2f landing=(%.2f,%.2f,%.2f)",
+            "pocket=%d cap=%d gate=%d/%d navY=%.2f landingGround=%.2f landing=(%.2f,%.2f,%.2f)",
             wall?"wall":"platform",entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
             object.type,object.container,object.containerSerial,object.index,object.serial,
             here.x,here.y,here.z,entry.watch.anchor.x,entry.watch.anchor.y,entry.watch.anchor.z,
@@ -1068,6 +1081,7 @@ namespace Unstuck
             trace?trace->ground:0.0f,trace?trace->clearance:0.0f,
             trace?trace->slope.y:0.0f,trace?trace->slope.x:0.0f,trace?trace->slope.z:0.0f,
             trace?trace->sourceFace:-2,trace?trace->pocket:-2,trace?trace->physicalCap:0,
+            trace?trace->expectedGate:-2,trace?trace->landingGate:-2,
             trace?trace->surface:0.0f,trace?trace->landingGround:0.0f,
             target.x,target.y,target.z);
         DebugLog(line);

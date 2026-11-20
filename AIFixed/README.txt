@@ -61,11 +61,15 @@ resource cache shared with hauling jobs.
 Completing a project releases its unused source reservations, so the next
 project can use the same stock. Already collected construction cargo can
 still be delivered where needed or returned to storage.
+If a collection plan stops running, its uncollected stock is released within
+five seconds. The construction search skips stock with a recent native path
+failure for that worker and tries another source the game offers.
 
 Among locally reachable productive machines, engineers continue their assigned
 site while they can contribute. An engineer without a useful delivery can take
-the next viable project. If a machine has received all materials and assembly
-is under way, additional workers can move on to another machine or a wall.
+the next viable project. If a machine has an assembler and its remaining
+materials are covered by active deliveries, additional workers can move on
+to another machine or a wall.
 New assignments prefer earlier started or placed machines when they have work.
 Older blueprints start with native selection. Placement order resets on load.
 
@@ -100,11 +104,14 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 Готовая постройка освобождает остаток резервов источников, поэтому их запасы
 доступны следующей стройке. Уже полученные материалы можно использовать по
 потребности или вернуть на склад.
+Если задача забора перестала выполняться, бронь ещё не взятого запаса
+освобождается за пять секунд. Инженеры обходят источники, для которых игра
+недавно не нашла маршрут у данного персонажа, и ищут доступный запас.
 
 Инженер продолжает назначенную машину, пока может помочь на этой стройке.
 Если ему нечего доставить, он может взять следующую доступную постройку.
-Когда все материалы уже на месте и сборка идёт, лишние рабочие переходят на
-другую машину или стену. Новые назначения предпочитают ранее начатые и
+Когда сборка уже идёт и остаток покрывают активные доставки, свободные
+рабочие переходят на другую машину или стену. Новые назначения предпочитают ранее начатые и
 ранее размещённые машины, на которых есть работа. Для старых чертежей
 первую цель выбирает игра. При загрузке порядок размещения сбрасывается.
 

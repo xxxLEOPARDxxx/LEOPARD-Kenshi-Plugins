@@ -58,6 +58,7 @@ def direct_target(at, opcode):
     return at+5+struct.unpack_from('<i',code,1)[0]
 for caller,thunk,target in ((0x5A20CB,0x1515E,0x59C570),
                             (0x59D166,0x1515E,0x59C570),
+                            (0x59C7A1,0x23BEB,0x5AF800),
                             (0x59C7B0,0xA81C,0x996EB0),
                             (0x59C88D,0xF222,0x8CAFD0)):
     assert direct_target(caller,0xE8)==thunk

@@ -156,9 +156,11 @@ struct AI
 };
 struct AITaskSytem:OrdersReceiver
 {
-    Character* character;CharBody* body;ActionDeque actions;unsigned replans;
+    Character* character;CharBody* body;ActionDeque actions;unsigned replans;hand failedSource;
     AITaskSytem():character(NULL),body(NULL),replans(0){}
     void taskImpossible(){Boundary();++replans;}
+    bool isPathImpossible(const hand& source)
+    {Boundary();return source.type==failedSource.type&&source.index==failedSource.index&&source.serial==failedSource.serial;}
 };
 OrdersReceiver* Character::getOrdersReciever(){Boundary();return system;}
 Character* hand::getCharacter()const{Boundary();return type==CHARACTER&&actors.count(index)&&actors[index]->handle.serial==serial?actors[index]:NULL;}
@@ -174,7 +176,9 @@ static bool Yes(){InterlockedIncrement(&admitCalls);return allow;}static bool No
 static unsigned sourceCalls=0,findCalls=0,groundCalls=0,gives=0,takes=0,collects=0,pickups=0,callbacks=0;
 static GameData* material=NULL;static GameData* otherMaterial=NULL;static Item* groundA=NULL;static Item* groundB=NULL;static StorageBuilding* storage=NULL;
 static bool Safe(AI*,Item*){Boundary();++groundCalls;return true;}
-static void Machines(AI*,lektor<Building*>& out,unsigned){Boundary();static Building* array[1];array[0]=storage;out.stuff=array;out.count=1;}
+static StorageBuilding* otherStorage=NULL;
+static void Machines(AI*,lektor<Building*>& out,unsigned)
+{Boundary();static Building* array[2];array[0]=storage;array[1]=otherStorage;out.stuff=array;out.count=otherStorage?2:1;}
 struct NativeCaller
 {
     uintptr_t saved;
@@ -306,6 +310,19 @@ int main()
     CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
     CHECK(Of(ai.resultsCache.resourceSourceCache[&mats])==Of(first.handle));
     CHECK(scratchConstructed==scratchBeforeCold+1&&scratchDestroyed==scratchConstructed);
+    {
+        StorageBuilding other(24);other.inv.counts[&mats]=16;
+        otherStorage=&other;groundA=NULL;groundB=NULL;
+        system.failedSource=store.handle;
+        ai.resultsCache.resourceSourceCache[&mats]=store.handle;
+        CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(other.handle));
+        CHECK(Of(ai.resultsCache.resourceSourceCache[&mats])==Of(store.handle));
+        CHECK(EngineerMaterialsRuntime::Source(&ai.resultsCache,out,&mats,NULL)==1&&Of(out)==Of(store.handle));
+        ai.resultsCache.resourceSourceCache.erase(&mats);
+        CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(other.handle));
+        CHECK(Of(ai.resultsCache.resourceSourceCache[&mats])==Of(store.handle));
+        system.failedSource.setNull();groundA=&first;groundB=&alternate;otherStorage=NULL;
+    }
     ai.resultsCache.resourceSourceCache[&mats]=hand();
     CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
     CHECK(ai.resultsCache.resourceSourceCache[&mats].isNull());
@@ -459,6 +476,13 @@ int main()
     lone.isInInventory=true;const unsigned changedMoves=moveAttempts,changedEnds=endedActions;
     EngineerMaterialsRuntime::Body(&loseBody1,.1f);
     CHECK(moveAttempts==changedMoves&&endedActions==changedEnds+1&&!loseBody1.action);
+    ++epoch;Invalidate();lone.isInInventory=false;lone.owner.setNull();loseBody1.action=&moves[1];
+    EngineerMaterialsRuntime::Selected(&loseSys1,&builder,1,NORMAL);
+    moves[1].subject=project.handle; // leftover collect does not own this unrelated Move
+    lone.isInInventory=true;const unsigned unrelatedMoves=moveAttempts;
+    EngineerMaterialsRuntime::Body(&loseBody1,.1f);
+    CHECK(moveAttempts==unrelatedMoves+1&&loseBody1.action==&moves[1]);
+    moves[1].subject=lone.handle;
     ++epoch;Invalidate();lone.isInInventory=false;lone.owner.setNull();loseBody1.action=&moves[1];
     EngineerMaterialsRuntime::Selected(&loseSys1,&builder,1,NORMAL);CHECK(deniedCount==0);
     project.state.needs[&mats]=0;const unsigned completedMoves=moveAttempts,completedEnds=endedActions;

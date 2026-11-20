@@ -59,7 +59,12 @@ namespace EngineerMaterialsRuntime
     private:Guard(const Guard&);Guard& operator=(const Guard&);
     };
     inline Identity Of(const hand& h)
-    {Identity x;x.type=h.type;x.container=h.container;x.containerSerial=h.containerSerial;x.index=h.index;x.serial=h.serial;return x;}
+    {
+        Identity x;
+        if(h.type==NULL_ITEM)return x;
+        x.type=h.type;x.container=h.container;x.containerSerial=h.containerSerial;x.index=h.index;x.serial=h.serial;
+        return x;
+    }
     inline hand Handle(const Identity& h)
     {return hand(h.index,h.serial,static_cast<itemType>(h.type),h.container,h.containerSerial);}
     inline bool MaterialOf(GameData* data,Material& out)
@@ -299,8 +304,8 @@ namespace EngineerMaterialsRuntime
     {Guard lock;return Sync(r.epoch)?coordinator.Preview(r):0;}
     static bool RequestCurrent(const Request& r)
     {return Sync(r.epoch)&&r.completionRevision==ProjectRevision(r.project);}
-    static int Commit(const Request& r)
-    {Guard lock;return RequestCurrent(r)?coordinator.Commit(r):0;}
+    static int Commit(const Request& r,bool acquiring=false)
+    {Guard lock;return RequestCurrent(r)?coordinator.Commit(r,acquiring):0;}
     static int Grant(const Request& r)
     {Guard lock;return RequestCurrent(r)?coordinator.Grant(r):0;}
     static bool Has(const Request& r)
@@ -423,6 +428,10 @@ namespace EngineerMaterialsRuntime
         if(!native||caller!=image+0x59C7B5||!query||query->ai!=ai||query->epoch!=Epoch()||!query->material||!Active())return native;
         Request r;return RequestFor(ai->me,query->project,item->handle,query->material,r,query->epoch,false)&&Preview(r)>0;
     }
+    static bool SourcePathFailed(AI* ai,const hand& source)
+    {
+        return source.type==BUILDING&&ai->taskSystemAI&&ai->taskSystemAI->isPathImpossible(source);
+    }
     static void Machines(AI* ai,lektor<Building*>& out,unsigned flags)
     {
         const uintptr_t caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
@@ -433,7 +442,8 @@ namespace EngineerMaterialsRuntime
         for(unsigned i=0;i<out.size();++i)
         {
             Building* b=out[i];Request r;
-            if(b&&RequestFor(ai->me,query->project,b->handle,query->material,r,query->epoch,false)&&Preview(r)>0)out.stuff[kept++]=b;
+            if(b&&RequestFor(ai->me,query->project,b->handle,query->material,r,query->epoch,false)&&
+                !SourcePathFailed(ai,b->handle)&&Preview(r)>0)out.stuff[kept++]=b;
         }
         out.count=kept;
     }
@@ -510,7 +520,7 @@ namespace EngineerMaterialsRuntime
             }
             const hand source=cold?out:it->second;
             Request cached;
-            if(RequestFor(self->ai->me,query->project,source,material,cached,e,false,true)&&
+            if(!SourcePathFailed(self->ai,source)&&RequestFor(self->ai->me,query->project,source,material,cached,e,false,true)&&
                 Preview(cached)>0&&(cold||CachedSourceOffered(source,material,e))&&e==Epoch())
             {out=source;return native;}
         }
@@ -527,7 +537,7 @@ namespace EngineerMaterialsRuntime
         if(!unmanaged&&score>0)
         {
             Request r;
-            if(!RequestFor(self->ai->me,query->project,out,material,r,e,false)||Preview(r)<=0)
+            if(SourcePathFailed(self->ai,out)||!RequestFor(self->ai->me,query->project,out,material,r,e,false)||Preview(r)<=0)
             {out.setNull();score=0;}
         }
         if(e!=Epoch()){out.setNull();return 0;}
@@ -624,6 +634,7 @@ namespace EngineerMaterialsRuntime
         if(!system||!system->character||!system->body||!NativePending(pending)||e!=Epoch())return;
         CharBody* body=system->body;Tasker* action=body->getCurrentAction();const unsigned kind=MoveClass(action);
         if(!kind||*reinterpret_cast<uintptr_t*>(body)!=image+0x16F7938)return;
+        if(kind==0x16BCD88&&Of(action->subject)!=Of(pending->subject))return;
         DeniedMove mark;mark.actor=Of(system->character->handle);mark.project=Of(project->handle);
         mark.source=Of(pending->subject);mark.subject=Of(action->subject);mark.moveClass=kind;
         mark.pendingClass=static_cast<unsigned>(*reinterpret_cast<uintptr_t*>(pending)-image);
@@ -664,9 +675,13 @@ namespace EngineerMaterialsRuntime
     }
     static void ValidateSourceMove(CharBody* body,Character* actor,Building* project,unsigned e)
     {
-        if(!MoveClass(body->getCurrentAction())||!body->ai)return;
+        Tasker* action=body->getCurrentAction();const unsigned kind=MoveClass(action);
+        if(!kind||!body->ai)return;
         AITaskSytem* system=body->ai->taskSystemAI;Tasker* pending=PendingCollection(system);
         if(!pending||!NativePending(pending))return;
+        // A plain Move targets the source itself. The Door variants are
+        // transitions on the admitted collection's native route.
+        if(kind==0x16BCD88&&Of(action->subject)!=Of(pending->subject))return;
         Request previous;
         if(!SourceWatch(Of(actor->handle),Of(project->handle),Of(pending->subject),GetTickCount(),e,previous))return;
         Building::ConstructionState* state=project->getBuildState();GameData* material=NULL;
@@ -679,7 +694,8 @@ namespace EngineerMaterialsRuntime
         for(unsigned i=0;i<state->mats.size();++i)
         {Building::ConstructionState::BuildMaterial* m=state->mats[i];if(m&&Matches(m->mat,previous.material)){material=m->mat;break;}}
         Request current;
-        if(e==Epoch()&&(!material||!RequestFor(actor,project,pending->subject,material,current,e,false,true)||RevalidateSource(previous,current)<=0))
+        if(e==Epoch()&&(!material||SourcePathFailed(body->ai,pending->subject)||
+            !RequestFor(actor,project,pending->subject,material,current,e,false,true)||RevalidateSource(previous,current)<=0))
         {
             DenyMove(system,project,pending,e);StopDeniedMove(body,actor,project,e);
         }
@@ -758,7 +774,7 @@ namespace EngineerMaterialsRuntime
             return;
         }
         if(!CanTrack(r)){CancelAt(r.actor,e);originalCollect(task,body);return;}
-        if(!Commit(r)){if(e==Epoch()){CancelAt(r.actor,e);Replan(body);}return;}
+        if(!Commit(r,true)){if(e==Epoch()){CancelAt(r.actor,e);Replan(body);}return;}
         Transfer scope(task,body,project,e);originalCollect(task,body);
         if(scope.hasRequest)Finish(scope);else CancelAt(r.actor,e);
     }
@@ -771,7 +787,7 @@ namespace EngineerMaterialsRuntime
         Request r;
         if(!Plan(actor,project,task,r,e)){if(e==Epoch()){Cancel(actor->handle);Replan(body);}return;}
         if(!CanTrack(r)){CancelAt(r.actor,e);originalPickup(task,body);return;}
-        if(!Commit(r)){if(e==Epoch()){CancelAt(r.actor,e);Replan(body);}return;}
+        if(!Commit(r,true)){if(e==Epoch()){CancelAt(r.actor,e);Replan(body);}return;}
         // Native picks a whole ground stack. Reserve the whole source
         // exclusively, even when only a small part is useful to this project.
         // Plan and table admission call native boundaries. Resolve again with
@@ -912,6 +928,7 @@ namespace EngineerMaterialsRuntime
         {0x348810,739,0xBC047E0F34FDF635ui64}, // complete private deliver body
         {0x998190,32,0x3C6D01831BF88D8Fui64}, // destination
         {0x8CBD80,26,0x585500F46FE32AF1ui64}, // destinationPath
+        {0x5AF800,172,0xC992A47FE39410A9ui64}, // AITaskSytem::isPathImpossible, native recent failures
         {0x3BA11,5,0x7C0457CAC6AF67CFui64}, // exact Inventory/ShopTrader virtual thunk
         {0x5C7F40,44,0x971672B7A82B80F8ui64}, // carryWeight
         {0xD20E0,9,0xE0372D5A580DDC7Cui64}, // singleWeight
@@ -1036,6 +1053,7 @@ namespace EngineerMaterialsRuntime
             KenshiLib::GetRealAddress(&CharStats::getStat)==intptr_t(image+0x883BF0)&&
             KenshiLib::GetRealAddress(&CharBody::endAction)==intptr_t(image+0x50BBA0)&&
             KenshiLib::GetRealAddress(&AITaskSytem::taskImpossible)==intptr_t(image+0x50BE00)&&
+            KenshiLib::GetRealAddress(&AITaskSytem::isPathImpossible)==intptr_t(image+0x5AF800)&&
             KenshiLib::GetRealAddress(&InventoryItemBase::_NV_getItemWeightSingle)==intptr_t(image+0xD20E0);
     }
     inline bool Install()
