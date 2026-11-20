@@ -118,9 +118,6 @@ def prepare():
     subprocess.run([sys.executable, str(WORK / 'prepare_release.py'), 'KEO'], check=True,
                    env=dict(os.environ, KENSHI_RELEASE_INPUT_ROOT=str(candidate.parent)))
     verify_package()
-    sys.path.insert(0, str(TOOLS))
-    from release_metadata import render_note
-    (WORK / 'nexus/KEO-6_changelog.txt').write_text(render_note(NOTE) + '\n', encoding='utf-8')
     save(PREPARED, dict(mod='KEO', version='6', code_commit='0dbe9c7', archive=str(ARCHIVE),
         archive_sha256=sha(ARCHIVE), dll_sha256=DLL_HASH, files=sorted(FILES), changes=NOTE,
         nexus_status='prepared_for_owner', verification='CRC, exact Steam/Nexus parity, three MO catalogs'))

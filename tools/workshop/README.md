@@ -10,6 +10,8 @@ Maintain full player descriptions in `desc/qol-20261029.json`: purpose, features
 
 Write both languages of each current version's changes in `release_notes.json`. Preparation updates `changelog.json` while retaining older versions. Full version notes are sent once to Steam Updates; they must not be duplicated in Steam or Nexus descriptions. The history is synchronized with its versioned copy. Every mod/fork README also describes current-version changes in English and Russian.
 
+The shared `ALL_CHANGELOG_MODS.txt` records published releases only, through `personal_changelog.py --published`. Keep release text exports out of the Nexus output folder.
+
 `validate_descriptions.py ModName ...` checks full generated bodies, both player-guide languages, no duplicate changelog sections in Steam/Nexus outputs, balanced BBCode, matching changelog and Steam byte limits. Preparation runs it before replacing ZIPs.
 
 Preparation and validation never upload. `steam_upload.py` is the existing publisher, now versioned here too: it sends the English description, then a separate Russian translation. Upload attaches one bilingual changelog to the first submission; the translation adds no duplicate note. Missing changelogs fail explicitly. Do not run the publisher during preparation. The user uploads Nexus first and supplies links; the corresponding Steam release follows afterwards. Maintain these tracked sources and synchronize the working copy when changing release behavior.
