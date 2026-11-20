@@ -530,15 +530,15 @@
     ]
   },
   "KEO": {
-    "version": "6",
-    "published_version": "5",
+    "version": "7",
+    "published_version": "6",
     "en": [
-      "Fixed a second compatibility issue that could prevent KEO jobs from registering when another plugin had already connected to the game’s job creation system. This could leave Shift + right-click unable to add Waypoint route.",
-      "If registration still fails, the standard log now identifies which stage failed."
+      "Enabled verified save-loading, NPC model and equipment, and resource reuse optimizations on the supported GOG 1.0.65 build.",
+      "Restored Stock shop counter with compatible StackSort releases on Steam and GOG. It works in either plugin load order."
     ],
     "ru": [
-      "Исправлена ещё одна причина, по которой работы KEO могли не регистрироваться, если другой плагин уже подключился к системе создания заданий игры. Из-за этого Shift + ПКМ мог не добавлять работу «Маршрут по точкам».",
-      "Если регистрация всё же не удаётся, в обычном журнале теперь указан этап сбоя."
+      "На поддерживаемой сборке GOG 1.0.65 включены оптимизации загрузки сохранений, подготовки моделей и экипировки NPC, а также повторного использования ресурсов.",
+      "Восстановлена работа «Пополнять прилавок» с совместимыми выпусками StackSort на Steam и GOG. Порядок загрузки плагинов не важен."
     ]
   }
 }

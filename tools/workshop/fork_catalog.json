@@ -1803,12 +1803,12 @@
       "en": "Original source code is available in the linked repository.",
       "ru": "Исходный код оригинала доступен в указанном репозитории."
     },
-    "version": "6",
+    "version": "7",
     "changes": {
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
         "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
-        "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
+        "One package for Steam and the supported GOG 1.0.65 build.",
         "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
         "Route-ownership and stale-point checks, plus corrections to city path-readiness handling.",
         "Optional RAM/VRAM resource preparation and faster startup, save and NPC loading.",
@@ -1817,7 +1817,7 @@
       "ru": [
         "Страница MCM; без MCM доступна исходная вкладка KEO.",
         "Русский/английский/китайский интерфейс; для других языков - английский. Подробный журнал выключен.",
-        "Единый пакет Steam/GOG; GOG проверен не всесторонне.",
+        "Один пакет для Steam и поддерживаемой сборки GOG 1.0.65.",
         "Функции Steel (KenshiQOL): переносимый вес, сбор продукции, пополнение прилавков и циклические маршруты.",
         "Исправления маршрутов, устаревших точек и готовности пути в городах.",
         "Необязательная подготовка RAM/VRAM и ускорение загрузки игры, сейвов и NPC.",
@@ -1828,7 +1828,7 @@
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
         "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
-        "Steam/GOG in one package. GOG works, but broad gameplay testing is not complete.",
+        "One package for Steam and the supported GOG 1.0.65 build.",
         "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
         "Route-ownership and stale-point checks, plus corrections to city path-readiness handling.",
         "Optional RAM/VRAM resource preparation and faster startup, save and NPC loading.",
@@ -1837,7 +1837,7 @@
       "ru": [
         "Страница MCM; без MCM доступна исходная вкладка KEO.",
         "Русский/английский/китайский интерфейс; для других языков - английский. Подробный журнал выключен.",
-        "Единый пакет Steam/GOG; GOG проверен не всесторонне.",
+        "Один пакет для Steam и поддерживаемой сборки GOG 1.0.65.",
         "Функции Steel (KenshiQOL): переносимый вес, сбор продукции, пополнение прилавков и циклические маршруты.",
         "Исправления маршрутов, устаревших точек и готовности пути в городах.",
         "Необязательная подготовка RAM/VRAM и ускорение загрузки игры, сейвов и NPC.",
@@ -1927,6 +1927,16 @@
         "ru": [
           "Исправлена ещё одна причина, по которой работы KEO могли не регистрироваться, если другой плагин уже подключился к системе создания заданий игры. Из-за этого Shift + ПКМ мог не добавлять работу «Маршрут по точкам».",
           "Если регистрация всё же не удаётся, в обычном журнале теперь указан этап сбоя."
+        ]
+      },
+      "7": {
+        "en": [
+          "Enabled verified save-loading, NPC model and equipment, and resource reuse optimizations on the supported GOG 1.0.65 build.",
+          "Restored Stock shop counter with compatible StackSort releases on Steam and GOG. It works in either plugin load order."
+        ],
+        "ru": [
+          "На поддерживаемой сборке GOG 1.0.65 включены оптимизации загрузки сохранений, подготовки моделей и экипировки NPC, а также повторного использования ресурсов.",
+          "Восстановлена работа «Пополнять прилавок» с совместимыми выпусками StackSort на Steam и GOG. Порядок загрузки плагинов не важен."
         ]
       }
     }
