@@ -64,6 +64,9 @@ still be delivered where needed or returned to storage.
 If a collection plan stops running, its uncollected stock is released within
 five seconds. The construction search skips stock with a recent native path
 failure for that worker and tries another source the game offers.
+Engineers can deliver materials they already carry through the game's normal
+delivery action. A paused or abandoned delivery stops covering the project
+after 15 seconds without a matching delivery route.
 
 Among locally reachable productive machines, engineers continue their assigned
 site while they can contribute. An engineer without a useful delivery can take
@@ -107,6 +110,9 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 Если задача забора перестала выполняться, бронь ещё не взятого запаса
 освобождается за пять секунд. Инженеры обходят источники, для которых игра
 недавно не нашла маршрут у данного персонажа, и ищут доступный запас.
+Инженер с нужным грузом может донести его штатной задачей доставки.
+Если 15 секунд не видно действующего маршрута доставки, груз перестаёт
+считаться покрытием потребности стройки.
 
 Инженер продолжает назначенную машину, пока может помочь на этой стройке.
 Если ему нечего доставить, он может взять следующую доступную постройку.

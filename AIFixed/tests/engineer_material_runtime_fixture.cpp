@@ -275,6 +275,11 @@ int main()
 {
     using namespace EngineerMaterialsRuntime;
     Init(Yes,No,E);ready=1;image=reinterpret_cast<uintptr_t>(con)-0x2132D70;
+    const Identity sampled=Of(hand(7002,1,CHARACTER,8002,1));
+    CHECK(DeliveryCheckDue(sampled,epoch,1000));
+    CHECK(!DeliveryCheckDue(sampled,epoch,1999));
+    CHECK(DeliveryCheckDue(sampled,epoch,2000));
+    CHECK(DeliveryCheckDue(sampled,epoch+1,2001));
     originalFind=::Find;originalSource=::Source;originalGroundSafe=Safe;originalMachines=::Machines;
     originalSelected=::Selected;originalQuantity=::Quantity;originalCollect=::Collect;originalPickup=::Pickup;
     originalAdd=::Add;originalTake=::Take;originalDeliver=::Deliver;originalBody=::Body;SetSelectedCallback(Callback);
@@ -522,8 +527,8 @@ int main()
     for(unsigned i=0;i<AIFixedEngineer::Coordinator::Capacity;++i)
     {
         Request full;full.actor=Of(hand(1000+i,1,CHARACTER,1,1));full.project=Of(project.handle);full.source=full.actor;
-        full.material=mm;full.need=1000000;full.carried=1;full.epoch=epoch;full.now=GetTickCount();bool tracked=false;
-        CHECK(Cargo(full,tracked)==1&&tracked);
+        full.material=mm;full.need=1000000;full.carried=1;full.epoch=epoch;full.now=GetTickCount();
+        CHECK(Cargo(full)==1);
     }
     winBody.action=&moves[0];EngineerMaterialsRuntime::Selected(&winSys,&cargoGoal,1,NORMAL);
     CHECK(deniedCount==0);const unsigned capacityMoves=moveAttempts;EngineerMaterialsRuntime::Body(&winBody,.1f);CHECK(moveAttempts==capacityMoves+1);
@@ -596,6 +601,26 @@ int main()
     CHECK(body2.action==&deliveryWalk);
     body.action=&collectMats;EngineerMaterialsRuntime::Collect(&collectMats,&body);
     CHECK(actor.inv.counts[&mats]==2&&matsOutput.inv.counts[&mats]==4);
+    // A parked engineer's real cargo can fill the reservation table for the
+    // last ingredient. Another engineer with that ingredient must still be
+    // allowed to execute the delivery vanilla selected.
+    ++epoch;Invalidate();
+    actor.inv.counts[&mats]=6;second.inv.counts[&mats]=1;
+    system.actions.list.clear();system.actions.list.push_back(&readyDelivery);body.action=&deliveryWalk;
+    EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    body2.action=&deliveryWalk;
+    EngineerMaterialsRuntime::Selected(&system2,&builder,1,NORMAL);
+    EngineerMaterialsRuntime::Body(&body2,.1f);
+    CHECK(body2.action==&deliveryWalk); // was cancelled and reelected in a loop
+    Tasker doorWalk=move;doorWalk.vptr=image+0x16BCEA8;
+    body2.action=&doorWalk;
+    system2.actions.list.push_back(&collectMats);
+    EngineerMaterialsRuntime::Selected(&system2,&builder,1,NORMAL);
+    EngineerMaterialsRuntime::Body(&body2,.1f);
+    CHECK(body2.action==&doorWalk&&DeliveryNext(&system2,Of(mixedSite.handle)));
+    system2.actions.list.pop_front();
+    CHECK(!DeliveryNext(&system2,Of(mixedSite.handle)));
+    system.actions.list.clear();system.actions.list.push_back(&collectMats);
     // A producer's physical inventory can still contain the same material
     // elsewhere after the amount in the output section drops.
     ++epoch;Invalidate();actor.inv.counts.clear();second.inv.counts.clear();

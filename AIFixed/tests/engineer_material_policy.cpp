@@ -63,6 +63,22 @@ int main()
     c.Finish(abandoned,3);
     CHECK(c.Preview(replacement)==4);
     c.Reset(3);
+    Request parked=Req();parked.need=7;parked.carried=7;
+    CHECK(c.Cargo(parked)==7);
+    replacement.now=15101;replacement.available=7;
+    CHECK(c.Preview(replacement)==7); // cargo without a live delivery no longer covers the site
+    c.ObserveDelivery(parked.actor,parked.project,15101,3);
+    CHECK(c.Preview(replacement)==7); // stale observations cannot resurrect an old pledge
+    c.Reset(3);
+    CHECK(c.Cargo(parked)==7);
+    c.ObserveDelivery(parked.actor,parked.project,10000,3);
+    CHECK(c.Preview(replacement)==0);
+    c.Reset(3);
+    CHECK(c.Commit(abandoned)==4);
+    c.ObserveDelivery(abandoned.actor,abandoned.project,4100,3);
+    replacement.now=5101;replacement.available=4;
+    CHECK(c.Preview(replacement)==4); // walking to the site does not renew uncollected stock
+    c.Reset(3);
     // A selected owner's source witness survives a long native walk without
     // renewing its resource/demand lease. Unobserved witnesses expire fully.
     Request witness=Req();witness.ground=true;witness.available=1;witness.need=1;

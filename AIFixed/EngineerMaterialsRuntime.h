@@ -40,6 +40,7 @@ namespace EngineerMaterialsRuntime
     static volatile LONG initialized=0,ready=0;
     enum { CompletionStripes=64 };
     static volatile LONG completionRevision[CompletionStripes]={};
+    static volatile LONG64 deliveryChecks[64]={};
     static unsigned generation=0;
     static AIFixedEngineer::Coordinator coordinator;
     struct DeniedMove
@@ -84,6 +85,20 @@ namespace EngineerMaterialsRuntime
     }
     static unsigned ProjectRevision(const Identity& h)
     {return static_cast<unsigned>(InterlockedCompareExchange(CompletionStripe(h),0,0));}
+    static bool DeliveryCheckDue(const Identity& actor,unsigned e,unsigned now)
+    {
+        // This table throttles observations only. It owns no claims, and a
+        // collision can at most cause an extra check or a one-second delay.
+        const unsigned key=(actor.index*0x9e3779b9u)^(actor.container*0x85ebca6bu)^
+            actor.serial^(actor.containerSerial*31u)^(e*0x9e3779b9u);
+        volatile LONG64* slot=&deliveryChecks[(key^(key>>16))&63];
+        const LONG64 previous=InterlockedCompareExchange64(slot,0,0);
+        const unsigned __int64 bits=static_cast<unsigned __int64>(previous);
+        if(previous&&static_cast<unsigned>(bits>>32)==key&&static_cast<int>(now-static_cast<unsigned>(bits))<1000)
+            return false;
+        const LONG64 next=static_cast<LONG64>((static_cast<unsigned __int64>(key)<<32)|now);
+        return InterlockedCompareExchange64(slot,next,previous)==previous;
+    }
     static unsigned Epoch(){return readEpoch?static_cast<unsigned>(readEpoch()):0;}
     static void ClearDenied()
     {for(unsigned i=0;i<AIFixedEngineer::Coordinator::Capacity;++i)denied[i].used=false;InterlockedExchange(&deniedCount,0);}
@@ -314,8 +329,8 @@ namespace EngineerMaterialsRuntime
     {Guard lock;return Sync(r.epoch)&&coordinator.HasReceipt(r);}
     static bool CanTrack(const Request& r)
     {Guard lock;return Sync(r.epoch)&&coordinator.CanTrack(r);}
-    static int Cargo(const Request& r,bool& capacity)
-    {Guard lock;if(!Sync(r.epoch))return 0;capacity=coordinator.CanCargo(r);return capacity?coordinator.Cargo(r):0;}
+    static int Cargo(const Request& r)
+    {Guard lock;return Sync(r.epoch)?coordinator.Cargo(r):0;}
     static bool SourceWatch(const Identity& actor,const Identity& project,const Identity& source,unsigned now,unsigned e,Request& out)
     {Guard lock;return Sync(e)&&coordinator.SourceWatch(actor,project,source,now,e,out);}
     static int RevalidateSource(const Request& previous,const Request& current)
@@ -592,13 +607,12 @@ namespace EngineerMaterialsRuntime
         // insert a higher-rank job, or call into GOAP while holding our lock.
         if(body&&body->ai&&body->ai->taskSystemAI)body->ai->taskSystemAI->taskImpossible();
     }
-    struct CargoResult{int pledged;bool present,full;CargoResult():pledged(0),present(false),full(false){}};
-    static CargoResult CommitCargo(Character* actor,Building* project,unsigned e)
+    static void CommitCargo(Character* actor,Building* project,unsigned e)
     {
-        CargoResult result;Building::ConstructionState* state=project->getBuildState();
-        if(!state||state->mats.size()>16)return result;
+        Building::ConstructionState* state=project->getBuildState();
+        if(!state||state->mats.size()>16)return;
         const Identity who=Of(actor->handle),where=Of(project->handle);
-        if(state->isComplete){CompleteProject(where,e);return result;}
+        if(state->isComplete){CompleteProject(where,e);return;}
         for(unsigned i=0;i<state->mats.size()&&e==Epoch();++i)
         {
             Building::ConstructionState::BuildMaterial* needed=state->mats[i];if(!needed)continue;
@@ -606,9 +620,8 @@ namespace EngineerMaterialsRuntime
             r.need=state->needsMat(needed->mat);r.carried=InventoryCount(actor,needed->mat);
             if(r.need<=0||r.carried<=0)continue;
             r.actor=who;r.project=where;r.source=who;r.available=r.carried;r.epoch=e;r.now=GetTickCount();
-            result.present=true;bool capacity=false;result.pledged+=Cargo(r,capacity);if(!capacity)result.full=true;
+            Cargo(r);
         }
-        return result;
     }
     static unsigned MoveClass(Tasker* action)
     {
@@ -619,15 +632,23 @@ namespace EngineerMaterialsRuntime
     }
     static bool NativePending(Tasker* pending)
     {
-        return ExactClass(pending,true)||ExactClass(pending,false)||(pending&&pending->key()==ADD_MATERIALS_TO_BUILDING&&
-            *reinterpret_cast<uintptr_t*>(pending)==image+0x16BDEF8);
+        return ExactClass(pending,true)||ExactClass(pending,false);
     }
-    static Tasker* PendingDelivery(AITaskSytem* system,const Identity& project)
+    static bool DeliveryNext(AITaskSytem* system,const Identity& project)
     {
-        if(!system||system->actions.list.size()>8)return NULL;
+        if(!system||system->actions.list.size()>8)return false;
         for(size_t i=0;i<system->actions.list.size();++i)
-        {Tasker* t=system->actions.list[i];if(t&&t->key()==ADD_MATERIALS_TO_BUILDING&&Of(t->subject)==project&&NativePending(t))return t;}
-        return NULL;
+        {
+            Tasker* t=system->actions.list[i];
+            if(NativePending(t))return false;
+            if(t&&t->key()==ADD_MATERIALS_TO_BUILDING&&Of(t->subject)==project&&
+               *reinterpret_cast<uintptr_t*>(t)==image+0x16BDEF8)return true;
+        }
+        return false;
+    }
+    static bool DeliveryMove(AITaskSytem* system,const Identity& site,Tasker* action,unsigned kind)
+    {
+        return kind&&(kind!=0x16BCD88||Of(action->subject)==site)&&DeliveryNext(system,site);
     }
     static void DenyMove(AITaskSytem* system,Building* project,Tasker* pending,unsigned e)
     {
@@ -636,6 +657,7 @@ namespace EngineerMaterialsRuntime
         if(!kind||*reinterpret_cast<uintptr_t*>(body)!=image+0x16F7938)return;
         if(kind==0x16BCD88&&Of(action->subject)!=Of(pending->subject))return;
         DeniedMove mark;mark.actor=Of(system->character->handle);mark.project=Of(project->handle);
+        if(DeliveryMove(system,mark.project,action,kind))return;
         mark.source=Of(pending->subject);mark.subject=Of(action->subject);mark.moveClass=kind;
         mark.pendingClass=static_cast<unsigned>(*reinterpret_cast<uintptr_t*>(pending)-image);
         mark.key=action->key();mark.pendingKey=pending->key();mark.start=action->startTime;mark.end=action->endTime;
@@ -660,7 +682,7 @@ namespace EngineerMaterialsRuntime
         if(!mark.used||mark.epoch!=e||e!=Epoch()||mark.project!=Of(project->handle)||
             *reinterpret_cast<uintptr_t*>(body)!=image+0x16F7938)return;
         AITaskSytem* system=body->ai?body->ai->taskSystemAI:NULL;
-        Tasker* pending=mark.pendingKey==COLLECT_OUTPUT_RESOURCE_BUILD_MATS?PendingCollection(system):PendingDelivery(system,mark.project);
+        Tasker* pending=PendingCollection(system);
         Tasker* action=body->getCurrentAction();
         if(!NativePending(pending)||pending->key()!=mark.pendingKey||Of(pending->subject)!=mark.source||
             *reinterpret_cast<uintptr_t*>(pending)!=image+mark.pendingClass||MoveClass(action)!=mark.moveClass||
@@ -668,6 +690,7 @@ namespace EngineerMaterialsRuntime
             action->endTime!=mark.end||action->priority!=mark.priority||action->weight!=mark.weight||
             action->location.x!=mark.x||action->location.y!=mark.y||action->location.z!=mark.z)return;
         if(e!=Epoch()||body->getCurrentAction()!=action||SelectedProject(actor)!=project)return;
+        if(DeliveryMove(system,mark.project,action,mark.moveClass))return;
         // Defer native destruction until the owning body phase. Native
         // endAction calls the admitted Move end/stop and deletes only this
         // ownership-confirmed current action; jobs and goal rank stay native.
@@ -677,11 +700,18 @@ namespace EngineerMaterialsRuntime
     {
         Tasker* action=body->getCurrentAction();const unsigned kind=MoveClass(action);
         if(!kind||!body->ai)return;
-        AITaskSytem* system=body->ai->taskSystemAI;Tasker* pending=PendingCollection(system);
-        if(!pending||!NativePending(pending))return;
+        AITaskSytem* system=body->ai->taskSystemAI;const Identity site=Of(project->handle);
+        if(DeliveryMove(system,site,action,kind))
+        {
+            const unsigned now=GetTickCount();const Identity who=Of(actor->handle);
+            if(DeliveryCheckDue(who,e,now))
+            {Guard lock;if(Sync(e))coordinator.ObserveDelivery(who,site,now,e);}
+            return;
+        }
+        Tasker* pending=PendingCollection(system);
+        if(!NativePending(pending)||(kind==0x16BCD88&&Of(action->subject)!=Of(pending->subject)))return;
         // A plain Move targets the source itself. The Door variants are
         // transitions on the admitted collection's native route.
-        if(kind==0x16BCD88&&Of(action->subject)!=Of(pending->subject))return;
         Request previous;
         if(!SourceWatch(Of(actor->handle),Of(project->handle),Of(pending->subject),GetTickCount(),e,previous))return;
         Building::ConstructionState* state=project->getBuildState();GameData* material=NULL;
@@ -711,8 +741,12 @@ namespace EngineerMaterialsRuntime
             CancelAt(Of(who),e);Building* project=SelectedProject(actor);Request r;
             if(project&&SupportedProject(project))
             {
-                const CargoResult cargo=CommitCargo(actor,project,e);Tasker* collection=PendingCollection(system);
-                bool advances=!collection&&(!cargo.present||cargo.pledged||cargo.full);
+                // A reservation limits how much more to collect. The
+                // native delivery can use useful cargo already in a pack.
+                CommitCargo(actor,project,e);Tasker* collection=PendingCollection(system);
+                Tasker* action=system->body?system->body->getCurrentAction():NULL;
+                if(collection&&DeliveryMove(system,Of(project->handle),action,MoveClass(action)))collection=NULL;
+                bool advances=!collection;
                 if(collection&&NativePending(collection))
                 {
                     bool unmanaged=false;
@@ -725,8 +759,6 @@ namespace EngineerMaterialsRuntime
                         if(!advances)DenyMove(system,project,collection,e);
                     }
                 }
-                else if(!collection&&cargo.present&&!cargo.pledged&&!cargo.full)
-                    DenyMove(system,project,PendingDelivery(system,Of(project->handle)),e);
                 if(advances&&e==Epoch()&&projectStarted)projectStarted(project,e);
             }
         }

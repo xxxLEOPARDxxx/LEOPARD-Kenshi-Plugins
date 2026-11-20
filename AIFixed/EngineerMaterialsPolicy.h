@@ -46,8 +46,9 @@ namespace AIFixedEngineer
     {
         struct Claim
         {
-            Request request;int quantity,sourceUnits;unsigned started,observed,checked;bool used,completed,acquiring;
-            Claim():quantity(0),sourceUnits(0),started(0),observed(0),checked(0),used(false),completed(false),acquiring(false){}
+            Request request;int quantity,sourceUnits;unsigned started,observed,deliveryObserved,checked;bool used,completed,acquiring;
+            Claim():quantity(0),sourceUnits(0),started(0),observed(0),deliveryObserved(0),checked(0),
+                used(false),completed(false),acquiring(false){}
         };
         Claim claims[128];Owned owned[128];unsigned epoch,serial;
         static int Min(int a,int b){return a<b?a:b;}
@@ -61,8 +62,13 @@ namespace AIFixedEngineer
         {return c.used&&c.request.epoch==epoch&&static_cast<int>(now-c.started)<LeaseMs;}
         static bool SourceLive(const Claim& c,unsigned now)
         {return c.sourceUnits>0&&(c.acquiring||static_cast<int>(now-c.observed)<SourceLeaseMs);}
+        static int Carried(const Claim& c,unsigned now)
+        {
+            return c.acquiring||static_cast<int>(now-c.deliveryObserved)<DeliveryLeaseMs?
+                Min(c.quantity,c.request.carried):0;
+        }
         static int Claimed(const Claim& c,unsigned now)
-        {return SourceLive(c,now)?c.quantity:Min(c.quantity,c.request.carried);}
+        {return SourceLive(c,now)?c.quantity:Carried(c,now);}
         int Find(const Identity& actor,const Material* material=NULL)const
         {for(unsigned i=0;i<Capacity;++i)if(claims[i].used&&claims[i].request.actor==actor&&
             (!material||claims[i].request.material==*material))return int(i);return -1;}
@@ -152,12 +158,13 @@ namespace AIFixedEngineer
             const unsigned started=same?claims[slot].started:r.now;
             claims[slot].request=r;claims[slot].quantity=Min(r.need,r.carried+quantity);
             claims[slot].sourceUnits=r.ground?r.available:quantity;
-            claims[slot].started=started;claims[slot].observed=r.now;claims[slot].checked=r.now-250;
+            claims[slot].started=started;claims[slot].observed=r.now;claims[slot].deliveryObserved=r.now;
+            claims[slot].checked=r.now-250;
             claims[slot].used=true;claims[slot].completed=false;claims[slot].acquiring=acquiring;
             EmptyPlaceholders();return quantity;
         }
     public:
-        enum{Capacity=128,Batch=32,LeaseMs=120000,SourceLeaseMs=5000};
+        enum{Capacity=128,Batch=32,LeaseMs=120000,SourceLeaseMs=5000,DeliveryLeaseMs=15000};
         Coordinator():epoch(0),serial(0){}
         int Demand(const Identity& actor,const Identity& project,const Material& material,int need,unsigned now,unsigned e,
                    bool carriedOnly=false)const
@@ -167,7 +174,7 @@ namespace AIFixedEngineer
             {
                 const Claim& c=claims[i];
                 if(Live(c,now)&&!c.completed&&c.request.actor!=actor&&c.request.project==project&&c.request.material==material)
-                    need=Sub(need,carriedOnly?Min(c.quantity,c.request.carried):Claimed(c,now));
+                    need=Sub(need,carriedOnly?Carried(c,now):Claimed(c,now));
             }
             return need;
         }
@@ -177,9 +184,6 @@ namespace AIFixedEngineer
             for(unsigned i=0;i<Capacity;++i){if(!claims[i].used)claim=true;if(!owned[i].token)ledger=true;}
             return claim&&ledger;
         }
-        bool CanCargo(const Request& r)const
-        {if(r.epoch!=epoch||!r.material.Valid())return false;if(Find(r.actor,&r.material)>=0)return true;
-            for(unsigned i=0;i<Capacity;++i)if(!claims[i].used)return true;return false;}
         int Preview(const Request& r)const{return Calculate(r);}
         int Cargo(const Request& r)
         {
@@ -197,7 +201,7 @@ namespace AIFixedEngineer
             if(slot<0)return 0;
             claims[slot].request=r;claims[slot].request.source=r.actor;
             claims[slot].quantity=quantity;claims[slot].sourceUnits=0;claims[slot].started=r.now;
-            claims[slot].observed=r.now;claims[slot].checked=r.now;claims[slot].used=true;
+            claims[slot].observed=r.now;claims[slot].deliveryObserved=r.now;claims[slot].checked=r.now;claims[slot].used=true;
             claims[slot].completed=false;claims[slot].acquiring=false;
             return quantity; // Existing cargo creates no ownership credit or ownership placeholder.
         }
@@ -232,6 +236,7 @@ namespace AIFixedEngineer
                 }
                 else if(c.sourceUnits&&!SourceLive(c,now))
                 {c.sourceUnits=0;c.quantity=Min(c.quantity,c.request.carried);}
+                if(c.used&&c.request.source==c.request.actor&&!Carried(c,now))c=Claim();
             }
             EmptyPlaceholders();
         }
@@ -253,6 +258,16 @@ namespace AIFixedEngineer
             }
             return false;
         }
+        void ObserveDelivery(const Identity& actor,const Identity& project,unsigned now,unsigned e)
+        {
+            if(e!=epoch)return;
+            for(unsigned i=0;i<Capacity;++i)
+            {
+                Claim& c=claims[i];
+                if(!Live(c,now)||c.completed||c.request.actor!=actor||c.request.project!=project||!Carried(c,now))continue;
+                if(static_cast<int>(now-c.deliveryObserved)>0)c.deliveryObserved=now;
+            }
+        }
         int RevalidateSource(const Request& watched,const Request& current)
         {
             const int useful=Calculate(current);
@@ -267,6 +282,7 @@ namespace AIFixedEngineer
             c.sourceUnits=Min(c.sourceUnits,current.ground?current.available:useful);
             c.request.carried=current.carried;
             c.quantity=Min(c.quantity,current.carried+Min(c.sourceUnits,useful));
+            if(static_cast<int>(current.now-c.deliveryObserved)>0)c.deliveryObserved=current.now;
             return useful;
         }
         bool Has(const Request& r)const
