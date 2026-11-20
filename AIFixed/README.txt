@@ -68,18 +68,17 @@ Engineers can deliver materials they already carry through the game's normal
 delivery action. A paused or abandoned delivery stops covering the project
 after 15 seconds without a matching delivery route.
 
-Among locally reachable productive machines, engineers continue their assigned
-site while they can contribute. An engineer without a useful delivery can take
-the next viable project. If a machine has an assembler and its remaining
-materials are covered by active deliveries, additional workers can move on
-to another machine or a wall.
-New assignments prefer earlier started or placed machines when they have work.
+Engineers collect materials, deliver them and build under the same job.
+Productive machines with useful work share a priority by first start, then
+observed placement. If the first machine offers no viable work, native
+planning can take the next machine. Wall and repair selection stay native.
 Older blueprints start with native selection. Placement order resets on load.
 
-Only proven construction cargo may be returned, at the original Engineer job
-rank ahead of lower jobs. Preexisting stock, still-needed project material and
-different personal variants are protected. Native movement/one-unit transfer
-preserve rollback. Missing/full/unreachable/unsupported storage retains cargo.
+Once construction finishes, engineers try to return proven excess to a
+compatible store before their next ordinary permanent job. Higher-priority
+work can interrupt an unfinished construction immediately. Personal cargo
+and earlier mixed stock are protected. Native movement and one-unit transfer
+preserve rollback. Unavailable storage or route leaves the cargo with the engineer.
 Acquisition credits reset on load: unknown earlier-session leftovers are retained.
 Surplus return supports the verified KEP 0.17.3 furnace and LSE planner hooks.
 
@@ -114,18 +113,17 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 Если 15 секунд не видно действующего маршрута доставки, груз перестаёт
 считаться покрытием потребности стройки.
 
-Инженер продолжает назначенную машину, пока может помочь на этой стройке.
-Если ему нечего доставить, он может взять следующую доступную постройку.
-Когда сборка уже идёт и остаток покрывают активные доставки, свободные
-рабочие переходят на другую машину или стену. Новые назначения предпочитают ранее начатые и
-ранее размещённые машины, на которых есть работа. Для старых чертежей
-первую цель выбирает игра. При загрузке порядок размещения сбрасывается.
+Сбор, доставка материалов и строительство входят в одну инженерную работу.
+У машин с доступной работой приоритет общий: сначала начатые, затем
+размещённые раньше. Если на первой машине нет доступной работы, игра может
+взять следующую. Стены и ремонт выбирает игра. Для старых чертежей первую
+цель выбирает игра. При загрузке порядок размещения сбрасывается.
 
-На склад возвращается только подтверждённый остаток наших материалов,
-с исходным рангом инженерной работы перед менее важными задачами. Прежний
-запас, нужные проекту материалы и отличающиеся личные экземпляры защищены.
-Штатные движение и поштучная передача сохраняют возврат при отказе приёмника.
-Нет подходящего свободного доступного склада - груз остаётся у инженера.
+После завершения стройки инженер старается отнести подтверждённый остаток
+на подходящий склад перед следующей обычной постоянной работой. Пока стройка
+идёт, более важная работа может прервать её сразу. Личные вещи и смешанный
+запас прежних строек защищены. Штатные движение и поштучная передача сохраняют
+возврат при отказе приёмника. При недоступном складе груз остаётся у инженера.
 Учёт полученного сбрасывается при загрузке: неизвестные старые остатки остаются.
 Возврат работает с проверенными обработчиками печей KEP 0.17.3 и планировщика LSE.
 

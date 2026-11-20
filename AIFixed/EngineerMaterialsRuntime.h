@@ -141,6 +141,11 @@ namespace EngineerMaterialsRuntime
         if(!out||!capacity||!InterlockedCompareExchange(&initialized,0,0))return 0;
         const unsigned e=Epoch();Guard lock;return Sync(e)?coordinator.ListOwned(out,capacity):0;
     }
+    inline unsigned ListOwnedFor(const Identity& actor,OwnedSurplus* out,unsigned capacity,unsigned e)
+    {
+        if(!Active())return 0;
+        Guard lock;return Sync(e)?coordinator.ListOwnedFor(actor,out,capacity):0;
+    }
     inline bool CheckOwned(const OwnedSurplus& row,int total,int& allowed)
     {
         allowed=0;if(!Active())return false;const unsigned e=Epoch();Guard lock;if(!Sync(e))return false;

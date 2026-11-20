@@ -45,15 +45,6 @@ AIFixedEngineerPriority::Key EngineerKey(const hand& key)
     AIFixedEngineerPriority::Key result={key.type,key.container,key.containerSerial,key.index,key.serial};
     return result;
 }
-bool EngineerAssignedProject(AI* ai,AIFixedEngineerPriority::Key* out)
-{
-    OrdersReceiver* orders=ai&&ai->me?ai->me->getOrdersReciever():NULL;
-    if(!orders)return false;
-    const TaskMatch& goal=orders->getCurrentGoal();
-    if(goal.key()!=JOB_BUILDER||goal.subtarget.type!=BUILDING)return false;
-    *out=EngineerKey(goal.subtarget);
-    return true;
-}
 bool EngineerSnapshot(Building* b,AIFixedEngineerPriority::Candidate* out)
 {
     __try
@@ -84,10 +75,6 @@ bool EngineerSnapshot(Building* b,AIFixedEngineerPriority::Candidate* out)
         case BF_ENGINE:result.productive=!result.wall;break;
         default:break;
         }
-        // Use the native frame's evidence of assembly and require all
-        // materials on-site before diverting an extra engineer.
-        result.assembling=AIFixedEngineerPriority::Construction(result)&&state->buildersThisFrame>0&&
-            state->mats.size()<=16&&!state->needMats();
         if(generation!=static_cast<unsigned>(EngineerEpoch()))return false;
         *out=result;return true;
     }
@@ -107,12 +94,6 @@ Building* EngineerResolve(const AIFixedEngineerPriority::Key& key)
         return b;
     }
     __except(EngineerNativeFaultFilter(GetExceptionCode())){return NULL;}
-}
-bool EngineerHasSuppliedAssembler(AI* ai,Building* b,unsigned generation)
-{
-    Building::ConstructionState* state=b->getBuildState();
-    return state&&state->buildersThisFrame>0&&
-        EngineerMaterialsRuntime::ProjectNeedsCovered(ai->me,b,generation);
 }
 void EngineerCompletedProject(const AIFixedEngineerPriority::Key& key,unsigned generation)
 {

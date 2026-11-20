@@ -13,7 +13,7 @@ for opt in ['/Od','/O2']:
 
 mutants={
  'untagged_fill':fixture.replace('*reinterpret_cast<ULONG_PTR*>(fills[i])=OwnedFillVtable();','(void)fills[i];'),
- 'skip_before_start_gate':fixture.replace('if(!planningToken)return originalSetTask(self,from);','return originalSetTask(self,from);'),
+ 'skip_before_start_gate':fixture.replace('if(!planningToken||planningSystem!=self)return originalSetTask(self,from);','return originalSetTask(self,from);'),
  'unbudgeted_queries':fixture.replace('if(searchCount>=4)return false;','if(searchCount>=4000)return false;'),
  'no_actor_backoff':fixture.replace('if(slot&&static_cast<LONG>(now-slot->next)<0)return false;','if(false)return false;'),
 }

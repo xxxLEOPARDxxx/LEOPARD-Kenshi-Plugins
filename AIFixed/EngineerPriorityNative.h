@@ -40,9 +40,7 @@ namespace PriorityNative
         bool (*addHook)(void*,void*,void**);
         void (*report)(const char*);
         bool (*diskIdentity)(); // Optional offline host override; production defaults to SHA256 of main EXE.
-        bool (*assignedProject)(AI*,Key*);
         void (*constructionCompleted)(const Key&,unsigned);
-        bool (*hasSuppliedAssembler)(AI*,Building*,unsigned);
     };
     struct Pin {unsigned rva,size;unsigned __int64 hash;};
     static const Pin pins[] = {
@@ -110,7 +108,7 @@ namespace PriorityNative
     static unsigned maintenanceCursor=0;static unsigned registryGeneration=0;static LONG registryInvalidation=-1;
     static FinderFn originalFinder=0;static SelectorFn originalSelector=0;
     static ScoreSlotFn originalScoreSlot=0;static FactoryFn originalFactory=0;static BuilderFn originalBuilder=0;
-    struct FinderFrame {AI* ai;unsigned generation;LONG invalidation;bool bad,assigned;Key assignment;};
+    struct FinderFrame {AI* ai;unsigned generation;LONG invalidation;bool bad;};
     struct SelectorFrame {FinderFrame* finder;void* scoreMap;Round round;};
     static __declspec(thread) FinderFrame* finderFrame=0;
     static __declspec(thread) SelectorFrame* selectorFrame=0;
@@ -133,19 +131,6 @@ namespace PriorityNative
         __finally {--inCallback;}
         return ok;
     }
-    static bool SnapshotFor(FinderFrame* frame,Building* b,Candidate* c)
-    {
-        if(!Snapshot(b,c))return false;
-        if(!c->assembling&&AIFixedEngineerPriority::Construction(*c)&&config.hasSuppliedAssembler&&
-           (!frame->assigned||!AIFixedEngineerPriority::Equal(frame->assignment,c->key)))
-        {
-            ++inCallback;
-            __try {__try {c->assembling=config.hasSuppliedAssembler(frame->ai,b,frame->generation);}
-                   __except(EXCEPTION_EXECUTE_HANDLER){c->assembling=false;}}
-            __finally {--inCallback;}
-        }
-        return true;
-    }
     static bool Allowed(AI* ai)
     {++inCallback;bool ok=false;__try{__try{ok=config.allowActor(ai);}__except(EXCEPTION_EXECUTE_HANDLER){ok=false;}}__finally{--inCallback;}return ok;}
     static Building* Resolve(const Key& key)
@@ -167,13 +152,6 @@ namespace PriorityNative
         if(Invalid()==local){Synchronise(generation,local);registry.Start(candidate.key);}
         LeaveCriticalSection(&metadataLock);
     }
-    static bool Assignment(AI* ai,Key* project)
-    {
-        ++inCallback;bool assigned=false;
-        __try {__try {assigned=config.assignedProject(ai,project);} __except(EXCEPTION_EXECUTE_HANDLER){assigned=false;}}
-        __finally {--inCallback;}
-        return assigned;
-    }
     static bool FinderIdentity(void* finder,AI* ai)
     {
         __try
@@ -191,7 +169,6 @@ namespace PriorityNative
         EnterCriticalSection(&metadataLock);
         if(Invalid()!=parent->invalidation){LeaveCriticalSection(&metadataLock);return false;}
         Synchronise(parent->generation,parent->invalidation);registry.Begin(frame->round,parent->generation);
-        frame->round.assigned=parent->assigned;frame->round.assignment=parent->assignment;
         LeaveCriticalSection(&metadataLock);return true;
     }
     // Explicit caller-taking core lets offline fixtures execute the real bridge
@@ -205,7 +182,7 @@ namespace PriorityNative
         {frame->round.bad=true;return result;}
         if(frame->scoreMap&&frame->scoreMap!=self){frame->round.bad=true;return result;}
         frame->scoreMap=self;Candidate candidate={};
-        if(!SnapshotFor(frame->finder,*key,&candidate)){frame->round.bad=true;return result;}
+        if(!Snapshot(*key,&candidate)){frame->round.bad=true;return result;}
         bool completed=false;
         EnterCriticalSection(&metadataLock);
         if(registryGeneration!=frame->finder->generation||registryInvalidation!=frame->finder->invalidation||
@@ -233,7 +210,7 @@ namespace PriorityNative
         selectorFrame=&frame;Building* native=0;
         __try{native=originalSelector(self);}__finally{selectorFrame=previous;}
         if(frame.round.bad||parent->bad||!SameEpoch(parent->generation,parent->invalidation))return native;
-        Candidate nativeInfo={};if(!SnapshotFor(parent,native,&nativeInfo))return native;
+        Candidate nativeInfo={};if(!Snapshot(native,&nativeInfo))return native;
         Key replacement={};bool replace=false;
         EnterCriticalSection(&metadataLock);
         if(registryInvalidation==parent->invalidation&&Invalid()==parent->invalidation)
@@ -242,11 +219,8 @@ namespace PriorityNative
         if(!replace)return native;
         Building* chosen=Resolve(replacement);Candidate live={};
         using namespace AIFixedEngineerPriority;
-        if(!SnapshotFor(parent,chosen,&live)||!Equal(live.key,replacement)||!SameEpoch(parent->generation,parent->invalidation))return native;
-        const bool assigned=frame.round.assignmentSeen&&Equal(frame.round.assignment,replacement);
-        const bool useful=Construction(live)&&(!live.assembling||assigned);
-        const bool alternate=frame.round.hasAlternative&&Equal(frame.round.alternative,replacement)&&OtherConstruction(live);
-        return useful||alternate?chosen:native;
+        if(!Snapshot(chosen,&live)||!Equal(live.key,replacement)||!SameEpoch(parent->generation,parent->invalidation))return native;
+        return Construction(live)?chosen:native;
     }
     static float FinderHook(AI* ai,const hand& in,hand& out,bool justAsking)
     {
@@ -255,8 +229,7 @@ namespace PriorityNative
             __try{native=originalFinder(ai,in,out,justAsking);}__finally{finderFrame=previous;}return native;}
         unsigned generation=0;const LONG local=Invalid();
         if(!Current(&generation)||!Allowed(ai)||!SameEpoch(generation,local))return originalFinder(ai,in,out,justAsking);
-        FinderFrame frame={ai,generation,local,false,false,{}};
-        frame.assigned=Assignment(ai,&frame.assignment);
+        FinderFrame frame={ai,generation,local,false};
         finderFrame=&frame;float native=0;
         __try{native=originalFinder(ai,in,out,justAsking);}__finally{finderFrame=previous;}
         return native;
@@ -334,7 +307,7 @@ namespace PriorityNative
     }
     static bool Configure(const Config& c,const unsigned char* module=0,size_t bytes=0)
     {
-        if(configured||attempted||!c.current||!c.allowActor||!c.snapshot||!c.resolve||!c.addHook||!c.report||!c.assignedProject)return false;
+        if(configured||attempted||!c.current||!c.allowActor||!c.snapshot||!c.resolve||!c.addHook||!c.report)return false;
         if(!module){module=reinterpret_cast<const unsigned char*>(GetModuleHandleW(0));bytes=0x232C000;}
         config=c;image=module;imageSize=bytes;InitializeCriticalSection(&metadataLock);configured=true;return true;
     }

@@ -156,6 +156,11 @@ int main()
     b=Req(2);b.available=100;b.need=10;CHECK(c.Preview(b)==0); // existing carried cargo is demand too
     c.Reset(3);a=Req();CHECK(c.Commit(a)==32);c.Acquired(a,3,7,10);CHECK(c.ListOwned(rows,128)==1);
     Owned stale=rows[0];c.Cancel(a.actor);CHECK(c.ListOwned(rows,128)==1); // cancelling preserves proven surplus
+    Request separate=a;separate.project=Id(90);separate.carried=10;
+    CHECK(c.Commit(separate)==32);c.Acquired(separate,2,10,12);
+    CHECK(c.ListOwnedFor(a.actor,rows,1)==1&&rows[0].project==separate.project&&rows[0].owned==2&&rows[0].baseline==10);
+    CHECK(c.ListOwnedFor(a.actor,rows,0)==1&&c.ListOwnedFor(Id(99),rows,1)==0);
+    CHECK(c.CheckOwned(rows[0],12,allowed)&&allowed==2&&!c.CheckOwned(stale,12,allowed));
     c.Reset(3);CHECK(!c.CheckOwned(stale,10,allowed));
     for(unsigned i=0;i<Coordinator::Capacity;++i){Request x=Req(i+1);x.project=Id(i+1000);x.source=Id(i+2000);CHECK(c.Commit(x)==32);}
     CHECK(c.Commit(Req(999))==0); // bounded table, no eviction of live actor

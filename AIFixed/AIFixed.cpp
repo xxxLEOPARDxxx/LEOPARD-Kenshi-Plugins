@@ -1107,9 +1107,7 @@ namespace
         config.current=&EngineerCurrent;config.allowActor=&EngineerAllowActor;
         config.snapshot=&EngineerSnapshot;config.resolve=&EngineerResolve;
         config.addHook=&EngineerAddHook;config.report=&EngineerReport;
-        config.assignedProject=&EngineerAssignedProject;
         config.constructionCompleted=&EngineerCompletedProject;
-        config.hasSuppliedAssembler=&EngineerHasSuppliedAssembler;
         // Construction requires both target selection and shared materials.
         // Surplus return is optional and owns a separate native safety gate.
         const bool priority=PriorityNative::Configure(config)&&PriorityNative::Install();

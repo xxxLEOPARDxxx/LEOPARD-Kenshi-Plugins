@@ -15,10 +15,8 @@ mutants=[
  ('shared_builder_scope',True,'||placementDepth==1',''),
  ('townclaim_compat',True,'{0x57C1E0,0x20,0x3ff5030ff1d41cf3ULL}','{0x57C1E0,0x2570,0x778f1cf72006b4c1ULL}'),
  ('recycled_identity',True,'!Equal(live.key,replacement)||',''),
- ('ignore_assembly',False,'if(c.assembling&&!assigned)return;',''),
- ('ignore_reserved_delivery',True,'&&config.hasSuppliedAssembler&&','&&false&&config.hasSuppliedAssembler&&'),
- ('drop_assignment',False,'if(q.assignmentSeen){out=q.assignment;return !Equal(out,native.key);}',''),
- ('ignore_wall_when_full',False,'if(q.hasAlternative){out=q.alternative;return true;}',''),
+ ('ignore_first_start',False,'(started&&!q.started)','false'),
+ ('override_native_nonproduction',False,'||!Construction(native)',''),
  ('stale_election',True,'||generation!=expectedGeneration||','||'),
 ]
 match=re.search(r'    static void Maintenance\(unsigned requested=8\)\s*\{',native);assert match
@@ -31,7 +29,7 @@ for label,is_native,old,new in mutants:
  (work/'EngineerPriorityPolicy.h').write_text(policy if is_native else changed,encoding='utf-8')
  (work/'EngineerPriorityNative.h').write_text(changed if is_native else native,encoding='utf-8')
  env=os.environ.copy();env['PATH']=str(vc/'bin/amd64')+';'+env['PATH'];env['INCLUDE']=str(vc/'include')+';'+str(sdk/'Include')+';'+str(work);env['LIB']=str(vc/'lib/amd64')+';'+str(sdk/'Lib/x64')
- uses_native=is_native or label=='ignore_wall_when_full'
+ uses_native=is_native
  exe=work/'mutant.exe';fixture=here/('engineer_priority_native_fixture.cpp' if uses_native else 'engineer_priority_policy_fixture.cpp')
  build=subprocess.run([str(vc/'bin/amd64/cl.exe'),'/nologo','/EHsc','/MD','/O2',str(fixture),'/Fe'+str(exe),'/Fo'+str(work)+'/'],cwd=work,env=env,capture_output=True,text=True)
  assert build.returncode==0,(label,build.stdout,build.stderr)

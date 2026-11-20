@@ -4,7 +4,6 @@
 #include "EngineerPriorityPolicy.h"
 enum BuildingFunction { BF_ANY,BF_MINE,BF_RESOURCE_STORAGE,BF_RESEARCH,BF_REFINERY,BF_GENERATOR,BF_BED,BF_TRAINING,BF_CAGE,BF_SHOP,BF_CRAFTING,BF_CORPSE_DISPOSAL,BF_TURRET,BF_GENERAL_STORAGE,BF_ITEM_FURNACE,BF_LIGHT,BF_TABLE,BF_CHAIR,BF_FLUFF,BF_SHELL_WITH_INTERIOR,BF_WALL,BF_GATE,BF_DOOR,BF_BATTERY,BF_THRONE,BF_SKELETON_BED,BF_RAIN_COLLECTOR,BF_MINE_NATURAL,BF_STEERING,BF_ENGINE,BF_LIQUID_TANK };
 enum itemType { BUILDING=0 };
-enum TaskType { NO_TASK,JOB_BUILDER };
 enum BuildingClassType { BCTYPE_USABLE,BCTYPE_PRODUCTION,BCTYPE_CRAFTING,BCTYPE_FARM,BCTYPE_RESEARCH,BCTYPE_ITEM_FURNACE };
 const int IN_NOTHING=0;
 struct Building;
@@ -13,8 +12,7 @@ struct hand {
  hand(unsigned i=1,unsigned s=2,itemType t=BUILDING,unsigned c=3,unsigned cs=4):type(t),container(c),containerSerial(cs),index(i),serial(s){}
  Building* getBuilding()const;
 };
-struct TaskMatch {TaskType type;hand subtarget;TaskMatch():type(NO_TASK){}TaskType key()const{return type;} };
-struct OrdersReceiver {bool jobs,orders;TaskMatch goal;OrdersReceiver():jobs(true),orders(false){}bool isJobsEnabled(){return jobs;}bool hasPlayerOrders(){return orders;}const TaskMatch& getCurrentGoal(){return goal;} };
+struct OrdersReceiver {bool jobs,orders;OrdersReceiver():jobs(true),orders(false){}bool isJobsEnabled(){return jobs;}bool hasPlayerOrders(){return orders;} };
 struct Character {
  bool player,dead,down,unconscious,carried,combat,isCarryingSomething,isChained,isUsingTurret,throwPlayer;int inSomething;
  OrdersReceiver receiver;
@@ -30,10 +28,8 @@ struct World {Player* player;}world;
 World* ou=&world;
 struct Building {
  struct ConstructionState {
-  struct Materials {unsigned size()const{return 3;} } mats;
-  bool isComplete,isPaused,isDismantled,missing;int buildersThisFrame;
-  ConstructionState():isComplete(false),isPaused(false),isDismantled(false),missing(true),buildersThisFrame(0){}
-  bool needMats()const{return missing;}
+  bool isComplete,isPaused,isDismantled;
+  ConstructionState():isComplete(false),isPaused(false),isDismantled(false){}
  } state;
  hand handle;Faction faction;BuildingFunction function;BuildingClassType classType;bool disabled,wall;
  Building():function(BF_MINE),classType(BCTYPE_USABLE),disabled(false),wall(false){}
@@ -56,7 +52,6 @@ namespace EngineerMaterialsRuntime
     unsigned completionGeneration=0;
     bool knownNewCompletion=false;
     void Maintenance(){}
-    bool ProjectNeedsCovered(Character*,Building*,unsigned){return false;}
     void CompleteProject(const AIFixedEngineer::Identity& key,unsigned e,bool newCompletion)
     {completed=key;completionGeneration=e;knownNewCompletion=newCompletion;}
 }
@@ -88,15 +83,6 @@ int main(){
  Check(propagated,"foreign native C++ exception is not swallowed by read-only admission wrappers");actor.throwPlayer=false;
  Building b;resolved=&b;AIFixedEngineerPriority::Candidate candidate={};
  Check(EngineerSnapshot(&b,&candidate)&&candidate.productive&&!candidate.wall,"production uses native function category");
- Check(!EngineerAssignedProject(&ai,&candidate.key),"a non-engineering goal never establishes construction affinity");
- actor.receiver.goal.type=JOB_BUILDER;actor.receiver.goal.subtarget=b.handle;
- Check(EngineerAssignedProject(&ai,&candidate.key)&&candidate.key.index==b.handle.index,
-       "the current native engineer subtarget identifies the assignment");
- b.state.buildersThisFrame=1;
- Check(EngineerSnapshot(&b,&candidate)&&!candidate.assembling,"active worker on site still leaves room for useful deliveries");
- b.state.missing=false;
- Check(EngineerSnapshot(&b,&candidate)&&candidate.assembling,"only stocked machine with an active builder is marked assembling");
- b.state.buildersThisFrame=0;b.state.missing=true;
  Check(EngineerResolve(candidate.key)==&b,"fresh resolution validates complete serial identity");
  EngineerCompletedProject(candidate.key,generation);
  const AIFixedEngineer::Identity& completed=EngineerMaterialsRuntime::completed;

@@ -295,7 +295,9 @@ namespace AIFixedEngineer
             const int c=LiveSlot(r),o=FindOwned(r.actor,r.material);
             if(c<0||o<0||moved<=0||before<0||after<before||after-before!=moved)return;
             Owned& ledger=owned[o];
-            if(ledger.expectedTotal!=before)
+            // A row is one material from one project. Earlier stock remains
+            // protected when the same material arrives for a different job.
+            if(ledger.expectedTotal!=before||ledger.project!=r.project)
             {ledger.owned=0;ledger.baseline=before;ledger.token=Token();}
             if(moved>1000000-ledger.owned){ledger=Owned();claims[c]=Claim();return;}
             ledger.owned+=moved;ledger.expectedTotal=after;ledger.project=r.project;
@@ -331,6 +333,17 @@ namespace AIFixedEngineer
         }
         unsigned ListOwned(Owned* out,unsigned capacity)const
         {unsigned n=0;for(unsigned i=0;i<Capacity&&n<capacity;++i)if(owned[i].token&&owned[i].owned>0)out[n++]=owned[i];return n;}
+        unsigned ListOwnedFor(const Identity& actor,Owned* out,unsigned capacity)const
+        {
+            unsigned n=0;
+            for(unsigned i=0;i<Capacity;++i)
+                if(owned[i].token&&owned[i].owned>0&&owned[i].actor==actor)
+                {
+                    if(n==capacity)return capacity+1;
+                    out[n++]=owned[i];
+                }
+            return n;
+        }
         unsigned ListOwnedSlice(Owned* out,unsigned capacity,unsigned& cursor)const
         {
             unsigned n=0,examined=0;cursor%=Capacity;

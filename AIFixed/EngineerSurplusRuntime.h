@@ -9,7 +9,7 @@ namespace EngineerSurplusRuntime
 {
     typedef AIFixedEngineer::Identity Identity;
     typedef EngineerMaterialsRuntime::OwnedSurplus Owned;
-    enum { Capacity=128, OwnedCapacity=128, ItemLimit=1024 };
+    enum { Capacity=128, ItemLimit=1024 };
     bool (*admit)()=NULL,(*debug)()=NULL,(*allowed)(Character*)=NULL;
     LONG (*epoch)()=NULL;
     volatile LONG ready=0;
@@ -18,6 +18,9 @@ namespace EngineerSurplusRuntime
     unsigned serial=0;
     __declspec(thread) unsigned depth=0;
     __declspec(thread) AITaskSytem* normalJobScope=NULL;
+    __declspec(thread) AITaskSytem* normalRunScope=NULL;
+    __declspec(thread) AITaskSytem* planningSystem=NULL;
+    __declspec(thread) bool* planningAccepted=NULL;
     __declspec(thread) unsigned planningToken=0;
     __declspec(thread) LONG planningEpoch=-1;
     ULONG_PTR ownedFillTable[6]={0,0,0,0,0,0};
@@ -25,11 +28,12 @@ namespace EngineerSurplusRuntime
     struct DepthScope{DepthScope(){++depth;}~DepthScope(){--depth;}private:DepthScope(const DepthScope&);DepthScope& operator=(const DepthScope&);};
     struct Episode
     {
-        bool used,retired,committed,transaction,deleted,pending;
-        unsigned token;LONG generation;int jobSlot;DWORD retryAt;
+        bool used,retired,committed,transaction,deleted,pending,handedOff;
+        unsigned token;LONG generation;int jobSlot,jobKey;DWORD retryAt;
         Identity actor,jobSubject,storage,piece,sourceInventory;
         ULONG_PTR fill,jobTask; Owned credit;
-        Episode():used(false),retired(false),committed(false),transaction(false),deleted(false),pending(false),token(0),generation(-1),jobSlot(-1),retryAt(0),fill(0),jobTask(0){}
+        Episode():used(false),retired(false),committed(false),transaction(false),deleted(false),pending(false),handedOff(false),
+            token(0),generation(-1),jobSlot(-1),jobKey(0),retryAt(0),fill(0),jobTask(0){}
     };
     Episode episodes[Capacity];
     struct Guard{Guard(){AcquireSRWLockExclusive(&metadata);}~Guard(){ReleaseSRWLockExclusive(&metadata);}};
@@ -72,18 +76,29 @@ namespace EngineerSurplusRuntime
         // tasks. hasOrders would permanently suppress otherwise idle engineers.
         return o&&o->isJobsEnabled()&&!o->hasPlayerOrders()&&Live(e);
     }
-    int BuilderSlot(AITaskSytem* tasks,Tasker* t)
+    int NormalSlot(AITaskSytem* tasks,Tasker* t)
     {
-        if(!tasks||!t||t->key()!=JOB_BUILDER||!t->taskData||t->taskData->permaJob!=PERMAJOB_NORMAL)return -1;
+        if(!tasks||!t||!t->taskData||t->taskData->permaJob!=PERMAJOB_NORMAL)return -1;
         const int n=tasks->getPermajobCount();if(n<0||n>128)return -1;
         for(int i=0;i<n;++i)if(tasks->getPermajobData(i)==t)return i;
         return -1;
     }
+    int BuilderSlot(AITaskSytem* tasks,Tasker* t)
+    {return t&&t->key()==JOB_BUILDER?NormalSlot(tasks,t):-1;}
     bool JobStillThere(AITaskSytem* tasks,const Episode& e)
     {
         const int n=tasks->getPermajobCount();if(e.jobSlot<0||e.jobSlot>=n||n>128)return false;
         const Tasker* t=tasks->getPermajobData(e.jobSlot);
-        return t&&reinterpret_cast<ULONG_PTR>(t)==e.jobTask&&t->key()==JOB_BUILDER&&Of(t->subject)==e.jobSubject;
+        return t&&reinterpret_cast<ULONG_PTR>(t)==e.jobTask&&t->key()==e.jobKey&&Of(t->subject)==e.jobSubject&&
+            t->taskData&&t->taskData->permaJob==PERMAJOB_NORMAL;
+    }
+    bool UnfinishedAssignment(AITaskSytem* tasks)
+    {
+        const TaskMatch& current=tasks->getCurrentGoal();
+        if(current.key()!=JOB_BUILDER||current.subtarget.type!=BUILDING)return false;
+        Building* project=current.subtarget.getBuilding();
+        Building::ConstructionState* state=project?project->getBuildState():NULL;
+        return !state||!state->isComplete;
     }
     Inventory* Backpack(Character* c)
     {ContainerItem* bag=c->hasABackpackOn();return bag?bag->getInventory():NULL;}
@@ -95,10 +110,8 @@ namespace EngineerSurplusRuntime
         Building* project=EngineerMaterialsRuntime::Handle(credit.project).getBuilding();
         if(!Live(generation)||!project||Of(project->handle)!=credit.project)return false;
         Building::ConstructionState* state=project->getBuildState();
-        if(!Live(generation)||!state)return false;
-        const int needed=state->isComplete||state->isDismantled?0:state->needsMat(data);
-        if(!Live(generation))return false;
-        units=AIFixedEngineerSurplus::Surplus(proven,needed);return units>0;
+        if(!Live(generation)||!state||!state->isComplete||state->isDismantled)return false;
+        units=proven;return true;
     }
     GameData* DataIn(Inventory* inv,const AIFixedEngineer::Material& material)
     {
@@ -176,27 +189,36 @@ namespace EngineerSurplusRuntime
         return candidate&&Live(generation)&&FungibleInventory(body,candidate,data)&&Live(generation)&&
             (pack==body||FungibleInventory(pack,candidate,data))&&Live(generation);
     }
-    bool Prepare(AITaskSytem* tasks,Tasker* builder,int slot,Episode& out)
+    bool Prepare(AITaskSytem* tasks,Tasker* job,int slot,Episode& out)
     {
-        Character* c=tasks->character;const LONG e=Epoch();if(!Eligible(c,e))return false;
+        Character* c=tasks->character;const LONG e=Epoch();if(!Eligible(c,e)||UnfinishedAssignment(tasks))return false;
         const Identity actor=Of(c->handle);
         if(ReadActor(actor,out))
         {
-            if(out.generation==e&&out.jobSlot==slot&&out.jobTask==reinterpret_cast<ULONG_PTR>(builder)&&Of(builder->subject)==out.jobSubject)return true;
+            if(out.generation==e&&out.jobSlot==slot&&out.jobTask==reinterpret_cast<ULONG_PTR>(job)&&
+                job->key()==out.jobKey&&Of(job->subject)==out.jobSubject)return true;
             Retire(actor);
         }
         unsigned materialTurn=0,storageCursor=0;
-        Owned rows[OwnedCapacity],mine[8];unsigned mineCount=0;
-        const unsigned n=EngineerMaterialsRuntime::ListOwned(rows,OwnedCapacity);
-        for(unsigned i=0;i<n&&i<OwnedCapacity;++i)if(rows[i].actor==actor&&rows[i].epoch==static_cast<unsigned>(e))
-        {if(mineCount==8)return false;mine[mineCount++]=rows[i];}
+        Owned mine[8];
+        const unsigned mineCount=EngineerMaterialsRuntime::ListOwnedFor(actor,mine,8,static_cast<unsigned>(e));
+        if(mineCount>8)return false;
         if(!mineCount||!SearchTicket(actor,e,GetTickCount(),materialTurn,storageCursor))return false;
-        const Owned& credit=mine[materialTurn%mineCount];
-        GameData* data=DataIn(c->getInventory(),credit.material);if(!data)data=DataIn(Backpack(c),credit.material);
-        int units=0;if(!data||!Returnable(c,credit,data,e,units)||units<=0||!CargoReady(c,data,e))return false;
+        const Owned* credit=NULL;
+        GameData* data=NULL;
+        for(unsigned i=0;i<mineCount&&Live(e);++i)
+        {
+            const Owned& row=mine[(materialTurn+i)%mineCount];
+            data=DataIn(c->getInventory(),row.material);if(!data)data=DataIn(Backpack(c),row.material);
+            int units=0;
+            if(data&&Returnable(c,row,data,e,units)&&units>0&&CargoReady(c,data,e))
+            {credit=&row;break;}
+        }
+        if(!credit)return false;
         StorageBuilding* b=FindStorage(c,data,e,storageCursor);
-        if(!b||!Eligible(c,e)||BuilderSlot(tasks,builder)!=slot)return false;
-        Episode made;made.used=true;made.generation=e;made.jobSlot=slot;made.jobTask=reinterpret_cast<ULONG_PTR>(builder);made.actor=actor;made.jobSubject=Of(builder->subject);made.storage=Of(b->handle);made.credit=credit;
+        if(!b||!Eligible(c,e)||NormalSlot(tasks,job)!=slot)return false;
+        Episode made;made.used=true;made.generation=e;made.jobSlot=slot;made.jobTask=reinterpret_cast<ULONG_PTR>(job);
+        made.jobKey=job->key();made.actor=actor;made.jobSubject=Of(job->subject);made.storage=Of(b->handle);made.credit=*credit;
         Guard g;
         for(unsigned j=0;j<Capacity;++j)if(!episodes[j].used)
         {if(++serial==0)++serial;made.token=serial;episodes[j]=made;out=made;return true;}
@@ -229,12 +251,21 @@ namespace EngineerSurplusRuntime
     void Planning(unsigned token,bool on)
     {Guard g;for(unsigned i=0;i<Capacity;++i)if(episodes[i].used&&episodes[i].token==token)episodes[i].transaction=on;}
     bool (*originalSetTask)(AITaskSytem*,AITaskSytem::ActionsListMgr*)=NULL;
+    bool (*originalRunGoals)(AITaskSytem*,void*,bool)=NULL;
+    __declspec(noinline) bool RunGoalsHook(AITaskSytem* self,void* jobs,bool playerOrder)
+    {
+        AITaskSytem* previous=normalRunScope;
+        normalRunScope=!playerOrder&&_ReturnAddress()==image+0x5105d8?self:NULL;
+        __try{return originalRunGoals(self,jobs,playerOrder);}
+        __finally{normalRunScope=previous;}
+    }
     bool SetTaskHook(AITaskSytem* self,AITaskSytem::ActionsListMgr* from)
     {
-        if(!planningToken)return originalSetTask(self,from);
+        if(!planningToken||planningSystem!=self)return originalSetTask(self,from);
         Episode e;
         if(!Live(planningEpoch)||!ReadToken(planningToken,e)||e.retired||e.generation!=planningEpoch||
-           from!=&self->actionsTryList||!Eligible(self->character,planningEpoch)||!JobStillThere(self,e))return false;
+           _ReturnAddress()!=image+0x50f9c6||from!=&self->actionsTryList||
+           !Eligible(self->character,planningEpoch)||!JobStillThere(self,e))return false;
         const size_t n=from->list.size();if(!n||n>64)return false;
         Tasker* fills[64];unsigned count=0;const ULONG_PTR base=reinterpret_cast<ULONG_PTR>(image);
         for(size_t i=0;i<n;++i)
@@ -248,38 +279,52 @@ namespace EngineerSurplusRuntime
             {if((t->key()!=FILL_MACHINE&&t->key()!=OPERATE_STORAGE)||Of(t->subject)!=e.storage)return false;fills[count++]=t;}
             else if(t->key()==FILL_MACHINE||t->key()==OPERATE_STORAGE)return false;
         }
-        if(!count)return false;
+        // runGoals retains the original ranked job only when the final
+        // synthetic task has a different key.
+        if(!count||from->list[n-1]->key()==e.jobKey)return false;
         {
             Guard g;bool found=false;
             for(unsigned i=0;i<Capacity;++i)if(episodes[i].used&&episodes[i].token==e.token&&!episodes[i].retired)
-            {episodes[i].fill=reinterpret_cast<ULONG_PTR>(fills[0]);episodes[i].committed=false;found=true;break;}
+            {
+                episodes[i].fill=reinterpret_cast<ULONG_PTR>(fills[0]);episodes[i].committed=false;
+                episodes[i].handedOff=false;found=true;break;
+            }
             if(!found)return false;
         }
         // No callbacks/allocations between tagging and native ownership handoff.
         // The tag covers every fill, even if later validation/goal commit fails.
         for(unsigned i=0;i<count;++i)*reinterpret_cast<ULONG_PTR*>(fills[i])=OwnedFillVtable();
-        return originalSetTask(self,from);
+        const bool started=originalSetTask(self,from);
+        if(started)
+        {
+            // Native ownership changes even if plugin eligibility changes
+            // during startAction. A successful handoff prevents replanning
+            // the main job against the same trial deque.
+            if(planningAccepted)*planningAccepted=true;
+            Guard g;
+            for(unsigned i=0;i<Capacity;++i)
+                if(episodes[i].used&&episodes[i].token==e.token&&!episodes[i].retired&&episodes[i].fill)
+                {episodes[i].handedOff=true;break;}
+        }
+        return started;
     }
     void DeleteSeed(Tasker* seed)
     {if(seed){typedef void*(*Delete)(Tasker*,unsigned);(*reinterpret_cast<Delete*>(*reinterpret_cast<char**>(seed)))(seed,1);}}
-    float GoapHook(AITaskSytem* self,Tasker* target,bool asks,bool playerOrder)
+    float TryReturn(AITaskSytem* self,Tasker* target,bool asks,int slot,LONG e)
     {
-        const ULONG_PTR from=reinterpret_cast<ULONG_PTR>(_ReturnAddress());
-        const LONG callEpoch=Epoch();const float native=originalGoap(self,target,asks,playerOrder);
-        if(native!=0||!Live(callEpoch)||depth||playerOrder||from!=reinterpret_cast<ULONG_PTR>(image)+0x50fd28||!self)return native;
-        const LONG e=callEpoch;Character* c=self->character;const int slot=BuilderSlot(self,target);
-        if(slot<0||!Eligible(c,e))return native;
+        Character* c=self->character;
+        if(!Eligible(c,e)||UnfinishedAssignment(self)||!self->actionsTryList.isEmpty())return 0;
         DepthScope scope;Episode state;bool prepared=false;
         try{prepared=Prepare(self,target,slot,state);}catch(...){throw;}
-        if(!prepared){return native;}
+        if(!prepared)return 0;
         Building* resolved=EngineerMaterialsRuntime::Handle(state.storage).getBuilding();
         UseableStuff* usable=resolved?resolved->getUseableStuff():NULL;
         StorageBuilding* storage=usable?usable->getFunctionStuff():NULL;
         GameData* data=DataIn(c->getInventory(),state.credit.material);if(!data)data=DataIn(Backpack(c),state.credit.material);
         int units=0;
         if(!data||!CargoReady(c,data,e)||!ValidStorage(c,storage,data,e)||!Returnable(c,state.credit,data,e,units)||units<=0||!self->actionsTryList.isEmpty())
-        {Retire(state.actor);return native;}
-        Tasker* seed=NULL;float result=0;Planning(state.token,true);
+        {Retire(state.actor);return 0;}
+        Tasker* seed=NULL;float result=0;bool accepted=false;Planning(state.token,true);
         try
         {
             const hand destination=EngineerMaterialsRuntime::Handle(state.storage);
@@ -292,26 +337,52 @@ namespace EngineerSurplusRuntime
             if(seed&&Live(e)&&seed->key()==FILL_MACHINE&&Of(seed->subject)==state.storage&&
                 *reinterpret_cast<ULONG_PTR*>(seed)==reinterpret_cast<ULONG_PTR>(image)+0x16be0f0)
             {
-                const unsigned saved=planningToken;const LONG savedEpoch=planningEpoch;
-                planningToken=state.token;planningEpoch=e;
-                try{result=originalGoap(self,seed,asks,false);}catch(...){planningToken=saved;planningEpoch=savedEpoch;throw;}
-                planningToken=saved;planningEpoch=savedEpoch;
+                const unsigned saved=planningToken;const LONG savedEpoch=planningEpoch;AITaskSytem* savedSystem=planningSystem;
+                bool* savedAccepted=planningAccepted;
+                planningToken=state.token;planningEpoch=e;planningSystem=self;planningAccepted=&accepted;
+                try{result=originalGoap(self,seed,asks,false);}
+                catch(...){planningToken=saved;planningEpoch=savedEpoch;planningSystem=savedSystem;planningAccepted=savedAccepted;throw;}
+                planningToken=saved;planningEpoch=savedEpoch;planningSystem=savedSystem;planningAccepted=savedAccepted;
             }
             Tasker* deleting=seed;seed=NULL;DeleteSeed(deleting);
             Planning(state.token,false);
-            if(result>0)return result;
+            if(accepted)return result>0?result:1.0f;
         }
         catch(...){DeleteSeed(seed);Planning(state.token,false);Retire(state.actor);throw;}
         // A generated native plan may already own its first action. Never
         // cancel body/foreign actions here; failed preparation is disabled.
-        Planning(state.token,false);Retire(state.actor);return result>0?result:native;
+        Planning(state.token,false);Retire(state.actor);return 0;
+    }
+    float GoapHook(AITaskSytem* self,Tasker* target,bool asks,bool playerOrder)
+    {
+        const ULONG_PTR from=reinterpret_cast<ULONG_PTR>(_ReturnAddress());
+        const LONG e=Epoch();
+        if(!Live(e)||depth||!asks||playerOrder||from!=reinterpret_cast<ULONG_PTR>(image)+0x50fd28||!self||!target)
+            return originalGoap(self,target,asks,playerOrder);
+        if(target->key()!=JOB_BUILDER)
+        {
+            const int slot=normalRunScope==self&&Eligible(self->character,e)?NormalSlot(self,target):-1;
+            if(slot>=0)
+            {
+                // The normal permanent-job scorer has nominated this job.
+                // Use its rank for the return leg before starting its action.
+                const float unload=TryReturn(self,target,asks,slot,e);
+                if(unload>0)return unload;
+                if(e!=Epoch())return 0;
+            }
+            return originalGoap(self,target,asks,playerOrder);
+        }
+        const float native=originalGoap(self,target,asks,playerOrder);
+        if(native!=0||!Live(e))return native;
+        const int slot=BuilderSlot(self,target);
+        return slot>=0?TryReturn(self,target,asks,slot,e):native;
     }
     void Selected(AITaskSytem* tasks,Tasker* selected)
     {
         if(!tasks||!tasks->character)return;const Identity actor=Of(tasks->character->handle);Episode e;
         if(!ReadActor(actor,e))return;
-        const bool own=e.fill&&e.generation==Epoch()&&selected&&selected->key()==JOB_BUILDER&&
-            BuilderSlot(tasks,selected)==e.jobSlot&&Of(selected->subject)==e.jobSubject&&JobStillThere(tasks,e);
+        const bool own=e.handedOff&&e.fill&&e.generation==Epoch()&&selected&&selected->key()==e.jobKey&&
+            NormalSlot(tasks,selected)==e.jobSlot&&Of(selected->subject)==e.jobSubject&&JobStillThere(tasks,e);
         Guard g;for(unsigned i=0;i<Capacity;++i)if(episodes[i].used&&episodes[i].token==e.token)
         {episodes[i].committed=own;episodes[i].retired=!own;if(!own&&!episodes[i].fill&&!episodes[i].pending&&!episodes[i].transaction)episodes[i]=Episode();}
     }
@@ -464,7 +535,7 @@ namespace EngineerSurplusRuntime
         if(!Eligible(c,e.generation)||!c->getAI()||!c->getAI()->taskSystemAI)return 0;
         AITaskSytem* tasks=c->getAI()->taskSystemAI;
         if(!JobStillThere(tasks,e)||!tasks->body||tasks->body->getCurrentAction()!=self||self->key()!=FILL_MACHINE||
-           Of(self->subject)!=e.storage||Of(building->handle)!=e.storage||tasks->currentGoal.key()!=JOB_BUILDER||
+           Of(self->subject)!=e.storage||Of(building->handle)!=e.storage||tasks->currentGoal.key()!=e.jobKey||
            Of(tasks->currentGoal.subject)!=e.jobSubject)return 0;
         Inventory* body=c->getInventory();Inventory* pack=Backpack(c);
         if(!inventory||(inventory!=body&&inventory!=pack))return 0;
@@ -555,6 +626,8 @@ namespace EngineerSurplusRuntime
         if(!Contract(0x74bd70,0x4e9,0xa9f01c9c7210604aULL))return false;
         if(!PlannerEntry())return false;
         if(!Contract(0x50fbc0,0x2bc,0xdc6ed95659b1ae50ULL))return false;
+        if(!Bytes(0x5105d3,"\xe8\x2e\xe9\xb0\xff",5)||!Bytes(0x1ef06,"\xe9\xb5\x0c\x4f\x00",5)||
+           !Bytes(0x50f9c1,"\xe8\x64\xac\xb2\xff",5)||!Bytes(0x3a62a,"\xe9\x81\x24\x4d\x00",5))return false;
         if(!Contract(0x50c850,0x124,0x57bbe974df7b4420ULL))return false;
         if(!Contract(0x32eb90,0x1663,0x325bb951c9771e3fULL)&&!(image[0x32eb90]==0xe9&&Contract(0x32eb95,0x165e,0x9ff28a9340a2516aULL)))return false;
         if(KenshiLib::GetRealAddress(&Tasker::score)!=reinterpret_cast<intptr_t>(image+0x60f2f0)||KenshiLib::GetRealAddress(&AITaskSytem::runGOAP)!=reinterpret_cast<intptr_t>(image+0x50f380))return false;
@@ -578,6 +651,7 @@ namespace EngineerSurplusRuntime
         std::memcpy(ownedFillTable,image+0x16be0e8,sizeof(ownedFillTable));
         if(KenshiLib::SUCCESS!=KenshiLib::AddHook(image+0x50cab0,SetTaskHook,&originalSetTask)||
            KenshiLib::SUCCESS!=KenshiLib::AddHook(image+0x50db20,ChoosePermaHook,&originalChoosePerma)||
+           KenshiLib::SUCCESS!=KenshiLib::AddHook(image+0x50fbc0,RunGoalsHook,&originalRunGoals)||
            KenshiLib::SUCCESS!=KenshiLib::AddHook(image+0x340eb0,StorageHook,&originalStorage)||
            KenshiLib::SUCCESS!=KenshiLib::AddHook(image+0x33ee80,FillDeleteHook,&originalFillDelete)||
            KenshiLib::SUCCESS!=KenshiLib::AddHook(image+0x60f2f0,ScoreHook,&originalScore)||

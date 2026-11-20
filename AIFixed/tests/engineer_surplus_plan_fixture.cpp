@@ -7,17 +7,25 @@ typedef AIFixedEngineer::Identity Identity;static Identity Id(unsigned n){Identi
 static unsigned char*image=(unsigned char*)0x140000000ULL;static unsigned planningToken=7;static LONG planningEpoch=3,currentEpoch=3;static bool permit=true,job=true,found=true;static ULONG_PTR owned[6];static ULONG_PTR OwnedFillVtable(){return(ULONG_PTR)&owned[1];}enum{FILL_MACHINE=93,OPERATE_STORAGE=124,Capacity=128};
 struct TaskData{};struct Tasker{ULONG_PTR vt;TaskData*taskData;int type;hand subject;Tasker():vt((ULONG_PTR)image+0x16be0f0),taskData((TaskData*)1),type(93){subject.id=Id(8);}int key(){return type;}};
 struct AITaskSytem{struct ActionsListMgr{std::deque<Tasker*>list;};ActionsListMgr actionsTryList;void*character;};
-struct Episode{bool used,retired,committed;unsigned token;LONG generation;Identity storage;ULONG_PTR fill;Episode():used(true),retired(false),committed(false),token(7),generation(3),storage(Id(8)),fill(0){}};static Episode episodes[Capacity];struct Guard{};
+static AITaskSytem* planningSystem;
+static bool accepted;
+static bool* planningAccepted=&accepted;
+static unsigned char* setTaskCaller;
+static void* SetTaskCaller(){return setTaskCaller;}
+#define _ReturnAddress SetTaskCaller
+struct Episode{bool used,retired,committed,handedOff;unsigned token;LONG generation;int jobKey;Identity storage;ULONG_PTR fill;Episode():used(true),retired(false),committed(false),handedOff(false),token(7),generation(3),jobKey(125),storage(Id(8)),fill(0){}};static Episode episodes[Capacity];struct Guard{};
 static bool Live(LONG e){return e==currentEpoch;}static bool ReadToken(unsigned,Episode&e){e=episodes[0];return found;}static bool Eligible(void*,LONG){return permit;}static bool JobStillThere(AITaskSytem*,const Episode&){return job;}
 static unsigned starts=0;static bool NativeSet(AITaskSytem*,AITaskSytem::ActionsListMgr*from){++starts;for(size_t i=0;i<from->list.size();++i)if(from->list[i]->type==93||from->list[i]->type==124)Check(from->list[i]->vt==OwnedFillVtable(),"owned fill tagged before first native startAction");return true;}static bool(*originalSetTask)(AITaskSytem*,AITaskSytem::ActionsListMgr*)=NativeSet;
 // @SET_TASK@
 // @BUDGET_TYPES@
 // @BUDGET@
-static void Reset(AITaskSytem&t){starts=0;planningToken=7;planningEpoch=currentEpoch=3;permit=job=found=true;episodes[0]=Episode();for(unsigned i=1;i<Capacity;++i)episodes[i].used=false;t.actionsTryList.list.clear();}
+static void Reset(AITaskSytem&t){starts=0;accepted=false;planningToken=7;planningSystem=&t;setTaskCaller=image+0x50f9c6;planningEpoch=currentEpoch=3;permit=job=found=true;episodes[0]=Episode();for(unsigned i=1;i<Capacity;++i)episodes[i].used=false;t.actionsTryList.list.clear();}
 int main(){AITaskSytem tasks;Tasker fill,second,move;move.type=29;move.vt=(ULONG_PTR)image+0x16b1110;
- Reset(tasks);tasks.actionsTryList.list.push_back(&move);tasks.actionsTryList.list.push_back(&fill);tasks.actionsTryList.list.push_back(&second);Check(SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==1,"valid entire native trial plan admitted");Check(fill.vt==OwnedFillVtable()&&second.vt==OwnedFillVtable(),"all fills tagged even when first action is movement");
+ Reset(tasks);tasks.actionsTryList.list.push_back(&move);tasks.actionsTryList.list.push_back(&fill);tasks.actionsTryList.list.push_back(&second);Check(SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==1&&episodes[0].handedOff&&accepted,"valid entire native trial plan admitted");Check(fill.vt==OwnedFillVtable()&&second.vt==OwnedFillVtable(),"all fills tagged even when first action is movement");
  Reset(tasks);fill=Tasker();fill.vt=(ULONG_PTR)image+0x16b9990;tasks.actionsTryList.list.push_back(&fill);Check(!SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==0,"wrong native fill class rejected before start");
  Reset(tasks);fill=Tasker();fill.subject.id=Id(99);tasks.actionsTryList.list.push_back(&fill);Check(!SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==0,"foreign storage rejected before start");
+ Reset(tasks);fill=Tasker();episodes[0].jobKey=fill.key();tasks.actionsTryList.list.push_back(&fill);Check(!SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==0,"synthetic last action cannot replace the original permanent goal identity");
+ Reset(tasks);AITaskSytem nested;nested.actionsTryList.list.push_back(&move);Check(SetTaskHook(&nested,&nested.actionsTryList)&&starts==1,"different native planner bypasses the cleanup token");
  Reset(tasks);fill=Tasker();tasks.actionsTryList.list.push_back(&fill);currentEpoch=4;Check(!SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==0,"load during planning rejects all actions before start");
  Reset(tasks);fill=Tasker();tasks.actionsTryList.list.push_back(&fill);found=false;Check(!SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==0,"missing metadata refuses plan before start");
  Reset(tasks);fill=Tasker();tasks.actionsTryList.list.push_back(&fill);episodes[0].retired=true;Check(!SetTaskHook(&tasks,&tasks.actionsTryList)&&starts==0,"input cancellation before handoff refuses plan");

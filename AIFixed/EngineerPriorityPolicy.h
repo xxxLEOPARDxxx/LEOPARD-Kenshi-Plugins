@@ -6,17 +6,15 @@
 namespace AIFixedEngineerPriority
 {
     struct Key { unsigned type,container,containerSerial,index,serial; };
-    struct Candidate { Key key;bool productive,wall,complete,paused,dismantled,assembling; };
+    struct Candidate { Key key;bool productive,wall,complete,paused,dismantled; };
     inline bool Equal(const Key& a,const Key& b)
     {return a.type==b.type&&a.container==b.container&&a.containerSerial==b.containerSerial&&a.index==b.index&&a.serial==b.serial;}
     inline bool Construction(const Candidate& c)
     {return c.key.type==0&&c.productive&&!c.wall&&!c.complete&&!c.paused&&!c.dismantled;}
-    inline bool OtherConstruction(const Candidate& c)
-    {return c.key.type==0&&!c.paused&&!c.dismantled&&!Construction(c);}
     struct Round
     {
-        unsigned generation,count;bool bad,unknown,started,assigned,assignmentSeen,hasOpen,hasAlternative;
-        Key assignment,best,open,alternative;unsigned __int64 ordinal;
+        unsigned generation,count;bool bad,unknown,started;
+        Key best;unsigned __int64 ordinal;
     };
     class Registry
     {
@@ -65,15 +63,7 @@ namespace AIFixedEngineerPriority
         {
             if(q.bad)return;
             if(++q.count>MaxObserved||q.generation!=generation_){q.bad=true;return;}
-            if(!Construction(c))
-            {
-                if(!q.hasAlternative&&OtherConstruction(c)){q.alternative=c.key;q.hasAlternative=true;}
-                return;
-            }
-            const bool assigned=q.assigned&&Equal(c.key,q.assignment);
-            if(c.assembling&&!assigned)return;
-            if(assigned)q.assignmentSeen=true;
-            if(!q.hasOpen){q.open=c.key;q.hasOpen=true;}
+            if(!Construction(c))return;
             const Entry* e=Find(c.key);
             // A previously existing blueprint has no proven placement age.
             // A fallback is safer than treating observation/handle order as age.
@@ -86,13 +76,6 @@ namespace AIFixedEngineerPriority
         bool Select(const Round& q,unsigned generation,const Candidate& native,Key& out)const
         {
             if(q.bad||generation!=generation_||q.generation!=generation||!Construction(native))return false;
-            if(q.assignmentSeen){out=q.assignment;return !Equal(out,native.key);}
-            if(native.assembling)
-            {
-                if(q.hasOpen){out=q.ordinal&&(!q.unknown||q.started)?q.best:q.open;return !Equal(out,native.key);}
-                if(q.hasAlternative){out=q.alternative;return true;}
-                return false;
-            }
             if((q.unknown&&!q.started)||!q.ordinal)return false;
             const Entry* first=Find(q.best);const Entry* current=Find(native.key);
             if(!first||(first->started!=0)!=q.started||(q.started?first->started:first->ordinal)!=q.ordinal||first==current)return false;
