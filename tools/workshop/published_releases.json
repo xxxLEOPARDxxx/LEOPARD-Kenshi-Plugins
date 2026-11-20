@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-18",
+  "date": "2026-11-20",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -34,7 +34,13 @@
     "AIFixed": {
       "nexus": 2256,
       "workshop_id": 3829845490,
-      "version": "3"
+      "version": "4",
+      "archive_sha256": "067b73805cd3812c285a93b489ec0057b4175d87f1165a88cfcc12dcc80c57fa",
+      "dll_sha256": "204a31a681b8698e99b0399503fad61d60951209d5ca1f8bbe13ce83051d23b9",
+      "bilingual_change_note_sha256": "945ea7ed13f6e15ad544f1501ad2fd2c8fbefb31d9e6a896e578ebd00f193d3f",
+      "steam_version": "4",
+      "nexus_version": "4",
+      "published_msk": "2026-11-20T09:15:24.153643+03:00"
     },
     "SkillLevelUpInfo": {
       "nexus": 2257,
@@ -83,7 +89,13 @@
     "Formations": {
       "nexus": 2235,
       "workshop_id": 3821113149,
-      "version": "2"
+      "version": "3",
+      "archive_sha256": "6458d5a7336797fde9c57ae694e40e6f41db0f6a41064fe73e74b5887b4218b8",
+      "dll_sha256": "892b7645134d41dde5dae74512a816b1ebff7a6c26e1846014f51ab5c51532be",
+      "bilingual_change_note_sha256": "fccf5bfdf47b33f8ce20917adad0cde7a1c0749eacabefe94c3b8d70eefcfb30",
+      "steam_version": "3",
+      "nexus_version": "3",
+      "published_msk": "2026-11-20T09:15:33.420485+03:00"
     },
     "Hidden-Faction-Relations": {
       "nexus": 2208,
