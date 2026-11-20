@@ -5,10 +5,9 @@
 struct AI{unsigned char unused[0x2f8];void* actor;};
 struct Building;
 struct hand{unsigned words[8];Building* building;Building* getBuilding()const{return building;}};
-struct TaskMatch{hand subject;};
 struct GameData{};struct TownBase{};struct Faction{};struct FactoryCallbackInterface{};struct Layout{};struct GameSaveState{};struct RootObjectFactory{};
 namespace Ogre{struct Vector3{float x,y,z;};struct Quaternion{float w,x,y,z;};}
-struct Building{unsigned index;bool productive,wall,complete,paused,dismantled;};
+struct Building{unsigned index;bool productive,wall,complete,paused,dismantled,assembling;};
 #define AIFIXED_ENGINEER_PRIORITY_EXTERNAL_TYPES
 #include <EngineerPriorityNative.h>
 using namespace AIFixedEngineerPriority;
@@ -20,40 +19,28 @@ static bool wrongCaller=false,reenter=false,invalidateDuring=false;static AI* ne
 static Building a={100,true,false,false,false,false},b={2,true,false,false,false,false},wall={3,false,true,false,false,false},legacy={4,true,false,false,false,false};
 static Building* candidates[8];static unsigned candidateCount=0;static Building* nativeResult=&b;static void* finderObject=0;static int nativeThrow=0;
 static Building* noSource=NULL;
-static bool inTransit=false,wrongMaterialCaller=false,wrongCache=false,expireDuringWait=false;
-static unsigned materialCalls=0,coverageChecks=0;
+static Building* assignedProject=NULL;
 static unsigned completionCalls=0,completionEpoch=0;static Key completedKey={};
 static void CheckUnlocked(){if(PriorityNative::metadataLock.RecursionCount&&reinterpret_cast<size_t>(PriorityNative::metadataLock.OwningThread)==GetCurrentThreadId())InterlockedIncrement(&lockedCallbacks);}
 static void Completed(const Key& key,unsigned e){CheckUnlocked();++completionCalls;completedKey=key;completionEpoch=e;}
 static bool Current(unsigned*g){CheckUnlocked();if(throwCurrent)RaiseException(0xE0421041,0,0,0);*g=epoch;return active;}
 static bool Allowed(AI*){CheckUnlocked();return allow;}
-static bool MaterialsEnRoute(AI*,Building* project)
+static bool Assignment(AI*,Key* key)
 {
-    CheckUnlocked();++coverageChecks;
-    const bool covered=inTransit&&project==noSource;
-    if(expireDuringWait)inTransit=false;
-    return covered;
+    CheckUnlocked();
+    if(!assignedProject)return false;
+    const Key assigned={0,3,7,assignedProject->index,9};*key=assigned;return true;
 }
-static bool Snapshot(Building*p,Candidate*c){CheckUnlocked();if(throwSnapshot)RaiseException(0xE0421042,0,0,0);if(reenter){reenter=false;hand in={},out={};PriorityNative::FinderHook(nestedAI,in,out,false);}if(invalidSnapshot||!p)return false;std::memset(c,0,sizeof(*c));c->key.type=0;c->key.container=3;c->key.containerSerial=7;c->key.index=p->index;c->key.serial=9;c->productive=p->productive;c->wall=p->wall;c->complete=p->complete;c->paused=p->paused;c->dismantled=p->dismantled;return true;}
+static bool Snapshot(Building*p,Candidate*c){CheckUnlocked();if(throwSnapshot)RaiseException(0xE0421042,0,0,0);if(reenter){reenter=false;hand in={},out={};PriorityNative::FinderHook(nestedAI,in,out,false);}if(invalidSnapshot||!p)return false;std::memset(c,0,sizeof(*c));c->key.type=0;c->key.container=3;c->key.containerSerial=7;c->key.index=p->index;c->key.serial=9;c->productive=p->productive;c->wall=p->wall;c->complete=p->complete;c->paused=p->paused;c->dismantled=p->dismantled;c->assembling=p->assembling;return true;}
 static Building* Resolve(const Key&k){CheckUnlocked();++resolveCalls;if(failedResolve)return 0;if(badResolved)return &legacy;Building* all[]={&a,&b,&wall,&legacy};for(unsigned i=0;i<4;++i)if(all[i]->index==k.index)return all[i];return 0;}
 static void Report(const char*){++reports;}
 static float slotResult=0;
 static float* OriginalSlot(void*,Building*const*){CheckUnlocked();InterlockedIncrement(&slotCalls);return &slotResult;}
-static float OriginalMaterials(void*,const void*,const TaskMatch&,hand& out)
-{CheckUnlocked();++materialCalls;out.words[0]=57;return 0.0f;}
 static Building* OriginalSelector(void*){
     CheckUnlocked();InterlockedIncrement(&selectorCalls);
     for(unsigned i=0;i<candidateCount;++i)
     {
-        if(candidates[i]==noSource&&PriorityNative::selectorFrame)
-        {
-            TaskMatch request={};request.subject.building=noSource;hand out={};
-            AI* actor=PriorityNative::selectorFrame->finder->ai;
-            void* cache=reinterpret_cast<unsigned char*>(actor)+(wrongCache?0x210:0x208);
-            const float score=PriorityNative::MaterialsAt(cache,NULL,request,out,image+(wrongMaterialCaller?0x9A5FF4:0x9A5FF3));
-            Check(score==0.0f&&out.words[0]==57,"intentional wait leaves the source score and output unchanged");
-            continue;
-        }
+        if(candidates[i]==noSource)continue;
         float*p=PriorityNative::ScoreSlotAt(&slotResult,&candidates[i],image+(wrongCaller?0x9A60F4:0x9A60F3));
         Check(p==&slotResult,"score-slot native pointer preserved");
         if(invalidateDuring){invalidateDuring=false;++epoch;PriorityNative::Invalidate();}
@@ -66,7 +53,7 @@ static void Place(Building*,const void*,GameSaveState*,bool);
 static void OriginalBuilder(void*);
 static bool TestDisk(){return true;}
 static Building* OriginalFactory(RootObjectFactory* self,GameData* data,Ogre::Vector3 position,TownBase* town,Faction* owner,Ogre::Quaternion rotation,FactoryCallbackInterface* callback,Layout* layout,Building* door,GameSaveState* saved,Building* indoors,bool invisible,bool completed,bool foliage,int floor,bool outside){CheckUnlocked();InterlockedIncrement(&factoryCalls);if(probeABI){Check(self==reinterpret_cast<RootObjectFactory*>(1)&&town==reinterpret_cast<TownBase*>(2)&&owner==reinterpret_cast<Faction*>(3)&&callback==reinterpret_cast<FactoryCallbackInterface*>(4)&&layout==reinterpret_cast<Layout*>(5)&&door==reinterpret_cast<Building*>(6)&&saved==reinterpret_cast<GameSaveState*>(7)&&indoors==reinterpret_cast<Building*>(8)&&invisible&&completed&&foliage&&floor==23&&outside,"all factory ABI arguments forwarded exactly");}if(nestedFactory){nestedFactory=false;Place(&legacy,image+0x101,0,false);}if(position.x!=1||position.y!=2||position.z!=3||rotation.w!=1||rotation.x||rotation.y||rotation.z)RaiseException(0xE0421043,0,0,0);return data?reinterpret_cast<Building*>(data):factoryResult;}
-static bool AddHook(void*where,void*,void**original){++hookCalls;size_t r=(unsigned char*)where-image;if(r==0x998190)*original=(void*)&OriginalFinder;else if(r==0x9A5D40)*original=(void*)&OriginalSelector;else if(r==0x8D9600)*original=(void*)&OriginalSlot;else if(r==0x57C1E0)*original=(void*)&OriginalFactory;else if(r==0x4D6810)*original=(void*)&OriginalBuilder;else if(r==0x60E740)*original=(void*)&OriginalMaterials;else return false;return true;}
+static bool AddHook(void*where,void*,void**original){++hookCalls;size_t r=(unsigned char*)where-image;if(r==0x998190)*original=(void*)&OriginalFinder;else if(r==0x9A5D40)*original=(void*)&OriginalSelector;else if(r==0x8D9600)*original=(void*)&OriginalSlot;else if(r==0x57C1E0)*original=(void*)&OriginalFactory;else if(r==0x4D6810)*original=(void*)&OriginalBuilder;else return false;return true;}
 static void Place(Building*p,const void*caller=0,GameSaveState*saved=0,bool completed=false){factoryResult=p;Ogre::Vector3 v={1,2,3};Ogre::Quaternion q={1,0,0,0};PriorityNative::FactoryAt(0,reinterpret_cast<GameData*>(p),v,0,0,q,0,0,0,saved,0,false,completed,false,0,false,caller?caller:image+0x4D6DE5);}
 static void OriginalBuilder(void*){Place(&a,image+0x101,0,false);Place(&b,image+0x102,0,false);if(throwBuilder)throw 74;}
 static unsigned Find(AI&ai){hand in={},out={};float f=PriorityNative::FinderHook(&ai,in,out,true);Check(f==(out.words[0]?0.625f:0.0f)&&out.words[1]==8,"finder native score and unrelated out fields preserved");return out.words[0];}
@@ -74,11 +61,11 @@ static DWORD WINAPI WorkerFind(void*p){unsigned* result=static_cast<unsigned*>(p
 static DWORD WINAPI WorkerPlace(void*p){for(unsigned i=0;i<200;++i)Place(static_cast<Building*>(p));return 0;}
 int main(int argc,char**argv){
  Check(argc==2,"mapped image supplied");if(argc!=2)return 1;FILE*f=0;fopen_s(&f,argv[1],"rb");Check(f!=0,"mapped fixture opens");if(!f)return 1;fseek(f,0,SEEK_END);size_t size=ftell(f);rewind(f);image=(unsigned char*)std::malloc(size);Check(image&&fread(image,1,size,f)==size,"mapped fixture read");fclose(f);const unsigned thunks[5]={0x4CF5F,0x20D56,0x1E1DC,0x8918,0x5305D};for(unsigned i=0;i<5;++i)reinterpret_cast<size_t*>(image+0x1740910)[i]=reinterpret_cast<size_t>(image+thunks[i]);
- PriorityNative::Config cfg={};cfg.current=Current;cfg.allowActor=Allowed;cfg.snapshot=Snapshot;cfg.resolve=Resolve;cfg.addHook=AddHook;cfg.report=Report;cfg.diskIdentity=TestDisk;cfg.materialsEnRoute=MaterialsEnRoute;cfg.constructionCompleted=Completed;
+ PriorityNative::Config cfg={};cfg.current=Current;cfg.allowActor=Allowed;cfg.snapshot=Snapshot;cfg.resolve=Resolve;cfg.addHook=AddHook;cfg.report=Report;cfg.diskIdentity=TestDisk;cfg.assignedProject=Assignment;cfg.constructionCompleted=Completed;
  Check(PriorityNative::Configure(cfg,image,size),"callbacks configured");Check(PriorityNative::Install(),"exact Steam image installs native observers");if(!PriorityNative::Ready()){std::printf("%u checks, %u failures\n",checks,failures);return 1;}
 
- Check(hookCalls==6&&reports==0,"exact six hooks, no startup error");
- Check(PriorityNative::Install()&&hookCalls==6,"installation is one-shot");
+ Check(hookCalls==5&&reports==0,"exact five hooks, no startup error");
+ Check(PriorityNative::Install()&&hookCalls==5,"installation is one-shot");
  Check(PriorityNative::AdmitImage(image,size),"unmodified full native proof admitted");
  Check(!PriorityNative::AdmitImage(0,0)&&!PriorityNative::AdmitImage(image,64),"null or truncated image refused");
  for(unsigned pi=0;pi<sizeof(PriorityNative::pins)/sizeof(PriorityNative::pins[0]);++pi){const PriorityNative::Pin&pin=PriorityNative::pins[pi];unsigned offsets[3]={0,pin.size/2,pin.size-1};for(unsigned k=0;k<3;++k){image[pin.rva+offsets[k]]^=1;Check(!PriorityNative::AdmitImage(image,size),"mutated first/middle/last native body refused");image[pin.rva+offsets[k]]^=1;}}
@@ -103,28 +90,34 @@ int main(int argc,char**argv){
  Place(&a);Place(&b);LONG calls=factoryCalls;
  Check(Find(ai)==100,"production bridge chooses earlier confirmed placement from final positive candidates");
  Check(finderCalls==1&&selectorCalls==1&&slotCalls==2&&factoryCalls==calls,"one original call at each native boundary");
- noSource=&a;inTransit=true;
- Check(Find(ai)==2&&coverageChecks==0,"speculative checks cannot claim a machine");
+ noSource=&a;
+ Check(Find(ai)==2,"speculative checks cannot claim a machine");
+ PriorityNative::Invalidate();Place(&b);Place(&a);noSource=NULL;
  PriorityNative::Started(&a,epoch-1);
- Check(Find(ai)==2&&coverageChecks==0,"old-world election cannot record the current construction priority");
+ Check(Find(ai)==2,"old-world election cannot record the current construction priority");
  PriorityNative::Started(&a,epoch);
- const unsigned materialsBefore=materialCalls;
- Check(Find(ai)==0&&materialCalls==materialsBefore+1,"waiting for a working machine does not divert to the next machine");
+ Check(Find(ai)==100,"a started machine with a useful job outranks the next placement");
+ noSource=&a;
+ Check(Find(ai)==2,"a worker without a useful trip can take the next positive machine");
  // Native drops the first machine from discovery at completion. The same
  // engineer must be able to take the second before registry maintenance.
  a.complete=true;candidateCount=1;
- const unsigned beforeHandoff=coverageChecks;
- Check(Find(ai)==2&&coverageChecks==beforeHandoff,"next machine remains selectable while completed focus and incoming claims are still recorded");
+ Check(Find(ai)==2,"next machine remains selectable while completed focus and incoming claims are still recorded");
  a.complete=false;candidateCount=2;
  nativeResult=&wall;Check(Find(ai)==3,"the same wait does not suppress native wall work");nativeResult=&b;
  candidates[2]=&wall;candidateCount=3;
- Check(Find(ai)==3,"positive wall remains available even when native first ranks the later machine");
- wall.paused=true;Check(Find(ai)==0,"a paused alternate is not substituted for the native winner");wall.paused=false;
+ Check(Find(ai)==2,"do not replace the next viable machine merely because an earlier one is waiting");
+ wall.paused=true;Check(Find(ai)==2,"a paused alternate cannot suppress the native winner");wall.paused=false;
  candidateCount=2;
- wrongMaterialCaller=true;Check(Find(ai)==2,"only the native construction scoring callsite may defer a project");wrongMaterialCaller=false;
- wrongCache=true;Check(Find(ai)==2,"another actor's cache cannot defer the selected machine");wrongCache=false;
- expireDuringWait=true;Check(Find(ai)==2,"cancelled delivery falls back within the same native selection");expireDuringWait=false;
- inTransit=false;Check(Find(ai)==2,"a genuinely unsupplied machine yields to useful work");
+ noSource=NULL;a.assembling=true;nativeResult=&a;
+ Check(Find(ai)==2,"free engineer chooses next productive site while first has an assembler");
+ assignedProject=&a;nativeResult=&b;
+ Check(Find(ai)==100,"worker already on the first positive project continues assembly");
+ assignedProject=&b;a.assembling=false;nativeResult=&a;
+ Check(Find(ai)==2,"worker already on the second project does not bounce back to a positive earlier project");
+ assignedProject=NULL;a.assembling=true;b.assembling=true;candidates[2]=&wall;candidateCount=3;
+ Check(Find(ai)==3,"walls remain useful when all positive machines already have builders");
+ a.assembling=false;b.assembling=false;candidateCount=2;
  noSource=NULL;nativeResult=&legacy;candidates[0]=&legacy;
  Check(Find(ai)==100,"established focus also orders legacy blueprints once elected");
  a.complete=true;

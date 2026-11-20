@@ -6,7 +6,7 @@
 namespace AIFixedEngineerPriority
 {
     struct Key { unsigned type,container,containerSerial,index,serial; };
-    struct Candidate { Key key;bool productive,wall,complete,paused,dismantled; };
+    struct Candidate { Key key;bool productive,wall,complete,paused,dismantled,assembling; };
     inline bool Equal(const Key& a,const Key& b)
     {return a.type==b.type&&a.container==b.container&&a.containerSerial==b.containerSerial&&a.index==b.index&&a.serial==b.serial;}
     inline bool Construction(const Candidate& c)
@@ -15,8 +15,8 @@ namespace AIFixedEngineerPriority
     {return c.key.type==0&&!c.paused&&!c.dismantled&&!Construction(c);}
     struct Round
     {
-        unsigned generation,count;bool bad,unknown,started,waiting,trackWaiting,hasAlternative;
-        Key best,alternative;unsigned __int64 ordinal;
+        unsigned generation,count;bool bad,unknown,started,assigned,assignmentSeen,hasOpen,hasAlternative;
+        Key assignment,best,open,alternative;unsigned __int64 ordinal;
     };
     class Registry
     {
@@ -24,7 +24,7 @@ namespace AIFixedEngineerPriority
         enum { MaxEntries=512,Slots=1024,MaxProbes=64,MaxObserved=256 };
         Registry(){Reset(0);}
         void Reset(unsigned generation)
-        {std::memset(entries_,0,sizeof(entries_));generation_=generation;count_=startedCount_=0;next_=0;}
+        {std::memset(entries_,0,sizeof(entries_));generation_=generation;count_=0;next_=0;}
         bool Record(const Key& key)
         {
             if(key.type!=0)return false;
@@ -43,14 +43,11 @@ namespace AIFixedEngineerPriority
         {
             if(!Record(key))return;
             Entry* e=Find(key);
-            if(e&&!e->started&&next_!=~static_cast<unsigned __int64>(0)){e->started=++next_;++startedCount_;}
+            if(e&&!e->started&&next_!=~static_cast<unsigned __int64>(0))e->started=++next_;
         }
-        bool Started(const Key& key)const
-        {const Entry* e=Find(key);return e&&e->started;}
         bool Forget(const Key& key)
         {
             Entry* e=Find(key);if(!e)return false;
-            if(e->started)--startedCount_;
             e->state=2;--count_;return true;
         }
         unsigned Collect(Key* keys,unsigned limit,unsigned& cursor)const
@@ -62,31 +59,41 @@ namespace AIFixedEngineerPriority
             return found;
         }
         void Begin(Round& q,unsigned generation)const
-        {std::memset(&q,0,sizeof(q));q.generation=generation;q.bad=generation!=generation_;q.trackWaiting=startedCount_!=0;}
+        {std::memset(&q,0,sizeof(q));q.generation=generation;q.bad=generation!=generation_;}
         void Poison(Round& q)const {q.bad=true;}
-        void Observe(Round& q,const Candidate& c,bool waiting=false)const
+        void Observe(Round& q,const Candidate& c)const
         {
             if(q.bad)return;
             if(++q.count>MaxObserved||q.generation!=generation_){q.bad=true;return;}
             if(!Construction(c))
             {
-                if(!waiting&&!q.hasAlternative&&OtherConstruction(c)){q.alternative=c.key;q.hasAlternative=true;}
+                if(!q.hasAlternative&&OtherConstruction(c)){q.alternative=c.key;q.hasAlternative=true;}
                 return;
             }
+            const bool assigned=q.assigned&&Equal(c.key,q.assignment);
+            if(c.assembling&&!assigned)return;
+            if(assigned)q.assignmentSeen=true;
+            if(!q.hasOpen){q.open=c.key;q.hasOpen=true;}
             const Entry* e=Find(c.key);
             // A previously existing blueprint has no proven placement age.
             // A fallback is safer than treating observation/handle order as age.
-            if(!e){if(!waiting)q.unknown=true;return;}
+            if(!e){q.unknown=true;return;}
             const bool started=e->started!=0;
-            if(waiting&&!started)return;
             const unsigned __int64 ordinal=started?e->started:e->ordinal;
             if(!q.ordinal||(started&&!q.started)||(started==q.started&&ordinal<q.ordinal))
-            {q.best=c.key;q.ordinal=ordinal;q.started=started;q.waiting=waiting;}
-            else if(started==q.started&&ordinal==q.ordinal&&!waiting)q.waiting=false;
+            {q.best=c.key;q.ordinal=ordinal;q.started=started;}
         }
         bool Select(const Round& q,unsigned generation,const Candidate& native,Key& out)const
         {
-            if(q.bad||(q.unknown&&!q.started)||generation!=generation_||q.generation!=generation||!q.ordinal||!Construction(native))return false;
+            if(q.bad||generation!=generation_||q.generation!=generation||!Construction(native))return false;
+            if(q.assignmentSeen){out=q.assignment;return !Equal(out,native.key);}
+            if(native.assembling)
+            {
+                if(q.hasOpen){out=q.ordinal&&(!q.unknown||q.started)?q.best:q.open;return !Equal(out,native.key);}
+                if(q.hasAlternative){out=q.alternative;return true;}
+                return false;
+            }
+            if((q.unknown&&!q.started)||!q.ordinal)return false;
             const Entry* first=Find(q.best);const Entry* current=Find(native.key);
             if(!first||(first->started!=0)!=q.started||(q.started?first->started:first->ordinal)!=q.ordinal||first==current)return false;
             // The first already elected machine wins only among candidates in
@@ -97,7 +104,7 @@ namespace AIFixedEngineerPriority
         }
     private:
         struct Entry {Key key;unsigned __int64 ordinal,started;unsigned state;};
-        Entry entries_[Slots];unsigned generation_,count_,startedCount_;unsigned __int64 next_;
+        Entry entries_[Slots];unsigned generation_,count_;unsigned __int64 next_;
         static unsigned Hash(const Key& k)
         {
             unsigned h=2166136261u;const unsigned values[5]={k.type,k.container,k.containerSerial,k.index,k.serial};

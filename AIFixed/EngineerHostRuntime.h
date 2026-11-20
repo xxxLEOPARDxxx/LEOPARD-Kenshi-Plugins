@@ -40,6 +40,20 @@ bool EngineerAllowActor(AI* ai)
     __try{return ai&&EngineerAllowed(ai->me);}
     __except(EngineerNativeFaultFilter(GetExceptionCode())){return false;}
 }
+AIFixedEngineerPriority::Key EngineerKey(const hand& key)
+{
+    AIFixedEngineerPriority::Key result={key.type,key.container,key.containerSerial,key.index,key.serial};
+    return result;
+}
+bool EngineerAssignedProject(AI* ai,AIFixedEngineerPriority::Key* out)
+{
+    OrdersReceiver* orders=ai&&ai->me?ai->me->getOrdersReciever():NULL;
+    if(!orders)return false;
+    const TaskMatch& goal=orders->getCurrentGoal();
+    if(goal.key()!=JOB_BUILDER||goal.subtarget.type!=BUILDING)return false;
+    *out=EngineerKey(goal.subtarget);
+    return true;
+}
 bool EngineerSnapshot(Building* b,AIFixedEngineerPriority::Candidate* out)
 {
     __try
@@ -52,9 +66,7 @@ bool EngineerSnapshot(Building* b,AIFixedEngineerPriority::Candidate* out)
         Building::ConstructionState* state=b->getBuildState();
         if(!state)return false;
         AIFixedEngineerPriority::Candidate result={};
-        result.key.type=b->handle.type;result.key.container=b->handle.container;
-        result.key.containerSerial=b->handle.containerSerial;result.key.index=b->handle.index;
-        result.key.serial=b->handle.serial;result.wall=b->isAWall();
+        result.key=EngineerKey(b->handle);result.wall=b->isAWall();
         result.complete=state->isComplete;result.paused=state->isPaused;
         result.dismantled=state->isDismantled;
         switch(b->getBuildingClass())
@@ -72,6 +84,10 @@ bool EngineerSnapshot(Building* b,AIFixedEngineerPriority::Candidate* out)
         case BF_ENGINE:result.productive=!result.wall;break;
         default:break;
         }
+        // Use the native frame's evidence of assembly and require all
+        // materials on-site before diverting an extra engineer.
+        result.assembling=AIFixedEngineerPriority::Construction(result)&&state->buildersThisFrame>0&&
+            state->mats.size()<=16&&!state->needMats();
         if(generation!=static_cast<unsigned>(EngineerEpoch()))return false;
         *out=result;return true;
     }

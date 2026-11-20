@@ -6,11 +6,12 @@
 #include <cstring>
 #include <string>
 #include <map>
+#include <new>
 #include <deque>
 #include <vector>
 #include "../EngineerMaterialsPolicy.h"
-static unsigned checks=0,nativeCalls=0;static uintptr_t returnAddress=0;
-static LONG epoch=3;static bool flipEpochOnCount=false,flipEpochUnderLock=false;
+static unsigned checks=0,nativeCalls=0,scratchConstructed=0,scratchDestroyed=0,offerCalls=0;static uintptr_t returnAddress=0;
+static LONG epoch=3;static bool flipEpochOnCount=false,flipEpochUnderLock=false,flipEpochOnSource=false,dropAdmissionOnSource=false;
 static LONG epochCalls=0,admitCalls=0;
 static unsigned vanishItem=0,vanishOnRead=0,itemReads=0,lockCalls=0;
 static unsigned liveOfferLists=0;
@@ -114,7 +115,7 @@ struct StorageBuilding:Building
     bool isProductionEmpty(){Boundary();return outputUnits<=0;}
     void getItemsWeWantRidOf(lektor<GameData*>& out,bool loot)
     {
-        Boundary();CHECK(!loot);
+        Boundary();++offerCalls;CHECK(!loot);
         out.maxSize=static_cast<unsigned>(inv.counts.size());
         if(!out.maxSize)return;
         out.stuff=new GameData*[out.maxSize];
@@ -148,6 +149,8 @@ struct AI
     {
         AI* ai;
         std::map<GameData*,hand,std::less<GameData*>,std::allocator<std::pair<GameData* const,hand> > > resourceSourceCache;
+        AIResultsCacher* _CONSTRUCTOR(AI* owner){Boundary();++scratchConstructed;AIResultsCacher* cache=new(this) AIResultsCacher;cache->ai=owner;return cache;}
+        void _DESTRUCTOR(){Boundary();++scratchDestroyed;this->~AIResultsCacher();}
     } resultsCache;
     Character* me;AITaskSytem* taskSystemAI;
 };
@@ -172,18 +175,30 @@ static unsigned sourceCalls=0,findCalls=0,groundCalls=0,gives=0,takes=0,collects
 static GameData* material=NULL;static GameData* otherMaterial=NULL;static Item* groundA=NULL;static Item* groundB=NULL;static StorageBuilding* storage=NULL;
 static bool Safe(AI*,Item*){Boundary();++groundCalls;return true;}
 static void Machines(AI*,lektor<Building*>& out,unsigned){Boundary();static Building* array[1];array[0]=storage;out.stuff=array;out.count=1;}
+struct NativeCaller
+{
+    uintptr_t saved;
+    explicit NativeCaller(unsigned rva):saved(returnAddress){returnAddress=EngineerMaterialsRuntime::image+rva;}
+    ~NativeCaller(){returnAddress=saved;}
+};
+static bool GroundCandidate(AI* ai,Item* item)
+{NativeCaller caller(0x59C7B5);return EngineerMaterialsRuntime::GroundSafe(ai,item);}
 static float Source(AI::AIResultsCacher* c,hand& out,GameData* d,StorageBuilding*)
 {
     Boundary();++sourceCalls;
-    if(c->resourceSourceCache.count(d)){out=c->resourceSourceCache[d];return 1;}
+    if(flipEpochOnSource){flipEpochOnSource=false;++epoch;out=groundB->handle;return 1;}
+    if(dropAdmissionOnSource){dropAdmissionOnSource=false;allow=false;out=groundB->handle;return 1;}
+    if(c->resourceSourceCache.count(d)){out=c->resourceSourceCache[d];return out.isNull()?0.0f:1.0f;}
     Item* candidates[2]={groundA,groundB};
-    for(unsigned i=0;i<2;++i)if(candidates[i]&&candidates[i]->data==d&&EngineerMaterialsRuntime::GroundSafe(c->ai,candidates[i]))
+    for(unsigned i=0;i<2;++i)if(candidates[i]&&candidates[i]->data==d&&GroundCandidate(c->ai,candidates[i]))
     {out=candidates[i]->handle;c->resourceSourceCache[d]=out;return 1;}
-    lektor<Building*> machines;EngineerMaterialsRuntime::Machines(c->ai,machines,0x04002436);
+    lektor<Building*> machines;
+    {NativeCaller caller(0x59C892);EngineerMaterialsRuntime::Machines(c->ai,machines,0x04002436);}
     if(machines.size()){out=machines[0]->handle;c->resourceSourceCache[d]=out;return 1;}
     out.setNull();return 0;
 }
-static float Find(AI* ai,const hand&,hand& out,bool){Boundary();++findCalls;return EngineerMaterialsRuntime::Source(&ai->resultsCache,out,material,NULL);}
+static float Find(AI* ai,const hand&,hand& out,bool)
+{Boundary();++findCalls;NativeCaller caller(0x5A20D0);return EngineerMaterialsRuntime::Source(&ai->resultsCache,out,material,NULL);}
 struct Finder{uintptr_t vptr,pad[3];Character* actor;};
 static bool nativePathImpossible=false;
 static bool DestinationPath(void*,const hand&){Boundary();return nativePathImpossible;}
@@ -277,6 +292,54 @@ int main()
     ai.resultsCache.resourceSourceCache[&mats]=first.handle;ai.resultsCache.resourceSourceCache[&iron]=store.handle;
     hand out;CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1);CHECK(out.index==alternate.handle.index);
     CHECK(sourceCalls==1&&findCalls==1&&ai.resultsCache.resourceSourceCache.count(&iron)==1);
+    CHECK(Of(ai.resultsCache.resourceSourceCache[&mats])==Of(first.handle));
+    CHECK(EngineerMaterialsRuntime::Source(&ai.resultsCache,out,&mats,NULL)==1&&Of(out)==Of(first.handle));
+    ai.resultsCache.resourceSourceCache.erase(&mats);
+    groundA=&alternate;
+    const unsigned scratchBeforeCold=scratchConstructed,sourceBeforeCold=sourceCalls;
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
+    CHECK(Of(ai.resultsCache.resourceSourceCache[&mats])==Of(alternate.handle));
+    CHECK(sourceCalls==sourceBeforeCold+1&&scratchConstructed==scratchBeforeCold);
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
+    CHECK(sourceCalls==sourceBeforeCold+1&&scratchConstructed==scratchBeforeCold);
+    groundA=&first;ai.resultsCache.resourceSourceCache.erase(&mats);
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
+    CHECK(Of(ai.resultsCache.resourceSourceCache[&mats])==Of(first.handle));
+    CHECK(scratchConstructed==scratchBeforeCold+1&&scratchDestroyed==scratchConstructed);
+    ai.resultsCache.resourceSourceCache[&mats]=hand();
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
+    CHECK(ai.resultsCache.resourceSourceCache[&mats].isNull());
+    flipEpochOnSource=true;
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==0&&out.isNull());
+    CHECK(scratchDestroyed==scratchConstructed);
+    ai.resultsCache.resourceSourceCache.erase(&mats);
+    flipEpochOnSource=true;
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==0&&out.isNull());
+    Invalidate();
+    ai.resultsCache.resourceSourceCache[&mats]=first.handle;
+    dropAdmissionOnSource=true;
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(first.handle));
+    CHECK(!allow&&scratchDestroyed==scratchConstructed);allow=true;
+    {
+        Query outer(&ai,&project,NULL,epoch);
+        CHECK(EngineerMaterialsRuntime::Find(&ai,hand(),out,true)==1&&Of(out)==Of(first.handle));
+        CHECK(query==&outer);
+    }
+    ai.resultsCache.resourceSourceCache[&mats]=store.handle;
+    const unsigned beforeLarge=offerCalls;
+    store.inv.all.count=store.inv.all.maxSize=129;
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(store.handle));
+    CHECK(offerCalls==beforeLarge);
+    store.inv.all.count=1;store.inv.all.maxSize=2;
+    ai.resultsCache.resourceSourceCache[&mats]=alternate.handle;
+    CHECK(EngineerMaterialsRuntime::Find(&ai,project.handle,out,true)==1&&Of(out)==Of(alternate.handle));
+    {
+        Query filter(&ai,&project,&mats,epoch);
+        NativeCaller caller(0x59D16B);
+        ai.resultsCache.resourceSourceCache.erase(&mats);
+        CHECK(EngineerMaterialsRuntime::Source(&ai.resultsCache,out,&mats,NULL)==1&&Of(out)==Of(first.handle));
+        CHECK(query==&filter);
+    }
     Request preview;CHECK(RequestFor(&actor,&project,alternate.handle,&mats,preview));CHECK(Preview(preview)==1); // queries reserve nothing
     groundA=NULL;groundB=NULL;ai.resultsCache.resourceSourceCache.erase(&mats);
     EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);CHECK(callbacks==1);
@@ -520,13 +583,13 @@ int main()
     EngineerMaterialsRuntime::Body(&body,.1f);
     CHECK(body.action==&move&&Preview(unpledged)==4);
     // The multi-output provider no longer advertises the required material.
-    // Its old cached row should be discarded while an unrelated row stays.
+    // An abandoned construction source leaves both native haul cache rows intact.
     ++epoch;Invalidate();matsOutput.producer=false;matsOutput.output=&iron;
     mixedSite.state.needs[&iron]=0;
     ai.resultsCache.resourceSourceCache[&mats]=matsOutput.handle;
     ai.resultsCache.resourceSourceCache[&iron]=store.handle;
     body.action=&collectMats;EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
-    CHECK(ai.resultsCache.resourceSourceCache.count(&mats)==0);
+    CHECK(ai.resultsCache.resourceSourceCache.count(&mats)==1&&Of(ai.resultsCache.resourceSourceCache[&mats])==Of(matsOutput.handle));
     CHECK(ai.resultsCache.resourceSourceCache.count(&iron)==1);
     // The native goal and move for the completed project can still be live
     // when another engineer starts the next machine from the same store.

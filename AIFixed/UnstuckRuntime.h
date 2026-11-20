@@ -30,7 +30,7 @@ namespace Unstuck
         Sample():used(false){}
     };
 
-    enum WallIntent { NoWallIntent, EmbeddedWallOnly, RetreatWall, RetreatWallOnly };
+    enum WallIntent { NoWallIntent, EmbeddedWallOnly, CrestWall, CrestWallOnly };
 
     struct History
     {
@@ -50,7 +50,8 @@ namespace Unstuck
         float ground, clearance, surface, landingGround;
         AIFixedGate::Point slope;
         int sourceFace, pocket,physicalCap;
-        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),sourceFace(-2),pocket(-2),physicalCap(0){}
+        bool wallHit;
+        LandingTrace():reason("not-probed"),ground(0),clearance(0),surface(0),landingGround(0),slope(0,0,0),sourceFace(-2),pocket(-2),physicalCap(0),wallHit(false){}
     };
 
     // The movement hook can run on another thread. It only publishes identity.
@@ -286,13 +287,34 @@ namespace Unstuck
             {
                 subject=Identity(goal->subject);
                 destination=AIFixedGate::Point();
-                wall=ordinary && movement->movementMode==MOVE_NORMAL?RetreatWall:RetreatWallOnly;
+                wall=ordinary && movement->movementMode==MOVE_NORMAL?CrestWall:CrestWallOnly;
                 return true;
             }
             if (movement->movementMode==MOVE_DIRECTION) return false;
         }
+        const HavokCharacter::CharacterState state=navigation->getState();
+        const bool idle=task==NULL_TASK || task==IDLE;
+        // A lone pack animal can lose its travel order on a wall. Keep its
+        // stationary observation and require physical crest or enclosure proof.
+        if (c->isAnimal() && movement->movementMode==MOVE_NORMAL &&
+            (idle?(state==HavokCharacter::IDLE || state==HavokCharacter::GOAL_REACHED):
+                (!RetreatTask(task) && TravelGoal(task) && PathBlocked(navigation,false))))
+        {
+            const auto& footing=movement->isStandingOnSomething();
+            Building* standing=footing.getBuilding();
+            if (!footing || (standing && standing->isAWall()))
+            {
+                if (idle)
+                {
+                    subject=Identity(standing?standing->handle:hand());
+                    destination=AIFixedGate::Point();
+                }
+                wall=ordinary?CrestWall:CrestWallOnly;
+                return true;
+            }
+        }
         if (ordinary) return true;
-        if (navigation->getState()!=HavokCharacter::IDLE) return false;
+        if (state!=HavokCharacter::IDLE) return false;
         Building* standing=movement->isStandingOnSomething().getBuilding();
         if (task==NULL_TASK || task==IDLE)
         {
@@ -401,8 +423,20 @@ namespace Unstuck
         return start && start==AIFixedGate::Side(Point(landing),inside,outside);
     }
 
+    bool JoinedWallSections(WallBuilding* first,WallBuilding* second)
+    {
+        if (!first || !second) return false;
+        const float alignment=first->getOrientation().xAxis().dotProduct(second->getOrientation().xAxis());
+        if (!_finite(alignment) || std::fabs(alignment)<.95f) return false;
+        const AIFixedGate::Point a=Point(first->getPosition()),b=Point(first->getWallEndPosition());
+        const AIFixedGate::Point c=Point(second->getPosition()),d=Point(second->getWallEndPosition());
+        const float join=AIFixedGate::WorldUnits(1.0f);
+        return AIFixedGate::DistanceSq(a,c)<=join*join || AIFixedGate::DistanceSq(a,d)<=join*join ||
+            AIFixedGate::DistanceSq(b,c)<=join*join || AIFixedGate::DistanceSq(b,d)<=join*join;
+    }
+
     bool CrossesBarrier(GameWorld* world,const Ogre::Vector3& origin,const Ogre::Vector3& landing,
-                        Building* support,bool exterior,bool verifiedCrest=false)
+                        Building* support,bool exterior,bool verifiedCrest,bool verifiedWallEscape)
     {
         // Spatial searches can omit long walls whose origins are far away.
         // Validate the actual structure supporting the NPC independently.
@@ -432,7 +466,8 @@ namespace Unstuck
                 {
                     // Adjacent pieces can overlap the recovery corridor at a
                     // join. Their actual wall spans are narrower than the AABB.
-                    if (support && wall && exterior &&
+                    if (support && wall && (exterior ||
+                        (verifiedWallEscape && JoinedWallSections(support->isAWall(),wall))) &&
                         WallAllowsLanding(wall,origin,landing,false,false)) continue;
                     return true;
                 }
@@ -463,11 +498,12 @@ namespace Unstuck
         WallBuilding* wall;
         Ogre::Vector3 outward;
         float edge;
-        WallEscape():wall(NULL),outward(0,0,0),edge(0){}
+        bool exterior;
+        WallEscape():wall(NULL),outward(0,0,0),edge(0),exterior(false){}
     };
 
     bool ReadWallEscape(CharMovement* movement,NavMesh* nav,const Ogre::Vector3& here,
-                        float ground,bool elevated,WallEscape& exit)
+                        float ground,bool elevated,WallEscape& exit,LandingTrace& trace)
     {
         const float above=here.y-ground;
         if (elevated ? (above<50.0f || above>140.0f) : (above<-15.0f || above>=50.0f)) return false;
@@ -478,11 +514,14 @@ namespace Unstuck
         physHit roof(false,true,here.y);
         UtilityT::trace(roof,start,down,~0u);
         if (roof.traceWasAborted() || !roof.hit || !AIFixedGate::Finite(Point(roof.position))) return false;
-        if (elevated ? (std::fabs(roof.position.y-here.y)>5.0f || !(roof.normal.y>.5f)) :
+        if (elevated ? std::fabs(roof.position.y-here.y)>5.0f :
             (roof.position.y<=body.y+1.5f || roof.position.y>start.y)) return false;
         Building* object=roof.getBuilding();
         WallBuilding* wall=object?object->isAWall():NULL;
-        if (!wall || (standing && standing!=wall) || wall->isDisabled()) return false;
+        if (!wall) return false;
+        trace.wallHit=true;
+        if (elevated && !(roof.normal.y>.5f)) return false;
+        if (wall->isDisabled()) return false;
         const Building::ConstructionState* state=wall->getBuildState();
         if (!state || !state->isComplete) return false;
         const Ogre::Vector3 a=wall->getPosition(), b=wall->getWallEndPosition();
@@ -493,19 +532,25 @@ namespace Unstuck
         const float side=(here-a).dotProduct(normal);
         const float join=AIFixedGate::WorldUnits(1.0f);
         if (!_finite(along) || !_finite(side) || along<-join || along>length+join) return false;
+        if (standing && standing!=wall &&
+            (!elevated || (along>join && along<length-join) ||
+                !JoinedWallSections(standing->isAWall(),wall))) return false;
         if (elevated)
         {
             Ogre::Vector3 point;
             unsigned key=~0u;
             // A real walkway is allowed to remain occupied, even with a
             // failed retreat path or a manual movement command.
-            if (nav->getClosestPoint(here,3.0f,0.0f,false,point,key)!=0 ||
-                wall->getOutsideGateCode()!=0) return false;
+            trace.sourceFace=nav->getClosestPoint(here,3.0f,0.0f,false,point,key);
+            if (trace.sourceFace!=0) return false;
             const float outside=wall->getOrientation().xAxis().dotProduct(normal);
             if (!_finite(outside) || std::fabs(outside)<.5f || std::fabs(side)>20.0f) return false;
             const float sign=outside>0.0f?1.0f:-1.0f;
-            if (sign*side<-AIFixedGate::WorldUnits(.1f)) return false;
-            exit.outward=normal*sign;
+            // Close to the crest centreline the native exterior gives an
+            // unambiguous exit. Away from it, keep the actor on its own side.
+            exit.exterior=sign*side>=-AIFixedGate::WorldUnits(.1f);
+            if (exit.exterior && wall->getOutsideGateCode()!=0) return false;
+            exit.outward=normal*(exit.exterior?sign:-sign);
         }
         else
         {
@@ -819,12 +864,12 @@ namespace Unstuck
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
         trace.ground=ground;
         if (!_finite(ground)) return RejectLanding(trace,"invalid-ground");
-        const bool elevatedWall=wallIntent==RetreatWall || wallIntent==RetreatWallOnly;
+        const bool elevatedWall=here.y-ground>=50.0f && (wallIntent==CrestWall || wallIntent==CrestWallOnly);
         WallEscape wallExit;
         if (!guard && (elevatedWall || here.y-ground<50.0f))
-            ReadWallEscape(movement,nav,here,ground,elevatedWall,wallExit);
-        if (!wallExit.wall && (wallIntent==EmbeddedWallOnly || wallIntent==RetreatWallOnly ||
-            (elevatedWall && support && support->isAWall())))
+            ReadWallEscape(movement,nav,here,ground,elevatedWall,wallExit,trace);
+        if (!wallExit.wall && (wallIntent==EmbeddedWallOnly || wallIntent==CrestWallOnly ||
+            (elevatedWall && (trace.wallHit || (support && support->isAWall())))))
             return RejectLanding(trace,"wall-support-unconfirmed");
         if (here.y-ground<50.0f) support=NULL;
         if (wallExit.wall) support=wallExit.wall;
@@ -949,8 +994,12 @@ namespace Unstuck
         if (destinationGate<0) return RejectLanding(trace,"invalid-gate-code");
         if (wallExit.wall)
         {
-            const int sourceGate=nav->getGateCode(here);
-            const int expectedGate=elevatedWall?0:(sourceGate>=0?sourceGate:actor->amInsideTownWalls());
+            // There may be no fresh face at crest height. In that case the
+            // measured lateral side fixes the ground seed before the navmesh
+            // can move the requested landing to a nearby polygon.
+            const int sourceGate=nav->getGateCode(elevatedWall?below:here);
+            const int expectedGate=elevatedWall?(wallExit.exterior?0:sourceGate):
+                (sourceGate>=0?sourceGate:actor->amInsideTownWalls());
             if (destinationGate!=expectedGate) return RejectLanding(trace,"wall-gate-code");
             if ((landing-here).dotProduct(wallExit.outward)<wallExit.edge+clearance+1.5f ||
                 !StandingSpaceClear(landing,clearance,(std::max)(80.0f,here.y-landing.y+clearance)))
@@ -978,7 +1027,7 @@ namespace Unstuck
             if (destinationGate!=sourceGate) return RejectLanding(trace,"town-gate-code");
         }
         if (CrossesBarrier(world,here,landing,guard?NULL:support,destinationGate==0,
-                           wallExit.wall && elevatedWall)) return RejectLanding(trace,"barrier");
+                           wallExit.wall && elevatedWall,wallExit.wall!=NULL)) return RejectLanding(trace,"barrier");
         if (!zone->isLoadedMT() || zone->isBeingLoadedMT() || !nav->isLoaded(zone)) return RejectLanding(trace,"zone-changed");
         trace.reason="accepted";
         return true;
@@ -993,22 +1042,23 @@ namespace Unstuck
         if (!trace && ((entry.reportedAt && activeMs-entry.reportedAt<15000) || activeMs-lastReport<200)) return;
         CharMovement* movement=c->movement;
         Building* support=movement->isStandingOnSomething().getBuilding();
-        if (!support || support->getSpecialFunction()!=BF_FLUFF) return;
+        const bool wall=(support && support->isAWall()) || (trace && trace->wallHit);
+        if (!wall && (!support || support->getSpecialFunction()!=BF_FLUFF)) return;
         entry.reportedAt=lastReport=activeMs;
         CharBody* body=c->getBody();
         const Tasker* action=body?body->getCurrentAction():NULL;
         const HavokCharacter* nav=movement->havokCharacter;
         const float* a=nav->position.m_quad.m128_f32,*b=nav->goal.m_quad.m128_f32;
         const Ogre::Vector3 here=c->getPosition(),target=landing?*landing:here;
-        const Identity object(support->handle);
+        const Identity object(support?support->handle:hand());
         char line[768];
         _snprintf_s(line,_TRUNCATE,
-            "platform NPC %u/%u/%u:%u/%u support %u/%u/%u:%u/%u p=(%.2f,%.2f,%.2f) "
+            "%s NPC %u/%u/%u:%u/%u support %u/%u/%u:%u/%u p=(%.2f,%.2f,%.2f) "
             "anchor=(%.2f,%.2f,%.2f) age=%.3f failureAge=%.3f active=%u goal=%d action=%d "
             "native=%d/%d native_delta=(%.2f,%.2f,%.2f) attempt=%u failed=%u fresh=%u reason=%s "
             "site=%u ground=%.2f radius=%.2f slopeY=%.3f slopeXZ=(%.3f,%.3f) sourceFace=%d "
             "pocket=%d cap=%d navY=%.2f landingGround=%.2f landing=(%.2f,%.2f,%.2f)",
-            entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
+            wall?"wall":"platform",entry.actor.type,entry.actor.container,entry.actor.containerSerial,entry.actor.index,entry.actor.serial,
             object.type,object.container,object.containerSerial,object.index,object.serial,
             here.x,here.y,here.z,entry.watch.anchor.x,entry.watch.anchor.y,entry.watch.anchor.z,
             entry.watch.active?hours-entry.watch.since:0.0,hours-entry.watch.guardFailure,entry.watch.active?1:0,

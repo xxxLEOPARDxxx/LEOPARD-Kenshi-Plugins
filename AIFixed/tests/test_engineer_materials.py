@@ -52,7 +52,8 @@ for opt in ('Od','O2'):
     subprocess.run([str(exe)],check=True)
 
 mutations={
-    'stale_source_cache':('self->resourceSourceCache.erase(it);','(void)0;'),
+    'leaks_construction_source':('originalSource(scratch.cache,out,material,skip);','originalSource(self,out,material,skip);'),
+    'leaks_nested_ordinary_filter':('Query unfiltered(NULL,NULL,NULL,query->epoch);','(void)0;'),
     'no_commit':('advances=planned&&Commit(r)>0;', 'advances=planned;'),
     'tiny_batch':('int quantity=Grant(r);','int quantity=2;'),
     'unreserved_fallback':('if(scope->epoch!=Epoch()||!scope->hasRequest||!Matches(material,scope->request.material)||!Has(scope->request))return NULL;',

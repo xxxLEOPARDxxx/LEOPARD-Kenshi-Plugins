@@ -36,7 +36,7 @@ struct Building {
     int getSpecialFunction(){return function;}bool isDisabled(){return disabled;}
     bool isAWall(){return wall;}bool isGate(){return false;}
 };
-struct StandingHandle {Building* object;Building* getBuilding(){return object;}operator bool(){return object!=NULL;}};
+struct StandingHandle {Building* object;Building* getBuilding()const{return object;}operator bool()const{return object!=NULL;}};
 struct HVector {struct {float m128_f32[4];} m_quad;};
 struct HavokCharacter {
     enum CharacterState {IDLE,GOAL_REACHED,FOLLOWING_PATH,MANUAL};
@@ -368,16 +368,29 @@ int main(){
         wall==EmbeddedWallOnly,"stale retreat paths cannot establish upper wall intent");
     actor.actionData.type=MOVE_ON_FREE_WILL;actor.action.taskData=&actor.actionData;actor.body.currentAction=&actor.action;
     Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
-        wall==RetreatWallOnly,"current movement plus failed remote descent admits the retreat wall-only lane");
+        wall==CrestWallOnly,"current movement plus failed remote descent admits the retreat wall-only lane");
     nav.goal=nav.position;
     Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
         wall==EmbeddedWallOnly,"a native goal at the actor's feet cannot establish upper wall intent");
-    actor.animal=false;actor.data.type=IDLE;actor.body.currentAction=NULL;
+    actor.data.type=IDLE;actor.body.currentAction=NULL;
     Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,IDLE,subject,destination,wall)&&
-        wall==EmbeddedWallOnly,"idle on reported wall can request only a proven solid enclosure exit");
+        wall==CrestWallOnly,"a solo idle animal on reported wall can request proven crest descent");
+    actor.animal=false;
+    Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,IDLE,subject,destination,wall)&&
+        wall==EmbeddedWallOnly,"idle humans can use only confirmed physical enclosure");
     platform.wall=false;
     Check(!ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,IDLE,subject,destination,wall),
         "idle on other native support is outside the wall-only lane");
+    Reset(actor,movement,nav,platform);g_unstuckDelayHours=1;
+    actor.position=Ogre::Vector3(-9297.729492f,380.797913f,27216.945313f);
+    actor.animal=true;movement.support.object=NULL;nav.state=HavokCharacter::GOAL_REACHED;
+    for (unsigned n=0;n<115 && !teleports;++n)
+    {
+        currentHours=960+n*.01;activeMs=1000+n*100;
+        Inspect(&world,id,currentHours,0);
+    }
+    Check(teleports==1 && firstRelocationAge>=1.0,
+        "a lone animal with an ended goal and no native standing handle preserves the full wait");
 #endif
     printf("AIFixed extracted guard trace: %s (%d checks; 316 captured observations, synthetic repeated order/time)\n",failures?"FAIL":"PASS",checks);
     return failures?1:0;

@@ -1107,7 +1107,7 @@ namespace
         config.current=&EngineerCurrent;config.allowActor=&EngineerAllowActor;
         config.snapshot=&EngineerSnapshot;config.resolve=&EngineerResolve;
         config.addHook=&EngineerAddHook;config.report=&EngineerReport;
-        config.materialsEnRoute=&EngineerMaterialsRuntime::MaterialsEnRoute;
+        config.assignedProject=&EngineerAssignedProject;
         config.constructionCompleted=&EngineerCompletedProject;
         // Construction requires both target selection and shared materials.
         // Surplus return is optional and owns a separate native safety gate.

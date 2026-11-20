@@ -338,12 +338,6 @@ namespace EngineerMaterialsRuntime
         }
         return hasNeed&&e==Epoch();
     }
-    static bool MaterialsEnRoute(AI* ai,Building* project)
-    {
-        const unsigned e=Epoch();
-        Character* actor=ai?ai->me:NULL;
-        return project&&Eligible(actor)&&ProjectNeedsCovered(actor,project,e);
-    }
     struct Query
     {
         AI* ai;Building* project;GameData* material;Query* previous;unsigned epoch;bool unmanaged;
@@ -409,23 +403,31 @@ namespace EngineerMaterialsRuntime
         return !productiveProject||!productiveProject(project);
     }
 
+    static float FindUnfiltered(AI* ai,const hand& in,hand& out,bool asking)
+    {
+        if(!query)return originalFind(ai,in,out,asking);
+        Query withoutParent(NULL,NULL,NULL,query->epoch);
+        return originalFind(ai,in,out,asking);
+    }
     static float Find(AI* ai,const hand& in,hand& out,bool asking)
     {
         const unsigned e=Epoch();
-        if(!ai||!Eligible(ai->me))return originalFind(ai,in,out,asking);
-        Building* project=in.getBuilding();if(e!=Epoch()||!project||!SupportedProject(project))return originalFind(ai,in,out,asking);
+        if(!ai||!Eligible(ai->me))return FindUnfiltered(ai,in,out,asking);
+        Building* project=in.getBuilding();if(e!=Epoch()||!project||!SupportedProject(project))return FindUnfiltered(ai,in,out,asking);
         Query scope(ai,project,NULL,e);return originalFind(ai,in,out,asking);
     }
     static bool GroundSafe(AI* ai,Item* item)
     {
+        const uintptr_t caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
         const bool native=originalGroundSafe(ai,item);
-        if(!native||!query||query->ai!=ai||query->epoch!=Epoch()||!query->material||!Active())return native;
+        if(!native||caller!=image+0x59C7B5||!query||query->ai!=ai||query->epoch!=Epoch()||!query->material||!Active())return native;
         Request r;return RequestFor(ai->me,query->project,item->handle,query->material,r,query->epoch,false)&&Preview(r)>0;
     }
     static void Machines(AI* ai,lektor<Building*>& out,unsigned flags)
     {
+        const uintptr_t caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
         originalMachines(ai,out,flags);
-        if(!query||query->ai!=ai||query->epoch!=Epoch()||!query->material||flags!=0x04002436||!Active())return;
+        if(caller!=image+0x59C892||!query||query->ai!=ai||query->epoch!=Epoch()||!query->material||flags!=0x04002436||!Active())return;
         if(out.size()>256){query->unmanaged=true;return;}
         unsigned kept=0;
         for(unsigned i=0;i<out.size();++i)
@@ -436,25 +438,105 @@ namespace EngineerMaterialsRuntime
         out.count=kept;
     }
     typedef std::map<GameData*,hand,std::less<GameData*>,std::allocator<std::pair<GameData* const,hand> > > ResourceSources;
+    struct MachineOutputs
+    {
+        lektor<GameData*> offered;
+        ~MachineOutputs()
+        {
+            // The SDK lektor does not release its storage. Pair the native
+            // allocation with the same game delete[] used by task247.
+            if(offered.stuff)reinterpret_cast<void (*)(void*)>(image+0xED562E)(offered.stuff);
+        }
+    };
+    static bool ReadMachineOffers(StorageBuilding* storage,MachineOutputs& outputs)
+    {
+        Inventory* inventory=storage->getInventory();if(!inventory)return false;
+        const lektor<Item*>& stock=inventory->getAllItems();
+        const unsigned limit=128;
+        if(stock.size()>limit||stock.size()>stock.maxSize||(stock.size()&&!stock.stuff))return false;
+        storage->getItemsWeWantRidOf(outputs.offered,false);
+        const lektor<GameData*>& offers=outputs.offered;
+        return offers.size()<=limit&&offers.size()<=offers.maxSize&&(!offers.size()||offers.stuff);
+    }
+    static bool CachedSourceOffered(const hand& source,GameData* material,unsigned e)
+    {
+        if(source.type!=BUILDING)return true;
+        Building* building=source.getBuilding();StorageBuilding* storage=building?building->getFunctionStuff():NULL;
+        if(!storage||e!=Epoch())return false;
+        if(ExactSingleOutput(storage))return true; // RequestFor checks the exact single output and quantity.
+        MachineOutputs outputs;
+        if(!ReadMachineOffers(storage,outputs))return e==Epoch(); // Preserve an uninspectable native source.
+        if(e!=Epoch())return false;
+        for(unsigned i=0;i<outputs.offered.size();++i)if(outputs.offered[i]==material)return true;
+        return false;
+    }
+    struct SourceScratch
+    {
+        __declspec(align(16)) unsigned char memory[sizeof(AI::AIResultsCacher)];
+        AI::AIResultsCacher* cache;
+        explicit SourceScratch(AI* ai):cache(reinterpret_cast<AI::AIResultsCacher*>(memory)->_CONSTRUCTOR(ai)){}
+        ~SourceScratch(){cache->_DESTRUCTOR();}
+    private:
+        SourceScratch(const SourceScratch&);SourceScratch& operator=(const SourceScratch&);
+    };
     static float Source(AI::AIResultsCacher* self,hand& out,GameData* material,StorageBuilding* skip)
     {
+        const uintptr_t caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
         Material key;
-        if(!self||!query||query->ai!=self->ai||query->epoch!=Epoch()||!Eligible(self->ai->me)||!MaterialOf(material,key))return originalSource(self,out,material,skip);
-        Query scope(self->ai,query->project,material,query->epoch);
-        ResourceSources::iterator it=self->resourceSourceCache.find(material);
-        if(it!=self->resourceSourceCache.end())
+        if(caller!=image+0x5A20D0||!self||!query||query->material||query->ai!=self->ai||
+            query->epoch!=Epoch()||!Eligible(self->ai->me)||!MaterialOf(material,key))
         {
-            Request cached;
-            if(!RequestFor(self->ai->me,scope.project,it->second,material,cached,scope.epoch,false,true)||Preview(cached)<=0)
-                self->resourceSourceCache.erase(it); // Exactly this actor/material; one native requery below.
+            if(!query||!query->material)return originalSource(self,out,material,skip);
+            // If native code re-enters an ordinary source lookup while a
+            // construction search is active, hide the outer candidate filter.
+            Query unfiltered(NULL,NULL,NULL,query->epoch);
+            return originalSource(self,out,material,skip);
         }
-        const float score=originalSource(self,out,material,skip);
-        if(scope.unmanaged||scope.epoch!=Epoch())return score;
-        if(score>0)
+        // This cache belongs to the actor, and native hauling reads it too.
+        // A cold key gets the same unfiltered native answer as vanilla.
+        // Construction may reuse it, but must never overwrite an entry or
+        // publish its reservation-filtered alternative in the native cache.
+        const unsigned e=query->epoch;
+        const ResourceSources::const_iterator it=self->resourceSourceCache.find(material);
+        if(!skip)
+        {
+            const bool cold=it==self->resourceSourceCache.end();
+            float native=1.0f;
+            if(cold)
+            {
+                native=originalSource(self,out,material,skip);
+                if(e!=Epoch()){out.setNull();return 0;}
+                if(native<=0)return native;
+            }
+            const hand source=cold?out:it->second;
+            Request cached;
+            if(RequestFor(self->ai->me,query->project,source,material,cached,e,false,true)&&
+                Preview(cached)>0&&(cold||CachedSourceOffered(source,material,e))&&e==Epoch())
+            {out=source;return native;}
+        }
+        if(e!=Epoch()){out.setNull();return 0;}
+        float score=0;bool unmanaged=false;
+        {
+            SourceScratch scratch(self->ai);
+            if(e!=Epoch()){out.setNull();return 0;}
+            Query scope(self->ai,query->project,material,e);
+            score=originalSource(scratch.cache,out,material,skip);
+            unmanaged=scope.unmanaged;
+        }
+        if(e!=Epoch()){out.setNull();return 0;}
+        if(!unmanaged&&score>0)
         {
             Request r;
-            if(!RequestFor(self->ai->me,scope.project,out,material,r,scope.epoch,false)||Preview(r)<=0)
-            {self->resourceSourceCache.erase(material);out.setNull();return 0;}
+            if(!RequestFor(self->ai->me,query->project,out,material,r,e,false)||Preview(r)<=0)
+            {out.setNull();score=0;}
+        }
+        if(e!=Epoch()){out.setNull();return 0;}
+        if(!Active())
+        {
+            Query unfiltered(NULL,NULL,NULL,e);
+            score=originalSource(self,out,material,skip);
+            if(e!=Epoch()){out.setNull();return 0;}
+            return score;
         }
         return score;
     }
@@ -470,33 +552,6 @@ namespace EngineerMaterialsRuntime
         }
         return NULL;
     }
-    struct MachineOutputs
-    {
-        lektor<GameData*> offered;
-        ~MachineOutputs()
-        {
-            // The SDK lektor does not release its storage. Pair the native
-            // allocation with the same game delete[] used by task247.
-            if(offered.stuff)reinterpret_cast<void (*)(void*)>(image+0xED562E)(offered.stuff);
-        }
-    };
-    static void ClearUnofferedSource(Character* actor,Building* project,const hand& source,
-                                    const lektor<GameData*>& offered,unsigned e)
-    {
-        AI* ai=actor->getAI();
-        if(e!=Epoch()||!ai||ai->me!=actor)return;
-        Building::ConstructionState* state=project->getBuildState();
-        if(e!=Epoch()||!state||state->mats.size()>16)return;
-        ResourceSources& cache=ai->resultsCache.resourceSourceCache;
-        for(unsigned i=0;i<state->mats.size();++i)
-        {
-            Building::ConstructionState::BuildMaterial* item=state->mats[i];if(!item)continue;
-            ResourceSources::iterator hit=cache.find(item->mat);
-            if(hit==cache.end()||Of(hit->second)!=Of(source))continue;
-            unsigned j=0;while(j<offered.size()&&offered[j]!=item->mat)++j;
-            if(j==offered.size())cache.erase(hit);
-        }
-    }
     static bool Plan(Character* actor,Building* project,Tasker* collection,Request& r,unsigned e,bool* unmanaged=NULL)
     {
         if(!actor||!project||!collection||!collection->taskData||
@@ -510,23 +565,15 @@ namespace EngineerMaterialsRuntime
         Building* building=source.getBuilding();
         StorageBuilding* storage=building?building->getFunctionStuff():NULL;
         if(!storage||e!=Epoch())return false;
-        Inventory* inventory=storage->getInventory();if(!inventory)return false;
-        const lektor<Item*>& stock=inventory->getAllItems();
-        const unsigned offerLimit=128;
-        if(stock.size()>offerLimit||stock.size()>stock.maxSize||(stock.size()&&!stock.stuff))
-        {if(unmanaged)*unmanaged=true;return false;}
         // A machine's inventory also contains inputs. The native collection
         // action can pick only from the materials the source offers to it.
         MachineOutputs outputs;
-        storage->getItemsWeWantRidOf(outputs.offered,false);
-        if(outputs.offered.size()>offerLimit||outputs.offered.size()>outputs.offered.maxSize||
-            (outputs.offered.size()&&!outputs.offered.stuff))
+        if(!ReadMachineOffers(storage,outputs))
         {if(unmanaged)*unmanaged=true;return false;}
         for(unsigned i=0;i<outputs.offered.size()&&e==Epoch();++i)
         {
             if(RequestFor(actor,project,source,outputs.offered[i],r,e,true,true)&&Preview(r)>0)return true;
         }
-        if(e==Epoch())ClearUnofferedSource(actor,project,source,outputs.offered,e);
         return false;
     }
     static void Replan(CharBody* body)
@@ -848,7 +895,11 @@ namespace EngineerMaterialsRuntime
     struct NativeWindow{unsigned rva,size;unsigned __int64 fnv;};
     static const NativeWindow windows[]={
         {0x5A1FD0,32,0xECDAD4C5BC7F91DCui64}, // findBuildingMaterials
-        {0x59C570,32,0x76906C168530657Dui64}, // getResourceSource
+        {0x59C570,2466,0x681D05DB02E19B58ui64}, // complete getResourceSource for private cache receiver and scoped calls
+        {0x5A20CB,5,0xD65C28F63E360C47ui64}, // construction caller of getResourceSource
+        {0x167B308,4,0x4B72477F9C5C2F98ui64}, // native non-null cache hit score 1.0
+        {0x640380,77,0xFDEBFFD670E6287Eui64}, // cache constructor
+        {0x63F020,272,0x55C95217471243E0ui64}, // cache destructor
         {0x996EB0,32,0xE948DC3FCFB3251Dui64}, // groundSafety
         {0x8CAFD0,32,0xA950E9DFC678ABEAui64}, // machines
         {0x50C060,32,0x8F16911AF68911ADui64}, // selected
@@ -909,6 +960,8 @@ namespace EngineerMaterialsRuntime
     {
         typedef char NativeConBaseOffset[offsetof(GlobalConstants,ENCUMBRANCE_BASE)==0x128?1:-1];
         typedef char NativeConMultiplierOffset[offsetof(GlobalConstants,CARRY_WEIGHT_MULT)==0x12C?1:-1];
+        typedef char NativeSourceCacheOffset[offsetof(AI::AIResultsCacher,resourceSourceCache)==0x80?1:-1];
+        typedef char NativeSourceCacheSize[sizeof(AI::AIResultsCacher)==0xA0?1:-1];
         HMODULE module=GetModuleHandleW(NULL);if(!module)return false;
         image=reinterpret_cast<uintptr_t>(module);
         const IMAGE_DOS_HEADER* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
@@ -970,6 +1023,8 @@ namespace EngineerMaterialsRuntime
         }
         return KenshiLib::GetRealAddress(&AI::findBuildingMaterials)==intptr_t(image+0x5A1FD0)&&
             KenshiLib::GetRealAddress(&AI::AIResultsCacher::getResourceSource)==intptr_t(image+0x59C570)&&
+            KenshiLib::GetRealAddress(&AI::AIResultsCacher::_CONSTRUCTOR)==intptr_t(image+0x640380)&&
+            KenshiLib::GetRealAddress(&AI::AIResultsCacher::_DESTRUCTOR)==intptr_t(image+0x63F020)&&
             KenshiLib::GetRealAddress(&AI::itemOnGroundStealingCheckIsSafe)==intptr_t(image+0x996EB0)&&
             KenshiLib::GetRealAddress(&AI::getAllLocalMachines)==intptr_t(image+0x8CAFD0)&&
             KenshiLib::GetRealAddress(&AITaskSytem::_NV_setCurrentGoal)==intptr_t(image+0x50C060)&&

@@ -50,6 +50,21 @@ delete_at=0x33CFBF
 assert pe.get_data(delete_at,1)==b'\xe8'
 assert delete_at+5+struct.unpack_from('<i',data,pe.get_offset_from_rva(delete_at)+1)[0]==delete_thunk
 assert pe.get_data(0x33CF04,13).hex()=='498b0424498bccff9060010000' # root building getInventory
+# Ordinary hauling and construction share the same map, but only the exact
+# construction call may use the private receiver and its candidate filters.
+def direct_target(at, opcode):
+    code=pe.get_data(at,5)
+    assert code[0]==opcode
+    return at+5+struct.unpack_from('<i',code,1)[0]
+for caller,thunk,target in ((0x5A20CB,0x1515E,0x59C570),
+                            (0x59D166,0x1515E,0x59C570),
+                            (0x59C7B0,0xA81C,0x996EB0),
+                            (0x59C88D,0xF222,0x8CAFD0)):
+    assert direct_target(caller,0xE8)==thunk
+    assert direct_target(thunk,0xE9)==target
+assert pe.get_data(0x59D15F,7).hex()=='498d8e08020000' # native actor's cache at +0x208
+assert pe.get_data(0x640396,3).hex()=='488911' # native scratch constructor stores AI* at +0
+assert struct.unpack('<f',pe.get_data(0x167B308,4))[0]==1.0
 # The allocation-free shortcut recognizes only the original single-output
 # method. Multi-output crafting has a different dispatch target.
 for thunk,target in [(0x481D5,0x299AC0),(0x16D9C,0x2B5410)]:

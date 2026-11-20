@@ -56,16 +56,18 @@ Storage batches use outstanding demand, stock and the native carrying-weight
 calculation, up to 32 units. Invalid/unknown weight or no free weight retains the
 native batch of two. Existing whole-ground-stack pickup is not manually split.
 Machine collections reserve materials the machine actually offers as output.
+Construction searches keep reservation-filtered choices out of the native
+resource cache shared with hauling jobs.
 Completing a project releases its unused source reservations, so the next
 project can use the same stock. Already collected construction cargo can
 still be delivered where needed or returned to storage.
 
-Among locally reachable productive machines, engineers prefer one they already
-started while it can be built or its remaining materials are on the way.
-Engineers who have nothing to deliver can take other jobs or work on walls.
-An unavailable or unsupplied machine can yield to another project. New machines
-use the observed placement order. Older blueprints start with native selection
-and keep the same preference once an engineer starts work. Order resets on load.
+Among locally reachable productive machines, engineers continue their assigned
+site while they can contribute. An engineer without a useful delivery can take
+the next viable project. If a machine has received all materials and assembly
+is under way, additional workers can move on to another machine or a wall.
+New assignments prefer earlier started or placed machines when they have work.
+Older blueprints start with native selection. Placement order resets on load.
 
 Only proven construction cargo may be returned, at the original Engineer job
 rank ahead of lower jobs. Preexisting stock, still-needed project material and
@@ -93,17 +95,18 @@ CoordinateEngineers=0. MCM > Инженеры; для установки нуж�
 или отсутствие свободного веса сохраняют штатную партию из двух предметов.
 Подбор целой наземной стопки вручную не разделяется.
 У станков резервируются только материалы, которые они отдают на выходе.
+Результаты инженерного поиска с учётом резервов не записываются в общий
+кэш, которым пользуются обычные переносчики.
 Готовая постройка освобождает остаток резервов источников, поэтому их запасы
 доступны следующей стройке. Уже полученные материалы можно использовать по
 потребности или вернуть на склад.
 
-Среди доступных машин инженеры предпочитают уже начатую, пока её можно
-строить или оставшиеся материалы несут. Свободные инженеры могут строить
-стены и выполнять другие работы. Если машина недоступна или для неё
-действительно нет материалов, очередь может перейти к следующей. Новые
-машины учитывают порядок размещения. Для старых чертежей первую цель выбирает
-игра, а после начала работ инженеры держат её в приоритете. При загрузке
-порядок сбрасывается.
+Инженер продолжает назначенную машину, пока может помочь на этой стройке.
+Если ему нечего доставить, он может взять следующую доступную постройку.
+Когда все материалы уже на месте и сборка идёт, лишние рабочие переходят на
+другую машину или стену. Новые назначения предпочитают ранее начатые и
+ранее размещённые машины, на которых есть работа. Для старых чертежей
+первую цель выбирает игра. При загрузке порядок размещения сбрасывается.
 
 На склад возвращается только подтверждённый остаток наших материалов,
 с исходным рангом инженерной работы перед менее важными задачами. Прежний
@@ -184,10 +187,11 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     застревание по коллизии даже при потере опоры в данных движения. Выход
     сохраняет сторону ворот и область навмеша. Пробы при наличии лица навмеша
     ограничены одной в секунду отдельно от обычной проверки вне навмеша.
-    Если вьючный зверь застрял наверху стены при отступлении, спуск возможен
-    после проверки опоры и отсутствия проходимой поверхности под ним. Выход
-    из толщи стены требует подтверждения коллизии той же секции. Точка выхода
-    должна быть свободной, на суше и на исходной стороне преграды.
+    Застрявший наверху стены вьючный зверь может спуститься после проверки
+    опоры и отсутствия проходимой поверхности под ним. Выход из толщи стены
+    требует подтверждения коллизии той же секции. Свободная точка выхода
+    должна лежать на суше и на исходной стороне преграды. Соседняя стыковая
+    секция учитывается по реальной геометрии, закрытые ворота блокируют выход.
     NPC, у которого срываются попытки пройти к цели, может спуститься с
     крутого склона платформы на свободную сушу в той же загруженной зоне,
     без пересечения стен и закрытых ворот. Для спуска нужны выбранное время
@@ -280,10 +284,12 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     elevated entrapment after a load loses the standing support handle. The
     landing must stay on the same side and navmesh region. Valid-face probes
     are limited to one per second independently of ordinary off-mesh recovery.
-    A retreating pack animal trapped on a wall can descend once terrain and
+    A pack animal trapped on a wall can descend once terrain and
     collision checks confirm that its footing is on the wall outside the
     walkable surface. A character trapped inside a wall needs collision proof
     from the same segment, with a clear, dry landing on the original side.
+    Joined segments use their actual span to check the exit. A closed gate
+    still blocks it.
     NPCs repeatedly failing to reach their destinations can leave a steep platform
     slope for clear, dry ground in the same loaded zone while preserving wall
     and closed-gate boundaries. Recovery requires the selected time without progress,

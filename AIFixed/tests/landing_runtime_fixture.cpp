@@ -16,27 +16,37 @@ struct Vector3 {
     float dotProduct(const Vector3& b)const{return x*b.x+y*b.y+z*b.z;}
     float squaredLength()const{return x*x+y*y+z*z;}
 };
+struct Aabb {Vector3 mCenter,mHalfSize;};
 }
 struct DoorStuff {
-    bool isSetupComplete;
+    bool isSetupComplete,broken;
     Ogre::Vector3 getDoorPosInside(){return Ogre::Vector3();}
     Ogre::Vector3 getDoorPosOutside(){return Ogre::Vector3();}
+    bool isBroken(){return broken;}
+    float getDoorOpenAmount(){return 0.0f;}
 };
-struct Building {
+struct RootObject {};
+struct Building:RootObject {
     bool gate,wall,disabled;int outsideGate;
     DoorStuff door;
     struct ConstructionState {bool isComplete;} state;
     struct Orientation {Ogre::Vector3 xAxis(){return Ogre::Vector3(-1,0,0);}};
-    Building():gate(false),wall(false),disabled(false),outsideGate(0){door.isSetupComplete=false;state.isComplete=true;}
+    Ogre::Aabb bounds;
+    Ogre::Vector3 wallPosition;
+    float wallLength;
+    Building():gate(false),wall(false),disabled(false),outsideGate(0),wallPosition(-9200,140,27300),wallLength(100){
+        door.isSetupComplete=false;door.broken=true;state.isComplete=true;
+    }
     Building* isGate(){return gate?this:NULL;}
     Building* isAWall(){return wall?this:NULL;}
     DoorStuff* getDoor(){return gate?&door:NULL;}
     bool isDisabled(){return disabled;}
     ConstructionState* getBuildState(){return &state;}
-    Ogre::Vector3 getPosition(){return Ogre::Vector3(-9200,140,27300);}
-    Ogre::Vector3 getWallEndPosition(){return Ogre::Vector3(-9200,140,27400);}
+    Ogre::Vector3 getPosition(){return wallPosition;}
+    Ogre::Vector3 getWallEndPosition(){return wallPosition+Ogre::Vector3(0,0,wallLength);}
     Orientation getOrientation(){return Orientation();}
     int getOutsideGateCode(){return outsideGate;}
+    const Ogre::Aabb& getAABB(){return bounds;}
 };
 typedef Building WallBuilding;
 struct StandingHandle {Building* building;operator bool(){return building!=NULL;}Building* getBuilding(){return building;}};
@@ -54,17 +64,29 @@ struct ZoneManager {ZoneMap* getZoneMap(const Ogre::Vector3&){return &zone;}};
 struct NavMesh {
     Ogre::Vector3 candidate;
     unsigned exteriorCalls;
-    int sourceCode,targetCode,exteriorResult,sourceFaceResult,requeryResult;
+    int sourceCode,targetCode,exteriorResult,sourceFaceResult,requeryResult,alternateCode;
     unsigned sourceKey;
-    float requeryShift;
+    float requeryShift,gateSplitX;
     bool isLoaded(ZoneMap*){return true;}bool isGenerating(){return false;}
     int getClosestPoint(const Ogre::Vector3& p,float,float,bool,Ogre::Vector3& out,unsigned& key){out=p;key=sourceKey;return sourceFaceResult;}
     int getClosestExteriorPoint(const Ogre::Vector3&,float radius,float,Ogre::Vector3& out){++exteriorCalls;out=candidate;if(radius==10){out.x+=requeryShift;return requeryResult;}return exteriorResult;}
-    int getGateCode(const Ogre::Vector3& p){return p.y>200?sourceCode:targetCode;}
+    int getGateCode(const Ogre::Vector3& p){
+        if (gateSplitX && p.x>gateSplitX) return alternateCode;
+        return p.y>200?sourceCode:targetCode;
+    }
 };
-struct GameWorld {NavMesh* navmesh;ZoneManager* zoneMgr;};
+template<class T>struct lektor {T object;unsigned count;unsigned size(){return count;}T operator[](unsigned){return object;}};
+enum {BUILDING};
+struct GameWorld {
+    NavMesh* navmesh;ZoneManager* zoneMgr;Building* nearby;
+    void getObjectsWithinSphere(lektor<RootObject*>&,const Ogre::Vector3&,float,int,unsigned,void*);
+};
+lektor<RootObject*>& GateObjects(){static lektor<RootObject*> result;return result;}
 float ground=140;
 bool slopeConfirmed=true,standingClear=true,barrier=false,water=false;
+void GameWorld::getObjectsWithinSphere(lektor<RootObject*>& out,const Ogre::Vector3&,float,int,unsigned,void*){
+    out.object=nearby;out.count=barrier?128u:nearby?1u:0u;
+}
 bool pocketConfirmed=false,physicalCapConfirmed=false;
 int pocketResult=0,physicalCapCalls=0;
 bool nativeAgrees=true;
@@ -116,9 +138,6 @@ bool FindRockExit(const Ogre::Vector3&,float,unsigned,Ogre::Vector3&,unsigned&){
 bool NativePositionAgrees(void*,const Ogre::Vector3&){return nativeAgrees;}
 bool StandingSpaceClear(const Ogre::Vector3&,float,float){return standingClear;}
 // @WALL_SIDE@
-bool CrossesBarrier(GameWorld*,const Ogre::Vector3& from,const Ogre::Vector3& to,Building* support,bool exterior,bool verified){
-    return barrier || (support && support->wall && !WallAllowsLanding(support,from,to,true,exterior,verified));
-}
 // @WALL_INTENT@
 // @TRACE_STRUCT@
 // @WALL_ESCAPE@
@@ -134,9 +153,9 @@ bool Probe(GameWorld& w,Character& actor,Building& platform,const Ogre::Vector3&
     return accepted;
 }
 int main(){
-    NavMesh nav;nav.sourceKey=0x02000307;nav.sourceFaceResult=1;nav.exteriorCalls=0;nav.sourceCode=nav.targetCode=0;nav.exteriorResult=nav.requeryResult=1;nav.requeryShift=0;
+    NavMesh nav;nav.sourceKey=0x02000307;nav.sourceFaceResult=1;nav.exteriorCalls=0;nav.sourceCode=nav.targetCode=0;nav.exteriorResult=nav.requeryResult=1;nav.requeryShift=0;nav.gateSplitX=0;nav.alternateCode=0;
     nav.candidate=Ogre::Vector3(18740,140,47720);
-    ZoneManager manager;GameWorld world={&nav,&manager};Building platform;
+    ZoneManager manager;GameWorld world={&nav,&manager,NULL};Building platform;
     HavokCharacter navigation={0x02000307};
     CharMovement movement;movement.havokCharacter=&navigation;movement.standing.building=&platform;
     Character actor={&movement};
@@ -158,7 +177,7 @@ int main(){
     Check(!Probe(world,actor,platform,Ogre::Vector3(18778,320.02f,47724),"terrain-height-limit"),
         "even a confirmed steep platform cannot exceed18m");
     Check(nav.exteriorCalls==calls,"excessive height rejection precedes exterior navmesh search");
-    platform.gate=true;
+    platform.gate=true;platform.door.isSetupComplete=true;
     Check(!Probe(world,actor,platform,Ogre::Vector3(18778,281,47724),"terrain-height-limit",false),
         "gate recovery retains its14m limit");
     Check(Probe(world,actor,platform,Ogre::Vector3(18778,280,47724),"accepted",false),
@@ -178,6 +197,21 @@ int main(){
     Check(!Probe(world,actor,embeddedWall,embedded,"wall-landing-clearance",false,EmbeddedWallOnly),
         "solid enclosure may only be escaped toward the original side");
     nav.candidate.x=-9240;
+    Building joiningWall;joiningWall.wall=true;
+    embeddedWall.wallLength=50;
+    joiningWall.wallPosition.z+=embeddedWall.wallLength;
+    joiningWall.bounds.mCenter=Ogre::Vector3(-9205,155,27345);
+    joiningWall.bounds.mHalfSize=Ogre::Vector3(15,20,20);
+    world.nearby=&joiningWall;nav.targetCode=27;
+    Check(Probe(world,actor,embeddedWall,embedded,"accepted",false,EmbeddedWallOnly),
+        "an adjacent wall's AABB may overlap a proven same-side interior wall exit");
+    joiningWall.wallPosition.x+=12;
+    Check(!Probe(world,actor,embeddedWall,embedded,"barrier",false,EmbeddedWallOnly),
+        "an unjoined wall with the same AABB still blocks the interior exit");
+    joiningWall.wall=false;joiningWall.gate=true;joiningWall.door.isSetupComplete=true;joiningWall.door.broken=false;
+    Check(!Probe(world,actor,embeddedWall,embedded,"barrier",false,EmbeddedWallOnly),
+        "wall enclosure cannot bypass a closed gate without a confirmed same side");
+    world.nearby=NULL;nav.targetCode=0;
     wrongShape=true;
     Check(!Probe(world,actor,embeddedWall,embedded,"wall-support-unconfirmed",false,EmbeddedWallOnly),
         "overhead and both side hits must come from the same collider");
@@ -194,22 +228,48 @@ int main(){
     const Ogre::Vector3 crest(-9200,wallTop,27292.5f);
     nav.candidate=Ogre::Vector3(-9235,140,27292.5f);
     nav.sourceFaceResult=1;
-    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,RetreatWallOnly),
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,CrestWallOnly),
         "a fresh walkable crest face keeps the retreating actor on a real walkway");
-    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,RetreatWall),
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,CrestWall),
         "ordinary movement fallback cannot override rejected retreat on a real supported wall walkway");
     nav.sourceFaceResult=0;
-    Check(Probe(world,actor,embeddedWall,crest,"accepted",false,RetreatWallOnly),
+    Check(Probe(world,actor,embeddedWall,crest,"accepted",false,CrestWallOnly),
         "an unsupported retreating animal at a small wall endpoint join can use the proven exterior");
     nav.targetCode=27;
-    Check(!Probe(world,actor,embeddedWall,crest,"wall-gate-code",false,RetreatWallOnly),
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-gate-code",false,CrestWallOnly),
         "the elevation fallback cannot enter a walled town");
     nav.targetCode=0;
-    Check(!Probe(world,actor,embeddedWall,Ogre::Vector3(-9190,wallTop,27292.5f),
-        "wall-support-unconfirmed",false,RetreatWallOnly),
-        "the crest fallback cannot switch an actor already positioned on the interior side");
+    wallTop=210;
+    nav.candidate=Ogre::Vector3(-9235,140,27320);
+    embeddedWall.outsideGate=27;
+    LandingTrace unsafeCrest;Ogre::Vector3 crestLanding;unsigned crestSites=0;
+    Check(!FindLanding(&world,&actor,NULL,Ogre::Vector3(-9201,wallTop,27320),0,crestLanding,crestSites,false,unsafeCrest,CrestWall)&&
+        unsafeCrest.wallHit&&!strcmp(unsafeCrest.reason,"wall-support-unconfirmed"),
+        "a rejected physical crest cannot be treated as general off-mesh terrain without its standing handle");
+    embeddedWall.outsideGate=0;wallTop=230;
+    nav.candidate=Ogre::Vector3(-9155,140,27320);
+    nav.sourceCode=-1;nav.targetCode=27;
+    Check(Probe(world,actor,embeddedWall,Ogre::Vector3(-9192.42f,wallTop,27320),
+        "accepted",false,CrestWallOnly),
+        "a stranded animal 7.58 units inside the crest can descend on the same side");
+    joiningWall.wall=true;joiningWall.gate=false;joiningWall.wallPosition=Ogre::Vector3(-9200,140,27265);
+    joiningWall.wallLength=35;
+    movement.standing.building=&joiningWall;
+    nav.candidate.z=27300;
+    Check(Probe(world,actor,embeddedWall,Ogre::Vector3(-9192.42f,wallTop,27300),
+        "accepted",false,CrestWallOnly),
+        "native standing support can name the other joined section at a crest seam");
+    nav.candidate.z=27320;
+    movement.standing.building=NULL;
+    nav.gateSplitX=-9160;
+    Check(!Probe(world,actor,embeddedWall,Ogre::Vector3(-9192.42f,wallTop,27320),
+        "wall-gate-code",false,CrestWallOnly),
+        "the native closest-point search cannot switch the interior crest seed's town side");
+    nav.gateSplitX=0;
+    nav.sourceCode=nav.targetCode=0;
+    nav.candidate.z=27292.5f;
     nav.candidate.x=-9165;
-    Check(!Probe(world,actor,embeddedWall,crest,"wall-landing-clearance",false,RetreatWallOnly),
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-landing-clearance",false,CrestWallOnly),
         "even an exterior code cannot override the measured wall side");
     nav.candidate.x=-9235;
     colliderWall=NULL;
