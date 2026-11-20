@@ -32,7 +32,7 @@ try:
         assert old_zip.read_bytes()==b'preserve old release until verified'
         assert not (output/'UITweaks-13.zip').exists()
         # Use actual compiled catalogs; no fabricated gettext file is accepted.
-        source=HERE.parents[1]/'UITweaks/locale'
+        source=Path(build.OURS)/'UITweaks/locale'
         for language in ('en_GB','ru_RU','zh_CN'):
             target=candidate/'locale'/language/'LC_MESSAGES';target.mkdir(parents=True)
             shutil.copy2(source/language/'LC_MESSAGES/ui_tweaks.mo',target/'ui_tweaks.mo')
@@ -53,6 +53,13 @@ try:
         assert rerun==path and rerun_count==count
         for name, data in protected.items():
             assert (output/name).read_bytes()==data, "Rerun changed protected archive: " + name
+        formations=root/'inputs/Formations';formations.mkdir()
+        (formations/'RE_Kenshi.json').write_text('{"Plugins":["Formations.dll"]}',encoding='utf-8')
+        (formations/'Formations.dll').write_bytes(b'isolated built-in language candidate')
+        (formations/'README.txt').write_text('English / Русский test README',encoding='utf-8')
+        shutil.copy2(build.source_dir('Formations')+'/LICENSE',formations/'LICENSE')
+        path,count=nexus_pack.pack({'mod':'Formations','version':'3'})
+        assert Path(path).is_file() and count==4
         # Execute the real preparation caller, replacing only its subprocesses
         # and metadata writer. It must resolve selected runtime input fail-closed.
         prepare_release.HERE=root/'prepare';prepare_release.HERE.mkdir()

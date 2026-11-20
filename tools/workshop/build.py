@@ -199,7 +199,7 @@ ITEMS = [
             "neutrals, diplomats. A heavily optimised fork of BFrizzleFoShizzle's mod with "
             "settings in Mod Config Menu."),
     # Форк Formations от Slinkysalmon03 (исходники шли с модом в Мастерской, GPLv3) - 17.10.2026.
-    dict(mod="Formations", title="Formations Extended (MCM fork) (QoL)", nexus=2235, version="2",
+    dict(mod="Formations", title="Formations Extended (MCM fork) (QoL)", nexus=2235, version="3",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Bannerlord-style squad formations: drag a shape, march in order, and keep a formation "
             "while following the leader - 13 follow shapes, a shape of its own for every squad. A fork of "
@@ -253,7 +253,7 @@ SKIP_DIRS = set(["memory", "strings"])
 # One runtime catalog per language: prefer compiled MO when it exists.
 # PO-only upstream plugins retain PO until their loader is migrated.
 
-ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=2256,version="3",tags=["Gameplay","RE_Kenshi"],lang=True,drop=[],en="A modular AI collection with robotic care, optional rest and own-gate assistance, configured through MCM."))
+ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=2256,version="4",tags=["Gameplay","RE_Kenshi"],lang=True,drop=[],en="A modular AI collection with robotic care, optional rest and own-gate assistance, configured through MCM."))
 
 def runtime_file_allowed(mod, folder, name):
     rel = os.path.relpath(os.path.join(folder, name), mod_dir(mod)).replace(os.sep, "/")

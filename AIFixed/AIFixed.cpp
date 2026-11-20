@@ -1571,7 +1571,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
         Tr("Time without physical progress before attempting recovery. 1-4 game hours; checks continue at the same rate. Changes apply immediately."),1,1,4,0);
     api->section(api,Tr("Engineers"));
     api->toggle(api,"AIFixed","CoordinateEngineers",Tr("Coordinate player engineers"),
-        Tr("Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."),0,MCM_RESTART);
+        Tr("Share construction-material reservations, fetch useful batches and prefer finishing started production machines. After construction finishes, try to return proven leftovers before the next ordinary job. Manual orders, combat and urgent work take priority. Off by default."),0,MCM_RESTART);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "AIFixed", "Debug", Tr("Detailed log"), Tr("Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."), 0, MCM_RESTART);
 }

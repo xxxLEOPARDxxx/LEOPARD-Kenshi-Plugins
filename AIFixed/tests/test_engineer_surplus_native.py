@@ -50,6 +50,9 @@ assert fnv(storage_wrapper)==0xdead890ede93144a
 assert 'if(!PlannerEntry())return false;' in s, 'Existing LSE planner detour must be supported'
 assert 'if(!Contract(0x50cab0,0x170,0x30cde7edcc348bb3ULL))return false;' in s
 assert not re.search(r'if\(!Bytes\(0x50f380',s), 'An unconditional strict entry check blocks LSE'
+assert '__declspec(thread) char storageList' not in s, 'Native storage query buffer must not outlive the search'
+assert 'NativePointerList<Building> candidates;' in s, 'Storage search needs scoped ownership'
+assert 'EngineerMaterialsRuntime::SelectedProject(tasks->body,tasks->character)' in s, 'Surplus gate must prefer the committed construction destination'
 checks+=5
 
 # Exercise the whole production admission path with native windows and both

@@ -8,11 +8,14 @@ static void Check(bool b,const char*s){++checks;if(!b){++failures;printf("FAIL %
 typedef AIFixedEngineer::Identity Identity;typedef AIFixedEngineer::Owned Owned;
 static Identity Id(unsigned n){Identity a;a.type=1;a.index=n;a.serial=4;a.container=2;a.containerSerial=9;return a;}
 struct Building;
-struct hand{Identity id;hand(const Identity&i=Identity()):id(i){}Building* getBuilding()const;};static Identity Of(const hand&h){return h.id;}
+enum{BUILDING,JOB_BUILDER=125,ITEM,BF_RESOURCE_STORAGE};
+struct hand{Identity id;int type;hand(const Identity&i=Identity()):id(i),type(BUILDING){}Building* getBuilding()const;};static Identity Of(const hand&h){return h.id;}
 struct GameData{};static GameData data;
 struct Item{GameData*data;bool isEquipped,isUnique;int quantity,owner;float chargesLeft,originalFullChargeAmount,quality;void*manufacturerData;void*materialData;void*coloriseData;Item():data(&::data),isEquipped(false),isUnique(false),quantity(1),owner(1),chargesLeft(1),originalFullChargeAmount(1),quality(1),manufacturerData(0),materialData(0),coloriseData(0){}GameData*getGameData(){return data;}bool canStackWith(Item*p){return owner==p->owner;}};
 template<class T>struct lektor:std::vector<T>{};struct Inventory{lektor<Item*>items;const lektor<Item*>&getAllItems(){++scans;return items;}};static Inventory body,pack;
-struct Character{hand handle;Inventory*getInventory(){return &body;}};static Character actor;
+struct StorageBuilding;
+struct AI{bool reachable;bool isDestinationAccessible(StorageBuilding*,bool){return reachable;}};
+struct Character{hand handle;AI ai;Inventory*getInventory(){return &body;}AI*getAI(){return &ai;}int getFaction(){return 1;}};static Character actor;
 struct Building
 {
     struct ConstructionState{bool isComplete,isDismantled;} state;
@@ -22,17 +25,34 @@ struct Building
 static Building finished,unfinished;
 Building* hand::getBuilding()const
 {return id==finished.handle.id?&finished:(id==unfinished.handle.id?&unfinished:NULL);}
-struct Tasker{hand subject;int key(){return 125;}};struct AITaskSytem{Character*character;};struct StorageBuilding{hand handle;};static StorageBuilding store;
+struct Tasker{hand subject;int key(){return JOB_BUILDER;}};
+struct Body{Tasker* active;Tasker*getCurrentAction(){return active;}};
+struct TaskMatch{hand subtarget;int task;TaskMatch():task(0){}int key()const{return task;}};
+struct AITaskSytem{Character*character;Body*body;TaskMatch goal;AITaskSytem():character(NULL),body(NULL){}const TaskMatch&getCurrentGoal(){return goal;}};
+struct InventorySection{bool room;bool hasRoomForItem(GameData*,int){return room;}};
+struct StorageBuilding:Building
+{
+    struct ConsumptionItem{GameData* item;InventorySection* inventorySection;} slots[2];
+    int specialItemTypesOnly;
+    int getSpecialFunction(){return BF_RESOURCE_STORAGE;}
+    bool isDisabled(){return false;}
+    int getFaction(){return 1;}
+    bool canHaveSomeOfThese(GameData*){return true;}
+    int getNumConsumtionItems(){return 2;}
+    ConsumptionItem*getConsumtionItems(int slot){return &slots[slot];}
+};
+static StorageBuilding store;
 static LONG generation=3;static DWORD now=100;static bool enabled=true,storeAvailable=true;static SRWLOCK metadata=SRWLOCK_INIT;enum{Capacity=128,OwnedCapacity=128,ItemLimit=1024};
 static LONG Epoch(){return generation;}static DWORD Clock(){return now;}
 #define GetTickCount Clock
 static bool Live(LONG e){return enabled&&generation==e;}static bool Eligible(Character*,LONG e){return Live(e);}static Inventory*Backpack(Character*){return &pack;}static int NormalSlot(AITaskSytem*,Tasker*){return 2;}
-static bool UnfinishedAssignment(AITaskSytem*){return false;}
 static Owned owned,other;static unsigned credits=1;
 static int Total(Character*,GameData*){return 2;}
 static StorageBuilding*FindStorage(Character*,GameData*,LONG,unsigned){++queries;return storeAvailable?&store:NULL;}
 namespace EngineerMaterialsRuntime
 {
+    static Building* actualProject=NULL;
+    static Building* SelectedProject(Body*,Character*){return actualProject;}
     static unsigned ListOwnedFor(const Identity&,Owned*out,unsigned cap,unsigned)
     {if(cap>=1)out[0]=owned;if(cap>=2&&credits>1)out[1]=other;return credits;}
     static bool Matches(GameData*p,const AIFixedEngineer::Material&){return p==&data;}
@@ -52,4 +72,18 @@ Reset(managed,personal);body.items.assign(129,&managed);Check(!Prepare(&tasks,&b
 Reset(managed,personal);pack.items.assign(129,&personal);Check(!Prepare(&tasks,&builder,2,out)&&queries==0,"oversized worn backpack also refuses builder before travel");
 Reset(managed,personal);body.items.assign(1025,&managed);Check(!Prepare(&tasks,&builder,2,out)&&queries==0,"ItemLimit source refuses synthetic builder without storage search");
 Reset(managed,personal);storeAvailable=false;Check(!Prepare(&tasks,&builder,2,out)&&queries==1,"full or unavailable storage keeps native builder failure");allRefused=true;for(unsigned i=0;i<1000;++i)if(Prepare(&tasks,&builder,2,out))allRefused=false;Check(allRefused,"full storage native fallback remains unadmitted");Check(queries==1,"paused timestamp full-storage retries have bounded native queries");now+=250;Check(!Prepare(&tasks,&builder,2,out)&&queries==1,"actor cooldown spans global budget refill");now+=1250;Check(!Prepare(&tasks,&builder,2,out)&&queries==2,"full storage periodically retries after bounded backoff");
+Reset(managed,personal);Body active={&builder};tasks.body=&active;tasks.goal.task=JOB_BUILDER;
+tasks.goal.subtarget=finished.handle;EngineerMaterialsRuntime::actualProject=&unfinished;
+Check(!Prepare(&tasks,&builder,2,out)&&queries==0,"completed stale goal cannot pre-empt the unfinished active job");
+tasks.goal.subtarget=unfinished.handle;EngineerMaterialsRuntime::actualProject=&finished;
+Check(Prepare(&tasks,&builder,2,out)&&queries==1,"finished active job can return even if the stale goal remains unfinished");
+EngineerMaterialsRuntime::actualProject=NULL;Check(UnfinishedAssignment(&tasks),"unknown active plan stays native");
+InventorySection first={false},second={true};store.specialItemTypesOnly=ITEM;store.state.isComplete=true;actor.ai.reachable=true;
+store.slots[0].item=&data;store.slots[0].inventorySection=&first;
+store.slots[1].item=NULL;store.slots[1].inventorySection=&second;
+Check(!ValidStorage(&actor,&store,&data,generation),"generic store room does not admit a full exact section");
+store.slots[1].item=&data;
+Check(ValidStorage(&actor,&store,&data,generation)==&second,"storage admission selects a matching section with room");
+actor.ai.reachable=false;
+Check(!ValidStorage(&actor,&store,&data,generation),"inaccessible storage cannot start a return trip");
 printf("%u checks, %u failures\n",checks,failures);return failures?1:0;}

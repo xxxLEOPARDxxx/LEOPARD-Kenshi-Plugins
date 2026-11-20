@@ -17,7 +17,7 @@ for the originals, open source and investigation notes.
 GPLv3: LICENSE; точная основа / exact provenance: UPSTREAM.md.
 RE_Kenshi/KenshiLib — BFrizzleFoShizzle; Localization.h — Asur и участники.
 
-Prepared release 2 / Подготовленный выпуск 2 (2026-11-02)
+Release 2 / Выпуск 2 (2026-11-02)
 
 English
 
@@ -41,8 +41,7 @@ English
 
 ПОДРОБНЫЙ СПРАВОЧНИК ВОЗМОЖНОСТЕЙ / DETAILED FEATURE REFERENCE
 
-ENGINEERS / ИНЖЕНЕРЫ - local development candidate, 2026-11-20
-Not a published release / Не опубликованный выпуск.
+ENGINEERS / ИНЖЕНЕРЫ
 
 CoordinateEngineers=0. MCM > Engineers; restarting installs the adapters.
 Coordinates automatic player Engineer jobs. Native election retains direct
@@ -481,4 +480,24 @@ English
 - Добавлено необязательное освобождение NPC, застрявших в скалах, рудных жилах, стенах, воротах и небольших опорах. Обездвиженные ранениями и персонажи без ног не считаются застрявшими.
 - Ожидание без продвижения настраивается от 1 до 4 игровых часов, по умолчанию 1 час. Перед перемещением проверяется безопасное место рядом; функция по умолчанию выключена.
 - Исправлены проход собственных ворот и продолжение движения после открытия. Закрытие после прохода учитывает персонажей в проёме; радиус поиска настраивается до 500 м.
+- Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed.
+
+## Release 4 / Выпуск 4
+
+English
+
+- Optional coordination for player engineers. They account for materials already on the way, collect useful batches from storage and production outputs, and prioritise finishing machines under construction.
+- After finishing construction, engineers try to return identified leftovers to suitable storage before their next ordinary permanent job. Manual orders, combat and urgent work keep priority.
+- Improved recovery for NPCs and pack animals trapped in walls and at wall joins. Recovery checks for a safe exit on the same side.
+- Skeletons put in ordinary beds by automatic rescuers can switch to powered repair beds after regaining mobility. Modded repair beds are recognised by their treatment function.
+- Reduced background work for engineer coordination and freed temporary storage search memory after use.
+- Original SleepFix and GateFix are not required: their adapted functions are already included in AI Fixed.
+
+Русский
+
+- Добавлено необязательное согласование работы инженеров игрока. Они учитывают материалы в пути, берут нужное количество со складов и выходов станков, в первую очередь завершают начатые машины.
+- После завершения стройки инженеры стараются вернуть подтверждённые остатки на подходящий склад перед следующей обычной постоянной работой. Ручные приказы, бой и срочные работы сохраняют приоритет.
+- Улучшено освобождение NPC и вьючных животных, застрявших в стенах и на стыках. Проверяется безопасный выход на ту же сторону.
+- Скелет, которого автоматический спасатель уложил в обычную кровать, после восстановления подвижности может перейти на ремкровать с питанием. Модовые ремкровати распознаются по функции лечения.
+- Снижена фоновая нагрузка согласования инженеров. Временная память поиска склада освобождается после использования.
 - Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed.

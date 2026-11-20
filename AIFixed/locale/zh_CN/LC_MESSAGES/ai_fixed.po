@@ -153,8 +153,8 @@ msgstr "工程师"
 msgid "Coordinate player engineers"
 msgstr "协调玩家工程师"
 
-msgid "Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."
-msgstr "共享建筑材料预留记录，一次搬运适量材料，并优先完工较早新放置的生产设备。在恢复较低优先级工作前，将确认来自建筑任务的剩余材料送回仓库。手动命令、战斗和较高优先级工作优先。默认关闭。"
+msgid "Share construction-material reservations, fetch useful batches and prefer finishing started production machines. After construction finishes, try to return proven leftovers before the next ordinary job. Manual orders, combat and urgent work take priority. Off by default."
+msgstr "共享建筑材料预留记录，一次搬运适量材料，优先完成已开工的生产设备。完工后尝试将确认多余的材料送回仓库，再开始下一项普通工作。手动命令、战斗和紧急工作优先。默认关闭。"
 
 msgid "Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."
 msgstr "在 RE_Kenshi_log.txt 中记录维修床、通过城门、NPC 脱困及工程师协调的详细信息。"

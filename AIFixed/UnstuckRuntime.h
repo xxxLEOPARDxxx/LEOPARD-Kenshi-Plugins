@@ -874,7 +874,7 @@ namespace Unstuck
         if (!guard && (elevatedWall || here.y-ground<50.0f))
             ReadWallEscape(movement,nav,here,ground,elevatedWall,wallExit,trace);
         if (!wallExit.wall && (wallIntent==EmbeddedWallOnly || wallIntent==CrestWallOnly ||
-            (elevatedWall && (trace.wallHit || (support && support->isAWall())))))
+            trace.wallHit || (elevatedWall && support && support->isAWall())))
             return RejectLanding(trace,"wall-support-unconfirmed");
         if (here.y-ground<50.0f) support=NULL;
         if (wallExit.wall) support=wallExit.wall;

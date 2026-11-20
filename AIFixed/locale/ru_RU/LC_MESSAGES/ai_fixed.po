@@ -153,8 +153,8 @@ msgstr "Инженеры"
 msgid "Coordinate player engineers"
 msgstr "Согласовывать работу инженеров игрока"
 
-msgid "Share construction-material reservations, fetch useful batches and prefer finishing newly placed production machines. Return proven construction leftovers to storage before lower-priority work. Direct orders, combat and higher-priority jobs take precedence. Off by default."
-msgstr "Учитывать материалы, за которыми уже отправились инженеры, брать полезное количество за один заход и сначала завершать ранее поставленные производственные машины. Возвращать на склад подтверждённые остатки стройматериалов перед менее важной работой. Ручные приказы, бой и более важные работы имеют приоритет. По умолчанию выключено."
+msgid "Share construction-material reservations, fetch useful batches and prefer finishing started production machines. After construction finishes, try to return proven leftovers before the next ordinary job. Manual orders, combat and urgent work take priority. Off by default."
+msgstr "Учитывать материалы в пути, брать нужное количество и в первую очередь завершать начатые производственные машины. После окончания стройки попытаться вернуть подтверждённые остатки перед следующей обычной работой. Ручные приказы, бой и срочные работы важнее. По умолчанию выключено."
 
 msgid "Details about repair beds, gate passage, stuck NPCs and engineer coordination in RE_Kenshi_log.txt."
 msgstr "Подробности о ремкроватях, проходе ворот, застрявших NPC и согласовании работы инженеров в RE_Kenshi_log.txt."

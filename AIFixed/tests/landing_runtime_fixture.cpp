@@ -235,6 +235,10 @@ int main(){
     wrongShape=true;
     Check(!Probe(world,actor,embeddedWall,embedded,"wall-support-unconfirmed",false,EmbeddedWallOnly),
         "overhead and both side hits must come from the same collider");
+    LandingTrace unconfirmedWall;Ogre::Vector3 unconfirmedLanding;unsigned unconfirmedSites=0;
+    Check(!FindLanding(&world,&actor,NULL,embedded,0,unconfirmedLanding,unconfirmedSites,false,unconfirmedWall)&&
+        unconfirmedWall.wallHit&&!strcmp(unconfirmedWall.reason,"wall-support-unconfirmed"),
+        "generic off-mesh recovery also needs enclosure proof when a physical wall was hit");
     wrongShape=false;wallHollow=true;
     Check(!Probe(world,actor,embeddedWall,embedded,"wall-support-unconfirmed",false,EmbeddedWallOnly),
         "a tunnel under the same wall collider is not solid enclosure");

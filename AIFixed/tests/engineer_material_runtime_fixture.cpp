@@ -415,7 +415,18 @@ int main()
     project.state.mats.count=17;const unsigned collected=collects;EngineerMaterialsRuntime::Collect(&collection,&body);
     CHECK(collects==collected+1&&actor.inv.counts[&mats]==2);project.state.mats.count=1;
     actor.player=false;const unsigned beforeLocks=lockCalls;const LONG beforeEpochs=epochCalls,beforeAdmits=admitCalls;
-    EngineerMaterialsRuntime::Body(&body,.1f);CHECK(lockCalls==beforeLocks&&epochCalls==beforeEpochs&&admitCalls==beforeAdmits);actor.player=true;
+    EngineerMaterialsRuntime::Body(&body,.1f);CHECK(lockCalls==beforeLocks&&epochCalls==beforeEpochs&&admitCalls==beforeAdmits);
+    const unsigned beforeCallbacks=callbacks;
+    EngineerMaterialsRuntime::Selected(&system,&builder,1,NORMAL);
+    CHECK(lockCalls==beforeLocks&&callbacks==beforeCallbacks);
+    actor.player=true;
+    {
+        Tasker build=delivery;TaskData buildData={BUILD};build.taskData=&buildData;build.vptr=image+0x16BDE78;
+        Tasker* savedAction=body.action;body.action=&build;
+        EngineerMaterialsRuntime::Body(&body,.1f);
+        CHECK(lockCalls==beforeLocks);
+        body.action=savedAction;
+    }
     // Expanded storage batches use actual modified strength, current native
     // weight and the heaviest matching source unit. No future bag discount.
     ++epoch;Invalidate();actor.inv.counts[&mats]=0;store.inv.counts[&mats]=100;project.state.needs[&mats]=100;

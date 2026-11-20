@@ -34,7 +34,10 @@ def pack(item):
             if any(x.lower().endswith('.po') for x in names):raise RuntimeError('Clean candidate must contain MO runtime catalogs only')
             catalogs=[x for x in names if x.endswith('.mo')]
             languages={x.split('/locale/')[1].split('/')[0] for x in catalogs if '/locale/' in x}
-            if len(catalogs)!=3 or languages!={'ru_RU','en_GB','zh_CN'}:raise RuntimeError('Candidate must contain exactly three runtime languages')
+            if mod in build.LANG_BUILT_IN:
+                if catalogs:raise RuntimeError('Built-in localization must not contain external catalogs: '+mod)
+            elif len(catalogs)!=3 or languages!={'ru_RU','en_GB','zh_CN'}:
+                raise RuntimeError('Candidate must contain exactly three runtime languages')
             if not any(Path(x).name.lower() in ('readme.md','readme.txt') for x in names):raise RuntimeError('Candidate README missing')
             source=build.source_dir(mod)
             if source:

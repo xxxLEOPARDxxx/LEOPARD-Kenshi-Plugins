@@ -146,19 +146,23 @@
     ]
   },
   "AIFixed": {
-    "version": "3",
-    "published_version": "2",
-    "ru": [
-      "Добавлено необязательное освобождение NPC, застрявших в скалах, рудных жилах, стенах, воротах и небольших опорах. Обездвиженные ранениями и персонажи без ног не считаются застрявшими.",
-      "Ожидание без продвижения настраивается от 1 до 4 игровых часов, по умолчанию 1 час. Перед перемещением проверяется безопасное место рядом; функция по умолчанию выключена.",
-      "Исправлены проход собственных ворот и продолжение движения после открытия. Закрытие после прохода учитывает персонажей в проёме; радиус поиска настраивается до 500 м.",
-      "Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed."
-    ],
+    "version": "4",
+    "published_version": "3",
     "en": [
-      "Added optional recovery for NPCs stranded in rocks, ore deposits, walls, gates and small supports. Characters immobilised by injuries or missing legs are not treated as stuck.",
-      "The wait without progress is adjustable from 1 to 4 game hours, default 1 hour. A nearby safe landing is checked before moving the NPC; recovery is off by default.",
-      "Corrected passage through own gates and movement after opening them. Closing after passage accounts for characters in the opening; the search radius is adjustable up to 500 m.",
+      "Optional coordination for player engineers. They account for materials already on the way, collect useful batches from storage and production outputs, and prioritise finishing machines under construction.",
+      "After finishing construction, engineers try to return identified leftovers to suitable storage before their next ordinary permanent job. Manual orders, combat and urgent work keep priority.",
+      "Improved recovery for NPCs and pack animals trapped in walls and at wall joins. Recovery checks for a safe exit on the same side.",
+      "Skeletons put in ordinary beds by automatic rescuers can switch to powered repair beds after regaining mobility. Modded repair beds are recognised by their treatment function.",
+      "Reduced background work for engineer coordination and freed temporary storage search memory after use.",
       "Original SleepFix and GateFix are not required: their adapted functions are already included in AI Fixed."
+    ],
+    "ru": [
+      "Добавлено необязательное согласование работы инженеров игрока. Они учитывают материалы в пути, берут нужное количество со складов и выходов станков, в первую очередь завершают начатые машины.",
+      "После завершения стройки инженеры стараются вернуть подтверждённые остатки на подходящий склад перед следующей обычной постоянной работой. Ручные приказы, бой и срочные работы сохраняют приоритет.",
+      "Улучшено освобождение NPC и вьючных животных, застрявших в стенах и на стыках. Проверяется безопасный выход на ту же сторону.",
+      "Скелет, которого автоматический спасатель уложил в обычную кровать, после восстановления подвижности может перейти на ремкровать с питанием. Модовые ремкровати распознаются по функции лечения.",
+      "Снижена фоновая нагрузка согласования инженеров. Временная память поиска склада освобождается после использования.",
+      "Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed."
     ]
   },
   "StackSort": {
@@ -206,15 +210,15 @@
     ]
   },
   "Formations": {
-    "version": "2",
-    "published_version": "1",
+    "version": "3",
+    "published_version": "2",
     "en": [
-      "[b]Correct language from Steam Workshop.[/b] The MCM page and in-game formation readout now follow the game language even when the plugin is installed outside the local mods folder.",
-      "[b]Normal and RE_Kenshi launches.[/b] Both executable locations find the same game settings; personal settings and formations stored in saves remain unchanged."
+      "Formation shortcuts appear in a game-themed popup attached just above the retractable character panel. The popup follows the panel and uses the active HUD theme.",
+      "Detailed logging is optional and off by default. The Mod Config Menu setting applies immediately. Errors are still recorded."
     ],
     "ru": [
-      "[b]Правильный язык из Steam Workshop.[/b] Страница MCM и игровые подписи строя используют язык игры, даже если плагин установлен вне локальной папки mods.",
-      "[b]Обычный запуск и RE_Kenshi.[/b] Оба расположения EXE находят настройки игры; личные настройки и строй в сохранениях не меняются."
+      "Подсказка с клавишами построений оформлена в игровом стиле и примыкает к верхнему краю выдвижной панели персонажа. Она следует за панелью и использует активную тему HUD.",
+      "Подробный журнал по умолчанию выключен. Настройка в Mod Config Menu применяется сразу. Ошибки по-прежнему записываются."
     ]
   },
   "TauntExpansion": {

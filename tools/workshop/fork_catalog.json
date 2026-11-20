@@ -411,17 +411,21 @@
       "ru": "Автор приложил исходники к оригинальному моду в Steam Workshop; отдельный публичный репозиторий не подтверждён.",
       "en": "The author shipped source code with the original Steam Workshop mod; no separate public repository has been verified."
     },
-    "version": "2",
+    "version": "3",
     "changes": {
       "ru": [
         "Добавлен строй при следовании с 13 доступными фигурами: 3 игровых и 10 новых; выбор каждого отряда хранится с сохранением.",
         "К четырём исходным фигурам перетаскивания добавлены семь, всего 11.",
-        "Любая клавиша или сочетание как модификатор; «Держать» после построения можно отключить; MCM и три языка."
+        "Любая клавиша или сочетание как модификатор; «Держать» после построения можно отключить; MCM и три языка.",
+        "Подсказка с клавишами построений оформлена в игровом стиле и примыкает к верхнему краю выдвижной панели персонажа. Она следует за панелью и использует активную тему HUD.",
+        "Подробный журнал по умолчанию выключен. Настройка в Mod Config Menu применяется сразу. Ошибки по-прежнему записываются."
       ],
       "en": [
         "Added follow formations with 13 offered shapes: 3 native and 10 new; each squad selection is stored with the save.",
         "Seven shapes join the four original drag formations, for 11 in total.",
-        "Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages."
+        "Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages.",
+        "Formation shortcuts appear in a game-themed popup attached just above the retractable character panel. The popup follows the panel and uses the active HUD theme.",
+        "Detailed logging is optional and off by default. The Mod Config Menu setting applies immediately. Errors are still recorded."
       ]
     },
     "history": {
@@ -442,18 +446,32 @@
           "[b]Correct language from Steam Workshop.[/b] The MCM page and in-game formation readout now follow the game language even when the plugin is installed outside the local mods folder.",
           "[b]Normal and RE_Kenshi launches.[/b] Both executable locations find the same game settings; personal settings and formations stored in saves remain unchanged."
         ]
+      },
+      "3": {
+        "en": [
+          "Formation shortcuts appear in a game-themed popup attached just above the retractable character panel. The popup follows the panel and uses the active HUD theme.",
+          "Detailed logging is optional and off by default. The Mod Config Menu setting applies immediately. Errors are still recorded."
+        ],
+        "ru": [
+          "Подсказка с клавишами построений оформлена в игровом стиле и примыкает к верхнему краю выдвижной панели персонажа. Она следует за панелью и использует активную тему HUD.",
+          "Подробный журнал по умолчанию выключен. Настройка в Mod Config Menu применяется сразу. Ошибки по-прежнему записываются."
+        ]
       }
     },
     "player_changes": {
       "ru": [
         "Добавлен строй при следовании с 13 доступными фигурами: 3 игровых и 10 новых; выбор каждого отряда хранится с сохранением.",
         "К четырём исходным фигурам перетаскивания добавлены семь, всего 11.",
-        "Любая клавиша или сочетание как модификатор; «Держать» после построения можно отключить; MCM и три языка."
+        "Любая клавиша или сочетание как модификатор; «Держать» после построения можно отключить; MCM и три языка.",
+        "Подсказка с клавишами построений оформлена в игровом стиле и примыкает к верхнему краю выдвижной панели персонажа. Она следует за панелью и использует активную тему HUD.",
+        "Подробный журнал по умолчанию выключен. Настройка в Mod Config Menu применяется сразу. Ошибки по-прежнему записываются."
       ],
       "en": [
         "Added follow formations with 13 offered shapes: 3 native and 10 new; each squad selection is stored with the save.",
         "Seven shapes join the four original drag formations, for 11 in total.",
-        "Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages."
+        "Any key or combination can be the modifier; Hold after forming can be disabled, with MCM and three languages.",
+        "Formation shortcuts appear in a game-themed popup attached just above the retractable character panel. The popup follows the panel and uses the active HUD theme.",
+        "Detailed logging is optional and off by default. The Mod Config Menu setting applies immediately. Errors are still recorded."
       ]
     }
   },

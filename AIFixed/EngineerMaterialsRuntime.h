@@ -207,7 +207,13 @@ namespace EngineerMaterialsRuntime
         if(!Active())return;const unsigned now=GetTickCount();
         if(unsigned(now-maintenanceAt)<250)return;maintenanceAt=now;
         const unsigned e=Epoch();OwnedSurplus rows[8];unsigned count=0;
-        {Guard lock;if(Sync(e))count=coordinator.ListOwnedSlice(rows,8,maintenanceCursor);}
+        {
+            Guard lock;
+            if(!Sync(e))return;
+            if(unsigned(now-expiredAt)>=1000)
+            {coordinator.Expire(now,e);ExpireDenied(now);expiredAt=now;}
+            count=coordinator.ListOwnedSlice(rows,8,maintenanceCursor);
+        }
         for(unsigned i=0;i<count;++i)
         {
             if(e!=Epoch())return;Character* actor=Handle(rows[i].actor).getCharacter();
@@ -459,16 +465,21 @@ namespace EngineerMaterialsRuntime
         out.count=kept;
     }
     typedef std::map<GameData*,hand,std::less<GameData*>,std::allocator<std::pair<GameData* const,hand> > > ResourceSources;
-    struct MachineOutputs
+    template<class T> struct NativePointerList
     {
-        lektor<GameData*> offered;
-        ~MachineOutputs()
+        lektor<T*> offered;
+        NativePointerList(){}
+        ~NativePointerList()
         {
             // The SDK lektor does not release its storage. Pair the native
-            // allocation with the same game delete[] used by task247.
+            // allocation with the game delete[] used by the native lists.
             if(offered.stuff)reinterpret_cast<void (*)(void*)>(image+0xED562E)(offered.stuff);
         }
+    private:
+        NativePointerList(const NativePointerList&);
+        NativePointerList& operator=(const NativePointerList&);
     };
+    typedef NativePointerList<GameData> MachineOutputs;
     static bool ReadMachineOffers(StorageBuilding* storage,MachineOutputs& outputs)
     {
         Inventory* inventory=storage->getInventory();if(!inventory)return false;
@@ -766,8 +777,8 @@ namespace EngineerMaterialsRuntime
     {
         const unsigned e=Epoch();
         originalSelected(system,task,score,priority);
-        if(e!=Epoch())return;
-        if(system&&system->character)
+        if(e!=Epoch()||!system||!system->character||!system->character->isPlayerCharacter())return;
+        if(Active())
         {
             Character* actor=system->character;const hand who=actor->handle;
             CancelAt(Of(who),e);Building* project=SelectedProject(system->body,actor);Request r;
@@ -956,12 +967,10 @@ namespace EngineerMaterialsRuntime
         const unsigned e=Epoch();
         if(Active())
         {
-            const unsigned now=GetTickCount();
             if(e!=Epoch()){originalBody(body,time);return;}
             Building* project=SelectedProject(body,actor);
             if(!project)CancelAt(Of(actor->handle),e);
             else{StopDeniedMove(body,actor,project,e);ValidateSourceMove(body,actor,project,e);}
-            {Guard lock;if(Sync(e)&&unsigned(now-expiredAt)>=1000){coordinator.Expire(now,e);ExpireDenied(now);expiredAt=now;}}
         }
         originalBody(body,time);
     }

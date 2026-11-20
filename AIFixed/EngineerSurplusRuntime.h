@@ -95,8 +95,15 @@ namespace EngineerSurplusRuntime
     bool UnfinishedAssignment(AITaskSytem* tasks)
     {
         const TaskMatch& current=tasks->getCurrentGoal();
-        if(current.key()!=JOB_BUILDER||current.subtarget.type!=BUILDING)return false;
-        Building* project=current.subtarget.getBuilding();
+        if(current.key()!=JOB_BUILDER)return false;
+        Building* project=EngineerMaterialsRuntime::SelectedProject(tasks->body,tasks->character);
+        if(!project)
+        {
+            // An active but unrecognised plan keeps the native job ordering.
+            if(tasks->body&&tasks->body->getCurrentAction())return true;
+            if(current.subtarget.type!=BUILDING)return false;
+            project=current.subtarget.getBuilding();
+        }
         Building::ConstructionState* state=project?project->getBuildState():NULL;
         return !state||!state->isComplete;
     }
@@ -120,14 +127,22 @@ namespace EngineerSurplusRuntime
         {Item* p=items[i];if(p&&!p->isEquipped&&p->quantity>0&&EngineerMaterialsRuntime::Matches(p->getGameData(),material))return p->getGameData();}
         return NULL;
     }
-    bool ValidStorage(Character* c,StorageBuilding* b,GameData* data,LONG e)
+    InventorySection* ValidStorage(Character* c,StorageBuilding* b,GameData* data,LONG e)
     {
-        return b&&Live(e)&&b->getSpecialFunction()==BF_RESOURCE_STORAGE&&!b->isDisabled()&&
+        if(!(b&&Live(e)&&b->getSpecialFunction()==BF_RESOURCE_STORAGE&&!b->isDisabled()&&
             b->getBuildState()&&b->getBuildState()->isComplete&&b->getFaction()==c->getFaction()&&
-            b->specialItemTypesOnly==ITEM&&b->canHaveSomeOfThese(data)&&
-            c->getAI()->isDestinationAccessible(b,false)&&Live(e);
+            b->specialItemTypesOnly==ITEM&&b->canHaveSomeOfThese(data)&&Live(e)))return NULL;
+        const int count=b->getNumConsumtionItems();
+        if(count<0||count>32)return NULL;
+        for(int i=0;i<count&&Live(e);++i)
+        {
+            StorageBuilding::ConsumptionItem* slot=b->getConsumtionItems(i);
+            InventorySection* section=slot&&slot->item==data?slot->inventorySection:NULL;
+            if(section&&section->hasRoomForItem(data,1)&&Live(e))
+                return c->getAI()->isDestinationAccessible(b,false)&&Live(e)?section:NULL;
+        }
+        return NULL;
     }
-    __declspec(thread) char storageList[sizeof(lektor<Building*>)];
     struct SearchSlot
     {
         bool used;Identity actor;DWORD next;unsigned turn,cursor;
@@ -156,9 +171,10 @@ namespace EngineerSurplusRuntime
     // @SURPLUS_SEARCH_BUDGET_END@
     StorageBuilding* FindStorage(Character* c,GameData* data,LONG e,unsigned cursor)
     {
-        lektor<Building*>& list=*reinterpret_cast<lektor<Building*>*>(storageList);list.clear();
+        EngineerMaterialsRuntime::NativePointerList<Building> candidates;
+        lektor<Building*>& list=candidates.offered;
         c->getAI()->getAllLocalMachines(list,1u<<BF_RESOURCE_STORAGE);
-        if(!Live(e)||!list.size()||list.size()>256)return NULL;
+        if(!Live(e)||!list.size()||list.size()>256||list.size()>list.maxSize||!list.stuff)return NULL;
         StorageBuilding* best=NULL;float distance=1e30f;const Ogre::Vector3 pos=c->getPosition();
         const unsigned count=list.size()<16?list.size():16;
         for(unsigned i=0;i<count;++i)
@@ -541,11 +557,8 @@ namespace EngineerSurplusRuntime
         if(!inventory||(inventory!=body&&inventory!=pack))return 0;
         if(e.pending)return 0; // Recovery has its own bounded, feature-independent maintenance.
         GameData* data=DataIn(inventory,e.credit.material);int units=0;
-        if(!data||!ValidStorage(c,building,data,e.generation)||!Returnable(c,e.credit,data,e.generation,units)||units<=0)return 0;
-        const int n=building->getNumConsumtionItems();if(n<0||n>32)return 0;
-        InventorySection* destination=NULL;
-        for(int i=0;i<n;++i){StorageBuilding::ConsumptionItem* slot=building->getConsumtionItems(i);if(slot&&slot->item==data){destination=slot->inventorySection;break;}}
-        if(!destination||!destination->hasRoomForItem(data,1))return 0;
+        InventorySection* destination=data?ValidStorage(c,building,data,e.generation):NULL;
+        if(!destination||!Returnable(c,e.credit,data,e.generation,units)||units<=0)return 0;
         Item* item=NULL;const lektor<Item*>& all=inventory->getAllItems();if(all.size()>ItemLimit)return 0;
         for(unsigned i=0;i<all.size();++i)if(all[i]&&!all[i]->isEquipped&&all[i]->quantity>0&&all[i]->getGameData()==data){item=all[i];break;}
         if(!item||!FungibleInventory(body,item,data)||(pack!=body&&!FungibleInventory(pack,item,data))||!Live(e.generation))return 0;
