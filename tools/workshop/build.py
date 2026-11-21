@@ -160,7 +160,7 @@ ITEMS = [
     # --- форк BetterLooting (XxAtreuSSxX, GitHub, GPLv3); страница в Steam
     # автором снята, на Nexus - чужая перезаливка 2178. nexus - после
     # нашей выкладки на Nexus.
-    dict(mod="BetterLooting", title="Better Looting (MCM fork) (QoL)", nexus=2218, version="7",
+    dict(mod="BetterLooting", title="Better Looting (MCM fork) (QoL)", nexus=2218, version="8",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en='Rule-based looting, required-item lists, protected player storage, optional ground pickup and deposit to base storage.'),
     dict(mod="Map-markers", title="Map markers (MCM fork) (QoL)", nexus=2211, version="5",

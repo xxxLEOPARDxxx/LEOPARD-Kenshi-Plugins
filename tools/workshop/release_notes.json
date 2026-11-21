@@ -54,13 +54,19 @@
     ]
   },
   "BetterLooting": {
-    "version": "7",
-    "published_version": "6",
+    "version": "8",
+    "published_version": "7",
     "en": [
-      "Reduced startup work for inventory monitoring and selective deposit protections."
+      "Five personal preset slots in MCM replace the built-in profiles. Name, save, apply or clear each slot. Existing working rules carry over.",
+      "Automatic looting skips living and dead characters carried by members of your squads. Standard looting rules apply again once they are put down.",
+      "Aligned the preset fields and buttons with the game’s settings and fixed a crash when closing the Options window from the Better Looting page.",
+      "Preset slots fit smaller options windows. Incomplete or damaged slots can be cleared or overwritten."
     ],
     "ru": [
-      "Ускорена стартовая настройка обновления инвентаря и защит при выборочной выгрузке предметов."
+      "В MCM появилось пять слотов для своих пресетов вместо встроенных профилей. Слот можно назвать, сохранить, применить или очистить. Текущие правила сохраняются.",
+      "Автосбор пропускает живых и мёртвых персонажей, которых несут бойцы ваших отрядов. После того как их положили на землю, действуют обычные правила сбора.",
+      "Поля и кнопки пресетов выровнены по игровому меню. Исправлен вылет при закрытии настроек со страницы Better Looting.",
+      "Слоты помещаются в небольшом окне настроек. Повреждённый или неполный слот можно очистить либо перезаписать."
     ]
   },
   "SkillLevelUpInfo": {

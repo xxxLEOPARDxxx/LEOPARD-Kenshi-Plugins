@@ -109,19 +109,23 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "7",
+    "version": "8",
     "changes": {
       "ru": [
         "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
         "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже.",
         "Исправлены вылеты при повторном сборе по Insert после разгрузки, закрытия или смены окон инвентаря и замены рюкзака.",
-        "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике."
+        "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике.",
+        "[b]Пять личных пресетов[/b] правил сбора с кнопками сохранения, применения и очистки.",
+        "[b]Защита переносимых персонажей[/b] от автосбора, пока их несёт кто-то из отрядов игрока."
       ],
       "en": [
         "MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.",
         "Required items, protected player storage and nearest-first ground pickup. Details and settings are below.",
         "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
-        "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
+        "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source.",
+        "[b]Five personal presets[/b] for loot rules, with save, apply and clear controls.",
+        "[b]Carried characters are protected[/b] from automatic looting while in a player squad member’s arms."
       ]
     },
     "history": {
@@ -186,6 +190,20 @@
         "ru": [
           "Ускорена стартовая настройка обновления инвентаря и защит при выборочной выгрузке предметов."
         ]
+      },
+      "8": {
+        "en": [
+          "Five personal preset slots in MCM replace the built-in profiles. Name, save, apply or clear each slot. Existing working rules carry over.",
+          "Automatic looting skips living and dead characters carried by members of your squads. Standard looting rules apply again once they are put down.",
+          "Aligned the preset fields and buttons with the game’s settings and fixed a crash when closing the Options window from the Better Looting page.",
+          "Preset slots fit smaller options windows. Incomplete or damaged slots can be cleared or overwritten."
+        ],
+        "ru": [
+          "В MCM появилось пять слотов для своих пресетов вместо встроенных профилей. Слот можно назвать, сохранить, применить или очистить. Текущие правила сохраняются.",
+          "Автосбор пропускает живых и мёртвых персонажей, которых несут бойцы ваших отрядов. После того как их положили на землю, действуют обычные правила сбора.",
+          "Поля и кнопки пресетов выровнены по игровому меню. Исправлен вылет при закрытии настроек со страницы Better Looting.",
+          "Слоты помещаются в небольшом окне настроек. Повреждённый или неполный слот можно очистить либо перезаписать."
+        ]
       }
     },
     "player_changes": {
@@ -193,13 +211,17 @@
         "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
         "Обязательные предметы, защита своих хранилищ и подбор с земли по близости. Подробности и настройки — ниже.",
         "Исправлены вылеты при повторном сборе по Insert после разгрузки, закрытия или смены окон инвентаря и замены рюкзака.",
-        "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике."
+        "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике.",
+        "[b]Пять личных пресетов[/b] правил сбора с кнопками сохранения, применения и очистки.",
+        "[b]Защита переносимых персонажей[/b] от автосбора, пока их несёт кто-то из отрядов игрока."
       ],
       "en": [
         "MCM and three languages; KEO transfer and theft fixes; restored Alt+Insert deposit.",
         "Required items, protected player storage and nearest-first ground pickup. Details and settings are below.",
         "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
-        "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
+        "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source.",
+        "[b]Five personal presets[/b] for loot rules, with save, apply and clear controls.",
+        "[b]Carried characters are protected[/b] from automatic looting while in a player squad member’s arms."
       ]
     }
   },
