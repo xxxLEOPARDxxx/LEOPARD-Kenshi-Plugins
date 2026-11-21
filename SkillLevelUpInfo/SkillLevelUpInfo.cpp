@@ -9,6 +9,7 @@
 #include <ModConfigMenu.h>
 #include <Debug.h>
 #include <core/Functions.h>
+#include <StartupHookBatch.h>
 #include <kenshi/Globals.h>
 #include <kenshi/GameWorld.h>
 #include <kenshi/PlayerInterface.h>
@@ -616,10 +617,17 @@ __declspec(dllexport) void startPlugin()
     if(!XpPanelTextStyle::InitializeNativeProfile())
         ErrorLog("SkillLevelUpInfo: unsupported MyGUI font ABI; retaining default XP text style");
     LoadSettings();
-    if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&increaseStat), Increase, &g_origIncrease) != KenshiLib::SUCCESS)
-        ErrorLog("SkillLevelUpInfo: cannot hook XP increase; baseline polling remains active");
-    if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&CharStats::getGUIDataForMainInfo), Panel, &g_origPanel) != KenshiLib::SUCCESS)
-        ErrorLog("SkillLevelUpInfo: cannot hook character-panel XP bars");
+    StartupHooks::Hook xpObservers[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&increaseStat), Increase, &g_origIncrease),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&CharStats::getGUIDataForMainInfo), Panel, &g_origPanel)
+    };
+    StartupHooks::Install(xpObservers, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    if (!xpObservers[0].installed)
+        ErrorLog("SkillLevelUpInfo: could not confirm XP increase hook; baseline polling remains active");
+    if (!xpObservers[1].installed)
+        ErrorLog("SkillLevelUpInfo: could not confirm character-panel XP bars hook");
     if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update), Update, &g_origUpdate) != KenshiLib::SUCCESS)
         ErrorLog("SkillLevelUpInfo: cannot hook GUI update");
     if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::_NV_loadFromSerialise), Load, &g_origLoad) != KenshiLib::SUCCESS)
