@@ -4,12 +4,22 @@
     "PatientSelfAid": {
       "nexus": 2193,
       "workshop_id": 3812149895,
-      "version": "5"
+      "version": "5",
+      "steam_version": "5",
+      "nexus_version": "6",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "687198ec8fd3414726c5d8585672380ea014e4b064eda40f652e82a19794ba6a",
+      "nexus_dll_sha256": "9b8c2824339a5b29d0583c46b98acbb3172d7f2d2e1fe501e9753ad01541048c"
     },
     "AssignedWorkers": {
       "nexus": 2191,
       "workshop_id": 3812150807,
-      "version": "8"
+      "version": "8",
+      "steam_version": "8",
+      "nexus_version": "9",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "735f4419977f7b89a9dbe648071f8507535b45acaaf9e526e048ce8e77e04f17",
+      "nexus_dll_sha256": "0225530a27e5cc3506dc2a2b7c7ddb2f84c1440d1ff8b5d36591c504cf94f2c1"
     },
     "RecruitMarkers": {
       "nexus": 2232,
@@ -19,17 +29,32 @@
     "BetterLooting": {
       "nexus": 2218,
       "workshop_id": 3816121198,
-      "version": "6"
+      "version": "6",
+      "steam_version": "6",
+      "nexus_version": "7",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "dfce3dacb4145d05f86641e0060c57746c77760ef6ce0565668a9b1b645831c8",
+      "nexus_dll_sha256": "12af7f459817b4fabd515c243433fb667a1ea6c4610b6f846f17f63142b3a163"
     },
     "UITweaks": {
       "nexus": 2192,
       "workshop_id": 3812150876,
-      "version": "13"
+      "version": "13",
+      "steam_version": "13",
+      "nexus_version": "14",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "1395d4ab8cb6ac42915b838ebd30c51c5456a3bff0d55d75dbb25be5b644ac43",
+      "nexus_dll_sha256": "8e040c77e4a26f67aa4e802a530b2f0fba74c4e0eded8757bb002e9bfb78efa4"
     },
     "ModConfigMenu": {
       "nexus": 2202,
       "workshop_id": 3813761584,
-      "version": "13"
+      "version": "13",
+      "steam_version": "13",
+      "nexus_version": "14",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "963d546c07be816ef1c685fb609bdfb8cceaeba08563cf85bd91407c78f256ea",
+      "nexus_dll_sha256": "8fb30d5ca61d4478aaccd5a0244569a876ac25d549e910b35bef3c22a5d681f4"
     },
     "AIFixed": {
       "nexus": 2256,
@@ -39,8 +64,11 @@
       "dll_sha256": "204a31a681b8698e99b0399503fad61d60951209d5ca1f8bbe13ce83051d23b9",
       "bilingual_change_note_sha256": "945ea7ed13f6e15ad544f1501ad2fd2c8fbefb31d9e6a896e578ebd00f193d3f",
       "steam_version": "4",
-      "nexus_version": "4",
-      "published_msk": "2026-11-20T09:15:24.153643+03:00"
+      "nexus_version": "5",
+      "published_msk": "2026-11-20T09:15:24.153643+03:00",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "ae75f33009dd03e3bf59c33650e3dc8b11463b669b1c3d53bc47c61c443e8d70",
+      "nexus_dll_sha256": "f32fcf31b8e1a6b1c0d6f702f382571c6d24a3543347e8b3d7a91173243e41a4"
     },
     "SkillLevelUpInfo": {
       "nexus": 2257,
@@ -49,7 +77,12 @@
       "archive_sha256": "6ede2c3194e1e5cdbd2b7cb6fbc50452fb3073ee8902e3814e52f50e18e32537",
       "dll_sha256": "33ad71b5de7c534a9dd8d493ded562c1e3650853bb59f547e514bdd537fc7a33",
       "published_msk": "2026-11-17T18:15:59.584956+03:00",
-      "bilingual_change_note_sha256": "95034a348a2c78afbd52ca63bd7e2a810b0f82359d84b200ea2584b17c3e2419"
+      "bilingual_change_note_sha256": "95034a348a2c78afbd52ca63bd7e2a810b0f82359d84b200ea2584b17c3e2419",
+      "steam_version": "5",
+      "nexus_version": "6",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "29bfdfde71360d1f5a21d7c102bd77c2d2132315e834a1071a4b616f868466de",
+      "nexus_dll_sha256": "db398109aa2102a2982e4a9828a0813e78d1a31d3001a60f793f6b9c2994408b"
     },
     "MultiXPMining": {
       "nexus": 2258,
@@ -59,27 +92,52 @@
     "Character Inspector": {
       "nexus": 2259,
       "workshop_id": 3829848451,
-      "version": "3"
+      "version": "3",
+      "steam_version": "3",
+      "nexus_version": "4",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "5dfc8be89f069f7debe1e380b774b083ca9bf8729dbce61c55ee308f3c64af2c",
+      "nexus_dll_sha256": "95f3983fda3baf0a67585000fcad714ec1867eb8cb12311e4db9914789b7474a"
     },
     "KenshiRotate": {
       "nexus": 2260,
       "workshop_id": 3829848534,
-      "version": "3"
+      "version": "3",
+      "steam_version": "3",
+      "nexus_version": "4",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "e89cff1793b9d8379c55136196fb70d1b42f6b8800669946b7b20647148e555c",
+      "nexus_dll_sha256": "65f6a53751d08764246bbfcd015bda8218c9e47dcc5cebd7aaadbadc71b7fc21"
     },
     "KillCounter": {
       "nexus": 2261,
       "workshop_id": 3829848599,
-      "version": "3"
+      "version": "3",
+      "steam_version": "3",
+      "nexus_version": "4",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "54325208b215f1f214bc9d79941740d1689ac7fbf74cda130e57b327a9136ac1",
+      "nexus_dll_sha256": "263298690a5ba297229aba890080319f2dd2f03e157cc01653f830c28bee4fda"
     },
     "Auto-Pause-on-Load": {
       "nexus": 2206,
       "workshop_id": 3813851956,
-      "version": "6"
+      "version": "6",
+      "steam_version": "6",
+      "nexus_version": "7",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "b4ca316e35c1a8a164fa71760934c5be8a7ab04a998b447811596c50ddfba560",
+      "nexus_dll_sha256": "7b8ebdb8f10c93bd4abc2a721bc0d2ae8b9ce7a66995106b89a6b3cc1321247a"
     },
     "Character-Highlight": {
       "nexus": 2233,
       "workshop_id": 3820546396,
-      "version": "4"
+      "version": "4",
+      "steam_version": "4",
+      "nexus_version": "5",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "d2c407e9d9dc0234db981b5cca3d92fcaf4b6e44bf3b7f104e906fba63aa591e",
+      "nexus_dll_sha256": "0bccf754af461a97d7ed828e48be5f7717340e9e0a506978ac791263d7b6822e"
     },
     "Container-Highlight": {
       "nexus": 2207,
@@ -94,8 +152,11 @@
       "dll_sha256": "892b7645134d41dde5dae74512a816b1ebff7a6c26e1846014f51ab5c51532be",
       "bilingual_change_note_sha256": "fccf5bfdf47b33f8ce20917adad0cde7a1c0749eacabefe94c3b8d70eefcfb30",
       "steam_version": "3",
-      "nexus_version": "3",
-      "published_msk": "2026-11-20T09:15:33.420485+03:00"
+      "nexus_version": "4",
+      "published_msk": "2026-11-20T09:15:33.420485+03:00",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "05cb2dab08f70bc67fce393d37f056ae7ead612425e872eea1af11c4ad1e3034",
+      "nexus_dll_sha256": "3a14e29290e628e52a1872dd07f74a17e8b4fbf640b1760d36ee1aa52c0780d8"
     },
     "Hidden-Faction-Relations": {
       "nexus": 2208,
@@ -115,7 +176,12 @@
     "Loot-Scoot-Execute": {
       "nexus": 2210,
       "workshop_id": 3813852124,
-      "version": "8"
+      "version": "8",
+      "steam_version": "8",
+      "nexus_version": "9",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "f9f3bb2b02a98988e813309dd085a1483e85bdd5bea06db3537a1730e05d2326",
+      "nexus_dll_sha256": "1275fd03b124e0312be00d5322c95d7e808dc16df536a1ab259925718ebfbeda"
     },
     "Map-markers": {
       "nexus": 2211,
@@ -125,7 +191,12 @@
     "Organize-the-Crafting-Stations": {
       "nexus": 2219,
       "workshop_id": 3816121254,
-      "version": "2"
+      "version": "2",
+      "steam_version": "2",
+      "nexus_version": "3",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "1236b4d6baeb6a67ea31510575e679f8a57faf2cf3fefda5f7f3af683a242eca",
+      "nexus_dll_sha256": "0982e49f90af8ffd7a744f4bd259f2b229f1b27f6b2527b239974f2a4265c731"
     },
     "Organize-the-Trader": {
       "nexus": 2212,
@@ -136,7 +207,12 @@
       "preview_sha256": "fd283f3ea5b362fff3ef97b8d8331aef3da2b25b48b8d746e55fe64a973f6382",
       "archive_sha256": "0ad54d6a76b9ca371aeb791e7ec0d39498f9a472bd36fb9261413fa31b260047",
       "published_utc": "2026-10-31T23:33:55.937439+00:00",
-      "bilingual_change_note_sha256": "1290b45e5f0a44618a959d85042893ad01584b2a0bc3f4f61ff02fb6b7fb4a29"
+      "bilingual_change_note_sha256": "1290b45e5f0a44618a959d85042893ad01584b2a0bc3f4f61ff02fb6b7fb4a29",
+      "steam_version": "8",
+      "nexus_version": "9",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "3d3d312e3a2ea0b580e3c5c85eb182dfc8ff0e7d3cea0945c36b0aab98fbffb2",
+      "nexus_dll_sha256": "4ceeb8597588e10716740f69d4d55c9426a2d1e8e5c3fb196eeaebc3b20449aa"
     },
     "Vital-Read": {
       "nexus": 2213,
@@ -151,7 +227,12 @@
     "Wall-B-Gone": {
       "nexus": 2215,
       "workshop_id": 3813852362,
-      "version": "5"
+      "version": "5",
+      "steam_version": "5",
+      "nexus_version": "6",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "1bf313de712bc63c51b54e79b87a45672d6defc229da576431b74d2ea94ec589",
+      "nexus_dll_sha256": "fc773f4f2e4dd80bc708cc09b0de99193a07f50053cd03969a8af00a68f536a2"
     },
     "StackSort": {
       "nexus": 2262,
@@ -197,7 +278,12 @@
     "GearCompare": {
       "nexus": 2190,
       "workshop_id": 3812150687,
-      "version": "8"
+      "version": "8",
+      "steam_version": "8",
+      "nexus_version": "9",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "532c4cd9a6004902adf845da050adba443b3dc57172b52e6052ab8925e55795d",
+      "nexus_dll_sha256": "475549990c0e30e8eba67a6746ba2f3c683926dc8784b6261355c3c6330e1a13"
     },
     "ItemMarkers": {
       "nexus": 2224,
@@ -227,7 +313,12 @@
     "WantedMap": {
       "nexus": 2203,
       "workshop_id": 3813761812,
-      "version": "8"
+      "version": "8",
+      "steam_version": "8",
+      "nexus_version": "9",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "a474f9886a12d17a95ecf51a7649321dfb926ccbd1a700a0831cfcc852f41b50",
+      "nexus_dll_sha256": "e774f7af13f347acb42406df9cb2191300b0c9d1815ec669e173c5fb484b6009"
     },
     "KEO": {
       "nexus": 2271,
@@ -238,7 +329,10 @@
       "published_msk": "2026-11-20T16:05:04.040595+03:00",
       "bilingual_change_note_sha256": "c0e2e93537d9f0566f2f51df0ea3d35ce4bd8ecfc3bf95d7e07ae21d68cf8d23",
       "steam_version": "7",
-      "nexus_version": "7"
+      "nexus_version": "8",
+      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
+      "nexus_archive_sha256": "147dd945d1efd196f30963b6a04fec619f70854765d321c52429b1e8fb3f6d85",
+      "nexus_dll_sha256": "feab993139c89b31c4fe7e967e3644d7c4749c9f9864e49daa2d2f90159e1a28"
     }
   }
 }
