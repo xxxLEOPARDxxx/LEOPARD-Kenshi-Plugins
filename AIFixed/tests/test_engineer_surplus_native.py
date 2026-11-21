@@ -33,6 +33,16 @@ planner_wrapper=bytes.fromhex(
  '4424480f14f687050cd602000f5ac6ff158f6a010085c0740e0f2f3514bd0100b81f0000'
  '007705b820000000803d6bbd0200000f28c6741e4898488d0ddbd50200f00fc13c81488b'
  '5c24400f287424204883c4305fc3488b5c24400f287424204883c4305fc3')
+# The same jobs hook in LSE's startup-batch build.
+planner_batch_wrapper=bytes.fromhex(
+ '48895c2408574883ec300f297424204c8bd9bf010000004885d27456488b42704885c0744d4c8b'
+ '15dc7b02004d85d2740e493bc2750981784426010000741a488b0dca7b02004885c97427483bc1'
+ '7522817844270100007519803d226a020000400fb6df740e8bc7f00fc105487c0200eb0232db49'
+ '8bcbff15937c02000f28f084db7466803df769020000745df30f117424488b4424480f14f68705'
+ '9c7b02000f5ac6ff153f3a010085c0740e0f2f3594840100b81f0000007705b820000000803dbb'
+ '690200000f28c6741e4898488d0d6b7b0200f00fc13c81488b5c24400f287424204883c4305fc3'
+ '488b5c24400f287424204883c4305fc3')
+assert fnv(planner_batch_wrapper)==0x8fce3c6c38a760fd
 # RVA 0x5cec0 in KEP 0.17.3 (PE timestamp 0x6a9acdf7), the furnace-extension
 # hook. Its non-furnace path tail-jumps to the saved original with all arguments.
 storage_wrapper=bytes.fromhex(
@@ -75,7 +85,7 @@ src.write_text('''#include <Windows.h>
 #include <cstring>
 #include <cstdio>
 #include <cwchar>
-static unsigned char game[0x232c000], lse[0x16000], kep[0x5d100];
+static unsigned char game[0x232c000], lse[0x16e00], kep[0x5d100];
 static unsigned char* image=game;
 static bool lseLoaded=true, kepLoaded=true;
 static bool StartupGateClosed(){return false;}
@@ -119,11 +129,17 @@ int main() {
     static const unsigned char planner[]={'''+array(planner_wrapper)+'''};
     static const unsigned char storage[]={'''+array(storage_wrapper)+'''};
     memcpy(lse+0x15c10,planner,sizeof(planner));
+    static const unsigned char plannerBatch[]={'''+array(planner_batch_wrapper)+'''};
+    memcpy(lse+0x16d00,plannerBatch,sizeof(plannerBatch));
     memcpy(kep+0x5cec0,storage,sizeof(storage));
     bool okay=Check("vanilla native contracts",true);
     game[0x60f2f0]=0xe9; // KEO's already-shared score entry.
     HookEntry(game+0x50f380,lse+0x15c10);
     okay=Check("LSE planner with shared score",true)&&okay;
+    HookEntry(game+0x50f380,lse+0x16d00);
+    okay=Check("LSE startup-batch planner",true)&&okay;
+    lse[0x16d25]^=1;okay=Check("modified LSE startup-batch wrapper",false)&&okay;lse[0x16d25]^=1;
+    HookEntry(game+0x50f380,lse+0x15c10);
     game[0x50f380+0x650]^=1;
     okay=Check("modified planner body",false)&&okay;
     game[0x50f380+0x650]^=1;

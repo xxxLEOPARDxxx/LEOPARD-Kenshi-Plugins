@@ -601,7 +601,8 @@ namespace EngineerSurplusRuntime
         // tasks unchanged.
         return Contract(0x50f380,0x6af,0x37b09f9ef0175dbbULL)||
             (image[0x50f380]==0xe9&&Contract(0x50f385,0x6aa,0xf27e769eb7fb5a5dULL)&&
-             AuditedHook(0x50f380,L"Loot-Scoot-Execute.dll",0x15c10,0xfa,0x953671ec41749d05ULL));
+             (AuditedHook(0x50f380,L"Loot-Scoot-Execute.dll",0x15c10,0xfa,0x953671ec41749d05ULL)||
+              AuditedHook(0x50f380,L"Loot-Scoot-Execute.dll",0x16d00,0xfa,0x8fce3c6c38a760fdULL)));
     }
     bool StorageEntry()
     {
