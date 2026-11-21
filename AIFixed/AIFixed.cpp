@@ -50,6 +50,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include "../shared/StartupHookBatch.h"
 
 #include <kenshi/Character.h>
 #include <kenshi/CharMovement.h>
@@ -1633,36 +1634,25 @@ __declspec(dllexport) void startPlugin()
     if(!g_gateHooksReady)ErrorLog("AIFixed: gate intent hooks incomplete; gate assistance suspended");
     InstallEngineers();
 
-    // Хук стоит всегда, выключатель правки читается на ходу.
-    if (KenshiLib::SUCCESS !=
-        KenshiLib::AddHook(KenshiLib::GetRealAddress(&AI::findOwnedFreeBed),
-                           FindOwnedFreeBed_hook,
-                           &g_origFindOwnedFreeBed))
-    {
-        ErrorLog("AIFixed: could not hook the bed search, skeletons keep going to ordinary beds");
-    }
-
-    if (KenshiLib::SUCCESS !=
-        KenshiLib::AddHook(KenshiLib::GetRealAddress(&AI::_NV_scoreGetOutOfBedOnceFullyHealed),
-                           GetOutHealed_hook,
-                           &g_origGetOutHealed))
-    {
-        ErrorLog("AIFixed: could not hook the get-out-of-bed check, skeletons leave repair beds at once");
-    }
-
-    // Саморемонт - из обновления интерфейса; выключатель читается на ходу.
-    if (KenshiLib::SUCCESS !=
-        KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
-                           GuiUpdate_hook,
-                           &g_origGuiUpdate))
-    {
-        ErrorLog("AIFixed: could not hook the interface update, no self-repair");
-    }
-
-    if((g_debug||(g_lifecycleReady&&g_newHooksReady))&&
-       KenshiLib::SUCCESS!=KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::dropCarriedObject),
-                                             Drop_hook,&g_origDrop))
-        ErrorLog("AIFixed: could not observe automatic rescue bed placements");
+    // Rest/GUI observers have independent originals and read their settings live.
+    // Lifecycle, order and engineer hooks have already published readiness.
+    const bool watchDrop = g_debug||(g_lifecycleReady&&g_newHooksReady);
+    StartupHooks::Hook hooks[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&AI::findOwnedFreeBed),
+                           FindOwnedFreeBed_hook, &g_origFindOwnedFreeBed, "findOwnedFreeBed"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&AI::_NV_scoreGetOutOfBedOnceFullyHealed),
+                           GetOutHealed_hook, &g_origGetOutHealed, "scoreGetOutOfBedOnceFullyHealed"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
+                           GuiUpdate_hook, &g_origGuiUpdate, "ForgottenGUI::update"),
+        StartupHooks::Hook(watchDrop ? KenshiLib::GetRealAddress(&Character::dropCarriedObject) : 0,
+                           Drop_hook, &g_origDrop, "dropCarriedObject", watchDrop)
+    };
+    StartupHooks::Install(hooks, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    for (size_t i = 0; i < sizeof(hooks)/sizeof(hooks[0]); ++i)
+        if (hooks[i].enabled && !hooks[i].installed)
+            ErrorLog(std::string("AIFixed: startup hook installation unconfirmed: ") + hooks[i].name);
 
     // Остальная диагностика - только при подробном журнале на старте.
     if (g_debug)

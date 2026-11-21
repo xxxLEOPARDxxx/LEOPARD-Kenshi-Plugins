@@ -23,7 +23,7 @@ def function(name):
     return text[match.start():end]
 
 policy = text[text.index('    bool g_rmbWasDown ='):text.index('    DWORD g_lastDropLogMs =')]
-hooks = text[text.index('    void (*g_origAddOrder)'):text.index('    void HookByExport(')]
+hooks = text[text.index('    void (*g_origAddOrder)'):text.index('    template<class Detour, class Original>\n    StartupHooks::Hook HookByExport(')]
 fixture = (tests / 'right_click_fixture.cpp').read_text(encoding='utf-8')
 generated = fixture.replace('// EXTRACT_PRODUCTION', policy + '\n' + function('DropOrder') + '\n' + hooks)
 cpp = out / 'actual_right_click.cpp'

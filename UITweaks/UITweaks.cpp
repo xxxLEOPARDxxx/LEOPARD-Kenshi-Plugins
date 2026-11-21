@@ -76,6 +76,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include "../shared/StartupHookBatch.h"
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -3251,12 +3252,12 @@ namespace
         g_origCharMoveOrder(self, dest, subject, location);
     }
 
-    void HookByExport(const char* name, void* hook, void** orig)
+    template<class Detour, class Original>
+    StartupHooks::Hook HookByExport(const char* name, Detour hook, Original* orig)
     {
         HMODULE const lib = GetModuleHandleA("KenshiLib.dll");
         void* const stub = lib != NULL ? reinterpret_cast<void*>(GetProcAddress(lib, name)) : NULL;
-        if (stub == NULL || KenshiLib::SUCCESS != KenshiLib::AddHook(KenshiLib::GetRealAddress(stub), hook, orig))
-            ErrorLog(std::string("UITweaks: could not hook ") + name);
+        return StartupHooks::Hook(stub ? KenshiLib::GetRealAddress(stub) : 0, hook, orig, name);
     }
 
     // ---- Сдвиг на то же место (22.10.2026)
@@ -3329,14 +3330,14 @@ namespace
 
     // экспорт MyGUIEngine - переходник jmp (инкрементальная сборка); хук -
     // на саму функцию
-    void HookMyGui(const char* name, void* hook, void** orig)
+    template<class Detour, class Original>
+    StartupHooks::Hook HookMyGui(const char* name, Detour hook, Original* orig)
     {
         HMODULE const lib = GetModuleHandleA("MyGUIEngine_x64.dll");
         unsigned char* p = lib != NULL ? reinterpret_cast<unsigned char*>(GetProcAddress(lib, name)) : NULL;
         if (p != NULL && p[0] == 0xE9)
             p = p + 5 + *reinterpret_cast<int*>(p + 1);
-        if (p == NULL || KenshiLib::SUCCESS != KenshiLib::AddHook(p, hook, orig))
-            ErrorLog(std::string("UITweaks: could not hook ") + name);
+        return StartupHooks::Hook(p, hook, orig, name);
     }
 
     MyGUI::TextBox* FindTraderMoney(MyGUI::Widget* widget, int depth)
@@ -3825,32 +3826,33 @@ __declspec(dllexport) void startPlugin()
                  "right clicks may still pass through the inventory window");
     }
     // закрытые в заголовках - адрес по имени экспорта
-    HookByExport("?updateLastMoveWaypointSelectedCharacters@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
-                 reinterpret_cast<void*>(&MoveWaypoint_hook), reinterpret_cast<void**>(&g_origMoveWaypoint));
-    HookByExport("?playerMove@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
-                 reinterpret_cast<void*>(&PlayerMove_hook), reinterpret_cast<void**>(&g_origPlayerMove));
-    HookByExport("?_NV_playerMoveOrderDefault@Character@@QEAAXPEAVBuilding@@PEAVRootObject@@AEBVVector3@Ogre@@@Z",
-                 reinterpret_cast<void*>(&CharMoveOrder_hook), reinterpret_cast<void**>(&g_origCharMoveOrder));
+    StartupHooks::Hook hooks[] = {
+        HookByExport("?updateLastMoveWaypointSelectedCharacters@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
+                     MoveWaypoint_hook, &g_origMoveWaypoint),
+        HookByExport("?playerMove@PlayerInterface@@QEAAXAEBVVector3@Ogre@@PEAVBuilding@@@Z",
+                     PlayerMove_hook, &g_origPlayerMove),
+        HookByExport("?_NV_playerMoveOrderDefault@Character@@QEAAXPEAVBuilding@@PEAVRootObject@@AEBVVector3@Ogre@@@Z",
+                     CharMoveOrder_hook, &g_origCharMoveOrder),
 
-    // Сдвиг виджета на то же место - не пересобирать слой. Хук стоит
-    // всегда, выключатель (SkipSameMoves) читается на ходу.
-    HookMyGui("?setPosition@Widget@MyGUI@@UEAAXAEBU?$TPoint@H@types@2@@Z",
-              reinterpret_cast<void*>(&SetPositionPoint_hook), reinterpret_cast<void**>(&g_origSetPositionPoint));
-    HookMyGui("?setPosition@Widget@MyGUI@@QEAAXHH@Z",
-              reinterpret_cast<void*>(&SetPositionXY_hook), reinterpret_cast<void**>(&g_origSetPositionXY));
+        // SkipSameMoves is read live by these four geometry detours.
+        HookMyGui("?setPosition@Widget@MyGUI@@UEAAXAEBU?$TPoint@H@types@2@@Z",
+                  SetPositionPoint_hook, &g_origSetPositionPoint),
+        HookMyGui("?setPosition@Widget@MyGUI@@QEAAXHH@Z",
+                  SetPositionXY_hook, &g_origSetPositionXY),
+        HookMyGui("?setSize@Widget@MyGUI@@UEAAXAEBU?$TSize@H@types@2@@Z",
+                  SetSizePoint_hook, &g_origSetSizePoint),
+        HookMyGui("?setRealSize@Widget@MyGUI@@QEAAXAEBU?$TSize@M@types@2@@Z",
+                  SetRealSize_hook, &g_origSetRealSize),
 
-    HookMyGui("?setSize@Widget@MyGUI@@UEAAXAEBU?$TSize@H@types@2@@Z",
-              reinterpret_cast<void*>(&SetSizePoint_hook), reinterpret_cast<void**>(&g_origSetSizePoint));
-    HookMyGui("?setRealSize@Widget@MyGUI@@QEAAXAEBU?$TSize@M@types@2@@Z",
-              reinterpret_cast<void*>(&SetRealSize_hook), reinterpret_cast<void**>(&g_origSetRealSize));
-
-    // Иконка вещи у мыши во вкладке «Ремесло» - нужно знать её станок.
-    if (KenshiLib::SUCCESS !=
-        KenshiLib::AddHook(KenshiLib::GetRealAddress(&ManagementScreen::setCraftingBench),
-                           SetCraftingBench_hook, &g_origSetCraftingBench))
-    {
-        ErrorLog("UITweaks: could not hook the crafting tab, no item icons there");
-    }
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&ManagementScreen::setCraftingBench),
+                           SetCraftingBench_hook, &g_origSetCraftingBench, "setCraftingBench")
+    };
+    StartupHooks::Install(hooks, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    for (size_t i = 0; i < sizeof(hooks)/sizeof(hooks[0]); ++i)
+        if (!hooks[i].installed)
+            ErrorLog(std::string("UITweaks: startup hook installation unconfirmed: ") + hooks[i].name);
 
     // Кнопка случайного имени в редакторе персонажа.
     if (g_randomName &&
