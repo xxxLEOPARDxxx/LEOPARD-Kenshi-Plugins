@@ -14,83 +14,63 @@
     ]
   },
   "AssignedWorkers": {
-    "version": "8",
-    "published_version": "7",
+    "version": "9",
+    "published_version": "8",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for the worker panels across building types, including crafting, farming, research and turrets."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка панелей работников для станков, ферм, исследований, турелей и других построек."
     ]
   },
   "PatientSelfAid": {
-    "version": "5",
-    "published_version": "4",
+    "version": "6",
+    "published_version": "5",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for resetting self-aid state when a character loads or a new game starts."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка сброса состояния самолечения при загрузке персонажа и начале новой игры."
     ]
   },
   "UITweaks": {
-    "version": "13",
-    "published_version": "12",
+    "version": "14",
+    "published_version": "13",
     "en": [
-      "[b]Save and load previews.[/b] Select an existing slot in Save Game or Load Game to see its screenshot below the window. Successful manual saves, quicksaves and autosaves capture the game with its HUD while excluding save/load and pause menus. Slots without an image show no preview frame.",
-      "[b]Stable, sharper previews.[/b] The dialog opens higher before selection and stays put when changing rows. Its full-width preview frame fits the complete image without cropping. New screenshots use filtered resizing and lossless PNG up to 1600x900; older JPEG previews remain readable.",
-      "[b]A taller save list.[/b] MCM offers Save/load window height from 100% to 160%, default 120%. It applies on the next opening and respects the screen and preview space.",
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for crafting-window handling, tooltip updates, and inventory and interface events."
     ],
     "ru": [
-      "[b]Предпросмотр сохранений и загрузок.[/b] Выберите существующий слот в меню сохранения или загрузки, чтобы увидеть снимок под окном. Успешные ручные, быстрые и автоматические сохранения получают снимок игры с HUD, без меню сохранения, загрузки и паузы. У слотов без изображения рамка предпросмотра скрыта.",
-      "[b]Стабильный и чёткий снимок.[/b] Окно сразу открывается выше и не двигается при смене строки. Рамка идёт по ширине окна, изображение вписывается целиком без обрезки. Новые снимки используют качественное уменьшение и PNG без потерь до 1600x900; старые JPEG по-прежнему читаются.",
-      "[b]Более высокий список сейвов.[/b] В MCM настраивается высота окон сохранения и загрузки от 100% до 160%, по умолчанию 120%. Изменение применяется при следующем открытии с учётом экрана и места под снимок.",
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка обработки окон ремесла, подсказок и событий интерфейса и инвентаря."
     ]
   },
   "ModConfigMenu": {
-    "version": "13",
-    "published_version": "12",
+    "version": "14",
+    "published_version": "13",
     "en": [
-      "Reset to defaults now asks for confirmation with a red warning. Cancel or Escape keeps your settings; only the selected mod is reset after confirmation."
+      "Reduced startup work for observing when the settings window updates and closes."
     ],
     "ru": [
-      "Сброс по умолчанию теперь требует подтверждения с красным предупреждением. Отмена или Escape сохраняют настройки; после подтверждения сбрасывается только выбранный мод."
+      "Ускорена стартовая настройка обновления и закрытия окна настроек."
     ]
   },
   "BetterLooting": {
-    "version": "6",
-    "published_version": "5",
-    "ru": [
-      "Исправлены вылеты при повторном сборе по Insert после разгрузки, закрытия или смены окон инвентаря и замены рюкзака.",
-      "Перед отделением предмета от стопки проверяется место в инвентаре назначения. Непоместившаяся добыча остаётся в источнике."
-    ],
+    "version": "7",
+    "published_version": "6",
     "en": [
-      "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
-      "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
+      "Reduced startup work for inventory monitoring and selective deposit protections."
+    ],
+    "ru": [
+      "Ускорена стартовая настройка обновления инвентаря и защит при выборочной выгрузке предметов."
     ]
   },
   "SkillLevelUpInfo": {
-    "version": "5",
-    "published_version": "4",
+    "version": "6",
+    "published_version": "5",
     "en": [
-      "Excluded the unused Mass combat skill from XP and level-up notifications and recent-training bars. Other skills and the game's XP calculation are unchanged."
+      "Reduced startup work for experience notifications and the character stat panel."
     ],
     "ru": [
-      "Неиспользуемый навык «Массовый бой» исключён из сообщений об опыте, повышении уровня и полос недавних тренировок. Остальные навыки и расчёт опыта игры не изменены."
+      "Ускорена стартовая настройка уведомлений об опыте и панели характеристик."
     ]
   },
   "MultiXPMining": {
@@ -108,61 +88,45 @@
     ]
   },
   "Character Inspector": {
-    "version": "3",
-    "published_version": "2",
-    "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
-    ],
-    "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
-    ]
-  },
-  "KenshiRotate": {
-    "version": "3",
-    "published_version": "2",
-    "en": [
-      "Workers can automatically unload rotated items into storage. Quick transfers and automatic unloading can merge compatible items into an existing stack in its current orientation.",
-      "Dragging onto a stack still requires matching orientations."
-    ],
-    "ru": [
-      "Работники автоматически разгружают перевёрнутые предметы на склад. При быстрой и автоматической передаче совместимые предметы объединяются с существующей стопкой в её ориентации.",
-      "При перетаскивании на стопку ориентации предметов должны совпадать."
-    ]
-  },
-  "KillCounter": {
-    "version": "3",
-    "published_version": "2",
-    "ru": [
-      "Добавлен учёт добиваний из обновлённого Loot-Scoot-Execute: убийство засчитывается фактическому исполнителю, в том числе после чужого оглушения.",
-      "Повторное начисление одного убийства исключено; авторство первоначального оглушения сохраняется. Loot-Scoot-Execute необязателен для обычной работы счётчика."
-    ],
-    "en": [
-      "Added finisher credit from the updated Loot-Scoot-Execute: the actual executor receives the kill, including after another character knocked the victim out.",
-      "The same kill is not counted twice, and the original knockout credit is preserved. Loot-Scoot-Execute remains optional for ordinary counter operation."
-    ]
-  },
-  "AIFixed": {
     "version": "4",
     "published_version": "3",
     "en": [
-      "Optional coordination for player engineers. They account for materials already on the way, collect useful batches from storage and production outputs, and prioritise finishing machines under construction.",
-      "After finishing construction, engineers try to return identified leftovers to suitable storage before their next ordinary permanent job. Manual orders, combat and urgent work keep priority.",
-      "Improved recovery for NPCs and pack animals trapped in walls and at wall joins. Recovery checks for a safe exit on the same side.",
-      "Skeletons put in ordinary beds by automatic rescuers can switch to powered repair beds after regaining mobility. Modded repair beds are recognised by their treatment function.",
-      "Reduced background work for engineer coordination and freed temporary storage search memory after use.",
-      "Original SleepFix and GateFix are not required: their adapted functions are already included in AI Fixed."
+      "Reduced startup work for updating the inspection panel and tracking the closing of inventories and other windows."
     ],
     "ru": [
-      "Добавлено необязательное согласование работы инженеров игрока. Они учитывают материалы в пути, берут нужное количество со складов и выходов станков, в первую очередь завершают начатые машины.",
-      "После завершения стройки инженеры стараются вернуть подтверждённые остатки на подходящий склад перед следующей обычной постоянной работой. Ручные приказы, бой и срочные работы сохраняют приоритет.",
-      "Улучшено освобождение NPC и вьючных животных, застрявших в стенах и на стыках. Проверяется безопасный выход на ту же сторону.",
-      "Скелет, которого автоматический спасатель уложил в обычную кровать, после восстановления подвижности может перейти на ремкровать с питанием. Модовые ремкровати распознаются по функции лечения.",
-      "Снижена фоновая нагрузка согласования инженеров. Временная память поиска склада освобождается после использования.",
-      "Оригинальные SleepFix и GateFix устанавливать не нужно: их адаптированные функции уже включены в AI Fixed."
+      "Ускорена стартовая настройка обновления панели осмотра и отслеживания закрытия инвентарей и других окон."
+    ]
+  },
+  "KenshiRotate": {
+    "version": "4",
+    "published_version": "3",
+    "en": [
+      "Reduced startup work for item and inventory-icon cleanup. Use KEO 8 for compatible shop counter stocking."
+    ],
+    "ru": [
+      "Ускорена стартовая настройка очистки данных предметов и значков инвентаря. Для совместимой работы пополнения прилавка обновите KEO до версии 8."
+    ]
+  },
+  "KillCounter": {
+    "version": "4",
+    "published_version": "3",
+    "en": [
+      "Reduced startup work for tracking melee and ranged hits."
+    ],
+    "ru": [
+      "Ускорена стартовая настройка учёта ударов в ближнем бою и попаданий из дальнобойного оружия."
+    ]
+  },
+  "AIFixed": {
+    "version": "5",
+    "published_version": "4",
+    "en": [
+      "Reduced startup work for bed selection, recovery and interface checks.",
+      "Engineer surplus return stays compatible with Loot Scoot Execute 9."
+    ],
+    "ru": [
+      "Ускорена стартовая настройка поиска кроватей, окончания лечения и обновления интерфейса.",
+      "Возврат лишних материалов инженерами совместим с Loot Scoot Execute 9."
     ]
   },
   "StackSort": {
@@ -182,17 +146,13 @@
     ]
   },
   "Organize-the-Trader": {
-    "version": "8",
-    "published_version": "7",
+    "version": "9",
+    "published_version": "8",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for detecting when trader and inventory layouts are created."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка отслеживания создания окон торговца и инвентаря."
     ]
   },
   "BestMinimap": {
@@ -210,15 +170,13 @@
     ]
   },
   "Formations": {
-    "version": "3",
-    "published_version": "2",
+    "version": "4",
+    "published_version": "3",
     "en": [
-      "Formation shortcuts appear in a game-themed popup attached just above the retractable character panel. The popup follows the panel and uses the active HUD theme.",
-      "Detailed logging is optional and off by default. The Mod Config Menu setting applies immediately. Errors are still recorded."
+      "Reduced startup work for handling movement orders and computing formation positions from the camera."
     ],
     "ru": [
-      "Подсказка с клавишами построений оформлена в игровом стиле и примыкает к верхнему краю выдвижной панели персонажа. Она следует за панелью и использует активную тему HUD.",
-      "Подробный журнал по умолчанию выключен. Настройка в Mod Config Menu применяется сразу. Ошибки по-прежнему записываются."
+      "Ускорена стартовая настройка обработки приказов движения и расчёта позиции построения по камере."
     ]
   },
   "TauntExpansion": {
@@ -264,17 +222,13 @@
     ]
   },
   "GearCompare": {
-    "version": "8",
-    "published_version": "7",
+    "version": "9",
+    "published_version": "8",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for armour, weapon and crossbow comparison tooltips."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка подсказок сравнения брони, оружия и арбалетов."
     ]
   },
   "ItemMarkers": {
@@ -348,13 +302,13 @@
     ]
   },
   "WantedMap": {
-    "version": "8",
-    "published_version": "7",
+    "version": "9",
+    "published_version": "8",
     "en": [
-      "Recognises the full-width colon in Chinese wanted poster titles so they can be matched to map targets."
+      "Reduced startup work for wanted-target death tracking and the inventory icons used by the map."
     ],
     "ru": [
-      "Объявления о розыске с полноширинным китайским двоеточием распознаются при поиске целей на карте."
+      "Ускорена стартовая настройка учёта смерти целей и значков в инвентаре для меток розыска."
     ]
   },
   "Container-Highlight": {
@@ -416,63 +370,43 @@
     ]
   },
   "Organize-the-Crafting-Stations": {
-    "version": "2",
-    "published_version": "1",
+    "version": "3",
+    "published_version": "2",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for detecting when crafting station layouts are created."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка отслеживания создания окон ремесленных станков."
     ]
   },
   "Auto-Pause-on-Load": {
-    "version": "6",
-    "published_version": "5",
+    "version": "7",
+    "published_version": "6",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for the dialogue, injury and imported-save pause triggers."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка автопаузы при диалогах, ранениях и импорте сохранения."
     ]
   },
   "Loot-Scoot-Execute": {
-    "version": "8",
-    "published_version": "7",
-    "ru": [
-      "Shift + «Добить» добавляет постоянную работу по целям, которых этот исполнитель лично оглушил в бою или скрытности. Shift + «Добить всех» добавляет работу по лежащим врагам.",
-      "Постоянные работы выполняются после боя, учитывают приоритет работ и уступают прямым приказам. Разрешение не-врагов действует на собственные подтверждённые оглушения; работа по врагам остаётся только для врагов.",
-      "Восстановлено добивание поверженных животных. Радиус поиска теперь соответствует метрам; дистанция самого удара настраивается отдельно.",
-      "При разрешённом убийстве нейтрала или союзника окно нарушения закона длится не менее 20 секунд. Свидетелей и их реакцию определяет игра.",
-      "Обновлённый Kill Counter засчитывает добивание исполнителю без двойного начисления. Kill Counter необязателен; подсказки уточнены на трёх языках."
-    ],
+    "version": "9",
+    "published_version": "8",
     "en": [
-      "Shift + Execute adds a persistent job for targets personally knocked out by that executor in combat or stealth. Shift + Execute All adds a job for downed enemies.",
-      "Persistent jobs run after combat, respect job priority and yield to direct orders. Non-hostile permission applies to verified own knockouts; the enemy job remains hostile-only.",
-      "Restored finishers on downed animals. Search radius now uses metres; strike distance is configured separately.",
-      "For permitted neutral or allied murders, the crime window lasts at least 20 seconds. Witnesses and their reactions are handled by the game.",
-      "The updated Kill Counter credits finishers to their executor without double counting. Kill Counter is optional; tooltips were clarified in all three languages."
+      "Reduced startup work for handling player commands that cancel pending executions, including movement waypoints. Use AI Fixed 5 for engineer surplus return when using both plugins."
+    ],
+    "ru": [
+      "Ускорена стартовая настройка обработки приказов и точек маршрута, отменяющих отложенные добивания. Для возврата излишков инженерами при совместной работе обновите AI Fixed до версии 5."
     ]
   },
   "Wall-B-Gone": {
-    "version": "5",
-    "published_version": "4",
+    "version": "6",
+    "published_version": "5",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Reduced startup work for reading the settings window and saving hotkey changes."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Ускорена стартовая настройка окна параметров и сохранения изменений горячей клавиши."
     ]
   },
   "Hidden-Faction-Relations": {
@@ -516,29 +450,33 @@
     ]
   },
   "Character-Highlight": {
-    "version": "4",
-    "published_version": "3",
+    "version": "5",
+    "published_version": "4",
     "en": [
-      "Optional NPC names in relationship colours, with a separate Ctrl+N hotkey and adjustable horizontal and vertical offsets. In the maintainer's test scene, enabling names caused no noticeable FPS drop.",
-      "Optional relationship tint when hovering over a character, with adjustable tint intensity so clothing and equipment remain visible.",
-      "Fixed name colours when a highlight palette component exceeds the normal range."
+      "Reduced startup work for tint cleanup and character portraits.",
+      "Cleaned up unused outline settings and their translations."
     ],
     "ru": [
-      "Имена NPC окрашиваются по отношениям. Есть отдельное сочетание Ctrl+N и смещение по обеим осям. В тестовой сцене автора форка показ имён не вызвал заметной просадки FPS.",
-      "Можно включить окраску по отношениям при наведении курсора. Интенсивность регулируется, чтобы одежда и экипировка оставались видны.",
-      "Исправлены неверные цвета имён при выходе значения цвета за допустимый диапазон."
+      "Ускорена стартовая настройка сброса подсветки и обработки портретов.",
+      "Удалены неиспользуемые настройки контуров и их переводы."
     ]
   },
   "KEO": {
-    "version": "7",
-    "published_version": "6",
+    "version": "8",
+    "published_version": "7",
     "en": [
-      "Enabled verified save-loading, NPC model and equipment, and resource reuse optimizations on the supported GOG 1.0.65 build.",
-      "Restored Stock shop counter with compatible StackSort releases on Steam and GOG. It works in either plugin load order."
+      "Faster initialization before the main menu with compatible KenshiLib.",
+      "Short movement orders stay closer to the selected point. Squads keep the current destination and gathering point when an order is replaced or the leader has no usable route.",
+      "Long trips request the next required area sooner and resume only when a usable passage is found.",
+      "Supported models prepare triangle connectivity faster. Buffered save loading reads related fields together on Steam and GOG.",
+      "Shop counter stocking remains compatible with Rotate Items 4."
     ],
     "ru": [
-      "На поддерживаемой сборке GOG 1.0.65 включены оптимизации загрузки сохранений, подготовки моделей и экипировки NPC, а также повторного использования ресурсов.",
-      "Восстановлена работа «Пополнять прилавок» с совместимыми выпусками StackSort на Steam и GOG. Порядок загрузки плагинов не важен."
+      "Ускорена инициализация до главного меню с совместимой версией KenshiLib.",
+      "Короткие приказы ведут ближе к выбранной точке. Отряд сохраняет актуальную цель и точку сбора при повторном приказе или отсутствии пути у ведущего.",
+      "На длинном маршруте следующий нужный участок запрашивается заранее. Отряд продолжает движение, когда найдена пригодная точка прохода.",
+      "Быстрее подготавливаются связи между треугольниками поддерживаемых моделей. На Steam и GOG связанные поля сейва читаются вместе, когда они уже в буфере.",
+      "Пополнение прилавка совместимо с Rotate Items 4."
     ]
   }
 }

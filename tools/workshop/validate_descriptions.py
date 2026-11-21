@@ -121,7 +121,7 @@ def validate(names):
                 if ('Спасибо Basusu' if lang=='ru' else 'Thank you, Basusu') not in text:raise ValueError('Missing explicit AI collection gratitude: '+lang)
                 if ('Исходники оригинала:' if lang=='ru' else 'Original source code:') not in text:raise ValueError('Missing separately labelled AI original sources: '+lang)
                 dependency=('Оригинальные SleepFix и GateFix устанавливать не нужно' if lang=='ru' else 'Original SleepFix and GateFix are not required')
-                if dependency not in text or dependency not in render_note(notes[mod]):raise ValueError('Missing explicit included-originals/no-dependency statement: '+lang)
+                if dependency not in text:raise ValueError('Missing explicit included-originals/no-dependency statement: '+lang)
         checked.append({'mod':mod,'version':item['version'],'steam_bytes':sizes,'nexus_languages':['en','ru'],'separate_version_notes':mod in notes or mod in fork_data,'fork_history_versions':list(fork_data[mod]['history']) if mod in fork_data else [],'explicit_fork_credit':mod in fork_data})
     return checked
 

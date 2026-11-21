@@ -392,3 +392,13 @@ UITweaks.ini — ваши настройки: обновление мода ег
 Localization diagnostics / Журнал локализации (2026-11-01)
 Locale and catalogue-size summaries are written only while this plugin's Detailed log is enabled. Enabling it after translations have loaded reports the existing catalogue once. Loading/format errors remain visible with detailed logging off.
 Сводка языка и числа переводов записывается только при включённом подробном журнале этого плагина. Включение журнала после загрузки переводов выводит сводку существующего каталога один раз. Ошибки загрузки и формата видны и при выключенном подробном журнале.
+
+Release 14 / Выпуск 14
+
+English
+
+- Reduced startup work for crafting-window handling, tooltip updates, and inventory and interface events.
+
+Русский
+
+- Ускорена стартовая настройка обработки окон ремесла, подсказок и событий интерфейса и инвентаря.

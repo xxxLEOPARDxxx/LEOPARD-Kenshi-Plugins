@@ -157,3 +157,13 @@ English
 English
 
 - Recognises the full-width colon in Chinese wanted poster titles so they can be matched to map targets.
+
+Release 9 / Выпуск 9
+
+English
+
+- Reduced startup work for wanted-target death tracking and the inventory icons used by the map.
+
+Русский
+
+- Ускорена стартовая настройка учёта смерти целей и значков в инвентаре для меток розыска.

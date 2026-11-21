@@ -8,7 +8,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "6",
+    "version": "7",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -75,6 +75,14 @@
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
         ]
+      },
+      "7": {
+        "en": [
+          "Reduced startup work for the dialogue, injury and imported-save pause triggers."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка автопаузы при диалогах, ранениях и импорте сохранения."
+        ]
       }
     },
     "player_changes": {
@@ -101,7 +109,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "6",
+    "version": "7",
     "changes": {
       "ru": [
         "MCM и три языка; исправления переноса с KEO и правил краденого; восстановленная раскладка Alt+Insert.",
@@ -170,6 +178,14 @@
           "Fixed crashes during repeated Insert looting after unloading, closing or switching inventory windows, and changing backpacks.",
           "Destination room is checked before splitting an item from its stack. Loot that does not fit stays in the source."
         ]
+      },
+      "7": {
+        "en": [
+          "Reduced startup work for inventory monitoring and selective deposit protections."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка обновления инвентаря и защит при выборочной выгрузке предметов."
+        ]
       }
     },
     "player_changes": {
@@ -196,7 +212,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "4",
+    "version": "5",
     "changes": {
       "ru": [
         "Добавлены MCM и русский/английский/китайский интерфейс, отдельные переключатели категорий, дальность и настройки окраски.",
@@ -249,6 +265,16 @@
           "Можно включить окраску по отношениям при наведении курсора. Интенсивность регулируется, чтобы одежда и экипировка оставались видны.",
           "Исправлены неверные цвета имён при выходе значения цвета за допустимый диапазон."
         ]
+      },
+      "5": {
+        "en": [
+          "Reduced startup work for tint cleanup and character portraits.",
+          "Cleaned up unused outline settings and their translations."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка сброса подсветки и обработки портретов.",
+          "Удалены неиспользуемые настройки контуров и их переводы."
+        ]
       }
     },
     "player_changes": {
@@ -277,7 +303,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "3",
+    "version": "4",
     "changes": {
       "ru": [
         "В MCM можно включить осмотр и кнопку инвентаря; отдельное назначение открытия убрано.",
@@ -317,6 +343,14 @@
           "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+        ]
+      },
+      "4": {
+        "en": [
+          "Reduced startup work for updating the inspection panel and tracking the closing of inventories and other windows."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка обновления панели осмотра и отслеживания закрытия инвентарей и других окон."
         ]
       }
     },
@@ -411,7 +445,7 @@
       "ru": "Автор приложил исходники к оригинальному моду в Steam Workshop; отдельный публичный репозиторий не подтверждён.",
       "en": "The author shipped source code with the original Steam Workshop mod; no separate public repository has been verified."
     },
-    "version": "3",
+    "version": "4",
     "changes": {
       "ru": [
         "Добавлен строй при следовании с 13 доступными фигурами: 3 игровых и 10 новых; выбор каждого отряда хранится с сохранением.",
@@ -455,6 +489,14 @@
         "ru": [
           "Подсказка с клавишами построений оформлена в игровом стиле и примыкает к верхнему краю выдвижной панели персонажа. Она следует за панелью и использует активную тему HUD.",
           "Подробный журнал по умолчанию выключен. Настройка в Mod Config Menu применяется сразу. Ошибки по-прежнему записываются."
+        ]
+      },
+      "4": {
+        "en": [
+          "Reduced startup work for handling movement orders and computing formation positions from the camera."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка обработки приказов движения и расчёта позиции построения по камере."
         ]
       }
     },
@@ -719,7 +761,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "3",
+    "version": "4",
     "changes": {
       "ru": [
         "MCM заменяет прежнюю вкладку MODS: одно назначение клавиатуры или мыши с модификаторами, MMB по умолчанию; NONE отключает ввод. Для назначения мыши нужен MCM 10 или новее.",
@@ -764,6 +806,14 @@
           "Работники автоматически разгружают перевёрнутые предметы на склад. При быстрой и автоматической передаче совместимые предметы объединяются с существующей стопкой в её ориентации.",
           "При перетаскивании на стопку ориентации предметов должны совпадать."
         ]
+      },
+      "4": {
+        "en": [
+          "Reduced startup work for item and inventory-icon cleanup. Use KEO 8 for compatible shop counter stocking."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка очистки данных предметов и значков инвентаря. Для совместимой работы пополнения прилавка обновите KEO до версии 8."
+        ]
       }
     },
     "player_changes": {
@@ -792,7 +842,7 @@
       "ru": "Исходники поставлялись с установленным оригиналом; публичный репозиторий и разрешение автора на распространение изменённой версии не подтверждены. Явной лицензии локально не было.",
       "en": "Source code shipped with the installed original; a public repository and author permission to redistribute a modified version have not been verified. No explicit license was present locally."
     },
-    "version": "3",
+    "version": "4",
     "changes": {
       "ru": [
         "В MCM добавлены общее включение учёта и независимый показ каждой строки; скрытие строки не останавливает её учёт, отключение сохраняет накопленное.",
@@ -839,6 +889,14 @@
           "Added finisher credit from the updated Loot-Scoot-Execute: the actual executor receives the kill, including after another character knocked the victim out.",
           "The same kill is not counted twice, and the original knockout credit is preserved. Loot-Scoot-Execute remains optional for ordinary counter operation."
         ]
+      },
+      "4": {
+        "en": [
+          "Reduced startup work for tracking melee and ranged hits."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка учёта ударов в ближнем бою и попаданий из дальнобойного оружия."
+        ]
       }
     },
     "player_changes": {
@@ -867,7 +925,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "8",
+    "version": "9",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -973,6 +1031,14 @@
           "Restored finishers on downed animals. Search radius now uses metres; strike distance is configured separately.",
           "For permitted neutral or allied murders, the crime window lasts at least 20 seconds. Witnesses and their reactions are handled by the game.",
           "The updated Kill Counter credits finishers to their executor without double counting. Kill Counter is optional; tooltips were clarified in all three languages."
+        ]
+      },
+      "9": {
+        "en": [
+          "Reduced startup work for handling player commands that cancel pending executions, including movement waypoints. Use AI Fixed 5 for engineer surplus return when using both plugins."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка обработки приказов и точек маршрута, отменяющих отложенные добивания. Для возврата излишков инженерами при совместной работе обновите AI Fixed до версии 5."
         ]
       }
     },
@@ -1105,7 +1171,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "2",
+    "version": "3",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -1137,6 +1203,14 @@
           "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+        ]
+      },
+      "3": {
+        "en": [
+          "Reduced startup work for detecting when crafting station layouts are created."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка отслеживания создания окон ремесленных станков."
         ]
       }
     },
@@ -1190,7 +1264,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "8",
+    "version": "9",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -1288,6 +1362,14 @@
           "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+        ]
+      },
+      "9": {
+        "en": [
+          "Reduced startup work for detecting when trader and inventory layouts are created."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка отслеживания создания окон торговца и инвентаря."
         ]
       }
     },
@@ -1553,7 +1635,7 @@
       "ru": "Исходники оригинала доступны в указанном репозитории.",
       "en": "Original source code is available in the linked repository."
     },
-    "version": "5",
+    "version": "6",
     "changes": {
       "ru": [
         "Настройки перенесены из Mod Hub в MCM; добавлены русский и китайский переводы.",
@@ -1609,6 +1691,14 @@
           "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
           "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
           "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+        ]
+      },
+      "6": {
+        "en": [
+          "Reduced startup work for reading the settings window and saving hotkey changes."
+        ],
+        "ru": [
+          "Ускорена стартовая настройка окна параметров и сохранения изменений горячей клавиши."
         ]
       }
     },
@@ -1803,7 +1893,7 @@
       "en": "Original source code is available in the linked repository.",
       "ru": "Исходный код оригинала доступен в указанном репозитории."
     },
-    "version": "7",
+    "version": "8",
     "changes": {
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
@@ -1937,6 +2027,22 @@
         "ru": [
           "На поддерживаемой сборке GOG 1.0.65 включены оптимизации загрузки сохранений, подготовки моделей и экипировки NPC, а также повторного использования ресурсов.",
           "Восстановлена работа «Пополнять прилавок» с совместимыми выпусками StackSort на Steam и GOG. Порядок загрузки плагинов не важен."
+        ]
+      },
+      "8": {
+        "en": [
+          "Faster initialization before the main menu with compatible KenshiLib.",
+          "Short movement orders stay closer to the selected point. Squads keep the current destination and gathering point when an order is replaced or the leader has no usable route.",
+          "Long trips request the next required area sooner and resume only when a usable passage is found.",
+          "Supported models prepare triangle connectivity faster. Buffered save loading reads related fields together on Steam and GOG.",
+          "Shop counter stocking remains compatible with Rotate Items 4."
+        ],
+        "ru": [
+          "Ускорена инициализация до главного меню с совместимой версией KenshiLib.",
+          "Короткие приказы ведут ближе к выбранной точке. Отряд сохраняет актуальную цель и точку сбора при повторном приказе или отсутствии пути у ведущего.",
+          "На длинном маршруте следующий нужный участок запрашивается заранее. Отряд продолжает движение, когда найдена пригодная точка прохода.",
+          "Быстрее подготавливаются связи между треугольниками поддерживаемых моделей. На Steam и GOG связанные поля сейва читаются вместе, когда они уже в буфере.",
+          "Пополнение прилавка совместимо с Rotate Items 4."
         ]
       }
     }
