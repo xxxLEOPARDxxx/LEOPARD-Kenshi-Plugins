@@ -39,17 +39,17 @@
     "BetterLooting": {
       "nexus": 2218,
       "workshop_id": 3816121198,
-      "version": "7",
-      "steam_version": "7",
-      "nexus_version": "7",
-      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
-      "nexus_archive_sha256": "dfce3dacb4145d05f86641e0060c57746c77760ef6ce0565668a9b1b645831c8",
-      "nexus_dll_sha256": "12af7f459817b4fabd515c243433fb667a1ea6c4610b6f846f17f63142b3a163",
-      "published_msk": "2026-11-22T00:45:11.089050+03:00",
-      "steam_confirmed_msk": "2026-11-22T00:45:11.089050+03:00",
-      "archive_sha256": "dfce3dacb4145d05f86641e0060c57746c77760ef6ce0565668a9b1b645831c8",
-      "dll_sha256": "12af7f459817b4fabd515c243433fb667a1ea6c4610b6f846f17f63142b3a163",
-      "bilingual_change_note_sha256": "fe7f1271c98f7e1f6f5c52648adf322685ba2ab2a39523ddec19a572098b5256"
+      "version": "8",
+      "steam_version": "8",
+      "nexus_version": "8",
+      "nexus_confirmed_msk": "2026-11-22T02:36:59.543261+03:00",
+      "nexus_archive_sha256": "3da33a1ad08edafe136f687cda0499ba86b2003cb38da0f75e165f49ce3d61f4",
+      "nexus_dll_sha256": "a7f60b19fe9011a5a5b7661f746eb56334a271a9e66e49504e616385ed052078",
+      "published_msk": "2026-11-22T02:37:06.414529+03:00",
+      "steam_confirmed_msk": "2026-11-22T02:37:06.414529+03:00",
+      "archive_sha256": "3da33a1ad08edafe136f687cda0499ba86b2003cb38da0f75e165f49ce3d61f4",
+      "dll_sha256": "a7f60b19fe9011a5a5b7661f746eb56334a271a9e66e49504e616385ed052078",
+      "bilingual_change_note_sha256": "9a8da0b94ad71f4205b52e618fcc3455299c326648989d31e1a0eed21cbe90a2"
     },
     "UITweaks": {
       "nexus": 2192,
