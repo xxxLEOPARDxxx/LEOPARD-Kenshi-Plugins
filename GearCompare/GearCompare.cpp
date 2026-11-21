@@ -59,6 +59,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include <StartupHookBatch.h>
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -2801,46 +2802,51 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
-    // Удаление окошка, его содержимое и строки описания снаряжения. Все
-    // шесть функций экспортированы; KEP тоже перехватывает getTooltipData1 у
-    // клинков и арбалетов - мы зовём исходную первой, цепочка цела.
-    struct HookSpec { const char* name; void* target; void* detour; void** original; };
-    const HookSpec hooks[] =
+    // Tooltip lifetime and construction must be observed before item data.
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&ToolTipInventory::_DESTRUCTOR),
+            TipDestructor_hook, &g_origTipDestructor))
     {
-        { "ToolTipInventory::~ToolTipInventory",
-          reinterpret_cast<void*>(KenshiLib::GetRealAddress(&ToolTipInventory::_DESTRUCTOR)),
-          reinterpret_cast<void*>(&TipDestructor_hook),
-          reinterpret_cast<void**>(&g_origTipDestructor) },
-        { "ToolTipInventory::setContent",
-          reinterpret_cast<void*>(KenshiLib::GetRealAddress(&ToolTipInventory::_NV_setContent)),
-          reinterpret_cast<void*>(&SetContent_hook),
-          reinterpret_cast<void**>(&g_origSetContent) },
-        { "Armour::getTooltipData1",
-          reinterpret_cast<void*>(KenshiLib::GetRealAddress(&Armour::_NV_getTooltipData1)),
-          reinterpret_cast<void*>(&ArmourTip_hook),
-          reinterpret_cast<void**>(&g_origArmourTip) },
-        { "LockedArmour::getTooltipData1",
-          reinterpret_cast<void*>(KenshiLib::GetRealAddress(&LockedArmour::_NV_getTooltipData1)),
-          reinterpret_cast<void*>(&LockedTip_hook),
-          reinterpret_cast<void**>(&g_origLockedTip) },
-        { "Sword::getTooltipData1",
-          reinterpret_cast<void*>(KenshiLib::GetRealAddress(&Sword::_NV_getTooltipData1)),
-          reinterpret_cast<void*>(&SwordTip_hook),
-          reinterpret_cast<void**>(&g_origSwordTip) },
-        { "Crossbow::getTooltipData1",
-          reinterpret_cast<void*>(KenshiLib::GetRealAddress(&Crossbow::_NV_getTooltipData1)),
-          reinterpret_cast<void*>(&CrossbowTip_hook),
-          reinterpret_cast<void**>(&g_origCrossbowTip) }
-    };
+        ErrorLog("GearCompare: could not hook ToolTipInventory::~ToolTipInventory");
+        return;
+    }
+    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
+            KenshiLib::GetRealAddress(&ToolTipInventory::_NV_setContent),
+            SetContent_hook, &g_origSetContent))
+    {
+        ErrorLog("GearCompare: could not hook ToolTipInventory::setContent");
+        return;
+    }
 
-    for (int i = 0; i < sizeof(hooks) / sizeof(hooks[0]); ++i)
+    // Each type forwards via its own original, including existing KEP hooks.
+    StartupHooks::Hook tips[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&Armour::_NV_getTooltipData1),
+                           &ArmourTip_hook, &g_origArmourTip, "Armour::getTooltipData1"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&LockedArmour::_NV_getTooltipData1),
+                           &LockedTip_hook, &g_origLockedTip, "LockedArmour::getTooltipData1"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&Sword::_NV_getTooltipData1),
+                           &SwordTip_hook, &g_origSwordTip, "Sword::getTooltipData1"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&Crossbow::_NV_getTooltipData1),
+                           &CrossbowTip_hook, &g_origCrossbowTip, "Crossbow::getTooltipData1")
+    };
+    const size_t tipCount = sizeof(tips)/sizeof(tips[0]);
+    for (size_t i = 0; i < tipCount; ++i)
     {
-        if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-                hooks[i].target, hooks[i].detour, hooks[i].original))
-        {
-            ErrorLog(std::string("GearCompare: could not hook ") + hooks[i].name);
-            return;
-        }
+        if (tips[i].target) continue;
+        ErrorLog(std::string("GearCompare: unavailable tooltip target: ") + tips[i].name);
+        return;
+    }
+    bool immediateReady = true;
+    StartupHooks::Install(tips, [&immediateReady](void* target, void* detour, void** original) -> bool {
+        if (immediateReady)
+            immediateReady = KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+        return immediateReady;
+    });
+    for (size_t i = 0; i < tipCount; ++i)
+    {
+        if (tips[i].installed) continue;
+        ErrorLog(std::string("GearCompare: startup hook installation unconfirmed: ") + tips[i].name);
+        return;
     }
 
     // Станок вкладки «Ремесло» - для рецептов строк. UITweaks перехватывает
