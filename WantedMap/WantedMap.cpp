@@ -63,6 +63,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include <StartupHookBatch.h>
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -1673,11 +1674,16 @@ __declspec(dllexport) void startPlugin()
         return;
     }
     InitializeCriticalSection(&g_deathLock);
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&Character::declareDead), DeclareDead_hook, &g_origDeclareDead))
-        ErrorLog("WantedMap: could not hook Character::declareDead, deaths seen only on the map");
-    if (KenshiLib::SUCCESS != KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&InventoryIcon::_CONSTRUCTOR), IconCtor_hook, &g_origIconCtor))
-        ErrorLog("WantedMap: could not hook InventoryIcon, no badge on posters");
+    StartupHooks::Hook optionalHooks[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&Character::declareDead), DeclareDead_hook, &g_origDeclareDead),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&InventoryIcon::_CONSTRUCTOR), IconCtor_hook, &g_origIconCtor)
+    };
+    StartupHooks::Install(optionalHooks, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    if (!optionalHooks[0].installed)
+        ErrorLog("WantedMap: could not confirm Character::declareDead hook");
+    if (!optionalHooks[1].installed)
+        ErrorLog("WantedMap: could not confirm InventoryIcon badge hook");
     DebugLog("WantedMap: installed");
 }

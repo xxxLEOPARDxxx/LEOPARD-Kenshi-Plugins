@@ -47,6 +47,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include <StartupHookBatch.h>
 
 #include <kenshi/Globals.h>
 #include <kenshi/GameWorld.h>
@@ -617,11 +618,16 @@ __declspec(dllexport) void startPlugin()
         return;
     }
 
-    if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&Character::_NV_loadFromSerialise),
-                          Load, &g_origLoad) != KenshiLib::SUCCESS)
-        ErrorLog("PatientSelfAid: cannot hook character load");
-    if (KenshiLib::AddHook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame),
-                          NewGame, &g_origNewGame) != KenshiLib::SUCCESS)
-        ErrorLog("PatientSelfAid: cannot hook new game");
+    StartupHooks::Hook sessionObservers[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&Character::_NV_loadFromSerialise), Load, &g_origLoad),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&SaveFileSystem::newGame), NewGame, &g_origNewGame)
+    };
+    StartupHooks::Install(sessionObservers, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    if (!sessionObservers[0].installed)
+        ErrorLog("PatientSelfAid: could not confirm character load hook");
+    if (!sessionObservers[1].installed)
+        ErrorLog("PatientSelfAid: could not confirm new game hook");
     if (g_debug) DebugLog("PatientSelfAid: installed");
 }
