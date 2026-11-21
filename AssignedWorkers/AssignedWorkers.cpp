@@ -66,6 +66,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include <StartupHookBatch.h>
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -1058,20 +1059,6 @@ namespace
     }
 
 
-    // Хук - типизированным указателем: привести адрес экземпляра шаблона
-    // прямо к void* VC10 не даёт (C2440), через переменную - можно.
-    void Install(const char* name, intptr_t target, GuiDataFn detour,
-                 GuiDataFn* orig)
-    {
-        if (target == 0 ||
-            KenshiLib::SUCCESS != KenshiLib::AddHook(
-                target, reinterpret_cast<void*>(detour), orig))
-        {
-            ErrorLog(std::string("AssignedWorkers: could not hook ") + name);
-        }
-    }
-
-
     void (*g_origGuiUpdate)(ForgottenGUI* thisptr) = NULL;
 
     void GuiUpdate_hook(ForgottenGUI* thisptr)
@@ -1124,27 +1111,29 @@ __declspec(dllexport) void startPlugin()
 
     PowerMarkers::Install();
 
-    Install("UseableStuff::getGUIData",
-            KenshiLib::GetRealAddress(&UseableStuff::_NV_getGUIData),
-            &GuiData_hook<0>, &g_orig[0]);
-    Install("ProductionBuilding::getGUIData",
-            KenshiLib::GetRealAddress(&ProductionBuilding::_NV_getGUIData),
-            &GuiData_hook<1>, &g_orig[1]);
-    Install("CraftingBuilding::getGUIData",
-            KenshiLib::GetRealAddress(&CraftingBuilding::_NV_getGUIData),
-            &GuiData_hook<2>, &g_orig[2]);
-    Install("FarmBuilding::getGUIData",
-            KenshiLib::GetRealAddress(&FarmBuilding::_NV_getGUIData),
-            &GuiData_hook<3>, &g_orig[3]);
-    Install("FurnaceBuilding::getGUIData",
-            KenshiLib::GetRealAddress(&FurnaceBuilding::_NV_getGUIData),
-            &GuiData_hook<4>, &g_orig[4]);
-    Install("ResearchBuilding::getGUIData",
-            KenshiLib::GetRealAddress(&ResearchBuilding::_NV_getGUIData),
-            &GuiData_hook<5>, &g_orig[5]);
-    Install("TurretBuilding::getGUIData",
-            KenshiLib::GetRealAddress(&TurretBuilding::_NV_getGUIData),
-            &GuiData_hook<6>, &g_orig[6]);
+    StartupHooks::Hook panels[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&UseableStuff::_NV_getGUIData),
+                           &GuiData_hook<0>, &g_orig[0], "UseableStuff::getGUIData"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&ProductionBuilding::_NV_getGUIData),
+                           &GuiData_hook<1>, &g_orig[1], "ProductionBuilding::getGUIData"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&CraftingBuilding::_NV_getGUIData),
+                           &GuiData_hook<2>, &g_orig[2], "CraftingBuilding::getGUIData"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&FarmBuilding::_NV_getGUIData),
+                           &GuiData_hook<3>, &g_orig[3], "FarmBuilding::getGUIData"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&FurnaceBuilding::_NV_getGUIData),
+                           &GuiData_hook<4>, &g_orig[4], "FurnaceBuilding::getGUIData"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&ResearchBuilding::_NV_getGUIData),
+                           &GuiData_hook<5>, &g_orig[5], "ResearchBuilding::getGUIData"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&TurretBuilding::_NV_getGUIData),
+                           &GuiData_hook<6>, &g_orig[6], "TurretBuilding::getGUIData")
+    };
+    static_assert(sizeof(panels)/sizeof(panels[0]) == HOOKS, "one original per panel observer");
+    StartupHooks::Install(panels, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    for (size_t i = 0; i < HOOKS; ++i)
+        if (!panels[i].installed)
+            ErrorLog(std::string("AssignedWorkers: startup hook installation unconfirmed: ") + panels[i].name);
 
     if (KenshiLib::SUCCESS !=
         KenshiLib::AddHook(KenshiLib::GetRealAddress(&ForgottenGUI::update),
