@@ -44,6 +44,7 @@
 
 #include <Debug.h>
 #include <core/Functions.h>
+#include <StartupHookBatch.h>
 
 #include <mygui/MyGUI_Gui.h>
 #include <mygui/MyGUI_Widget.h>
@@ -3301,12 +3302,17 @@ __declspec(dllexport) void startPlugin()
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::create, no Mods tab");
         return;
     }
-    const bool resetUpdate = KenshiLib::SUCCESS == KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&OptionsWindow::_NV_update), Update_hook, &g_origUpdate);
+    StartupHooks::Hook windowObservers[] = {
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&OptionsWindow::_NV_update), Update_hook, &g_origUpdate),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&OptionsWindow::hide), Hide_hook, &g_origHide)
+    };
+    StartupHooks::Install(windowObservers, [](void* target, void* detour, void** original) {
+        return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;
+    });
+    const bool resetUpdate = windowObservers[0].installed;
     if (!resetUpdate)
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::update, changes saved only on close");
-    const bool resetHide = KenshiLib::SUCCESS == KenshiLib::AddHook(
-            KenshiLib::GetRealAddress(&OptionsWindow::hide), Hide_hook, &g_origHide);
+    const bool resetHide = windowObservers[1].installed;
     if (!resetHide)
         ErrorLog("ModConfigMenu: could not hook OptionsWindow::hide; reset confirmation disabled");
     const bool resetKeyDown = KenshiLib::SUCCESS == KenshiLib::AddHook(
