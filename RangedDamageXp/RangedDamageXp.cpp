@@ -121,7 +121,7 @@ namespace
                                      ini.c_str()) != 0;
     }
 
-    unsigned ReadPercent(const std::string& ini, const char* key, unsigned def, unsigned min, unsigned max)
+    unsigned ReadBoundedInt(const std::string& ini, const char* key, unsigned def, unsigned min, unsigned max)
     {
         const float value = ReadFloat(ini, key, float(def));
         if (value <= min) return min;
@@ -138,10 +138,11 @@ namespace
         if (colour[0] == '#' && std::strlen(colour) == 7 &&
             std::strspn(colour+1, "0123456789abcdefABCDEF") == 6)
             style.colour = uint32_t(std::strtoul(colour+1, NULL, 16));
-        style.brightnessPercent = ReadPercent(ini, "BoltTrailBrightness", style.brightnessPercent, 15, 160);
-        style.lengthPercent = ReadPercent(ini, "BoltTrailLength", style.lengthPercent, 50, 200);
-        style.fadePercent = ReadPercent(ini, "BoltTrailFade", style.fadePercent, 10, 100);
+        style.brightnessPercent = ReadBoundedInt(ini, "BoltTrailBrightness", style.brightnessPercent, 15, 160);
+        style.lengthPercent = ReadBoundedInt(ini, "BoltTrailLength", style.lengthPercent, 50, 200);
+        style.fadePercent = ReadBoundedInt(ini, "BoltTrailFade", style.fadePercent, 10, 100);
         style.outline = ReadBool(ini, "BoltTrailOutline", style.outline);
+        style.trailLimit = ReadBoundedInt(ini, "BoltTrailLimit", style.trailLimit, 1, bolt_trail::MaxTrails);
         bolt_trail::ConfigureAppearance(style);
     }
 
@@ -365,6 +366,7 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->integer(api, "RangedDamageXp", "BoltTrailLength", Tr("Trail length (%)"), Tr("Trail length relative to Meitou. The trail stops at the muzzle on short flights."), trailDefaults.lengthPercent, 50, 200, 0);
     api->integer(api, "RangedDamageXp", "BoltTrailFade", Tr("Fade length (%)"), Tr("Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."), trailDefaults.fadePercent, 10, 100, 0);
     api->toggle(api, "RangedDamageXp", "BoltTrailOutline", Tr("Dark outline"), Tr("Adds a soft dark edge around the streak."), trailDefaults.outline ? 1 : 0, 0);
+    api->integer(api, "RangedDamageXp", "BoltTrailLimit", Tr("Maximum bolt trails"), Tr("Maximum number of bolt trails shown at once. A higher limit may cost more FPS in large fights."), trailDefaults.trailLimit, 1, bolt_trail::MaxTrails, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "RangedDamageXp", "Debug", Tr("Detailed log"), Tr("A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."), 0, 0);
 }

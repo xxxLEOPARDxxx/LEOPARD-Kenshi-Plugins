@@ -113,11 +113,11 @@ ITEMS = [
          en="Select your own building site that is not built yet and move or "
             "rotate it with the editor's arrows - no dismantling, no developer "
             "menu."),
-    dict(mod="RangedDamageXp", title="Ranged Damage Xp (QoL)", nexus=2205, version="3",
+    dict(mod="RangedDamageXp", title="Ranged Damage Xp (QoL)", nexus=2205, version="4",
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Crossbow (and turret) experience for the damage a hit actually "
             "dealt after armour, on top of the vanilla XP for shooting; a share "
-            "goes to Perception."),
+            "goes to Perception. Optional fading bolt trails with custom appearance and limit."),
     # --- форки модов Emkej (оригиналы - Emkej8 на Nexus), настройки в MCM.
     # Наши страницы на Nexus - 2206-2215 (05.10.2026).
     # Описания - desc/make_desc.py (шапка fork_header: автор и что изменено).
@@ -257,6 +257,8 @@ ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=2256,version="5",ta
 
 def runtime_file_allowed(mod, folder, name):
     rel = os.path.relpath(os.path.join(folder, name), mod_dir(mod)).replace(os.sep, "/")
+    if mod == "RangedDamageXp" and rel == "RangedDamageXp-source.zip":
+        return True  # Corresponding source accompanies the GPL binary.
     if mod == "KenshiRotate" and rel.startswith("lang/"):
         return False
     if name.lower().endswith(".po") and os.path.isfile(os.path.join(folder, name[:-3] + ".mo")):

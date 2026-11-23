@@ -127,3 +127,9 @@ msgstr "Dark outline"
 
 msgid "Adds a soft dark edge around the streak."
 msgstr "Adds a soft dark edge around the streak."
+
+msgid "Maximum bolt trails"
+msgstr "Maximum bolt trails"
+
+msgid "Maximum number of bolt trails shown at once. A higher limit may cost more FPS in large fights."
+msgstr "Maximum number of bolt trails shown at once. A higher limit may cost more FPS in large fights."

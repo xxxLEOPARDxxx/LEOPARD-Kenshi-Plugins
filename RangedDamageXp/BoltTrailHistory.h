@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Bolt streaks adapted from MeitouClient by VlcekM and contributors. See ORIGIN.md.
 #pragma once
 
 #include "BoltTrails.h"
@@ -7,7 +9,6 @@
 
 namespace bolt_trail {
 
-const unsigned MaxTrails = 64;
 const float FlightSeconds = 0.2f;
 const float FlightLengthLimit = 500.0f;
 const float StopSeconds = 0.15f;
@@ -34,7 +35,7 @@ inline bool InWorld(Point p)
 struct Streak { Point head, tail; };
 
 class History {
-    enum { Ways = 4, Buckets = MaxTrails / Ways };
+    enum { Ways = 4 };
 
     struct Trail {
         uintptr_t bolt;
@@ -73,14 +74,24 @@ class History {
     };
 
     Trail trails[MaxTrails];
-    unsigned active;
+    unsigned active, limit, buckets;
 
 public:
-    History() { Clear(); }
+    History() : limit(0) { SetLimit(DefaultTrailLimit); }
+
+    void SetLimit(unsigned requested)
+    {
+        const unsigned next = ClampTrailLimit(requested);
+        if (limit == next) return;
+        limit = next;
+        buckets = (next + Ways - 1) / Ways;
+        // Changing the bucket count changes bolt lookup. Start tracking again.
+        Clear();
+    }
 
     void Clear()
     {
-        for (unsigned i = 0; i < MaxTrails; ++i) trails[i].bolt = 0;
+        for (unsigned i = 0; i < limit; ++i) trails[i].bolt = 0;
         active = 0;
     }
 
@@ -94,10 +105,12 @@ public:
         if (!bolt || !InWorld(before) || !InWorld(head) || !(speed > 0 && speed < 1000000) ||
             !(directionSq > 0.5f && directionSq < 1.5f)) return;
 
-        const unsigned bucket = unsigned((bolt ^ (bolt >> 4) ^ (bolt >> 9)) % Buckets) * Ways;
+        const unsigned hash = unsigned(bolt ^ (bolt >> 4) ^ (bolt >> 9));
+        const unsigned bucket = (hash % buckets) * Ways;
+        const unsigned end = bucket + Ways < limit ? bucket + Ways : limit;
         Trail* available = NULL;
         Trail* flight = NULL;
-        for (unsigned i = bucket; i < bucket + Ways; ++i) {
+        for (unsigned i = bucket; i < end; ++i) {
             Trail& candidate = trails[i];
             if (!candidate.bolt || (candidate.stopped && candidate.Remaining(now) <= 0)) {
                 if (!available) available = &candidate;
@@ -110,9 +123,9 @@ public:
                 }
             }
         }
+        if (!flight && (!available || !flying)) return;
         direction = direction * (1.0f/std::sqrt(directionSq));
         if (!flight) {
-            if (!available || !flying) return;
             flight = available;
             if (!flight->bolt) ++active;
             flight->bolt = bolt;
@@ -137,7 +150,7 @@ public:
                    Streak (&out)[MaxTrails])
     {
         unsigned used = 0;
-        for (unsigned i = 0; i < MaxTrails; ++i) {
+        for (unsigned i = 0; i < limit; ++i) {
             Trail& trail = trails[i];
             if (!trail.bolt) continue;
             if (timeAdvanced && !trail.stopped && trail.frame != frame)

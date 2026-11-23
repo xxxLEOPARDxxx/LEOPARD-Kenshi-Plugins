@@ -127,3 +127,9 @@ msgstr "Тёмная обводка"
 
 msgid "Adds a soft dark edge around the streak."
 msgstr "Добавляет мягкую тёмную кромку вдоль следа."
+
+msgid "Maximum bolt trails"
+msgstr "Максимум следов от болтов"
+
+msgid "Maximum number of bolt trails shown at once. A higher limit may cost more FPS in large fights."
+msgstr "Максимальное число одновременно видимых следов. Высокий лимит может снижать FPS в крупных боях."

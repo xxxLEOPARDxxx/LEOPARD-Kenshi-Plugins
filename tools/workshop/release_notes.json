@@ -276,17 +276,15 @@
     ]
   },
   "RangedDamageXp": {
-    "version": "3",
-    "published_version": "2",
+    "version": "4",
+    "published_version": "3",
     "en": [
-      "[b]Optional language diagnostics.[/b] Language and translation-catalogue summaries follow this plugin's Detailed log setting, which is off by default.",
-      "[b]Useful errors remain visible.[/b] Translation loading and format errors are still reported with Detailed log disabled. Enabling the setting after loading reports the saved summary once without reloading translations.",
-      "[b]Clean update package.[/b] English, Russian and Simplified Chinese each use one compiled runtime catalogue. Personal settings and gameplay saves are preserved."
+      "Optional Meitou-style bolt trails show the path of crossbow bolts, including misses. The thin trail fades towards the tail and shrinks when the bolt stops. Enable it in MCM on supported Steam builds and restart the game.",
+      "Adjust trail colour, brightness, length, fade, dark outline and the maximum number of simultaneous trails in MCM. The limit is 64 by default and can be set from 1 to 256. These settings apply without restarting."
     ],
     "ru": [
-      "[b]Необязательная диагностика языка.[/b] Сводки языка и каталога переводов подчиняются настройке подробного журнала этого плагина, выключенной по умолчанию.",
-      "[b]Ошибки остаются видимыми.[/b] Ошибки загрузки и формата переводов записываются и при выключенном подробном журнале. Включение настройки после загрузки выводит сохранённую сводку один раз без перезагрузки переводов.",
-      "[b]Чистый пакет обновления.[/b] Английский, русский и упрощённый китайский используют по одному скомпилированному рабочему каталогу. Личные настройки и игровые сохранения сохраняются."
+      "Необязательные следы в стиле Meitou показывают траекторию арбалетных болтов, в том числе при промахах. Тонкий след затухает к хвосту и стягивается при остановке болта. Включается в MCM на поддерживаемой сборке Steam и требует перезапуска игры.",
+      "В MCM можно настроить цвет, яркость, длину, затухание, тёмную обводку и максимум одновременных следов. По умолчанию 64, диапазон от 1 до 256. Эти настройки применяются без перезапуска."
     ]
   },
   "StatColours": {

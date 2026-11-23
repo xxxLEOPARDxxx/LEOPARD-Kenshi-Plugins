@@ -43,7 +43,28 @@ int main()
     history.Clear();
     for (unsigned i = 1; i < 1000; ++i)
         history.Observe(i, start, Point(20), forward, 500, 0, 0.04f, true, false, 12, 2, 100);
-    assert(history.Build(12, 2, true, 100, output) == MaxTrails);
+    assert(history.Build(12, 2, true, 100, output) == DefaultTrailLimit);
+    const unsigned limits[] = {0, 1, 3, 5, 63, 64, 65, 127, 255, 256, 999};
+    for (unsigned i = 0; i < sizeof(limits)/sizeof(limits[0]); ++i) {
+        const unsigned limit = ClampTrailLimit(limits[i]);
+        if (limits[i] == 0) assert(limit == 1);
+        else if (limits[i] > 256) assert(limit == 256);
+        else assert(limit == limits[i]);
+        history.SetLimit(limits[i]);
+        history.Clear();
+        assert(!history.Active());
+        for (unsigned bolt = 1; bolt < 2000; ++bolt)
+            history.Observe(bolt, start, Point(20), forward, 500, 0, 0.04f, true, false, 12, 2, 100);
+        assert(history.Build(12, 2, true, 100, output) == limit);
+        history.SetLimit(limits[i]);
+        assert(history.Build(12, 2, true, 100, output) == limit);
+    }
+    history.SetLimit(1);
+    assert(history.Build(12, 2, true, 100, output) <= 1);
+    history.SetLimit(MaxTrails);
+    assert(history.Build(12, 2, true, 100, output) == 0);
+    history.Observe(1, start, Point(20), forward, 500, 0, 0.04f, true, false, 12, 2, 100);
+    assert(history.Build(12, 2, true, 100, output) == 1);
     Quad quad;
     assert(MakeQuad(output[0], Point(10,0,100), Point(1,0,0), quad));
     assert(Near(Length(quad.headRight-quad.headLeft), 0.7f));

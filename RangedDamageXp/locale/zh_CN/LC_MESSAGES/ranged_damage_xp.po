@@ -127,3 +127,9 @@ msgstr "深色描边"
 
 msgid "Adds a soft dark edge around the streak."
 msgstr "在尾迹周围添加柔和的深色边缘。"
+
+msgid "Maximum bolt trails"
+msgstr "弩箭轨迹数量上限"
+
+msgid "Maximum number of bolt trails shown at once. A higher limit may cost more FPS in large fights."
+msgstr "可同时显示的弩箭轨迹数量上限。上限越高，大规模战斗中的帧率可能越低。"

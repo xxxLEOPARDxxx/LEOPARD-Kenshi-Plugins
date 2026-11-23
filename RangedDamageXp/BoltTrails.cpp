@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Bolt streaks adapted from MeitouClient by VlcekM and contributors. See ORIGIN.md.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "BoltTrails.h"
@@ -45,7 +47,8 @@ LONGLONG PackAppearance(const Appearance& style)
 {
     return LONGLONG(style.colour) | (LONGLONG(style.brightnessPercent) << 24) |
            (LONGLONG(style.lengthPercent) << 32) | (LONGLONG(style.fadePercent) << 40) |
-           (LONGLONG(style.outline) << 47);
+           (LONGLONG(style.outline) << 47) |
+           (LONGLONG(ClampTrailLimit(style.trailLimit) - 1) << 48);
 }
 
 __declspec(align(8)) volatile LONGLONG appearanceBits = PackAppearance(Appearance());
@@ -58,7 +61,8 @@ Appearance ReadAppearance()
     style.brightnessPercent = unsigned((bits >> 24) & 0xff);
     style.lengthPercent = unsigned((bits >> 32) & 0xff);
     style.fadePercent = unsigned((bits >> 40) & 0x7f);
-    style.outline = (bits >> 47) != 0;
+    style.outline = ((bits >> 47) & 1) != 0;
+    style.trailLimit = unsigned((bits >> 48) & 0xff) + 1;
     return style;
 }
 
@@ -129,7 +133,7 @@ class Drawing : public Ogre::SceneManager::Listener,
         lines->textureCoord(u, v);
     }
 
-    bool EnsureGeometry(Ogre::SceneManager* owner, Ogre::SceneNode* root)
+    bool EnsureGeometry(Ogre::SceneManager* owner, Ogre::SceneNode* root, unsigned trailLimit)
     {
         if (!scene) {
             owner->addListener(this);
@@ -165,8 +169,8 @@ class Drawing : public Ogre::SceneManager::Listener,
             lines->setCastShadows(false);
             lines->setQueryFlags(0);
             lines->setRenderQueueGroup(ForwardQueue);
-            lines->estimateVertexCount(MaxTrails * 4);
-            lines->estimateIndexCount(MaxTrails * 6);
+            lines->estimateVertexCount(trailLimit * 4);
+            lines->estimateIndexCount(trailLimit * 6);
         }
         if (!node) {
             node = root->createChildSceneNode(Ogre::SCENE_DYNAMIC);
@@ -251,7 +255,7 @@ public:
             Quad quad;
             if (!MakeQuad(streaks[i], eye, right, quad)) continue;
             if (!vertices) {
-                if (!EnsureMask(style) || !EnsureGeometry(owner, root)) return false;
+                if (!EnsureMask(style) || !EnsureGeometry(owner, root, style.trailLimit)) return false;
                 if (section) lines->beginUpdate(0);
                 else lines->begin(MaterialName, Ogre::RenderOperation::OT_TRIANGLE_LIST);
             }
@@ -430,6 +434,7 @@ void RunFrame(GameWorld* world, float time, void (*original)(GameWorld*, float))
         return;
     }
     Frame frame(world);
+    history.SetLimit(frame.style.trailLimit);
     {
         CaptureFrame capture(frame);
         original(world, time);

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Bolt streaks adapted from MeitouClient by VlcekM and contributors. See ORIGIN.md.
 #pragma once
 
 #include "BoltTrailHistory.h"
