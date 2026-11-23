@@ -413,17 +413,17 @@
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "8",
-      "archive_sha256": "147dd945d1efd196f30963b6a04fec619f70854765d321c52429b1e8fb3f6d85",
-      "dll_sha256": "feab993139c89b31c4fe7e967e3644d7c4749c9f9864e49daa2d2f90159e1a28",
-      "published_msk": "2026-11-22T00:44:43.647887+03:00",
-      "bilingual_change_note_sha256": "c19f2d3e2e55882c569b222b7535ac78f47a242c267c549ac060ca4021c47f2a",
-      "steam_version": "8",
-      "nexus_version": "8",
-      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
-      "nexus_archive_sha256": "147dd945d1efd196f30963b6a04fec619f70854765d321c52429b1e8fb3f6d85",
-      "nexus_dll_sha256": "feab993139c89b31c4fe7e967e3644d7c4749c9f9864e49daa2d2f90159e1a28",
-      "steam_confirmed_msk": "2026-11-22T00:44:43.647887+03:00"
+      "version": "9",
+      "archive_sha256": "215333e4a46baf7080da5ed54cb2f61dd0c11ff56372ab8b21794ed04492d7a8",
+      "dll_sha256": "13f7f0b8a9b93cfd896d96d3c8bb7eebe861358dcf1e95737d9c960683424f93",
+      "published_msk": "2026-11-24T01:49:37+03:00",
+      "bilingual_change_note_sha256": "83a2f37b1fb42159c534a55e4ff4331e57e8d5f6650d7dd127b615c491a9851c",
+      "steam_version": "9",
+      "nexus_version": "9",
+      "nexus_confirmed_msk": "2026-11-24T01:49:30.740026+03:00",
+      "nexus_archive_sha256": "215333e4a46baf7080da5ed54cb2f61dd0c11ff56372ab8b21794ed04492d7a8",
+      "nexus_dll_sha256": "13f7f0b8a9b93cfd896d96d3c8bb7eebe861358dcf1e95737d9c960683424f93",
+      "steam_confirmed_msk": "2026-11-24T01:49:38.846487+03:00"
     }
   }
 }
