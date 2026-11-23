@@ -97,3 +97,33 @@ msgstr "命中昏迷倒地的目标也给予经验。"
 
 msgid "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
 msgstr "每次计入的命中都会在 RE_Kenshi_log.txt 中记录一行：谁、命中谁、伤害、经验、前后等级。"
+
+msgid "Trail colour"
+msgstr "尾迹颜色"
+
+msgid "Colour of the bright center of the trail."
+msgstr "尾迹亮色核心的颜色。"
+
+msgid "Trail brightness (%)"
+msgstr "尾迹亮度（%）"
+
+msgid "Opacity of the bright center next to the bolt."
+msgstr "弩箭附近亮色核心的不透明度。"
+
+msgid "Trail length (%)"
+msgstr "尾迹长度（%）"
+
+msgid "Maximum trail length relative to the original. Short flights still leave a shorter trail."
+msgstr "相对于原始长度的最大尾迹长度。飞行距离较短时，尾迹也会更短。"
+
+msgid "Fade length (%)"
+msgstr "渐隐长度（%）"
+
+msgid "Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."
+msgstr "向尾端逐渐淡出的尾迹比例。设为 100% 时，整条尾迹都会渐隐。"
+
+msgid "Dark outline"
+msgstr "深色描边"
+
+msgid "Adds a thin dark edge so the trail stands out over bright ground and in rain."
+msgstr "添加细窄的深色边缘，使尾迹在明亮地面上和雨中更清晰。"

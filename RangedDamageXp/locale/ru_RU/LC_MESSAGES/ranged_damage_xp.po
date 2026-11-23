@@ -97,3 +97,33 @@ msgstr "Давать опыт и за попадания по лежащим б�
 
 msgid "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
 msgstr "Строка в RE_Kenshi_log.txt на каждое засчитанное попадание: кто, по кому, урон, опыт, уровень до и после."
+
+msgid "Trail colour"
+msgstr "Цвет следа"
+
+msgid "Colour of the bright center of the trail."
+msgstr "Цвет светлой середины следа."
+
+msgid "Trail brightness (%)"
+msgstr "Яркость следа (%)"
+
+msgid "Opacity of the bright center next to the bolt."
+msgstr "Непрозрачность светлой середины возле болта."
+
+msgid "Trail length (%)"
+msgstr "Длина следа (%)"
+
+msgid "Maximum trail length relative to the original. Short flights still leave a shorter trail."
+msgstr "Максимальная длина относительно исходной. При коротком полёте след будет короче."
+
+msgid "Fade length (%)"
+msgstr "Длина затухания (%)"
+
+msgid "Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."
+msgstr "Доля следа, которая плавно затухает к хвосту. При 100% затухание идёт по всей длине."
+
+msgid "Dark outline"
+msgstr "Тёмная обводка"
+
+msgid "Adds a thin dark edge so the trail stands out over bright ground and in rain."
+msgstr "Добавляет тонкую тёмную кромку, чтобы след выделялся на светлом грунте и в дождь."

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BoltTrails.h"
+
 #include <stdint.h>
 #include <cmath>
 #include <cstddef>
@@ -8,7 +10,7 @@ namespace bolt_trail {
 
 const unsigned MaxTrails = 64;
 const unsigned SamplesPerTrail = 8;
-const unsigned MaxSegments = MaxTrails * (SamplesPerTrail - 1);
+const unsigned MaxSegments = MaxTrails * SamplesPerTrail; // One extra segment for the fade boundary.
 const uint32_t TrailLifetimeMs = 100;
 const float MaxTrailLength = 180.0f;
 
@@ -105,8 +107,11 @@ public:
         trail->Push(to, now);
     }
 
-    unsigned Build(uint32_t now, Segment (&out)[MaxSegments]) const
+    unsigned Build(uint32_t now, Segment (&out)[MaxSegments], const Appearance& appearance) const
     {
+        const float maxLength = MaxTrailLength * float(appearance.lengthPercent) / 100.0f;
+        const uint32_t maxHistoryAge = appearance.lengthPercent > 100 ? appearance.lengthPercent : TrailLifetimeMs;
+        const float brightness = float(appearance.brightnessPercent) / 100.0f;
         unsigned used = 0;
         for (unsigned t = 0; t < MaxTrails; ++t) {
             const Trail& trail = trails[t];
@@ -114,16 +119,16 @@ public:
             unsigned head = trail.Last();
             const uint32_t elapsed = now - trail.at[head];
             if (elapsed >= TrailLifetimeMs) continue;
-            const float opacity = 0.55f * (1.0f - float(elapsed) / TrailLifetimeMs);
+            const float opacity = brightness * (1.0f - float(elapsed) / TrailLifetimeMs);
             float distances[SamplesPerTrail] = {0};
             const unsigned first = used;
             unsigned count = 0;
             for (unsigned i = 1; i < trail.count; ++i) {
                 const unsigned tail = (head + SamplesPerTrail - 1) % SamplesPerTrail;
-                if (i > 1 && now - trail.at[tail] >= TrailLifetimeMs) break;
+                if (i > 1 && now - trail.at[tail] >= maxHistoryAge) break;
                 const Point a = trail.points[head], b = trail.points[tail];
                 const float length = std::sqrt(DistanceSquared(a, b));
-                const float room = MaxTrailLength - distances[count];
+                const float room = maxLength - distances[count];
                 const bool clipped = length >= room;
                 Segment& segment = out[used++];
                 segment.head = a;
@@ -135,10 +140,23 @@ public:
             }
             if (!count) continue;
             const float total = distances[count];
+            const float fadeLength = total * float(appearance.fadePercent) / 100.0f;
+            const float fadeStart = total - fadeLength;
             for (unsigned i = 0; i < count; ++i) {
                 Segment& segment = out[first+i];
-                segment.headAlpha = opacity * (1.0f - distances[i] / total);
-                segment.tailAlpha = opacity * (1.0f - distances[i+1] / total);
+                const float from = distances[i], to = distances[i+1];
+                segment.headAlpha = from > fadeStart ? opacity * (total-from) / fadeLength : opacity;
+                segment.tailAlpha = to > fadeStart ? opacity * (total-to) / fadeLength : opacity;
+                if (from < fadeStart && fadeStart < to) {
+                    const Point startFade = Toward(segment.head, segment.tail, (fadeStart-from) / (to-from));
+                    Segment& fading = out[used++];
+                    fading.head = startFade;
+                    fading.tail = segment.tail;
+                    fading.headAlpha = opacity;
+                    fading.tailAlpha = segment.tailAlpha;
+                    segment.tail = startFade;
+                    segment.tailAlpha = opacity;
+                }
             }
         }
         return used;

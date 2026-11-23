@@ -97,3 +97,33 @@ msgstr "Give experience for hitting targets lying unconscious."
 
 msgid "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
 msgstr "A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."
+
+msgid "Trail colour"
+msgstr "Trail colour"
+
+msgid "Colour of the bright center of the trail."
+msgstr "Colour of the bright center of the trail."
+
+msgid "Trail brightness (%)"
+msgstr "Trail brightness (%)"
+
+msgid "Opacity of the bright center next to the bolt."
+msgstr "Opacity of the bright center next to the bolt."
+
+msgid "Trail length (%)"
+msgstr "Trail length (%)"
+
+msgid "Maximum trail length relative to the original. Short flights still leave a shorter trail."
+msgstr "Maximum trail length relative to the original. Short flights still leave a shorter trail."
+
+msgid "Fade length (%)"
+msgstr "Fade length (%)"
+
+msgid "Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."
+msgstr "Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."
+
+msgid "Dark outline"
+msgstr "Dark outline"
+
+msgid "Adds a thin dark edge so the trail stands out over bright ground and in rain."
+msgstr "Adds a thin dark edge so the trail stands out over bright ground and in rain."

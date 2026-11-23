@@ -34,6 +34,8 @@
 #include "BoltTrails.h"
 
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -119,6 +121,30 @@ namespace
                                      ini.c_str()) != 0;
     }
 
+    unsigned ReadPercent(const std::string& ini, const char* key, unsigned def, unsigned min, unsigned max)
+    {
+        const float value = ReadFloat(ini, key, float(def));
+        if (value <= min) return min;
+        if (value >= max) return max;
+        return unsigned(value + 0.5f);
+    }
+
+    void LoadTrailAppearance(const std::string& ini)
+    {
+        bolt_trail::Appearance style;
+        char colour[32];
+        GetPrivateProfileStringA("RangedDamageXp", "BoltTrailColour", bolt_trail::DefaultColourText,
+                                 colour, sizeof(colour), ini.c_str());
+        if (colour[0] == '#' && std::strlen(colour) == 7 &&
+            std::strspn(colour+1, "0123456789abcdefABCDEF") == 6)
+            style.colour = uint32_t(std::strtoul(colour+1, NULL, 16));
+        style.brightnessPercent = ReadPercent(ini, "BoltTrailBrightness", style.brightnessPercent, 15, 100);
+        style.lengthPercent = ReadPercent(ini, "BoltTrailLength", style.lengthPercent, 50, 200);
+        style.fadePercent = ReadPercent(ini, "BoltTrailFade", style.fadePercent, 10, 100);
+        style.outline = ReadBool(ini, "BoltTrailOutline", style.outline);
+        bolt_trail::ConfigureAppearance(style);
+    }
+
     void LoadSettings()
     {
         const std::string ini = IniPath();
@@ -133,6 +159,7 @@ namespace
         g_allies = ReadBool(ini, "Allies", g_allies);
         g_downed = ReadBool(ini, "DownedTargets", g_downed);
         g_trailsRequested = ReadBool(ini, "BoltTrails", false);
+        LoadTrailAppearance(ini);
         g_debug = ReadBool(ini, "Debug", false);
         KLocLog::SetEnabled(g_debug);
 
@@ -332,6 +359,12 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "RangedDamageXp", "DownedTargets", Tr("Hits on downed targets"), Tr("Give experience for hitting targets lying unconscious."), 0, 0);
     api->section(api, Tr("Visual effects"));
     api->toggle(api, "RangedDamageXp", "BoltTrails", Tr("Bolt trails"), Tr("Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."), 0, MCM_RESTART);
+    const bolt_trail::Appearance trailDefaults;
+    api->colour(api, "RangedDamageXp", "BoltTrailColour", Tr("Trail colour"), Tr("Colour of the bright center of the trail."), bolt_trail::DefaultColourText, 0);
+    api->integer(api, "RangedDamageXp", "BoltTrailBrightness", Tr("Trail brightness (%)"), Tr("Opacity of the bright center next to the bolt."), trailDefaults.brightnessPercent, 15, 100, 0);
+    api->integer(api, "RangedDamageXp", "BoltTrailLength", Tr("Trail length (%)"), Tr("Maximum trail length relative to the original. Short flights still leave a shorter trail."), trailDefaults.lengthPercent, 50, 200, 0);
+    api->integer(api, "RangedDamageXp", "BoltTrailFade", Tr("Fade length (%)"), Tr("Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."), trailDefaults.fadePercent, 10, 100, 0);
+    api->toggle(api, "RangedDamageXp", "BoltTrailOutline", Tr("Dark outline"), Tr("Adds a thin dark edge so the trail stands out over bright ground and in rain."), trailDefaults.outline ? 1 : 0, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "RangedDamageXp", "Debug", Tr("Detailed log"), Tr("A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."), 0, 0);
 }

@@ -1,7 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "BoltTrails.h"
-#include "BoltTrailHistory.h"
+#include "BoltTrailRibbon.h"
 
 #include <Windows.h>
 #include <cstring>
@@ -9,12 +9,14 @@
 #include <core/Functions.h>
 #include <kenshi/GameWorld.h>
 #include <kenshi/Renderer.h>
+#include <ogre/OgreCamera.h>
 #include <ogre/OgreManualObject.h>
 #include <ogre/OgreMaterialManager.h>
 #include <ogre/OgrePass.h>
 #include <ogre/OgreSceneManager.h>
 #include <ogre/OgreSceneNode.h>
 #include <ogre/OgreTechnique.h>
+#include <ogre/OgreViewport.h>
 
 namespace bolt_trail {
 namespace {
@@ -24,11 +26,61 @@ const unsigned char ForwardQueue = 83; // Kenshi Lighting_HDR particles pass.
 const unsigned NodeOffset = 0x58;
 const unsigned FlightStateOffset = 0x70;
 const unsigned Flying = 1;
+const float CoreHalfWidth = 0.8f;
+const float OutlineHalfWidth = 1.5f;
+const unsigned MaxBands = 3;
 
 History history;
 Segment segments[MaxSegments];
 void (*originalAdvance)(void*) = NULL;
 bool stopped = false;
+
+LONGLONG PackAppearance(const Appearance& style)
+{
+    return LONGLONG(style.colour) | (LONGLONG(style.brightnessPercent) << 24) |
+           (LONGLONG(style.lengthPercent) << 31) | (LONGLONG(style.fadePercent) << 39) |
+           (LONGLONG(style.outline) << 46);
+}
+
+__declspec(align(8)) volatile LONGLONG appearanceBits = PackAppearance(Appearance());
+
+Appearance ReadAppearance()
+{
+    const LONGLONG bits = InterlockedCompareExchange64(&appearanceBits, 0, 0);
+    Appearance style;
+    style.colour = uint32_t(bits & 0xffffff);
+    style.brightnessPercent = unsigned((bits >> 24) & 0x7f);
+    style.lengthPercent = unsigned((bits >> 31) & 0xff);
+    style.fadePercent = unsigned((bits >> 39) & 0x7f);
+    style.outline = (bits >> 46) != 0;
+    return style;
+}
+
+Point CopyPoint(const Ogre::Vector3& v)
+{
+    return Point(v.x, v.y, v.z);
+}
+
+bool MakeView(Renderer& renderer, Ogre::SceneNode& root, View& view)
+{
+    Ogre::Camera* camera = renderer.getCamera();
+    Ogre::Viewport* viewport = renderer.getViewport();
+    if (!camera || !viewport) return false;
+    const Ogre::Matrix4& projection = camera->getProjectionMatrix();
+    view.pixelScaleX = std::abs(projection[0][0]) * viewport->getActualWidth() * 0.5f;
+    view.pixelScaleY = std::abs(projection[1][1]) * viewport->getActualHeight() * 0.5f;
+    if (!(view.pixelScaleX > 0 && view.pixelScaleY > 0)) return false;
+
+    const Ogre::Quaternion orientation =
+        root._getDerivedOrientationUpdated().Inverse() * camera->getDerivedOrientation();
+    view.eye = CopyPoint(root.convertWorldToLocalPosition(camera->getDerivedPosition()));
+    view.right = CopyPoint(orientation * Ogre::Vector3::UNIT_X);
+    view.up = CopyPoint(orientation * Ogre::Vector3::UNIT_Y);
+    view.forward = CopyPoint(orientation * Ogre::Vector3::NEGATIVE_UNIT_Z);
+    view.nearDepth = (std::max)(0.01f, camera->getNearClipDistance());
+    view.perspective = camera->getProjectionType() == Ogre::PT_PERSPECTIVE;
+    return true;
+}
 
 class Drawing : public Ogre::SceneManager::Listener,
                 public Ogre::MovableObject::Listener, public Ogre::Node::Listener
@@ -38,10 +90,20 @@ class Drawing : public Ogre::SceneManager::Listener,
     Ogre::ManualObject* lines;
     bool section, visible;
 
-    void Vertex(const Point& point, float alpha)
+    void Vertex(const Point& point, const Ogre::ColourValue& colour, float alpha)
     {
         lines->position(point.x, point.y, point.z);
-        lines->colour(1.0f, 0.87f, 0.65f, alpha);
+        lines->colour(colour.r, colour.g, colour.b, colour.a * alpha);
+    }
+
+    void Band(const Ribbon& ribbon, unsigned vertex, float left, float right, const Ogre::ColourValue& colour)
+    {
+        const Segment& segment = ribbon.segment;
+        Vertex(Offset(segment.tail, ribbon.tailPerPixel, left), colour, segment.tailAlpha);
+        Vertex(Offset(segment.tail, ribbon.tailPerPixel, right), colour, segment.tailAlpha);
+        Vertex(Offset(segment.head, ribbon.headPerPixel, right), colour, segment.headAlpha);
+        Vertex(Offset(segment.head, ribbon.headPerPixel, left), colour, segment.headAlpha);
+        lines->quad(vertex, vertex+1, vertex+2, vertex+3);
     }
 
     bool EnsureGeometry(Ogre::SceneManager* owner, Ogre::SceneNode* root)
@@ -63,6 +125,7 @@ class Drawing : public Ogre::SceneManager::Listener,
                 pass->setLightingEnabled(false);
                 pass->setDepthCheckEnabled(true);
                 pass->setDepthWriteEnabled(false);
+                pass->setCullingMode(Ogre::CULL_NONE);
                 pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
                 material->setReceiveShadows(false);
                 material->load();
@@ -76,8 +139,8 @@ class Drawing : public Ogre::SceneManager::Listener,
             lines->setCastShadows(false);
             lines->setQueryFlags(0);
             lines->setRenderQueueGroup(ForwardQueue);
-            lines->estimateVertexCount(MaxSegments * 2);
-            lines->estimateIndexCount(MaxSegments * 2);
+            lines->estimateVertexCount(MaxSegments * MaxBands * 4);
+            lines->estimateIndexCount(MaxSegments * MaxBands * 6);
         }
         if (!node) {
             node = root->createChildSceneNode(Ogre::SCENE_DYNAMIC);
@@ -145,17 +208,35 @@ public:
         history.Clear();
     }
 
-    bool Update(Ogre::SceneManager* owner, Ogre::SceneNode* root, unsigned used)
+    bool Update(Ogre::SceneManager* owner, Ogre::SceneNode* root, const View& view,
+                const Appearance& style, unsigned used)
     {
         if (scene && scene != owner) ReleaseScene();
-        if (!EnsureGeometry(owner, root)) return false;
-        if (section) lines->beginUpdate(0);
-        else lines->begin(MaterialName, Ogre::RenderOperation::OT_LINE_LIST);
+        const Ogre::ColourValue core(float((style.colour >> 16) & 0xff) / 255.0f,
+                                     float((style.colour >> 8) & 0xff) / 255.0f,
+                                     float(style.colour & 0xff) / 255.0f, 1.0f);
+        const Ogre::ColourValue edge(0.02f, 0.03f, 0.04f, 0.85f);
+        unsigned vertices = 0;
         for (unsigned i = 0; i < used; ++i) {
-            Vertex(segments[i].tail, segments[i].tailAlpha);
-            Vertex(segments[i].head, segments[i].headAlpha);
+            Ribbon ribbon;
+            if (!MakeRibbon(view, segments[i], ribbon)) continue;
+            if (!vertices) {
+                if (!EnsureGeometry(owner, root)) return false;
+                if (section) lines->beginUpdate(0);
+                else lines->begin(MaterialName, Ogre::RenderOperation::OT_TRIANGLE_LIST);
+            }
+            Band(ribbon, vertices, -CoreHalfWidth, CoreHalfWidth, core);
+            vertices += 4;
+            if (style.outline) {
+                Band(ribbon, vertices, -OutlineHalfWidth, -CoreHalfWidth, edge);
+                Band(ribbon, vertices+4, CoreHalfWidth, OutlineHalfWidth, edge);
+                vertices += 8;
+            }
         }
-        for (unsigned i = 0; i < used * 2; ++i) lines->index(i);
+        if (!vertices) {
+            Hide();
+            return true;
+        }
         if (!lines->end()) return false;
         section = true;
         if (!visible) lines->setVisible(true);
@@ -285,6 +366,11 @@ bool Install()
     return KenshiLib::AddHook(base + 0x437d40, &Advance, &originalAdvance) == KenshiLib::SUCCESS;
 }
 
+void ConfigureAppearance(const Appearance& appearance)
+{
+    InterlockedExchange64(&appearanceBits, PackAppearance(appearance));
+}
+
 void RunFrame(GameWorld* world, float time, void (*original)(GameWorld*, float))
 {
     if (stopped || activeFrame) {
@@ -307,11 +393,13 @@ void RunFrame(GameWorld* world, float time, void (*original)(GameWorld*, float))
             draw.Hide();
             return;
         }
-        const unsigned used = history.Build(frame.now, segments);
-        if (used) {
-            if (!draw.Update(frame.scene, frame.root, used)) StopVisuals();
-        } else {
+        const Appearance style = ReadAppearance();
+        const unsigned used = history.Build(frame.now, segments, style);
+        View view;
+        if (!used || !MakeView(*static_cast<Renderer*>(world->render), *frame.root, view)) {
             draw.Hide();
+        } else if (!draw.Update(frame.scene, frame.root, view, style, used)) {
+            StopVisuals();
         }
     } catch (...) { StopVisuals(); }
 }
