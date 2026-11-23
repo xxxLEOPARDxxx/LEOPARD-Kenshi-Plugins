@@ -56,6 +56,15 @@ msgstr "命中友军"
 msgid "Hits on downed targets"
 msgstr "命中倒地目标"
 
+msgid "Visual effects"
+msgstr "视觉效果"
+
+msgid "Bolt trails"
+msgstr "弩箭尾迹"
+
+msgid "Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."
+msgstr "为飞行中的弩箭绘制细而渐隐的尾迹，未命中时也会显示。此效果独立于经验值设置，仅在受支持的 Steam 版本中可用。"
+
 msgid "Diagnostics"
 msgstr "诊断"
 

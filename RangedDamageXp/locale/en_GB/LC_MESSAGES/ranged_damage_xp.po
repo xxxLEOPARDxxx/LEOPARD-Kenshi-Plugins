@@ -59,6 +59,15 @@ msgstr "Hits on downed targets"
 msgid "Diagnostics"
 msgstr "Diagnostics"
 
+msgid "Visual effects"
+msgstr "Visual effects"
+
+msgid "Bolt trails"
+msgstr "Bolt trails"
+
+msgid "Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."
+msgstr "Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."
+
 msgid "Detailed log"
 msgstr "Detailed log"
 

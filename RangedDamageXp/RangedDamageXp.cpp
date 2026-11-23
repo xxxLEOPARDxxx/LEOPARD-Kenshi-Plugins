@@ -31,6 +31,7 @@
 
 #include <Windows.h>
 #include <IniDefaults.h>
+#include "BoltTrails.h"
 
 #include <cstdio>
 #include <string>
@@ -74,6 +75,9 @@ namespace
     bool  g_allies = false;           // опыт за попадания по своим
     bool  g_downed = false;           // опыт за лежачих (без сознания)
     bool  g_debug = false;             // строка в журнал на каждое попадание
+    bool  g_trailsRequested = false;
+    bool  g_trailsInstalled = false;
+    bool  g_xpInstalled = false;
 
     std::string IniFileName()
     {
@@ -128,6 +132,7 @@ namespace
         g_turrets = ReadBool(ini, "Turrets", g_turrets);
         g_allies = ReadBool(ini, "Allies", g_allies);
         g_downed = ReadBool(ini, "DownedTargets", g_downed);
+        g_trailsRequested = ReadBool(ini, "BoltTrails", false);
         g_debug = ReadBool(ini, "Debug", false);
         KLocLog::SetEnabled(g_debug);
 
@@ -292,7 +297,9 @@ namespace
 
     void MainLoop_hook(GameWorld* thisptr, float time)
     {
-        g_origMainLoop(thisptr, time);
+        if (g_trailsInstalled) bolt_trail::RunFrame(thisptr, time, g_origMainLoop);
+        else g_origMainLoop(thisptr, time);
+        if (!g_xpInstalled) return;
 
         EnterCriticalSection(&g_lock);
         g_work.swap(g_pending);
@@ -323,6 +330,8 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "RangedDamageXp", "Turrets", Tr("Turrets"), Tr("Shots from a turret train the Turrets skill."), 1, 0);
     api->toggle(api, "RangedDamageXp", "Allies", Tr("Hits on allies"), Tr("Give experience for hitting your own people too. Off by default, otherwise shooting allies would pay."), 0, 0);
     api->toggle(api, "RangedDamageXp", "DownedTargets", Tr("Hits on downed targets"), Tr("Give experience for hitting targets lying unconscious."), 0, 0);
+    api->section(api, Tr("Visual effects"));
+    api->toggle(api, "RangedDamageXp", "BoltTrails", Tr("Bolt trails"), Tr("Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."), 0, MCM_RESTART);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "RangedDamageXp", "Debug", Tr("Detailed log"), Tr("A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."), 0, 0);
 }
@@ -333,18 +342,9 @@ __declspec(dllexport) void startPlugin()
     InitializeCriticalSection(&g_lock);
     LoadSettings();
 
-    if (!g_enabled)
+    if (!g_enabled && !g_trailsRequested)
     {
         DebugLog("RangedDamageXp: disabled in the ini");
-        return;
-    }
-
-    if (KenshiLib::SUCCESS !=
-        KenshiLib::AddHook(KenshiLib::GetRealAddress(&MedicalSystem::addWound),
-                           AddWound_hook, &g_origAddWound))
-    {
-        ErrorLog("RangedDamageXp: could not hook MedicalSystem::addWound, "
-                 "the plugin stays off");
         return;
     }
 
@@ -353,9 +353,20 @@ __declspec(dllexport) void startPlugin()
             KenshiLib::GetRealAddress(&GameWorld::_NV_mainLoop_GPUSensitiveStuff),
             MainLoop_hook, &g_origMainLoop))
     {
-        ErrorLog("RangedDamageXp: could not hook the game loop, "
-                 "hits are seen but no xp is given");
+        ErrorLog("RangedDamageXp: could not hook the game loop");
         return;
+    }
+
+    if (g_enabled) {
+        g_xpInstalled = KenshiLib::SUCCESS ==
+            KenshiLib::AddHook(KenshiLib::GetRealAddress(&MedicalSystem::addWound),
+                               AddWound_hook, &g_origAddWound);
+        if (!g_xpInstalled) ErrorLog("RangedDamageXp: could not hook MedicalSystem::addWound");
+    }
+    if (g_trailsRequested) {
+        g_trailsInstalled = bolt_trail::Install();
+        if (!g_trailsInstalled)
+            ErrorLog("RangedDamageXp: bolt flight hook unavailable on this executable or hook chain");
     }
 
     DebugLog("RangedDamageXp: installed");

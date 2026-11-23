@@ -56,6 +56,15 @@ msgstr "Попадания по своим"
 msgid "Hits on downed targets"
 msgstr "Попадания по лежачим"
 
+msgid "Visual effects"
+msgstr "Визуальные эффекты"
+
+msgid "Bolt trails"
+msgstr "Следы от болтов"
+
+msgid "Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."
+msgstr "Показывает тонкий затухающий след за летящими болтами, в том числе при промахе. Работает независимо от начисления опыта. Доступно в поддерживаемых версиях Steam."
+
 msgid "Diagnostics"
 msgstr "Диагностика"
 
