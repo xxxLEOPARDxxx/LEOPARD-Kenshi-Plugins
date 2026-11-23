@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-22",
+  "date": "2026-11-24",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -378,7 +378,17 @@
     "RangedDamageXp": {
       "nexus": 2205,
       "workshop_id": 3813761935,
-      "version": "3"
+      "version": "4",
+      "steam_version": "4",
+      "nexus_version": "4",
+      "published_msk": "2026-11-24T01:41:25+03:00",
+      "steam_confirmed_msk": "2026-11-24T01:43:03.053185+03:00",
+      "nexus_confirmed_msk": "2026-11-24T01:43:03.053185+03:00",
+      "archive_sha256": "6c20f713915d14d50dce07c5a36aae17f0c36b9babe5864c361ebcaf66b2eff5",
+      "dll_sha256": "4702f00cc822be26e285e1c70e75097784a8bcbb194757a2410d6ef95e113e6b",
+      "nexus_archive_sha256": "6c20f713915d14d50dce07c5a36aae17f0c36b9babe5864c361ebcaf66b2eff5",
+      "nexus_dll_sha256": "4702f00cc822be26e285e1c70e75097784a8bcbb194757a2410d6ef95e113e6b",
+      "bilingual_change_note_sha256": "4b5f2fdf9cfa8fc700c9417cb3b7e32348bdbd79b2452d459f7b1e393d18e2ac"
     },
     "StatColours": {
       "nexus": 2189,

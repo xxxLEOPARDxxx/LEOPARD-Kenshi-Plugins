@@ -462,21 +462,19 @@
     ]
   },
   "KEO": {
-    "version": "8",
-    "published_version": "7",
+    "version": "9",
+    "published_version": "8",
     "en": [
-      "Faster initialization before the main menu with compatible KenshiLib.",
-      "Short movement orders stay closer to the selected point. Squads keep the current destination and gathering point when an order is replaced or the leader has no usable route.",
-      "Long trips request the next required area sooner and resume only when a usable passage is found.",
-      "Supported models prepare triangle connectivity faster. Buffered save loading reads related fields together on Steam and GOG.",
-      "Shop counter stocking remains compatible with Rotate Items 4."
+      "Startup resource warmup reads faster in the main menu. The configured background reading limit still applies during play.",
+      "The optional warmup text stays visible after warmup so you can see the current RAM and VRAM cache totals. Turn it off in MCM to hide it.",
+      "Empty character animation queues skip unnecessary worker starts on supported builds.",
+      "Added a safeguard against a crash when unloading terrain materials on exit."
     ],
     "ru": [
-      "Ускорена инициализация до главного меню с совместимой версией KenshiLib.",
-      "Короткие приказы ведут ближе к выбранной точке. Отряд сохраняет актуальную цель и точку сбора при повторном приказе или отсутствии пути у ведущего.",
-      "На длинном маршруте следующий нужный участок запрашивается заранее. Отряд продолжает движение, когда найдена пригодная точка прохода.",
-      "Быстрее подготавливаются связи между треугольниками поддерживаемых моделей. На Steam и GOG связанные поля сейва читаются вместе, когда они уже в буфере.",
-      "Пополнение прилавка совместимо с Rotate Items 4."
+      "Ускорен стартовый прогрев ресурсов в главном меню. Во время игры действует настроенный лимит фонового чтения.",
+      "Текст прогрева остаётся на экране после завершения и показывает объём кэшей ОЗУ и видеопамяти. Его можно скрыть галочкой в MCM.",
+      "На поддерживаемых сборках пустые очереди анимации персонажей больше не запускают лишние рабочие потоки.",
+      "Добавлена защита от одного из вылетов при освобождении материалов рельефа на выходе из игры."
     ]
   }
 }
