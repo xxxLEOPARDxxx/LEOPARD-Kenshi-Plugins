@@ -4,60 +4,56 @@
 
 namespace bolt_trail {
 
-struct View {
-    Point eye, right, up, forward;
-    float pixelScaleX, pixelScaleY, nearDepth;
-    bool perspective;
-};
+const unsigned MaskWidth = 16, MaskHeight = 64, MaskMipLevels = 6;
+const float DrawRange = 20400.0f;
 
-struct Ribbon {
-    Segment segment;
-    Point tailPerPixel, headPerPixel;
-};
-
-inline Point Offset(Point p, Point direction, float scale)
+inline Point Cross(Point a, Point b)
 {
-    return Point(p.x + direction.x*scale, p.y + direction.y*scale, p.z + direction.z*scale);
+    return Point(a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x);
 }
 
-inline float Project(Point position, Point eye, Point axis)
-{
-    return (position.x-eye.x)*axis.x + (position.y-eye.y)*axis.y + (position.z-eye.z)*axis.z;
-}
+struct Quad { Point headLeft, headRight, tailRight, tailLeft; };
 
-inline bool MakeRibbon(const View& view, const Segment& input, Ribbon& output)
+inline bool MakeQuad(const Streak& streak, Point eye, Point cameraRight, Quad& quad)
 {
-    float tailDepth = Project(input.tail, view.eye, view.forward);
-    float headDepth = Project(input.head, view.eye, view.forward);
-    if (tailDepth < view.nearDepth && headDepth < view.nearDepth) return false;
-    output.segment = input;
-    Segment& segment = output.segment;
-    if (tailDepth < view.nearDepth) {
-        const float t = (view.nearDepth-tailDepth) / (headDepth-tailDepth);
-        segment.tail = Toward(input.tail, input.head, t);
-        segment.tailAlpha += (input.headAlpha-input.tailAlpha)*t;
-        tailDepth = view.nearDepth;
-    } else if (headDepth < view.nearDepth) {
-        const float t = (view.nearDepth-headDepth) / (tailDepth-headDepth);
-        segment.head = Toward(input.head, input.tail, t);
-        segment.headAlpha += (input.tailAlpha-input.headAlpha)*t;
-        headDepth = view.nearDepth;
-    }
-
-    const float tailScale = view.perspective ? tailDepth : 1.0f;
-    const float headScale = view.perspective ? headDepth : 1.0f;
-    const float dx = (Project(segment.head, view.eye, view.right)/headScale -
-                      Project(segment.tail, view.eye, view.right)/tailScale) * view.pixelScaleX;
-    const float dy = (Project(segment.head, view.eye, view.up)/headScale -
-                      Project(segment.tail, view.eye, view.up)/tailScale) * view.pixelScaleY;
-    const float lengthSquared = dx*dx + dy*dy;
-    if (!(lengthSquared > 0.0001f)) return false;
-    const float inverseLength = 1.0f / std::sqrt(lengthSquared);
-    const Point lateral = Offset(Offset(Point(), view.right, -dy*inverseLength/view.pixelScaleX),
-                                view.up, dx*inverseLength/view.pixelScaleY);
-    output.tailPerPixel = Offset(Point(), lateral, tailScale);
-    output.headPerPixel = Offset(Point(), lateral, headScale);
+    const Point axis = streak.head-streak.tail;
+    const float length = Length(axis);
+    if (!(length > 0.001f) || LengthSquared(streak.head-eye) > (DrawRange+length)*(DrawRange+length))
+        return false;
+    const Point centre = (streak.head+streak.tail)*0.5f;
+    const Point side = Cross(axis*(1.0f/length), eye-centre);
+    const float sideLength = Length(side);
+    const Point halfWidth = (sideLength > 0.00001f ? side*(1.0f/sideLength) : cameraRight)*(Width*0.5f);
+    quad.headLeft = streak.head-halfWidth;
+    quad.headRight = streak.head+halfWidth;
+    quad.tailRight = streak.tail+halfWidth;
+    quad.tailLeft = streak.tail-halfWidth;
     return true;
+}
+
+inline unsigned char ByteFromUnit(float value)
+{
+    const float scaled = value*255.0f;
+    const unsigned low = unsigned(scaled);
+    const float fraction = scaled-float(low);
+    return static_cast<unsigned char>(low + (fraction > 0.5f || (fraction == 0.5f && (low & 1))));
+}
+
+inline void MakeMask(unsigned char* rgba, unsigned fadePercent, bool outline)
+{
+    const float fade = float(fadePercent)/100.0f;
+    for (unsigned y = 0; y < MaskHeight; ++y) {
+        const float v = (float(y)+0.5f)/MaskHeight;
+        const float tail = (1.0f-v)/fade, tip = v/0.04f;
+        const float along = (tail < 1.0f ? tail : 1.0f) * (tip < 1.0f ? tip : 1.0f);
+        for (unsigned x = 0; x < MaskWidth; ++x) {
+            const float across = (float(x)+0.5f)*2.0f/MaskWidth-1.0f;
+            const unsigned char rgb = outline && std::abs(across) > 0.68f ? 18 : 255;
+            const unsigned at = (y*MaskWidth+x)*4;
+            rgba[at] = rgba[at+1] = rgba[at+2] = rgb;
+            rgba[at+3] = ByteFromUnit(along*(1.0f-across*across));
+        }
+    }
 }
 
 }

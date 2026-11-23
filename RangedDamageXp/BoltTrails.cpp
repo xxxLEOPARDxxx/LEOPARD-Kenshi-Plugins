@@ -10,36 +10,42 @@
 #include <kenshi/GameWorld.h>
 #include <kenshi/Renderer.h>
 #include <ogre/OgreCamera.h>
+#include <ogre/OgreHardwarePixelBuffer.h>
 #include <ogre/OgreManualObject.h>
 #include <ogre/OgreMaterialManager.h>
 #include <ogre/OgrePass.h>
 #include <ogre/OgreSceneManager.h>
 #include <ogre/OgreSceneNode.h>
 #include <ogre/OgreTechnique.h>
-#include <ogre/OgreViewport.h>
+#include <ogre/OgreTextureManager.h>
+#include <ogre/OgreTextureUnitState.h>
 
 namespace bolt_trail {
 namespace {
 
-const char MaterialName[] = "LEOPARD/RangedDamageXp/BoltTrails";
-const unsigned char ForwardQueue = 83; // Kenshi Lighting_HDR particles pass.
+const char MaterialName[] = "LEOPARD/RangedDamageXp/Streak";
+const char MaskName[] = "LEOPARD/RangedDamageXp/StreakMask";
+const unsigned char ForwardQueue = 84; // After the main particle queue in Lighting_HDR.
 const unsigned NodeOffset = 0x58;
+const unsigned SpeedOffset = 0x44;
+const unsigned AgeOffset = 0x60;
 const unsigned FlightStateOffset = 0x70;
 const unsigned Flying = 1;
-const float CoreHalfWidth = 0.8f;
-const float OutlineHalfWidth = 1.5f;
-const unsigned MaxBands = 3;
+const unsigned HitBody = 2, HitWorld = 3;
 
 History history;
-Segment segments[MaxSegments];
+Streak streaks[MaxTrails];
 void (*originalAdvance)(void*) = NULL;
+const float* simulationDelta = NULL;
+double simulationClock = 0;
+unsigned frameSerial = 0;
 bool stopped = false;
 
 LONGLONG PackAppearance(const Appearance& style)
 {
     return LONGLONG(style.colour) | (LONGLONG(style.brightnessPercent) << 24) |
-           (LONGLONG(style.lengthPercent) << 31) | (LONGLONG(style.fadePercent) << 39) |
-           (LONGLONG(style.outline) << 46);
+           (LONGLONG(style.lengthPercent) << 32) | (LONGLONG(style.fadePercent) << 40) |
+           (LONGLONG(style.outline) << 47);
 }
 
 __declspec(align(8)) volatile LONGLONG appearanceBits = PackAppearance(Appearance());
@@ -49,10 +55,10 @@ Appearance ReadAppearance()
     const LONGLONG bits = InterlockedCompareExchange64(&appearanceBits, 0, 0);
     Appearance style;
     style.colour = uint32_t(bits & 0xffffff);
-    style.brightnessPercent = unsigned((bits >> 24) & 0x7f);
-    style.lengthPercent = unsigned((bits >> 31) & 0xff);
-    style.fadePercent = unsigned((bits >> 39) & 0x7f);
-    style.outline = (bits >> 46) != 0;
+    style.brightnessPercent = unsigned((bits >> 24) & 0xff);
+    style.lengthPercent = unsigned((bits >> 32) & 0xff);
+    style.fadePercent = unsigned((bits >> 40) & 0x7f);
+    style.outline = (bits >> 47) != 0;
     return style;
 }
 
@@ -61,25 +67,19 @@ Point CopyPoint(const Ogre::Vector3& v)
     return Point(v.x, v.y, v.z);
 }
 
-bool MakeView(Renderer& renderer, Ogre::SceneNode& root, View& view)
+void HalveMask(unsigned char* rgba, unsigned width, unsigned height)
 {
-    Ogre::Camera* camera = renderer.getCamera();
-    Ogre::Viewport* viewport = renderer.getViewport();
-    if (!camera || !viewport) return false;
-    const Ogre::Matrix4& projection = camera->getProjectionMatrix();
-    view.pixelScaleX = std::abs(projection[0][0]) * viewport->getActualWidth() * 0.5f;
-    view.pixelScaleY = std::abs(projection[1][1]) * viewport->getActualHeight() * 0.5f;
-    if (!(view.pixelScaleX > 0 && view.pixelScaleY > 0)) return false;
-
-    const Ogre::Quaternion orientation =
-        root._getDerivedOrientationUpdated().Inverse() * camera->getDerivedOrientation();
-    view.eye = CopyPoint(root.convertWorldToLocalPosition(camera->getDerivedPosition()));
-    view.right = CopyPoint(orientation * Ogre::Vector3::UNIT_X);
-    view.up = CopyPoint(orientation * Ogre::Vector3::UNIT_Y);
-    view.forward = CopyPoint(orientation * Ogre::Vector3::NEGATIVE_UNIT_Z);
-    view.nearDepth = (std::max)(0.01f, camera->getNearClipDistance());
-    view.perspective = camera->getProjectionType() == Ogre::PT_PERSPECTIVE;
-    return true;
+    const unsigned xs = width > 1 ? 2 : 1, ys = height > 1 ? 2 : 1;
+    const unsigned nextWidth = width/xs, nextHeight = height/ys;
+    for (unsigned y = 0; y < nextHeight; ++y)
+        for (unsigned x = 0; x < nextWidth; ++x)
+            for (unsigned c = 0; c < 4; ++c) {
+                unsigned sum = 0;
+                for (unsigned dy = 0; dy < ys; ++dy)
+                    for (unsigned dx = 0; dx < xs; ++dx)
+                        sum += rgba[((y*ys+dy)*width+x*xs+dx)*4+c];
+                rgba[(y*nextWidth+x)*4+c] = static_cast<unsigned char>((sum + xs*ys/2)/(xs*ys));
+            }
 }
 
 class Drawing : public Ogre::SceneManager::Listener,
@@ -89,21 +89,44 @@ class Drawing : public Ogre::SceneManager::Listener,
     Ogre::SceneNode* node;
     Ogre::ManualObject* lines;
     bool section, visible;
+    unsigned maskFade;
+    bool maskOutline;
 
-    void Vertex(const Point& point, const Ogre::ColourValue& colour, float alpha)
+    bool EnsureMask(const Appearance& style)
     {
-        lines->position(point.x, point.y, point.z);
-        lines->colour(colour.r, colour.g, colour.b, colour.a * alpha);
+        if (maskFade == style.fadePercent && maskOutline == style.outline) return true;
+        Ogre::TextureManager* textures = Ogre::TextureManager::getSingletonPtr();
+        if (!textures) return false;
+        Ogre::TexturePtr texture = textures->getByName(MaskName);
+        if (texture.isNull())
+            texture = textures->createManual(MaskName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                             Ogre::TEX_TYPE_2D, MaskWidth, MaskHeight, MaskMipLevels,
+                                             Ogre::PF_BYTE_RGBA, Ogre::TU_STATIC_WRITE_ONLY);
+        if (texture.isNull() || texture->getNumMipmaps() != MaskMipLevels) return false;
+
+        unsigned char pixels[MaskWidth*MaskHeight*4];
+        MakeMask(pixels, style.fadePercent, style.outline);
+        unsigned width = MaskWidth, height = MaskHeight;
+        for (unsigned mip = 0; mip <= MaskMipLevels; ++mip) {
+            Ogre::HardwarePixelBufferSharedPtr buffer = texture->getBuffer(0, mip);
+            if (buffer.isNull()) return false;
+            buffer->blitFromMemory(Ogre::PixelBox(width, height, 1, Ogre::PF_BYTE_RGBA, pixels));
+            if (mip < MaskMipLevels) {
+                HalveMask(pixels, width, height);
+                width = width > 1 ? width/2 : 1;
+                height = height > 1 ? height/2 : 1;
+            }
+        }
+        maskFade = style.fadePercent;
+        maskOutline = style.outline;
+        return true;
     }
 
-    void Band(const Ribbon& ribbon, unsigned vertex, float left, float right, const Ogre::ColourValue& colour)
+    void Vertex(const Point& point, const Ogre::ColourValue& colour, float u, float v)
     {
-        const Segment& segment = ribbon.segment;
-        Vertex(Offset(segment.tail, ribbon.tailPerPixel, left), colour, segment.tailAlpha);
-        Vertex(Offset(segment.tail, ribbon.tailPerPixel, right), colour, segment.tailAlpha);
-        Vertex(Offset(segment.head, ribbon.headPerPixel, right), colour, segment.headAlpha);
-        Vertex(Offset(segment.head, ribbon.headPerPixel, left), colour, segment.headAlpha);
-        lines->quad(vertex, vertex+1, vertex+2, vertex+3);
+        lines->position(point.x, point.y, point.z);
+        lines->colour(colour);
+        lines->textureCoord(u, v);
     }
 
     bool EnsureGeometry(Ogre::SceneManager* owner, Ogre::SceneNode* root)
@@ -120,13 +143,16 @@ class Drawing : public Ogre::SceneManager::Listener,
                 material = materials->create(MaterialName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
                 Ogre::Technique* technique = material->getNumTechniques() ? material->getTechnique(0) : material->createTechnique();
                 Ogre::Pass* pass = technique->getNumPasses() ? technique->getPass(0) : technique->createPass();
-                pass->setVertexProgram("Basic_Colour_VP");
-                pass->setFragmentProgram("Basic_FP");
+                pass->setVertexProgram("Basic_Coloured_Texture_VP");
+                pass->setFragmentProgram("Basic_Texture_FP");
                 pass->setLightingEnabled(false);
                 pass->setDepthCheckEnabled(true);
                 pass->setDepthWriteEnabled(false);
                 pass->setCullingMode(Ogre::CULL_NONE);
                 pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+                Ogre::TextureUnitState* sampler = pass->createTextureUnitState(MaskName);
+                sampler->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+                sampler->setTextureFiltering(Ogre::TFO_TRILINEAR);
                 material->setReceiveShadows(false);
                 material->load();
             }
@@ -139,8 +165,8 @@ class Drawing : public Ogre::SceneManager::Listener,
             lines->setCastShadows(false);
             lines->setQueryFlags(0);
             lines->setRenderQueueGroup(ForwardQueue);
-            lines->estimateVertexCount(MaxSegments * MaxBands * 4);
-            lines->estimateIndexCount(MaxSegments * MaxBands * 6);
+            lines->estimateVertexCount(MaxTrails * 4);
+            lines->estimateIndexCount(MaxTrails * 6);
         }
         if (!node) {
             node = root->createChildSceneNode(Ogre::SCENE_DYNAMIC);
@@ -151,7 +177,8 @@ class Drawing : public Ogre::SceneManager::Listener,
     }
 
 public:
-    Drawing() : scene(NULL), node(NULL), lines(NULL), section(false), visible(false) {}
+    Drawing() : scene(NULL), node(NULL), lines(NULL), section(false), visible(false),
+                maskFade(0), maskOutline(false) {}
     bool Visible() const { return visible; }
 
     void Hide()
@@ -179,6 +206,7 @@ public:
         }
         scene->removeListener(this);
         scene = NULL;
+        maskFade = 0;
     }
 
     void sceneManagerDestroyed(Ogre::SceneManager* source) override
@@ -189,6 +217,7 @@ public:
         node = NULL;
         lines = NULL;
         section = visible = false;
+        maskFade = 0;
         history.Clear();
     }
 
@@ -197,6 +226,7 @@ public:
         if (source != lines) return;
         lines = NULL;
         section = visible = false;
+        maskFade = 0;
         history.Clear();
     }
 
@@ -208,30 +238,29 @@ public:
         history.Clear();
     }
 
-    bool Update(Ogre::SceneManager* owner, Ogre::SceneNode* root, const View& view,
+    bool Update(Ogre::SceneManager* owner, Ogre::SceneNode* root, Point eye, Point right,
                 const Appearance& style, unsigned used)
     {
         if (scene && scene != owner) ReleaseScene();
         const Ogre::ColourValue core(float((style.colour >> 16) & 0xff) / 255.0f,
                                      float((style.colour >> 8) & 0xff) / 255.0f,
-                                     float(style.colour & 0xff) / 255.0f, 1.0f);
-        const Ogre::ColourValue edge(0.02f, 0.03f, 0.04f, 0.85f);
+                                     float(style.colour & 0xff) / 255.0f,
+                                     BaseOpacity * float(style.brightnessPercent) / 100.0f);
         unsigned vertices = 0;
         for (unsigned i = 0; i < used; ++i) {
-            Ribbon ribbon;
-            if (!MakeRibbon(view, segments[i], ribbon)) continue;
+            Quad quad;
+            if (!MakeQuad(streaks[i], eye, right, quad)) continue;
             if (!vertices) {
-                if (!EnsureGeometry(owner, root)) return false;
+                if (!EnsureMask(style) || !EnsureGeometry(owner, root)) return false;
                 if (section) lines->beginUpdate(0);
                 else lines->begin(MaterialName, Ogre::RenderOperation::OT_TRIANGLE_LIST);
             }
-            Band(ribbon, vertices, -CoreHalfWidth, CoreHalfWidth, core);
+            Vertex(quad.headLeft, core, 0, 0);
+            Vertex(quad.headRight, core, 1, 0);
+            Vertex(quad.tailRight, core, 1, 1);
+            Vertex(quad.tailLeft, core, 0, 1);
+            lines->quad(vertices, vertices+1, vertices+2, vertices+3);
             vertices += 4;
-            if (style.outline) {
-                Band(ribbon, vertices, -OutlineHalfWidth, -CoreHalfWidth, edge);
-                Band(ribbon, vertices+4, CoreHalfWidth, OutlineHalfWidth, edge);
-                vertices += 8;
-            }
         }
         if (!vertices) {
             Hide();
@@ -261,11 +290,24 @@ struct Frame {
     GameWorld* world;
     Ogre::SceneManager* scene;
     Ogre::SceneNode* root;
-    DWORD now;
-    bool resolved, sampled;
+    Appearance style;
+    unsigned serial;
+    bool timeRead, timeAdvanced, resolved, sampled;
 
-    Frame(GameWorld* owner) : world(owner), scene(NULL), root(NULL),
-                              now(0), resolved(false), sampled(false) {}
+    Frame(GameWorld* owner) : world(owner), scene(NULL), root(NULL), style(ReadAppearance()),
+                              serial(++frameSerial), timeRead(false), timeAdvanced(false),
+                              resolved(false), sampled(false) {}
+
+    void AdvanceClock()
+    {
+        if (timeRead) return;
+        timeRead = true;
+        // MainLoop writes the step at 0x787f13, before dispatching the bolted projectiles.
+        // Read only after that dispatch begins or MainLoop has returned.
+        const float delta = *simulationDelta;
+        timeAdvanced = world && !world->paused && !world->gameResetting && delta > 0 && delta <= 1;
+        if (timeAdvanced) simulationClock += delta;
+    }
 
     bool Resolve()
     {
@@ -286,7 +328,6 @@ struct Frame {
             historyRoot = root;
             historyOrigin = origin;
         }
-        now = GetTickCount();
         return true;
     }
 
@@ -330,11 +371,13 @@ void Advance(void* projectile)
     Frame* frame = activeFrame;
     Ogre::SceneNode* node = NULL;
     Point before;
+    float ageBefore = 0;
     if (frame && !stopped && Field<unsigned>(projectile, FlightStateOffset) == Flying) {
         try {
             Ogre::SceneNode* flightNode = Field<Ogre::SceneNode*>(projectile, NodeOffset);
             if (flightNode && frame->Resolve() && flightNode->getParent() == frame->root) {
                 before = Record(*flightNode);
+                ageBefore = Field<float>(projectile, AgeOffset);
                 node = flightNode;
             }
         } catch (...) { stopped = true; }
@@ -344,7 +387,14 @@ void Advance(void* projectile)
     if (Field<Ogre::SceneNode*>(projectile, NodeOffset) != node) return;
     try {
         if (node->getParent() != frame->root) return;
-        history.Sample(reinterpret_cast<uintptr_t>(projectile), before, Record(*node), frame->now);
+        const unsigned state = Field<unsigned>(projectile, FlightStateOffset);
+        const float ageAfter = Field<float>(projectile, AgeOffset);
+        const float speed = Field<float>(projectile, SpeedOffset);
+        frame->AdvanceClock();
+        history.Observe(reinterpret_cast<uintptr_t>(projectile), before, Record(*node),
+                        CopyPoint(node->getOrientation().zAxis()), speed, ageBefore, ageAfter,
+                        state == Flying, state == HitBody || state == HitWorld,
+                        frame->serial, simulationClock, frame->style.lengthPercent);
         frame->sampled = true;
     } catch (...) { stopped = true; }
 }
@@ -359,10 +409,12 @@ bool Install()
     if (!dos || dos->e_magic != IMAGE_DOS_SIGNATURE || dos->e_lfanew <= 0) return false;
     const IMAGE_NT_HEADERS64* pe = reinterpret_cast<const IMAGE_NT_HEADERS64*>(base + dos->e_lfanew);
     const unsigned char entry[] = {0x48,0x8b,0xc4,0x55,0x57,0x48,0x8d,0x68,0xa1,0x48,
-                                   0x81,0xec,0xe8,0,0,0,0x83,0x79,0x70,0x01};
+                                   0x81,0xec,0xe8,0,0,0,0x83,0x79,0x70,0x01,
+                                   0xf3,0x0f,0x10,0x05,0xd4,0xa9,0xcf,0x01};
     if (pe->Signature != IMAGE_NT_SIGNATURE || pe->FileHeader.TimeDateStamp != 0x65d604d7 ||
         pe->OptionalHeader.SizeOfImage != 0x232c000 || std::memcmp(base + 0x437d40, entry, sizeof(entry)))
         return false;
+    simulationDelta = reinterpret_cast<const float*>(base + 0x2132730);
     return KenshiLib::AddHook(base + 0x437d40, &Advance, &originalAdvance) == KenshiLib::SUCCESS;
 }
 
@@ -386,20 +438,26 @@ void RunFrame(GameWorld* world, float time, void (*original)(GameWorld*, float))
         StopVisuals();
         return;
     }
-    if (!frame.sampled && !draw.Visible()) return;
+    if (!frame.sampled && !history.Active() && !draw.Visible()) return;
     try {
         if (!frame.Resolve() || !frame.SceneStillLive()) {
             history.Clear();
             draw.Hide();
             return;
         }
-        const Appearance style = ReadAppearance();
-        const unsigned used = history.Build(frame.now, segments, style);
-        View view;
-        if (!used || !MakeView(*static_cast<Renderer*>(world->render), *frame.root, view)) {
+        frame.AdvanceClock();
+        const unsigned used = history.Build(frame.serial, simulationClock, frame.timeAdvanced,
+                                            frame.style.lengthPercent, streaks);
+        Renderer* renderer = static_cast<Renderer*>(world->render);
+        Ogre::Camera* camera = renderer->getCamera();
+        if (!used || !camera) {
             draw.Hide();
-        } else if (!draw.Update(frame.scene, frame.root, view, style, used)) {
-            StopVisuals();
+        } else {
+            const Point eye = CopyPoint(frame.root->convertWorldToLocalPosition(camera->getDerivedPosition()));
+            const Ogre::Quaternion orientation =
+                frame.root->_getDerivedOrientationUpdated().Inverse() * camera->getDerivedOrientation();
+            const Point right = CopyPoint(orientation * Ogre::Vector3::UNIT_X);
+            if (!draw.Update(frame.scene, frame.root, eye, right, frame.style, used)) StopVisuals();
         }
     } catch (...) { StopVisuals(); }
 }

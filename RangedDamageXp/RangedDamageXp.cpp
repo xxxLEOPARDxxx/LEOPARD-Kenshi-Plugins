@@ -138,7 +138,7 @@ namespace
         if (colour[0] == '#' && std::strlen(colour) == 7 &&
             std::strspn(colour+1, "0123456789abcdefABCDEF") == 6)
             style.colour = uint32_t(std::strtoul(colour+1, NULL, 16));
-        style.brightnessPercent = ReadPercent(ini, "BoltTrailBrightness", style.brightnessPercent, 15, 100);
+        style.brightnessPercent = ReadPercent(ini, "BoltTrailBrightness", style.brightnessPercent, 15, 160);
         style.lengthPercent = ReadPercent(ini, "BoltTrailLength", style.lengthPercent, 50, 200);
         style.fadePercent = ReadPercent(ini, "BoltTrailFade", style.fadePercent, 10, 100);
         style.outline = ReadBool(ini, "BoltTrailOutline", style.outline);
@@ -361,10 +361,10 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->toggle(api, "RangedDamageXp", "BoltTrails", Tr("Bolt trails"), Tr("Draw a thin, fading trail behind flying bolts, including misses. Works independently of experience. Available on supported Steam builds."), 0, MCM_RESTART);
     const bolt_trail::Appearance trailDefaults;
     api->colour(api, "RangedDamageXp", "BoltTrailColour", Tr("Trail colour"), Tr("Colour of the bright center of the trail."), bolt_trail::DefaultColourText, 0);
-    api->integer(api, "RangedDamageXp", "BoltTrailBrightness", Tr("Trail brightness (%)"), Tr("Opacity of the bright center next to the bolt."), trailDefaults.brightnessPercent, 15, 100, 0);
-    api->integer(api, "RangedDamageXp", "BoltTrailLength", Tr("Trail length (%)"), Tr("Maximum trail length relative to the original. Short flights still leave a shorter trail."), trailDefaults.lengthPercent, 50, 200, 0);
+    api->integer(api, "RangedDamageXp", "BoltTrailBrightness", Tr("Trail brightness (%)"), Tr("Brightness relative to Meitou. At 100%, the trail uses Meitou's opacity."), trailDefaults.brightnessPercent, 15, 160, 0);
+    api->integer(api, "RangedDamageXp", "BoltTrailLength", Tr("Trail length (%)"), Tr("Trail length relative to Meitou. The trail stops at the muzzle on short flights."), trailDefaults.lengthPercent, 50, 200, 0);
     api->integer(api, "RangedDamageXp", "BoltTrailFade", Tr("Fade length (%)"), Tr("Portion of the trail that fades towards the tail. At 100%, it fades along its entire length."), trailDefaults.fadePercent, 10, 100, 0);
-    api->toggle(api, "RangedDamageXp", "BoltTrailOutline", Tr("Dark outline"), Tr("Adds a thin dark edge so the trail stands out over bright ground and in rain."), trailDefaults.outline ? 1 : 0, 0);
+    api->toggle(api, "RangedDamageXp", "BoltTrailOutline", Tr("Dark outline"), Tr("Adds a soft dark edge around the streak."), trailDefaults.outline ? 1 : 0, 0);
     api->section(api, Tr("Diagnostics"));
     api->toggle(api, "RangedDamageXp", "Debug", Tr("Detailed log"), Tr("A line in RE_Kenshi_log.txt for every counted hit: who, whom, damage, experience, level before and after."), 0, 0);
 }

@@ -107,14 +107,14 @@ msgstr "Colour of the bright center of the trail."
 msgid "Trail brightness (%)"
 msgstr "Trail brightness (%)"
 
-msgid "Opacity of the bright center next to the bolt."
-msgstr "Opacity of the bright center next to the bolt."
+msgid "Brightness relative to Meitou. At 100%, the trail uses Meitou's opacity."
+msgstr "Brightness relative to Meitou. At 100%, the trail uses Meitou's opacity."
 
 msgid "Trail length (%)"
 msgstr "Trail length (%)"
 
-msgid "Maximum trail length relative to the original. Short flights still leave a shorter trail."
-msgstr "Maximum trail length relative to the original. Short flights still leave a shorter trail."
+msgid "Trail length relative to Meitou. The trail stops at the muzzle on short flights."
+msgstr "Trail length relative to Meitou. The trail stops at the muzzle on short flights."
 
 msgid "Fade length (%)"
 msgstr "Fade length (%)"
@@ -125,5 +125,5 @@ msgstr "Portion of the trail that fades towards the tail. At 100%, it fades alon
 msgid "Dark outline"
 msgstr "Dark outline"
 
-msgid "Adds a thin dark edge so the trail stands out over bright ground and in rain."
-msgstr "Adds a thin dark edge so the trail stands out over bright ground and in rain."
+msgid "Adds a soft dark edge around the streak."
+msgstr "Adds a soft dark edge around the streak."

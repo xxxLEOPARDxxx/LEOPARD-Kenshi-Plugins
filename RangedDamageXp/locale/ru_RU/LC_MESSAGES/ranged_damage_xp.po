@@ -107,14 +107,14 @@ msgstr "Цвет светлой середины следа."
 msgid "Trail brightness (%)"
 msgstr "Яркость следа (%)"
 
-msgid "Opacity of the bright center next to the bolt."
-msgstr "Непрозрачность светлой середины возле болта."
+msgid "Brightness relative to Meitou. At 100%, the trail uses Meitou's opacity."
+msgstr "Яркость относительно Meitou. При 100% прозрачность такая же, как в Meitou."
 
 msgid "Trail length (%)"
 msgstr "Длина следа (%)"
 
-msgid "Maximum trail length relative to the original. Short flights still leave a shorter trail."
-msgstr "Максимальная длина относительно исходной. При коротком полёте след будет короче."
+msgid "Trail length relative to Meitou. The trail stops at the muzzle on short flights."
+msgstr "Длина следа относительно Meitou. При коротком полёте след не выходит за точку выстрела."
 
 msgid "Fade length (%)"
 msgstr "Длина затухания (%)"
@@ -125,5 +125,5 @@ msgstr "Доля следа, которая плавно затухает к х�
 msgid "Dark outline"
 msgstr "Тёмная обводка"
 
-msgid "Adds a thin dark edge so the trail stands out over bright ground and in rain."
-msgstr "Добавляет тонкую тёмную кромку, чтобы след выделялся на светлом грунте и в дождь."
+msgid "Adds a soft dark edge around the streak."
+msgstr "Добавляет мягкую тёмную кромку вдоль следа."

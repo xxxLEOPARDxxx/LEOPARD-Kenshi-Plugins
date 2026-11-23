@@ -5,15 +5,15 @@ class GameWorld;
 
 namespace bolt_trail {
 
-const char DefaultColourText[] = "#80e0ff";
+const char DefaultColourText[] = "#ffffff";
 
 struct Appearance {
     uint32_t colour;
     unsigned brightnessPercent, lengthPercent, fadePercent;
     bool outline;
 
-    Appearance() : colour(0x80e0ff), brightnessPercent(85), lengthPercent(100),
-                   fadePercent(50), outline(true) {}
+    Appearance() : colour(0xffffff), brightnessPercent(100), lengthPercent(100),
+                   fadePercent(100), outline(false) {}
 };
 
 void ConfigureAppearance(const Appearance& appearance);

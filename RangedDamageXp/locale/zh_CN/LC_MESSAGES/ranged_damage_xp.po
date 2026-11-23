@@ -107,14 +107,14 @@ msgstr "尾迹亮色核心的颜色。"
 msgid "Trail brightness (%)"
 msgstr "尾迹亮度（%）"
 
-msgid "Opacity of the bright center next to the bolt."
-msgstr "弩箭附近亮色核心的不透明度。"
+msgid "Brightness relative to Meitou. At 100%, the trail uses Meitou's opacity."
+msgstr "相对于 Meitou 的亮度。设为 100% 时，使用与 Meitou 相同的不透明度。"
 
 msgid "Trail length (%)"
 msgstr "尾迹长度（%）"
 
-msgid "Maximum trail length relative to the original. Short flights still leave a shorter trail."
-msgstr "相对于原始长度的最大尾迹长度。飞行距离较短时，尾迹也会更短。"
+msgid "Trail length relative to Meitou. The trail stops at the muzzle on short flights."
+msgstr "相对于 Meitou 的尾迹长度。飞行距离较短时，尾迹不会延伸到发射点之后。"
 
 msgid "Fade length (%)"
 msgstr "渐隐长度（%）"
@@ -125,5 +125,5 @@ msgstr "向尾端逐渐淡出的尾迹比例。设为 100% 时，整条尾迹都
 msgid "Dark outline"
 msgstr "深色描边"
 
-msgid "Adds a thin dark edge so the trail stands out over bright ground and in rain."
-msgstr "添加细窄的深色边缘，使尾迹在明亮地面上和雨中更清晰。"
+msgid "Adds a soft dark edge around the streak."
+msgstr "在尾迹周围添加柔和的深色边缘。"
