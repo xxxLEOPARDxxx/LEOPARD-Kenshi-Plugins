@@ -425,16 +425,21 @@ namespace Unstuck
         return start && start==AIFixedGate::Side(Point(landing),inside,outside);
     }
 
-    bool JoinedWallSections(WallBuilding* first,WallBuilding* second)
+    bool WallSectionsMeet(WallBuilding* first,WallBuilding* second)
     {
         if (!first || !second) return false;
-        const float alignment=first->getOrientation().xAxis().dotProduct(second->getOrientation().xAxis());
-        if (!_finite(alignment) || std::fabs(alignment)<.95f) return false;
         const AIFixedGate::Point a=Point(first->getPosition()),b=Point(first->getWallEndPosition());
         const AIFixedGate::Point c=Point(second->getPosition()),d=Point(second->getWallEndPosition());
         const float join=AIFixedGate::WorldUnits(1.0f);
         return AIFixedGate::DistanceSq(a,c)<=join*join || AIFixedGate::DistanceSq(a,d)<=join*join ||
             AIFixedGate::DistanceSq(b,c)<=join*join || AIFixedGate::DistanceSq(b,d)<=join*join;
+    }
+
+    bool JoinedWallSections(WallBuilding* first,WallBuilding* second)
+    {
+        if (!first || !second) return false;
+        const float alignment=first->getOrientation().xAxis().dotProduct(second->getOrientation().xAxis());
+        return _finite(alignment) && std::fabs(alignment)>=.95f && WallSectionsMeet(first,second);
     }
 
     bool CrossesBarrier(GameWorld* world,const Ogre::Vector3& origin,const Ogre::Vector3& landing,
@@ -466,11 +471,18 @@ namespace Unstuck
                     return true;
                 if (AIFixedUnstuck::OverlapsStructure(Point(origin),Point(landing),Point(box.mCenter),Point(box.mHalfSize)))
                 {
-                    // Adjacent pieces can overlap the recovery corridor at a
-                    // join. Their actual wall spans are narrower than the AABB.
-                    if (support && wall && (exterior ||
-                        (verifiedWallEscape && JoinedWallSections(support->isAWall(),wall))) &&
-                        WallAllowsLanding(wall,origin,landing,false,false)) continue;
+                    // A crest descent can clear even an angled join when it
+                    // stays on the same side of both completed wall pieces.
+                    if (support && wall)
+                    {
+                        bool joined=exterior || (verifiedWallEscape && JoinedWallSections(support->isAWall(),wall));
+                        if (!joined && verifiedCrest && !wall->isDisabled())
+                        {
+                            const Building::ConstructionState* state=wall->getBuildState();
+                            joined=state && state->isComplete && WallSectionsMeet(support->isAWall(),wall);
+                        }
+                        if (joined && WallAllowsLanding(wall,origin,landing,false,false)) continue;
+                    }
                     return true;
                 }
                 continue;

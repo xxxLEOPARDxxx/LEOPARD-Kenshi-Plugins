@@ -229,6 +229,45 @@ int main(){
     joiningWall.wallPosition.x+=12;
     Check(!Probe(world,actor,embeddedWall,embedded,"barrier",false,EmbeddedWallOnly),
         "an unjoined wall with the same AABB still blocks the interior exit");
+    {
+        // The saved pack animal stands at the wide Wall IV / narrow Wall IV
+        // join. A conservative bounding box overlaps the descent corridor,
+        // although the trace retreats farther onto the same side of both walls.
+        Building wide,narrow;
+        wide.wall=narrow.wall=true;
+        wide.wallPosition=Ogre::Vector3(-9545.32f,317.5f,27183.70f);
+        wide.wallAxis=Ogre::Vector3(.994f,0,.109f);
+        wide.wallExterior=Ogre::Vector3(.109f,0,-.994f);
+        wide.wallLength=254.41f;
+        narrow.wallPosition=wide.getWallEndPosition();
+        narrow.wallAxis=Ogre::Vector3(.744f,0,.669f);
+        narrow.wallExterior=Ogre::Vector3(.669f,0,-.744f);
+        narrow.wallLength=40;
+        narrow.bounds.mCenter=narrow.wallPosition;
+        narrow.bounds.mHalfSize=Ogre::Vector3(25,70,25);
+        const Ogre::Vector3 stuck(-9297.43f,380.78f,27217.11f);
+        const Ogre::Vector3 safe(-9301.79f,274.86f,27256.87f);
+        world.nearby=&narrow;
+        Check(!CrossesBarrier(&world,stuck,safe,&wide,false,true,true),
+            "an angled joined wall does not block a crest descent away from both walls");
+        Check(CrossesBarrier(&world,stuck,Ogre::Vector3(-9255,274.86f,27241),&wide,false,true,true),
+            "a descent that crosses the angled joining wall is still blocked");
+        Check(CrossesBarrier(&world,stuck,safe,&wide,false,false,true),
+            "the angled join allowance is limited to verified crest descent");
+        narrow.wallPosition.z+=15;
+        Check(CrossesBarrier(&world,stuck,safe,&wide,false,true,true),
+            "an unjoined angled wall is still a barrier");
+        narrow.wallPosition=wide.getWallEndPosition();
+        narrow.wallPosition.x+=5;
+        narrow.wallPosition.z+=15;
+        Check(CrossesBarrier(&world,stuck,safe,&wide,false,true,true),
+            "a nearby wall with overlapping bounds is not a joined segment");
+        narrow.wallPosition=wide.getWallEndPosition();
+        narrow.state.isComplete=false;
+        Check(CrossesBarrier(&world,stuck,safe,&wide,false,true,true),
+            "an unfinished joined wall cannot use the angled join allowance");
+        world.nearby=&joiningWall;
+    }
     joiningWall.wall=false;joiningWall.gate=true;joiningWall.door.isSetupComplete=true;joiningWall.door.broken=false;
     Check(!Probe(world,actor,embeddedWall,embedded,"barrier",false,EmbeddedWallOnly),
         "wall enclosure cannot bypass a closed gate without a confirmed same side");
