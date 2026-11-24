@@ -546,15 +546,16 @@ namespace Unstuck
             trace.sourceFace=nav->getClosestPoint(here,3.0f,0.0f,false,point,key);
             if (trace.sourceFace!=0)
             {
-                // Only an animal actively trying a blocked downhill retreat
-                // can leave a valid face, and only if the native local
-                // connectivity check confirms an isolated pocket.
+                // Only an animal whose current downhill retreat already
+                // failed can leave a valid face. A directly confirmed wall
+                // can trap an animal even when its top is on the navmesh.
                 HavokCharacter* navigation=movement->havokCharacter;
                 if (!blockedDescent || trace.sourceFace!=1 || key==~0u ||
                     key!=navigation->currentFace || !NativePositionAgrees(navigation,here) ||
                     !AIFixedGate::Finite(Point(point)) ||
-                    AIFixedGate::DistanceSq(Point(here),Point(point))>9.0f ||
-                    !ReadNavPocket(nav,movement,trace.pocket)) return false;
+                    AIFixedGate::DistanceSq(Point(here),Point(point))>9.0f) return false;
+                if (!ReadNavPocket(nav,movement,trace.pocket) &&
+                    (trace.pocket!=0 || standing!=wall)) return false;
             }
             const float outside=wall->getOrientation().xAxis().dotProduct(normal);
             if (!_finite(outside) || std::fabs(outside)<.5f || std::fabs(side)>20.0f) return false;

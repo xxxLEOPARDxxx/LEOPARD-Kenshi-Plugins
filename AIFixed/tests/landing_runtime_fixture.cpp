@@ -262,10 +262,24 @@ int main(){
         "blocked animal descent may leave a disconnected wall face on the same side");
     pocketConfirmed=false;
     Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,BlockedAnimalCrestOnly),
-        "a connected walkway is never bypassed");
+        "the non-isolated fallback needs a standing handle for the physically verified wall");
+    movement.standing.building=&embeddedWall;
+    Check(Probe(world,actor,embeddedWall,crest,"accepted",false,BlockedAnimalCrestOnly),
+        "a failed retreat can leave a non-isolated face on the verified supporting wall");
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,CrestWallOnly),
+        "an idle animal or ordinary walkway user stays on a valid face");
     pocketResult=-1;
     Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,BlockedAnimalCrestOnly),
-        "a busy navigation graph cannot prove disconnection");
+        "an unavailable pocket query cannot establish local recovery");
+    pocketResult=0;
+    standingClear=false;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-landing-clearance",false,BlockedAnimalCrestOnly),
+        "the non-isolated fallback still needs safe landing clearance");
+    standingClear=true;
+    nav.targetCode=27;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-gate-code",false,BlockedAnimalCrestOnly),
+        "the non-isolated fallback does not cross to another gate code");
+    nav.targetCode=0;movement.standing.building=NULL;
     pocketConfirmed=true;
     nav.sourceKey=~0u;
     Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,BlockedAnimalCrestOnly),
