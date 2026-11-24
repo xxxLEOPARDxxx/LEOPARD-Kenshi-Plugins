@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -287,7 +287,17 @@
     "Vital-Sense": {
       "nexus": 2214,
       "workshop_id": 3813852288,
-      "version": "9"
+      "version": "10",
+      "archive_sha256": "7e43467ce28cb2c1865a43b22a0883c93edbe7bded1aa7e7bcae8df84a254082",
+      "dll_sha256": "0dbd80b9412ee07e2c6e1da99f3de1b6cc02c7f453bc313e553cdc7fb433395a",
+      "published_msk": "2026-11-25T00:59:29.102030+03:00",
+      "bilingual_change_note_sha256": "1a58b3fc1edee199874d560140f7a410104d672e3488dcb3b567b9bf61bca2e2",
+      "steam_version": "10",
+      "nexus_version": "10",
+      "nexus_confirmed_msk": "2026-11-25T00:59:21.682345+03:00",
+      "nexus_archive_sha256": "7e43467ce28cb2c1865a43b22a0883c93edbe7bded1aa7e7bcae8df84a254082",
+      "nexus_dll_sha256": "0dbd80b9412ee07e2c6e1da99f3de1b6cc02c7f453bc313e553cdc7fb433395a",
+      "steam_confirmed_msk": "2026-11-25T00:59:29.102030+03:00"
     },
     "Wall-B-Gone": {
       "nexus": 2215,
