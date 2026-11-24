@@ -198,10 +198,13 @@ GateRestoreLock=1; GateSearchRadius=30 (5..500 m); GateCloseDelay=3 (1..30 s).
     сохраняет сторону ворот и область навмеша. Пробы при наличии лица навмеша
     ограничены одной в секунду отдельно от обычной проверки вне навмеша.
     Застрявший наверху стены вьючный зверь может спуститься после проверки
-    опоры и отсутствия проходимой поверхности под ним. Выход из толщи стены
+    опоры. При затяжном неудачном отступлении можно проверить спуск и с
+    проходимой поверхности, если игра и проверка коллизии подтверждают
+    одну и ту же стену. Выход из толщи стены
     требует подтверждения коллизии той же секции. Свободная точка выхода
     должна лежать на суше и на исходной стороне преграды. Соседняя стыковая
-    секция учитывается по реальной геометрии, закрытые ворота блокируют выход.
+    секция учитывается по реальной геометрии, в том числе на угловом стыке.
+    Закрытые ворота блокируют выход.
     NPC, у которого срываются попытки пройти к цели, может спуститься с
     крутого склона платформы на свободную сушу в той же загруженной зоне,
     без пересечения стен и закрытых ворот. Для спуска нужны выбранное время
@@ -294,12 +297,13 @@ DETAILED FEATURE REFERENCE (ENGLISH)
     elevated entrapment after a load loses the standing support handle. The
     landing must stay on the same side and navmesh region. Valid-face probes
     are limited to one per second independently of ordinary off-mesh recovery.
-    A pack animal trapped on a wall can descend once terrain and
-    collision checks confirm that its footing is on the wall outside the
-    walkable surface. A character trapped inside a wall needs collision proof
+    A pack animal trapped on a wall can descend after footing checks. If a
+    downhill retreat keeps failing on a walkable face, the engine and the
+    collision check must confirm the same supporting wall. A character
+    trapped inside a wall needs collision proof
     from the same segment, with a clear, dry landing on the original side.
-    Joined segments use their actual span to check the exit. A closed gate
-    still blocks it.
+    Joined segments use their actual span to check the exit, including
+    angled crest joins. A closed gate still blocks it.
     NPCs repeatedly failing to reach their destinations can leave a steep platform
     slope for clear, dry ground in the same loaded zone while preserving wall
     and closed-gate boundaries. Recovery requires the selected time without progress,
@@ -513,3 +517,13 @@ English
 
 - Ускорена стартовая настройка поиска кроватей, окончания лечения и обновления интерфейса.
 - Возврат лишних материалов инженерами совместим с Loot Scoot Execute 9.
+
+Release 6 / Выпуск 6
+
+English
+
+- Pack animals stuck on top of walls, including angled wall joins, can descend to a clear spot on the same side after a failed retreat.
+
+Русский
+
+- Вьючные звери, застрявшие наверху стены, в том числе на угловом стыке, после неудачного отступления могут спуститься на свободное место с той же стороны.

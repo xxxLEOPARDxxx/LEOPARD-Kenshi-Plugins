@@ -1911,14 +1911,14 @@
       "en": "Original source code is available in the linked repository.",
       "ru": "Исходный код оригинала доступен в указанном репозитории."
     },
-    "version": "9",
+    "version": "10",
     "changes": {
       "en": [
         "Optional MCM page; the original KEO tab remains a fallback.",
         "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
         "One package for Steam and the supported GOG 1.0.65 build.",
         "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
-        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling.",
+        "Ordinary movement uses Kenshi pathfinding. With Backpack fixes, furnace jobs also collect severed limbs from a worn backpack.",
         "Optional RAM/VRAM resource preparation and faster startup, save and NPC loading.",
         "Optional automatic native building repair and full exterior/interior navmesh regeneration for visited zones, following KenshiQOL."
       ],
@@ -1927,7 +1927,7 @@
         "Русский/английский/китайский интерфейс; для других языков - английский. Подробный журнал выключен.",
         "Один пакет для Steam и поддерживаемой сборки GOG 1.0.65.",
         "Функции Steel (KenshiQOL): переносимый вес, сбор продукции, пополнение прилавков и циклические маршруты.",
-        "Исправления маршрутов, устаревших точек и готовности пути в городах.",
+        "Штатный поиск пути для обычного движения. С исправлениями рюкзаков работа у печи учитывает конечности в надетом рюкзаке.",
         "Необязательная подготовка RAM/VRAM и ускорение загрузки игры, сейвов и NPC.",
         "Автоматический ремонт построек и полной навсетки посещённых зон по образцу KenshiQOL."
       ]
@@ -1938,7 +1938,7 @@
         "English, Russian and Simplified Chinese interface, English fallback and detailed logging off by default.",
         "One package for Steam and the supported GOG 1.0.65 build.",
         "Useful KenshiQOL features by Steel combined with KEO: optional carried weight, production collection, counter stocking and cyclic routes.",
-        "Route-ownership and stale-point checks, plus corrections to city path-readiness handling.",
+        "Ordinary movement uses Kenshi pathfinding. With Backpack fixes, furnace jobs also collect severed limbs from a worn backpack.",
         "Optional RAM/VRAM resource preparation and faster startup, save and NPC loading.",
         "Optional automatic native building repair and full exterior/interior navmesh regeneration for visited zones, following KenshiQOL."
       ],
@@ -1947,7 +1947,7 @@
         "Русский/английский/китайский интерфейс; для других языков - английский. Подробный журнал выключен.",
         "Один пакет для Steam и поддерживаемой сборки GOG 1.0.65.",
         "Функции Steel (KenshiQOL): переносимый вес, сбор продукции, пополнение прилавков и циклические маршруты.",
-        "Исправления маршрутов, устаревших точек и готовности пути в городах.",
+        "Штатный поиск пути для обычного движения. С исправлениями рюкзаков работа у печи учитывает конечности в надетом рюкзаке.",
         "Необязательная подготовка RAM/VRAM и ускорение загрузки игры, сейвов и NPC.",
         "Автоматический ремонт построек и полной навсетки посещённых зон по образцу KenshiQOL."
       ]
@@ -2075,6 +2075,16 @@
           "Текст прогрева остаётся на экране после завершения и показывает объём кэшей ОЗУ и видеопамяти. Его можно скрыть галочкой в MCM.",
           "На поддерживаемых сборках пустые очереди анимации персонажей больше не запускают лишние рабочие потоки.",
           "Добавлена защита от одного из вылетов при освобождении материалов рельефа на выходе из игры."
+        ]
+      },
+      "10": {
+        "en": [
+          "Ordinary movement and squad orders use Kenshi's own pathfinding. Area preloading, optional automatic navmesh repair and the Waypoint route job remain available.",
+          "With Backpack fixes enabled, furnace jobs also collect severed limbs from a worn backpack."
+        ],
+        "ru": [
+          "Обычные приказы движения и движение отрядов используют штатный поиск пути Kenshi. Предзагрузка зон, необязательное автовосстановление навсетки и задание «Маршрут по точкам» остаются доступны.",
+          "С включёнными исправлениями рюкзаков персонажи относят в печь отсечённые конечности из надетого рюкзака."
         ]
       }
     }

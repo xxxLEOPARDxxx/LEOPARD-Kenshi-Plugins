@@ -221,7 +221,7 @@ ITEMS.extend([
          en="Help prevent crowd-pushed outside-to-inside crossings through closed player-owned gates and doors."),
 ])
 
-ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="9",
+ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="10",
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="A maintenance fork of Kenshi Engine Optimizations with MCM settings, translations and optional inventory jobs."))
 
@@ -253,7 +253,7 @@ SKIP_DIRS = set(["memory", "strings"])
 # One runtime catalog per language: prefer compiled MO when it exists.
 # PO-only upstream plugins retain PO until their loader is migrated.
 
-ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=2256,version="5",tags=["Gameplay","RE_Kenshi"],lang=True,drop=[],en="A modular AI collection with robotic care, optional rest and own-gate assistance, configured through MCM."))
+ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=2256,version="6",tags=["Gameplay","RE_Kenshi"],lang=True,drop=[],en="A modular AI collection with robotic care, optional rest and own-gate assistance, configured through MCM."))
 
 def runtime_file_allowed(mod, folder, name):
     rel = os.path.relpath(os.path.join(folder, name), mod_dir(mod)).replace(os.sep, "/")
