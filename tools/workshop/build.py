@@ -133,7 +133,7 @@ ITEMS = [
          tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
          en="Execute and Execute All for downed enemies in the context menu - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),
-    dict(mod="Vital-Sense", title="Vital Sense (MCM fork) (QoL)", nexus=2214, version="9",
+    dict(mod="Vital-Sense", title="Vital Sense (MCM fork) (QoL)", nexus=2214, version="10",
          tags=["GUI", "RE_Kenshi"], lang=True, drop=[],
          en="Hold ALT for state and bounty markers over visible characters - a fork of "
             "Emkej8's mod with settings in Mod Config Menu."),

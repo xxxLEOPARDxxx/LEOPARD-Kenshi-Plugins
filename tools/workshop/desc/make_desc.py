@@ -1171,7 +1171,7 @@ fork("Vital-Sense", "Vital Sense", """[h2]ЧТО ДЕЛАЕТ[/h2]
 
 [list]
 [*]без сознания, кома, умирает, притворяется мёртвым, мёртв - значком и коротким текстом;
-[*]цвет по отношению: враг, нейтрал, союзник, свой отряд;
+[*]цвет по отношениям фракций. Павшие бойцы сохраняют цвет своего отряда.
 [*]значок награды над разыскиваемыми, цвет - по сумме награды;
 [*]по желанию - подсветка тела лежащих персонажей, чтобы их было видно издалека.
 [/list]
@@ -1183,7 +1183,7 @@ Hold ALT - state markers appear over visible characters; release - they are gone
 
 [list]
 [*]unconscious, coma, dying, playing dead, dead - as an icon and short text;
-[*]colour by relation: enemy, neutral, ally, your squad;
+[*]colour follows faction standing. Fallen squad members keep their squad colour.
 [*]a bounty icon over wanted characters, coloured by the bounty amount;
 [*]optionally a body highlight on downed characters, so they are visible from afar.
 [/list]
