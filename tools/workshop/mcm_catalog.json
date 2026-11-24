@@ -26,7 +26,7 @@
         "source_url": "https://github.com/Basusu0/Basusu-kenshi-plugins"
       }
     ],
-    "published_version": "5"
+    "published_version": "6"
   },
   {
     "package": "AssignedWorkers",
@@ -775,8 +775,8 @@
     "public": true,
     "release_authorized": true,
     "nexus_url": "https://www.nexusmods.com/kenshi/mods/2271",
-    "nexus_published_version": "8",
-    "published_version": "9",
+    "nexus_published_version": "10",
+    "published_version": "10",
     "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834042449"
   }
 ]

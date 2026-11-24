@@ -84,17 +84,17 @@
     "AIFixed": {
       "nexus": 2256,
       "workshop_id": 3829845490,
-      "version": "5",
-      "archive_sha256": "ae75f33009dd03e3bf59c33650e3dc8b11463b669b1c3d53bc47c61c443e8d70",
-      "dll_sha256": "f32fcf31b8e1a6b1c0d6f702f382571c6d24a3543347e8b3d7a91173243e41a4",
-      "bilingual_change_note_sha256": "4cb26f49cf191c76c5422962fc095c44cb32a0f4235b6afaff7430e9512c2369",
-      "steam_version": "5",
-      "nexus_version": "5",
-      "published_msk": "2026-11-22T00:44:50.940436+03:00",
-      "nexus_confirmed_msk": "2026-11-22T00:40:00+03:00",
-      "nexus_archive_sha256": "ae75f33009dd03e3bf59c33650e3dc8b11463b669b1c3d53bc47c61c443e8d70",
-      "nexus_dll_sha256": "f32fcf31b8e1a6b1c0d6f702f382571c6d24a3543347e8b3d7a91173243e41a4",
-      "steam_confirmed_msk": "2026-11-22T00:44:50.940436+03:00"
+      "version": "6",
+      "archive_sha256": "5582f44263051b630abc52e078845397fc70fdefedc9634239312a9cfa0f0736",
+      "dll_sha256": "024a583d059e445493c74bdc201d0ad15c78653ce491ccc7995ce4bb8fe2899e",
+      "bilingual_change_note_sha256": "2ee4f9b7acbc30d0fb81468aedbde8ebc92f317d06543a5bf97371cdad664695",
+      "steam_version": "6",
+      "nexus_version": "6",
+      "published_msk": "2026-11-24T07:38:40.618089+03:00",
+      "nexus_confirmed_msk": "2026-11-24T07:37:06.824647+03:00",
+      "nexus_archive_sha256": "5582f44263051b630abc52e078845397fc70fdefedc9634239312a9cfa0f0736",
+      "nexus_dll_sha256": "024a583d059e445493c74bdc201d0ad15c78653ce491ccc7995ce4bb8fe2899e",
+      "steam_confirmed_msk": "2026-11-24T07:38:40.618089+03:00"
     },
     "SkillLevelUpInfo": {
       "nexus": 2257,
@@ -382,11 +382,11 @@
       "steam_version": "4",
       "nexus_version": "4",
       "published_msk": "2026-11-24T01:41:25+03:00",
-      "steam_confirmed_msk": "2026-11-24T01:43:03.053185+03:00",
-      "nexus_confirmed_msk": "2026-11-24T01:43:03.053185+03:00",
-      "archive_sha256": "6c20f713915d14d50dce07c5a36aae17f0c36b9babe5864c361ebcaf66b2eff5",
+      "steam_confirmed_msk": "2026-11-24T07:38:55.003829+03:00",
+      "nexus_confirmed_msk": "2026-11-24T07:37:06.824647+03:00",
+      "archive_sha256": "1836008624b690d72c81327b2c7fb686c563e03f12f1287fb270b990d9a15d60",
       "dll_sha256": "4702f00cc822be26e285e1c70e75097784a8bcbb194757a2410d6ef95e113e6b",
-      "nexus_archive_sha256": "6c20f713915d14d50dce07c5a36aae17f0c36b9babe5864c361ebcaf66b2eff5",
+      "nexus_archive_sha256": "1836008624b690d72c81327b2c7fb686c563e03f12f1287fb270b990d9a15d60",
       "nexus_dll_sha256": "4702f00cc822be26e285e1c70e75097784a8bcbb194757a2410d6ef95e113e6b",
       "bilingual_change_note_sha256": "4b5f2fdf9cfa8fc700c9417cb3b7e32348bdbd79b2452d459f7b1e393d18e2ac"
     },
@@ -413,17 +413,17 @@
     "KEO": {
       "nexus": 2271,
       "workshop_id": 3834042449,
-      "version": "9",
-      "archive_sha256": "215333e4a46baf7080da5ed54cb2f61dd0c11ff56372ab8b21794ed04492d7a8",
-      "dll_sha256": "13f7f0b8a9b93cfd896d96d3c8bb7eebe861358dcf1e95737d9c960683424f93",
-      "published_msk": "2026-11-24T01:49:37+03:00",
-      "bilingual_change_note_sha256": "83a2f37b1fb42159c534a55e4ff4331e57e8d5f6650d7dd127b615c491a9851c",
-      "steam_version": "9",
-      "nexus_version": "9",
-      "nexus_confirmed_msk": "2026-11-24T01:49:30.740026+03:00",
-      "nexus_archive_sha256": "215333e4a46baf7080da5ed54cb2f61dd0c11ff56372ab8b21794ed04492d7a8",
-      "nexus_dll_sha256": "13f7f0b8a9b93cfd896d96d3c8bb7eebe861358dcf1e95737d9c960683424f93",
-      "steam_confirmed_msk": "2026-11-24T01:49:38.846487+03:00"
+      "version": "10",
+      "archive_sha256": "78180bf37850cce1d07c87e47d932263c50674a6ded7c087742635ac066f8748",
+      "dll_sha256": "a88b7588e200d37e38da6d67070eb7480b507d1e34707aa38b6b5fcb05aa958f",
+      "published_msk": "2026-11-24T07:38:48.671174+03:00",
+      "bilingual_change_note_sha256": "db3b542c1e038203737d33e50a6910072eae0d912407fb213073b04256b9ea2d",
+      "steam_version": "10",
+      "nexus_version": "10",
+      "nexus_confirmed_msk": "2026-11-24T07:37:06.824647+03:00",
+      "nexus_archive_sha256": "78180bf37850cce1d07c87e47d932263c50674a6ded7c087742635ac066f8748",
+      "nexus_dll_sha256": "a88b7588e200d37e38da6d67070eb7480b507d1e34707aa38b6b5fcb05aa958f",
+      "steam_confirmed_msk": "2026-11-24T07:38:48.671174+03:00"
     }
   }
 }
