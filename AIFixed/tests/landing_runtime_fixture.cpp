@@ -152,6 +152,7 @@ struct UtilityT {
 AIFixedGate::Point Point(const Ogre::Vector3& p){return AIFixedGate::Point(p.x,p.y,p.z);}
 bool ReadPlatformSlope(Building*,const Ogre::Vector3&,AIFixedGate::Point& out,unsigned& group){out=normal;group=7;return slopeConfirmed;}
 bool ReadPlatformPocket(NavMesh*,CharMovement*,const AIFixedGate::Point&,int& result){result=pocketConfirmed?1:pocketResult;return pocketConfirmed;}
+bool ReadNavPocket(NavMesh*,CharMovement*,int& result){result=pocketConfirmed?1:pocketResult;return pocketConfirmed;}
 bool ReadPhysicalPlatformCap(Building*,const Ogre::Vector3&,const AIFixedGate::Point&,unsigned){++physicalCapCalls;return physicalCapConfirmed;}
 Building* FindElevatedGate(const Ogre::Vector3&,float){return NULL;}
 bool FindRockExit(const Ogre::Vector3&,float,unsigned,Ogre::Vector3&,unsigned&){return false;}
@@ -256,6 +257,21 @@ int main(){
         "a fresh walkable crest face keeps the retreating actor on a real walkway");
     Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,CrestWall),
         "ordinary movement fallback cannot override rejected retreat on a real supported wall walkway");
+    pocketConfirmed=true;
+    Check(Probe(world,actor,embeddedWall,crest,"accepted",false,BlockedAnimalCrestOnly),
+        "blocked animal descent may leave a disconnected wall face on the same side");
+    pocketConfirmed=false;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,BlockedAnimalCrestOnly),
+        "a connected walkway is never bypassed");
+    pocketResult=-1;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,BlockedAnimalCrestOnly),
+        "a busy navigation graph cannot prove disconnection");
+    pocketConfirmed=true;
+    nav.sourceKey=~0u;
+    Check(!Probe(world,actor,embeddedWall,crest,"wall-support-unconfirmed",false,BlockedAnimalCrestOnly),
+        "the current navigation face must match the confirmed wall face");
+    nav.sourceKey=navigation.currentFace;
+    pocketConfirmed=false;pocketResult=0;
     nav.sourceFaceResult=0;
     Check(Probe(world,actor,embeddedWall,crest,"accepted",false,CrestWallOnly),
         "an unsupported retreating animal at a small wall endpoint join can use the proven exterior");

@@ -30,7 +30,7 @@ namespace Unstuck
         Sample():used(false){}
     };
 
-    enum WallIntent { NoWallIntent, EmbeddedWallOnly, CrestWall, CrestWallOnly };
+    enum WallIntent { NoWallIntent, EmbeddedWallOnly, CrestWall, CrestWallOnly, BlockedAnimalCrest, BlockedAnimalCrestOnly };
 
     struct History
     {
@@ -266,7 +266,7 @@ namespace Unstuck
         HavokCharacter* navigation=movement->havokCharacter;
         if (AnimalRetreat(c,task))
         {
-            bool retreat=false;
+            bool retreat=false,blockedDescent=false;
             if (movement->movementMode==MOVE_DIRECTION && navigation->getState()==HavokCharacter::MANUAL)
             {
                 const AIFixedGate::Point direction=Point(movement->desiredMotion);
@@ -283,12 +283,13 @@ namespace Unstuck
                 retreat=action && action->taskData &&
                     (action->key()==MOVE_ON_FREE_WILL || RetreatTask(action->key())) &&
                     AIFixedGate::Finite(delta) && delta.y<=-5.0f;
+                blockedDescent=retreat;
             }
             if (retreat)
             {
                 subject=Identity(goal->subject);
                 destination=AIFixedGate::Point();
-                wall=ordinary && movement->movementMode==MOVE_NORMAL?CrestWall:CrestWallOnly;
+                wall=blockedDescent?(ordinary?BlockedAnimalCrest:BlockedAnimalCrestOnly):CrestWallOnly;
                 return true;
             }
             if (movement->movementMode==MOVE_DIRECTION) return false;
@@ -494,6 +495,8 @@ namespace Unstuck
             AIFixedGate::DistanceSq(Point(here),Point(navigation->getPosition()))<=25.0f;
     }
 
+    bool ReadNavPocket(NavMesh* nav,CharMovement* movement,int& result);
+
     struct WallEscape
     {
         WallBuilding* wall;
@@ -504,7 +507,7 @@ namespace Unstuck
     };
 
     bool ReadWallEscape(CharMovement* movement,NavMesh* nav,const Ogre::Vector3& here,
-                        float ground,bool elevated,WallEscape& exit,LandingTrace& trace)
+                        float ground,bool elevated,bool blockedDescent,WallEscape& exit,LandingTrace& trace)
     {
         const float above=here.y-ground;
         if (elevated ? (above<50.0f || above>140.0f) : (above<-15.0f || above>=50.0f)) return false;
@@ -540,10 +543,19 @@ namespace Unstuck
         {
             Ogre::Vector3 point;
             unsigned key=~0u;
-            // A real walkway is allowed to remain occupied, even with a
-            // failed retreat path or a manual movement command.
             trace.sourceFace=nav->getClosestPoint(here,3.0f,0.0f,false,point,key);
-            if (trace.sourceFace!=0) return false;
+            if (trace.sourceFace!=0)
+            {
+                // Only an animal actively trying a blocked downhill retreat
+                // can leave a valid face, and only if the native local
+                // connectivity check confirms an isolated pocket.
+                HavokCharacter* navigation=movement->havokCharacter;
+                if (!blockedDescent || trace.sourceFace!=1 || key==~0u ||
+                    key!=navigation->currentFace || !NativePositionAgrees(navigation,here) ||
+                    !AIFixedGate::Finite(Point(point)) ||
+                    AIFixedGate::DistanceSq(Point(here),Point(point))>9.0f ||
+                    !ReadNavPocket(nav,movement,trace.pocket)) return false;
+            }
             const float outside=wall->getOrientation().xAxis().dotProduct(normal);
             if (!_finite(outside) || std::fabs(outside)<.5f || std::fabs(side)>20.0f) return false;
             const float sign=outside>0.0f?1.0f:-1.0f;
@@ -799,12 +811,9 @@ namespace Unstuck
         __except(EXCEPTION_EXECUTE_HANDLER) { Fault();return -1; }
     }
 
-    bool ReadPlatformPocket(NavMesh* nav,CharMovement* movement,const AIFixedGate::Point& normal,int& result)
+    bool ReadNavPocket(NavMesh* nav,CharMovement* movement,int& result)
     {
-        // A rounded end of a tilted support can have a small walkable cap.
-        // Keep ordinary flat posts and connected ramps out of this fallback.
         result=-2;
-        if (!AIFixedUnstuck::IsRoundedGuardFooting(normal)) return false;
         HavokCharacter* navigation=movement->havokCharacter;
         if (!navigation || navigation->currentFace==~0u || !_finite(navigation->radius) ||
             navigation->radius<=0 || navigation->radius>2.0f) return false;
@@ -818,6 +827,14 @@ namespace Unstuck
         if (!lock.owns_lock()) return false;
         result=QueryPlatformPocket(nav,navigation);
         return result==1;
+    }
+
+    bool ReadPlatformPocket(NavMesh* nav,CharMovement* movement,const AIFixedGate::Point& normal,int& result)
+    {
+        // A rounded end of a tilted support can have a small walkable cap.
+        // Keep ordinary flat posts and connected ramps out of this fallback.
+        result=-2;
+        return AIFixedUnstuck::IsRoundedGuardFooting(normal) && ReadNavPocket(nav,movement,result);
     }
 
     bool RejectLanding(LandingTrace& trace,const char* reason)
@@ -869,12 +886,13 @@ namespace Unstuck
         const float ground=UtilityT::getTerrainHeight(here.x,here.z);
         trace.ground=ground;
         if (!_finite(ground)) return RejectLanding(trace,"invalid-ground");
-        const bool elevatedWall=here.y-ground>=50.0f && (wallIntent==CrestWall || wallIntent==CrestWallOnly);
+        const bool blockedDescent=wallIntent==BlockedAnimalCrest || wallIntent==BlockedAnimalCrestOnly;
+        const bool elevatedWall=here.y-ground>=50.0f && (blockedDescent || wallIntent==CrestWall || wallIntent==CrestWallOnly);
         WallEscape wallExit;
         if (!guard && (elevatedWall || here.y-ground<50.0f))
-            ReadWallEscape(movement,nav,here,ground,elevatedWall,wallExit,trace);
+            ReadWallEscape(movement,nav,here,ground,elevatedWall,blockedDescent,wallExit,trace);
         if (!wallExit.wall && (wallIntent==EmbeddedWallOnly || wallIntent==CrestWallOnly ||
-            trace.wallHit || (elevatedWall && support && support->isAWall())))
+            wallIntent==BlockedAnimalCrestOnly || trace.wallHit || (elevatedWall && support && support->isAWall())))
             return RejectLanding(trace,"wall-support-unconfirmed");
         if (here.y-ground<50.0f) support=NULL;
         if (wallExit.wall) support=wallExit.wall;

@@ -368,7 +368,7 @@ int main(){
         wall==EmbeddedWallOnly,"stale retreat paths cannot establish upper wall intent");
     actor.actionData.type=MOVE_ON_FREE_WILL;actor.action.taskData=&actor.actionData;actor.body.currentAction=&actor.action;
     Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
-        wall==CrestWallOnly,"current movement plus failed remote descent admits the retreat wall-only lane");
+        wall==BlockedAnimalCrestOnly,"only a current blocked downhill retreat can check an occupied wall face");
     nav.goal=nav.position;
     Check(ReadRecoveryIntent(&actor,&movement,&actor.currentGoal,RETREAT_HOMETOWN,subject,destination,wall)&&
         wall==EmbeddedWallOnly,"a native goal at the actor's feet cannot establish upper wall intent");
