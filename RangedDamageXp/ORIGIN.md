@@ -13,5 +13,5 @@ Adapted to C++ and Kenshi/Ogre in November 2026. The port samples the native
 projectile update and adds a bounded trail history and MCM controls. Meitou's
 NVIDIA runtime exception is not used.
 
-The binary distribution includes `RangedDamageXp-source.zip` with the plugin's
-corresponding source, build instructions, and KenshiLib interface headers.
+The [version 4 plugin source and build instructions](https://github.com/xxxLEOPARDxxx/LEOPARD-Kenshi-Plugins/tree/76189c800a1663098c6e44b019c5899dc448774c/RangedDamageXp)
+are available separately. The same revision contains the shared plugin headers.

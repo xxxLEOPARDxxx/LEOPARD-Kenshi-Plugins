@@ -257,8 +257,6 @@ ITEMS.append(dict(mod="AIFixed",title="AI Fixed (QoL)",nexus=2256,version="6",ta
 
 def runtime_file_allowed(mod, folder, name):
     rel = os.path.relpath(os.path.join(folder, name), mod_dir(mod)).replace(os.sep, "/")
-    if mod == "RangedDamageXp" and rel == "RangedDamageXp-source.zip":
-        return True  # Corresponding source accompanies the GPL binary.
     if mod == "KenshiRotate" and rel.startswith("lang/"):
         return False
     if name.lower().endswith(".po") and os.path.isfile(os.path.join(folder, name[:-3] + ".mo")):
