@@ -757,6 +757,25 @@
     "public": false
   },
   {
+    "package": "Extra Durability (HARD)",
+    "name": "Extra Durability (HARD)",
+    "id": "ExtraDurability",
+    "group": "own",
+    "status": "release_authorized_by_user",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\ExtraDurability",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\ExtraDurability\\ExtraDurability.cpp",
+        "line": 918,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true,
+    "release_authorized": true,
+    "public": false
+  },
+  {
     "package": "KEO",
     "name": "KEO: Kenshi Engine Optimizations",
     "id": "KEO",
@@ -778,5 +797,23 @@
     "nexus_published_version": "10",
     "published_version": "10",
     "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834042449"
+  },
+  {
+    "package": "RecruitablePrisonersPayment",
+    "name": "Recruitable Prisoners - Payment Fix",
+    "id": "RecruitablePrisonersPayment",
+    "group": "optional_experimental",
+    "status": "retired_local",
+    "author": "LEOPARD",
+    "source": "D:\\DEV\\Kenshi\\ours\\RecruitablePrisonersPayment",
+    "source_export": [
+      {
+        "path": "D:\\DEV\\Kenshi\\ours\\RecruitablePrisonersPayment\\RecruitablePrisonersPayment.cpp",
+        "line": 267,
+        "method": "direct"
+      }
+    ],
+    "dll_export_verified": true,
+    "public": false
   }
 ]

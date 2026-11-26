@@ -1,0 +1,263 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Extra Durability (HARD)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Durability"
+msgstr "耐久度"
+
+msgid "Condition"
+msgstr "状态"
+
+msgid "Broken"
+msgstr "已损坏"
+
+msgid "Tools charge"
+msgstr "工具余量"
+
+msgid "Equipment repair interrupted."
+msgstr "装备修理已中断。"
+
+msgid "Could not use the tools."
+msgstr "无法使用工具。"
+
+msgid "Equipment repaired."
+msgstr "装备已修复。"
+
+msgid "Repair tools spent."
+msgstr "修理工具已耗尽。"
+
+msgid "Equipment can only be repaired while conscious and out of combat."
+msgstr "只能在清醒且脱离战斗时修理装备。"
+
+msgid "Tools are required to repair equipment."
+msgstr "需要工具来修理装备。"
+
+msgid "Equipment repair is already in progress."
+msgstr "正在修理装备。"
+
+msgid "Repair started. Keep the character still."
+msgstr "开始修理。请让角色保持原地。"
+
+msgid "Weapons and armour wear in combat. Tools restore durability."
+msgstr "武器和护甲会在战斗中磨损。工具可以恢复装备耐久度。"
+
+msgid "Enable plugin"
+msgstr "启用插件"
+
+msgid "Enables equipment wear, its combat effects, and repairs."
+msgstr "启用装备磨损、相关战斗效果和装备修理。"
+
+msgid "Durability affects smelting"
+msgstr "熔炼产出受耐久度影响"
+
+msgid "Diagnostics"
+msgstr "诊断"
+
+msgid "Detailed log"
+msgstr "详细日志"
+
+msgid "Logs completed repairs and destroyed equipment. Hook errors are always logged."
+msgstr "记录已完成的修理和已销毁的装备。始终记录挂钩安装错误。"
+
+
+msgid "NPC equipment wear"
+msgstr "NPC 装备磨损"
+
+msgid "Applies the same wear, breakage, and destruction rules to NPC equipment."
+msgstr "NPC 装备采用与玩家小队相同的磨损、损坏和销毁规则。"
+
+msgid "Destroy items at 0% durability"
+msgstr "耐久度归零时销毁装备"
+
+msgid "Weapons and armour break at 0% durability. With this option on, they disappear without scrap. With it off, they remain available for repair or smelting. Meitou never breaks."
+msgstr "武器和护甲的耐久度归零时会损坏。开启后装备消失，不留下废料。关闭后，损坏的装备可修理或熔炼。铭刀永远不会损坏。"
+
+msgid "Equipment breakage notices"
+msgstr "装备损坏通知"
+
+msgid "Shows who broke which item in your squads. NPC breakage is always silent."
+msgstr "显示玩家小队中哪名角色的哪件装备损坏。"
+
+msgid "#FF6363Weapon on #8BDD70%s#FF6363 broke - %s"
+msgstr "#FF6363#8BDD70%s#FF6363 的武器已损坏 - %s"
+
+msgid "#FF6363Armour on #8BDD70%s#FF6363 broke - %s"
+msgstr "#FF6363#8BDD70%s#FF6363 的护甲已损坏 - %s"
+
+msgid "Repair Weapon"
+msgstr "修理武器"
+
+msgid "Repair Armour"
+msgstr "修理护甲"
+
+msgid "Off"
+msgstr "关闭"
+
+msgid "Top"
+msgstr "上方"
+
+msgid "Bottom"
+msgstr "下方"
+
+msgid "Equipment condition bar"
+msgstr "装备耐久条"
+
+msgid "Shows a thin durability bar inside icons for worn weapons and armour."
+msgstr "在有磨损的武器和护甲图标内显示细耐久条。"
+
+msgid "Wear and breakage"
+msgstr "磨损与损坏"
+
+msgid "Weapon damage"
+msgstr "武器伤害"
+
+msgid "Armour protection"
+msgstr "护甲防护"
+
+msgid "Durability by tier"
+msgstr "各档耐久度"
+
+msgid "Repair"
+msgstr "修理"
+
+msgid "Smelting"
+msgstr "熔炼"
+
+msgid "The item furnace scales the material yield according to the condition of the gear."
+msgstr "熔炉根据装备耐久度调整返还的材料数量。"
+
+msgid "Breakage protection from grade"
+msgstr "免于损坏的最低等级"
+
+msgid "Melee weapons at or above this grade cannot break. 0 protects only vanilla Meitou. Vanilla Meitou is always protected."
+msgstr "达到或超过此等级的近战武器不会损坏。设为 0 时仅保护原版名刀。原版名刀始终受到保护。"
+
+msgid "Melee wear per hit or block"
+msgstr "近战武器每次命中或格挡的损耗"
+
+msgid "Durability points lost on a registered hit or block. 0 disables new wear from this action."
+msgstr "命中或格挡成功时损失的耐久点数。设为 0 时，此操作不再造成磨损。"
+
+msgid "Crossbow wear per shot"
+msgstr "弩每次射击的损耗"
+
+msgid "Durability points lost on each shot, including misses. 0 disables new wear from this action."
+msgstr "每次射击损失的耐久点数，包括未命中。设为 0 时，此操作不再造成磨损。"
+
+msgid "Armour wear per hit"
+msgstr "护甲每次受击的损耗"
+
+msgid "Durability points lost by the armour layer that covers a hit. 0 disables new wear from this action."
+msgstr "命中所覆盖的护甲层损失的耐久点数。设为 0 时，此操作不再造成磨损。"
+
+msgid "Weapon damage starts dropping at (%)"
+msgstr "武器伤害开始下降的耐久度 (%)"
+
+msgid "At higher durability the weapon deals full damage. This setting covers melee weapons and crossbows."
+msgstr "耐久度高于此值时，武器造成完整伤害。近战武器和弩共用此设置。"
+
+msgid "Weapon damage reaches minimum at (%)"
+msgstr "武器伤害降至最低的耐久度 (%)"
+
+msgid "At or below this durability, weapon damage stays at its minimum until breakage. This value is capped at the start of the penalty."
+msgstr "耐久度等于或低于此值时，武器保持最低伤害直至损坏。此值不会超过伤害开始下降的阈值。"
+
+msgid "Minimum weapon damage (%)"
+msgstr "最低武器伤害 (%)"
+
+msgid "Share of the original damage at the bottom of the wear range. Broken weapons stop dealing damage. Protected weapons still use this minimum at 0 durability."
+msgstr "磨损惩罚最大时保留的原始伤害比例。损坏的武器不再造成伤害，受保护的武器在耐久度为 0 时仍保留此比例。"
+
+msgid "Armour protection starts dropping at (%)"
+msgstr "护甲防护开始下降的耐久度 (%)"
+
+msgid "At higher durability, normal armour coverage applies."
+msgstr "耐久度高于此值时，使用原版护甲覆盖范围判定。"
+
+msgid "Armour protection reaches minimum at (%)"
+msgstr "护甲防护降至最低的耐久度 (%)"
+
+msgid "At or below this durability, protection stays at its minimum until breakage. This value is capped at the start of the penalty."
+msgstr "耐久度等于或低于此值时，护甲效能保持在最低值直至损坏。此值不会超过防护开始下降的阈值。"
+
+msgid "Minimum armour effectiveness (%)"
+msgstr "最低护甲效能 (%)"
+
+msgid "Chance for a layer to stay effective after passing the normal coverage check, at the bottom of the wear range. At 0 durability a broken layer offers no protection."
+msgstr "承受最大磨损惩罚的护甲层在通过原版覆盖判定后仍然有效的概率。损坏的护甲层不提供防护。"
+
+msgid "Tier 1 - Rusted / Prototype"
+msgstr "第 1 档 - 锈蚀 / 原型"
+
+msgid "Maximum durability in this tier. Existing wear is stored in points, so changing this value can change the percentage on used gear."
+msgstr "本档的最高耐久度。存档记录剩余耐久点数，修改上限可能改变已磨损装备的耐久百分比。"
+
+msgid "Tier 2 - Mid-Grade / Shoddy"
+msgstr "第 2 档 - 中等废料 / 粗劣"
+
+msgid "Tier 3 - Refitted blades"
+msgstr "第 3 档 - 翻修刀刃"
+
+msgid "Tier 4 - Catun No. 1 / Standard"
+msgstr "第 4 档 - 卡屯 1 型 / 标准"
+
+msgid "Tier 5 - Catun No. 2"
+msgstr "第 5 档 - 卡屯 2 型"
+
+msgid "Tier 6 - Catun No. 3 / High"
+msgstr "第 6 档 - 卡屯 3 型 / 高级"
+
+msgid "Tier 7 - Mk I to III"
+msgstr "第 7 档 - Mk I 到 III"
+
+msgid "Tier 8 - Edge / Specialist"
+msgstr "第 8 档 - 边缘型 / 专家"
+
+msgid "Tier 9 - Meitou / Masterwork"
+msgstr "第 9 档 - 名刀 / 杰作"
+
+msgid "Restored by a full tool kit (%)"
+msgstr "整套工具恢复的耐久度 (%)"
+
+msgid "Base share of maximum durability restored with a full charge, before the smithing bonus."
+msgstr "整套工具恢复的最高耐久度基础比例，锻造技能加成另计。"
+
+msgid "Minimum points per full tool kit"
+msgstr "整套工具至少恢复的耐久度"
+
+msgid "The charge restores at least this many points before the smithing bonus. With both repair amounts set to 0, tools restore nothing."
+msgstr "整套工具在计算锻造加成前至少恢复的耐久点数。如果两项恢复量都设为 0，则禁用修理。"
+
+msgid "Repair efficiency bonus at skill 100 (%)"
+msgstr "锻造技能 100 时的修理效率加成 (%)"
+
+msgid "Extra durability a full charge restores at smithing skill 100. The bonus grows with skill."
+msgstr "锻造技能达到 100 时，整套工具恢复的额外耐久度百分比。加成随技能提高。"
+
+msgid "Full tool kit use time, game seconds"
+msgstr "用完一整套工具所需的游戏秒数"
+
+msgid "Time to use a full charge at smithing skill 0, at normal game speed. Smaller repairs use less time and charge."
+msgstr "在正常游戏速度下，技能为 0 时用完一整套工具的时间。小修理消耗的时间和工具更少。"
+
+msgid "Repair speed bonus at skill 100 (%)"
+msgstr "锻造技能 100 时的修理速度加成 (%)"
+
+msgid "Extra repair speed at smithing skill 100. 100 doubles the speed."
+msgstr "锻造技能达到 100 时的额外修理速度。设为 100 时，速度翻倍。"
+
+msgid "Smithing experience from repairs (%)"
+msgstr "修理获得的锻造经验 (%)"
+
+msgid "100 awards the usual experience per point restored. 0 disables repair experience."
+msgstr "设为 100 时，每恢复一点耐久度获得常规经验。设为 0 时，修理不再获得经验。"
+
+msgid "Smelting yield at 0 durability (%)"
+msgstr "耐久度为 0 时的熔炼产出 (%)"
+
+msgid "Share of the normal materials returned at 0 durability. The yield rises linearly to the normal amount at full durability."
+msgstr "耐久度为 0 时返还的常规材料比例。产出随耐久度线性增长，满耐久时返还常规数量。"
