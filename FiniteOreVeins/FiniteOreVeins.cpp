@@ -246,11 +246,21 @@ struct PanelAddress : ProductionBuilding {
     using ProductionBuilding::_NV_getGUIState;
 };
 
+struct InspectablePanel : DatapanelGUI {
+    static bool CanAddRows(const DatapanelGUI& panel)
+    {
+        return (panel.*&InspectablePanel::scrollView) != NULL;
+    }
+};
+
 void (*nativePanel)(ProductionBuilding*, DatapanelGUI*, int) = NULL;
 void ShowOre(ProductionBuilding* building, DatapanelGUI* panel, int category)
 {
     nativePanel(building, panel, category);
-    if (!panel || !ready)
+    const int buildingStateCategory = 4;
+    // Hover tooltips also call getGUIState, but have no scroll view.
+    // DataPanelLine::createMe dereferences it when creating a custom row.
+    if (!ready || category != buildingStateCategory || !panel || !InspectablePanel::CanAddRows(*panel))
         return;
     if (!IsManagedOre(building)) {
         panel->removeLine(RowKey, category);
