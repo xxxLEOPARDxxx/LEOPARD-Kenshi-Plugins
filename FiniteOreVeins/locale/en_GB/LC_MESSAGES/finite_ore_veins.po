@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en_GB\n"
+
+msgid "Depleted"
+msgstr "Depleted"
+
+msgid "Recovering"
+msgstr "Recovering"
+
+msgid "Ore remaining"
+msgstr "Ore remaining"
+
+msgid "Ore deposits"
+msgstr "Ore deposits"
+
+msgid "Enable plugin"
+msgstr "Enable plugin"
+
+msgid "Limits natural ore veins, including compatible modded veins."
+msgstr "Limits natural ore veins, including compatible modded veins."
+
+msgid "Ore at 100% quality"
+msgstr "Ore at 100% quality"
+
+msgid "Base reserve in units per natural vein."
+msgstr "Base reserve in units per natural vein."
+
+msgid "Scale reserve by quality"
+msgstr "Scale reserve by quality"
+
+msgid "A vein at 80% quality holds 80% of the base reserve."
+msgstr "A vein at 80% quality holds 80% of the base reserve."
+
+msgid "Recovery"
+msgstr "Recovery"
+
+msgid "Days to refill"
+msgstr "Days to refill"
+
+msgid "Game days to refill after the delay. 0 disables recovery."
+msgstr "Game days to refill after the delay. 0 disables recovery."
+
+msgid "Hours before recovery"
+msgstr "Hours before recovery"
+
+msgid "Delay after the last unit was mined, in game hours."
+msgstr "Delay after the last unit was mined, in game hours."
+
+msgid "Reopen at (%)"
+msgstr "Reopen at (%)"
+
+msgid "An exhausted vein stays closed until this share is restored. 0 reopens at one unit."
+msgstr "An exhausted vein stays closed until this share is restored. 0 reopens at one unit."
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Writes diagnostic messages for the plugin. Errors are always logged."
+msgstr "Writes diagnostic messages for the plugin. Errors are always logged."
