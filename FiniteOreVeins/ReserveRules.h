@@ -9,7 +9,7 @@ struct Rules {
     double refillDays;
     double restHours;
     unsigned reopenPercent;
-    Rules() : refillDays(10), restHours(12), reopenPercent(25) {}
+    Rules() : refillDays(365), restHours(48), reopenPercent(0) {}
 };
 
 struct Reserve {

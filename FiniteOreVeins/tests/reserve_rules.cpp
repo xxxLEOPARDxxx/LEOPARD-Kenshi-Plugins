@@ -6,7 +6,23 @@
 int main()
 {
     using namespace finite_ore;
-    const Rules rules;
+    const Rules defaults;
+    assert(defaults.refillDays == 365 && defaults.restHours == 48 && defaults.reopenPercent == 0);
+    Reserve recovering(100);
+    recovering.share = 0;
+    recovering.lastMined = 100;
+    recovering.closed = true;
+    Refresh(recovering, defaults, 10000, 148);
+    assert(recovering.closed && Units(recovering, 10000) == 0);
+    Refresh(recovering, defaults, 10000, 149);
+    assert(!recovering.closed && Units(recovering, 10000) == 1);
+    Refresh(recovering, defaults, 10000, 148 + 365 * 24);
+    assert(Units(recovering, 10000) == 10000);
+
+    Rules rules;
+    rules.refillDays = 10;
+    rules.restHours = 12;
+    rules.reopenPercent = 25;
     const unsigned full = Capacity(5, 1600, -4800);
     assert(full >= 7500 && full <= 17500);
     assert(Capacity(5, 1600, -4800) == full);
@@ -67,6 +83,7 @@ int main()
     assert(!small.closed && Units(small, 1) == 1);
 
     Rules immediate;
+    immediate.refillDays = 10;
     immediate.restHours = 0;
     immediate.reopenPercent = 0;
     Reserve early(0);

@@ -99,9 +99,9 @@ void LoadSettings()
     if (path.empty())
         return;
     Rules next;
-    next.refillDays = IniNumber(path, "RefillDays", "10", 0, 365);
-    next.restHours = IniNumber(path, "RestHours", "12", 0, 240);
-    next.reopenPercent = static_cast<unsigned>(IniNumber(path, "ReopenPercent", "25", 0, 100) + 0.5);
+    next.refillDays = IniNumber(path, "RefillDays", "365", 0, 365);
+    next.restHours = IniNumber(path, "RestHours", "48", 0, 240);
+    next.reopenPercent = static_cast<unsigned>(IniNumber(path, "ReopenPercent", "0", 0, 100) + 0.5);
     const bool debug = IniToggle(path, "Debug", false);
     const bool active = IniToggle(path, "Enabled", true);
     KLocLog::SetEnabled(debug);
@@ -367,11 +367,11 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
                 ::Tr("Each natural vein holds 1500-3500 units of ore per worker slot."), 1, 0);
     api->section(api, ::Tr("Recovery"));
     api->number(api, Section, "RefillDays", ::Tr("Days to refill"),
-                ::Tr("Game days to refill after the delay. 0 disables recovery."), 10, 0, 365, 1, 0);
+                ::Tr("Game days to refill after the delay. 0 disables recovery."), 365, 0, 365, 1, 0);
     api->number(api, Section, "RestHours", ::Tr("Hours before recovery"),
-                ::Tr("Delay after the last unit was mined, in game hours."), 12, 0, 240, 1, 0);
+                ::Tr("Delay after the last unit was mined, in game hours."), 48, 0, 240, 1, 0);
     api->integer(api, Section, "ReopenPercent", ::Tr("Reopen at (%)"),
-                 ::Tr("An exhausted vein stays closed until this share is restored. 0 reopens at one unit."), 25, 0, 100, 0);
+                 ::Tr("An exhausted vein stays closed until this share is restored. 0 reopens at one unit."), 0, 0, 100, 0);
     api->section(api, ::Tr("Diagnostics"));
     api->toggle(api, Section, "Debug", ::Tr("Detailed log"),
                 ::Tr("Writes diagnostic messages for the plugin. Errors are always logged."), 0, 0);
