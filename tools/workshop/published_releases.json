@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-25",
+  "date": "2026-11-27",
   "mods": {
     "PatientSelfAid": {
       "nexus": 2193,
@@ -434,6 +434,19 @@
       "nexus_archive_sha256": "78180bf37850cce1d07c87e47d932263c50674a6ded7c087742635ac066f8748",
       "nexus_dll_sha256": "a88b7588e200d37e38da6d67070eb7480b507d1e34707aa38b6b5fcb05aa958f",
       "steam_confirmed_msk": "2026-11-24T07:38:48.671174+03:00"
+    },
+    "Extra Durability (HARD)": {
+      "nexus": 2313,
+      "workshop_id": 3846488497,
+      "version": "1",
+      "steam_version": "1",
+      "nexus_version": "1",
+      "nexus_confirmed_msk": "2026-11-27T02:58:42+03:00",
+      "published_msk": "2026-11-27T02:58:57+03:00",
+      "steam_confirmed_msk": "2026-11-27T02:58:57+03:00",
+      "archive_sha256": "b90ec2f5e7c44cc4b46c132ce1219bbd91fcb8e39a64b59dcaad9a5c830db152",
+      "dll_sha256": "e31bf6ec6d47414a027f57ab5a7e908ce399a76026bdb93274f554200afed708",
+      "bilingual_change_note_sha256": "2f7df960d9cd0110c329bf16a8355406a11d0c9f3e08516900ec5dbf4abc2c92"
     }
   }
 }

@@ -773,7 +773,9 @@
     ],
     "dll_export_verified": true,
     "release_authorized": true,
-    "public": false
+    "public": true,
+    "published_version": "1",
+    "nexus_published_version": "1"
   },
   {
     "package": "KEO",
