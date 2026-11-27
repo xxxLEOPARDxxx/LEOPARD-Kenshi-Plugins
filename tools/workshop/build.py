@@ -225,7 +225,7 @@ ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="A maintenance fork of Kenshi Engine Optimizations with MCM settings, translations and optional inventory jobs."))
 
-ITEMS.append(dict(mod="Extra Durability (HARD)", title="Extra Durability (HARD)", version="1",
+ITEMS.append(dict(mod="Extra Durability (HARD)", title="Extra Durability (HARD)", nexus=2313, version="1",
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="Weapons and armour wear out in combat. Keep your squad equipped by repairing gear with ordinary Tools."))
 
