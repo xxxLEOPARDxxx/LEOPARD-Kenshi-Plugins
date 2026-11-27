@@ -1,4 +1,22 @@
 {
+  "Extra Durability (HARD)": {
+    "version": "1",
+    "published_version": "0",
+    "en": [
+      "Added persistent combat wear for melee weapons, crossbows, armour and clothing, with optional wear for NPC equipment.",
+      "Worn equipment loses damage or protection. Broken items are destroyed by default, with configurable melee grade protection, an option to keep broken gear, and breakage notices for player squads.",
+      "Item tooltips show durability and worn equipment icons can show a condition bar.",
+      "Ordinary Tools repair gear through character right-click commands. Craft Tools at weapon and heavy armour smithies. The relevant smithing skill improves repairs and earns experience.",
+      "Gear condition can reduce material yield at the item furnace. MCM controls wear, combat penalties, durability tiers, repair and smelting. In-game text is available in English, Russian and Simplified Chinese."
+    ],
+    "ru": [
+      "Добавлен сохраняемый боевой износ оружия ближнего боя, арбалетов, брони и одежды. Износ экипировки NPC можно отключить.",
+      "Изношенное снаряжение теряет урон или защиту. По умолчанию сломанные предметы уничтожаются. Можно настроить защиту оружия по грейду, сохранять сломанные вещи и показывать уведомления о поломке в своём отряде.",
+      "Прочность показана в подсказках. На значках изношенной экипировки можно показать полоску прочности.",
+      "Обычные Инструменты чинят снаряжение через меню ПКМ на персонаже. Инструменты можно изготовить на оружейных станках и в кузне тяжёлых доспехов. Профильная ковка улучшает ремонт и получает за него опыт.",
+      "Износ может уменьшать выход материалов в печи. В MCM настраиваются износ, боевые штрафы, ступени прочности, ремонт и переплавка. Текст в игре доступен на английском, русском и упрощённом китайском."
+    ]
+  },
   "RecruitMarkers": {
     "version": "5",
     "published_version": "4",

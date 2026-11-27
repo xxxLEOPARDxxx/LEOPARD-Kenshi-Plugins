@@ -225,6 +225,12 @@ ITEMS.append(dict(mod="KEO", title="KEO (MCM fork) (QoL)", nexus=2271, version="
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="A maintenance fork of Kenshi Engine Optimizations with MCM settings, translations and optional inventory jobs."))
 
+ITEMS.append(dict(mod="Extra Durability (HARD)", title="Extra Durability (HARD)", version="1",
+                  tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
+                  en="Weapons and armour wear out in combat. Keep your squad equipped by repairing gear with ordinary Tools."))
+
+SOURCE_NAMES = {"Extra Durability (HARD)": "ExtraDurability", "Character Inspector": "CharacterInspector"}
+
 SKIP = re.compile(r"(^_.*\.(info|img)$)|(\.bak$)|(\.pre[^.]*$)|(\.prelog$)|"
                   r"(\.bak-[^.]*$)|(\.log$)|(_runtime_table\.txt$)|"
                   # mod-config.json у форков Emkej - личные настройки; плагин
@@ -276,7 +282,8 @@ def runtime_file_allowed(mod, folder, name):
 def source_dir(mod):
     if mod == "KEO":
         return KEO_SOURCE if os.path.isdir(KEO_SOURCE) else None
-    for folder in (os.path.join(OURS,mod), os.path.join(FORKS,"CharacterInspector" if mod=="Character Inspector" else mod)):
+    source_name = SOURCE_NAMES.get(mod, mod)
+    for folder in (os.path.join(OURS, source_name), os.path.join(FORKS, source_name)):
         if os.path.isdir(folder):
             return folder
     return None

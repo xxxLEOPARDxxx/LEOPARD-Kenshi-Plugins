@@ -27,9 +27,9 @@ def validate_public_mcm_text(text,path,require_all=False,allow_original_keo=Fals
     packages={entry['package'] for entry in public}
     for entry in mcm_catalog():
         if entry['package'] in packages:continue
-        # Explicit release preparation permits only KEO's own description.
-        # It does not publish KEO in MCM or authorize any other private project.
-        if entry['package']=='KEO' and current_mod=='KEO' and entry.get('release_authorized') is True:
+        # Explicit release preparation permits this project's own description.
+        # The public MCM catalog still requires confirmed publication.
+        if entry['package']==current_mod and entry.get('release_authorized') is True:
             continue
         aliases={entry['name'],entry['package'],entry['id']}
         if entry['package']=='XP_Overhaul':aliases.add('XPO')

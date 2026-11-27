@@ -28,13 +28,14 @@ def exports_mcm(path):
 
 def verify_catalog(catalog):
     known={entry['package'] for entry in catalog}
+    package_names={source: package for package, source in build.SOURCE_NAMES.items()}
     build_root=Path(build.OURS).parent/'build';found={}
     for root in (Path(build.OURS),Path(build.FORKS)):
         for source in root.iterdir():
             if not source.is_dir():continue
             dlls=[p for p in (build_root/source.name).glob('*.dll') if exports_mcm(p)]
             if not dlls:continue
-            mod='Character Inspector' if source.name=='CharacterInspector' else source.name
+            mod=package_names.get(source.name, source.name)
             found[mod]=[str(p) for p in dlls]
     missing=set(found)-known
     if missing:raise ValueError('MCM documentation misses built plugins: '+', '.join(sorted(missing)))

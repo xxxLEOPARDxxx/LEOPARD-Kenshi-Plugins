@@ -1,0 +1,263 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Extra Durability (HARD)\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Durability"
+msgstr "Durability"
+
+msgid "Condition"
+msgstr "Condition"
+
+msgid "Broken"
+msgstr "Broken"
+
+msgid "Tools charge"
+msgstr "Tools charge"
+
+msgid "Equipment repair interrupted."
+msgstr "Equipment repair interrupted."
+
+msgid "Could not use the tools."
+msgstr "Could not use the tools."
+
+msgid "Equipment repaired."
+msgstr "Equipment repaired."
+
+msgid "Repair tools spent."
+msgstr "Repair tools spent."
+
+msgid "Equipment can only be repaired while conscious and out of combat."
+msgstr "Equipment can only be repaired while conscious and out of combat."
+
+msgid "Tools are required to repair equipment."
+msgstr "Tools are required to repair equipment."
+
+msgid "Equipment repair is already in progress."
+msgstr "Equipment repair is already in progress."
+
+msgid "Repair started. Keep the character still."
+msgstr "Repair started. Keep the character still."
+
+msgid "Weapons and armour wear in combat. Tools restore durability."
+msgstr "Weapons and armour wear in combat. Tools restore durability."
+
+msgid "Enable plugin"
+msgstr "Enable plugin"
+
+msgid "Enables equipment wear, its combat effects, and repairs."
+msgstr "Enables equipment wear, its combat effects, and repairs."
+
+msgid "Durability affects smelting"
+msgstr "Durability affects smelting"
+
+msgid "Diagnostics"
+msgstr "Diagnostics"
+
+msgid "Detailed log"
+msgstr "Detailed log"
+
+msgid "Logs completed repairs and destroyed equipment. Hook errors are always logged."
+msgstr "Logs completed repairs and destroyed equipment. Hook errors are always logged."
+
+
+msgid "NPC equipment wear"
+msgstr "NPC equipment wear"
+
+msgid "Applies the same wear, breakage, and destruction rules to NPC equipment."
+msgstr "Applies the same wear, breakage, and destruction rules to NPC equipment."
+
+msgid "Destroy items at 0% durability"
+msgstr "Destroy items at 0% durability"
+
+msgid "Weapons and armour break at 0% durability. With this option on, they disappear without scrap. With it off, they remain available for repair or smelting. Meitou never breaks."
+msgstr "Weapons and armour break at 0% durability. With this option on, they disappear without scrap. With it off, they remain available for repair or smelting. Meitou never breaks."
+
+msgid "Equipment breakage notices"
+msgstr "Equipment breakage notices"
+
+msgid "Shows who broke which item in your squads. NPC breakage is always silent."
+msgstr "Shows who broke which item in your squads. NPC breakage is always silent."
+
+msgid "#FF6363Weapon on #8BDD70%s#FF6363 broke - %s"
+msgstr "#FF6363Weapon on #8BDD70%s#FF6363 broke - %s"
+
+msgid "#FF6363Armour on #8BDD70%s#FF6363 broke - %s"
+msgstr "#FF6363Armour on #8BDD70%s#FF6363 broke - %s"
+
+msgid "Repair Weapon"
+msgstr "Repair Weapon"
+
+msgid "Repair Armour"
+msgstr "Repair Armour"
+
+msgid "Off"
+msgstr "Off"
+
+msgid "Top"
+msgstr "Top"
+
+msgid "Bottom"
+msgstr "Bottom"
+
+msgid "Equipment condition bar"
+msgstr "Equipment condition bar"
+
+msgid "Shows a thin durability bar inside icons for worn weapons and armour."
+msgstr "Shows a thin durability bar inside icons for worn weapons and armour."
+
+msgid "Wear and breakage"
+msgstr "Wear and breakage"
+
+msgid "Weapon damage"
+msgstr "Weapon damage"
+
+msgid "Armour protection"
+msgstr "Armour protection"
+
+msgid "Durability by tier"
+msgstr "Durability by tier"
+
+msgid "Repair"
+msgstr "Repair"
+
+msgid "Smelting"
+msgstr "Smelting"
+
+msgid "The item furnace scales the material yield according to the condition of the gear."
+msgstr "The item furnace scales the material yield according to the condition of the gear."
+
+msgid "Breakage protection from grade"
+msgstr "Breakage protection from grade"
+
+msgid "Melee weapons at or above this grade cannot break. 0 protects only vanilla Meitou. Vanilla Meitou is always protected."
+msgstr "Melee weapons at or above this grade cannot break. 0 protects only vanilla Meitou. Vanilla Meitou is always protected."
+
+msgid "Melee wear per hit or block"
+msgstr "Melee wear per hit or block"
+
+msgid "Durability points lost on a registered hit or block. 0 disables new wear from this action."
+msgstr "Durability points lost on a registered hit or block. 0 disables new wear from this action."
+
+msgid "Crossbow wear per shot"
+msgstr "Crossbow wear per shot"
+
+msgid "Durability points lost on each shot, including misses. 0 disables new wear from this action."
+msgstr "Durability points lost on each shot, including misses. 0 disables new wear from this action."
+
+msgid "Armour wear per hit"
+msgstr "Armour wear per hit"
+
+msgid "Durability points lost by the armour layer that covers a hit. 0 disables new wear from this action."
+msgstr "Durability points lost by the armour layer that covers a hit. 0 disables new wear from this action."
+
+msgid "Weapon damage starts dropping at (%)"
+msgstr "Weapon damage starts dropping at (%)"
+
+msgid "At higher durability the weapon deals full damage. This setting covers melee weapons and crossbows."
+msgstr "At higher durability the weapon deals full damage. This setting covers melee weapons and crossbows."
+
+msgid "Weapon damage reaches minimum at (%)"
+msgstr "Weapon damage reaches minimum at (%)"
+
+msgid "At or below this durability, weapon damage stays at its minimum until breakage. This value is capped at the start of the penalty."
+msgstr "At or below this durability, weapon damage stays at its minimum until breakage. This value is capped at the start of the penalty."
+
+msgid "Minimum weapon damage (%)"
+msgstr "Minimum weapon damage (%)"
+
+msgid "Share of the original damage at the bottom of the wear range. Broken weapons stop dealing damage. Protected weapons still use this minimum at 0 durability."
+msgstr "Share of the original damage at the bottom of the wear range. Broken weapons stop dealing damage. Protected weapons still use this minimum at 0 durability."
+
+msgid "Armour protection starts dropping at (%)"
+msgstr "Armour protection starts dropping at (%)"
+
+msgid "At higher durability, normal armour coverage applies."
+msgstr "At higher durability, normal armour coverage applies."
+
+msgid "Armour protection reaches minimum at (%)"
+msgstr "Armour protection reaches minimum at (%)"
+
+msgid "At or below this durability, protection stays at its minimum until breakage. This value is capped at the start of the penalty."
+msgstr "At or below this durability, protection stays at its minimum until breakage. This value is capped at the start of the penalty."
+
+msgid "Minimum armour effectiveness (%)"
+msgstr "Minimum armour effectiveness (%)"
+
+msgid "Chance for a layer to stay effective after passing the normal coverage check, at the bottom of the wear range. At 0 durability a broken layer offers no protection."
+msgstr "Chance for a layer to stay effective after passing the normal coverage check, at the bottom of the wear range. At 0 durability a broken layer offers no protection."
+
+msgid "Tier 1 - Rusted / Prototype"
+msgstr "Tier 1 - Rusted / Prototype"
+
+msgid "Maximum durability in this tier. Existing wear is stored in points, so changing this value can change the percentage on used gear."
+msgstr "Maximum durability in this tier. Existing wear is stored in points, so changing this value can change the percentage on used gear."
+
+msgid "Tier 2 - Mid-Grade / Shoddy"
+msgstr "Tier 2 - Mid-Grade / Shoddy"
+
+msgid "Tier 3 - Refitted blades"
+msgstr "Tier 3 - Refitted blades"
+
+msgid "Tier 4 - Catun No. 1 / Standard"
+msgstr "Tier 4 - Catun No. 1 / Standard"
+
+msgid "Tier 5 - Catun No. 2"
+msgstr "Tier 5 - Catun No. 2"
+
+msgid "Tier 6 - Catun No. 3 / High"
+msgstr "Tier 6 - Catun No. 3 / High"
+
+msgid "Tier 7 - Mk I to III"
+msgstr "Tier 7 - Mk I to III"
+
+msgid "Tier 8 - Edge / Specialist"
+msgstr "Tier 8 - Edge / Specialist"
+
+msgid "Tier 9 - Meitou / Masterwork"
+msgstr "Tier 9 - Meitou / Masterwork"
+
+msgid "Restored by a full tool kit (%)"
+msgstr "Restored by a full tool kit (%)"
+
+msgid "Base share of maximum durability restored with a full charge, before the smithing bonus."
+msgstr "Base share of maximum durability restored with a full charge, before the smithing bonus."
+
+msgid "Minimum points per full tool kit"
+msgstr "Minimum points per full tool kit"
+
+msgid "The charge restores at least this many points before the smithing bonus. With both repair amounts set to 0, tools restore nothing."
+msgstr "The charge restores at least this many points before the smithing bonus. With both repair amounts set to 0, tools restore nothing."
+
+msgid "Repair efficiency bonus at skill 100 (%)"
+msgstr "Repair efficiency bonus at skill 100 (%)"
+
+msgid "Extra durability a full charge restores at smithing skill 100. The bonus grows with skill."
+msgstr "Extra durability a full charge restores at smithing skill 100. The bonus grows with skill."
+
+msgid "Full tool kit use time, game seconds"
+msgstr "Full tool kit use time, game seconds"
+
+msgid "Time to use a full charge at smithing skill 0, at normal game speed. Smaller repairs use less time and charge."
+msgstr "Time to use a full charge at smithing skill 0, at normal game speed. Smaller repairs use less time and charge."
+
+msgid "Repair speed bonus at skill 100 (%)"
+msgstr "Repair speed bonus at skill 100 (%)"
+
+msgid "Extra repair speed at smithing skill 100. 100 doubles the speed."
+msgstr "Extra repair speed at smithing skill 100. 100 doubles the speed."
+
+msgid "Smithing experience from repairs (%)"
+msgstr "Smithing experience from repairs (%)"
+
+msgid "100 awards the usual experience per point restored. 0 disables repair experience."
+msgstr "100 awards the usual experience per point restored. 0 disables repair experience."
+
+msgid "Smelting yield at 0 durability (%)"
+msgstr "Smelting yield at 0 durability (%)"
+
+msgid "Share of the normal materials returned at 0 durability. The yield rises linearly to the normal amount at full durability."
+msgstr "Share of the normal materials returned at 0 durability. The yield rises linearly to the normal amount at full durability."

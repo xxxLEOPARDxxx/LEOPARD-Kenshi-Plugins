@@ -1,0 +1,263 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Extra Durability (HARD)\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Durability"
+msgstr "Прочность"
+
+msgid "Condition"
+msgstr "Состояние"
+
+msgid "Broken"
+msgstr "Сломано"
+
+msgid "Tools charge"
+msgstr "Заряд инструментов"
+
+msgid "Equipment repair interrupted."
+msgstr "Ремонт экипировки прерван."
+
+msgid "Could not use the tools."
+msgstr "Не удалось использовать инструменты."
+
+msgid "Equipment repaired."
+msgstr "Экипировка отремонтирована."
+
+msgid "Repair tools spent."
+msgstr "Инструменты израсходованы."
+
+msgid "Equipment can only be repaired while conscious and out of combat."
+msgstr "Ремонт доступен в сознании и вне боя."
+
+msgid "Tools are required to repair equipment."
+msgstr "Для ремонта экипировки нужны инструменты."
+
+msgid "Equipment repair is already in progress."
+msgstr "Ремонт уже идёт."
+
+msgid "Repair started. Keep the character still."
+msgstr "Ремонт начат. Оставьте персонажа на месте."
+
+msgid "Weapons and armour wear in combat. Tools restore durability."
+msgstr "Оружие и броня изнашиваются в бою. Инструменты восстанавливают их прочность."
+
+msgid "Enable plugin"
+msgstr "Включить плагин"
+
+msgid "Enables equipment wear, its combat effects, and repairs."
+msgstr "Включает износ экипировки, его влияние на бой и ремонт."
+
+msgid "Durability affects smelting"
+msgstr "Учитывать износ при переплавке"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Detailed log"
+msgstr "Подробный журнал"
+
+msgid "Logs completed repairs and destroyed equipment. Hook errors are always logged."
+msgstr "Записывает завершённые ремонты и уничтожение экипировки. Ошибки установки записываются всегда."
+
+
+msgid "NPC equipment wear"
+msgstr "Износ у NPC"
+
+msgid "Applies the same wear, breakage, and destruction rules to NPC equipment."
+msgstr "Применяет к экипировке NPC те же правила износа, поломки и уничтожения, что и к отряду игрока."
+
+msgid "Destroy items at 0% durability"
+msgstr "Уничтожать предметы при 0%"
+
+msgid "Weapons and armour break at 0% durability. With this option on, they disappear without scrap. With it off, they remain available for repair or smelting. Meitou never breaks."
+msgstr "Оружие и броня ломаются при 0% прочности. Включено - предмет исчезает без остатка. Выключено - сломанный предмет можно отремонтировать или переплавить. Мейто не ломается."
+
+msgid "Equipment breakage notices"
+msgstr "Уведомления о поломке"
+
+msgid "Shows who broke which item in your squads. NPC breakage is always silent."
+msgstr "Показывает, у кого из бойцов твоих отрядов и какой предмет сломался."
+
+msgid "#FF6363Weapon on #8BDD70%s#FF6363 broke - %s"
+msgstr "#FF6363У #8BDD70%s#FF6363 сломалось оружие - %s"
+
+msgid "#FF6363Armour on #8BDD70%s#FF6363 broke - %s"
+msgstr "#FF6363У #8BDD70%s#FF6363 сломалась броня - %s"
+
+msgid "Repair Weapon"
+msgstr "Починить оружие"
+
+msgid "Repair Armour"
+msgstr "Починить броню"
+
+msgid "Off"
+msgstr "Выключено"
+
+msgid "Top"
+msgstr "Сверху"
+
+msgid "Bottom"
+msgstr "Снизу"
+
+msgid "Equipment condition bar"
+msgstr "Полоска прочности экипировки"
+
+msgid "Shows a thin durability bar inside icons for worn weapons and armour."
+msgstr "Показывает тонкую полоску внутри значков оружия, брони и одежды с износом."
+
+msgid "Wear and breakage"
+msgstr "Износ и поломка"
+
+msgid "Weapon damage"
+msgstr "Урон оружия"
+
+msgid "Armour protection"
+msgstr "Защита брони"
+
+msgid "Durability by tier"
+msgstr "Прочность по ступеням"
+
+msgid "Repair"
+msgstr "Ремонт"
+
+msgid "Smelting"
+msgstr "Переплавка"
+
+msgid "The item furnace scales the material yield according to the condition of the gear."
+msgstr "Печь учитывает прочность экипировки при расчёте выхода материалов."
+
+msgid "Breakage protection from grade"
+msgstr "Защита от поломки с грейда"
+
+msgid "Melee weapons at or above this grade cannot break. 0 protects only vanilla Meitou. Vanilla Meitou is always protected."
+msgstr "Оружие ближнего боя с этим грейдом и выше не ломается. При 0 защищён только штатный Мейто. Штатный Мейто защищён при любом пороге."
+
+msgid "Melee wear per hit or block"
+msgstr "Износ оружия за удар или блок"
+
+msgid "Durability points lost on a registered hit or block. 0 disables new wear from this action."
+msgstr "Сколько единиц прочности теряется при засчитанном попадании или блоке. 0 отключает износ от этого действия."
+
+msgid "Crossbow wear per shot"
+msgstr "Износ арбалета за выстрел"
+
+msgid "Durability points lost on each shot, including misses. 0 disables new wear from this action."
+msgstr "Сколько единиц прочности теряется за выстрел, включая промах. 0 отключает износ от этого действия."
+
+msgid "Armour wear per hit"
+msgstr "Износ брони за попадание"
+
+msgid "Durability points lost by the armour layer that covers a hit. 0 disables new wear from this action."
+msgstr "Сколько единиц прочности теряет слой брони, на который пришлось попадание. 0 отключает износ от этого действия."
+
+msgid "Weapon damage starts dropping at (%)"
+msgstr "Урон начинает падать при (%)"
+
+msgid "At higher durability the weapon deals full damage. This setting covers melee weapons and crossbows."
+msgstr "При большей прочности оружие наносит полный урон. Порог общий для оружия ближнего боя и арбалетов."
+
+msgid "Weapon damage reaches minimum at (%)"
+msgstr "Урон достигает минимума при (%)"
+
+msgid "At or below this durability, weapon damage stays at its minimum until breakage. This value is capped at the start of the penalty."
+msgstr "При этой прочности и ниже урон остаётся минимальным до поломки. Верхний предел этого значения задаёт начало штрафа."
+
+msgid "Minimum weapon damage (%)"
+msgstr "Минимальный урон оружия (%)"
+
+msgid "Share of the original damage at the bottom of the wear range. Broken weapons stop dealing damage. Protected weapons still use this minimum at 0 durability."
+msgstr "Доля штатного урона при максимальном штрафе. Сломанное оружие перестаёт наносить урон. Защищённое оружие сохраняет эту долю даже при нуле."
+
+msgid "Armour protection starts dropping at (%)"
+msgstr "Защита начинает падать при (%)"
+
+msgid "At higher durability, normal armour coverage applies."
+msgstr "При большей прочности действует обычная проверка покрытия брони."
+
+msgid "Armour protection reaches minimum at (%)"
+msgstr "Защита достигает минимума при (%)"
+
+msgid "At or below this durability, protection stays at its minimum until breakage. This value is capped at the start of the penalty."
+msgstr "При этой прочности и ниже эффективность брони остаётся минимальной до поломки. Верхний предел этого значения задаёт начало штрафа."
+
+msgid "Minimum armour effectiveness (%)"
+msgstr "Минимальная эффективность брони (%)"
+
+msgid "Chance for a layer to stay effective after passing the normal coverage check, at the bottom of the wear range. At 0 durability a broken layer offers no protection."
+msgstr "Вероятность, что слой с максимальным штрафом защитит после штатной проверки покрытия. Сломанный слой не даёт защиты."
+
+msgid "Tier 1 - Rusted / Prototype"
+msgstr "Ступень 1 - Ржавое / Прототип"
+
+msgid "Maximum durability in this tier. Existing wear is stored in points, so changing this value can change the percentage on used gear."
+msgstr "Максимальная прочность этой ступени. В сейве хранится остаток в единицах. Смена максимума может изменить процент на изношенных вещах."
+
+msgid "Tier 2 - Mid-Grade / Shoddy"
+msgstr "Ступень 2 - Утиль среднего класса / Низкое"
+
+msgid "Tier 3 - Refitted blades"
+msgstr "Ступень 3 - Восстановленные клинки"
+
+msgid "Tier 4 - Catun No. 1 / Standard"
+msgstr "Ступень 4 - Катунь 1 / Стандартное"
+
+msgid "Tier 5 - Catun No. 2"
+msgstr "Ступень 5 - Катунь 2"
+
+msgid "Tier 6 - Catun No. 3 / High"
+msgstr "Ступень 6 - Катунь 3 / Высокое"
+
+msgid "Tier 7 - Mk I to III"
+msgstr "Ступень 7 - Мк I-III"
+
+msgid "Tier 8 - Edge / Specialist"
+msgstr "Ступень 8 - Кромка / Специалист"
+
+msgid "Tier 9 - Meitou / Masterwork"
+msgstr "Ступень 9 - Мейто / Шедевр"
+
+msgid "Restored by a full tool kit (%)"
+msgstr "Восстановление полным набором (%)"
+
+msgid "Base share of maximum durability restored with a full charge, before the smithing bonus."
+msgstr "Базовая доля максимальной прочности, которую восстанавливает полный заряд. Бонус кузнеца начисляется отдельно."
+
+msgid "Minimum points per full tool kit"
+msgstr "Минимум единиц за полный набор"
+
+msgid "The charge restores at least this many points before the smithing bonus. With both repair amounts set to 0, tools restore nothing."
+msgstr "Полный заряд восстанавливает не меньше этого количества до применения бонуса кузнеца. Если оба параметра восстановления равны 0, ремонт отключён."
+
+msgid "Repair efficiency bonus at skill 100 (%)"
+msgstr "Бонус эффективности при навыке 100 (%)"
+
+msgid "Extra durability a full charge restores at smithing skill 100. The bonus grows with skill."
+msgstr "Дополнительная прочность, которую восстанавливает полный заряд при навыке ковки 100. Бонус растёт вместе с навыком."
+
+msgid "Full tool kit use time, game seconds"
+msgstr "Расход полного набора, игровых секунд"
+
+msgid "Time to use a full charge at smithing skill 0, at normal game speed. Smaller repairs use less time and charge."
+msgstr "Сколько времени занимает полный расход инструментов при навыке 0 на обычной скорости игры. Небольшой ремонт требует меньше времени и заряда."
+
+msgid "Repair speed bonus at skill 100 (%)"
+msgstr "Бонус скорости при навыке 100 (%)"
+
+msgid "Extra repair speed at smithing skill 100. 100 doubles the speed."
+msgstr "Дополнительная скорость ремонта при навыке ковки 100. Значение 100 удваивает скорость."
+
+msgid "Smithing experience from repairs (%)"
+msgstr "Опыт ковки за ремонт (%)"
+
+msgid "100 awards the usual experience per point restored. 0 disables repair experience."
+msgstr "При 100 начисляется обычный опыт за каждую восстановленную единицу. 0 отключает опыт от ремонта."
+
+msgid "Smelting yield at 0 durability (%)"
+msgstr "Выход переплавки при нуле (%)"
+
+msgid "Share of the normal materials returned at 0 durability. The yield rises linearly to the normal amount at full durability."
+msgstr "Доля штатного выхода материалов при нуле прочности. Выход растёт линейно до обычного значения при полной прочности."
