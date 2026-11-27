@@ -1,126 +1,190 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <mmsystem.h>
+#include <dsound.h>
+#include <algorithm>
+#include <cmath>
 #include <cstring>
+#include <fstream>
+#include <string>
+#include <vector>
 
 #include <Debug.h>
 #include <kenshi/Building/Building.h>
-#include <kenshi/Character.h>
+#include <kenshi/GameWorld.h>
+#include <kenshi/Globals.h>
+#include <kenshi/OptionsHolder.h>
+#include <kenshi/PlayerInterface.h>
 #include "VeinSound.h"
+
+#pragma comment(lib, "dsound.lib")
+
+extern "C" IMAGE_DOS_HEADER __ImageBase;
 
 namespace finite_ore {
 namespace {
 
-typedef unsigned __int64 AudioObject;
-
-typedef int (*RegisterObject)(AudioObject, const char*, unsigned);
-typedef int (*UnregisterObject)(AudioObject);
-typedef int (*SetPosition)(AudioObject, const AkSoundPosition&);
-typedef int (*SetSwitch)(const char*, const char*, AudioObject);
-typedef unsigned (*PostEvent)(const char*, AudioObject, unsigned, void*, void*,
-                              unsigned, void*, unsigned);
-
-RegisterObject registerObject = NULL;
-UnregisterObject unregisterObject = NULL;
-SetPosition setPosition = NULL;
-SetSwitch setSwitch = NULL;
-PostEvent postEvent = NULL;
-const void* volatile const* audioQueue = NULL;
-unsigned soundSerial = 0;
+const unsigned VoiceCount = 4;
+IDirectSound* device = NULL;
+IDirectSoundBuffer* voices[VoiceCount] = {};
+unsigned nextVoice = 0;
 bool reportedPlaybackError = false;
 
-enum { Register, Unregister, Position, Switch, Post, FunctionCount };
-struct Profile {
-    DWORD timestamp;
-    DWORD imageSize;
-    unsigned queue;
-    unsigned function[FunctionCount];
+struct WaveHeader {
+    DWORD riff, riffSize, wave, format, formatSize;
+    WORD codec, channels;
+    DWORD sampleRate, bytesPerSecond;
+    WORD blockAlign, bitsPerSample;
+    DWORD data, dataSize;
 };
+static_assert(sizeof(WaveHeader) == 44, "Expected the PCM WAV header layout");
 
-// Wwise entry points used by the native building and character sound paths.
-const Profile profiles[] = {
-    {0x65d604d7, 0x232c000, 0x2135b60, {0xa7fa50, 0xa7fb00, 0xa81d80, 0xa82010, 0xa860c0}},
-    {0x65d60519, 0x232a000, 0x2133ad0, {0xa7f170, 0xa7f220, 0xa814a0, 0xa81730, 0xa857e0}}
-};
-const unsigned char signatures[][24] = {
-    {0x48, 0x89, 0x6c, 0x24, 0x10, 0x48, 0x89, 0x74, 0x24, 0x18, 0x57, 0x48,
-     0x83, 0xec, 0x20, 0x41, 0x8b, 0xf0, 0x48, 0x8b, 0xea, 0x48, 0x8b, 0xf9},
-    {0x40, 0x53, 0x48, 0x83, 0xec, 0x20, 0x48, 0x8b, 0xd9, 0x48, 0x85, 0xc9,
-     0x75, 0x09, 0x8d, 0x41, 0x02, 0x48, 0x83, 0xc4, 0x20, 0x5b, 0xc3, 0xe8},
-    {0x48, 0x85, 0xc9, 0x75, 0x04, 0x8d, 0x41, 0x02, 0xc3, 0xe9, 0x82, 0xcb,
-     0xff, 0xff, 0xcc, 0xcc, 0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74},
-    {0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74, 0x24, 0x10, 0x57, 0x48,
-     0x83, 0xec, 0x20, 0x49, 0x8b, 0xf0, 0x48, 0x8b, 0xda, 0xe8, 0x66, 0xfc},
-    {0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x6c, 0x24, 0x10, 0x48, 0x89,
-     0x7c, 0x24, 0x18, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56, 0x48, 0x83, 0xec}
-};
-
-bool BindAudio()
+bool ReadClip(WaveHeader& header, std::vector<char>& samples)
 {
-    const unsigned char* image = reinterpret_cast<const unsigned char*>(GetModuleHandleW(NULL));
-    if (!image)
+    wchar_t path[MAX_PATH];
+    const DWORD length = GetModuleFileNameW((HMODULE)&__ImageBase, path, MAX_PATH);
+    if (!length || length >= MAX_PATH)
         return false;
-    const IMAGE_DOS_HEADER* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
-    if (dos->e_magic != IMAGE_DOS_SIGNATURE || dos->e_lfanew <= 0)
+    const std::wstring module(path, length);
+    const size_t stop = module.find_last_of(L"\\/");
+    if (stop == std::wstring::npos)
         return false;
-    const IMAGE_NT_HEADERS64* pe = reinterpret_cast<const IMAGE_NT_HEADERS64*>(image + dos->e_lfanew);
-    if (pe->Signature != IMAGE_NT_SIGNATURE || pe->FileHeader.Machine != IMAGE_FILE_MACHINE_AMD64 ||
-        pe->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+    const std::wstring clip = module.substr(0, stop + 1) + L"audio\\Crash_Debris.wav";
+
+    std::ifstream file(clip.c_str(), std::ios::binary);
+    // The packaged clip uses a canonical stereo PCM header. Bound reads in
+    // case the asset is replaced with an unsupported or damaged file.
+    if (!file.read(reinterpret_cast<char*>(&header), sizeof(header)) ||
+        header.riff != mmioFOURCC('R','I','F','F') ||
+        header.wave != mmioFOURCC('W','A','V','E') ||
+        header.format != mmioFOURCC('f','m','t',' ') || header.formatSize != 16 ||
+        header.data != mmioFOURCC('d','a','t','a') || header.codec != WAVE_FORMAT_PCM ||
+        header.channels != 2 || header.bitsPerSample != 16 || header.blockAlign != 4 ||
+        header.sampleRate != 44100 || header.bytesPerSecond != 44100 * 4 ||
+        !header.dataSize || header.dataSize > 4 * 1024 * 1024 ||
+        header.dataSize % header.blockAlign || header.riffSize != header.dataSize + 36)
+        return false;
+    samples.resize(header.dataSize);
+    return file.read(&samples[0], header.dataSize).good();
+}
+
+bool CreateVoices(HWND window)
+{
+    WaveHeader header;
+    std::vector<char> samples;
+    if (!ReadClip(header, samples) ||
+        FAILED(DirectSoundCreate(NULL, &device, NULL)) ||
+        FAILED(device->SetCooperativeLevel(window, DSSCL_NORMAL)))
         return false;
 
-    for (unsigned i = 0; i != sizeof(profiles) / sizeof(profiles[0]); ++i) {
-        const Profile& profile = profiles[i];
-        if (pe->FileHeader.TimeDateStamp != profile.timestamp ||
-            pe->OptionalHeader.SizeOfImage != profile.imageSize)
-            continue;
-        intptr_t entry[FunctionCount];
-        for (unsigned j = 0; j != FunctionCount; ++j) {
-            const unsigned char* address = image + profile.function[j];
-            if (std::memcmp(address, signatures[j], sizeof(signatures[j])))
-                return false;
-            entry[j] = reinterpret_cast<intptr_t>(address);
-        }
-        audioQueue = reinterpret_cast<const void* volatile const*>(image + profile.queue);
-        registerObject = reinterpret_cast<RegisterObject>(entry[Register]);
-        unregisterObject = reinterpret_cast<UnregisterObject>(entry[Unregister]);
-        setPosition = reinterpret_cast<SetPosition>(entry[Position]);
-        setSwitch = reinterpret_cast<SetSwitch>(entry[Switch]);
-        postEvent = reinterpret_cast<PostEvent>(entry[Post]);
-        return true;
+    WAVEFORMATEX format = {};
+    format.wFormatTag = WAVE_FORMAT_PCM;
+    format.nChannels = header.channels;
+    format.nSamplesPerSec = header.sampleRate;
+    format.nAvgBytesPerSec = header.bytesPerSecond;
+    format.nBlockAlign = header.blockAlign;
+    format.wBitsPerSample = header.bitsPerSample;
+
+    DSBUFFERDESC descriptor = {};
+    descriptor.dwSize = sizeof(descriptor);
+    descriptor.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_LOCSOFTWARE;
+    descriptor.dwBufferBytes = header.dataSize;
+    descriptor.lpwfxFormat = &format;
+    if (FAILED(device->CreateSoundBuffer(&descriptor, &voices[0], NULL)))
+        return false;
+
+    void* first = NULL;
+    void* second = NULL;
+    DWORD firstSize = 0, secondSize = 0;
+    if (FAILED(voices[0]->Lock(0, header.dataSize, &first, &firstSize, &second, &secondSize, 0)))
+        return false;
+    std::memcpy(first, &samples[0], firstSize);
+    if (secondSize)
+        std::memcpy(second, &samples[firstSize], secondSize);
+    if (FAILED(voices[0]->Unlock(first, firstSize, second, secondSize)))
+        return false;
+
+    for (unsigned i = 1; i < VoiceCount; ++i) {
+        // DirectSound requires an initial volume change on duplicate buffers.
+        if (FAILED(device->DuplicateSoundBuffer(voices[0], &voices[i])) ||
+            FAILED(voices[i]->SetVolume(DSBVOLUME_MIN)))
+            return false;
     }
-    return false;
-}
+    return true;
 }
 
-void InitializeVeinSound()
+bool PlayClip(HWND window, LONG volume, LONG pan)
 {
-    if (!BindAudio())
-        ErrorLog("FiniteOreVeins: unsupported native audio, vein depletion sound unavailable");
+    if (!device && !CreateVoices(window))
+        return false;
+
+    IDirectSoundBuffer* const voice = voices[nextVoice];
+    nextVoice = (nextVoice + 1) % VoiceCount;
+    return SUCCEEDED(voice->Stop()) &&
+           SUCCEEDED(voice->SetCurrentPosition(0)) &&
+           SUCCEEDED(voice->SetVolume(volume)) &&
+           SUCCEEDED(voice->SetPan(pan)) &&
+           SUCCEEDED(voice->Play(0, 0, 0));
+}
+
+}
+
+void ResetVeinSound()
+{
+    for (unsigned i = 0; i < VoiceCount; ++i) {
+        if (voices[i]) {
+            voices[i]->Stop();
+            voices[i]->Release();
+            voices[i] = NULL;
+        }
+    }
+    if (device) {
+        device->Release();
+        device = NULL;
+    }
+    nextVoice = 0;
 }
 
 void PlayVeinBreak(Building& vein)
 {
-    if (!audioQueue || !*audioQueue)
+    if (!ou || !ou->player || !ou->player->getCamera() ||
+        !options || !(options->sfxVolume > 0))
         return;
-    // Building destruction calls StopAll on the building emitter. Use a
-    // separate, fixed-position emitter whose ID is outside Kenshi's range.
-    const AudioObject emitter = 0x464f560000000000ULL | ++soundSerial;
-    const Ogre::Vector3& at = vein.getPosition();
-    const AkSoundPosition position = {{at.x, at.y, at.z}, {0.0f, 0.0f, 1.0f}};
-    const int akSuccess = 1;
-    if (registerObject(emitter, "FiniteOreVeins", 1) == akSuccess) {
-        const bool started = setPosition(emitter, position) == akSuccess &&
-                             setSwitch("Impacts", "Stone", emitter) == akSuccess &&
-                             postEvent("Impact", emitter, 0, NULL, NULL, 0, NULL, 0) != 0;
-        // An unregistered Wwise emitter retains its last position for voices
-        // already playing. This releases it without stopping the one-shot.
-        const bool released = unregisterObject(emitter) == akSuccess;
-        if (started && released)
+
+    const Ogre::Vector3 camera = ou->getCameraPos();
+    const Ogre::Vector3 delta = vein.getPosition() - camera;
+    const float range = 440.0f;
+    const float distance = std::sqrt(delta.x * delta.x + delta.z * delta.z + delta.y * delta.y * 0.25f);
+    if (!(distance < range))
+        return;
+
+    const HWND window = GetForegroundWindow();
+    DWORD owner = 0;
+    GetWindowThreadProcessId(window, &owner);
+    if (owner != GetCurrentProcessId())
+        return;
+
+    const Ogre::Vector3 forward = ou->getCameraCenter() - camera;
+    const float heading = std::sqrt(forward.x * forward.x + forward.z * forward.z);
+    const float side = heading > 0.01f && distance > 0.01f ?
+        (delta.z * forward.x - delta.x * forward.z) / (heading * distance) : 0;
+    const LONG pan = static_cast<LONG>(2000 * std::max(-1.0f, std::min(1.0f, side)));
+    const float gain = std::min(options->sfxVolume, 1.0f) * (1 - distance / range);
+    if (!(gain > 0))
+        return;
+    const LONG volume = static_cast<LONG>(std::max(-10000.0f, 2000.0f * std::log10(gain)));
+    try {
+        if (PlayClip(window, volume, pan))
             return;
+    } catch (...) {
+        // An audio device or clip failure must never prevent vein removal.
     }
+
+    ResetVeinSound();
     if (!reportedPlaybackError) {
         reportedPlaybackError = true;
-        ErrorLog("FiniteOreVeins: could not play or release the vein depletion sound");
+        ErrorLog("FiniteOreVeins: failed to play audio/Crash_Debris.wav");
     }
 }
 

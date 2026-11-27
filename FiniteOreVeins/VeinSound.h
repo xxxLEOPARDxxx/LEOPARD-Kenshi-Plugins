@@ -4,7 +4,7 @@ class Building;
 
 namespace finite_ore {
 
-void InitializeVeinSound();
+void ResetVeinSound();
 void PlayVeinBreak(Building& vein);
 
 }

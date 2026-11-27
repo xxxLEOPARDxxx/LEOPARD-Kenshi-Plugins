@@ -138,6 +138,7 @@ void ResetWorld(GameWorld* world)
         InterlockedExchange(&removalPending, 0);
     }
     nativeReset(world);
+    ResetVeinSound();
     {
         StateLock guard;
         deposits.clear();
@@ -549,7 +550,6 @@ __declspec(dllexport) void startPlugin()
     LoadSettings();
     if (!InstallOutputHook())
         return;
-    InitializeVeinSound();
     StartupHooks::Hook hooks[] = {
         StartupHooks::Hook(KenshiLib::GetRealAddress(&BuildingAccess::_DESTRUCTOR),
                            DestroyBuilding, &nativeDestroy, "building destruction"),

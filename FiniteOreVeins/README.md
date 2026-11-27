@@ -6,7 +6,7 @@
 
 Полная ёмкость - сумма случайных значений от 1500 до 3500 единиц на каждое доступное рабочее место. Например, жила на пять рабочих содержит от 7500 до 17500 единиц. Плагин использует максимальное число рабочих и положение жилы на карте, поэтому запас не меняется при смене смены, повторном выборе жилы или загрузке зоны. Качество руды по-прежнему влияет на штатную добычу.
 
-При добыче последней единицы жила исчезает со звуком удара по камню. Рабочие завершают добычу, а руда, оставшаяся в выходном слоте, выпадает рядом. В MCM есть две галочки: включение плагина и подробный журнал (по умолчанию выключен).
+При добыче последней единицы жила исчезает со звуком обрушения. Рабочие завершают добычу, а руда, оставшаяся в выходном слоте, выпадает рядом. В MCM есть две галочки: включение плагина и подробный журнал (по умолчанию выключен).
 
 В записи здания внутри зоны хранится оставшаяся доля запаса. Сейвы предыдущей сборки сохраняют долю при переходе на новую ёмкость. Удаление проходит по штатному пути удаления здания. После импорта состав жил следует поведению Kenshi при импорте мира.
 
@@ -18,6 +18,6 @@ An offline local build for Kenshi 1.0.65, RE_Kenshi, KenshiLib and MCM. Natural 
 
 Each worker slot contributes a random 1500-3500 ore to the vein's capacity. A five-slot vein holds 7500-17500 ore. The maximum worker count and the vein's map position keep its capacity consistent across selection, staffing and zone reloads. Ore quality still affects native mining.
 
-When the last unit is mined, the vein disappears with a stone impact sound. Miners stop working and any leftover output drops nearby. MCM has two toggles: enable the plugin and detailed logging (off by default).
+When the last unit is mined, the vein disappears with a debris crash sound. Miners stop working and any leftover output drops nearby. MCM has two toggles: enable the plugin and detailed logging (off by default).
 
 The remaining share persists in the vein's zone record. Saves from earlier builds retain that share with the new capacity. Depletion uses Kenshi's native building removal path. World import follows Kenshi's native import behaviour. This plugin adds the reserve alongside the resource grade and worker count through ProductionBuilding::getGUIFertility. Assigned Workers uses the parent ProductionBuilding::getGUIData. Hover tooltips without a scroll view are skipped.
