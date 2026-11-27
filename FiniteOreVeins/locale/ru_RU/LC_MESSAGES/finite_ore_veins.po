@@ -12,6 +12,9 @@ msgstr "Восстанавливается"
 msgid "Ore remaining"
 msgstr "Остаток руды"
 
+msgid "Ore still in the vein / total capacity. Each mined unit reduces the reserve by one."
+msgstr "Остаток в жиле / полная ёмкость. Каждая добытая единица уменьшает запас на одну."
+
 msgid "Ore deposits"
 msgstr "Рудные жилы"
 

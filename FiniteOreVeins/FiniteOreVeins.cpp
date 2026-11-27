@@ -19,6 +19,7 @@
 #include <kenshi/GameWorld.h>
 #include <kenshi/Globals.h>
 #include <kenshi/Kenshi.h>
+#include <kenshi/gui/DataPanelLine.h>
 #include <kenshi/gui/DatapanelGUI.h>
 #include <kenshi/util/TimeOfDay.h>
 
@@ -296,7 +297,10 @@ void ShowOre(ProductionBuilding* building, DatapanelGUI* panel, int category)
         content += " - ";
         content += ::Tr(permanentlyDry ? "Depleted" : "Recovering");
     }
-    panel->setLine(RowKey, ::Tr("Ore remaining"), content, category, false, true);
+    const bool newRow = !panel->lineExists(RowKey, category);
+    DataPanelLine* const row = panel->setLine(RowKey, ::Tr("Ore remaining"), content, category, false, true);
+    if (newRow && row)
+        row->setToolTipMainBar(::Tr("Ore still in the vein / total capacity. Each mined unit reduces the reserve by one."), false);
 }
 
 } // namespace

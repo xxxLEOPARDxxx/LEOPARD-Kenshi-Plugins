@@ -12,6 +12,9 @@ msgstr "恢复中"
 msgid "Ore remaining"
 msgstr "剩余矿石"
 
+msgid "Ore still in the vein / total capacity. Each mined unit reduces the reserve by one."
+msgstr "矿脉剩余储量 / 总容量。每开采一单位矿石，储量减少一。"
+
 msgid "Ore deposits"
 msgstr "矿脉"
 

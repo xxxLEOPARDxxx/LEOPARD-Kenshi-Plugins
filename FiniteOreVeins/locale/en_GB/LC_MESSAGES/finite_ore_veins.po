@@ -12,6 +12,9 @@ msgstr "Recovering"
 msgid "Ore remaining"
 msgstr "Ore remaining"
 
+msgid "Ore still in the vein / total capacity. Each mined unit reduces the reserve by one."
+msgstr "Ore still in the vein / total capacity. Each mined unit reduces the reserve by one."
+
 msgid "Ore deposits"
 msgstr "Ore deposits"
 
