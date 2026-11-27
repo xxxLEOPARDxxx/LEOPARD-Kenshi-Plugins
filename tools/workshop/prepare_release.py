@@ -10,7 +10,7 @@ def main():
     sync_notes(items)
     for item in items:
         mod=item['mod'];dst=build.mod_dir(mod);src=build.source_dir(mod)
-        (HERE/'images'/mod).mkdir(parents=True,exist_ok=True)
+        (HERE/'images'/item.get('images',mod)).mkdir(parents=True,exist_ok=True)
         if not dst:raise RuntimeError('Installed runtime missing: '+mod)
         if mod=='UITweaks':
             plugins=json.loads((Path(dst)/'RE_Kenshi.json').read_text(encoding='utf-8-sig')).get('Plugins',[])

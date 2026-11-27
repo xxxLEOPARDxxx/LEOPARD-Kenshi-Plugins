@@ -488,5 +488,18 @@
       "Обычные приказы движения и движение отрядов используют штатный поиск пути Kenshi. Предзагрузка зон, необязательное автовосстановление навсетки и задание «Маршрут по точкам» остаются доступны.",
       "С включёнными исправлениями рюкзаков персонажи относят в печь отсечённые конечности из надетого рюкзака."
     ]
+  },
+  "FiniteOreVeins": {
+    "version": "1",
+    "en": [
+      "Natural ore veins, including modded deposits, start with 1,500 to 3,500 units per available worker slot.",
+      "The vein panel shows remaining ore. On exhaustion, the vein collapses with a debris sound, miners stop, and leftover ore drops nearby.",
+      "MCM provides an enable toggle and optional detailed logging."
+    ],
+    "ru": [
+      "Природные жилы, в том числе модовые, получают от 1500 до 3500 единиц на каждое доступное рабочее место.",
+      "Карточка жилы показывает остаток. При истощении жила обрушивается со звуком, рабочие прекращают добычу, а остатки руды выпадают рядом.",
+      "В MCM можно включить плагин и подробный журнал."
+    ]
   }
 }

@@ -229,6 +229,10 @@ ITEMS.append(dict(mod="Extra Durability (HARD)", title="Extra Durability (HARD)"
                   tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="Weapons and armour wear out in combat. Keep your squad equipped by repairing gear with ordinary Tools."))
 
+ITEMS.append(dict(mod="FiniteOreVeins", title="Finite Ore Veins (HARD)", images="Finite Ore Veins (HARD)",
+                  version="1", tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
+                  en="Natural ore veins run out and collapse, leaving any mined ore nearby."))
+
 SOURCE_NAMES = {"Extra Durability (HARD)": "ExtraDurability", "Character Inspector": "CharacterInspector"}
 
 SKIP = re.compile(r"(^_.*\.(info|img)$)|(\.bak$)|(\.pre[^.]*$)|(\.prelog$)|"
@@ -544,7 +548,7 @@ def build(item):
     # Картинки: у Steam превью до 1 МБ, скриншоты с экрана весят по 5 МБ.
     # Тяжелее MAX_IMG - в JPEG, не шире 1920. Имена - латиницей
     # (<Mod>_NN), оригиналы в images\ не трогаются.
-    idir = os.path.join(HERE, "images", mod)
+    idir = os.path.join(HERE, "images", item.get("images", mod))
     imgs = sorted(os.listdir(idir)) if os.path.isdir(idir) else []
     sdir = os.path.join(dst, "screens")
     if os.path.exists(sdir):
@@ -601,7 +605,7 @@ if __name__ == "__main__":
         if mod_dir(it["mod"]) is None:
             print("%-16s нет папки мода в игре - пропущен" % it["mod"])
             continue
-        idir = os.path.join(HERE, "images", it["mod"])
+        idir = os.path.join(HERE, "images", it.get("images", it["mod"]))
         if not os.path.isdir(idir) or not os.listdir(idir):
             print("%-16s нет картинок в images/%s - собрано без них (в Steam рано)" % (it["mod"], it["mod"]))
         m = build(it)

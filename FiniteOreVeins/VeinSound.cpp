@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstring>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,12 @@
 #include <kenshi/OptionsHolder.h>
 #include <kenshi/PlayerInterface.h>
 #include "VeinSound.h"
+
+#define STB_VORBIS_HEADER_ONLY
+#define STB_VORBIS_NO_STDIO
+#define STB_VORBIS_NO_PUSHDATA_API
+#define STB_VORBIS_MAX_CHANNELS 2
+#include "third_party/stb_vorbis.c"
 
 #pragma comment(lib, "dsound.lib")
 
@@ -31,16 +38,7 @@ IDirectSoundBuffer* voices[VoiceCount] = {};
 unsigned nextVoice = 0;
 bool reportedPlaybackError = false;
 
-struct WaveHeader {
-    DWORD riff, riffSize, wave, format, formatSize;
-    WORD codec, channels;
-    DWORD sampleRate, bytesPerSecond;
-    WORD blockAlign, bitsPerSample;
-    DWORD data, dataSize;
-};
-static_assert(sizeof(WaveHeader) == 44, "Expected the PCM WAV header layout");
-
-bool ReadClip(WaveHeader& header, std::vector<char>& samples)
+bool ReadClip(std::vector<short>& samples, unsigned& rate)
 {
     wchar_t path[MAX_PATH];
     const DWORD length = GetModuleFileNameW((HMODULE)&__ImageBase, path, MAX_PATH);
@@ -50,46 +48,58 @@ bool ReadClip(WaveHeader& header, std::vector<char>& samples)
     const size_t stop = module.find_last_of(L"\\/");
     if (stop == std::wstring::npos)
         return false;
-    const std::wstring clip = module.substr(0, stop + 1) + L"audio\\Crash_Debris.wav";
-
-    std::ifstream file(clip.c_str(), std::ios::binary);
-    // The packaged clip uses a canonical stereo PCM header. Bound reads in
-    // case the asset is replaced with an unsupported or damaged file.
-    if (!file.read(reinterpret_cast<char*>(&header), sizeof(header)) ||
-        header.riff != mmioFOURCC('R','I','F','F') ||
-        header.wave != mmioFOURCC('W','A','V','E') ||
-        header.format != mmioFOURCC('f','m','t',' ') || header.formatSize != 16 ||
-        header.data != mmioFOURCC('d','a','t','a') || header.codec != WAVE_FORMAT_PCM ||
-        header.channels != 2 || header.bitsPerSample != 16 || header.blockAlign != 4 ||
-        header.sampleRate != 44100 || header.bytesPerSecond != 44100 * 4 ||
-        !header.dataSize || header.dataSize > 4 * 1024 * 1024 ||
-        header.dataSize % header.blockAlign || header.riffSize != header.dataSize + 36)
+    const std::wstring clip = module.substr(0, stop + 1) + L"audio\\Crash_Debris.ogg";
+    std::ifstream file(clip.c_str(), std::ios::binary | std::ios::ate);
+    const std::streamoff size = file.tellg();
+    if (size <= 0 || size > 1024 * 1024)
         return false;
-    samples.resize(header.dataSize);
-    return file.read(&samples[0], header.dataSize).good();
+    std::vector<unsigned char> encoded(static_cast<size_t>(size));
+    if (!file.seekg(0) || !file.read(reinterpret_cast<char*>(&encoded[0]), size))
+        return false;
+
+    // This is a short fixed Ogg Vorbis effect. Bound decoder storage as well
+    // as the output duration before allocating the shared DirectSound buffer.
+    std::vector<char> scratch(1024 * 1024);
+    const stb_vorbis_alloc allocation = {&scratch[0], static_cast<int>(scratch.size())};
+    std::unique_ptr<stb_vorbis, void (*)(stb_vorbis*)> decoder(
+        stb_vorbis_open_memory(&encoded[0], static_cast<int>(size), NULL, &allocation),
+        &stb_vorbis_close);
+    if (!decoder)
+        return false;
+    const stb_vorbis_info info = stb_vorbis_get_info(decoder.get());
+    if (info.channels != 2 || info.sample_rate < 8000 || info.sample_rate > 48000)
+        return false;
+    const unsigned frames = stb_vorbis_stream_length_in_samples(decoder.get());
+    if (!frames || frames > 10 * info.sample_rate)
+        return false;
+    samples.resize(frames * 2);
+    rate = info.sample_rate;
+    const int decoded = stb_vorbis_get_samples_short_interleaved(
+        decoder.get(), 2, &samples[0], static_cast<int>(samples.size()));
+    return decoded == static_cast<int>(frames) && !stb_vorbis_get_error(decoder.get());
 }
 
 bool CreateVoices(HWND window)
 {
-    WaveHeader header;
-    std::vector<char> samples;
-    if (!ReadClip(header, samples) ||
+    std::vector<short> samples;
+    unsigned rate = 0;
+    if (!ReadClip(samples, rate) ||
         FAILED(DirectSoundCreate(NULL, &device, NULL)) ||
         FAILED(device->SetCooperativeLevel(window, DSSCL_NORMAL)))
         return false;
 
     WAVEFORMATEX format = {};
     format.wFormatTag = WAVE_FORMAT_PCM;
-    format.nChannels = header.channels;
-    format.nSamplesPerSec = header.sampleRate;
-    format.nAvgBytesPerSec = header.bytesPerSecond;
-    format.nBlockAlign = header.blockAlign;
-    format.wBitsPerSample = header.bitsPerSample;
+    format.nChannels = 2;
+    format.nSamplesPerSec = rate;
+    format.wBitsPerSample = 16;
+    format.nBlockAlign = 2 * sizeof(short);
+    format.nAvgBytesPerSec = rate * format.nBlockAlign;
 
     DSBUFFERDESC descriptor = {};
     descriptor.dwSize = sizeof(descriptor);
     descriptor.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_LOCSOFTWARE;
-    descriptor.dwBufferBytes = header.dataSize;
+    descriptor.dwBufferBytes = static_cast<DWORD>(samples.size() * sizeof(short));
     descriptor.lpwfxFormat = &format;
     if (FAILED(device->CreateSoundBuffer(&descriptor, &voices[0], NULL)))
         return false;
@@ -97,11 +107,12 @@ bool CreateVoices(HWND window)
     void* first = NULL;
     void* second = NULL;
     DWORD firstSize = 0, secondSize = 0;
-    if (FAILED(voices[0]->Lock(0, header.dataSize, &first, &firstSize, &second, &secondSize, 0)))
+    if (FAILED(voices[0]->Lock(0, descriptor.dwBufferBytes, &first, &firstSize, &second, &secondSize, 0)))
         return false;
-    std::memcpy(first, &samples[0], firstSize);
+    const char* const pcm = reinterpret_cast<const char*>(&samples[0]);
+    std::memcpy(first, pcm, firstSize);
     if (secondSize)
-        std::memcpy(second, &samples[firstSize], secondSize);
+        std::memcpy(second, pcm + firstSize, secondSize);
     if (FAILED(voices[0]->Unlock(first, firstSize, second, secondSize)))
         return false;
 
@@ -184,7 +195,7 @@ void PlayVeinBreak(Building& vein)
     ResetVeinSound();
     if (!reportedPlaybackError) {
         reportedPlaybackError = true;
-        ErrorLog("FiniteOreVeins: failed to play audio/Crash_Debris.wav");
+        ErrorLog("FiniteOreVeins: failed to play audio/Crash_Debris.ogg");
     }
 }
 

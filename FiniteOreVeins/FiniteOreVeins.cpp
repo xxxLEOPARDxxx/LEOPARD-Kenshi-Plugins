@@ -35,6 +35,7 @@
 
 #include "FiniteOreVeins.h"
 #include "ReserveRules.h"
+#include "VeinIdentity.h"
 #include "VeinSound.h"
 
 // Globals.h declares FoliageSystem as a namespace in this SDK snapshot.
@@ -69,7 +70,9 @@ typedef std::map<const Building*, Deposit> Deposits;
 Deposits deposits;
 
 struct ExhaustedVein {
+    ExhaustedVein() : restored(false) {}
     hand target;
+    bool restored;
     std::set<hand> workers;
 };
 std::list<ExhaustedVein> pendingRemovals;
@@ -142,6 +145,8 @@ void ResetWorld(GameWorld* world)
     {
         StateLock guard;
         deposits.clear();
+        pendingRemovals.clear();
+        InterlockedExchange(&removalPending, 0);
     }
     ResetNaturalOreCatalog();
 }
@@ -248,7 +253,6 @@ bool NeedsSaving(const Building* building, const std::string& mod)
             return false;
     }
     InstanceID* const id = const_cast<Building*>(building)->getInstanceID();
-    // Generated veins receive a serialisable instance ID on the first save.
     return id && id->needsSaving(mod);
 }
 
@@ -310,6 +314,53 @@ bool (*nativeFoliage)(FoliageSystem*, FoliageSystem::EntData*, const Ogre::Vecto
 const Building* volatile excludedVisual = NULL;
 volatile LONG skippedVisual = 0;
 
+std::string MarkerFor(Building& building)
+{
+    if (!building.data)
+        return std::string();
+    const Ogre::Vector3 position = building.getPosition();
+    return DepletionMarker(building.data->stringID, position.x, position.z);
+}
+
+bool HasDepletionMarker(const ZoneMapContent& content, const std::string& key)
+{
+    if (key.empty())
+        return false;
+    for (auto it = content.deletedThings.begin(); it != content.deletedThings.end(); ++it)
+        if (it->uid == key)
+            return true;
+    return false;
+}
+
+bool QueueRestoredVein(Building& building)
+{
+    const hand target = building.getHandle();
+    if (target.isNull())
+        return false;
+    StateLock guard;
+    for (std::list<ExhaustedVein>::const_iterator it = pendingRemovals.begin(); it != pendingRemovals.end(); ++it)
+        if (it->target == target)
+            return true;
+    pendingRemovals.push_back(ExhaustedVein());
+    pendingRemovals.back().target = target;
+    pendingRemovals.back().restored = true;
+    InterlockedExchange(&removalPending, 1);
+    return true;
+}
+
+void SaveDepletionMarker(ZoneMapContent& content, Building& building)
+{
+    const std::string key = MarkerFor(building);
+    if (key.empty() || HasDepletionMarker(content, key))
+        return;
+    // The game's zone save serializes deletedThings and restores them before
+    // constructing foliage. This marker has no corresponding native instance.
+    InstanceID marker;
+    marker.uid = key;
+    marker.modified = true;
+    content._addDeletedThing(marker);
+}
+
 bool PlaceFoliage(FoliageSystem* system, FoliageSystem::EntData* data,
                   const Ogre::Vector3& position, const Ogre::Degree& angle, const float& scale,
                   Forests::TreeLoader3D* loader, Building* building, const Ogre::Matrix4& transform)
@@ -317,6 +368,17 @@ bool PlaceFoliage(FoliageSystem* system, FoliageSystem::EntData* data,
     if (building && building == excludedVisual) {
         InterlockedExchange(&skippedVisual, 1);
         return true;
+    }
+    if (ready && building && building->isFoliage && !building->isNestItem) {
+        const ZoneMapContent* const content = system->zoneMap ? system->zoneMap->mapContent : NULL;
+        if (content && content->deletedThings.size() != 0) {
+            try {
+                if (HasDepletionMarker(*content, MarkerFor(*building)) && QueueRestoredVein(*building))
+                    return true;
+            } catch (...) {
+                ReportStorageError();
+            }
+        }
     }
     return nativeFoliage(system, data, position, angle, scale, loader, building, transform);
 }
@@ -415,18 +477,30 @@ void ProcessOreRemoval(GameWorld* world, bool forceImmediate)
 {
     // Rebuilding the visuals is the expensive step. Process one vein per update.
     if (!forceImmediate && removalPending) {
-        ExhaustedVein job;
+        std::list<ExhaustedVein> current;
         {
             StateLock guard;
-            if (!pendingRemovals.empty()) {
-                job.target = pendingRemovals.front().target;
-                job.workers.swap(pendingRemovals.front().workers);
-                pendingRemovals.pop_front();
-            }
+            if (!pendingRemovals.empty())
+                current.splice(current.begin(), pendingRemovals, pendingRemovals.begin());
             InterlockedExchange(&removalPending, !pendingRemovals.empty());
         }
+        if (current.empty()) {
+            nativeKillList(world, forceImmediate);
+            return;
+        }
+        ExhaustedVein& job = current.front();
         Building* const building = job.target.getBuilding();
-        if (building && !enabled) {
+        if (building && job.restored) {
+            ZoneMap* const zone = world->zoneMgr ? world->zoneMgr->getZoneMap(building->getPosition()) : NULL;
+            ZoneMapContent* const content = zone ? zone->mapContent : NULL;
+            if (content && !content->isLoadedT()) {
+                StateLock guard;
+                pendingRemovals.splice(pendingRemovals.end(), current);
+                InterlockedExchange(&removalPending, 1);
+            } else if (content && building->isFoliage && !building->isNestItem) {
+                world->dynamicDestroyBuilding(job.target);
+            }
+        } else if (building && !enabled) {
             StateLock guard;
             const Deposits::iterator deposit = deposits.find(building);
             if (deposit != deposits.end())
@@ -439,6 +513,8 @@ void ProcessOreRemoval(GameWorld* world, bool forceImmediate)
                     InterlockedExchange(&skippedVisual, 0);
                     ZoneMap* const zone = world->zoneMgr ? world->zoneMgr->getZoneMap(vein->getPosition()) : NULL;
                     ZoneMapContent* const content = zone ? zone->mapContent : NULL;
+                    if (content)
+                        SaveDepletionMarker(*content, *building);
                     if (content && content->getFoliageSystem()) {
                         excludedVisual = building;
                         content->_reloadAllFoliage();

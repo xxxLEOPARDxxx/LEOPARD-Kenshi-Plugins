@@ -1,4 +1,5 @@
 #include "../ReserveRules.h"
+#include "../VeinIdentity.h"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -6,6 +7,13 @@
 int main()
 {
     using namespace finite_ore;
+    const std::string exhausted = DepletionMarker("natural-iron", -1234.0f, 1504.0f);
+    assert(!exhausted.empty());
+    assert(DepletionMarker("natural-iron", -1234.01f, 1504.01f) == exhausted);
+    assert(DepletionMarker("natural-iron", -1234.4f, 1504.0f) != exhausted);
+    assert(DepletionMarker("natural-copper", -1234.0f, 1504.0f) != exhausted);
+    assert(DepletionMarker("natural-iron", 1234.0f, 1504.0f) != exhausted);
+    assert(DepletionMarker("", 1234.0f, 1504.0f).empty());
     const unsigned full = Capacity(5, 1600, -4800);
     assert(full >= 7500 && full <= 17500);
     assert(Capacity(5, 1600, -4800) == full);

@@ -111,7 +111,11 @@ namespace
 
     void UpdateOutputHook(ProductionBuilding* building, float rate)
     {
-        if (!IsManagedOre(building))
+        // The admitted native routine can only insert at this threshold.
+        // Progress-only ticks do not classify the building or lock the reserve.
+        StorageBuilding::ConsumptionItem* const output = building->getProductionItem();
+        if (!output || !output->item || !output->inventorySection ||
+            !(output->amount + rate >= completionProgress) || !IsManagedOre(building))
         {
             originalUpdateOutput(building, rate);
             return;
@@ -119,16 +123,6 @@ namespace
         if (!BeginOreOutput(building))
             return;
         OutputReservation reservation(building);
-        StorageBuilding::ConsumptionItem* const output = building->getProductionItem();
-        // Match the native float addition and threshold. An ordinary tick
-        // that only advances progress does not scan inventory.
-        const bool canComplete = output && output->item && output->inventorySection &&
-                                 output->amount + rate >= completionProgress;
-        if (!canComplete)
-        {
-            originalUpdateOutput(building, rate);
-            return;
-        }
         InventorySection* const section = output->inventorySection;
         GameData* const product = output->item;
         const unsigned before = section->getNumItems();
