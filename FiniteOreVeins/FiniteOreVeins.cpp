@@ -9,15 +9,25 @@
 #include <climits>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <float.h>
+#include <list>
 #include <map>
+#include <set>
 
 #include <Debug.h>
 #include <core/Functions.h>
 #include <kenshi/Building/ProductionBuilding.h>
 #include <kenshi/GameSaveState.h>
+#include <kenshi/Appearance.h>
+#include <kenshi/CharBody.h>
+#include <kenshi/Character.h>
+#include <kenshi/FoliageSystem.h>
+#include <kenshi/Tasker.h>
+#include <kenshi/ZoneManager.h>
+#include <kenshi/ZoneMapContent.h>
 #include <kenshi/GameWorld.h>
-#include <kenshi/Globals.h>
+#include <kenshi/Inventory.h>
 #include <kenshi/Kenshi.h>
 #include <kenshi/gui/DataPanelLine.h>
 #include <kenshi/gui/DatapanelGUI.h>
@@ -25,6 +35,10 @@
 
 #include "FiniteOreVeins.h"
 #include "ReserveRules.h"
+#include "VeinSound.h"
+
+// Globals.h declares FoliageSystem as a namespace in this SDK snapshot.
+__declspec(dllimport) GameWorld* ou;
 
 namespace finite_ore {
 void ResetNaturalOreCatalog();
@@ -44,16 +58,24 @@ unsigned VeinCapacity(ProductionBuilding* building)
 }
 
 struct Deposit {
-    explicit Deposit(double now) : reserve(now), capacity(0), outputPending(false) {}
+    explicit Deposit(double now) : reserve(now), capacity(0), outputPending(false), removalQueued(false) {}
     Reserve reserve;
     unsigned capacity;
     bool outputPending;
+    bool removalQueued;
 };
 
 typedef std::map<const Building*, Deposit> Deposits;
 Deposits deposits;
+
+struct ExhaustedVein {
+    hand target;
+    std::set<hand> workers;
+};
+std::list<ExhaustedVein> pendingRemovals;
+volatile LONG removalPending = 0;
 SRWLOCK lock = SRWLOCK_INIT;
-Rules rules;
+volatile LONG detailedLog = 0;
 volatile LONG enabled = 1;
 volatile LONG ready = 0;
 volatile LONG storeError = 0;
@@ -75,14 +97,6 @@ double GameHours()
     return _finite(hour) && hour >= 0 && hour < INT_MAX / 60.0 ? hour : -1;
 }
 
-double IniNumber(const std::string& path, const char* key, const char* fallback, double low, double high)
-{
-    const double value = std::atof(PluginSettings::Text(Section, key, fallback, path).c_str());
-    if (_isnan(value))
-        return std::atof(fallback);
-    return value < low ? low : value > high ? high : value;
-}
-
 bool IniToggle(const std::string& path, const char* key, bool fallback)
 {
     std::string value = PluginSettings::Text(Section, key, fallback ? "1" : "0", path);
@@ -99,25 +113,14 @@ void LoadSettings()
     const std::string path = PluginSettings::Path();
     if (path.empty())
         return;
-    Rules next;
-    next.refillDays = IniNumber(path, "RefillDays", "365", 0, 365);
-    next.restHours = IniNumber(path, "RestHours", "48", 0, 240);
-    next.reopenPercent = static_cast<unsigned>(IniNumber(path, "ReopenPercent", "0", 0, 100) + 0.5);
     const bool debug = IniToggle(path, "Debug", false);
     const bool active = IniToggle(path, "Enabled", true);
     KLocLog::SetEnabled(debug);
-    {
-        StateLock guard;
-        rules = next;
-    }
+    InterlockedExchange(&detailedLog, debug);
     InterlockedExchange(&enabled, active);
-    if (debug) {
-        char message[192];
-        sprintf_s(message, "FiniteOreVeins: enabled=%u, 1500-3500 units per worker slot, refill=%.1f days, delay=%.1f hours, reopen=%u%%",
-                  active ? 1u : 0u, next.refillDays,
-                  next.restHours, next.reopenPercent);
-        DebugLog(message);
-    }
+    if (debug)
+        DebugLog(active ? "FiniteOreVeins: enabled, permanent depletion" :
+                          "FiniteOreVeins: disabled");
 }
 
 void ReportStorageError()
@@ -129,6 +132,11 @@ void ReportStorageError()
 void (*nativeReset)(GameWorld*) = NULL;
 void ResetWorld(GameWorld* world)
 {
+    {
+        StateLock guard;
+        pendingRemovals.clear();
+        InterlockedExchange(&removalPending, 0);
+    }
     nativeReset(world);
     {
         StateLock guard;
@@ -165,18 +173,12 @@ GameSaveState* SaveDeposit(ProductionBuilding* building, GameSaveState* result,
     GameData* data = result->getState(GAMESTATE_BUILDING);
     if (!data)
         return result;
-    const double now = GameHours();
     Reserve stored;
     {
         StateLock guard;
         const Deposits::const_iterator entry = deposits.find(building);
-        if (entry != deposits.end()) {
+        if (entry != deposits.end())
             stored = entry->second.reserve;
-            if (now >= 0) {
-                const unsigned capacity = entry->second.capacity ? entry->second.capacity : VeinCapacity(building);
-                Refresh(stored, rules, capacity, now);
-            }
-        }
     }
     try {
         if (stored.share < 1.0 || stored.closed) {
@@ -274,33 +276,189 @@ void ShowOre(ProductionBuilding* building, DatapanelGUI* panel, int category)
         panel->removeLine(RowKey, category);
         return;
     }
-    const double now = GameHours();
-    if (now < 0)
-        return;
-    Reserve shown(now);
+    Reserve shown;
     unsigned capacity;
-    bool permanentlyDry;
     {
         StateLock guard;
         const Deposits::const_iterator entry = deposits.find(building);
         capacity = entry != deposits.end() && entry->second.capacity ? entry->second.capacity : VeinCapacity(building);
-        if (entry != deposits.end()) {
+        if (entry != deposits.end())
             shown = entry->second.reserve;
-            Refresh(shown, rules, capacity, now);
-        }
-        permanentlyDry = rules.refillDays <= 0 && shown.closed;
     }
     char value[32];
-    sprintf_s(value, "%u / %u", Units(shown, capacity), capacity);
+    const unsigned left = Units(shown, capacity);
+    sprintf_s(value, "%u / %u", left, capacity);
     std::string content(value);
-    if (shown.closed) {
+    if (!left) {
         content += " - ";
-        content += ::Tr(permanentlyDry ? "Depleted" : "Recovering");
+        content += ::Tr("Depleted");
     }
     const bool newRow = !panel->lineExists(RowKey, category);
     DataPanelLine* const row = panel->setLine(RowKey, ::Tr("Ore remaining"), content, category, false, true);
     if (newRow && row)
         row->setToolTipMainBar(::Tr("Ore still in the vein / total capacity. Each mined unit reduces the reserve by one."), false);
+}
+
+struct DestructionAddress : GameWorld {
+    using GameWorld::processKillList;
+};
+
+bool (*nativeFoliage)(FoliageSystem*, FoliageSystem::EntData*, const Ogre::Vector3&,
+                      const Ogre::Degree&, const float&, Forests::TreeLoader3D*,
+                      Building*, const Ogre::Matrix4&) = NULL;
+const Building* volatile excludedVisual = NULL;
+volatile LONG skippedVisual = 0;
+
+bool PlaceFoliage(FoliageSystem* system, FoliageSystem::EntData* data,
+                  const Ogre::Vector3& position, const Ogre::Degree& angle, const float& scale,
+                  Forests::TreeLoader3D* loader, Building* building, const Ogre::Matrix4& transform)
+{
+    if (building && building == excludedVisual) {
+        InterlockedExchange(&skippedVisual, 1);
+        return true;
+    }
+    return nativeFoliage(system, data, position, angle, scale, loader, building, transform);
+}
+
+bool ClearStaleMiningTool(Character& worker, GameData* tool)
+{
+    Inventory* const inventory = worker.getInventory();
+    AppearanceBase* const appearance = worker.getAppearance();
+    if (!tool || !appearance || (inventory && inventory->hasItem(tool, 1)))
+        return false;
+
+    static const std::string hands("hands");
+    const AttachedEntity* const attachment = appearance->getAttachedEntity(hands);
+    if (!attachment)
+        return false;
+    // Both admitted 1.0.65 executables store the model's GameData here.
+    // AppearanceBase::detachItem(Item*) checks this same member.
+    const GameData* attachedData = NULL;
+    const size_t gameDataOffset = 0x78;
+    std::memcpy(&attachedData, reinterpret_cast<const char*>(attachment) + gameDataOffset, sizeof(attachedData));
+    return attachedData == tool && appearance->detachItem(hands);
+}
+
+void EndMining(GameWorld& world, ProductionBuilding& vein, std::set<hand>& workers)
+{
+    workers.insert(vein.currentOperators.begin(), vein.currentOperators.end());
+    static const std::string toolKey("special tool");
+    GameData* const tool = vein.functionalityData ?
+        vein.functionalityData->getFromListAsData(toolKey, 0, &world.gamedata, ITEM) : NULL;
+    unsigned finished = 0;
+    unsigned cleared = 0;
+    for (std::set<hand>::const_iterator it = workers.begin(); it != workers.end(); ++it) {
+        Character* const worker = it->getCharacter();
+        CharBody* const body = worker ? worker->getBody() : NULL;
+        Tasker* const action = body ? body->getCurrentAction() : NULL;
+        if (action && (action->subject.getBuilding() == &vein || action->currentSubTarget.getBuilding() == &vein)) {
+            body->endAction();
+            ++finished;
+        }
+        if (vein.currentOperators.find(*it) != vein.currentOperators.end())
+            vein.stopOperating(*it);
+        if (body && !body->getCurrentAction() && ClearStaleMiningTool(*worker, tool))
+            ++cleared;
+    }
+    if (detailedLog) {
+        char message[128];
+        sprintf_s(message, "FiniteOreVeins: vein cleanup: workers=%u, actions ended=%u, props detached=%u",
+                  static_cast<unsigned>(workers.size()), finished, cleared);
+        DebugLog(message);
+    }
+}
+
+bool DropOutput(ProductionBuilding& vein)
+{
+    const StorageBuilding::ConsumptionItem* const output = vein.getProductionItem();
+    InventorySection* const section = output ? output->inventorySection : NULL;
+    if (!section || !output->item)
+        return false;
+    Ogre::Vector3 position = vein.getPosition();
+    position.y += 5.0f;
+    const hand outside;
+    while (!section->getItems().empty()) {
+        Item* const item = section->getItems().back().item;
+        if (!item || item->getGameData() != output->item || !section->removeItem(item))
+            return false;
+        item->setInventoryWeAreIn(outside);
+        item->notifyOutdoors();
+        item->activate(true, position, Ogre::Quaternion::IDENTITY, false, YesNoMaybe::MAYBE, false);
+        position.x += 7.0f;
+    }
+    return true;
+}
+
+// Called with the state lock held. Store handles only across game updates.
+void QueueRemoval(ProductionBuilding& vein, Deposit& deposit)
+{
+    const hand target = vein.getHandle();
+    if (deposit.removalQueued || target.isNull())
+        return;
+    try {
+        ExhaustedVein job;
+        job.target = target;
+        job.workers.insert(vein.currentOperators.begin(), vein.currentOperators.end());
+        pendingRemovals.push_back(ExhaustedVein());
+        pendingRemovals.back().target = target;
+        pendingRemovals.back().workers.swap(job.workers);
+        deposit.removalQueued = true;
+        InterlockedExchange(&removalPending, 1);
+    } catch (...) {
+        ReportStorageError();
+    }
+}
+
+void (*nativeKillList)(GameWorld*, bool) = NULL;
+void ProcessOreRemoval(GameWorld* world, bool forceImmediate)
+{
+    // Rebuilding the visuals is the expensive step. Process one vein per update.
+    if (!forceImmediate && removalPending) {
+        ExhaustedVein job;
+        {
+            StateLock guard;
+            if (!pendingRemovals.empty()) {
+                job.target = pendingRemovals.front().target;
+                job.workers.swap(pendingRemovals.front().workers);
+                pendingRemovals.pop_front();
+            }
+            InterlockedExchange(&removalPending, !pendingRemovals.empty());
+        }
+        Building* const building = job.target.getBuilding();
+        if (building && !enabled) {
+            StateLock guard;
+            const Deposits::iterator deposit = deposits.find(building);
+            if (deposit != deposits.end())
+                deposit->second.removalQueued = false;
+        } else if (building && building->isFoliage && !building->isNestItem) {
+            ProductionBuilding* const vein = static_cast<ProductionBuilding*>(building);
+            try {
+                EndMining(*world, *vein, job.workers);
+                if (DropOutput(*vein)) {
+                    InterlockedExchange(&skippedVisual, 0);
+                    ZoneMap* const zone = world->zoneMgr ? world->zoneMgr->getZoneMap(vein->getPosition()) : NULL;
+                    ZoneMapContent* const content = zone ? zone->mapContent : NULL;
+                    if (content && content->getFoliageSystem()) {
+                        excludedVisual = building;
+                        content->_reloadAllFoliage();
+                        excludedVisual = NULL;
+                    }
+                    if (!skippedVisual)
+                        ErrorLog("FiniteOreVeins: vein not found during sector visual rebuild");
+                    if (job.target.getBuilding() == building) {
+                        PlayVeinBreak(*building);
+                        world->dynamicDestroyBuilding(job.target);
+                    }
+                } else {
+                    ErrorLog("FiniteOreVeins: could not release vein output before deletion");
+                }
+            } catch (...) {
+                excludedVisual = NULL;
+                ErrorLog("FiniteOreVeins: vein cleanup failed");
+            }
+        }
+    }
+    nativeKillList(world, forceImmediate);
 }
 
 } // namespace
@@ -323,11 +481,15 @@ bool BeginOreOutput(ProductionBuilding* building)
         Deposit& deposit = entry->second;
         if (deposit.outputPending)
             return false;
-        if (!deposit.capacity)
+        if (!deposit.capacity) {
             deposit.capacity = VeinCapacity(building);
-        Refresh(deposit.reserve, rules, deposit.capacity, now);
-        if (deposit.reserve.closed || !Units(deposit.reserve, deposit.capacity))
+            // Older saves may still be waiting for the reopening threshold.
+            deposit.reserve.closed = !Units(deposit.reserve, deposit.capacity);
+        }
+        if (deposit.reserve.closed) {
+            QueueRemoval(*building, deposit);
             return false;
+        }
         deposit.outputPending = true;
         return true;
     } catch (...) {
@@ -351,6 +513,8 @@ void EndOreOutput(ProductionBuilding* building, bool produced)
         if (produced)
             changed = Spend(deposit.reserve, deposit.capacity, now);
         deposit.outputPending = false;
+        if (changed && deposit.reserve.closed)
+            QueueRemoval(*building, deposit);
     }
     if (changed) {
         InstanceID* const id = building->getInstanceID();
@@ -369,14 +533,6 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
     api->section(api, ::Tr("Ore deposits"));
     api->toggle(api, Section, "Enabled", ::Tr("Enable plugin"),
                 ::Tr("Each natural vein holds 1500-3500 units of ore per worker slot."), 1, 0);
-    api->section(api, ::Tr("Recovery"));
-    api->number(api, Section, "RefillDays", ::Tr("Days to refill"),
-                ::Tr("Game days to refill after the delay. 0 disables recovery."), 365, 0, 365, 1, 0);
-    api->number(api, Section, "RestHours", ::Tr("Hours before recovery"),
-                ::Tr("Delay after the last unit was mined, in game hours."), 48, 0, 240, 1, 0);
-    api->integer(api, Section, "ReopenPercent", ::Tr("Reopen at (%)"),
-                 ::Tr("An exhausted vein stays closed until this share is restored. 0 reopens at one unit."), 0, 0, 100, 0);
-    api->section(api, ::Tr("Diagnostics"));
     api->toggle(api, Section, "Debug", ::Tr("Detailed log"),
                 ::Tr("Writes diagnostic messages for the plugin. Errors are always logged."), 0, 0);
 }
@@ -393,6 +549,7 @@ __declspec(dllexport) void startPlugin()
     LoadSettings();
     if (!InstallOutputHook())
         return;
+    InitializeVeinSound();
     StartupHooks::Hook hooks[] = {
         StartupHooks::Hook(KenshiLib::GetRealAddress(&BuildingAccess::_DESTRUCTOR),
                            DestroyBuilding, &nativeDestroy, "building destruction"),
@@ -405,7 +562,11 @@ __declspec(dllexport) void startPlugin()
         StartupHooks::Hook(KenshiLib::GetRealAddress(&Building::_NV_needsSaving),
                            NeedsSaving, &nativeNeedsSaving, "vein save eligibility"),
         StartupHooks::Hook(KenshiLib::GetRealAddress(&PanelAddress::_NV_getGUIFertility),
-                           ShowOre, &nativePanel, "vein information")
+                           ShowOre, &nativePanel, "vein information"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&DestructionAddress::processKillList),
+                           ProcessOreRemoval, &nativeKillList, "vein deletion"),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&FoliageSystem::finalMakeEnt),
+                           PlaceFoliage, &nativeFoliage, "vein visual removal")
     };
     StartupHooks::Install(hooks, [](void* target, void* detour, void** original) {
         return KenshiLib::AddHook(target, detour, original) == KenshiLib::SUCCESS;

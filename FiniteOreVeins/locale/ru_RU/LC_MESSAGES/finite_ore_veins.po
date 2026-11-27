@@ -6,9 +6,6 @@ msgstr ""
 msgid "Depleted"
 msgstr "Истощена"
 
-msgid "Recovering"
-msgstr "Восстанавливается"
-
 msgid "Ore remaining"
 msgstr "Остаток руды"
 
@@ -23,30 +20,6 @@ msgstr "Включить плагин"
 
 msgid "Each natural vein holds 1500-3500 units of ore per worker slot."
 msgstr "В природной жиле от 1500 до 3500 единиц руды на каждое рабочее место."
-
-msgid "Recovery"
-msgstr "Восстановление"
-
-msgid "Days to refill"
-msgstr "Дней до полного восстановления"
-
-msgid "Game days to refill after the delay. 0 disables recovery."
-msgstr "Игровые дни до полного заполнения после задержки. 0 отключает восстановление."
-
-msgid "Hours before recovery"
-msgstr "Часов до начала восстановления"
-
-msgid "Delay after the last unit was mined, in game hours."
-msgstr "Задержка после последней добытой единицы руды в игровых часах."
-
-msgid "Reopen at (%)"
-msgstr "Открыть при запасе (%)"
-
-msgid "An exhausted vein stays closed until this share is restored. 0 reopens at one unit."
-msgstr "Истощённая жила закрыта до восстановления указанной доли. При 0 открывается после первой единицы."
-
-msgid "Diagnostics"
-msgstr "Диагностика"
 
 msgid "Detailed log"
 msgstr "Подробный журнал"

@@ -6,9 +6,6 @@ msgstr ""
 msgid "Depleted"
 msgstr "Depleted"
 
-msgid "Recovering"
-msgstr "Recovering"
-
 msgid "Ore remaining"
 msgstr "Ore remaining"
 
@@ -23,30 +20,6 @@ msgstr "Enable plugin"
 
 msgid "Each natural vein holds 1500-3500 units of ore per worker slot."
 msgstr "Each natural vein holds 1500-3500 units of ore per worker slot."
-
-msgid "Recovery"
-msgstr "Recovery"
-
-msgid "Days to refill"
-msgstr "Days to refill"
-
-msgid "Game days to refill after the delay. 0 disables recovery."
-msgstr "Game days to refill after the delay. 0 disables recovery."
-
-msgid "Hours before recovery"
-msgstr "Hours before recovery"
-
-msgid "Delay after the last unit was mined, in game hours."
-msgstr "Delay after the last unit was mined, in game hours."
-
-msgid "Reopen at (%)"
-msgstr "Reopen at (%)"
-
-msgid "An exhausted vein stays closed until this share is restored. 0 reopens at one unit."
-msgstr "An exhausted vein stays closed until this share is restored. 0 reopens at one unit."
-
-msgid "Diagnostics"
-msgstr "Diagnostics"
 
 msgid "Detailed log"
 msgstr "Detailed log"

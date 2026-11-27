@@ -6,23 +6,6 @@
 int main()
 {
     using namespace finite_ore;
-    const Rules defaults;
-    assert(defaults.refillDays == 365 && defaults.restHours == 48 && defaults.reopenPercent == 0);
-    Reserve recovering(100);
-    recovering.share = 0;
-    recovering.lastMined = 100;
-    recovering.closed = true;
-    Refresh(recovering, defaults, 10000, 148);
-    assert(recovering.closed && Units(recovering, 10000) == 0);
-    Refresh(recovering, defaults, 10000, 149);
-    assert(!recovering.closed && Units(recovering, 10000) == 1);
-    Refresh(recovering, defaults, 10000, 148 + 365 * 24);
-    assert(Units(recovering, 10000) == 10000);
-
-    Rules rules;
-    rules.refillDays = 10;
-    rules.restHours = 12;
-    rules.reopenPercent = 25;
     const unsigned full = Capacity(5, 1600, -4800);
     assert(full >= 7500 && full <= 17500);
     assert(Capacity(5, 1600, -4800) == full);
@@ -62,35 +45,14 @@ int main()
         assert(Spend(rock, 100, 100));
     assert(!Spend(rock, 100, 100));
     assert(rock.closed && Units(rock, 100) == 0);
-    Refresh(rock, rules, 100, 111);
-    assert(rock.closed && Units(rock, 100) == 0);
-    Refresh(rock, rules, 100, 171);
-    assert(rock.closed && Units(rock, 100) == 24);
-    Refresh(rock, rules, 100, 172);
-    assert(!rock.closed && Units(rock, 100) == 25);
-    Refresh(rock, rules, 100, 352);
-    assert(!rock.closed && Units(rock, 100) == 100);
+    assert(!Spend(rock, 100, 100 + 365 * 24));
 
-    Rules permanent;
-    permanent.refillDays = 0;
+    // The ten-unit test vein and a restored near-empty production vein
+    // must both stop immediately after their exact final unit.
     Reserve small(3);
-    assert(Spend(small, 1, 3));
-    Refresh(small, permanent, 1, 5000);
-    assert(small.closed && !Spend(small, 1, 5000));
-    Refresh(small, rules, 1, 2);
-    assert(small.closed && Units(small, 1) == 0);
-    Refresh(small, rules, 1, 254);
-    assert(!small.closed && Units(small, 1) == 1);
-
-    Rules immediate;
-    immediate.refillDays = 10;
-    immediate.restHours = 0;
-    immediate.reopenPercent = 0;
-    Reserve early(0);
-    assert(Spend(early, 1, 0));
-    Refresh(early, immediate, 1, 12);
-    assert(early.closed);
-    Refresh(early, immediate, 1, 240);
-    assert(!early.closed && Units(early, 1) == 1);
-    std::puts("Reserve limits, exact final unit, cooldown, reopen, permanence and clock rollback passed");
+    for (unsigned i = 0; i < 10; ++i)
+        assert(Spend(small, 10, 3));
+    assert(small.closed && Units(small, 10) == 0);
+    assert(!Spend(small, 10, 5000));
+    std::puts("Worker limits, saved reserve precision, exact exhaustion and permanence passed");
 }

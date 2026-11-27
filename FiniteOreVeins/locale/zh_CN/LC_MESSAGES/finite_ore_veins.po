@@ -6,9 +6,6 @@ msgstr ""
 msgid "Depleted"
 msgstr "已枯竭"
 
-msgid "Recovering"
-msgstr "恢复中"
-
 msgid "Ore remaining"
 msgstr "剩余矿石"
 
@@ -23,30 +20,6 @@ msgstr "启用插件"
 
 msgid "Each natural vein holds 1500-3500 units of ore per worker slot."
 msgstr "天然矿脉的每个工作位提供 1500-3500 单位的矿石储量。"
-
-msgid "Recovery"
-msgstr "恢复"
-
-msgid "Days to refill"
-msgstr "完全恢复所需天数"
-
-msgid "Game days to refill after the delay. 0 disables recovery."
-msgstr "等待结束后完全恢复所需的游戏天数。0 表示关闭恢复。"
-
-msgid "Hours before recovery"
-msgstr "恢复前等待小时数"
-
-msgid "Delay after the last unit was mined, in game hours."
-msgstr "最后一次开采后的等待时间，以游戏小时计。"
-
-msgid "Reopen at (%)"
-msgstr "重新开放的储量 (%)"
-
-msgid "An exhausted vein stays closed until this share is restored. 0 reopens at one unit."
-msgstr "枯竭的矿脉恢复至此比例后开放。设为 0 时，恢复一单位矿石即开放。"
-
-msgid "Diagnostics"
-msgstr "诊断"
 
 msgid "Detailed log"
 msgstr "详细日志"
