@@ -35,12 +35,18 @@ const std::string UpdateKey("finite_ore_veins_minute_v1");
 const std::string MinedKey("finite_ore_veins_last_mined_v1");
 const std::string ClosedKey("finite_ore_veins_closed_v1");
 const std::string RowKey("FiniteOreVeins.OreRemaining");
-const int ShareScale = 1000000000;
+
+unsigned VeinCapacity(ProductionBuilding* building)
+{
+    const Ogre::Vector3 position = building->getPosition();
+    return Capacity(building->numOperatorsMax, position.x, position.z);
+}
 
 struct Deposit {
-    explicit Deposit(double now) : reserve(now), reservedCapacity(0) {}
+    explicit Deposit(double now) : reserve(now), capacity(0), outputPending(false) {}
     Reserve reserve;
-    unsigned reservedCapacity;
+    unsigned capacity;
+    bool outputPending;
 };
 
 typedef std::map<const Building*, Deposit> Deposits;
@@ -93,8 +99,6 @@ void LoadSettings()
     if (path.empty())
         return;
     Rules next;
-    next.baseOre = static_cast<unsigned>(IniNumber(path, "BaseOre", "100", 1, 10000) + 0.5);
-    next.scaleByQuality = IniToggle(path, "ScaleByQuality", true);
     next.refillDays = IniNumber(path, "RefillDays", "10", 0, 365);
     next.restHours = IniNumber(path, "RestHours", "12", 0, 240);
     next.reopenPercent = static_cast<unsigned>(IniNumber(path, "ReopenPercent", "25", 0, 100) + 0.5);
@@ -108,8 +112,8 @@ void LoadSettings()
     InterlockedExchange(&enabled, active);
     if (debug) {
         char message[192];
-        sprintf_s(message, "FiniteOreVeins: enabled=%u, base=%u, quality=%u, refill=%.1f days, delay=%.1f hours, reopen=%u%%",
-                  active ? 1u : 0u, next.baseOre, next.scaleByQuality ? 1u : 0u, next.refillDays,
+        sprintf_s(message, "FiniteOreVeins: enabled=%u, 1500-3500 units per worker slot, refill=%.1f days, delay=%.1f hours, reopen=%u%%",
+                  active ? 1u : 0u, next.refillDays,
                   next.restHours, next.reopenPercent);
         DebugLog(message);
     }
@@ -167,8 +171,10 @@ GameSaveState* SaveDeposit(ProductionBuilding* building, GameSaveState* result,
         const Deposits::const_iterator entry = deposits.find(building);
         if (entry != deposits.end()) {
             stored = entry->second.reserve;
-            if (now >= 0)
-                Refresh(stored, rules, Capacity(rules, building->_resourceMiningLevel), now);
+            if (now >= 0) {
+                const unsigned capacity = entry->second.capacity ? entry->second.capacity : VeinCapacity(building);
+                Refresh(stored, rules, capacity, now);
+            }
         }
     }
     try {
@@ -275,8 +281,8 @@ void ShowOre(ProductionBuilding* building, DatapanelGUI* panel, int category)
     bool permanentlyDry;
     {
         StateLock guard;
-        capacity = Capacity(rules, building->_resourceMiningLevel);
         const Deposits::const_iterator entry = deposits.find(building);
+        capacity = entry != deposits.end() && entry->second.capacity ? entry->second.capacity : VeinCapacity(building);
         if (entry != deposits.end()) {
             shown = entry->second.reserve;
             Refresh(shown, rules, capacity, now);
@@ -307,17 +313,18 @@ bool BeginOreOutput(ProductionBuilding* building)
         return false;
     try {
         StateLock guard;
-        const unsigned capacity = Capacity(rules, building->_resourceMiningLevel);
         Deposits::iterator entry = deposits.find(building);
         if (entry == deposits.end())
             entry = deposits.insert(std::make_pair(building, Deposit(now))).first;
         Deposit& deposit = entry->second;
-        if (deposit.reservedCapacity)
+        if (deposit.outputPending)
             return false;
-        Refresh(deposit.reserve, rules, capacity, now);
-        if (deposit.reserve.closed || !Units(deposit.reserve, capacity))
+        if (!deposit.capacity)
+            deposit.capacity = VeinCapacity(building);
+        Refresh(deposit.reserve, rules, deposit.capacity, now);
+        if (deposit.reserve.closed || !Units(deposit.reserve, deposit.capacity))
             return false;
-        deposit.reservedCapacity = capacity;
+        deposit.outputPending = true;
         return true;
     } catch (...) {
         ReportStorageError();
@@ -332,14 +339,14 @@ void EndOreOutput(ProductionBuilding* building, bool produced)
     {
         StateLock guard;
         const Deposits::iterator entry = deposits.find(building);
-        if (entry == deposits.end() || !entry->second.reservedCapacity)
+        if (entry == deposits.end() || !entry->second.outputPending)
             return;
         Deposit& deposit = entry->second;
         if (now < deposit.reserve.updated)
             now = deposit.reserve.updated;
         if (produced)
-            changed = Spend(deposit.reserve, deposit.reservedCapacity, now);
-        deposit.reservedCapacity = 0;
+            changed = Spend(deposit.reserve, deposit.capacity, now);
+        deposit.outputPending = false;
     }
     if (changed) {
         InstanceID* const id = building->getInstanceID();
@@ -354,14 +361,10 @@ extern "C" __declspec(dllexport) void MCM_Describe(MCM_Api* api)
 {
     using namespace finite_ore;
     static const std::string ini = PluginSettings::Path();
-    api->beginMod(api, Section, "Finite Ore Veins", ini.c_str(), &LoadSettings);
+    api->beginMod(api, Section, "Finite Ore Veins (HARD)", ini.c_str(), &LoadSettings);
     api->section(api, ::Tr("Ore deposits"));
     api->toggle(api, Section, "Enabled", ::Tr("Enable plugin"),
-                ::Tr("Limits natural ore veins, including compatible modded veins."), 1, 0);
-    api->integer(api, Section, "BaseOre", ::Tr("Ore at 100% quality"),
-                 ::Tr("Base reserve in units per natural vein."), 100, 1, 10000, 0);
-    api->toggle(api, Section, "ScaleByQuality", ::Tr("Scale reserve by quality"),
-                ::Tr("A vein at 80% quality holds 80% of the base reserve."), 1, 0);
+                ::Tr("Each natural vein holds 1500-3500 units of ore per worker slot."), 1, 0);
     api->section(api, ::Tr("Recovery"));
     api->number(api, Section, "RefillDays", ::Tr("Days to refill"),
                 ::Tr("Game days to refill after the delay. 0 disables recovery."), 10, 0, 365, 1, 0);

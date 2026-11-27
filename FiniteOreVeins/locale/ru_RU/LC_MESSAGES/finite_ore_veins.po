@@ -18,20 +18,8 @@ msgstr "Рудные жилы"
 msgid "Enable plugin"
 msgstr "Включить плагин"
 
-msgid "Limits natural ore veins, including compatible modded veins."
-msgstr "Ограничивает запас природных жил, в том числе добавленных совместимыми модами."
-
-msgid "Ore at 100% quality"
-msgstr "Запас при качестве 100%"
-
-msgid "Base reserve in units per natural vein."
-msgstr "Базовый запас одной природной жилы в единицах руды."
-
-msgid "Scale reserve by quality"
-msgstr "Запас зависит от качества"
-
-msgid "A vein at 80% quality holds 80% of the base reserve."
-msgstr "Жила качества 80% содержит 80% базового запаса."
+msgid "Each natural vein holds 1500-3500 units of ore per worker slot."
+msgstr "В природной жиле от 1500 до 3500 единиц руды на каждое рабочее место."
 
 msgid "Recovery"
 msgstr "Восстановление"

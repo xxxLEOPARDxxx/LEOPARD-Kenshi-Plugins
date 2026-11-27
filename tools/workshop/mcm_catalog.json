@@ -820,7 +820,7 @@
   },
   {
     "package": "FiniteOreVeins",
-    "name": "Finite Ore Veins",
+    "name": "Finite Ore Veins (HARD)",
     "id": "FiniteOreVeins",
     "group": "optional_experimental",
     "status": "local_testing",
@@ -829,7 +829,7 @@
     "source_export": [
       {
         "path": "D:\\DEV\\Kenshi\\ours\\FiniteOreVeins\\FiniteOreVeins.cpp",
-        "line": 352,
+        "line": 360,
         "method": "direct"
       }
     ],
