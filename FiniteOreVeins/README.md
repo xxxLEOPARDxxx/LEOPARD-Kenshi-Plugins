@@ -8,7 +8,7 @@
 
 Запас хранится в записи здания внутри зоны. Восстановление вычисляется по игровому времени при работе с жилой, открытии карточки или сохранении. В обычном сейве запись загружается вместе с зоной. После импорта состояние зависит от того, сохранил ли Kenshi нативную запись жилы. Можно отключить плагин и продолжить обычную добычу.
 
-Строка остатка строится в ProductionBuilding::getGUIState. Assigned Workers наблюдает родительский ProductionBuilding::getGUIData, вызывает его штатное продолжение и добавляет своих рабочих отдельно. Обе точки подтверждены в Steam и GOG 1.0.65. Фактическая совместная проверка в игре ещё не проводилась.
+Остаток выводится рядом с содержанием руды и числом рабочих. Мод дополняет раздел ресурсов через ProductionBuilding::getGUIFertility. Assigned Workers вызывает штатный ProductionBuilding::getGUIData и добавляет своих рабочих отдельно. Всплывающая подсказка без области прокрутки пропускается.
 
 ## English
 
@@ -16,4 +16,4 @@ An offline local build for Kenshi 1.0.65, RE_Kenshi, KenshiLib and MCM. Natural 
 
 MCM controls base reserve, richness scaling, recovery delay, recovery duration, and the reopening threshold. Defaults are 100 units at 100% quality, a 12-game-hour delay, 10 game days to refill, and reopening at 25%. A refill duration of 0 makes depletion permanent. Existing mining and hauling jobs remain under Kenshi's native AI.
 
-Reserve state persists in the vein's zone record. Recovery uses elapsed game time, including time spent outside that zone. Import follows the native zone record behaviour. Assigned Workers uses the parent panel hook, while this plugin adds the reserve in the native panel state method. The two paths have been checked offline on both executable variants.
+Reserve state persists in the vein's zone record. Recovery uses elapsed game time, including time spent outside that zone. Import follows the native zone record behaviour. This plugin adds the reserve alongside the resource grade and worker count through ProductionBuilding::getGUIFertility. Assigned Workers uses the parent ProductionBuilding::getGUIData. Hover tooltips without a scroll view are skipped.

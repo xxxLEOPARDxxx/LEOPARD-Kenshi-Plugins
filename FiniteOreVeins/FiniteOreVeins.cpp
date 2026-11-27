@@ -243,7 +243,7 @@ bool NeedsSaving(const Building* building, const std::string& mod)
 }
 
 struct PanelAddress : ProductionBuilding {
-    using ProductionBuilding::_NV_getGUIState;
+    using ProductionBuilding::_NV_getGUIFertility;
 };
 
 struct InspectablePanel : DatapanelGUI {
@@ -257,10 +257,11 @@ void (*nativePanel)(ProductionBuilding*, DatapanelGUI*, int) = NULL;
 void ShowOre(ProductionBuilding* building, DatapanelGUI* panel, int category)
 {
     nativePanel(building, panel, category);
-    const int buildingStateCategory = 4;
-    // Hover tooltips also call getGUIState, but have no scroll view.
+    const int buildingResourceCategory = 6;
+    // The HUD displays this page with the resource grade and worker count.
+    // Hover tooltips can request the same data without a scroll view.
     // DataPanelLine::createMe dereferences it when creating a custom row.
-    if (!ready || category != buildingStateCategory || !panel || !InspectablePanel::CanAddRows(*panel))
+    if (!ready || category != buildingResourceCategory || !panel || !InspectablePanel::CanAddRows(*panel))
         return;
     if (!IsManagedOre(building)) {
         panel->removeLine(RowKey, category);
@@ -396,7 +397,7 @@ __declspec(dllexport) void startPlugin()
                            LoadDeposit, &nativeLoad, "vein restore"),
         StartupHooks::Hook(KenshiLib::GetRealAddress(&Building::_NV_needsSaving),
                            NeedsSaving, &nativeNeedsSaving, "vein save eligibility"),
-        StartupHooks::Hook(KenshiLib::GetRealAddress(&PanelAddress::_NV_getGUIState),
+        StartupHooks::Hook(KenshiLib::GetRealAddress(&PanelAddress::_NV_getGUIFertility),
                            ShowOre, &nativePanel, "vein information")
     };
     StartupHooks::Install(hooks, [](void* target, void* detour, void** original) {
