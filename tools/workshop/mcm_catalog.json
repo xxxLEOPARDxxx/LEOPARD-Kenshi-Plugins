@@ -822,8 +822,8 @@
     "package": "FiniteOreVeins",
     "name": "Finite Ore Veins (HARD)",
     "id": "FiniteOreVeins",
-    "group": "optional_experimental",
-    "status": "local_testing",
+    "group": "own",
+    "status": "release_authorized_by_user",
     "author": "LEOPARD",
     "source": "D:\\DEV\\Kenshi\\ours\\FiniteOreVeins",
     "source_export": [
@@ -835,6 +835,8 @@
     ],
     "dll_export_verified": true,
     "release_authorized": true,
-    "public": false
+    "public": true,
+    "published_version": "1",
+    "nexus_published_version": "1"
   }
 ]

@@ -230,7 +230,7 @@ ITEMS.append(dict(mod="Extra Durability (HARD)", title="Extra Durability (HARD)"
                   en="Weapons and armour wear out in combat. Keep your squad equipped by repairing gear with ordinary Tools."))
 
 ITEMS.append(dict(mod="FiniteOreVeins", title="Finite Ore Veins (HARD)", images="Finite Ore Veins (HARD)",
-                  version="1", tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
+                  nexus=2314, version="1", tags=["Gameplay", "RE_Kenshi"], lang=True, drop=[],
                   en="Natural ore veins run out and collapse, leaving any mined ore nearby."))
 
 SOURCE_NAMES = {"Extra Durability (HARD)": "ExtraDurability", "Character Inspector": "CharacterInspector"}

@@ -447,6 +447,19 @@
       "archive_sha256": "b90ec2f5e7c44cc4b46c132ce1219bbd91fcb8e39a64b59dcaad9a5c830db152",
       "dll_sha256": "e31bf6ec6d47414a027f57ab5a7e908ce399a76026bdb93274f554200afed708",
       "bilingual_change_note_sha256": "2f7df960d9cd0110c329bf16a8355406a11d0c9f3e08516900ec5dbf4abc2c92"
+    },
+    "FiniteOreVeins": {
+      "nexus": 2314,
+      "workshop_id": 3846572585,
+      "version": "1",
+      "steam_version": "1",
+      "nexus_version": "1",
+      "nexus_confirmed_msk": "2026-11-27T08:09:53+03:00",
+      "published_msk": "2026-11-27T08:08:42+03:00",
+      "steam_confirmed_msk": "2026-11-27T08:08:42+03:00",
+      "archive_sha256": "71915d0b97942f5a7d55fe6a9d4b6885e0a4f0c834a3aa69d703579208cb16de",
+      "dll_sha256": "f8a011441d9ed0731f4799ba045cb27d2b743201ab41c3b548388d25fa7c6844",
+      "bilingual_change_note_sha256": "91dca14302f960dcfde2f020576903542a73e720141bc753d5dd257440bbe990"
     }
   }
 }
